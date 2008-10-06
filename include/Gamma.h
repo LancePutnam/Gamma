@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#define GAMMA_VERSION 0.9
+#define GAMMA_VERSION 0.9.0
 //#define GAMMA_H_INC_ALL
 
 // Core Functions
