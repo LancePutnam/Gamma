@@ -1,0 +1,115 @@
+Composite Systems
+--------------------------------------------------------------------------------
+
+Requirements:
+- Sub-units should automatically synchronize to their parent's domain
+- Sub-units should not have samples/unit data members since it is redundant
+
+A Synced currently has the following data members/sizes:
+
+Type Name		Size (B)
+---------		--------
+T * nodeL		4
+T * nodeR		4
+Sync * mSync	4
+double mSPU		8
+double mUPS		8
+
+		Total	28 B
+
+
+We can eliminate all 28B for objects that are manually resynchronized by their
+containing class.
+
+
+A Synced can either 1) get its sample rate from a Sync pointer or 2) assume
+a fixed sample rate of 1. Synced type 1 can be automatically synchronized while
+type 2 must be manually synchronized. Type 1 requires extra memory for the
+subject pointer and local sample rate values, while type 2 has no extra memory
+overhead. This makes type 2 ideal for use in composite objects (no memory overhead),
+but requires the containing object to manually synchronize its children.
+
+In the end, we would like to define one class for objects that can either be
+a type 1 or type 2 Synced. Unfortunately, parameters of type 2 are unitless
+while those of type 1 are not.
+
+
+
+
+Sampled Generators
+--------------------------------------------------------------------------------
+
+What set of names should be adopted?
+
+Children (relative, observers):
+	Synced, Sampled, Signal, DiscreteSignal, QuantumUnit, SampleRateObserver
+	
+Parent (absolute, observees):
+	Sync, Domain, Quantum, SampleSpace, SampleRate
+
+
+To implement this, we can use the Observer design pattern. This is a description
+from Wikipedia:
+
+"Define a one-to-many dependency between objects so that when one object changes 
+state, all its dependents are notified and updated automatically. To achieve 
+this one object (subject) should know about its dependents. Subject maintains 
+list of its dependents. Each dependent who wants to get notification on subject 
+state change, should register with subject."
+
+
+Using Sync (subject) and Synced (observer) as our terminology, we define their
+classes (generically) as:
+
+class Sync{
+	void attach(Synced& s);		// add new observer to list
+	void detach(Synced& s);		// remove existing observer from list
+	void notify();				// notify observers by calling their update() method
+	
+	List<Synced *> observers;	
+};
+
+class Synced{
+	virtual void update(){}
+};
+
+
+
+
+On Mathematical Terminology
+--------------------------------------------------------------------------------
+The formal mathematical terminology for the set of numbers between -1 and 1,
+inclusive, is a closed, bounded interval.
+
+[a,b]				bounded, closed
+(a,b) or ]a,b[		bounded, closed
+[a,b) or [a,b[		bounded, half-open
+
+
+Domain		The set of possible input values to a function
+Range		The set of possible output values of a function
+
+
+
+On Name
+--------------------------------------------------------------------------------
+Nos
+Feed
+S (nice, but taken!)
+Strings
+Synz (contraction of synthesize)
+Spread
+Dialog
+Rota
+Motus (motion)
+Rotare
+P/F	(position/frequency)
+Xform
+Shift
+Slip
+Para
+MetaAtoms
+Ness-Ity-Hood
+
+
+

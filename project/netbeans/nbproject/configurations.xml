@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="39">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>../../include/Ambisonics.h</itemPath>
+      <itemPath>../../include/arr.h</itemPath>
+      <itemPath>../../include/AudioIO.h</itemPath>
+      <itemPath>../../include/Chaos.h</itemPath>
+      <itemPath>../../include/Constants.h</itemPath>
+      <itemPath>../../include/Containers.h</itemPath>
+      <itemPath>../../include/DataFile.h</itemPath>
+      <itemPath>../../include/Delay.h</itemPath>
+      <itemPath>../../include/Effects.h</itemPath>
+      <itemPath>../../include/Envelope.h</itemPath>
+      <itemPath>../../include/FFT.h</itemPath>
+      <itemPath>../../include/Filter.h</itemPath>
+      <itemPath>../../include/gen.h</itemPath>
+      <itemPath>../../include/ipl.h</itemPath>
+      <itemPath>../../include/MacroD.h</itemPath>
+      <itemPath>../../include/MacroU.h</itemPath>
+      <itemPath>../../include/mem.h</itemPath>
+      <itemPath>../../include/Node.h</itemPath>
+      <itemPath>../../include/Noise.h</itemPath>
+      <itemPath>../../include/Oscillator.h</itemPath>
+      <itemPath>../../include/Particle.h</itemPath>
+      <itemPath>../../include/pstdint.h</itemPath>
+      <itemPath>../../include/rnd.h</itemPath>
+      <itemPath>../../include/Sampler.h</itemPath>
+      <itemPath>../../include/scl.h</itemPath>
+      <itemPath>../../include/SoundFile.h</itemPath>
+      <itemPath>../../include/Sync.h</itemPath>
+      <itemPath>../../include/synz.h</itemPath>
+      <itemPath>../../include/tbl.h</itemPath>
+      <itemPath>../../include/Timer.h</itemPath>
+      <itemPath>../../include/UnitMapper.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>../../src/Ambisonics.cpp</itemPath>
+      <itemPath>../../src/arr.cpp</itemPath>
+      <itemPath>../../src/AudioIO.cpp</itemPath>
+      <itemPath>../../src/DataFile.cpp</itemPath>
+      <itemPath>../../src/Delay.cpp</itemPath>
+      <itemPath>../../src/Oscillator.cpp</itemPath>
+      <itemPath>../../src/scl.cpp</itemPath>
+      <itemPath>../../src/SoundFile.cpp</itemPath>
+      <itemPath>../../src/Sync.cpp</itemPath>
+      <itemPath>../../tests/testAudioChannels.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>GNU</compilerSet>
+        <cRequired>true</cRequired>
+        <cppRequired>true</cppRequired>
+        <fortranRequired>false</fortranRequired>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <ccCompilerTool>
+          <includeDirectories>
+            <directoryPath>../../include</directoryPath>
+          </includeDirectories>
+        </ccCompilerTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerLibStdlibItem>Dynamic Linking</linkerLibStdlibItem>
+            <linkerLibFileItem>/usr/lib/libportaudio.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libsndfile.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libjack.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libFLAC.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libogg.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libasound.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libc_nonshared.a</linkerLibFileItem>
+          </linkerLibItems>
+          <commandLine>-lrt</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="../../include/Ambisonics.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/AudioIO.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Chaos.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Constants.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Containers.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/DataFile.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Delay.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Effects.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Envelope.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/FFT.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Filter.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/MacroD.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/MacroU.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Node.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Noise.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Oscillator.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Particle.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Sampler.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/SoundFile.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Sync.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Timer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/UnitMapper.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/arr.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/gen.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/ipl.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/mem.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/pstdint.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/rnd.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/scl.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/synz.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/tbl.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../src/Ambisonics.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/AudioIO.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/DataFile.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/Delay.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/Oscillator.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/SoundFile.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/Sync.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/arr.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/scl.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../tests/testAudioChannels.cpp">
+        <itemTool>1</itemTool>
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>GNU</compilerSet>
+        <cRequired>true</cRequired>
+        <cppRequired>true</cppRequired>
+        <fortranRequired>false</fortranRequired>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <cCompilerTool>
+          <developmentMode>5</developmentMode>
+        </cCompilerTool>
+        <ccCompilerTool>
+          <developmentMode>5</developmentMode>
+          <includeDirectories>
+            <directoryPath>../../include</directoryPath>
+          </includeDirectories>
+        </ccCompilerTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerLibStdlibItem>Dynamic Linking</linkerLibStdlibItem>
+            <linkerLibFileItem>/usr/lib/libportaudio.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libsndfile.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libjack.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libFLAC.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libogg.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libasound.a</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/libc_nonshared.a</linkerLibFileItem>
+          </linkerLibItems>
+          <commandLine>-lrt</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="../../include/Ambisonics.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/AudioIO.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Chaos.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Constants.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Containers.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/DataFile.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Delay.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Effects.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Envelope.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/FFT.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Filter.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/MacroD.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/MacroU.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Node.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Noise.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Oscillator.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Particle.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Sampler.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/SoundFile.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Sync.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/Timer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/UnitMapper.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/arr.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/gen.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/ipl.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/mem.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/pstdint.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/rnd.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/scl.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/synz.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../include/tbl.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="../../src/Ambisonics.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/AudioIO.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/DataFile.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/Delay.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/Oscillator.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/SoundFile.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/Sync.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/arr.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../src/scl.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="../../tests/testAudioChannels.cpp">
+        <itemTool>1</itemTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

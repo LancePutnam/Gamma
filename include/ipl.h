@@ -1,0 +1,451 @@
+#ifndef GAMMA_IPL_H_INC
+#define GAMMA_IPL_H_INC
+
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information */
+
+#include "Containers.h"
+#include "Constants.h"
+
+#include "MacroD.h"
+
+namespace gam{
+
+///	Interpolation functions.
+
+
+/// The naming convention for values is that their alphabetical order is
+/// equivalent to their sequence order (oldest to newest).
+/// The interpolated value lies 'frac' distance between 'x' and 'y'
+///	where 'frac' lies in [0, 1).
+namespace ipl{
+
+/// First order allpass interpolation.
+
+/// Best for delay lines, not good for random access.
+///
+template <class Tf, class Tv>
+Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
+
+/// First order allpass interpolation with warped fraction.
+template <class Tf, class Tv>
+Tv allpassFixed(Tf frac, const Tv& x, const Tv& y, Tv& o1);
+
+/// Bezier curve, 3-point quadratic.
+
+/// 'frac' [0, 1) is the value on the curve btw x2 and x0
+///
+TEM T bezier(T frac, T x2, T x1, T x0);
+
+/// Bezier curve, 4-point cubic.
+
+/// 'frac' [0, 1) is the value on the curve btw x3 and x0
+///
+TEM T bezier(T frac, T x3, T x2, T x1, T x0);
+
+template <class Tp, class Tv>
+Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
+
+
+/// Computes FIR coefficients for Waring-Lagrange interpolation.
+
+///		'h' are the FIR coefficients and should be of size ('order' + 1). \n
+///		'delay' is a fractional delay in samples. \n
+///		As order increases, this converges to sinc interpolation.
+TEM void lagrange(T * h, T delay, ULONG order);
+
+/// Optimized lagrange() for first order.
+TEM void lagrange1(T * h, T delay);
+
+/// Optimized lagrange() for second order.
+TEM void lagrange2(T * h, T delay);
+
+/// Optimized lagrange() for third order.
+TEM void lagrange3(T * h, T delay);
+
+/// Simplified parabolic interpolation of 3 points.
+
+/// This assumes the points are spaced evenly on the x axis from [-1, 1].
+/// The output is an offset from 0.
+TEM T parabolic(T xm1, T x, T xp1);
+
+// Various functions to perform Waring-Lagrange interpolation.
+//		These are much faster than using a general purpose FIR filter since
+//		the coefs are computed directly and nested multiplication is used
+//		rather than directly evaluating the polynomial (FIR).
+
+/// Cubic interpolation
+
+///	This is also known as a Catmull-Rom spline or Cardinal spline with a=-0.5.
+///
+template <class Tf, class Tv>
+Tv cubic(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
+
+template <class Tf, class Tv>
+Tv cubic2(Tf d, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
+
+/// Linear interpolation.  Identical to first order Lagrange.
+template <class Tf, class Tv>
+Tv linear(Tf frac, const Tv& x, const Tv& y);
+
+TEM void linear(T * dst, const T * xs, const T * xp1s, ULONG len, T frac);
+
+/// Nearest neighbor interpolation.
+template <class Tf, class Tv>
+Tv nearest(Tf frac, const Tv& x, const Tv& y);
+
+/// Quadratic interpolation
+template <class Tf, class Tv>
+Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z); 
+
+
+
+
+/// Truncating interpolation strategy
+//struct Trunc{
+//
+//	/// Return element from power-of-2 array
+//	template <class T>
+//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+//		return a.atPhase(phase);
+//	}
+//	
+//	template <class T>
+//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+//		return a[iInt];
+//	}
+//};
+//
+//
+/// Nearest neighbor interpolation strategy
+//struct Round{
+//
+//	/// Return element from power-of-2 array
+//	template <class T>
+//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+//
+//		// accessing normally truncates, so add half fraction to round
+//		return a.atPhase(phase + (a.oneIndex()>>1));
+//	}
+//	
+//	template <class T>
+//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+//		return ipl::nearest(
+//			iFrac,
+//			a[iInt],
+//			a[scl::wrapOnce(iInt + 1, max, min)]
+//		);
+//	}
+//};
+//
+//
+/// Linear interpolation strategy
+//struct Linear{
+//
+//	/// Return element from power-of-2 array
+//	template <class T>
+//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+//		return ipl::linear(
+//			a.fraction(phase),
+//			a.atPhase(phase),
+//			a.atPhase(phase + a.oneIndex())
+//		);
+//	}
+//	
+//	template <class T>
+//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+//		return ipl::linear(
+//			iFrac,
+//			a[iInt],
+//			a[scl::wrapOnce(iInt + 1, max, min)]
+//		);
+//	}
+//};
+//
+//
+/// Cubic interpolation strategy
+//struct Cubic{
+//
+//	/// Return element from power-of-2 array
+//	template <class T>
+//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+//		uint32_t one = a.oneIndex();
+//		return ipl::cubic(
+//			a.fraction(phase),
+//			a.atPhase(phase - one),
+//			a.atPhase(phase),
+//			a.atPhase(phase + one),
+//			a.atPhase(phase + (one<<1))
+//		);
+//	}
+//	
+//	template <class T>
+//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+//		return ipl::cubic(
+//			iFrac,
+//			a[scl::wrapOnce(iInt - 1, max, min)],
+//			a[iInt],
+//			a[scl::wrapOnce(iInt + 1, max, min)],
+//			a[scl::wrapOnce(iInt + 2, max, min)]
+//		);
+//	}
+//};
+//
+//
+/// Allpass interpolation strategy
+//template <class T>
+//struct AllPass{
+//
+//	AllPass(T prev=0): prev(prev){}
+//
+//	/// Return element from power-of-2 array
+//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+//		return ipl::allpass(					// Standard fraction
+//		//return Ipol::allpassFixed(				// Fixed fractional delay
+//			a.fraction(phase), 
+//			a.atPhase(phase), 
+//			a.atPhase(phase + a.oneIndex()),
+//			prev
+//		);
+//	}
+//
+//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+//		return ipl::allpass(
+//			iFrac,
+//			a[iInt],
+//			a[scl::wrapOnce(iInt + 1, max, min)],
+//			prev
+//		);
+//	}
+//	
+//	mutable T prev;
+//};
+
+
+
+
+// Implementation_______________________________________________________________
+
+template <class Tf, class Tv>
+inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
+	//f = f * 0.87 - 0.05;	// avoid pole near z = -1
+	return o1 = (y - o1) * f + x;
+}
+
+
+template <class Tf, class Tv>
+inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
+//	f = 1.f-f;
+//	f = allpassCoef(f);						// compute allpass coefficient
+//	return allpass(f, x, xp1, ym1);	// apply filter
+	
+	//f = f / (2.f - f);	// warp down
+	f = ((Tf)2 * f) / ((Tf)1 + f);	// warp up
+	//f = (1.5f * f) / (0.5f + f);
+	f -= (Tf)0.1;				// avoid pole near z = -1
+	return allpass(f, x, y, o1);	// apply filter
+}
+//
+//inline float Ipol::allpassCoef(float f, float offset){
+//	return (1.f - f) / (1.f + f) + offset;
+//}
+
+TEM inline T bezier(T d, T x2, T x1, T x0){
+	T d2 = d * d;
+	T dm1 = (T)1 - d;
+	T dm12 = dm1 * dm1;
+	return x2 * dm12 + (T)2 * x1 * dm1 * d + x0 * d2;
+
+//	x2 (1-d)(1-d) + 2 x1 (1-d) d + x0 d d
+//	x2 - d 2 x2 + d d x2 + d 2 x1 - d d 2 x1 + d d x0
+//	x2 - d (2 x2 + d x2 + 2 x1 - d 2 x1 + d x0)
+//	x2 - d (2 (x2 + x1) + d (x2 - 2 x1 + x0))
+
+//	float c2 = x2 - 2.f * x1 + x0;
+//	float c1 = 2.f * (x2 + x1);
+//	return x2 - (d * c2 + c1) * d;
+}
+
+
+TEM inline T bezier(T d, T x3, T x2, T x1, T x0){
+	T c1 = (T)3 * (x2 - x3);
+	T c2 = (T)3 * (x1 - x2) - c1;
+	T c3 = x0 - x3 - c1 - c2;
+	return ((c3 * d + c2) * d + c1) * d + x3;
+}
+
+
+template <class Tf, class Tv>
+inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){	
+//	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
+//	Tv c2 = w - x*(Tf)2.5 + y*(Tf)2. - z*(Tf)0.5;
+//	Tv c1 = (y - w)*(Tf)0.5;
+//	return ((c3 * f + c2) * f + c1) * f + x;
+
+	// -w + 3x - 3y + z	
+	// 2w - 5x + 4y - z
+	// c2 = w - 2x + y - c3
+
+//	Tv c3 = (x - y)*(Tf)3 + z - w;
+//	Tv c2 = w - x*(Tf)2 + y - c3;
+//	Tv c1 = y - w;
+//	return (((c3 * f + c2) * f + c1)) * f * (Tf)0.5 + x;
+	
+//	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
+//	Tv c2 = (y + w)*(Tf)0.5 - x - c3;
+//	Tv c1 = (y - w)*(Tf)0.5;	
+//	return ((c3 * f + c2) * f + c1) * f + x;
+
+	Tv c1 = (y - w)*(Tf)0.5;
+	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
+	Tv c2 = c1 + w - x - c3;
+	return ((c3 * f + c2) * f + c1) * f + x;
+}
+
+TEM void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, ULONG len, T f){
+	LOOP(len, dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]); )
+}
+
+
+// From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
+template <class Tf, class Tv>
+inline Tv cubic2(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
+	Tv c3 = z - y - w + x;
+	Tv c2 = w - x - c3;
+	Tv c1 = y - w;
+	return ((c3 * f + c2) * f + c1) * f + x;
+}
+
+
+// From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
+/*
+   Tension: 1 is high, 0 normal, -1 is low
+   Bias: 0 is even,
+         positive is towards first segment,
+         negative towards the other
+*/
+template <class Tp, class Tv>
+inline Tv hermite(Tp f,
+	const Tv& w, const Tv& x, const Tv& y, const Tv& z,
+	Tp tension, Tp bias)
+{
+	tension = ((Tp)1 - tension)*(Tp)0.5;
+
+	// compute endpoint tangents
+	//Tv m0 = ((x-w)*(1+bias) + (y-x)*(1-bias))*tension;
+	//Tv m1 = ((y-x)*(1+bias) + (z-y)*(1-bias))*tension;
+	Tv m0 = ((x*2 - w - y)*bias + y - w)*tension;
+	Tv m1 = ((y*2 - x - z)*bias + z - x)*tension;
+	
+//	x - w + x b - w b + y - x - y b + x b
+//	-w + 2x b - w b + y - y b
+//	b(2x - w - y) + y - w			
+//	
+//	y - x + y b - x b + z - y - z b + y b
+//	-x + 2y b - x b + z - z b
+//	b(2y - x - z) + z - x
+
+	Tp f2 = f  * f;
+	Tp f3 = f2 * f;
+
+	// compute hermite basis functions
+	Tp a3 = -2*f3 + 3*f2;
+	Tp a0 = 1 - a3;
+	Tp a2 = f3 - f2;
+	Tp a1 = f3 - 2*f2 + f;
+
+	return x*a0 + m0*a1 + m1*a2 + y*a3;
+}
+
+
+TEM void lagrange(T * a, T delay, ULONG order){
+	for(ULONG i=0; i<=order; i++){
+		T coef = (T)1;
+		T i_f = (T)i; 
+		for(ULONG j=0; j<=order; j++){
+			if(j != i){
+				T j_f = (T)j;
+				coef *= (delay - j_f) / (i_f - j_f);
+			}
+		}
+		*a++ = coef;
+	}
+}
+
+
+TEM inline void lagrange1(T * h, T d){
+	h[0] = (T)1 - d;
+	h[1] = d;
+}
+
+
+TEM inline void lagrange2(T * h, T d){
+	h[0] =      (d - (T)1) * (d - (T)2) * (T)0.5;
+	h[1] = -d              * (d - (T)2)         ;
+	h[2] =  d * (d - (T)1)              * (T)0.5;
+}
+
+
+TEM inline void lagrange3(T * h, T d){
+	T d1 = d - (T)1;
+	T d2 = d - (T)2;
+	T d3 = d - (T)3;
+	h[0] =     -d1 * d2 * d3 * (T)0.16666666667;
+	h[1] =  d      * d2 * d3 * (T)0.5;
+	h[2] = -d * d1      * d3 * (T)0.5;
+	h[3] =  d * d1 * d2      * (T)0.16666666667;
+}
+
+/*
+x1 (1 - d) + x0 d
+x1 - x1 d + x0 d
+x1 + (x0 - x1) d
+
+x2 (d - 1) (d - 2) /2 - x1 d (d - 2) + x0 d (d - 1) /2
+d d /2 x2 - d 3/2 x2 + x2 - d d x1 + d 2 x1 + d d /2 x0 - d /2 x0
+d d /2 x2 - d d x1 + d d /2 x0 - d 3/2 x2 + d 2 x1 - d /2 x0 + x2
+d (d (/2 x2 - x1 + /2 x0) - 3/2 x2 + 2 x1 - /2 x0) + x2
+*/
+
+template <class Tf, class Tv>
+inline Tv linear(Tf f, const Tv& x, const Tv& y){
+	return (y - x) * f + x;
+}
+
+
+TEM void linear(T * dst, const T * xs, const T * xp1s, ULONG len, T f){
+	LOOP(len, dst[i] = linear(f, xs[i], xp1s[i]); )
+}
+
+
+template <class Tf, class Tv>
+inline Tv nearest(Tf f, const Tv& x, const Tv& y){
+	return (f < (Tf)0.5) ? x : y;
+}
+
+
+TEM inline T parabolic(T xm1, T x, T xp1){
+	T numer = xm1 - xp1;
+	T denom = x - xp1 + x - xm1;
+	return (T)-0.5 * numer / denom;
+}
+
+
+template <class Tf, class Tv>
+inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
+	Tv c2 = (x + z)*(Tf)0.5 - y;
+	//Tv c1 = x*(Tf)-1.5 + y*(Tf)2 - z*(Tf)0.5;
+	Tv c1 = -x + y - c2;
+	return (c2 * f + c1) * f + x;
+}
+
+
+
+} // ipl::
+
+} // gam::
+
+#include "MacroU.h"
+
+#endif
+

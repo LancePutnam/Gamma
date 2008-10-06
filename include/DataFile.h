@@ -1,0 +1,120 @@
+#ifndef DATAFILE_H_INC
+#define DATAFILE_H_INC
+
+#include <stdio.h>
+
+#define TEM template<class T>
+#define ULONG unsigned long
+#define UI4 unsigned long
+#define UI8 unsigned long long
+
+/// Generic cross-endian file format for numerical data.
+
+/// The file format is a mix between binary and human-readable text.  Numbers are
+/// written in ascii in hexidecimal form to avoid messy endian issues.  At the
+/// time, only 4- and 8-byte data elements are supported.
+///
+/// Example:
+///		struct Point3D{ float x, y, z; }
+///
+///		Point3D p3d;
+///		DataFile file("positions.dat");
+///		file.openWrite();
+///		file.write4(&p3d, 3);
+///		file.write4(p3d.x); file.write4(p3d.y); file.write4(p3d.z);
+///		file.close();
+class DataFile{
+public:
+	DataFile(const char * path);
+	virtual ~DataFile();
+	
+	void close();		///< Close file
+	bool openWrite();	///< Open file for writing
+	bool openRead();	///< Open file for reading
+	
+
+	void read4(void * element);								///< Read 4-byte element from file
+	void read8(void * element);								///< Read 8-byte element from file
+	template<ULONG N> void read(void * element);			///< Read N-byte element from file
+	void read4(void * dst, ULONG len);						///< Read 'len' 4-byte elements from file
+	void read8(void * dst, ULONG len);						///< Read 'len' 8-byte elements from file
+	template<ULONG N> void read(void * dst, ULONG len);		///< Read 'len' N-byte elements from file
+
+	void write4(const void * element);						///< Write 4-byte element to file
+	void write8(const void * element);						///< Write 8-byte element to file
+	template<ULONG N> void write(const void * element);		///< Write N-byte element to file
+	void write4(const void * src, ULONG len);				///< Write 'len' 4-byte elements to file
+	void write8(const void * src, ULONG len);				///< Write 'len' 8-byte elements to file
+	template<ULONG N> void write(const void * src, ULONG len); ///< Write 'len' N-byte elements to file
+
+	const char * path() const { return mPath; }
+	void path(const char * p){ mPath=p; }
+
+	//TEM void read(T * dst, ULONG len);
+	//TEM void write(const T * src, ULONG len);
+
+private:
+	const char * mPath;
+	FILE * fp;
+	
+	TEM const char * typeString();
+	TEM const char * formatString();
+};
+
+
+//TEM void DataFile::write(const T * src, ULONG len){
+//	fprintf(fp, formatString<double>(), (UI8)len);
+//	fwrite(typeString<T>(), 3, 1, fp);
+//	fwrite("\r\n", 2, 1, fp);
+//	write8(src, len);	
+//	fwrite("\r\n", 2, 1, fp);
+//}
+//
+//
+
+#define DEFINE_SPECIAL(numBytes)\
+	template<> \
+	inline void DataFile::read<numBytes>(void * element){\
+		read##numBytes(element);\
+	}\
+	template<> \
+	inline void DataFile::read<numBytes>(void * dst, ULONG len){\
+		read##numBytes(dst, len);\
+	}\
+	template<>\
+	inline void DataFile::write<numBytes>(const void * element){\
+		write##numBytes(element);\
+	}\
+	template<>\
+	inline void DataFile::write<numBytes>(const void * src, ULONG len){\
+		write##numBytes(src, len);\
+	}
+
+	DEFINE_SPECIAL(4)
+	DEFINE_SPECIAL(8)
+	
+#undef DEFINE_SPECIAL
+
+#define DEFINE_SPECIAL(type, strType, strFormat) \
+	template<> \
+	inline const char * DataFile::typeString<type>(){\
+		return strType;\
+	}\
+	template<> \
+	inline const char * DataFile::formatString<type>(){\
+		return strFormat;\
+	}
+
+	DEFINE_SPECIAL(float,  "f04", "%08x "   )
+	DEFINE_SPECIAL(double, "f08", "%016llx ")
+	//DEFINE_SPECIAL(unsigned long, u04)
+	//DEFINE_SPECIAL(long, s04)
+#undef DEFINE_SPECIAL
+
+#undef ULONG
+#undef UI4
+#undef UI8
+#undef TEM
+
+#endif
+
