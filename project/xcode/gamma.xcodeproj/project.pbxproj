@@ -283,7 +283,7 @@
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../include/Types.h; sourceTree = SOURCE_ROOT; };
 		165065BF0B8F707700A34EA0 /* testMemory.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testMemory.cpp; path = ../../tests/testMemory.cpp; sourceTree = SOURCE_ROOT; };
 		1656F5B209EEF313006E3FD7 /* testParticle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testParticle.cpp; path = ../../tests/testParticle.cpp; sourceTree = "<group>"; };
-		1656F5BF09EEF31E006E3FD7 /* testParticle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testParticle; sourceTree = BUILT_PRODUCTS_DIR; };
+		1656F5BF09EEF31E006E3FD7 /* testNoise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNoise; sourceTree = BUILT_PRODUCTS_DIR; };
 		1656F5D809EEF3D7006E3FD7 /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Particle.h; path = ../../include/Particle.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		1683FC410E283786001FAF43 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = design.txt; path = ../../doc/design.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
@@ -308,7 +308,7 @@
 		16CE92EC0AAFB97900CEC0CF /* testContainers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testContainers.cpp; path = ../../tests/testContainers.cpp; sourceTree = SOURCE_ROOT; };
 		16CEF9120BBCDA0A0049666F /* Gamma.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Gamma.h; path = ../../include/Gamma.h; sourceTree = SOURCE_ROOT; };
 		16CF8D5A0BD9921200A80471 /* Effects.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Effects.h; path = ../../include/Effects.h; sourceTree = SOURCE_ROOT; };
-		16CF96C50B8037EC00598208 /* testAudioBiquad */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAudioBiquad; sourceTree = BUILT_PRODUCTS_DIR; };
+		16CF96C50B8037EC00598208 /* testConversion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testConversion; sourceTree = BUILT_PRODUCTS_DIR; };
 		16CF96D60B8038B700598208 /* testAudioBiquad.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioBiquad.cpp; path = ../../tests/testAudioBiquad.cpp; sourceTree = SOURCE_ROOT; };
 		16D15CA209F0219B001AE497 /* DFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFT.h; path = ../../include/DFT.h; sourceTree = SOURCE_ROOT; };
 		16D15CA309F0219B001AE497 /* DFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DFT.cpp; path = ../../src/DFT.cpp; sourceTree = SOURCE_ROOT; };
@@ -318,7 +318,7 @@
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		16D28AA70D39674A0058930E /* vecLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = vecLib.framework; path = /System/Library/Frameworks/vecLib.framework; sourceTree = "<absolute>"; };
-		16D2C47A0B5768D300BFA547 /* testAudioCombs */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAudioCombs; sourceTree = BUILT_PRODUCTS_DIR; };
+		16D2C47A0B5768D300BFA547 /* testConversion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testConversion; sourceTree = BUILT_PRODUCTS_DIR; };
 		16D2C47C0B57695900BFA547 /* testAudioCombs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioCombs.cpp; path = ../../tests/testAudioCombs.cpp; sourceTree = SOURCE_ROOT; };
 		16D2EC810E91D07A00845626 /* fftpack.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fftpack.cpp; path = ../../src/fftpack.cpp; sourceTree = SOURCE_ROOT; };
 		16D3E2E20BC058E700734CB1 /* testAudioLFO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioLFO.cpp; path = ../../tests/testAudioLFO.cpp; sourceTree = SOURCE_ROOT; };
@@ -366,7 +366,7 @@
 		16F5F6720CAD91C7003DD8DD /* testTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTimer.cpp; path = ../../tests/testTimer.cpp; sourceTree = SOURCE_ROOT; };
 		16F74C970A4E114600A34E6F /* testAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAnalysis.cpp; path = ../../tests/testAnalysis.cpp; sourceTree = SOURCE_ROOT; };
 		16F76AD60D11E01C001C3DCA /* testTable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTable; sourceTree = BUILT_PRODUCTS_DIR; };
-		16F76AFE0D11E23D001C3DCA /* testAnalysis */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAnalysis; sourceTree = BUILT_PRODUCTS_DIR; };
+		16F76AFE0D11E23D001C3DCA /* testAnalysis */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = testAnalysis; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76B140D11E34A001C3DCA /* testChaos */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testChaos; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76C740D12058C001C3DCA /* testEnvelope */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testEnvelope; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F7D07C0B5414A1008A2E29 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../include/Node.h; sourceTree = SOURCE_ROOT; };
@@ -820,11 +820,11 @@
 		7EB463FF0825DD10002E1A73 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1656F5BF09EEF31E006E3FD7 /* testParticle */,
+				1656F5BF09EEF31E006E3FD7 /* testNoise */,
 				169D40DD0A8168DA00605E51 /* testAudioIO */,
-				16D2C47A0B5768D300BFA547 /* testAudioCombs */,
+				16D2C47A0B5768D300BFA547 /* testConversion */,
 				169C118D0B65CC24000D2A44 /* testNoise */,
-				16CF96C50B8037EC00598208 /* testAudioBiquad */,
+				16CF96C50B8037EC00598208 /* testConversion */,
 				1699F3590B9D1BE500ECB243 /* testNode */,
 				C0F9EF680BB059670069B343 /* libgamma.dylib */,
 				168AAC9D0CD0025D00F36E4B /* libsynz.a */,
@@ -1881,7 +1881,7 @@
 			name = testParticle;
 			productInstallPath = /usr/local/bin;
 			productName = test;
-			productReference = 1656F5BF09EEF31E006E3FD7 /* testParticle */;
+			productReference = 1656F5BF09EEF31E006E3FD7 /* testNoise */;
 		};
 		1699F34A0B9D1BE500ECB243 /* testNode */ = {
 			isa = PBXToolTarget;
@@ -1945,7 +1945,7 @@
 			name = testAudioBiquad;
 			productInstallPath = /usr/local/bin;
 			productName = testConversion;
-			productReference = 16CF96C50B8037EC00598208 /* testAudioBiquad */;
+			productReference = 16CF96C50B8037EC00598208 /* testConversion */;
 		};
 		16D2C46A0B5768D300BFA547 /* testAudioCombs */ = {
 			isa = PBXToolTarget;
@@ -1961,7 +1961,7 @@
 			name = testAudioCombs;
 			productInstallPath = /usr/local/bin;
 			productName = testConversion;
-			productReference = 16D2C47A0B5768D300BFA547 /* testAudioCombs */;
+			productReference = 16D2C47A0B5768D300BFA547 /* testConversion */;
 		};
 /* End PBXToolTarget section */
 

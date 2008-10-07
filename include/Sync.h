@@ -58,6 +58,7 @@ public:
 	
 	///	Any instance state that depends on the sampling length should be updated here.
 	///
+	/// TODO: Maybe this should be pure virtual?
 	virtual void onResync(double ratioSPU){}
 
 	void scaleSPU(double v);	///< Scales samples/unit by factor.
