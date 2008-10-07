@@ -159,10 +159,10 @@ int main(int argc, char* argv[]){
 	//float tx[2], ty[2];
 	//scl::cross(tx, ty);
 	
-	for(int i=0; i<32; ++i){
-		float p = (i/32.)*2-1;
-		printf("% 6.4f: % 6.4f (% 6.4f)\n", p, sinFast(p*M_PI), sin(p*M_PI));
-	}
+//	for(int i=0; i<32; ++i){
+//		float p = (i/32.)*2-1;
+//		printf("% 6.4f: % 6.4f (% 6.4f)\n", p, sinFast(p*M_PI), sin(p*M_PI));
+//	}
 	
 }
 
