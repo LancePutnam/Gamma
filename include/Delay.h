@@ -520,7 +520,7 @@ public:
 
 protected:
 	#define USE(var) using super::var;
-	typedef Filter2<Tv,Tp> super;
+	typedef Filter2<Tv,Tp,Ts> super;
 	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(co0) USE(cd1) USE(cd2) USE(mRad)
 	#undef USE
 
