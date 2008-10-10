@@ -240,13 +240,13 @@ TEM void transpose2(T * arr, ULONG len);
 
 /// Sets elements' bytes to zero.
 TEM inline void zero(T * arr, uint len){ memset(arr, 0, len * sizeof(T)); }
-TEM inline void zero(T * arr, unsigned int len){ zero(arr, (uint)len); }
-
-template <class To0> void zero(To0& o0){ zero(&o0[0], (uint)o0.size()); }
-
-/// o0[i] = 0
-template <class To0, class Tind>
-void zero(To0& o0, const Tind& ind){ LOOP_IND(o0[i] = 0;) }
+//TEM inline void zero(T * arr, unsigned int len){ zero(arr, (uint)len); }
+//
+//template <class To0> void zero(To0& o0){ zero(&o0[0], (uint)o0.size()); }
+//
+///// o0[i] = 0
+//template <class To0, class Tind>
+//void zero(To0& o0, const Tind& ind){ LOOP_IND(o0[i] = 0;) }
 
 /// Get value from a power-of-two array.
 
