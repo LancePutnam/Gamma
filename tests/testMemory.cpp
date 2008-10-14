@@ -176,7 +176,7 @@ int main(int argc, char* argv[]){
 	
 	printf("\nStretch (out-place):\n");
 	arr::lineSlope1(tempE, lenE);
-	mem::zero(arrE, Loop(lenE));
+	mem::zero(arrE, lenE);
 	mem::stretch(arrE, tempE, lenE/2, 2);
 	PRINT_EVEN ASSERT_GUARDS
 
@@ -193,17 +193,17 @@ int main(int argc, char* argv[]){
 
 	printf("\nZero:\n");
 	SET_M1
-	mem::zero(arrE, Loop(lenE));
+	mem::zero(arrE, lenE);
 	PRINT_EVEN ASSERT_GUARDS
 
 	printf("\nZero (stride=2, offset=0):\n");
 	SET_M1
-	mem::zero(arrE, Loop(lenE,2));
+	mem::set(arrE, val(0), Loop(lenE,2));
 	PRINT_EVEN ASSERT_GUARDS
 
 	printf("\nZero (stride=2, offset=1):\n");
 	SET_M1
-	mem::zero(arrE, Loop(lenE,2,1));
+	mem::set(arrE, val(0), Loop(lenE,2,1));
 	PRINT_EVEN ASSERT_GUARDS
 
 

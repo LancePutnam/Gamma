@@ -10,7 +10,7 @@ LIBS = -L${PREFIX}/lib -L/usr/lib
 
 # Linux/BSD
 CFLAGS = -g -I. -I./include/ -I${PREFIX}/include -I/usr/include
-LDFLAGS = ${LIBS} -lsndfile -lportaudio -lfftwf -lm
+LDFLAGS = ${LIBS} -lsndfile -lportaudio -lm
 
 AR = ar cr
 CC = g++

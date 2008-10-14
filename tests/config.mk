@@ -12,10 +12,10 @@ LIBS = -L${PREFIX}/lib -L/usr/lib
 CFLAGS = -g -I. -I../include/ -I${PREFIX}/include -I/usr/include
 
 # Linux/BSD
-#LDFLAGS = ${LIBS} ../libsynz.a -lportaudio -lsndfile -lfftw3f
+#LDFLAGS = ${LIBS} ../libgamma.a -lportaudio -lsndfile
 
 # Mac OS
-LDFLAGS = ${LIBS} ../libsynz.a -lportaudio -lsndfile -lfftw3f -framework AudioUnit -framework AudioToolbox -framework CoreAudio -framework Carbon
+LDFLAGS = ${LIBS} ../libgamma.a -lportaudio -lsndfile -framework AudioUnit -framework AudioToolbox -framework CoreAudio -framework Carbon
 
 AR = ar cr
 CC = g++

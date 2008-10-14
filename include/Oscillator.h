@@ -461,8 +461,9 @@ protected:
 
 /// Linear function oscillator (non band-limited).
 
-/// This object generates various waveform types by modifying
-/// the output of a single upward ramping accumulator.
+/// This object generates various waveform types by modifying the output of a 
+/// single upward ramping accumulator. Generating methods with a 'U' suffix
+/// generate positive unipolar waveforms; all others are bipolar.
 template <class Ts=Synced>
 class LFO : public Accum<Ts>{
 public:
@@ -1051,6 +1052,7 @@ TEMS inline float LFO<Ts>::line2(){
 
 	// Starts at -1 (better for creating attack/decay like envelopes)
 	uint32_t m = scl::clip<uint32_t>(modi, 0xffefffff, 512); // avoid div by zero
+	//uint32_t m = scl::clip<uint32_t>(modi, 0xFFFFFC00, 1024); // avoid div by zero
 	float r1 = rampDown(phaseI() - m);
 	float r2 = rampDown(phaseI());
 	float p  = rampUpU(m);

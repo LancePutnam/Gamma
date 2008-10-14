@@ -20,18 +20,19 @@ OBJ = ${SRC:.cpp=.o}
 	@echo CC $<
 	@${CC} -c ${CFLAGS} -o $*.o $<
 
-libsynz.a: ${OBJ}
+libgamma.a: ${OBJ}
 	@echo AR $@
 	@${AR} $@ ${OBJ}
 	@${RANLIB} $@
 
 .PHONY: tests
 
-tests: libsynz.a
+tests: libgamma.a
 	@cd tests && make all
 
 clean:
-	@rm -f ${SRCDIR}/*.o *.a
+#	@rm -f ${SRCDIR}/*.o *.a
+	@rm -f ${SRCDIR}/*.o
 	@cd tests && make clean
 
-all: libsynz.a tests
+all: libgamma.a tests
