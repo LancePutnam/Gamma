@@ -863,7 +863,7 @@ TM1 inline uint32_t Delay<TM2>::delayFToI(float v){
 
 TM1 inline void Delay<TM2>::incPhase(){ mPhase += mPhaseInc; }
 
-TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", size());
+TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this->size());
 	mPhaseInc = this->oneIndex();
 	onResync(1);
 }

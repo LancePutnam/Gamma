@@ -144,7 +144,7 @@ struct Chorus{
 	
 	/// Filter sample (mono-mono)
 	float operator()(float in){
-		m(); return (comb1(in) + comb2(in)) * 0.5f;	
+		m(); return (comb1(in) + comb2(in)) * 0.5f;
 	}
 	
 	/// Filter sample (mono-stereo)
@@ -156,7 +156,7 @@ struct Chorus{
 	void operator()(float i1, float i2, float& o1, float& o2){
 		m(); o1=comb1(i1); o2=comb2(i2);		
 	}
-	
+
 	Comb<> comb1, comb2;	///< Comb filters
 	Quadra<double> mod;	///< Modulator
 	float delay;		///< Delay interval

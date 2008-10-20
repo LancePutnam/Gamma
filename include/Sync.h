@@ -57,7 +57,6 @@ public:
 	/// Called by my Sync reference after it changes its value.
 	
 	///	Any instance state that depends on the sampling length should be updated here.
-	///
 	/// TODO: Maybe this should be pure virtual?
 	virtual void onResync(double ratioSPU){}
 

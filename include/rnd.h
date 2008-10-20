@@ -277,7 +277,6 @@ TEM inline float add2I_float(T & rng){
 }
 #undef R
 
-#define AS_FLOAT(object) (*(float *)(&object))
 TEM inline float uni_float(T& rng){
 	return scl::uintToNormal<float>(rng());
 }
@@ -288,9 +287,8 @@ TEM inline float uniS_float(T& rng){
 
 TEM inline float binS_float(T & rng){
 	ULONG r = rng() & 0x80000000 | 0x3f800000;
-	return AS_FLOAT(r);
+	return scl::punUF32(r);
 }
-#undef AS_FLOAT
 
 TEM inline T & cond(T & v, const T & va, const T & vb, float pab, float pba){
 	     if(v == va) v = pick(vb, va, pba);

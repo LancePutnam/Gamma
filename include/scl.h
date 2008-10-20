@@ -458,7 +458,8 @@ ULONG floatToUInt(float value);
 long floatToInt(float value);
 
 /// Compute 2-D array indices from 1-D array index
-inline void index1to2(uint32_t index1, uint32_t sizeX, uint32_t& x, uint32_t& y){
+template <class T>
+inline void index1to2(T index1, T sizeX, T& x, T& y){
 	y = index1 / sizeX; x = index1 % sizeX;
 }
 
@@ -466,7 +467,8 @@ inline void index1to2(uint32_t index1, uint32_t sizeX, uint32_t& x, uint32_t& y)
 
 /// The x indices move fastest followed by y, then z.
 ///
-inline uint32_t index3to1(uint32_t x, uint32_t y, uint32_t z, uint32_t sizeX, uint32_t sizeY){
+template <class T>
+inline T index3to1(T x, T y, T z, T sizeX, T sizeY){
 	return x + sizeX * (y + sizeY * z);
 }
 
@@ -487,6 +489,18 @@ ULONG normalToUInt(float normal);
 ULONG normalToUInt2(float normal);
 
 TEM void polarToRect(T mag, T phs, T& real, T& imag);
+
+/// Type-pun 32-bit unsigned int to 32-bit float
+
+/// This function uses a union to avoid problems with direct pointer casting
+/// when fstrict-aliasing is on.
+inline float punUF32(uint32_t v){ union{float f; uint32_t i;} u; u.i=v; return u.f; }
+
+/// Type-pun 32-bit float to 32-bit unsigned int
+
+/// This function uses a union to avoid problems with direct pointer casting
+/// when fstrict-aliasing is on.
+inline uint32_t punFU32(float v){ union{float f; uint32_t i;} u; u.f=v; return u.i; }
 
 /// Convert rectangular coordinates to polar.
 TEM void rectToPolar(T& r, T& i);
@@ -598,8 +612,6 @@ namespace{
 		233, 239, 241, 251								  // 5
 	};
 	
-	TEM const T roundMagic();
-	
 	TEM T taylorFactor3(T vv, T c1, T c2, T c3);
 	TEM T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
 	TEM T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
@@ -614,20 +626,15 @@ inline bool isLittleEndian(){ return endian == 0; }
 
 // Implementation_______________________________________________________________
 
-// Type-punning macros
-// Using unions is safer than pointer casting when fstrict-aliasing is on
-#define PUN_I2F(vi, u) union{ float f; ULONG i; } u; u.i=vi;
-#define PUN_F2I(vf, u) union{ float f; ULONG i; } u; u.f=vf;
-
 
 namespace{
-	template<> inline const float  roundMagic<float >(){ return 12582912.f; }			// 2^23 * 1.5
-	template<> inline const double roundMagic<double>(){ return 6755399441055744.; }	// 2^52 * 1.5
-
+	const double roundMagic = 6755399441055744.; // 2^52 * 1.5
 }
 
 	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
 	template<> inline const double roundEps<double>(){ return 0.499999985; }
+
+
 
 
 #define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
@@ -702,7 +709,7 @@ void cross(const T1& a, const T2& b, T3& r){
 
 TEM inline T dot2(T x1, T x2, T y1, T y2){ return x1 * y1 + x2 * y2; }
 
-TEM inline T equals(T v1, T v2, T bw){ return equals(v1, v2, bw, scl::pow2<T>); }
+TEM inline T equals(T v1, T v2, T bw){ return equals(v1, v2, bw, pow2<T>); }
 
 template <class T, class F>
 inline T equals(T v1, T v2, T bw, F f){ return bw/(f(v1-v2) + bw); }
@@ -754,36 +761,38 @@ TEM inline T foldOnce(T v, T hi, T lo){
 template <class V2>
 void frenet(const V2& d1, V2& t, V2& n){
 	t = d1;
-	t *= scl::recSqrtFast(t.dot());
+	t *= recSqrtFast(t.dot());
 	n(-t[1], t[0]);	// normal according to right-hand rule
 }
 
 template <class V3>
 void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
 	t = d1;
-	scl::cross(d2, d1, b);
-	scl::cross(d1,  b, n);
+	cross(d2, d1, b);
+	cross(d1,  b, n);
 	
-	t *= scl::recSqrtFast(t.dot());
-	b *= scl::recSqrtFast(b.dot());
-	n *= scl::recSqrtFast(n.dot());	
+	t *= recSqrtFast(t.dot());
+	b *= recSqrtFast(b.dot());
+	n *= recSqrtFast(n.dot());	
 }
 
 template <class V3>
 void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
-	const V3 d1 = p0 - p1, d2 = d1 - (p1 - p2);
+	//const V3 d1 = p0 - p1, d2 = d1 - (p1 - p2);
+	const V3 d1 = (p0 - p2)*0.5;
+	const V3 d2 = (d1 - p1)*2.0; // p0 - 2*p1 + p2 = p0 - p2 - 2*p1 = 2*d1 - 2*p1
 	frenet(d1,d2, t,n,b);
 }
 
 TEM inline T hypot(T x, T y){ return sqrt(x*x + y*y); }
 
 TEM inline T linLog2(T v, T recMin){
-	v = scl::log2Fast(scl::abs(v) + (T)0.000001);	// offset to avoid -inf
+	v = log2Fast(scl::abs(v) + (T)0.000001);	// offset to avoid -inf
 	return scl::max(v * recMin, (T)-1) + (T)1;
 }
 
 inline ULONG log2(ULONG v){
-	v = scl::ceilPow2(v);
+	v = ceilPow2(v);
 	return multiplyDeBruijnBitPosition[(v * 0x077CB531UL) >> 27];
 }
 
@@ -831,9 +840,9 @@ TEM inline void mulQuat(T & r1, T & i1, T & j1, T & k1, T r2, T i2, T j2, T k2){
 }
 
 TEM T nearest(T val, const char * interval, long div){
-	long vr = scl::castIntRound(val);
+	long vr = castIntRound(val);
 	long numWraps = 0;
-	long vm = scl::wrap(vr, numWraps, div, 0L);
+	long vm = wrap(vr, numWraps, div, 0L);
 	long sum = 0;
 
 	while(*interval){
@@ -860,7 +869,7 @@ TEM inline T pow64(T v){ v*=v; v*=v; v*=v; v*=v; v*v; return v*v; }
 
 TEM inline T pow2S(T v){ return v*scl::abs(v); }
 
-TEM inline T pow3Abs(T v){ return abs(pow3(v)); }
+TEM inline T pow3Abs(T v){ return scl::abs(pow3(v)); }
 
 inline unsigned char prime(ULONG n){ return mPrimes54[n]; }
 TEM inline T prime(ULONG n, T mul){ return (T)prime(n) * mul; }
@@ -869,8 +878,9 @@ TEM inline T ratioET(T pc, T divisions, T interval){
 	return (T)pow((double)interval, (double)pc / (double)divisions);
 }
 
-TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
-TEM inline T round(T v, T s){ return round<T>(v / s) * s; }
+//TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
+TEM inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
+TEM inline T round(T v, T s){ printf("%f\n", v/s); return round<double>(v/s) * s; }
 TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
 
 //inline float round(float val, float step){
@@ -1208,7 +1218,7 @@ inline bool zeroCrossP(float prev, float now){
 
 
 inline int32_t castIntRound(double v){
-	v += roundMagic<double>();
+	v += roundMagic;
 	union{ double f; int32_t i[2]; } u; u.f = v;
 	return u.i[endian]; // result in lsb
 }
@@ -1218,14 +1228,17 @@ TEM inline long castIntTrunc(T v){
 }
 
 inline ULONG floatExponent(float v){
-	PUN_F2I(v,u) ULONG exp = u.i; 
-	return exp << 1 >> 24;
+
+	return scl::punFU32(v) << 1 >> 24;
+
+//	PUN_F2I(v,u) ULONG exp = u.i; 
+//	return exp << 1 >> 24;
 }
 
 inline float floatMantissa(float v){
-	PUN_F2I(v,u) ULONG frac = u.i;
-	frac = frac & MASK_F32_FRAC | 0x3f800000; 
-	return (*(float *)&frac) - 1.f;
+	uint32_t frac = scl::punFU32(v);
+	frac = frac & MASK_F32_FRAC | 0x3f800000;
+	return scl::punUF32(frac) - 1.f;
 }
 
 inline float intToNormal(short v){
@@ -1233,8 +1246,8 @@ inline float intToNormal(short v){
 //	vu = vu << 7 | 0x40000000;
 //	return *(float *)&vu - 3.f;
 
-	ULONG vu = (((ULONG)v) + 0x808000) << 7; // set fraction in float [2, 4)
-	PUN_I2F(vu,u) return u.f - 3.f;
+	uint32_t vu = (((uint32_t)v) + 0x808000) << 7; // set fraction in float [2, 4)
+	return scl::punUF32(vu) - 3.f;
 
 	//return (float)v / 32768.f; // naive method
 	//return (float)v * 0.000030517578125f; // less naive method
@@ -1274,7 +1287,7 @@ effective  precision
 */
 
 inline ULONG normalToUInt(float v){
-	PUN_F2I(v,u) ULONG normalU = u.i;
+	ULONG normalU = punFU32(v);
 	ULONG rbs = 126UL - (normalU >> 23UL);
 //	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
 //	printf("%x\n", 0x80000000UL >> rbs);
@@ -1287,8 +1300,7 @@ inline ULONG normalToUInt(float v){
 
 inline ULONG normalToUInt2(float v){
 	v++;	// go into [1,2] range, FP fraction is now result
-	PUN_F2I(v,u) ULONG result = u.i;
-	return result << 9;
+	return punFU32(v) << 9;
 }
 
 TEM inline void polarToRect(T m, T p, T& r, T& i){
@@ -1307,12 +1319,12 @@ TEM inline void rectToPolar(T& r, T& i){
 
 template<> inline float uintToNormal<float>(ULONG v){
 	v = v >> 9 | 0x3f800000; 
-	PUN_I2F(v, u) return u.f - 1.f;
+	return punUF32(v) - 1.f;
 }
 
 template<> inline float uintToNormalS<float>(ULONG v){
 	v = v >> 9 | 0x40000000;
-	PUN_I2F(v, u) return u.f - 3.f;
+	return punUF32(v) - 3.f;
 }
 
 inline float splitInt512(ULONG value, ULONG & intPart){
@@ -1346,7 +1358,7 @@ TEM inline void sphericalToCart(T & rho, T & phi, T & theta){
 // Amp precision:	24 bits
 inline float rampDown(ULONG p){
 	p = (p >> 9) | 0x40000000;
-	PUN_I2F(p,u) return 3.f - u.f;
+	return 3.f - punUF32(p);
 }
 
 // [-1, -0.5, 0, 0.5]
@@ -1354,7 +1366,7 @@ inline float rampDown(ULONG p){
 // Amp precision:	24 bits
 inline float rampUp(ULONG p){
 	p = (p >> 9) | 0x40000000;
-	PUN_I2F(p,u) return u.f - 3.f;
+	return punUF32(p) - 3.f;
 }
 
 // [1, 1, -1, -1] 
@@ -1373,7 +1385,7 @@ inline float triangle(ULONG p){
 	ULONG dir = p >> 31;
 	p = ((p^(-dir)) + dir);
 	p = (p >> 8) | 0x40000000;
-	PUN_I2F(p,u) return u.f - 3.f;
+	return scl::punUF32(p) - 3.f;
 }
 
 // Just another triangle wave algorithm
@@ -1396,13 +1408,14 @@ inline float triangle(ULONG p){
 inline float pulse(ULONG p, ULONG width){
 	ULONG saw1 = (p >> 9) | 0x40000000;
 	ULONG saw2 = ((p + width) >> 9) | 0x40000000;
-	PUN_I2F(saw1,u1) PUN_I2F(saw2,u2) return u1.f - u2.f;
+	return scl::punUF32(saw1) - scl::punUF32(saw2);
 }
 
 inline float stair(ULONG p, ULONG width){
 	ULONG sqr1 = 0x3f000000 | (p & 0x80000000);
 	ULONG sqr2 = 0x3f000000 | ((p + width) & 0x80000000);
-	PUN_I2F(sqr1,u1) PUN_I2F(sqr2,u2) return u1.f + u2.f;
+	return punUF32(sqr1) + punUF32(sqr2);
+	
 }
 
 inline float pulseU(ULONG p, ULONG width){
@@ -1412,7 +1425,7 @@ inline float pulseU(ULONG p, ULONG width){
 inline float rampUp2(ULONG p, ULONG width){
 	ULONG saw1 = (p >> 9) | 0x3f800000;
 	ULONG saw2 = ((p + width) >> 9) | 0x3f800000;
-	PUN_I2F(saw1,u1) PUN_I2F(saw2,u2) return u1.f + u2.f - 3.f;
+	return punUF32(saw1) + punUF32(saw2) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
@@ -1420,7 +1433,7 @@ inline float rampUp2(ULONG p, ULONG width){
 // Amp precision:	24 bits
 inline float rampUpU(ULONG p){
 	p = (p >> 9) | 0x3f800000;
-	PUN_I2F(p,u) return u.f - 1.f;
+	return punUF32(p) - 1.f;
 }
 
 // [1, 0.75, 0.5, 0.25]
@@ -1428,7 +1441,7 @@ inline float rampUpU(ULONG p){
 // Amp precision:	24 bits
 inline float rampDownU(ULONG p){
 	p = (p >> 9) | 0xbf800000;
-	PUN_I2F(p,u) return u.f + 2.f;
+	return punUF32(p) + 2.f;
 }
 
 inline float squareU(ULONG p){

@@ -9,6 +9,50 @@
 
 namespace gam{
 
+
+inline void neighborsWrap(int x1, int N, int& x0, int& x2){
+	x0 = x1-1; if(x1< 0) x1+=N;
+	x2 = x1+1; if(x2>=N) x2-=N;
+}
+
+
+class AccessStream1{
+public:
+
+	AccessStream1(int size, int begin=0)
+	:	i0(0), i1(0), i2(0), mSizeM1(size-1)
+	{
+		i1=checkM1(begin-1);
+		i2=begin;
+	}
+
+	void operator()(){
+		i0=i1; i1=i2; i2 = checkP1(i2+1);
+	}
+	
+	void operator()(int& a0, int& a1, int& a2){
+		(*this)(); a0=i0; a1=i1; a2=i2;
+	}
+
+	int i0, i1, i2;
+
+private:
+	int mSizeM1;
+
+	// wrap
+	int checkM1(int v){ return v<0 ? mSizeM1 : v; }
+	int checkP1(int v){ return v>mSizeM1 ? 0: v; }
+
+	// clip
+//	int checkM1(int v){ return v>0 ? v : 0; }
+//	int checkP1(int v){ return v<mSizeM1 ? v : mSizeM1; }
+
+	// fold
+//	int checkM1(int v){ return v>=0 ? v : 1; }
+//	int checkP1(int v){ return v<=mSizeM1 ? v : mSizeM1-1; }
+};
+
+
 template <class SBounds>
 struct NeighborsCross2D{
 

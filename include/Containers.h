@@ -21,7 +21,7 @@ namespace gam{
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
 	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
-	void operator()(uint32_t v){ mBitsI = scl::log2(convert(v)); mBitsF = 32U - mBitsI; }
+	void operator()(uint32_t v){ mBitsI = scl::log2(convert(v)); mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/ }
 	uint32_t convert(uint32_t v){ v=scl::ceilPow2(v); return v!=1 ? v : 2; }	// should return 0,2,4,8,16,...
 	uint32_t mBitsI;	// integer portion # bits
 	uint32_t mBitsF;	// fraction portion # bits
@@ -328,8 +328,9 @@ TEM2 inline const T&  ArrayBase<T,S>::operator[](uint32_t i) const { return elem
 
 TEM2 inline T * ArrayBase<T,S>::elems() const { return mElems; }
 
-TEM2 void ArrayBase<T,S>::freeElements(){
-	if(owner()){ mem::free(mElems); mSize(0); }	
+TEM2 void ArrayBase<T,S>::freeElements(){ //printf("ArrayBase::freeElements(): mElems=%p\n", mElems);
+	//if(owner()){ mem::free(mElems); mSize(0); }
+	if(owner() && mElems){ delete[] mElems; mElems=0; mSize(0); }	// TODO: delete[] is causing crash
 }
 
 TEM2 void ArrayBase<T,S>::own(){
@@ -348,11 +349,15 @@ TEM2 inline bool ArrayBase<T,S>::owner() const { return mOwner; }
 
 TEM2 void ArrayBase<T,S>::resize(uint32_t newSize){
 	newSize = mSize.convert(newSize);
-	if(owner() && mem::resize(mElems, size(), newSize)){
+	//if(owner() && mem::resize(mElems, size(), newSize)){
+	if(owner() && (newSize != size())){
+		freeElements();
+		mElems = new T[newSize];
 		mSize(newSize);
 		zero();
 		onResize();
 	}
+	//printf("ArrayBase::resize(): mElems=%p\n", mElems);
 }
 
 TEM2 inline uint32_t ArrayBase<T,S>::size() const { return mSize(); }
@@ -386,7 +391,7 @@ TEM inline void ArrayPow2<T>::putPhase(uint32_t phase, T v){ (*this)[index(phase
 
 TEM inline float ArrayPow2<T>::fraction(uint32_t phase) const{	
 	phase = phase << log2Size() >> 9 | 0x3f800000;
-	return (*(float *)&phase) - 1.f;
+	return scl::punUF32(phase) - 1.f;
 }
 
 

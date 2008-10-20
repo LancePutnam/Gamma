@@ -593,7 +593,7 @@ inline float atH(const float * src, ULONG bits, ULONG phase){
 
 inline float fraction(ULONG bits, ULONG phase){	
 	phase = phase << bits >> 9 | 0x3f800000;
-	return (*(float *)&phase) - 1.f;
+	return scl::punUF32(phase) - 1.f;
 }
 
 inline float phaseIncFactor(double framesPerSec){

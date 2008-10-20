@@ -54,7 +54,7 @@ public:
 
 	typedef Complex<T> complex;
 
-    CFFT(uint32_t size,						// size is power of 2
+    CFFT(uint32_t size=0,						// size is power of 2
 		bool doBitRev=true,
 		T scalef1 = 0.5, T scalef2 = 1.0,	// fwd transform scalings
 		T scalei1 = 1.0, T scalei2 = 1.0	// rev xform
@@ -119,8 +119,8 @@ CFFT<T>::~CFFT(){ freeMem(); }
 
 template <class T>
 void CFFT<T>::freeMem(){
-	if(mBitRev){ delete [] mBitRev; mBitRev=0; }
-    if(mW     ){ delete [] mW;      mW     =0; }
+	if(mBitRev){ delete[] mBitRev; mBitRev=0; }
+    if(mW     ){ delete[] mW;      mW     =0; }
 }
 
 
@@ -161,7 +161,7 @@ bool CFFT<T>::size(uint32_t n){
 		}
 	}
 	mN = 1<<k;
-	mLog2N = k;
+	mLog2N = k; //printf("N:%d log2(N):%d\n", mN, mLog2N);
 
 	mBitRev = new uint32_t[size()];
 	mW = k>0 ? new complex[size()>>1] : 0;

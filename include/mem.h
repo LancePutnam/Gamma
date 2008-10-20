@@ -84,6 +84,9 @@ bool equal(Ti0& i0, const Ti1& i1, const Indexer& ind){
 TEM void expand(T * dst, const T * src, ULONG lenSrc, ULONG amount);
 
 /// Like standard free, but checks if pointer is valid (!=0) and sets it to zero aftyer freeing it.
+
+/// This uses C-style memory management. No destructors will be called on
+/// class-type objects.
 TEM void free(T *& ptr);
 
 /// Finds index of first element in 'src' equal to 'element'.
@@ -151,6 +154,9 @@ TEM void replace(T * arr, ULONG len, const T * val, const T * with, ULONG num){
 }
 
 /// Resizes array.  Returns true if resized, false otherwise.
+
+/// This uses C-style memory management. No constructors or destructors will
+/// be called on class-type objects.
 TEM bool resize(T *& arr, ULONG sizeNow, ULONG sizeNew);
 
 /// Reverse elements' order in array.
