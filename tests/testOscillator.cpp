@@ -2,6 +2,7 @@
 #include "Oscillator.h"
 #include "gen.h"
 #include "scl.h"
+#include <iostream>
 
 #define DO(fnc)\
 printf("\n%s:\n", #fnc);\
@@ -32,22 +33,31 @@ int main(int argc, char* argv[]){
 	Square<> square(1);
 	TableSine<> tableSine(1);
 	
-	DO(accum.phase(); accum())
-	DO(accumPhase.nextPhase()/M_PI)
-	DO(impulse())
-	DO(impulse.odd())
+//	DO(accum.phase(); accum())
+//	DO(accumPhase.nextPhase()/M_PI)
+//	DO(impulse())
+//	DO(impulse.odd())
 	DO(lfo.cos())
 	DO(lfo.down())
 	DO(lfo.even3())
 	DO(lfo.even5())
+	DO(lfo.imp())
 	DO(lfo.line2(); lfo.mod(0.00))
 	DO(lfo.line2(); lfo.mod(0.25))
 	DO(lfo.line2(); lfo.mod(0.50))
 	DO(lfo.line2(); lfo.mod(0.75))
 	DO(lfo.line2(); lfo.mod(0.99999))
+	
+	DO(lfo.pulse(); lfo.mod(0.00))
+	DO(lfo.pulse(); lfo.mod(0.25))
+	DO(lfo.pulse(); lfo.mod(0.50))
+	DO(lfo.pulse(); lfo.mod(0.75))
+	DO(lfo.pulse(); lfo.mod(0.99999))
+	
+	DO(lfo.up();)
 	//printf("%x\n", lfo.modi);
 //	DO(lfo.stair())
-//	DO(lfo.sqr())
+	DO(lfo.sqr())
 //	DO(lfo.tri())
 //	DO(lfo.up())
 //	DO(osc())

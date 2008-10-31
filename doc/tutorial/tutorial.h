@@ -2,8 +2,8 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <stdio.h>
-#include "Gamma.h"
-#include "AudioIO.h"
+#include "Gamma.h" // core functions
+#include "AudioIO.h" 
 #include "Noise.h"
 #include "Oscillator.h"
 

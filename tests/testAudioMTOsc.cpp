@@ -18,7 +18,7 @@ float tables[numSamples];
 MultiTableOsc<> osc(tables, tableBits, numTables, 110);
 LFO<> lfoF(0.5);
 Accum<> tmr(lfoF.freq(), 2);
-gen::Counter cnt(3);
+gen::Trigger trig(3);
 
 void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);
@@ -28,13 +28,13 @@ void audioCB(AudioIOData & io){
 		
 		if(tmr()){
 			mem::zero(tables, numSamples);
-			switch(cnt.val){
+			switch(trig.val){
 				case 0:  tbl::multiWave(tables, 1<<tableBits, numTables, tbl::triangleSum); break;
 				case 1:  tbl::multiWave(tables, 1<<tableBits, numTables, tbl::squareSum); break;
 				case 2:  tbl::multiWave(tables, 1<<tableBits, numTables, tbl::sawSum); break;
 				default:;
 			}
-			cnt();
+			trig();
 		}
 	
 		osc.freqLL(scl::pow2( lfoF.upU() ) * 4000.f);

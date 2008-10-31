@@ -10,7 +10,7 @@ NoiseWhite<> white;
 NoisePink<> pink;
 NoiseBrown<> brown;
 Accum<> tmr(0.5);
-gen::Counter cnt(3);
+gen::Trigger cnt(3);
 
 void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);

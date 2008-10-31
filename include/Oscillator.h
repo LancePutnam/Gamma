@@ -481,15 +481,15 @@ public:
 	void mod(double n);	///< Sets modifier parameter of waveform from normal
 
 	float cos();		///< Cosine based on 3rd order polynomial
-	float down();		///< Downward ramp
+	float down();		///< Downward ramp (1 to -1)
 	float even3();		///< Even harmonic sine-like wave (3rd order)
 	float even5();		///< Even harmonic sine-like wave (5th order)
-	float imp();		///< Impulse (occurs at end of cycle)
+	float imp();		///< Impulse (occurs at beginning of cycle)
 	float line2();		///< 2-segment line. mod changes wave from down to tri to up
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
-	float sqr();		///< Square
-	float tri();		///< Triangle (starts at 1 going down then up)
+	float sqr();		///< Square (-1 to 1)
+	float tri();		///< Triangle (starts at 1 going down to -1 then up to 1)
 	float up();			///< Upward ramp
 	float up2();		///< Dual upward ramp (up + up). 'mod' controls pulse width.
 	
@@ -1086,7 +1086,12 @@ DEF(sineP9(),	scl::rampUp(phaseI()); r = scl::sinP9(r))
 
 #undef DEF
 
-TEMS inline float LFO<Ts>::imp(){ return this->cycle() ? 1.f : 0.f; }
+//TEMS inline float LFO<Ts>::imp(){ return this->cycle() ? 1.f : 0.f; }
+TEMS inline float LFO<Ts>::imp(){ 
+	float r = phaseI() < this->phaseIncI() ? 1.f : 0.f;
+	incPhase();
+	return r; 
+}
 
 TEMS inline bool LFO<Ts>::seq(){
 	uint32_t prev = phaseI();

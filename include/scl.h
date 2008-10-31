@@ -1406,8 +1406,9 @@ inline float triangle(ULONG p){
 // Amp precision:	24 bits
 // Width precision:	32 bits
 inline float pulse(ULONG p, ULONG width){
-	ULONG saw1 = (p >> 9) | 0x40000000;
-	ULONG saw2 = ((p + width) >> 9) | 0x40000000;
+	// output floating point exponent should be [1, 2)
+	ULONG saw1 = (p >> 9) | 0x3F800000;
+	ULONG saw2 = ((p + width) >> 9) | 0x3F800000;
 	return scl::punUF32(saw1) - scl::punUF32(saw2);
 }
 

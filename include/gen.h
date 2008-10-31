@@ -227,17 +227,17 @@ OF3(RSin,		rSin,		0,0,1)
 #undef OF1
 #undef OF2
 
-/// Counts up to a maximum value and then resets
-struct Counter{
-	Counter(uint32_t max, uint32_t val=0) : val(val), max(max){}
+/// Triggers after a specified number of iterations and then resets
+struct Trigger{
+	Trigger(uint32_t num, uint32_t val=0) : val(val), num(num){}
 	
-	/// Returns true upon reset
+	/// Returns (triggers) true upon reset
 	bool operator()(){
-		if(++val >= max){ val = 0; return true; }
+		if(++val >= num){ val = 0; return true; }
 		return false;
 	}
 	uint32_t val;		///< Value
-	uint32_t max;		///< Maximum value
+	uint32_t num;		///< Maximum value
 };
 
 
