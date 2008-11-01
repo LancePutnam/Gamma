@@ -542,8 +542,10 @@ float rampUp2	(ULONG phase, ULONG width);	// rampUp + rampUp
 //---- Unipolar waveforms [0, 1)
 float pulseU	(ULONG phase, ULONG width);	///< Returns value of unipolar pulse function.
 float rampUpU	(ULONG phase);	///< Returns value of unipolar downward ramp function.
+float rampUp2U	(ULONG phase);	///< Returns value of unipolar upward ramp2 function.
 float rampDownU	(ULONG phase);	///< Returns value of unipolar upward ramp function.
 float squareU	(ULONG phase);	///< Returns value of unipolar square function.
+float stairU(ULONG phase, ULONG width); ///< Returns value of unipolar stair function.
 float triangleU	(ULONG phase);	///< Returns value of unipolar triangle function.
 
 /// Dirichlet kernel, an impulse with n harmonics.
@@ -1416,9 +1418,12 @@ inline float stair(ULONG p, ULONG width){
 	ULONG sqr1 = 0x3f000000 | (p & 0x80000000);
 	ULONG sqr2 = 0x3f000000 | ((p + width) & 0x80000000);
 	return punUF32(sqr1) + punUF32(sqr2);
-	
 }
 
+inline float stairU(ULONG p, ULONG width){
+	return ((p & 0x80000000) ? 0.5f : 0.f) + (((p+width) & 0x80000000) ? 0.5f : 0.f);
+}
+	
 inline float pulseU(ULONG p, ULONG width){
 	return p > width ? 0.f : 1.f;
 }
@@ -1435,6 +1440,12 @@ inline float rampUp2(ULONG p, ULONG width){
 inline float rampUpU(ULONG p){
 	p = (p >> 9) | 0x3f800000;
 	return punUF32(p) - 1.f;
+}
+	
+inline float rampUp2U(ULONG p, ULONG width){
+	ULONG saw1 = (p >> 9) | 0x3F000000;
+	ULONG saw2 = ((p + width) >> 9) | 0x3F000000;
+	return punUF32(saw1) + punUF32(saw2) - 1.f;
 }
 
 // [1, 0.75, 0.5, 0.25]

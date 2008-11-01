@@ -27,9 +27,9 @@ int main(int argc, char* argv[]){
 	Saw<> saw(1);
 	Sine<> sine(1);
 	SineD<> sineD(1,1,2,0.25);
-	SineDs<> sineDs(4); for(int i=0; i<sineDs.size(); ++i) sineDs.set(i, i+1, 1./(i+1), 2.);
+	//SineDs<> sineDs(4); for(int i=0; i<sineDs.size(); ++i) sineDs.set(i, i+1, 1./(i+1), 2.);
 	SineR<> sineR(1);
-	SineRs<> sineRs(4); for(int i=0; i<sineRs.size(); ++i) sineRs.set(i, i+1, 1./(i+1));
+	//SineRs<> sineRs(4); for(int i=0; i<sineRs.size(); ++i) sineRs.set(i, i+1, 1./(i+1));
 	Square<> square(1);
 	TableSine<> tableSine(1);
 	
@@ -37,27 +37,49 @@ int main(int argc, char* argv[]){
 //	DO(accumPhase.nextPhase()/M_PI)
 //	DO(impulse())
 //	DO(impulse.odd())
-	DO(lfo.cos())
-	DO(lfo.down())
-	DO(lfo.even3())
-	DO(lfo.even5())
-	DO(lfo.imp())
-	DO(lfo.line2(); lfo.mod(0.00))
-	DO(lfo.line2(); lfo.mod(0.25))
-	DO(lfo.line2(); lfo.mod(0.50))
-	DO(lfo.line2(); lfo.mod(0.75))
-	DO(lfo.line2(); lfo.mod(0.99999))
+//	DO(lfo.cos())
+//	DO(lfo.down())
+//	DO(lfo.even3())
+//	DO(lfo.even5())
+//	DO(lfo.imp())
+//	DO(lfo.line2(); lfo.mod(0.00))
+//	DO(lfo.line2(); lfo.mod(0.25))
+//	DO(lfo.line2(); lfo.mod(0.50))
+//	DO(lfo.line2(); lfo.mod(0.75))
+//	DO(lfo.line2(); lfo.mod(0.99999))
+//	
+//	DO(lfo.pulse(); lfo.mod(0.00))
+//	DO(lfo.pulse(); lfo.mod(0.25))
+//	DO(lfo.pulse(); lfo.mod(0.50))
+//	DO(lfo.pulse(); lfo.mod(0.75))
+//	DO(lfo.pulse(); lfo.mod(0.99999))
 	
-	DO(lfo.pulse(); lfo.mod(0.00))
-	DO(lfo.pulse(); lfo.mod(0.25))
-	DO(lfo.pulse(); lfo.mod(0.50))
-	DO(lfo.pulse(); lfo.mod(0.75))
-	DO(lfo.pulse(); lfo.mod(0.99999))
+//	DO(lfo.up();)
+//	DO(lfo.stair(); lfo.mod(0.00))
+//	DO(lfo.stair(); lfo.mod(0.25))
+//	DO(lfo.stair(); lfo.mod(0.50))
+//	DO(lfo.stair(); lfo.mod(0.75))
+//	DO(lfo.stair(); lfo.mod(0.99999))
+
+	DO(lfo.line2U(); lfo.mod(0.00))
+	DO(lfo.line2U(); lfo.mod(0.25))
+	DO(lfo.line2U(); lfo.mod(0.50))
+	DO(lfo.line2U(); lfo.mod(0.75))
+	DO(lfo.line2U(); lfo.mod(0.99999))
 	
-	DO(lfo.up();)
-	//printf("%x\n", lfo.modi);
-//	DO(lfo.stair())
-	DO(lfo.sqr())
+	DO(lfo.pulseU(); lfo.mod(0.00))
+	DO(lfo.pulseU(); lfo.mod(0.25))
+	DO(lfo.pulseU(); lfo.mod(0.50))
+	DO(lfo.pulseU(); lfo.mod(0.75))
+	DO(lfo.pulseU(); lfo.mod(0.99999))
+
+	DO(lfo.stairU(); lfo.mod(0.00))
+	DO(lfo.stairU(); lfo.mod(0.25))
+	DO(lfo.stairU(); lfo.mod(0.50))
+	DO(lfo.stairU(); lfo.mod(0.75))
+	DO(lfo.stairU(); lfo.mod(0.99999))
+	
+//	DO(lfo.sqr())
 //	DO(lfo.tri())
 //	DO(lfo.up())
 //	DO(osc())

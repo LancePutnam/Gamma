@@ -492,17 +492,20 @@ public:
 	float tri();		///< Triangle (starts at 1 going down to -1 then up to 1)
 	float up();			///< Upward ramp
 	float up2();		///< Dual upward ramp (up + up). 'mod' controls pulse width.
-	
-	float downU();		///< Unipolar downward ramp
+
 	float cosU();		///< Unipolar cosine based on 3rd order polynomial
-	float patU();
-	float patU(uint32_t mul);
-	float pulseU();		///< Unipolar pulse
+	float downU();		///< Unipolar downward ramp
 	float hann();		///< Hann window
+	float line2U();		///< Unipolar line2
+	float pulseU();		///< Unipolar pulse
+	float stairU();		///< Unipolar stair
 	float sqrU();		///< Unipolar square
 	float triU();		///< Unipolar triangle (starts at 1 going down then up)
 	float upU();		///< Unipolar upward ramp
+	float up2U();		///< Unipolar upward ramp2
 
+	float patU();
+	float patU(uint32_t mul);
 	float sineT9();
 	float sineP9();
 
@@ -1060,6 +1063,12 @@ TEMS inline float LFO<Ts>::line2(){
 	return r;
 }
 
+TEMS inline float LFO<Ts>::line2U(){
+	return line2()*0.5f+0.5f;
+}
+
+
+
 DEF(down(),		scl::rampDown(phaseI()))
 DEF(even3(),	scl::rampUp(phaseI()); static float c=-1.50*sqrt(3.); r *= (1-r*r)*c;)
 DEF(even5(),	scl::rampUp(phaseI()); static float c=-1.25*pow(5.,0.25); r *= (1-scl::pow4(r))*c;)
@@ -1072,11 +1081,13 @@ DEF(up(),		scl::rampUp(phaseI()))
 DEF(up2(),		scl::rampUp2(phaseI(), modi))
 DEF(cosU(),		scl::triangle(phaseI()); r = r * (0.25f * r*r - 0.75f) + 0.5f)
 DEF(downU(),	scl::rampDownU(phaseI()))
-DEF(pulseU(),	scl::pulseU(phaseI(), modi))
 DEF(hann(),		scl::triangle(phaseI()); r = scl::warpSinSU(r))
+DEF(pulseU(),	scl::pulseU(phaseI(), modi))
 DEF(sqrU(),		scl::squareU(phaseI()))
+DEF(stairU(),	scl::stairU(phaseI(), modi))
 DEF(triU(),		scl::triangleU(phaseI()))
 DEF(upU(),		scl::rampUpU(phaseI()))
+DEF(up2U(),		scl::rampUp2U(phaseI(), modi))
 DEF(patU(),		scl::rampUpU(phaseI() & modi))
 
 DEF(patU(uint32_t mul), scl::rampUpU((phaseI() & modi) * mul))

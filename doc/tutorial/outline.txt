@@ -26,6 +26,9 @@ Generators
 		Amplitude
 		Phase
 		Frequency
+			vibrato to timbral
+			different harmonic relationships (all, odd, in-)
+			feedback (1-oscillator)
 	Noise
 
 Filters
@@ -46,6 +49,7 @@ Filters
 
 Instruments
 	Plucked String
+	4-op FM
 	
 
 Composition
