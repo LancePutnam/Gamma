@@ -2,7 +2,8 @@ include config.mk
 
 SRC = \
 	genOscLFO1.cpp \
-	genOscLFO2.cpp
+	genOscLFO2.cpp \
+	genOscFMFeedback.cpp
 
 TARGETS = ${SRC:.cpp=}
 
