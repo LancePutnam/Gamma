@@ -28,6 +28,7 @@ struct Complex{
 
 	union{
 		struct{ T r, i; };
+		//struct{ T x, y; };
 		T elems[2];
 	};
 	
@@ -114,6 +115,7 @@ struct Quat{
 	
 	union{
 		struct{ T r, i, j, k; };
+		//struct{ T w, x, y, z; };
 		T elems[4];
 	};
 	

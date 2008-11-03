@@ -9,7 +9,7 @@ MANPREFIX = ${PREFIX}/share/man
 LIBS = -L${PREFIX}/lib -L/usr/lib
 
 
-CFLAGS = -g -I. -I../include/ -I${PREFIX}/include -I/usr/include
+CFLAGS = -O3 -I. -I../include/ -I${PREFIX}/include -I/usr/include
 
 # Linux/BSD
 #LDFLAGS = ${LIBS} ../libgamma.a -lportaudio -lsndfile
