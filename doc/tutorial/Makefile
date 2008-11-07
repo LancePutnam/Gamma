@@ -4,7 +4,8 @@ SRC = \
 	genEnvAD.cpp \
 	genEnvDecay.cpp \
 	genEnvSeg.cpp \
-	genOscFMFeedback.cpp \
+	genModFrqFeedback.cpp \
+	genModFrqTransition.cpp \
 	genOscLFO1.cpp \
 	genOscLFO2.cpp \
 	genOscOsc.cpp \
