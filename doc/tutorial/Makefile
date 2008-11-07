@@ -1,9 +1,14 @@
 include config.mk
 
 SRC = \
+	genEnvAD.cpp \
+	genEnvDecay.cpp \
+	genEnvSeg.cpp \
+	genOscFMFeedback.cpp \
 	genOscLFO1.cpp \
 	genOscLFO2.cpp \
-	genOscFMFeedback.cpp
+	genOscOsc.cpp \
+	ioAudioDevice.cpp
 
 TARGETS = ${SRC:.cpp=}
 

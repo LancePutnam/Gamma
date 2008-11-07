@@ -50,7 +50,7 @@ Filters
 Instruments
 	Plucked String
 	4-op FM
-	
+	Inharmonic oscillators
 
 Composition
 	Polyphony

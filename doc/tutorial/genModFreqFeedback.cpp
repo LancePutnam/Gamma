@@ -1,8 +1,8 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Tutorial:		Generator/Oscillator/LFO
-	Description:	Using an LFO as an oscillator source.
+	Tutorial:		Generator / Modulation / Frequency
+	Description:	Single-oscillator feedback frequency modulation.
 */
 
 #include "tutorial.h"

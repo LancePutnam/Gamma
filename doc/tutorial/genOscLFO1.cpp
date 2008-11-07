@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Tutorial:		Generator/Oscillator/LFO
+	Tutorial:		Generator / Oscillator / LFO
 	Description:	Using an LFO as an oscillator source.
 */
 
