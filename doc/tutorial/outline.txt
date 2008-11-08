@@ -38,21 +38,27 @@ Filters
 	Granular/Granulation
 	Delay
 		Comb
-			Flanger
-			Chorus
-			Phaser
 	FIR/IIR
-		Reverb
 	Fourier
 		PV
 	Hilbert
-		Frequency Shifting
 
 
 Instruments
 	Plucked String
 	4-op FM
 	Inharmonic oscillators
+
+
+Effects
+	Flanger
+	Chorus
+	Phaser
+	Frequency Shift
+	Pitch Shift
+	Reverb
+	Vibrato
+
 
 Composition
 	Polyphony

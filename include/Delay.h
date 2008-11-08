@@ -193,6 +193,7 @@ public:
 	void delayNorm(float n);		///< Set normalized delay as (0, 1) of buffer size.
 	void freq(float v);				///< Set natural frequency (1/delay()).
 	void maxDelay(float v);			///< Set maximum delay length.
+	void zero();					///< Sets all elements to zero.
 		
 //	template <class I>
 //	Tv read(const I& ipol) const{
@@ -843,6 +844,10 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 		//printf("Delay::maxDelay(): resize to %d\n", (uint32_t)(mMaxDelay * spu()));
 		this->resize((uint32_t)(mMaxDelay * Ts::spu())); // calls onResize() -> onResync(double r)
 	}
+}
+
+TM1 void Delay<TM2>::zero(){ 
+	for(int i=0; i<ArrayPow2<Tv>::size(); ++i) ArrayPow2<Tv>::elems()[i] = 0;
 }
 
 

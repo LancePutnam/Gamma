@@ -22,14 +22,14 @@ int main(int argc, char* argv[]){
 	AccumPhase<> accumPhase(1);
 	Impulse<> impulse(1.);
 	LFO<> lfo(1, 0, 0.25);
-	Osc<> osc(1); osc << tup(1,1,0);
+	//Osc<> osc(1); osc << tup(1,1,0);
 	Quadra<> quadra(1);
 	Saw<> saw(1);
 	Sine<> sine(1);
 	SineD<> sineD(1,1,2,0.25);
 	//SineDs<> sineDs(4); for(int i=0; i<sineDs.size(); ++i) sineDs.set(i, i+1, 1./(i+1), 2.);
-	SineR<> sineR(1);
-	//SineRs<> sineRs(4); for(int i=0; i<sineRs.size(); ++i) sineRs.set(i, i+1, 1./(i+1));
+	//SineR<> sineR(1);
+	SineRs<> sineRs(4); for(int i=0; i<sineRs.size(); ++i) sineRs.set(i, i+1, 1./(i+1));
 	Square<> square(1);
 	TableSine<> tableSine(1);
 	
@@ -61,23 +61,23 @@ int main(int argc, char* argv[]){
 //	DO(lfo.stair(); lfo.mod(0.75))
 //	DO(lfo.stair(); lfo.mod(0.99999))
 
-	DO(lfo.line2U(); lfo.mod(0.00))
-	DO(lfo.line2U(); lfo.mod(0.25))
-	DO(lfo.line2U(); lfo.mod(0.50))
-	DO(lfo.line2U(); lfo.mod(0.75))
-	DO(lfo.line2U(); lfo.mod(0.99999))
-	
-	DO(lfo.pulseU(); lfo.mod(0.00))
-	DO(lfo.pulseU(); lfo.mod(0.25))
-	DO(lfo.pulseU(); lfo.mod(0.50))
-	DO(lfo.pulseU(); lfo.mod(0.75))
-	DO(lfo.pulseU(); lfo.mod(0.99999))
-
-	DO(lfo.stairU(); lfo.mod(0.00))
-	DO(lfo.stairU(); lfo.mod(0.25))
-	DO(lfo.stairU(); lfo.mod(0.50))
-	DO(lfo.stairU(); lfo.mod(0.75))
-	DO(lfo.stairU(); lfo.mod(0.99999))
+//	DO(lfo.line2U(); lfo.mod(0.00))
+//	DO(lfo.line2U(); lfo.mod(0.25))
+//	DO(lfo.line2U(); lfo.mod(0.50))
+//	DO(lfo.line2U(); lfo.mod(0.75))
+//	DO(lfo.line2U(); lfo.mod(0.99999))
+//	
+//	DO(lfo.pulseU(); lfo.mod(0.00))
+//	DO(lfo.pulseU(); lfo.mod(0.25))
+//	DO(lfo.pulseU(); lfo.mod(0.50))
+//	DO(lfo.pulseU(); lfo.mod(0.75))
+//	DO(lfo.pulseU(); lfo.mod(0.99999))
+//
+//	DO(lfo.stairU(); lfo.mod(0.00))
+//	DO(lfo.stairU(); lfo.mod(0.25))
+//	DO(lfo.stairU(); lfo.mod(0.50))
+//	DO(lfo.stairU(); lfo.mod(0.75))
+//	DO(lfo.stairU(); lfo.mod(0.99999))
 	
 //	DO(lfo.sqr())
 //	DO(lfo.tri())
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]){
 //	DO(sineD())
 //	DO(sineDs())
 //	DO(sineR())
-//	DO(sineRs())
+	DO(sineRs())
 //	DO(square())
 //	DO(tableSine())
 	

@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
 		Array<int> array2(array);
 		PRINT(array2)
 		array2.own();
-		array.zero();
+		mem::zero(array.elems(), array.size());
 		PRINT(array2)
 		
 		ArrayPow2<int> arrayPow2(8);
@@ -81,7 +81,8 @@ int main(int argc, char* argv[]){
 		Ring<int> ring(N);
 		bool r=false;
 		
-		ring.zero(); r = mem::equal(ring, Val<int>(0), N);
+		mem::zero(ring.elems(), ring.size());
+		r = mem::equal(ring, Val<int>(0), N);
 		printf("\tzero(): %s\n", r ? "pass" : "fail");
 		
 		for(int i=0; i<N*2; ++i){

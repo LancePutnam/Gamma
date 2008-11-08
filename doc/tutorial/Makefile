@@ -8,6 +8,8 @@ SRC = \
 	genModFrqFeedback.cpp \
 	genModFrqTransition.cpp \
 	genNoise.cpp \
+	genOscAddBeat.cpp \
+	genOscAddPacket.cpp \
 	genOscLFO1.cpp \
 	genOscLFO2.cpp \
 	genOscOsc.cpp \

@@ -39,6 +39,10 @@ struct SizeArray{
 
 
 /// Abstract base class for array types
+
+/// When the array is resized, if the elements are class-types, then their
+/// default constructors are called and if the elements are non-class-types,
+/// then they are left uninitialized.
 template <class T, class S>
 class ArrayBase{
 public:
@@ -69,7 +73,7 @@ public:
 	void resize(uint32_t newSize);			///< Resizes number of elements in array
 	void source(const ArrayBase<T,S>& src);	///< Sets source of array elements to another array
 	void source(T * src, uint32_t size);	///< Sets source of array elements to another array
-	void zero();							///< Zeroes array elements
+	//void zero();							// Zeroes array elements
 
 	virtual void onResize(){}
 
@@ -330,7 +334,13 @@ TEM2 inline T * ArrayBase<T,S>::elems() const { return mElems; }
 
 TEM2 void ArrayBase<T,S>::freeElements(){ //printf("ArrayBase::freeElements(): mElems=%p\n", mElems);
 	//if(owner()){ mem::free(mElems); mSize(0); }
-	if(owner() && mElems){ delete[] mElems; mElems=0; mSize(0); }	// TODO: delete[] is causing crash
+	//if(owner()){ delete[] mElems; mElems=0; mSize(0); }	// TODO: delete[] is causing crash
+	
+	if(owner()){
+		//printf("(%p) ArrayBase::freeElements(): mElems=%p\n", this, mElems);
+		delete [] mElems; 
+		mElems=0; mSize(0);
+	}
 }
 
 TEM2 void ArrayBase<T,S>::own(){
@@ -354,10 +364,10 @@ TEM2 void ArrayBase<T,S>::resize(uint32_t newSize){
 		freeElements();
 		mElems = new T[newSize];
 		mSize(newSize);
-		zero();
+		//zero();
 		onResize();
 	}
-	//printf("ArrayBase::resize(): mElems=%p\n", mElems);
+	//printf("ArrayBase::resize(): mElems=%p, size=%d\n", mElems, size());
 }
 
 TEM2 inline uint32_t ArrayBase<T,S>::size() const { return mSize(); }
@@ -373,7 +383,7 @@ TEM2 void ArrayBase<T,S>::source(T * src, uint32_t size){
 	mSize(size);
 }
 
-TEM2 void ArrayBase<T,S>::zero(){ if(owner()) mem::zero(elems(), size()); }
+//TEM2 void ArrayBase<T,S>::zero(){ if(owner()) mem::zero(elems(), size()); }
 
 #undef TEM2
 
