@@ -22,20 +22,20 @@ public:
 	Accum();
 
 	/// @param[in] frq		Initial frequency.
-	/// @param[in] phs		Initial normalized phase [0, 1).
+	/// @param[in] phs		Initial phase [0, 1).
 	Accum(float frq, float phs=0);
 	virtual ~Accum(){}
 
 	void freq(float value);			///< Set frequency.
 	void phase(float normal);		///< Set phase from [0, 1) of one period.
 	void phaseMax();				///< Set phase to maximum value.
-	void phaseAdd(float normal);	///< Add value to phase.		
+	void phaseAdd(float normal);	///< Add value to phase [0, 1).		
 	void period(float value);		///< Set period length.
 
 	float freq() const;				///< Returns frequency.
-	float phase() const;			///< Returns current normalized phase
+	float phase() const;			///< Returns current unit phase
 	uint32_t phaseI() const;		///< Returns current fixed-point phase value
-	float phaseInc() const;			///< Returns normalized phase increment from [0, 1).
+	float phaseInc() const;			///< Returns unit phase increment in [0, 1).
 	uint32_t phaseIncI() const;		///< Returns current fixed-point phase increment value
 
 	uint32_t operator()();			///< Alias of cycle().
@@ -56,6 +56,9 @@ protected:
 	float mFreq;			// Current frequency.
 	uint32_t mPhase;		// Current phase btw [0, 2^32)
 	uint32_t mPhaseInc;
+	
+	uint32_t phaseFI(float v);	// convert unit floating-point to fixed-point integer
+	float phaseIF(uint32_t v);	// convert fixed-point integer to unit floating-point
 };
 
 #define ACCUM_INHERIT\
@@ -70,7 +73,7 @@ template <class Tv=gam::real, class Ts=Synced>
 class AccumPhase : public Ts{
 public:
 	/// @param[in]	frq		Initial frequency.
-	/// @param[in]	phs		Initial normalized phase [0, 1).
+	/// @param[in]	phs		Initial phase [0, 1).
 	AccumPhase(Tv frq=440, Tv phs=0);
 	virtual ~AccumPhase(){}
 	
@@ -78,8 +81,8 @@ public:
 
 	void freq(Tv v);		///< Set frequency.
 	void period(Tv v);		///< Set period length.
-	void phase(Tv n);		///< Set phase from [0, 1) of one period.
-	void phaseAdd(Tv n);	///< Add value to unit phase.
+	void phase(Tv v);		///< Set phase from [0, 1) of one period.
+	void phaseAdd(Tv v);	///< Add value to unit phase.
 	
 	Tv freq();				///< Return frequency.
 	Tv period();			///< Return period.
@@ -143,7 +146,7 @@ public:
 	template <class T1, class T2, class T3>
 	Osc& operator<<(const Tup3<T1, T2, T3> & t){
 		Tv * e = elems();
-		arr::add(e, gen::Sin<Tv>(t.v1 * M_2PI / (Tv)size(), t.v3 * M_2PI, t.v2), Loop(size()));
+		arr::add(e, gen::Sin<Tv>(t.v1 * M_2PI / (Tv)size(), t.v3 * M_2PI, t.v2), size());
 		return *this;
 	}
 
@@ -719,39 +722,34 @@ TEMS Accum<Ts>::Accum(float freq, float phase): mFreq(freq){
 	(phase >= 1.f) ? phaseMax() : this->phase(phase);
 }
 
-TEMS void Accum<Ts>::onResync(double r){
-	//printf("Accum: onSyncChange\n");
+TEMS inline uint32_t Accum<Ts>::phaseFI(float v){
+	//return scl::normalToUInt(v);
+	//return (uint32_t)(v * 4294967296.);
+	return scl::castIntRound(v * 4294967296.);
+}
+
+TEMS inline float Accum<Ts>::phaseIF(uint32_t v){
+	return scl::uintToNormal<float>(v);
+}
+
+TEMS void Accum<Ts>::onResync(double r){ //printf("Accum: onSyncChange\n");
 	freq(mFreq);
 }
 
-TEMS inline void Accum<Ts>::freq(float value){
-	mFreq = value;
-	//mPhaseInc = scl::normalToUInt(value * mUPS);
-	mPhaseInc = scl::castIntRound((value * Ts::ups()) * 4294967296.);
-	//mPhaseInc = (uint32_t)(value * mUPS * 4294967296.);
-	//printf("Accum::freq(), %d %f\n", mPhaseInc, mUPS);
+TEMS inline void Accum<Ts>::freq(float v){
+	mFreq = v;
+	mPhaseInc = phaseFI(v * Ts::ups());
 }
 
 TEMS inline void Accum<Ts>::period(float value){ freq(1.f / value); }
+TEMS inline void Accum<Ts>::phase(float v){ mPhase = phaseFI(v); }
+TEMS inline void Accum<Ts>::phaseAdd(float v){ mPhase += phaseFI(v); }
 TEMS inline void Accum<Ts>::phaseMax(){ mPhase = 0xffffffff; }
 
-TEMS inline void Accum<Ts>::phase(float normal){
-	//mPhase = scl::normalToUInt(normal);
-	mPhase = scl::castIntRound((double)(normal * 4294967296.));
-	//printf("%f ", normal);
-	//printf("%lu %lu %lu\n", mPhase, scl::castIntRound((double)(normal * 4294967296.)), scl::normalToUInt(normal));
-}
-
-TEMS inline void Accum<Ts>::phaseAdd(float normal){
-//	normal = scl::wrap1(normal);
-//	mPhase += scl::normalToUInt(normal);
-	mPhase += scl::castIntRound(normal * 4294967296.);
-}
-
 TEMS inline float Accum<Ts>::freq() const { return mFreq; }
-TEMS inline float Accum<Ts>::phase() const { return scl::uintToNormal<float>(phaseI()); }
+TEMS inline float Accum<Ts>::phase() const { return phaseIF(phaseI()); }
 TEMS inline uint32_t Accum<Ts>::phaseI() const { return mPhase; }
-TEMS inline float Accum<Ts>::phaseInc() const { return scl::uintToNormal<float>(phaseIncI()); }
+TEMS inline float Accum<Ts>::phaseInc() const { return phaseIF(phaseIncI()); }
 TEMS inline uint32_t Accum<Ts>::phaseIncI() const { return mPhaseInc; }
 TEMS inline uint32_t Accum<Ts>::incPhase(){ return mPhase += phaseIncI(); }
 

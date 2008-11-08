@@ -53,7 +53,7 @@ public:
 	/// @param[in] unitsD	Decay length
 	/// @param[in] crvA		Attack curvature
 	/// @param[in] crvD		Decay curvature
-	AD(T unitsA, T unitsD, T crvA = -4, T crvD = 4);
+	AD(T unitsA, T unitsD, T crvA = 4, T crvD = -4);
 	
 	void attack(T units);		///< Set attack units
 	void curve(T valA, T valD);	///< Set attack/decay curvatures
@@ -81,8 +81,9 @@ template <class T=gam::real, class Ts=Synced>
 class Decay : public Ts{
 public:
 
-	/// @param[in] decay	Number of units until value decays -60 dB
-	Decay(T decay);
+	/// @param[in] decay	Number of units until initial value decays -60 dB
+	/// @param[in] val		Intial value
+	Decay(T decay, T val=1);
 
 	T operator()();			///< Generates next sample.
 	
@@ -405,11 +406,11 @@ TM1 void AD<TM2>::onResync(double r){
 
 //---- Decay
 
-TM1 Decay<TM2>::Decay(T decayA)
-:	mVal(1)
+TM1 Decay<TM2>::Decay(T decay_, T val)
+:	mVal(val)
 {
 	Ts::initSynced();
-	decay(decayA);
+	decay(decay_);
 }
 
 TM1 inline T Decay<TM2>::operator()(){ T o = mVal; mVal *= mMul; return o; }

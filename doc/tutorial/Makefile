@@ -4,11 +4,14 @@ SRC = \
 	genEnvAD.cpp \
 	genEnvDecay.cpp \
 	genEnvSeg.cpp \
+	genModFrqCM.cpp \
 	genModFrqFeedback.cpp \
 	genModFrqTransition.cpp \
+	genNoise.cpp \
 	genOscLFO1.cpp \
 	genOscLFO2.cpp \
 	genOscOsc.cpp \
+	genOscSineD.cpp \
 	ioAudioDevice.cpp
 
 TARGETS = ${SRC:.cpp=}

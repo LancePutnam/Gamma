@@ -16,11 +16,9 @@ template <class T = RNGLinCon>
 class NoiseBrown{
 public:
 
-	NoiseBrown(float val = 0, float step = 0.1, float min = -1, float max = 1, uint32_t seed=0) 
-		: val(val), step(step), min(min), max(max)
-	{
-		if(seed) rng = seed;
-	}
+	NoiseBrown(float val=0, float step=0.1, float min=-1, float max=1, uint32_t seed=0) 
+	:	val(val), step(step), min(min), max(max)
+	{	if(seed) rng = seed; }
 	
 	/// Generate next value
 	float operator()(){

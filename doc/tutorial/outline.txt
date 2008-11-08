@@ -14,7 +14,9 @@ Generators
 	Oscillator
 		Computed
 			Linear
-				Warped
+			Warped
+		Recursive Sine
+		Damped Sine
 		Table Lookup
 	Sample Playback
 	Envelope Generators
