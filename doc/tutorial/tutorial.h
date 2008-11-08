@@ -6,7 +6,8 @@
 
 #include <stdio.h>		// for printing to stdout
 #include "Gamma.h"		// core functions
-#include "AudioIO.h" 
+#include "AudioIO.h"
+#include "Delay.h"
 #include "Envelope.h"
 #include "Noise.h"
 #include "Oscillator.h"
