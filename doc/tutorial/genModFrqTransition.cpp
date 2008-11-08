@@ -2,7 +2,7 @@
 	See COPYRIGHT file for authors and license information
 	
 	Tutorial:		Generator / Modulation / Frequency
-	Description:	Transitioning from vibratory to timbral frequency modulation.
+	Description:	Transition from vibratory to timbral frequency modulation.
 */
 
 #include "tutorial.h"

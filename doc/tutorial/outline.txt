@@ -24,6 +24,8 @@ Generators
 		AD
 		ADSR
 	Additive synthesis
+		Beating
+		Wavepacket
 	Modulation
 		Amplitude
 		Phase

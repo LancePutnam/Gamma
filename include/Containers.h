@@ -73,7 +73,6 @@ public:
 	void resize(uint32_t newSize);			///< Resizes number of elements in array
 	void source(const ArrayBase<T,S>& src);	///< Sets source of array elements to another array
 	void source(T * src, uint32_t size);	///< Sets source of array elements to another array
-	//void zero();							// Zeroes array elements
 
 	virtual void onResize(){}
 
@@ -364,7 +363,6 @@ TEM2 void ArrayBase<T,S>::resize(uint32_t newSize){
 		freeElements();
 		mElems = new T[newSize];
 		mSize(newSize);
-		//zero();
 		onResize();
 	}
 	//printf("ArrayBase::resize(): mElems=%p, size=%d\n", mElems, size());

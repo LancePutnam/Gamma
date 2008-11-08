@@ -78,10 +78,8 @@ struct Complex{
 	C& normalize(){ return *this /= mag(); }
 	T phase() const { return atan2(i, r); }
 	C recip() const { T m=1./dot(); return C(r*m, -i*m); }
-
 	
 	bool operator < (const C& c) const { return dot() < c.dot(); }
-
 
 	static C& mul(C& a, const C& b){
 		return a(a.r*b.r - a.i*b.i, a.i*b.r + a.r*b.i);
@@ -226,7 +224,7 @@ struct Quat{
 
 /// This is a fixed size array to enable better loop unrolling optimizations
 /// by the compiler and to avoid an extra 'size' data member for small-sized
-/// arrays.
+/// arrays. It also lacks a constructor to allow C-style struct initializations.
 template <uint32_t N, class T>
 struct Multi{
 
