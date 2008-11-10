@@ -366,28 +366,31 @@ TEM T peak(T v, T bw){ return bw/(v+bw); }
 
 /// From "Bit Twiddling Hacks", 
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-ULONG bitsSet(ULONG val);
+ULONG bitsSet(ULONG v);
 
 /// Returns whether or not the value is even.
-bool even(ULONG value);
+bool even(ULONG v);
 
 /// Returns whether the absolute value is less than an epsilon.
 TEM bool lessAbs(T v, T eps=(T)0.000001);
 
 /// Returns maximum of two values.
-TEM T max(T val1, T val2);
+TEM T max(T v1, T v2);
 
 /// Returns mean of two values.
-TEM T mean(T val1, T val2);
+TEM T mean(T v1, T v2);
 
 /// Returns minimum of two values.
-TEM T min(T val1, T val2);
+TEM T min(T v1, T v2);
+
+/// Returns minimum of three values.
+TEM T min(T v1, T v2, T v3);
 
 /// Returns next largest value of 'val' that is a multiple of 'multiple'.
 TEM T nextMultiple(T val, T multiple);
 
 /// Returns whether the value is a power of two.
-bool powerOf2(int value);
+bool powerOf2(int v);
 
 /// Returns slope of line passing through two points.
 TEM T slope(T x1, T y1, T x2, T y2);
@@ -397,14 +400,14 @@ TEM T slope(T x1, T y1, T x2, T y2);
 /// This implements an algorithm from the paper 
 /// "Using de Bruijn Sequences to Index 1 in a Computer Word"
 /// by Charles E. Leiserson, Harald Prokof, and Keith H. Randall.
-ULONG trailingZeroes(ULONG value);
+ULONG trailingZeroes(ULONG v);
 
 /// Returns whether value is within [lo, hi].
-TEM bool within(T val, T lo, T hi);
+TEM bool within(T v, T lo, T hi);
 TEM bool within3(T v1, T v2, T v3, T lo, T hi);
 
 /// Returns whether value is within [lo, hi).
-TEM bool withinIE(T val, T lo, T hi);
+TEM bool withinIE(T v, T lo, T hi);
 
 /// Returns whether a positive zero crossing occured.
 bool zeroCrossP(float prev, float now);
@@ -813,9 +816,9 @@ TEM inline T mapLin(T v, T i0, T i1, T o0, T o1){
 	return (v - i0) * scale + o0;
 }
 
-inline double mapNormal(double normal, double b1, double b0, double power){
-	if(power != 1.) normal = pow(normal, power);
-	return b0 + (b1 - b0) * normal;
+inline double mapNormal(double v, double b1, double b0, double power){
+	if(power != 1.) v = pow(v, power);
+	return b0 + (b1 - b0) * v;
 }
 
 TEM inline void mix2(T& io1, T& io2, T mix){
@@ -1186,13 +1189,14 @@ inline ULONG bitsSet(ULONG v){
 inline bool even(ULONG v){ return 0 == (v & 1); }
 
 TEM inline bool lessAbs(T v, T eps){ return scl::abs(v) < eps; }
-TEM inline T max(T v1, T v2){ return v1 < v2 ? v2 : v1; }
+TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
 TEM inline T mean(T v1, T v2){ return (v1 + v2) * (T)0.5; }
-TEM inline T min(T v1, T v2){ return v1 < v2 ? v1 : v2; }
+TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
+TEM inline T min(T v1, T v2, T v3){ return (v1<v2 && v1<v3) ? v1 : scl::min(v2,v3); }
 
-TEM inline T nextMultiple(T val, T multiple){
-	ULONG div = (ULONG)(val / multiple);	
-	return (T)(div + 1) * multiple;
+TEM inline T nextMultiple(T v, T m){
+	ULONG div = (ULONG)(v / m);	
+	return (T)(div + 1) * m;
 }
 
 TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
@@ -1329,28 +1333,27 @@ template<> inline float uintToNormalS<float>(ULONG v){
 	return punUF32(v) - 3.f;
 }
 
-inline float splitInt512(ULONG value, ULONG & intPart){
+inline float splitInt512(ULONG v, ULONG & intPart){
 	union{ float f; ULONG i; }u;
-	u.i = value & 0x007fffff | 0x3f800000;
-	intPart = value >> 22;
+	u.i = v & 0x007fffff | 0x3f800000;
+	intPart = v >> 22;
 	return u.f - 1.f;
 }
 
-inline float splitInt1024(ULONG value, ULONG & intPart){
+inline float splitInt1024(ULONG v, ULONG & intPart){
 	union{ float f; ULONG i; }u;
-	//u.i = value << 10 >> 10 | 0x3F800000;
-	u.i = value << 1 & 0x007fffff | 0x3f800000;
-	intPart = value >> 22;
+	//u.i = v << 10 >> 10 | 0x3F800000;
+	u.i = v << 1 & 0x007fffff | 0x3f800000;
+	intPart = v >> 22;
 	return u.f - 1.f;
 }
 
-TEM inline void sphericalToCart(T & rho, T & phi, T & theta){
-	T rhoSinPhi = rho * sin(phi);
-	T thetaTmp = theta;
-	
-	theta = rho * cos(phi);
-	rho = rhoSinPhi * cos(thetaTmp);
-	phi = rhoSinPhi * sin(thetaTmp);
+TEM inline void sphericalToCart(T& r, T& p, T& t){
+	T rsinp = r * sin(p);
+	T tt = t;
+	t = r * cos(p);
+	r = rsinp * cos(tt);
+	p = rsinp * sin(tt);
 }
 
 
@@ -1407,30 +1410,30 @@ inline float triangle(ULONG p){
 // Freq precision:	32 bits
 // Amp precision:	24 bits
 // Width precision:	32 bits
-inline float pulse(ULONG p, ULONG width){
+inline float pulse(ULONG p, ULONG w){
 	// output floating point exponent should be [1, 2)
 	ULONG saw1 = (p >> 9) | 0x3F800000;
-	ULONG saw2 = ((p + width) >> 9) | 0x3F800000;
+	ULONG saw2 = ((p+w) >> 9) | 0x3F800000;
 	return scl::punUF32(saw1) - scl::punUF32(saw2);
 }
 
-inline float stair(ULONG p, ULONG width){
+inline float stair(ULONG p, ULONG w){
 	ULONG sqr1 = 0x3f000000 | (p & 0x80000000);
-	ULONG sqr2 = 0x3f000000 | ((p + width) & 0x80000000);
+	ULONG sqr2 = 0x3f000000 | ((p+w) & 0x80000000);
 	return punUF32(sqr1) + punUF32(sqr2);
 }
 
-inline float stairU(ULONG p, ULONG width){
-	return ((p & 0x80000000) ? 0.5f : 0.f) + (((p+width) & 0x80000000) ? 0.5f : 0.f);
+inline float stairU(ULONG p, ULONG w){
+	return ((p & 0x80000000) ? 0.5f : 0.f) + (((p+w) & 0x80000000) ? 0.5f : 0.f);
 }
 	
-inline float pulseU(ULONG p, ULONG width){
-	return p > width ? 0.f : 1.f;
+inline float pulseU(ULONG p, ULONG w){
+	return p > w ? 0.f : 1.f;
 }
 
-inline float rampUp2(ULONG p, ULONG width){
+inline float rampUp2(ULONG p, ULONG w){
 	ULONG saw1 = (p >> 9) | 0x3f800000;
-	ULONG saw2 = ((p + width) >> 9) | 0x3f800000;
+	ULONG saw2 = ((p+w) >> 9) | 0x3f800000;
 	return punUF32(saw1) + punUF32(saw2) - 3.f;
 }
 
@@ -1442,9 +1445,9 @@ inline float rampUpU(ULONG p){
 	return punUF32(p) - 1.f;
 }
 	
-inline float rampUp2U(ULONG p, ULONG width){
+inline float rampUp2U(ULONG p, ULONG w){
 	ULONG saw1 = (p >> 9) | 0x3F000000;
-	ULONG saw2 = ((p + width) >> 9) | 0x3F000000;
+	ULONG saw2 = ((p+w) >> 9) | 0x3F000000;
 	return punUF32(saw1) + punUF32(saw2) - 1.f;
 }
 
