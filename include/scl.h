@@ -885,7 +885,7 @@ TEM inline T ratioET(T pc, T divisions, T interval){
 
 //TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
 TEM inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
-TEM inline T round(T v, T s){ printf("%f\n", v/s); return round<double>(v/s) * s; }
+TEM inline T round(T v, T s){ return round<double>(v/s) * s; }
 TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
 
 //inline float round(float val, float step){
