@@ -389,11 +389,11 @@ TM1 inline T AD<TM2>::operator()(){
 		if(mCntA++ < mSmpsA)	return scl::min(mFncA(), (T)1);
 		else					mStage = 1;
 		
-	case 1:
+	case 1:{
 		T v = (T)1 - mFncD();
 		if(v > (T)0)			return v;
 		else					mStage = 2;
-		
+	}
 	default: return (T)0;
 	}
 }
