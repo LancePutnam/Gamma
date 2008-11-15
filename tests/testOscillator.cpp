@@ -93,7 +93,6 @@ int main(int argc, char* argv[]){
 //	DO(square())
 //	DO(tableSine())
 	
-	
 	//sine.phase(0.25);		DO(sine())
 	//sine.set(0.5, 0.25);	DO(sine())
 	
@@ -104,6 +103,19 @@ int main(int argc, char* argv[]){
 	
 //
 //	gen::RSin<> rsin(1./n);	DO(rsin())
+
+
+//	const int NP=512, N1=32, N2=N1*N1;
+//
+//	printf("\n");
+//	for(int j=0; j<N1; ++j){
+//	for(int i=0; i<N1; ++i){
+//		float x = (i/float(N1))*2-1;
+//		float y = (j/float(N1))*2-1;
+//		float v = sqrt(x*x + y*y);
+//		v = 1 - scl::clip(v);
+//		printf("%c ", scl::intensityToASCII(v));
+//	} printf("\n"); }
 
 	return 0;
 }

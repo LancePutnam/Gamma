@@ -493,6 +493,9 @@ ULONG normalToUInt2(float normal);
 
 TEM void polarToRect(T mag, T phs, T& real, T& imag);
 
+/// Maps a position in [-1, 1] to an index in [0, n). No boundary operations are performed.
+inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
+
 /// Type-pun 32-bit unsigned int to 32-bit float
 
 /// This function uses a union to avoid problems with direct pointer casting
@@ -572,6 +575,16 @@ TEM T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
 // I/O utilities
 //
 
+/// Returns an ASCII character most closely matching an intensity value in [0,1].
+inline char intensityToASCII(float v){
+	static const char map[] =
+	" .,;-~_+<>i!lI?/|)(1}{][rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@";
+	//"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+//	 123456789.123456789.123456789.123456789.123456789.123456789.1234
+	const int N  = sizeof(map)-1;
+	return map[int((N*scl::clip(v, 0.9999999f)))];
+}
+
 TEM void print(T & v, const char * post="", const char * pre="", FILE * fp=stdout);
 
 // Binary printing methods
@@ -579,6 +592,15 @@ void printBinary(ULONG value, const char * zero="0", const char * one="1", int m
 void printBinary(unsigned long long value, const char * zero="0", const char * one="1", int msb=64);
 void printBinary(float value, const char * zero="0", const char * one="1", int msb=32);
 void printBinary(void * value32, const char * zero="0", const char * one="1", int msb=32);
+
+
+TEM void print2D(T* pix, int nx, int ny, FILE * fp=stdout){
+	for(int j=0; j<nx; ++j){
+	for(int i=0; i<ny; ++i){
+		float v = pix[j*nx + i];
+		fprintf(fp, "%c ", scl::intensityToASCII(v));
+	} printf("\n"); }
+}
 
 /// Print signed normalized value on a horizontal plot.
 
@@ -589,15 +611,7 @@ void printBinary(void * value32, const char * zero="0", const char * one="1", in
 void printPlot(float value, ULONG width=50, bool spaces=true, const char * point="o");
 
 
-/// Returns an ASCII character most closely matching an intensity value in [0,1].
-inline char intensityToASCII(float v){
-	static const char map[] =
-	" .,;-~_+<>i!lI?/|)(1}{][rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@";
-	//"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
-//	 123456789.123456789.123456789.123456789.123456789.123456789.1234
-	const int N  = sizeof(map)-1;
-	return map[int((N*scl::clip(v, 0.9999999f)))];
-}
+
 
 
 // internal

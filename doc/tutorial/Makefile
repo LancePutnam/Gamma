@@ -15,7 +15,8 @@ SRC = \
 	genOscLFO2.cpp \
 	genOscOsc.cpp \
 	genOscSineD.cpp \
-	ioAudioDevice.cpp
+	ioAudioDevice.cpp \
+	visLissajous.cpp \
 
 TARGETS = ${SRC:.cpp=}
 
