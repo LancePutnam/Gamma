@@ -189,6 +189,20 @@ struct RMulAdd: public Val<T>{ INHERIT;
 	T add;												///< Addition amount
 };
 
+
+/// Sawtooth wave in interval [0, max)
+template <class T=gam::real>
+struct Saw: public RAdd<T>{ INHERIT;
+	Saw(T add, T val=0, T max=1): RAdd<T>(add, val), max(max){}
+	T operator()() const {
+		RAdd<T>::operator()();
+		if(val >= max) val -= max;
+		return val;
+	} 
+	T max;
+};
+
+
 /// Sinusoid sequence generator
 template <class T=gam::real>
 struct Sin: public RAdd<T>{ INHERIT;
