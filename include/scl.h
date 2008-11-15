@@ -589,6 +589,17 @@ void printBinary(void * value32, const char * zero="0", const char * one="1", in
 void printPlot(float value, ULONG width=50, bool spaces=true, const char * point="o");
 
 
+/// Returns an ASCII character most closely matching an intensity value in [0,1].
+inline char intensityToASCII(float v){
+	static const char map[] =
+	" .,;-~_+<>i!lI?/|)(1}{][rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@";
+	//"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+//	 123456789.123456789.123456789.123456789.123456789.123456789.1234
+	const int N  = sizeof(map)-1;
+	return map[int((N*scl::clip(v, 0.9999999f)))];
+}
+
+
 // internal
 namespace{
 
