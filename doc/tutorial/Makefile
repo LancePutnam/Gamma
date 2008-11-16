@@ -16,7 +16,11 @@ SRC = \
 	genOscOsc.cpp \
 	genOscSineD.cpp \
 	ioAudioDevice.cpp \
-	visLissajous.cpp \
+	vCrvBotanic.cpp \
+	vCrvEpicycloid.cpp \
+	vCrvHypocycloid.cpp \
+	vCrvLissajous.cpp \
+	vCrvSpiral.cpp
 
 TARGETS = ${SRC:.cpp=}
 
