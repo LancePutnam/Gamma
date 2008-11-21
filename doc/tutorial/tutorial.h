@@ -11,6 +11,7 @@
 #include "Envelope.h"
 #include "Noise.h"
 #include "Oscillator.h"
+#include "SoundFile.h"
 #include "Types.h"
 
 using namespace gam;

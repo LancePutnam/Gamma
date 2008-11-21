@@ -1,6 +1,7 @@
 include config.mk
 
 SRC = \
+	aIOFile.cpp \
 	genEnvAD.cpp \
 	genEnvDecay.cpp \
 	genEnvSeg.cpp \
