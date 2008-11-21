@@ -16,7 +16,7 @@ typedef float			real;	// default real number type
 
 
 /// Complex number
-template <class T=double>
+template <class T=gam::real>
 struct Complex{
 
 	typedef Complex<T> C;
@@ -99,7 +99,7 @@ typedef Complex<double> Complexd;
 
 
 /// Quaternion
-template <class T>
+template <class T=gam::real>
 struct Quat{
 	typedef Quat<T> Q;
 	
@@ -168,30 +168,30 @@ struct Quat{
 	Q& normalize(){ return *this /= mag(); }
 	
 	/// Rotate a vector by current quaternion
-	void rotate(T& x, T& y, T& z){
+	void rotate(T& x, T& y, T& z) const {
 		Q p(-i*x - j*y - k*z, r*x + j*z - k*y, r*y - i*z + k*x,	r*z + i*y - j*x);
 		p *= conj(); x=p.i; y=p.j; z=p.k;
 	}
 	
-	void toAxis(T& a, T& x, T& y, T& z){
+	void toAxis(T& a, T& x, T& y, T& z) const {
 		a = (T)2 * acos(r);
 		T s = 1./sqrt(i*i + j*j + k*k);
 		x = i*s; y = j*s; z = k*s;
 	}
 	
-	void toVectorX(T& x, T& y, T& z){
+	void toVectorX(T& x, T& y, T& z) const {
 		x = (j*j + k*k) * (T)-2 + (T)1;
 		y = (i*j + k*r) * (T) 2;
 		z = (i*k - j*r) * (T) 2;	
 	}
 
-	void toVectorY(T& x, T& y, T& z){
+	void toVectorY(T& x, T& y, T& z) const {
 		x = (i*j - k*r) * (T) 2;
 		y = (i*i + k*k) * (T)-2 + (T)1;
 		z = (j*k + i*r) * (T) 2;
 	}
 
-	void toVectorZ(T& x, T& y, T& z){
+	void toVectorZ(T& x, T& y, T& z) const {
 		x = (i*k + j*r) * (T) 2;
 		y = (j*k - i*r) * (T) 2;
 		z = (i*i + j*j) * (T)-2 + (T)1;
