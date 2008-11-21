@@ -11,6 +11,7 @@
 namespace gam{
 using std::string;
 
+
 SoundFile::SoundFile(string pathA){
 	fp = 0;
 	path(pathA);
@@ -101,7 +102,7 @@ bool SoundFile::instrument(){
 }
 
 
-void SoundFile::info(const SoundFile & src){
+void SoundFile::info(const SoundFile& src){
 	memcpy(&mInfo, &src.mInfo, sizeof(mInfo));
 }
 
@@ -135,17 +136,19 @@ int SoundFile::formatMajor(string sfpath){
 }
 
 void SoundFile::print(){
-	printf("%s\n", mPath.c_str());
-	printf("Sample rate: %f\n",  frameRate());
-	printf("Frames:      %lu\n", frames());
-	printf("Channels:    %lu\n", channels());
-	printf("Samples:     %lu\n", samples());
-	
+	printf("Path:       %s\n", mPath.c_str());
+
 	formatInfoMajor();
-	printf("Format:      %s, %s, ", formatInfo.name, formatInfo.extension) ;
+	printf("Format:     %s, %s, ", formatInfo.name, formatInfo.extension) ;
 	
 	formatInfoSubtype();
 	printf("%s\n", formatInfo.name) ;
+	
+	printf("Frame rate: %f\n",  frameRate());
+	printf("Frames:     %lu\n", frames());
+	printf("Channels:   %lu\n", channels());
+	printf("Samples:    %lu\n", samples());
+	printf("Length:     %f\n", frames()/frameRate());
 }
 
 } // end namespace gam

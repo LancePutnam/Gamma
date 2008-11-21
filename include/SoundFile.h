@@ -12,7 +12,8 @@
 #define TEM template<class T>
 
 namespace gam{
-
+	
+	
 /// Class for reading and writing sound file data.
 
 /// This is a wrapper around Erik de Castro Lopo's excellent libsndfile 
@@ -95,7 +96,7 @@ public:
 	void format(int newFormat);			///< Set format field.
 	void formatMajor(int major);		///< Set major format field
 	void formatMinor(int minor);		///< Set minor format field
-	void info(const SoundFile & src);	///< Copy file information from an other file.
+	void info(const SoundFile& src);	///< Copy file information from an other file.
 	void path(const char * path);		///< Set path of sound file.
 	void path(std::string path);		///< Set path of sound file.
 	
