@@ -731,7 +731,7 @@ TEM inline T clip(T v, int & clipFlag, T hi, T lo){
 TEM inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
 
 template <class T1, class T2, class T3>
-void cross(const T1& a, const T2& b, T3& r){
+inline void cross(const T1& a, const T2& b, T3& r){
 	r[0] = a[1] * b[2] - a[2] * b[1];
 	r[1] = a[2] * b[0] - a[0] * b[2];
 	r[2] = a[0] * b[1] - a[1] * b[0];
