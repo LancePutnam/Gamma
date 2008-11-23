@@ -109,7 +109,7 @@ TEM void fadeLin(T & weight1, T & weight2, T fade);
 /// 0.75	0			1		
 TEM void fadeTri(T & weight1, T & weight2, T fade);
 
-float factorial12(float value);				///< Returns factorial of value in [0, 12].
+//float factorial12(float value);				///< Returns factorial of value in [0, 12].
 ULONG factorial12(ULONG value);				///< Returns factorial of value in [0, 12].
 
 /// Return Fejer weighting factor for kth harmonic in a Fourier series of length n.
@@ -257,6 +257,22 @@ TEM T round(T value, T step);
 
 /// Returns floating point value rounded to nearest step multiple. Faster version to avoid 1/step divide.
 TEM T round(T value, T step, T recStep);
+
+#define DEF(name) TEM inline Complex<T> name(T ct, T st, T cp, T sp)
+
+// Spherical harmonics of l and m. For m!=0, the +m harmonic is returned.
+// To get the -m component of odd m, flip the sign of the real part of the +m component.
+// To get the -m component of even m, flip the sign of the imaginary part of the +m component.
+// The phi arguments should be of an angle |m| times the base phi angle.
+
+DEF(sharm00){ static const T c= 0.50*sqrt(    M_1_PI ); return Complex<T>(c, 0); }
+DEF(sharm10){ static const T c= 0.50*sqrt( 3.*M_1_PI ); return Complex<T>(c*ct); }
+DEF(sharm11){ static const T c=-0.50*sqrt( 3.*M_1_2PI); return Complex<T>(cp,sp)*c*st; }
+DEF(sharm20){ static const T c= 0.25*sqrt( 5.*M_1_PI ); return Complex<T>(c*3.*ct*ct - 1., 0); }
+DEF(sharm21){ static const T c=-0.50*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*ct*st; }
+DEF(sharm22){ static const T c= 0.25*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*st*st; }
+
+#undef DEF
 
 /// Continuous sign map.
 
@@ -617,13 +633,13 @@ void printPlot(float value, ULONG width=50, bool spaces=true, const char * point
 // internal
 namespace{
 
-	const float mFactorial12f[13] = {
-		0.f, 1.f, 2.f, 6.f, 24.f, 120.f, 720.f, 5040.f, 40320.f, 
-		362880.f, 3628800.f, 39916800.f, 479001600.f
-	};
+//	const float mFactorial12f[13] = {
+//		1.f, 1.f, 2.f, 6.f, 24.f, 120.f, 720.f, 5040.f, 40320.f, 
+//		362880.f, 3628800.f, 39916800.f, 479001600.f
+//	};
 
 	const ULONG mFactorial12u[13] = {
-		0, 1, 2, 6, 24, 120, 720, 5040, 40320, 
+		1, 1, 2, 6, 24, 120, 720, 5040, 40320, 
 		362880, 3628800, 39916800, 479001600
 	};
 
@@ -760,7 +776,7 @@ TEM inline void fadeTri(T & w1, T & w2, T f){
 	}
 }
 
-inline float factorial12(float v){ return mFactorial12f[(ULONG)v]; }
+//inline float factorial12(float v){ return mFactorial12f[(ULONG)v]; }
 inline ULONG factorial12(ULONG v){ return mFactorial12u[v]; }
 TEM inline T floor(T v){ return round(v - roundEps<T>()); }
 TEM inline T floor(T v, T s){ return floor(v/s)*s; }
