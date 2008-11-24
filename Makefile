@@ -36,3 +36,4 @@ clean:
 	@cd tests && make clean
 
 all: libgamma.a tests
+
