@@ -57,8 +57,8 @@ protected:
 	uint32_t mPhase;		// Current phase btw [0, 2^32)
 	uint32_t mPhaseInc;
 	
-	uint32_t phaseFI(float v);	// convert unit floating-point to fixed-point integer
-	float phaseIF(uint32_t v);	// convert fixed-point integer to unit floating-point
+	uint32_t phaseFI(float v) const;	// convert unit floating-point to fixed-point integer
+	float phaseIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
 };
 
 #define ACCUM_INHERIT\
@@ -724,13 +724,13 @@ TEMS Accum<Ts>::Accum(float freq, float phase): mFreq(freq){
 	(phase >= 1.f) ? phaseMax() : this->phase(phase);
 }
 
-TEMS inline uint32_t Accum<Ts>::phaseFI(float v){
+TEMS inline uint32_t Accum<Ts>::phaseFI(float v) const {
 	//return scl::normalToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
 	return scl::castIntRound(v * 4294967296.);
 }
 
-TEMS inline float Accum<Ts>::phaseIF(uint32_t v){
+TEMS inline float Accum<Ts>::phaseIF(uint32_t v) const {
 	return scl::uintToNormal<float>(v);
 }
 
