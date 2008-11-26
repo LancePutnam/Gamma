@@ -7,33 +7,34 @@ Fundamentals
 	Operations
 
 I/O
-	Audio Devices
-	Sound Files
+	*Audio Devices
+	*Sound Files
 
 Generators
 	Oscillator
 		Computed
-			Linear
-			Warped
+			*Linear
+			*Warped
 		Recursive Sine
-		Damped Sine
+		*Damped Sine
 		Table Lookup
 	Sample Playback
 	Envelope Generators
-		Decay
-		AD
+		*Decay
+		*AD
+		*Segment
 		ADSR
 	Additive synthesis
-		Beating
-		Wavepacket
+		*Beating
+		*Wavepacket
 	Modulation
-		Amplitude
+		*Amplitude
 		Phase
 		Frequency
-			vibrato to timbral
-			different harmonic relationships (all, odd, in-)
+			*vibrato to timbral
+			*different harmonic relationships (all, odd, in-)
 			feedback (1-oscillator)
-	Noise
+	*Noise
 
 Filters
 	Waveshaping
@@ -66,3 +67,7 @@ Composition
 	Polyphony
 	Timer
 	Mu
+
+
+(* = done)
+

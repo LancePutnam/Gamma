@@ -1,6 +1,7 @@
 include config.mk
 
 SRC = \
+	aEffFlanger.cpp \
 	aIOFile.cpp \
 	genEnvAD.cpp \
 	genEnvDecay.cpp \

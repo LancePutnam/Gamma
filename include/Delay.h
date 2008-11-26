@@ -354,9 +354,10 @@ public:
 	/// the filter.  Setting the decay amount effects only the feedback value.
 	/// The decay must be updated whenever the delay length of the filter changes.
 	void decay(float units, float end = 0.001f);
-	void ffd(const Tf& v);					///< Set feedforward amount [-1, 1].
 	void fbk(const Tf& v);					///< Set feedback amount (-1, 1).
 	void fbkAllPass(const Tf& v);			///< Set feedback amount (-1, 1) with feedforward set to opposite.
+	void ffd(const Tf& v);					///< Set feedforward amount [-1, 1].
+
 	void set(float delay, const Tf& ffd, const Tf& fbk); ///< Set several parameters.
 
 	Tv operator()(const Tv& i0);					///< Returns filtered value.
