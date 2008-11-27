@@ -126,18 +126,17 @@ struct Quat{
 //	Q& operator = (const Q& v){ r=v.r; i=v.i; j=v.j; k=v.k; return *this; }
 //	Q& operator = (const T& v){ r=v;   i=v;   j=v;   k=v;   return *this; }
 //	Q  operator - (const Q& v) const { return Q(r-v.r, i-v.i, j-v.j, k-v.k); }
-//	Q  operator - () const { return Q(-r, -i, -j, -k); }
-//	Q& operator -=(const Q& v){ r-=v.r; i-=v.i; j-=v.j; k-=v.k; return *this; }
-//	Q& operator -=(const T& v){ r-=v;   i-=v;   return *this; }
+	Q  operator - () const { return Q(-r, -i, -j, -k); }
+	Q  operator - (const Q& v) const { return Q(r-v.r, i-v.i, j-v.j, k-v.k); }
+	Q& operator -=(const Q& v){ r-=v.r; i-=v.i; j-=v.j; k-=v.k; return *this; }
 	Q  operator + (const Q& v) const { return Q(r+v.r, i+v.i, j+v.j, k+v.k); }
 	Q& operator +=(const Q& v){ r+=v.r; i+=v.i; j+=v.j; k+=v.k; return *this; }
-	Q& operator +=(const T& v){ r+=v;   i+=v;   j+=v;   k+=v;   return *this; }
 	Q  operator * (const Q& v) const { Q q(*this); return mul(q, v); }
 	Q  operator * (const T& v) const { return Q(r*v, i*v, j*v, k*v); }
 	Q& operator *=(const Q& v){ return mul(*this, v); }
 	Q& operator *=(const T& v){ r*=v; i*=v; j*=v; k*=v; return *this; }
 //	Q  operator / (const Q& v) const { Q c(*this); return div(c, v); }
-//	Q  operator / (const T& v) const { return Q(r/v, i/v); }
+	Q  operator / (const T& v) const { return Q(r/v, i/v, j/v, k/v); }
 //	Q& operator /=(const Q& v){ return div(*this, v); }
 	Q& operator /=(const T& v){ r/=v; i/=v; j/=v; k/=v; return *this; }
 
