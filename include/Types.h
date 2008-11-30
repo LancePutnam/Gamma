@@ -102,11 +102,11 @@ typedef Complex<double> Complexd;
 template <class T=gam::real>
 struct Quat{
 	typedef Quat<T> Q;
-	
+
 	struct Unit3{
-		Unit3(const T& vx, const T& vy, const T& vz)
+		Unit3(const T& vx, const T& vy, const T& vz, const T& scale=1)
 		:	x(vx), y(vy), z(vz)
-		{	T m = (T)1 / sqrt(x*x + y*y + z*z); x*=m; y*=m; z*=m; }
+		{	T m = scale / sqrt(x*x + y*y + z*z); x*=m; y*=m; z*=m; }
 		
 		T x,y,z;
 	};
@@ -117,7 +117,9 @@ struct Quat{
 		T elems[4];
 	};
 	
+	//Quat(const Quat& q): r(q.r), i(q.i), j(q.j), k(q.k){}
 	Quat(const T& r=(T)1, const T& i=(T)0, const T& j=(T)0, const T& k=(T)0): r(r), i(i), j(j), k(k){}
+	Quat(const T& a, const Unit3& u){ fromAxis(a,u); }
 
 	Q& operator ()(const T& vr, const T& vi, const T& vj, const T& vk){ r=vr; i=vi; j=vj; k=vk; return *this; }
 	T& operator[](uint32_t i){ return elems[i];}
