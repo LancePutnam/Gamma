@@ -25,20 +25,20 @@ public:
 	const float * in (ULONG channel);	///< Returns an in channel buffer.
 	float *       out(ULONG channel);	///< Returns an out channel buffer.
 	
-	ULONG inChans();					///< Returns effective number of input channels
-	ULONG outChans();					///< Returns effective number of output channels
-	ULONG auxChans();					///< Returns number of aux channels
+	ULONG inChans() const;				///< Returns effective number of input channels
+	ULONG outChans() const;				///< Returns effective number of output channels
+	ULONG auxChans() const;				///< Returns number of aux channels
 
-	ULONG inDeviceChans();		///< Returns number of channels opened on input device
-	ULONG outDeviceChans();		///< Returns number of channels opened on output device
-	ULONG numFrames();			///< Returns frames/buffer of audio I/O stream
-	double secondsPerBuffer();	///< Returns seconds/buffer of audio I/O stream
-	double fps();				///< Returns frames/second of audio I/O streams
-	double spf();				///< Returns seconds/frame of audio I/O streams
-	double time();				///< Returns current stream time in seconds
-	double time(ULONG frame);	///< Returns current stream time in seconds of frame
-	void zeroAux();				///< Zeros all the aux buffers
-	void zeroOut();				///< Zeros all the internal output buffers
+	ULONG inDeviceChans() const;		///< Returns number of channels opened on input device
+	ULONG outDeviceChans() const;		///< Returns number of channels opened on output device
+	ULONG numFrames() const;			///< Returns frames/buffer of audio I/O stream
+	double secondsPerBuffer() const;	///< Returns seconds/buffer of audio I/O stream
+	double fps() const;					///< Returns frames/second of audio I/O streams
+	double spf() const;					///< Returns seconds/frame of audio I/O streams
+	double time() const;				///< Returns current stream time in seconds
+	double time(ULONG frame) const;		///< Returns current stream time in seconds of frame
+	void zeroAux();						///< Zeros all the aux buffers
+	void zeroOut();						///< Zeros all the internal output buffers
 	
 protected:
 	PaStreamParameters mInParams, mOutParams;	// Input and output stream parameters.
@@ -98,8 +98,9 @@ public:
 	void setFramesPerBuffer(ULONG numFrames);
 	void auxChans(ULONG num);
 
-	ULONG chans(bool forOutput);
-	double cpu();					///< Returns current CPU usage of audio thread
+	ULONG chans(bool forOutput) const;
+	double cpu() const;					///< Returns current CPU usage of audio thread
+	bool killNANs() const;
 	bool supportsFPS(double fps);
 
 	void print();				///< Prints info about current i/o devices to stdout.
@@ -119,6 +120,7 @@ private:
 	bool mIsOpen;			// An audio device is open
 	bool mIsRunning;		// An audio stream is running
 	bool mInResizeDeferred, mOutResizeDeferred;
+	bool mKillNANs;			// whether to zero NANs
 
 	void init();		// Initializes PortAudio and member variables.
 	
@@ -132,7 +134,7 @@ private:
 	PaDeviceIndex defaultInDevice();
 	PaDeviceIndex defaultOutDevice();
 	
-	bool error();
+	bool error() const;
 	void inDevice(PaDeviceIndex index);		// directly set input device
 	void outDevice(PaDeviceIndex index);	// directly set output device
 	void setInDeviceChans(ULONG num);			// directly set # device input channels
@@ -156,27 +158,28 @@ inline float *       AudioIOData::aux(ULONG num){ return mBufA + num * numFrames
 inline const float * AudioIOData::in (ULONG chn){ return mBufI + chn * numFrames(); }
 inline float *       AudioIOData::out(ULONG chn){ return mBufO + chn * numFrames(); }
 
-inline ULONG AudioIOData:: inChans(){ return mNumI; }
-inline ULONG AudioIOData::outChans(){ return mNumO; }
-inline ULONG AudioIOData::auxChans(){ return mNumA; }
-inline ULONG AudioIOData::inDeviceChans(){ return (ULONG)mInParams.channelCount; }
-inline ULONG AudioIOData::outDeviceChans(){ return (ULONG)mOutParams.channelCount; }
+inline ULONG AudioIOData:: inChans() const { return mNumI; }
+inline ULONG AudioIOData::outChans() const { return mNumO; }
+inline ULONG AudioIOData::auxChans() const { return mNumA; }
+inline ULONG AudioIOData::inDeviceChans() const { return (ULONG)mInParams.channelCount; }
+inline ULONG AudioIOData::outDeviceChans() const { return (ULONG)mOutParams.channelCount; }
 
-inline double AudioIOData::fps(){ return mFramesPerSecond; }
-inline double AudioIOData::spf(){ return 1. / fps(); }
-inline double AudioIOData::time(){ return Pa_GetStreamTime(mStream); }
-inline double AudioIOData::time(ULONG frame){ return (double)frame * spf() + time(); }
-inline ULONG AudioIOData::numFrames(){ return mFramesPerBuffer; }
-inline double AudioIOData::secondsPerBuffer(){ return (double)numFrames() * spf(); }
+inline double AudioIOData::fps() const { return mFramesPerSecond; }
+inline double AudioIOData::spf() const { return 1. / fps(); }
+inline double AudioIOData::time() const { return Pa_GetStreamTime(mStream); }
+inline double AudioIOData::time(ULONG frame) const { return (double)frame * spf() + time(); }
+inline ULONG AudioIOData::numFrames() const { return mFramesPerBuffer; }
+inline double AudioIOData::secondsPerBuffer() const { return (double)numFrames() * spf(); }
 
 inline void AudioIO::operator()(){ if(callback) callback(*this); }
 
-inline ULONG AudioIO::chans(bool forOutput){ return forOutput ? outChans() : inChans(); }
-inline double AudioIO::cpu(){ return Pa_GetStreamCpuLoad(mStream); }
+inline ULONG AudioIO::chans(bool forOutput) const { return forOutput ? outChans() : inChans(); }
+inline double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mStream); }
+inline bool AudioIO::killNANs() const { return mKillNANs; }
 inline int AudioIO::numDevices(){ return Pa_GetDeviceCount(); }
 inline const char * AudioIO::errorText(int errNum){ return Pa_GetErrorText(errNum); }
 
-inline bool AudioIO::error(){ return mErrNum != paNoError; }
+inline bool AudioIO::error() const { return mErrNum != paNoError; }
 inline void AudioIO::inDevice(PaDeviceIndex index){ mInParams.device = index; }
 inline void AudioIO::outDevice(PaDeviceIndex index){ mOutParams.device = index; }
 inline void AudioIO::setInDeviceChans(ULONG num){ mInParams.channelCount = num; }

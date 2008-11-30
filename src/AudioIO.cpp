@@ -33,9 +33,10 @@ void (* AudioIO::callback)(AudioIOData &) = 0;
 
 AudioIO::AudioIO(
 	ULONG framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * user,
-	int outChansA, int inChansA ) :
-		AudioIOData(user),
-		mIsOpen(false), mIsRunning(false), mInResizeDeferred(false), mOutResizeDeferred(false)
+	int outChansA, int inChansA )
+:	AudioIOData(user),
+	mIsOpen(false), mIsRunning(false), mInResizeDeferred(false), mOutResizeDeferred(false),
+	mKillNANs(true)
 {
 	callback = callbackA;
 	
@@ -185,7 +186,7 @@ int AudioIO::paCallback(const void *input,
 						void * userData )
 {
 
-	AudioIO * io = (AudioIO *)userData;
+	AudioIO& io = *(AudioIO *)userData;
 
 	const float * paI = (const float *)input;
 	float * paO = (float *)output;
@@ -193,16 +194,24 @@ int AudioIO::paCallback(const void *input,
 	bool deinterleave = true;
 
 	if(deinterleave){
-		mem::deinterleave((float *)io->in(0),  paI, io->numFrames(), io->inDeviceChans() );
-		mem::deinterleave(io->out(0), paO, io->numFrames(), io->outDeviceChans());
+		mem::deinterleave((float *)io.in(0),  paI, io.numFrames(), io.inDeviceChans() );
+		mem::deinterleave(io.out(0), paO, io.numFrames(), io.outDeviceChans());
 	}
 
-	(*io)();	// call callback
-	
-	if(deinterleave){
-		mem::interleave(paO, io->out(0), io->numFrames(), io->outDeviceChans());
+	io();	// call callback
+
+	// kill pesky nans so we don't hurt anyone's ears
+	if(io.killNANs()){
+		for(int i=0; i<io.numFrames()*io.outDeviceChans(); ++i){
+			float& s = io.out(0)[i];
+			if(isnan(s)) s = 0.f;
+		}
 	}
-	
+
+	if(deinterleave){
+		mem::interleave(paO, io.out(0), io.numFrames(), io.outDeviceChans());
+	}
+
 	return 0;
 }
 
