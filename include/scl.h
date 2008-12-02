@@ -186,6 +186,9 @@ float log2Fast(float value);
 /// Maps value from [-1,1] to [depth, 1].
 TEM T mapDepth(T v, T depth){ return (v - (T)1) * (T)0.5 * depth + (T)1;  }
 
+/// Inverse 2nd power mapping for interval [0, 1].
+TEM T mapInvPow2(T v);
+
 /// Computes scale and offset necessary to map value from [i0, i1] to [o0, o1].
 TEM void mapLin(T i0, T i1, T o0, T o1, T & scale, T & offset);
 
@@ -234,6 +237,7 @@ TEM T pow6(T value);			///< Returns value to the 6th power.
 TEM T pow8(T value);			///< Returns value to the 8th power.
 TEM T pow16(T value);			///< Returns value to the 16th power.
 TEM T pow2S(T value);			///< Returns value to the 2nd power preserving sign.
+
 unsigned char prime(ULONG n);	///< Returns (n+1)th prime number up to n=53.
 TEM T prime(ULONG n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
 
@@ -846,6 +850,8 @@ inline float log2Fast(float v){
 	union{ float f; int32_t i; } u; u.f=v;
 	return (float)((u.i - 0x3f800000)) * 0.0000001192092896f;// / 8388608.f;
 }
+
+TEM inline T mapInvPow2(T v){ return T(1) - scl::pow2(T(1) - v); }
 
 TEM inline void mapLin(T i0, T i1, T o0, T o1, T& scale, T& offset){
 	scale = slope(i0, o0, i1, o1);

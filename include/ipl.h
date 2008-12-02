@@ -99,6 +99,15 @@ template <class Tf, class Tv>
 Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z); 
 
 
+/// Trilinear interpolation between eight corners of a cube.
+template <class Tf3, class Tv>
+inline Tv trilinear(
+	const Tf3& f, 
+	const Tv& v000, const Tv& v100,
+	const Tv& v010, const Tv& v110,
+	const Tv& v001, const Tv& v101,
+	const Tv& v011, const Tv& v111
+);
 
 
 /// Truncating interpolation strategy
@@ -437,6 +446,30 @@ inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
 	//Tv c1 = x*(Tf)-1.5 + y*(Tf)2 - z*(Tf)0.5;
 	Tv c1 = -x + y - c2;
 	return (c2 * f + c1) * f + x;
+}
+
+
+template <class F3, class Tv>
+inline Tv trilinear(
+	const F3& f, 
+	const Tv& v000, const Tv& v100,
+	const Tv& v010, const Tv& v110,
+	const Tv& v001, const Tv& v101,
+	const Tv& v011, const Tv& v111
+){
+	float f1=f[0], f2=f[1];
+
+	return
+	linear(f[2],
+		linear(f2,
+			linear(f1, v000, v100),
+			linear(f1, v010, v110)
+		),
+		linear(f2,
+			linear(f1, v001, v101),
+			linear(f1, v011, v111)			
+		)
+	);
 }
 
 
