@@ -265,12 +265,12 @@ TEM T round(T value, T step, T recStep);
 #define DEF(name) TEM inline Complex<T> name(T ct, T st, T cp, T sp)
 
 // Spherical harmonics of l and m. For m!=0, the +m harmonic is returned.
-// To get the -m component of odd m, flip the sign of the real part of the +m component.
-// To get the -m component of even m, flip the sign of the imaginary part of the +m component.
-// The phi arguments should be of an angle |m| times the base phi angle.
+// The input angles are in terms of cosine and sine of theta and phi.
+// The phi arguments should be of an angle m times the base phi angle.
+// For odd, negative m, the result should by multiplied by -1.
 
 DEF(sharm00){ static const T c= 0.50*sqrt(    M_1_PI ); return Complex<T>(c, 0); }
-DEF(sharm10){ static const T c= 0.50*sqrt( 3.*M_1_PI ); return Complex<T>(c*ct); }
+DEF(sharm10){ static const T c= 0.50*sqrt( 3.*M_1_PI ); return Complex<T>(c*ct, 0); }
 DEF(sharm11){ static const T c=-0.50*sqrt( 3.*M_1_2PI); return Complex<T>(cp,sp)*c*st; }
 DEF(sharm20){ static const T c= 0.25*sqrt( 5.*M_1_PI ); return Complex<T>(c*(3.*ct*ct - 1.), 0); }
 DEF(sharm21){ static const T c=-0.50*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*ct*st; }
