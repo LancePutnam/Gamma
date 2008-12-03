@@ -272,7 +272,7 @@ TEM T round(T value, T step, T recStep);
 DEF(sharm00){ static const T c= 0.50*sqrt(    M_1_PI ); return Complex<T>(c, 0); }
 DEF(sharm10){ static const T c= 0.50*sqrt( 3.*M_1_PI ); return Complex<T>(c*ct); }
 DEF(sharm11){ static const T c=-0.50*sqrt( 3.*M_1_2PI); return Complex<T>(cp,sp)*c*st; }
-DEF(sharm20){ static const T c= 0.25*sqrt( 5.*M_1_PI ); return Complex<T>(c*3.*ct*ct - 1., 0); }
+DEF(sharm20){ static const T c= 0.25*sqrt( 5.*M_1_PI ); return Complex<T>(c*(3.*ct*ct - 1.), 0); }
 DEF(sharm21){ static const T c=-0.50*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*ct*st; }
 DEF(sharm22){ static const T c= 0.25*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*st*st; }
 
