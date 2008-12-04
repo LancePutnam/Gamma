@@ -12,6 +12,7 @@ SRC = \
 	genModFrqTransition.cpp \
 	genNoise.cpp \
 	genOscAddBeat.cpp \
+	genOscAddBinBeat.cpp \
 	genOscAddPacket.cpp \
 	genOscLFO1.cpp \
 	genOscLFO2.cpp \
