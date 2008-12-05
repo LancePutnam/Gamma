@@ -169,6 +169,11 @@ TEM T gaussian(T v){ return exp(-v*v); }
 
 TEM T hypot(T x, T y);
 
+/// Generalized Laguerre polynomial L{n,k}
+///
+/// http://en.wikipedia.org/wiki/Laguerre_polynomials
+double laguerre(int n, int k, double x);
+
 /// Associated Legendre polynomial
 ///
 /// P_l^m(cos(t)) = (-1)^{l+m} / (2^l l!) sin^m(t) (d/d cos(t))^{l+m} sin^{2l}(t)
@@ -179,7 +184,6 @@ TEM T hypot(T x, T y);
 ///
 /// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
 double legendre(int l, int m, double t);
-
 
 /// Convert linear value to log2 in range [0, 1]
 TEM T linLog2(T v, T recMin);

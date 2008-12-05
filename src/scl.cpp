@@ -127,6 +127,16 @@ long floatToInt(float value){
 }
 
 
+double laguerre(int n, int k, double x) {
+	double res = 1, bin = 1;
+	
+	for(int i=n; i>=1; --i){
+		bin = bin * (k+i) / (n + 1 - i);
+		res = bin - x * res / i;
+	}
+	return res;
+}
+
 
 double legendre(int l, int m, double t){
 
