@@ -688,7 +688,7 @@ namespace{
 
 
 #define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
-GEN(int, abs) GEN(long, labs) GEN(float, fabsf) GEN(double, fabs)
+GEN(int, ::abs) GEN(long, labs) GEN(float, fabsf) GEN(double, fabs)
 TEM inline T abs(T v){ return v < (T)0 ? -v : v; }
 #undef GEN
 
