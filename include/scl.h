@@ -388,8 +388,8 @@ TEM T peak(T v, T bw){ return bw/(v+bw); }
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 ULONG bitsSet(ULONG v);
 
-/// Returns whether or not the value is even.
-bool even(ULONG v);
+/// Returns whether or not an integer value is even.
+TEM bool even(T v);
 
 /// Returns whether the absolute value is less than an epsilon.
 TEM bool lessAbs(T v, T eps=(T)0.000001);
@@ -408,6 +408,9 @@ TEM T min(T v1, T v2, T v3);
 
 /// Returns next largest value of 'val' that is a multiple of 'multiple'.
 TEM T nextMultiple(T val, T multiple);
+
+/// Returns whether or not an integer value is odd.
+TEM bool odd(T v);
 
 /// Returns whether the value is a power of two.
 bool powerOf2(int v);
@@ -1233,7 +1236,7 @@ inline ULONG bitsSet(ULONG v){
 	return ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
 }
 
-inline bool even(ULONG v){ return 0 == (v & 1); }
+TEM inline bool even(T v){ return 0 == odd(v); }
 
 TEM inline bool lessAbs(T v, T eps){ return scl::abs(v) < eps; }
 TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
@@ -1245,6 +1248,8 @@ TEM inline T nextMultiple(T v, T m){
 	ULONG div = (ULONG)(v / m);	
 	return (T)(div + 1) * m;
 }
+
+TEM inline bool odd(T v){ return v & T(1); }
 
 TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
