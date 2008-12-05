@@ -9,37 +9,6 @@
 namespace gam{
 namespace scl{
 
-float clipMag(float value, float min, float max){
-	union {float f; ULONG i;} v;
-	v.f = value;
-	ULONG sign = v.i & 0x80000000;
-	v.i |= 0x80000000;
-	v.f = clip(v.f, max, min);
-	v.i |= sign;
-	return v.f;
-}
-
-
-double freq(const char * note){
-
-	char c = *note++;
-	if(within(c, 'a', 'g')){
-		c -= 97;
-
-		static char r[7] = {9,11,0,2,4,5,7};
-		char result = r[(unsigned)c];
-		
-		c = *note++;
-		     if(c == '+'){ result++; c = *note; }
-		else if(c == '-'){ result--; c = *note; }
-		else if(c == ' '){ c = *note; }
-		
-		return pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		
-	}
-	return 0.;
-}
-
-
 char base10To36(int v){
 	if(within(v, 0, 9)) return '0' + v;
 	if(within(v,10,35)) return 'a' + v - 10;
@@ -90,6 +59,37 @@ uint16_t bytesToUInt16(const uint8_t * bytes2){
 }
 
 
+float clipMag(float value, float min, float max){
+	union {float f; ULONG i;} v;
+	v.f = value;
+	ULONG sign = v.i & 0x80000000;
+	v.i |= 0x80000000;
+	v.f = clip(v.f, max, min);
+	v.i |= sign;
+	return v.f;
+}
+
+
+double freq(const char * note){
+
+	char c = *note++;
+	if(within(c, 'a', 'g')){
+		c -= 97;
+
+		static char r[7] = {9,11,0,2,4,5,7};
+		char result = r[(unsigned)c];
+		
+		c = *note++;
+		     if(c == '+'){ result++; c = *note; }
+		else if(c == '-'){ result--; c = *note; }
+		else if(c == ' '){ c = *note; }
+		
+		return pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		
+	}
+	return 0.;
+}
+
+
 ULONG floatToUInt(float value){
 	ULONG valueU = *(ULONG *)&value;
 
@@ -125,6 +125,60 @@ long floatToInt(float value){
 		return 0;
 	}
 }
+
+
+
+double legendre(int l, int m, double t){
+
+	if(l<0){ /*printf("l=%d. l must be non-negative.\n");*/ return 0; }
+	if(m<-l || m>l){ /*printf("m=%d. m must be -l <= m <= l.\n");*/ return 0; }
+
+	// compute P_l^m(x) by the recurrence relation
+	//		(l-m)P_l^m(x) = x(2l-1)P_{l-1}^m(x) - (l+m-1)P_{l-2}^m(x)
+	// with 
+	//		P_m^m(x) = (-1)^m (2m-1)!! (1-x)^{m/2}, 
+	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
+
+	double P = 0;
+	double cs = cos(t);
+	double sn = sin(t);
+	int mm = m;			/*   mm = |m|   */
+	if(m<0) mm = -mm;
+	double y_1 = 1.;
+	
+	for(int i=1; i<=mm; ++i)
+		y_1 *= - 1.0 * (2.*i-1) * sn;
+	
+	if(l==mm){
+		P = y_1;
+	}
+
+	else{
+		double y = (2.*mm + 1.) * cs * y_1;
+		if(l==mm+1)	P = y;
+		else{
+			double c = 2. * mm - 1.;
+			for(int k=mm+2; k<=l; ++k){
+				double y_2 = y_1;
+				y_1 = y;
+				double d = c / (k - mm);
+				y = (2. + d) * cs * y_1 - (1. + d) * y_2;
+			}
+			P = y;
+		}
+	}
+
+	// In the case that m<0, 
+	// compute P_n^{-|m|}(x) by the formula 
+	//		P_l^{-|m|}(x) = (-1)^{|m|}((l-|m|)!/(l+|m|)!)^{1/2} P_l^{|m|}(x). 
+	if(m<0){
+		for(int i=l-mm+1; i<=l+mm; ++i) P *= 1. / i;
+		if(scl::odd(mm)) P = -P;
+	}
+
+	return P;
+}
+
 
 
 float split(float value, long & intPart){

@@ -169,6 +169,18 @@ TEM T gaussian(T v){ return exp(-v*v); }
 
 TEM T hypot(T x, T y);
 
+/// Associated Legendre polynomial
+///
+/// P_l^m(cos(t)) = (-1)^{l+m} / (2^l l!) sin^m(t) (d/d cos(t))^{l+m} sin^{2l}(t)
+///
+/// @param[in]	l	degree s.t. l>=0
+/// @param[in]	m	order s.t. -l<=m <=l
+/// @param[in]	t	variable
+///
+/// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
+double legendre(int l, int m, double t);
+
+
 /// Convert linear value to log2 in range [0, 1]
 TEM T linLog2(T v, T recMin);
 
@@ -261,6 +273,9 @@ TEM T round(T value, T step);
 
 /// Returns floating point value rounded to nearest step multiple. Faster version to avoid 1/step divide.
 TEM T round(T value, T step, T recStep);
+
+/// Returns value of spherical harmonic Y{l,m}(theta, phi).
+TEM Complex<T> sharm(int l, int m, T theta, T phi);
 
 #define DEF(name) TEM inline Complex<T> name(T ct, T st, T cp, T sp)
 
@@ -953,6 +968,15 @@ TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
 //	//val = fastFloor(val * step + u.f) * stepRec;
 //	return float(long(val * stepRec + u.f)) * step;
 //}
+
+TEM Complex<T> sharm(int l, int m, T theta, T phi){
+	T c = T(factorial12(l-m)) / T(factorial12(l+m));
+	c = sqrt((2*l + 1) / M_4PI * c);
+	c *= legendre(l, m, theta);
+	
+	phi *= m;
+	return Complex<T>(c*cos(phi), c*sin(phi));
+}
 
 TEM inline T sign(T v, T bw){ return v/(scl::abs(v) + bw); }
 
