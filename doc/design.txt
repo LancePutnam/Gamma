@@ -41,11 +41,32 @@ Sampled Generators
 
 What set of names should be adopted?
 
-Children (relative, observers):
-	Synced, Sampled, Signal, DiscreteSignal, QuantumUnit, SampleRateObserver
-	
-Parent (absolute, observees):
-	Sync, Domain, Quantum, SampleSpace, SampleRate
+Parent (absolute, subject):		Child (relative, observer):		
+Sync							Synced
+Inc								Inced
+Arc								Arced
+Meter							Metered
+Quantum							QuantumUnit
+Current							
+Conductor						Conducted
+Step							Stepped
+Joint							Limb
+DualSpace						Duality
+Pitch							Pitched
+Fundamental
+Medium							Wave
+Envir							Entity
+Harmonia						Harmonized
+
+
+
+'syn-' is Greek for 'together'
+
+The names should poetically decsribe the notion of a dual space with reciprocal
+fundamental frequency and period and entities that are members of the space.
+
+The parent determines the highest possible frequency component of any of its 
+members. 
 
 
 To implement this, we can use the Observer design pattern. This is a description
