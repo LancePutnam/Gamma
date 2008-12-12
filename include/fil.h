@@ -9,6 +9,39 @@
 namespace gam{
 namespace fil{
 
+
+
+/// One element delay.
+template<class T = gam::real> 
+class Delay1{
+public:
+	/// @param[in] iprev	Initial previous value.
+	Delay1(T iprev = 0) : prev(iprev){}
+
+	T prev;				///< The previous input sample.
+
+	/// Returns next delayed sample.
+	T operator()(T v){ T p=prev; prev=v; return p; }
+};
+
+
+
+/// Two element delay.
+template <class T=gam::real>
+class Delay2{
+public:
+	Delay2(const T& v2=(T)0, const T& v1=(T)0, const T& v0=(T)0) : v0(v0), v1(v1), v2(v2){}
+	T operator()(const T& v){ v2=v1; v1=v0; v0=v; return v0; }
+	T operator()(){ return v0; }		///< Get current value
+	T d1f(){ return v0-v1; }			///< Get first forward difference
+	T d1b(){ return v1-v2; }			///< Get first backward difference
+	T d1c(){ return (v0-v2)*0.5; }		///< Get first center difference
+	T d2(){ return d1f() - d1b(); }		///< Get second difference
+
+private: T v0, v1, v2;
+};
+
+
 // Direct domain lowpass filter
 template <class T=gam::real>
 class Lowpass{

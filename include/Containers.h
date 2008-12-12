@@ -216,6 +216,7 @@ public:
 	void copyUnwrap(T * dst, uint32_t len) const;
 	
 	uint32_t pos() const;			///< Return absolute index of last written element
+	uint32_t indexEnd() const;		///< Returns absolute index of end element
 	uint32_t indexPrev(uint32_t ago) const;	///< Returns absolute index of a previously written element
 
 	void operator()(const T& v);	///< Write new element
@@ -454,6 +455,11 @@ TEM void Ring<T>::copy(T * dst, uint32_t len, uint32_t delay) const{
 }
 
 TEM void Ring<T>::copyUnwrap(T * dst, uint32_t len) const { copy(dst, len, size() - 1); }
+
+TEM inline uint32_t Ring<T>::indexEnd() const {
+	uint32_t i = pos() + 1;
+	return (i != size()) ? i : 0;
+}
 
 TEM inline uint32_t Ring<T>::indexPrev(uint32_t v) const {
 	return scl::wrapOnce<int>(pos() - v, size());
