@@ -50,18 +50,11 @@ public:
 	void indToPos(int i1, int i2, int i3, float& p1, float& p2, float& p3) const;
 
 	// Get neighboring indices. No bounds checking.
-	void indNeighbors(int i1, int i2, int i3, int (&inds)[6], bool (&valid)[6]){
-		inds[0] = i1-1; inds[1] = i1+1;
-		inds[2] = i2-1;	inds[3] = i2+1;
-		inds[4] = i3-1;	inds[5] = i3+1;
-		
-		valid[0] = inds[0] >= 0;
-		valid[1] = inds[1] <  size1();
-		valid[2] = inds[2] >= 0;
-		valid[3] = inds[3] <  size2();
-		valid[4] = inds[4] >= 0;
-		valid[5] = inds[5] <  size3();
-	}
+	void indNeighbors(int i1, int i2, int i3, int (&inds)[6], bool (&valid)[6]) const;
+	void indNeighbors1(int i, int * inds, bool * valid) const;
+	void indNeighbors2(int i, int * inds, bool * valid) const;
+	void indNeighbors3(int i, int * inds, bool * valid) const;
+	void indNeighbors4(int i, int * inds, bool * valid) const;
 
 	int posToInd1(float p) const;
 	int posToInd2(float p) const;
@@ -76,6 +69,12 @@ public:
 
 	// Converts coordinate (p1, p2, p3, p4) to flat index.
 	int posToInd(float p1, float p2, float p3, float p4) const;
+	
+	void posToIndFrac(float p1, float p2, float p3, float& f1, float& f2, float& f3) const {
+		f1 = posToIndFrac(p1, 0);
+		f2 = posToIndFrac(p2, 1);
+		f3 = posToIndFrac(p3, 2);
+	}
 	
 	float max1() const { return mMax[0]; }
 	float max2() const { return mMax[1]; }
@@ -122,13 +121,20 @@ protected:
 	// Does position lie in dimension interval?
 	bool hasPos(float p, int d) const { return scl::withinIE(p, -mMax[d], mMax[d]); }
 
+	void indNeighbors(int i, int d, int * inds, bool * valid) const {
+		inds[0] = i-1; inds[1] = i+1;
+		valid[0] = inds[0] >= 0;
+		valid[1] = inds[1] <  n[d];
+	}
+
 	// Convert a dimension index to position
 	float indToPos(int i, int d) const { return ((i<<1) - n[d]) * m1_m; }
 	
 	// Direct conversion of position to dimension index
 	//int posToInd(float p, int d) const { return scl::wrap((p/mMax[d])*0.5f + 0.5f, 0.9999f) * n[d]; }
-	int posToInd(float p, int d) const { return (p/mMax[d]*0.5f + 0.5f) * n[d]; }
-	//int posToInd(float p, int d) const { return scl::castIntTrunc(p*mMul[d] + mAdd[d]); }
+	//int posToInd(float p, int d) const { return (p/mMax[d]*0.5f + 0.5f) * n[d]; }
+	int posToInd(float p, int d) const { return scl::castIntTrunc(posToIndFrac(p,d)); }
+	float posToIndFrac(float p, int d) const { return p*mMul[d] + mAdd[d]; }
 };
 
 
@@ -157,6 +163,39 @@ inline void Dims::indExpand(int i, int& i1, int& i2, int& i3) const {
 
 inline int Dims::indFlatten(int i1, int i2, int i3) const {
 	return scl::index3to1(i1,i2,i3, n[0],n[1]);
+}
+
+inline void Dims::indNeighbors(int i1, int i2, int i3, int (&inds)[6], bool (&valid)[6]) const {
+//	inds[0] = i1-1; inds[1] = i1+1;
+//	inds[2] = i2-1;	inds[3] = i2+1;
+//	inds[4] = i3-1;	inds[5] = i3+1;
+//	
+//	valid[0] = inds[0] >= 0;
+//	valid[1] = inds[1] <  size1();
+//	valid[2] = inds[2] >= 0;
+//	valid[3] = inds[3] <  size2();
+//	valid[4] = inds[4] >= 0;
+//	valid[5] = inds[5] <  size3();
+	
+	indNeighbors1(i1, inds  , valid  );
+	indNeighbors2(i2, inds+2, valid+2);
+	indNeighbors3(i3, inds+4, valid+4);
+}
+
+inline void Dims::indNeighbors1(int i, int * inds, bool * valid) const {
+	indNeighbors(i,0,inds,valid);
+}
+
+inline void Dims::indNeighbors2(int i, int * inds, bool * valid) const {
+	indNeighbors(i,1,inds,valid);
+}
+
+inline void Dims::indNeighbors3(int i, int * inds, bool * valid) const {
+	indNeighbors(i,2,inds,valid);
+}
+
+inline void Dims::indNeighbors4(int i, int * inds, bool * valid) const {
+	indNeighbors(i,3,inds,valid);
 }
 
 inline void Dims::indToPos(int i1, int i2, int i3, float& p1, float& p2, float& p3) const {
