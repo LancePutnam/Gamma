@@ -22,7 +22,7 @@ struct Complex{
 	typedef Complex<T> C;
 
 	struct Polar{
-		Polar(const T& mg, const T& ph): m(mg), p(ph){}
+		Polar(const T& m, const T& p): m(m), p(p){}
 		T m, p;
 	};
 
@@ -35,8 +35,8 @@ struct Complex{
 	Complex(const Complex& v): r(v.r), i(v.i){}
 	Complex(const Polar& v){ *this = v; }
 
-	Complex(const T& re=(T)1, const T& im=(T)0): r(re), i(im){}
-	Complex(const T& m, const T& p, int fromPol){ (*this) = Polar(m,p); }
+	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
+	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar(m,p); }
 
 	//static Complex polar(const T& m, const T& p){ return C(Polar(m,p)); }
 
@@ -45,8 +45,10 @@ struct Complex{
 
 	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
 	C& operator()(const Polar& p){ return *this = p; }
-	T& operator[](uint32_t ind){ return elems[ind];}
+	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
+	
+	bool operator==(const C& v) const { return (v.r==r) && (v.i==i); }
 	
 	C& operator = (const Polar& v){ r=v.m*cos(v.p); i=v.m*sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
@@ -374,8 +376,8 @@ class Indices : public Indexer{
 public:
 
 	Indices(uint maxSize)
-	:	Indexer(0), mMaxSize(maxSize), mElems(new uint[maxSize])
-	{}
+	:	Indexer(0), mMaxSize(maxSize)
+	{	mElems = new uint[maxSize]; }
 
 	~Indices(){ delete[] mElems; }
 
