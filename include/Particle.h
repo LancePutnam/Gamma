@@ -102,7 +102,7 @@ TEM PointParticles<T>::PointParticles(uint32_t size, uint32_t dims, uint32_t rat
 }
 
 
-TEM PointParticles<T>::~PointParticles(){ SAFE_FREE(dt); }
+TEM PointParticles<T>::~PointParticles(){ mem::free(dt); }
 
 TEM void PointParticles<T>::operator()(){
 

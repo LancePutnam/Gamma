@@ -328,7 +328,7 @@ TEM T sinT9(T radians);
 TEM T sinc(T radians, T eps=(T)0.0001);
 
 /// Sort values so that value1 <= value2.
-TEM void sort2(T & value1, T & value2);
+TEM void sort2(T& value1, T& value2);
 
 /// Truncates floating point value at decimal.
 TEM T trunc(T value);

@@ -6,7 +6,7 @@
 #define PRINT_TABLE \
 	for(uint32_t i=0; i<n; i++){\
 		float v = arr[i];\
-		printf("[%2lu] % 5.3f  ", i, v);\
+		printf("[%2d] % 5.3f  ", i, v);\
 		scl::printPlot(v, 32); printf("\n");\
 	}
 
@@ -28,14 +28,16 @@ int main(int argc, char* argv[]){
 		GEN(rMulAdd(0.9, -0.1, 1.))
 		GEN(nyquist(1))
 		GEN(recip(1.))
+		GEN(rCos<>(1./n))
+		GEN(rCos<>(1./n, 0.5))
 		GEN(Sin<>(M_2PI/n, 0))
 		GEN(Sin<>(M_2PI/n, M_PI_2, 0.5))
 		GEN(rSin(1./n))
 		GEN(rSin(1./n, 0.25))
 		GEN(rSin(1./n, 0., 0.5))
-		GEN(RSin2<>(1./n))
-		GEN(RSin2<>(1./n, 0.25))
-		GEN(RSin2<>(1./n, 0.25, 0.9))
+//		GEN(RSin2<>(1./n))
+//		GEN(RSin2<>(1./n, 0.25))
+//		GEN(RSin2<>(1./n, 0.25, 0.9))
 		
 		
 //		{	printf("\n");

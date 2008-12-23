@@ -94,7 +94,7 @@ struct RNGMulLinCon : public gen::RMul<uint32_t>{
 /// http://www.iro.umontreal.ca/~lecuyer/papers.html
 class RNGTaus{
 public:
-	RNGTaus(){ (*this) = rnd::getSeed(); }
+	RNGTaus();
 
 	/// @param[in] seed		Initial seed value
 	RNGTaus(uint32_t seed);
@@ -102,7 +102,7 @@ public:
 	uint32_t s1, s2, s3, s4;
 	
 	uint32_t operator()();				///< Generates uniform random unsigned integer in [0, 2^32).
-	void operator = (uint32_t seed);	///< Set seed
+	RNGTaus& operator= (uint32_t seed);	///< Set seed
 	void seed(uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); ///< Set seed
 
 private:
@@ -231,17 +231,20 @@ namespace rnd{
 
 //---- RNGTaus
 
-inline RNGTaus::RNGTaus(uint32_t sd){ (*this) = sd; }
+inline RNGTaus::RNGTaus(): s1(0), s2(0), s3(0), s4(0){ (*this) = rnd::getSeed(); }
+
+inline RNGTaus::RNGTaus(uint32_t sd): s1(0), s2(0), s3(0), s4(0){ (*this) = sd; }
 
 inline ULONG RNGTaus::operator()(){
 	iterate();
 	return s1 ^ s2 ^ s3 ^ s4;
 }
 
-inline void RNGTaus::operator=(uint32_t s){
+inline RNGTaus& RNGTaus::operator=(uint32_t s){
 	gen::RMulAdd<uint32_t> g(1664525, 1013904223, s);
 	g.val = s; g();
 	seed(g(), g(), g(), g());
+	return *this;
 }
 
 inline void RNGTaus::seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4){

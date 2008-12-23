@@ -202,7 +202,7 @@ int AudioIO::paCallback(const void *input,
 
 	// kill pesky nans so we don't hurt anyone's ears
 	if(io.killNANs()){
-		for(int i=0; i<io.numFrames()*io.outDeviceChans(); ++i){
+		for(uint32_t i=0; i<io.numFrames()*io.outDeviceChans(); ++i){
 			float& s = io.out(0)[i];
 			if(isnan(s)) s = 0.f;
 		}

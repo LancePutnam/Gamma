@@ -34,7 +34,7 @@ template <class T=gam::real>
 struct Val{
 	Val(): val((T)0){}								///< Constructor
 	Val(T v): val(v){}								///< Constructor
-	void operator = (T v){ val = v; }				///< Set value
+	Val& operator = (T v){ val=v; return *this; }	///< Set value
 	T operator()() const { return val; }			///< Generate next value
 	T& operator[](uint i)      { return val; }		///< Array set; sets current value 
 	T  operator[](uint i) const{ return (*this)(); }///< Array get; generates next element
@@ -70,12 +70,43 @@ struct Recip : public Val<T>{ INHERIT;
 	T operator()() const { return (T)1/val++; }			///< Generate next value
 };
 
+
+/// Cosine generator based on recursive formula x0 = c x1 - x2
+template <class T=gam::real>
+struct RCos : public Val<T>{ INHERIT;
+
+	/// Constructor
+	RCos(T frq=0, T amp=1): val2(0), c1(0){ set(frq,amp); }
+
+	/// Generate next value.
+	T operator()() const {
+		T v0 = val*c1 - val2;
+		val2 = val; val = v0;
+		return val2;
+	}
+	
+	T freq() const { return acos(c1*0.5) * M_1_2PI; }
+	
+	/// Set parameters from unit freq, phase, and amplitude.
+	RCos& set(T frq, T amp=(T)1){
+		c1  = T(cos(frq*M_2PI));
+		val2= c1*amp;
+		val = amp;
+		c1 *= T(2);
+		return *this;
+	}
+
+	mutable T val2;		///< 2-previous value
+	T c1;				///< 1-previous coefficient
+};
+
+
 /// Sinusoidal generator based on recursive formula x0 = c x1 - x2
 template <class T=gam::real>
 struct RSin : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RSin(T frq=0, T phs=0, T amp=1){ set(frq,phs,amp); }
+	RSin(T frq=0, T phs=0, T amp=1): val2(0), mul(0){ set(frq,phs,amp); }
 
 	/// Generate next value.
 	T operator()() const {
@@ -233,6 +264,7 @@ OF1(RAdd1,		rAdd1,		0)
 OF1(Recip,		recip,		1)
 
 OF2(RAdd,		rAdd,		1,0)
+OF2(RCos,		rCos,		0,1)
 OF2(RMul,		rMul,		1,1)
 
 OF3(RMulAdd,	rMulAdd,	1,0,0)

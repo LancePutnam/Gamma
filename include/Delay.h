@@ -839,7 +839,7 @@ TM1 inline void Delay<TM2>::incPhase(){ mPhase += mPhaseInc; }
 
 TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this->size());
 	mPhaseInc = this->oneIndex();
-	for(int i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
+	for(uint32_t i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
 	onResync(1);
 }
 
