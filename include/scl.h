@@ -328,7 +328,7 @@ TEM T sinT9(T radians);
 TEM T sinc(T radians, T eps=(T)0.0001);
 
 /// Sort values so that value1 <= value2.
-TEM void sort2(T& value1, T& value2);
+TEM void sort2(T & value1, T & value2);
 
 /// Truncates floating point value at decimal.
 TEM T trunc(T value);
@@ -362,6 +362,9 @@ TEM T wrap(T value, T hi=(T)1, T lo=(T)0);
 /// 'numWraps' reports how many wrappings occured where the sign, + or -,
 /// signifies above 'hi' or below 'lo', respectively.
 TEM T wrap(T value, long & numWraps, T hi=(T)1, T lo=(T)0);
+
+/// Returns value incremented by 1 and wrapped into interval [0, max).
+TEM T wrapAdd1(T v, T max){ ++v; return v == max ? 0 : v; }
 
 /// Like wrap(), but only adds or subtracts 'hi' once from value.
 TEM T wrapOnce(T value, T hi=(T)1);

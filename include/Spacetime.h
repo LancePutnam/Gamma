@@ -38,6 +38,7 @@ public:
 
 	// Convert dimension indices to flat lattice index.
 	// The indices lie in [0, N) where N is the size of the dimension.
+	int indFlatten(int i1, int i2) const;
 	int indFlatten(int i1, int i2, int i3) const;
 
 	// Convert flat index to dimension positions.
@@ -161,8 +162,10 @@ inline void Dims::indExpand(int i, int& i1, int& i2, int& i3) const {
 	i3 = i / size12();
  }
 
+inline int Dims::indFlatten(int i1, int i2) const { return i1 + i2*size1(); }
+
 inline int Dims::indFlatten(int i1, int i2, int i3) const {
-	return scl::index3to1(i1,i2,i3, n[0],n[1]);
+	return scl::index3to1(i1,i2,i3, size1(),size2());
 }
 
 inline void Dims::indNeighbors(int i1, int i2, int i3, int (&inds)[6], bool (&valid)[6]) const {
