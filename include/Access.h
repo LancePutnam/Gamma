@@ -16,40 +16,57 @@ inline void neighborsWrap(int x1, int N, int& x0, int& x2){
 }
 
 
+// Neighbor accessing strategies
+namespace acc{
+
+	struct None{
+		static int checkM1(int i, int mx, int mn){ return i; }
+		static int checkP1(int i, int mx, int mn){ return i; }
+	};
+
+	struct Wrap{
+		static int checkM1(int i, int mx, int mn){ return i<mn ? mx : i; }
+		static int checkP1(int i, int mx, int mn){ return i>mx ? mn : i; }
+	};
+
+	struct Clip{
+		static int checkM1(int i, int mx, int mn){ return i>mn ? i : mn; }
+		static int checkP1(int i, int mx, int mn){ return i<mx ? i : mx; }
+	};
+
+//	struct Fold{
+//		static int checkM1(int i, int mx, int mn){ return i>=mn ? i : mn+1; }
+//		static int checkP1(int i, int mx, int mn){ return i<=mx ? i : mx-1; }
+//	};
+};
+
+
+template <class Tacc=acc::Wrap>
 class AccessStream1{
 public:
 
-	AccessStream1(int size, int begin=0)
-	:	i0(0), i1(0), i2(0), mSizeM1(size-1)
+	/// @param[in] size		size of dimension
+	/// @param[in] min		minimum index
+	/// @param[in] begin	relative beginning index in [0, size)
+	AccessStream1(int size, int min=0, int stride=1, int begin=0)
+	:	i0(0), i1(0), i2(0), mMax((size-1)*stride + min), mMin(min), mStride(stride)
 	{
-		i1=checkM1(begin-1);
+		begin += min;
+		i1=checkM1(begin-mStride);
 		i2=begin;
 	}
 
-	void operator()(){
-		i0=i1; i1=i2; i2 = checkP1(i2+1);
-	}
-	
-	void operator()(int& a0, int& a1, int& a2){
-		(*this)(); a0=i0; a1=i1; a2=i2;
-	}
+	void operator()(){ i0=i1; i1=i2; i2=checkP1(i2+mStride); }
+	void operator()(int& a0, int& a1, int& a2){	(*this)(); a0=i0; a1=i1; a2=i2; }
+	bool valid(int i){ return (i<mMin) || (i>mMax); }
 
 	int i0, i1, i2;
 
 private:
-	int mSizeM1;
-
-	// wrap
-	int checkM1(int v){ return v<0 ? mSizeM1 : v; }
-	int checkP1(int v){ return v>mSizeM1 ? 0: v; }
-
-	// clip
-//	int checkM1(int v){ return v>0 ? v : 0; }
-//	int checkP1(int v){ return v<mSizeM1 ? v : mSizeM1; }
-
-	// fold
-//	int checkM1(int v){ return v>=0 ? v : 1; }
-//	int checkP1(int v){ return v<=mSizeM1 ? v : mSizeM1-1; }
+	int mMax, mMin, mStride;
+	
+	int checkM1(int i){ return Tacc::checkM1(i, mMax, mMin); }
+	int checkP1(int i){ return Tacc::checkP1(i, mMax, mMin); }
 };
 
 

@@ -70,8 +70,8 @@ extern "C"{\
 #define loopTime { for(uint32_t i=0; i<numFrames; ++i)
 
 #define loopFreq(dft){\
-	float * bin0 = dft.bins0();\
-	float * bin1 = dft.bins1();\
+	/*float * bin0 = dft.bins0();*/\
+	/*float * bin1 = dft.bins1();*/\
 	for(uint32_t i=0; i<dft.numBins(); ++i)
 	
 
