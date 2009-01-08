@@ -2,7 +2,8 @@
 	See COPYRIGHT file for authors and license information
 	
 	Tutorial:		Visual / Curve
-	Description:	Drawing 2D spirals using a damped complex oscillator.
+	Description:	Drawing 2D logarithmic spirals using a damped harmonic 
+					oscillator.
 */
 
 #include "tutorial.h"

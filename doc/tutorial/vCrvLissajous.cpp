@@ -10,7 +10,7 @@
 int main(int argc, char* argv[]){
 
 	const int NP=256;				// Number of points in curve
-	const int N1=31, N2=N1*N1;		// Size of graph
+	const int N1=15, N2=N1*N1;		// Size of graph
 	float pixels[N2];				// Accumulation buffer
 
 	SineR<> sineX, sineY;

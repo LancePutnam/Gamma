@@ -20,6 +20,7 @@ SRC = \
 	genOscSineD.cpp \
 	ioAudioDevice.cpp \
 	vCrvBotanic.cpp \
+	vCrvCircle.cpp \
 	vCrvEpicycloid.cpp \
 	vCrvHypocycloid.cpp \
 	vCrvLissajous.cpp \
