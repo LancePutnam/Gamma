@@ -330,6 +330,13 @@ TEM T sinc(T radians, T eps=(T)0.0001);
 /// Sort values so that value1 <= value2.
 TEM void sort2(T & value1, T & value2);
 
+/// Sum of integers squared from 1 to n.
+TEM T sumOfSquares(T n){
+	static const T c1_6 = 1/T(6);
+	static const T c2_6 = c1_6*T(2);
+	return n*(n+1)*(c2_6*n+c1_6);
+}
+
 /// Truncates floating point value at decimal.
 TEM T trunc(T value);
 

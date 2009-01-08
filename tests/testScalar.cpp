@@ -219,7 +219,6 @@ int main(int argc, char* argv[]){
 		result &= (scl::log2(v) == i);
 	}
 	checkTest(result);
-	
-	
+
 }
 

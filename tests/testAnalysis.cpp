@@ -18,8 +18,14 @@ int main(int argc, char* argv[]){
 	//arr::mul(table, size, 0.9999f);
 	//mem::set(table, val(1), Loop(size));
 	mem::set(table, rAdd(1./size, 0.), size);
+	
+	// print out function
+	for(uint32_t i=0; i<size; i++){
+		printf("[%4d]\t% 7.4f ", i, table[i]);
+		scl::printPlot(table[i]);
+		printf("\n");
+	}
 
-	arr::print(table, size);
 
 	uint32_t featureI;
 	float featureF;
@@ -74,7 +80,7 @@ int main(int argc, char* argv[]){
 	
 	featureI = arr::zeroCrossN(table, size, table[size-1]);
 	printf("Zero Crossings(-): %d\n", featureI);
-
+/*
 	printf("\nCluster:\n");
 	arr::lineSlope1(indices, size);
 	uint32_t numIndices = size;
@@ -97,6 +103,6 @@ int main(int argc, char* argv[]){
 	arr::lineSlope1(indices, size);
 	arr::sortQuick(table, indices, 0, size);
 	mem::print(table, indices, size, "% f");
-	
+*/	
 	return 0;
 }

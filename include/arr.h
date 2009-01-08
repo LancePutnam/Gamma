@@ -822,20 +822,20 @@ TEM void extrema(const T * src, ULONG len, ULONG & indexMin, ULONG & indexMax){
 
 template <class T, class T2, class T3>
 inline void fitLine(const T * src, ULONG len, T2& slope, T3& inter){
-	T lenT = (T)len;
-	T mInd = (lenT - (T)1) * (T)0.5;	// mean of independent variables (the indices)
-	T mSrc = sum(src, len) / lenT;		// mean of dependent variables
-	
-	T varInd = (T)0, cov = (T)0, ind = (T)0;
+	T lenT  = T(len);
+	T meanX = (lenT - T(1)) * T(0.5);	// mean of independent variables (the indices)
+	T meanY = sum(src, len) / lenT;		// mean of dependent variables
+	T varX  = T(2)*scl::sumOfSquares(meanX); // variance of x
+
+	T cov  = T(0);	// covariance
+	T dx   =-meanX;	// current distance from point to center along x
+
 	LOOP_P(len,
-		T diffInd = ind++ - mInd;
-		varInd += diffInd * diffInd;
-		cov    += (diffInd) * (*src++ - mSrc);
+		cov += dx++ * (*src++ - meanY);
 	)
-	
-	T slp = cov / varInd;
-	slope = slp;
-	inter = mSrc - slp * mInd;
+
+	slope = cov / varX;
+	inter = meanY - slope * meanX;
 }
 
 /*
@@ -870,8 +870,8 @@ inline void histogram(const Ts * src, ULONG len, Tb * bins, ULONG numBins, Ts sc
 template <class Ts, class Tb>
 inline void histogram(const Ts * src, ULONG len, Tb * bins, ULONG numBins, Ts scale, Ts offset){
 	LOOP_P(len,
-		long index = (long)(*src++ * scale + offset);
-		if(index >= 0 && index < numBins) bins[index]++;
+		int32_t index = (int32_t)(*src++ * scale + offset);
+		if(index >= 0 && index < (int32_t)numBins) bins[index]++;
 	)
 }
 
@@ -953,7 +953,7 @@ TEM T meanAbsDiff(const T * src, ULONG len){
 		prev = now;
     )
 	//if(mean < 0.0001f) mean = 0.0001f;	
-	return mean < (T)0.25 ? (T)-1 : sum * (T)0.5 / mean;
+	return mean < T(0.25) ? T(-1) : sum * T(0.5) / mean;
 }
 
 TEM T meanWeighted(const T * src, T * weights, ULONG len){
