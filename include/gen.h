@@ -270,8 +270,43 @@ OF2(RMul,		rMul,		1,1)
 OF3(RMulAdd,	rMulAdd,	1,0,0)
 OF3(RSin,		rSin,		0,0,1)
 
+#undef INHERIT
 #undef OF1
 #undef OF2
+#undef OF3
+
+
+
+// Complex number with a frequency.
+template <class T>
+class Spinner2 : public Complex<T>{
+public:
+	typedef Complex<T> C;
+	using C::operator();
+
+	Spinner2(const T& frq, const T& amp, const T& phs=T(0)){
+		set(frq, amp, phs);
+	}
+
+	C& operator()(){ return (*this) *= mFreq; }
+
+	void set(const T& frq, const T& amp, const T& phs){
+		this->fromPolar(amp, phs*M_2PI);
+		mFreq.fromPhase(frq*M_2PI);
+	}
+
+	void set(const T& frq, const Complex<T>& phs){
+		(*this)(phs.r, phs.i);
+		mFreq.fromPhase(frq*M_2PI);
+	}
+	
+	float freq() const { return mFreq.phase()*M_1_2PI; }
+
+protected:
+	C mFreq;
+};
+
+
 
 /// Triggers after a specified number of iterations and then resets
 struct Trigger{
@@ -304,7 +339,7 @@ struct OnOff{
 	uint32_t max, ons, cnt;
 };
 
-#undef INHERIT
+
 
 //template <class T=uint32_t>
 //struct Wrapper{

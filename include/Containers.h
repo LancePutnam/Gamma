@@ -19,7 +19,7 @@ namespace gam{
 
 /// Size type for ArrayPow2
 struct SizeArrayPow2{
-	SizeArrayPow2(uint32_t size): mBitsI(0), mBitsF(32){ (*this)(size); }
+	SizeArrayPow2(uint32_t size){ (*this)(size); }
 	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
 	void operator()(uint32_t v){ mBitsI = scl::log2(convert(v)); mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/ }
 	uint32_t convert(uint32_t v){ v=scl::ceilPow2(v); return v!=1 ? v : 2; }	// should return 0,2,4,8,16,...

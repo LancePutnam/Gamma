@@ -646,8 +646,8 @@ TEM inline void mulLine(T * arr, ULONG len, T start, T end, bool includeEnd){
 
 TEM T normalize(T * arr, ULONG len){
 	T max = scl::abs(arr[maxAbs(arr, len)]);
-	T normFactor = (T)1/max;
-	if(max != (T)0){ mul(arr, gen::Val<T>(normFactor), len); }
+	T normFactor = T(1)/max;
+	if(max != T(0)){ mul(arr, gen::Val<T>(normFactor), len); }
 	return normFactor;
 }
 
@@ -830,13 +830,14 @@ inline void fitLine(const T * src, ULONG len, T2& slope, T3& inter){
 	T cov  = T(0);	// covariance
 	T dx   =-meanX;	// current distance from point to center along x
 
-	LOOP_P(len,
+ 	LOOP_P(len,
 		cov += dx++ * (*src++ - meanY);
-	)
+ 	)
 
 	slope = cov / varX;
 	inter = meanY - slope * meanX;
 }
+
 
 /*
 
@@ -862,8 +863,8 @@ void add(T * arr, Indices & ind, T val){
 template <class Ts, class Tb>
 inline void histogram(const Ts * src, ULONG len, Tb * bins, ULONG numBins, Ts scale){
 	LOOP_P(len,
-		long index = (long)(*src++ * scale);
-		if(index >= 0 && index < numBins) bins[index]++;
+		int32_t index = (int32_t)(*src++ * scale);
+		if(index >= 0 && index < (int32_t)numBins) bins[index]++;
 	)
 }
 
@@ -952,8 +953,9 @@ TEM T meanAbsDiff(const T * src, ULONG len){
 		mean += abs;
 		prev = now;
     )
-	//if(mean < 0.0001f) mean = 0.0001f;	
+	//if(mean < 0.0001f) mean = 0.0001f;
 	return mean < T(0.25) ? T(-1) : sum * T(0.5) / mean;
+
 }
 
 TEM T meanWeighted(const T * src, T * weights, ULONG len){

@@ -316,8 +316,8 @@ TEM void Curve<T>::set(T length, T curve){
 		curve = curve_length * length;
 	}
 
-	mMul = exp(curve_length);
-	a1 = (T)1 / ((T)1 - exp(curve));
+	mMul = ::exp(curve_length);
+	a1 = (T)1 / ((T)1 - ::exp(curve));
 	b1 = a1;
 
 //	level = start;

@@ -337,7 +337,10 @@ public:
 	typedef Array<SineD<Tv, Synced1> > super;
 
 	/// @param[in]	num		Number of resonators
-	SineDs(uint32_t num): super(num){ Ts::initSynced(); }
+	SineDs(uint32_t num): super(num){
+		Ts::initSynced(); 
+		for(uint32_t i=0; i<num; ++i) set(i, 0,0,0);
+	}
 
 	/// Generate next sum of all oscillators
 	Tv operator()(){ Tv r=(Tv)0; for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j](); return r; }

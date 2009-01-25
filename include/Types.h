@@ -70,6 +70,9 @@ struct Complex{
 	C  operator / (const T& v) const { return C(r/v, i/v); }
 	C& operator /=(const C& v){ return div(*this, v); }
 	C& operator /=(const T& v){ r/=v; i/=v; return *this; }
+	
+	bool operator !=(const C& v) const { return (r!=v.r) && (i!=v.i); }
+	bool operator > (const C& v) const { return mag() > v.mag(); }
 
 	C  conj() const { return C(r,-i); }
 
@@ -96,6 +99,15 @@ struct Complex{
 typedef Complex<float > Complexf;
 typedef Complex<double> Complexd;
 
+
+
+template <class T>
+static Complex<T> exp(const Complex<T>& c){
+	T m = c.mag();
+	T p = c.phase();
+	Complex<T> r;
+	return r.fromPolar(::exp(m), p);
+}
 
 
 
@@ -481,5 +493,9 @@ private:
 
 
 }
+
+
+
+
 
 #endif

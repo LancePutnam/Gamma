@@ -230,7 +230,7 @@ TEM T nearest(T val, const char * interval = "2212221", long div=12);
 TEM T nearestDiv(T of, T to);
 
 /// Returns pole radius given a bandwidth and sampling interval
-TEM	inline T poleRadius(T bw, double ups){ return exp(-M_PI * bw * ups); }
+TEM	inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
 
 /// Evaluates polynomial a0 + a1 x + a2 x^2.
@@ -258,7 +258,7 @@ unsigned char prime(ULONG n);	///< Returns (n+1)th prime number up to n=53.
 TEM T prime(ULONG n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
 
 /// Returns pole radius given a T60 decay length and units/sample
-inline double radius60(double dcy, double ups){ return exp(M_LN001/dcy * ups); } // u/s * 1/u
+inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
 
 /// Returns equal temperament ratio- octave^(pc/divisions)
 TEM T ratioET(T pc, T divisions=12, T octave=2);
@@ -336,6 +336,7 @@ TEM T sumOfSquares(T n){
 	static const T c2_6 = c1_6*T(2);
 	return n*(n+1)*(c2_6*n+c1_6);
 }
+
 
 /// Truncates floating point value at decimal.
 TEM T trunc(T value);

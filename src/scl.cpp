@@ -152,27 +152,25 @@ double legendre(int l, int m, double t){
 	double P = 0;
 	double cs = cos(t);
 	double sn = sin(t);
-	int mm = m;			/*   mm = |m|   */
-	if(m<0) mm = -mm;
-	double y_1 = 1.;
+	int mm = scl::abs(m);			/*   mm = |m|   */
+	double y1 = 1.;
 	
 	for(int i=1; i<=mm; ++i)
-		y_1 *= - 1.0 * (2.*i-1) * sn;
+		y1 *= -((i<<1) - 1) * sn;
 	
-	if(l==mm){
-		P = y_1;
-	}
+	if(l==mm) P = y1;
 
 	else{
-		double y = (2.*mm + 1.) * cs * y_1;
-		if(l==mm+1)	P = y;
+		double y = ((mm<<1) + 1) * cs * y1;
+		if(l==(mm+1)) P = y;
+
 		else{
-			double c = 2. * mm - 1.;
+			double c = (mm<<1) - 1;
 			for(int k=mm+2; k<=l; ++k){
-				double y_2 = y_1;
-				y_1 = y;
+				double y2 = y1;
+				y1 = y;
 				double d = c / (k - mm);
-				y = (2. + d) * cs * y_1 - (1. + d) * y_2;
+				y = (2. + d) * cs * y1 - (1. + d) * y2;
 			}
 			P = y;
 		}

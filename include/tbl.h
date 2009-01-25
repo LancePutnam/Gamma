@@ -222,7 +222,7 @@ TEM void decay(T * dst, ULONG len, double order){
 	*dst++ = (T)1;
 	len -= 1;
 	LOOP_P(len,
-		*dst++ = (T)(exp(lambda * time) + offset) * scale;
+		*dst++ = (T)(::exp(lambda * time) + offset) * scale;
 		time++;
 	)
 }
