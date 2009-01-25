@@ -680,10 +680,14 @@ namespace{
 		362880, 3628800, 39916800, 479001600
 	};
 
-	const ULONG multiplyDeBruijnBitPosition[32] = {
-	  0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
-	  31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+	const ULONG deBruijnBitPosition[32] = {
+		 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8, 
+		31, 27, 13, 23, 21, 19, 16,  7, 26, 12, 18,  6, 11,  5, 10,  9
 	};
+	
+	inline uint32_t deBruijn(uint32_t v){
+		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
+	}
 
 	const unsigned char mPrimes54[54] = {
 	/*	  0    1    2    3    4    5    6    7    8    9   */
@@ -874,10 +878,7 @@ TEM inline T linLog2(T v, T recMin){
 	return scl::max(v * recMin, (T)-1) + (T)1;
 }
 
-inline ULONG log2(ULONG v){
-	v = ceilPow2(v);
-	return multiplyDeBruijnBitPosition[(v * 0x077CB531UL) >> 27];
-}
+inline ULONG log2(ULONG v){ return deBruijn(ceilPow2(v)); }
 
 inline float log2Fast(float v){
 	union{ float f; int32_t i; } u; u.f=v;
@@ -1292,9 +1293,7 @@ TEM inline bool odd(T v){ return v & T(1); }
 
 TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
-inline ULONG trailingZeroes(ULONG v){
-	return multiplyDeBruijnBitPosition[((v & -v) * 0x077CB531UL) >> 27];
-}
+inline ULONG trailingZeroes(ULONG v){ return deBruijn(v & -v); }
 
 TEM inline bool within  (T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 TEM inline bool withinIE(T v, T lo, T hi){ return (!(v < lo)) && (v < hi); }

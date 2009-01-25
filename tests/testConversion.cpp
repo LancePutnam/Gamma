@@ -70,12 +70,12 @@ int main(int argc, char* argv[]){
 
 	printf("\nCast double to int (round)\n");
 	for(double i=-1.5; i<1.5; i+=0.125){
-		printf("%6.3f -> %li\n", i, scl::castIntRound(i));
+		printf("%6.3f -> %d\n", i, scl::castIntRound(i));
 	}
 
 	printf("\nCast float to int (round)\n");
 	for(float i=-1.5f; i<1.5f; i+=0.125f){
-		printf("%6.3f -> %li\n", i, scl::castIntRound(i));
+		printf("%6.3f -> %d\n", i, scl::castIntRound(i));
 	}
 
 	printf("\nFloat exponent\n");
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]){
 		printf("%6.3f -> %lu\n", i, (unsigned long)scl::castIntRound(i * 4294967296.f));
 	
 	long x = (1<<23 - 1);
-	printf("%ld %ld\n", x, scl::castIntRound((float)x));
+	printf("%ld %d\n", x, scl::castIntRound((float)x));
 	
 	printf("\n");
 	ul = 0x1234567;
