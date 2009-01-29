@@ -14,6 +14,48 @@ typedef unsigned long	uint;	// default natural number type
 typedef float			real;	// default real number type
 
 
+/// Integer-based bit field
+template <class T=uint32_t>
+class Bits{
+public:
+
+	Bits(): mVal(T(0)){}
+	
+	/// Returns mask of enabled bits in input mask
+	T enabled(T bitMask) const { return mVal & bitMask; }
+
+	T triggered(T bitMask){
+		T r = enabled(bitMask);
+		disable(bitMask);
+		return r;
+	}
+	
+	/// Disable bits using mask
+	Bits& disable(T bitMask){ mVal&=~bitMask; return *this; }
+	
+	/// Enable bits using mask
+	Bits& enable(T bitMask){ mVal|=bitMask; return *this; }
+	
+	/// Set bits using mask
+	Bits& set(T bitMask, bool v){ v ? enable(bitMask) : disable(bitMask); return *this; }
+	
+	/// Toggle bits using mask
+	Bits& toggle(T bitMask){ mVal^=bitMask; return *this; }
+	
+	/// Zero all bits
+	Bits& zero(){ mVal = T(0); return *this; }
+
+	/// Get mask from specific bit number where 0 is the LSB.
+	static T mask(T bitNum){ return 1<<bitNum; }
+	
+	/// Get mask from two bit numbers where 0 is the LSB.
+	static T mask(T bitNum1, T bitNum2){ return (1<<bitNum1) | (1<<bitNum2); }
+
+private:
+	T mVal;
+};
+
+
 
 /// Complex number
 template <class T=gam::real>
