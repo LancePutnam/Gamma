@@ -284,7 +284,7 @@ public:
 	typedef Complex<T> C;
 	using C::operator();
 
-	Spinner2(const T& frq, const T& amp, const T& phs=T(0)){
+	Spinner2(const T& frq, const T& amp=T(1), const T& phs=T(0)){
 		set(frq, amp, phs);
 	}
 
