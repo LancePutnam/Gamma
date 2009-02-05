@@ -208,6 +208,7 @@ public:
 	Ring& operator=(const T& v){ super::operator=(v); return *this; }
 
 	const T& atPrev(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
+	const T& atEnd() const { return (*this)[indexEnd()]; }
 	
 	/// Copies len elements starting from element pos() - delay into dst.
 	void copy(T * dst, uint32_t len, uint32_t delay) const;
