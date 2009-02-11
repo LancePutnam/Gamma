@@ -284,7 +284,7 @@ public:
 	typedef Complex<T> C;
 	using C::operator();
 
-	Spinner2(const T& frq, const T& amp=T(1), const T& phs=T(0)){
+	Spinner2(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0)){
 		set(frq, amp, phs);
 	}
 
@@ -306,6 +306,23 @@ protected:
 	C mFreq;
 };
 
+
+struct Counter{
+	Counter(int max, int min=0, int inc=1, int val=0)
+	:	val(val), inc(inc), min(min), max(max){}
+	
+	/// Increments
+	int operator()(){
+		int r = scl::wrap(val, max, min);
+		val = r+inc;
+		return r;
+	}
+	
+	int val;		///< Value
+	int inc;		///< Increment
+	int min;		///< Minimum value
+	int max;		///< Maximum value
+};
 
 
 /// Triggers after a specified number of iterations and then resets
