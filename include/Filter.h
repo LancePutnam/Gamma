@@ -44,7 +44,7 @@ public:
 		return ((Tv)1 - mDecay*mDecay) /** (*this).i*/;
 	}
 	
-	virtual void onResize(double r){ width(mWidth); }
+	virtual void onResync(double r){ width(mWidth); }
 
 protected:
 	Tv mFreq, mWidth, mDecay;
