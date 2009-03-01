@@ -4,7 +4,7 @@
 
 using namespace gam;
 
-typedef Player<float, ipl::Linear, tap::Wrap> Player_t;
+typedef Player<float, ipl::Linear, tap::Clip> Player_t;
 const int numSmps = 4;
 
 #define SF_ROOT "../../../../sounds/"

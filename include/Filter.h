@@ -30,7 +30,7 @@ public:
 	
 	void width(const Tv& v){
 		mWidth = v;
-		mDecay = exp(-M_PI * v * Ts::ups());
+		mDecay = ::exp(-M_PI * v * Ts::ups());
 		freq(mFreq);
 	}
 
