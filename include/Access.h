@@ -1,11 +1,8 @@
-/*
- *  Access.h
- *  waveInteractions
- *
- *  Created by Lance on 10/2/08.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
- *
- */
+#ifndef GAMMA_ACCESS_H_INC
+#define GAMMA_ACCESS_H_INC
+
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information */
 
 namespace gam{
 
@@ -41,6 +38,8 @@ namespace acc{
 };
 
 
+// First iteration will give (begin-1, begin, begin+1) with specified 
+// neighbor accessing strategy.
 template <class Tacc=acc::Wrap>
 class AccessStream1{
 public:
@@ -191,3 +190,5 @@ for(int j=0; j<sy; ++j){
 
 
 } // gam::
+
+#endif
