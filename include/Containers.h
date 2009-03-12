@@ -48,6 +48,7 @@ class ArrayBase{
 public:
 	ArrayBase();
 	ArrayBase(uint32_t size);
+	ArrayBase(uint32_t size, const T& initial);
 	ArrayBase(T * src, uint32_t size);
 	ArrayBase(const ArrayBase<T,S>& src);
 
@@ -92,6 +93,7 @@ public:
 
 	Array(): super(){}
 	Array(uint32_t size): super(size){}
+	Array(uint32_t size, const T& initial): super(size, initial){}
 	Array(T * src, uint32_t size): super(src, size){}
 	Array(const Array<T>& src): super(src){}
 	
@@ -110,6 +112,7 @@ public:
 
 	ArrayPow2(): super(){}
 	ArrayPow2(uint32_t size): super(size){}
+	ArrayPow2(uint32_t size, const T& initial): super(size, initial){}
 	ArrayPow2(T * src, uint32_t size): super(src, size){}
 	ArrayPow2(const ArrayPow2<T>& src): super(src){}
 
@@ -315,6 +318,10 @@ TEM2 ArrayBase<T,S>::ArrayBase()
 TEM2 ArrayBase<T,S>::ArrayBase(uint32_t size)
 :	ARRAYBASE_INIT, mOwner(true)
 {	resize(size); }
+
+TEM2 ArrayBase<T,S>::ArrayBase(uint32_t size, const T& initial)
+:	ARRAYBASE_INIT, mOwner(true)
+{	resize(size); for(uint32_t i=0;i<this->size();++i) (*this)[i] = initial; }
 
 TEM2 ArrayBase<T,S>::ArrayBase(T * src, uint32_t size)
 :	ARRAYBASE_INIT, mOwner(false)
