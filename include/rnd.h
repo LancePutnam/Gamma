@@ -214,7 +214,10 @@ namespace rnd{
 	TEM void set(T * arr, ULONG len, ULONG num, T val=1);
 
 	/// Zeroes elements according to a probability.
-	TEM void thin(T * arr, ULONG len, float prob=0.5f);	
+	TEM void thin(T * arr, ULONG len, float prob=0.5f);
+	
+	/// Returns uniform random within interval [min, max) excluding 'exc' argument.
+	TEM T uniExc(const T& exc, const T& max, const T& min=T(0));
 	
 	/// Returns random integer in [0, num) according to weights (a PDF).
 	
@@ -347,6 +350,10 @@ TEM inline T quanOct(uint32_t q, T o){ return quan(q) * o + o; }
 
 TEM inline void thin(T * arr, ULONG len, float p){
 	LOOP_P(len,	if(prob(p)) *arr = (T)0; arr++; )
+}
+
+TEM inline T uniExc(const T& exc, const T& max, const T& min=T(0)){
+	T r=exc; while(exc==r){ r=uni(max,min); } return r;
 }
 
 #define DEF(rnd_t, fnc)\
