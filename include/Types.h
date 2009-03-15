@@ -204,9 +204,13 @@ struct Quat{
 	
 	// Set from angle (radians) and unit vector (x,y,z)
 	Q& fromAxis(T a, T x, T y, T z){
-		a *= (T)0.5;
-		T s2 = sin(a);
-		return (*this)(cos(a), x*s2, y*s2, z*s2);
+		a *= T(0.5);
+		return fromAxis(cos(a), sin(a), x,y,z);
+	}
+
+	// Set from cosine and sine of half-angle (radians) and unit vector (x,y,z)
+	Q& fromAxis(T cosA2, T sinA2, T x, T y, T z){
+		return (*this)(cosA2, x*sinA2, y*sinA2, z*sinA2);
 	}
 	
 	Q& fromAxis(T a, const Unit3& u){ return fromAxis(a, u.x, u.y, u.z); }
@@ -228,6 +232,30 @@ struct Quat{
 	void rotate(T& x, T& y, T& z) const {
 		Q p(-i*x - j*y - k*z, r*x + j*z - k*y, r*y - i*z + k*x,	r*z + i*y - j*x);
 		p *= conj(); x=p.i; y=p.j; z=p.k;
+	}
+	
+	template <class V3>
+	void rotate(V3& v) const {
+		Q p(-i*v[0] - j*v[1] - k*v[2], r*v[0] + j*v[2] - k*v[1], r*v[1] - i*v[2] + k*v[0], r*v[2] + i*v[1] - j*v[0]);
+		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
+	}
+
+	// Rotates a vector assuming input z component is zero
+	void rotateXY(T& x, T& y, T& z) const {
+		Q p(-i*x - j*y, r*x - k*y, r*y + k*x, i*y - j*x);
+		p *= conj(); x=p.i; y=p.j; z=p.k;
+	}
+	
+	// Rotates a vector assuming input y and z components are zero
+	void rotateX(T& x, T& y, T& z) const {
+		Q p(-i*x, r*x, k*x, -j*x);
+		p *= conj(); x=p.i; y=p.j; z=p.k;
+	}
+
+	template <class V3>
+	void rotateX(V3& v) const {
+		Q p(-i*v[0], r*v[0], k*v[0], -j*v[0]);
+		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
 	}
 	
 	void toAxis(T& a, T& x, T& y, T& z) const {
@@ -395,6 +423,13 @@ struct Vec3 : public Vec<3, T> {
 	
 	T dot() const { return dot(*this); }
 	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
+	Vec3 cross(const Vec3& v) const {
+		Vec3 r; const Vec3& t = *this;
+		r[0] = t[1]*v[2] - t[2]*v[1];
+		r[1] = t[2]*v[0] - t[0]*v[2];
+		r[2] = t[0]*v[1] - t[1]*v[0];
+		return r;
+	}
 };
 
 
