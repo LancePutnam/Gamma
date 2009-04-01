@@ -51,6 +51,34 @@ protected:
 };
 
 
+
+class AudioDevice{
+public:
+	AudioDevice(int deviceNum);
+	~AudioDevice();
+
+	bool valid() const { return 0 != mImpl; }
+	int id() const { return mID; }
+	const char * name() const;
+	int maxInputChannels() const;
+	int maxOutputChannels() const;
+	double defaultSampleRate() const;
+	
+	void print() const;	/// Prints info about specific i/o device to stdout.
+
+	static AudioDevice defaultInput();
+	static AudioDevice defaultOutput();
+	static int numDevices();			///< Returns number of audio i/o devices available.
+	static void printAll();				///< Prints info about all available i/o devices to stdout.
+
+private:
+	void setImpl(int deviceNum);
+	static void initDevices();
+	int mID;
+	const void * mImpl;
+};
+
+
 /// Audio callback type
 typedef void (*audioCallback)(AudioIOData& io);
 
@@ -106,16 +134,12 @@ public:
 	void print();				///< Prints info about current i/o devices to stdout.
 	void printError();			///< Prints info about current error status to stdout.
 
-
 	static const char * errorText(int errNum);		// Returns error string.
-	static int initDevices();
-	static int numDevices();				///< Returns number of audio i/o devices available.
-	static void printDevices();				///< Prints info about all available i/o devices to stdout.
-	static void printDevice(int deviceNo);	/// Prints info about specific i/o device to stdout.
 	
 private:
 	PaError mErrNum;							// Most recent error number.
-	PaDeviceIndex mInDevice, mOutDevice;		// Input and output device ids.	
+	//PaDeviceIndex mInDevice, mOutDevice;		// Input and output device ids.
+	AudioDevice mInDevice, mOutDevice;
 
 	bool mIsOpen;			// An audio device is open
 	bool mIsRunning;		// An audio stream is running
@@ -176,7 +200,6 @@ inline void AudioIO::operator()(){ if(callback) callback(*this); }
 inline ULONG AudioIO::chans(bool forOutput) const { return forOutput ? outChans() : inChans(); }
 inline double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mStream); }
 inline bool AudioIO::killNANs() const { return mKillNANs; }
-inline int AudioIO::numDevices(){ return Pa_GetDeviceCount(); }
 inline const char * AudioIO::errorText(int errNum){ return Pa_GetErrorText(errNum); }
 
 inline bool AudioIO::error() const { return mErrNum != paNoError; }

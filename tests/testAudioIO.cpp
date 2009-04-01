@@ -15,12 +15,12 @@ void audioCB(AudioIOData & io){
 }
 
 int main(int argc, char* argv[]){
-	
-	AudioIO::initDevices();
-	AudioIO::printDevices();
+
+	AudioDevice::printAll(); printf("\n");
 	
 	//AudioIO io(128, 44100., audioCB, NULL, 16, 16);
 	AudioIO io(128, 44100., audioCB, NULL, 2, 1);
+	
 	io.start();
 	io.print();
 
