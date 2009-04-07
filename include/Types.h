@@ -405,10 +405,10 @@ struct Vec : public Multi<N,T> {
 template <class T>
 struct Vec2 : public Vec<2, T> {
 	using Vec<2,T>::operator=;
-	Vec2(const Vec<2, T>& v){ (*this) = v; }
-	Vec2(T v=(T)0){ (*this)(v, v); }
-	Vec2(T v1, T v2){ (*this)(v1, v2); }
-	void operator()(T v1, T v2){ (*this)[0]=v1; (*this)[1]=v2; }
+	Vec2(const Vec<2, T>& v){ (*this)=v; }
+	Vec2(const T& v=T(0)){ (*this)(v,v); }
+	Vec2(const T& v1, const T& v2){ (*this)(v1,v2); }
+	void operator()(const T& v1, const T& v2){ (*this)[0]=v1; (*this)[1]=v2; }
 };
 
 
@@ -416,10 +416,12 @@ struct Vec2 : public Vec<2, T> {
 template <class T>
 struct Vec3 : public Vec<3, T> {
 	using Vec<3,T>::operator=;
-	Vec3(const Vec<3, T>& v){ (*this) = v; }
-	Vec3(T v=(T)0){ (*this)(v, v, v); }
-	Vec3(T v1, T v2, T v3=(T)0){ (*this)(v1, v2, v3); }
-	void operator()(T v1, T v2, T v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; }
+
+	Vec3(const Vec<3, T>& v){ (*this)=v; }
+	Vec3(const T& v=T(0)){ (*this)(v,v,v); }
+	Vec3(const T& v1, const T& v2, const T& v3=T(0)){ (*this)(v1,v2,v3); }
+
+	void operator()(const T& v1, const T& v2, const T& v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; }
 	
 	T dot() const { return dot(*this); }
 	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
@@ -433,6 +435,23 @@ struct Vec3 : public Vec<3, T> {
 };
 
 
+///< Four element vector
+template <class T>
+struct Vec4 : public Vec<4, T> {
+	using Vec<4,T>::operator=;
+
+	Vec4(const Vec<4, T>& v){ (*this)=v; }
+	Vec4(const T& v=T(0)){ (*this)(v,v,v,v); }
+	Vec4(const T& v1, const T& v2, const T& v3, const T& v4){ (*this)(v1,v2,v3,v4); }
+
+	void operator()(const T& v1, const T& v2, const T& v3, const T& v4){
+		(*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; (*this)[3]=v4; }
+	
+	T dot() const { return dot(*this); }
+	T dot(const Vec4& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2] + v[3]*(*this)[3]; }
+	
+	Vec3<T> xyz() const { return Vec3<T>((*this)[0], (*this)[1], (*this)[2]); }
+};
 
 
 
