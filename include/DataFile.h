@@ -8,6 +8,42 @@
 #define UI4 unsigned long
 #define UI8 unsigned long long
 
+
+class File{
+public:
+
+	/// @param[in] path		path of file
+	/// @param[in] mode		i/o mode w, r, wb, rb
+	File(const char * path, const char * mode);
+
+	~File();
+
+	void close();	///< Close file
+	bool open();	///< Open file with specified i/o mode
+
+	/// Returns character string of file contents (read mode only)
+	char * readAll();
+
+	/// Returns whether file is open
+	bool opened() const { return 0 != mFP; }
+	
+	/// Returns size (in bytes) of file contents
+	int size() const { return mSizeBytes; }
+
+protected:
+	const char * mPath;
+	const char * mMode;
+	char * mContent;
+	int mSizeBytes;
+	FILE * mFP;
+	
+	void freeContent();
+	void allocContent(int n);
+	void getSize();
+};
+
+
+
 /// Generic cross-endian file format for numerical data.
 
 /// The file format is a mix between binary and human-readable text.  Numbers are

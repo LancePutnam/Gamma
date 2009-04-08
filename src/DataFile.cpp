@@ -4,6 +4,54 @@
 #define UI4 unsigned long
 #define UI8 unsigned long long
 
+
+File::File(const char * path, const char * mode)
+:	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
+{	open(); }
+
+File::~File(){ close(); freeContent(); }
+
+void File::close(){ if(opened()){ fclose(mFP); mFP = 0; } }
+
+bool File::open(){
+	if(0 == mFP){
+		if(mFP = fopen(mPath, mMode)){
+			getSize();
+			return true;
+		}
+	}
+	return false;
+}
+
+char * File::readAll(){
+	if(opened() && mMode[0]=='r'){
+		int n = size();
+		allocContent(n);
+		fread(mContent, sizeof(char), n, mFP);
+	}
+	return mContent;
+}
+
+void File::freeContent(){ delete[] mContent; }
+void File::allocContent(int n){
+	if(mContent) freeContent();
+	mContent = new char[n+1];
+	mContent[n] = '\0';
+}
+
+void File::getSize(){
+	int r=0;
+	if(opened()){
+		fseek(mFP, 0, SEEK_END);
+		r = ftell(mFP);
+		rewind(mFP);
+	}
+	mSizeBytes = r;
+}
+
+
+
+
 DataFile::DataFile(const char * path)
 	: mPath(path), fp(0)
 {
