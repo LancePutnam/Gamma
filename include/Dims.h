@@ -1,5 +1,5 @@
-#ifndef GAMMA_SPACETIME_H_INC
-#define GAMMA_SPACETIME_H_INC
+#ifndef GAMMA_DIMS_H_INC
+#define GAMMA_DIMS_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
@@ -9,7 +9,7 @@
 namespace gam{
 
 
-/// Dimensions of a spacetime grid.
+/// Dimensions of a lattice (up to 4 dimensions).
 
 /// Conversions to and from positions and indices do not perform any bounds
 /// checking. Potential out-of-bounds coordinates and indices should be validated 
