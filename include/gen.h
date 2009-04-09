@@ -278,7 +278,7 @@ OF3(RSin,		rSin,		0,0,1)
 
 
 // Complex number with a frequency.
-template <class T>
+template <class T=double>
 class Spinner2 : public Complex<T>{
 public:
 	typedef Complex<T> C;
