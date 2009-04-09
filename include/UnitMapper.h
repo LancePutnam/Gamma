@@ -1,5 +1,8 @@
-#ifndef UNITMAPPER_H_INC
-#define UNITMAPPER_H_INC
+#ifndef GAMMA_UNITMAPPER_H_INC
+#define GAMMA_UNITMAPPER_H_INC
+
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information */
 
 #include <math.h>
 #include <map>
@@ -7,7 +10,7 @@
 #include "scl.h"
 #include "MacroD.h"
 
-namespace synz{
+namespace gam{
 
 namespace MapType{
 	/// Mapping types.
@@ -105,7 +108,7 @@ TEM T UnitMapper<T>::mapExp2(T u){
 	return (T)(pow(2., scl::mapNormal(u, bound1, bound0, 1.)) * p1);
 }
 
-} // synz::
+} // gam::
 
 #include "MacroU.h"
 
