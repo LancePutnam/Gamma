@@ -18,7 +18,7 @@ namespace gam{
 class Dims{
 public:
 
-	Dims(int s1, int s2, int s3=1, int s4=1){
+	Dims(int s1, int s2=1, int s3=1, int s4=1){
 		resize(s1,s2,s3,s4);
 	}
 
