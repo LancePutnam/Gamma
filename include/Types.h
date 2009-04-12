@@ -93,8 +93,10 @@ struct Complex{
 	bool operator==(const C& v) const { return (v.r==r) && (v.i==i); }
 	
 	C& operator = (const Polar& v){ r=v.m*cos(v.p); i=v.m*sin(v.p); return *this; }
+//	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
+//	C& operator = (const T& v){ r=v;   i=v;   return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
-	C& operator = (const T& v){ r=v;   i=v;   return *this; }
+	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
 	C  operator - () const { return C(-r, -i); }
 	C  operator - (const C& v) const { return C(r-v.r, i-v.i); }
 	C  operator - (const T& v) const { return C(r-v,   i-v); }
