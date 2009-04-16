@@ -165,7 +165,7 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
 
 
 /// Returns e^(-v*v)
-TEM T gaussian(T v){ return exp(-v*v); }
+TEM T gaussian(T v){ return ::exp(-v*v); }
 
 TEM T hypot(T x, T y);
 
@@ -229,6 +229,15 @@ TEM T nearest(T val, const char * interval = "2212221", long div=12);
 /// Returns nearest integer division of one value to another
 TEM T nearestDiv(T of, T to);
 
+/// Smooth negative map.
+
+/// The return value is close to 1 if v < 0 and close to 0 if v > 0.
+/// The smoothness is controlled with the bw argument.
+TEM T negative(T v, T bw);
+
+/// Same as negative(T,T), but 'amt' controls positive level (0,1) -> (-1,1).
+TEM T negative(T v, T bw, T amt);
+
 /// Returns pole radius given a bandwidth and sampling interval
 TEM	inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
@@ -239,10 +248,10 @@ TEM T poly(T x, T a0, T a1, T a2);
 /// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3.
 TEM T poly(T x, T a0, T a1, T a2, T a3);
 
-/// Continuous positive map.
+/// Smooth positive map.
 
 /// The return value is close to 1 if v > 0 and close to 0 if v < 0.
-///
+/// The smoothness is controlled with the bw argument.
 TEM T positive(T v, T bw);
 
 TEM T pow2(T value);			///< Returns value to the 2nd power.
@@ -394,6 +403,11 @@ T zero(T v, T bw, F f);
 
 
 TEM T notch(T v, T bw){ return v/(v+bw); }
+TEM T notch1(T v, T bw){ return notch(scl::abs(v), bw); }
+
+// Same as notch1, but 'amt' controls notch depth.
+TEM T notch1(T v, T bw, T amt){ return (T)1 - amt*peak1(v, bw); }
+TEM T notch2(T v, T bw){ return notch(v*v, bw); }
 
 /// Peak function.
 
@@ -404,7 +418,7 @@ TEM T notch(T v, T bw){ return v/(v+bw); }
 /// smaller bandwidth than the true response. Also, the true response is
 /// periodic, while this one is not.
 TEM T peak(T v, T bw){ return bw/(v+bw); }
-
+TEM T peak1(T v, T bw){ return bw/(scl::abs(v)+bw); }
 
 
 
@@ -940,10 +954,11 @@ TEM T nearest(T val, const char * interval, long div){
 }
 
 TEM inline T nearestDiv(T of, T to){ return to / round(to/of); }
-
+TEM inline T negative(T v, T bw){ return T(0.5) - sign(v, bw)*T(0.5); }
+TEM inline T negative(T v, T bw, T a){ return a - (T(1)-a)*sign(v, bw); }
 TEM inline T poly(T v, T a0, T a1, T a2){ return a0 + v*(a1 + v*a2); }
 TEM inline T poly(T v, T a0, T a1, T a2, T a3){ return a0 + v*(a1 + v*(a2 + v*a3)); }
-TEM inline T positive(T v, T bw){ return sign(v, bw)*0.5 + 0.5; }
+TEM inline T positive(T v, T bw){ return T(0.5) + sign(v, bw)*T(0.5); }
 TEM inline T pow2 (T v){ return v*v; }
 TEM inline T pow3 (T v){ return v*v*v; }
 TEM inline T pow4 (T v){ return pow2(pow2(v)); }
