@@ -170,6 +170,11 @@ TEM T gaussian(T v){ return ::exp(-v*v); }
 TEM T hypot(T x, T y);
 
 /// Returns (n+1)th argument.
+TEM inline const T& item(int n, const T& v1, const T& v2, const T& v3){
+	return (n<=0)?v1 : (n==1)?v2 : v3;
+}
+
+/// Returns (n+1)th argument.
 TEM inline const T& item(int n, const T& v1, const T& v2, const T& v3, const T& v4){
 	return (n<=0)?v1 : (n==1)?v2 : (n==2)?v3 : v4;
 }
@@ -284,13 +289,19 @@ TEM T ratioET(T pc, T divisions=12, T octave=2);
 float recSqrtFast(float value);
 
 /// Returns floating point value rounded to nearest integer.
-TEM T round(T value);
+TEM T round(T v);
 
-/// Returns floating point value rounded to nearest step multiple.
-TEM T round(T value, T step);
+/// Returns floating point value rounded to nearest integer multiple of 'step'.
+TEM T round(T v, T step);
 
-/// Returns floating point value rounded to nearest step multiple. Faster version to avoid 1/step divide.
-TEM T round(T value, T step, T recStep);
+/// Returns floating point value rounded to nearest integer multiple of 'step'. Faster version to avoid 1/step divide.
+TEM T round(T v, T step, T recStep);
+
+/// Returns value rounded to nearest integer away from zero.
+TEM T roundAway(T v);
+
+/// Returns value rounded to nearest to nearest integer multiple of 'step' away from zero.
+TEM T roundAway(T v, T step);
 
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
@@ -991,6 +1002,8 @@ TEM inline T ratioET(T pc, T divisions, T interval){
 TEM inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
 TEM inline T round(T v, T s){ return round<double>(v/s) * s; }
 TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
+TEM inline T roundAway(T v){ return v<T(0) ? floor(v) : ceil(v); }
+TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 
 //inline float round(float val, float step){
 //	union { float f; unsigned long i; } u;
