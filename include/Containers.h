@@ -234,6 +234,29 @@ protected:
 };
 
 
+/// Ring buffer that keeps track of its fill.
+template <class T>
+class RingFill : public Ring<T> {
+public:
+	typedef Ring<T> super;
+	RingFill(uint32_t size): super(size), mFill(0){}
+
+	void operator()(const T& v){
+		this->super::operator()(v);
+		if(mFill < super::size()) ++mFill;
+	}
+	
+	/// Reset fill to zero.
+	void reset(){ mFill=0; }
+	
+	/// Returns current fill of buffer.
+	uint32_t fill() const { return mFill; }
+	
+protected:
+	uint32_t mFill;
+	virtual void onResize(){ reset(); }
+};
+
 
 
 /// Double buffered ring-buffer
