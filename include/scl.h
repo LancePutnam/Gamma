@@ -169,6 +169,11 @@ TEM T gaussian(T v){ return ::exp(-v*v); }
 
 TEM T hypot(T x, T y);
 
+/// Returns (n+1)th argument.
+TEM inline const T& item(int n, const T& v1, const T& v2, const T& v3, const T& v4){
+	return (n<=0)?v1 : (n==1)?v2 : (n==2)?v3 : v4;
+}
+
 /// Generalized Laguerre polynomial L{n,k}
 ///
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
@@ -286,6 +291,9 @@ TEM T round(T value, T step);
 
 /// Returns floating point value rounded to nearest step multiple. Faster version to avoid 1/step divide.
 TEM T round(T value, T step, T recStep);
+
+/// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
+inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
 /// Returns value of spherical harmonic Y{l,m}(theta, phi).
 TEM Complex<T> sharm(int l, int m, T theta, T phi);
