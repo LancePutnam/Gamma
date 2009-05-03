@@ -80,8 +80,6 @@ struct Complex{
 	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar(m,p); }
 
-	//static Complex polar(const T& m, const T& p){ return C(Polar(m,p)); }
-
 	C& fromPhase(const T& p){ r=cos(p); i=sin(p); return *this; }
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar(m,p)); }
 
@@ -89,75 +87,65 @@ struct Complex{
 	C& operator()(const Polar& p){ return *this = p; }
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
-	
-	bool operator==(const C& v) const { return (v.r==r) && (v.i==i); }
 
-	// this was the old way, pretty sure not the way to do it...
-//	C& operator = (const T& v){ r=v;   i=v;   return *this; }
-//	C  operator - (const T& v) const { return C(r-v,   i-v); }
-//	C& operator -=(const T& v){ r-=v;   i-=v;   return *this; }
-//	C  operator + (const T& v) const { return C(r+v,   i+v); }
-//	C& operator +=(const T& v){ r+=v;   i+=v;   return *this; }
+	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if real and imaginary components are equal
+	bool operator !=(const C& v) const { return (r!=v.r) || (i!=v.i); }		///< Returns true if real or imaginary components are not equal
+	bool operator > (const C& v) const { return norm() > v.norm(); }		///< Returns true if norm is greater than argument's norm
+	bool operator < (const C& c) const { return norm() < c.norm(); }		///< Returns true if norm is less than argument's norm
 
 	C& operator = (const Polar& v){ r=v.m*cos(v.p); i=v.m*sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
 	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
-	C  operator - () const { return C(-r, -i); }
-	C  operator - (const C& v) const { return C(r-v.r, i-v.i); }
-	C  operator - (const T& v) const { return C(r-v,   i); }
 	C& operator -=(const C& v){ r-=v.r; i-=v.i; return *this; }
 	C& operator -=(const T& v){ r-=v; return *this; }
-	C  operator + (const C& v) const { return C(r+v.r, i+v.i); }
-	C  operator + (const T& v) const { return C(r+v,   i); }
 	C& operator +=(const C& v){ r+=v.r; i+=v.i; return *this; }
 	C& operator +=(const T& v){ r+=v; return *this; }
-	C  operator * (const C& v) const { C c(*this); return mul(c, v); }
-	C  operator * (const T& v) const { return C(r*v,   i*v); }
-	C& operator *=(const C& v){ return mul(*this, v); }
+	C& operator *=(const C& v){ return (*this)(r*v.r - i*v.i, i*v.r + r*v.i); }
 	C& operator *=(const T& v){ r*=v; i*=v; return *this; }
-	C  operator / (const C& v) const { C c(*this); return div(c, v); }
-	C  operator / (const T& v) const { return C(r/v, i/v); }
-	C& operator /=(const C& v){ return div(*this, v); }
+	C& operator /=(const C& v){ return (*this) *= v.recip(); }
 	C& operator /=(const T& v){ r/=v; i/=v; return *this; }
-	
-	bool operator !=(const C& v) const { return (r!=v.r) && (i!=v.i); }
-	bool operator > (const C& v) const { return mag() > v.mag(); }
+
+	const C operator - () const { return C(-r, -i); }
+	const C operator - (const C& v) const { return C(*this) -= v; }
+	const C operator - (const T& v) const { return C(*this) -= v; }
+	const C operator + (const C& v) const { return C(*this) += v; }
+	const C operator + (const T& v) const { return C(*this) += v; }
+	const C operator * (const C& v) const { return C(*this) *= v; }
+	const C operator * (const T& v) const { return C(*this) *= v; }
+	const C operator / (const C& v) const { return C(*this) /= v; }
+	const C operator / (const T& v) const { return C(*this) /= v; }
 
 	C  conj() const { return C(r,-i); }
 
-	T dot() const { return dot(*this); }
-	T dot(const C& v) const { return r*v.r + i*v.i; }
-	T mag() const { return sqrt(dot()); }
+	T abs() const { return sqrt(norm()); }					///< Returns absolute value (radius)
+	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
+	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns dot product
+	const C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
+	const C log() const { return Complex<T>(T(0.5)*::log(norm()), arg()); } ///< Returns log(z)
 	C mul2(const C& v) const { return C(r*v.r, i*v.i); }
-	C& normalize(){ return *this /= mag(); }
-	T phase() const { return atan2(i, r); }
-	C recip() const { T m=1./dot(); return C(r*m, -i*m); }
-	
-	bool operator < (const C& c) const { return dot() < c.dot(); }
+	T norm() const { return dot(*this); }					///< Returns norm, r*r + i*i, the square of the absolute value
+	C& normalize(){ return *this /= abs(); }				///< Sets absolute value to 1
+	const C pow(const C& v) const { return exp(v*log(*this)); }
+	const C recip() const { return conj()/norm(); }			///< Return multiplicative inverse
+	const C sgn() const { return (*this)/abs(); }			///< Returns signum, z/|z|, the closest point on unit circle
 
-	static C& mul(C& a, const C& b){
-		return a(a.r*b.r - a.i*b.i, a.i*b.r + a.r*b.i);
-	}
-
-	static C& div(C& a, const C& b){
-		T den = (T)1 / b.dot();
-		return a((a.r*b.r + a.i*b.i) * den, (a.i*b.r - a.r*b.i) * den);
-	}
+	T dot() const { return norm(); }
+	T mag() const { return abs(); }
+	T phase() const { return arg(); }
 };
 
 typedef Complex<float > Complexf;
 typedef Complex<double> Complexd;
 
-
-
-template <class T>
-static Complex<T> exp(const Complex<T>& c){
-	T m = c.mag();
-	T p = c.phase();
-	Complex<T> r;
-	return r.fromPolar(::exp(m), p);
-}
-
+#define TEM template <class T>
+TEM const Complex<T> exp(const Complex<T>& c){ return c.exp(); }
+TEM const Complex<T> log(const Complex<T>& c){ return c.log(); }
+TEM const Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
+TEM const Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
+TEM const Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
+TEM const Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
+TEM const Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+#undef TEM
 
 
 
