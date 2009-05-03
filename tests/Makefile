@@ -1,4 +1,6 @@
-include config.mk
+include ../config.mk
+LDFLAGS += ../libgamma.a
+CFLAGS += -I../include/
 
 SRC = \
 	testAnalysis.cpp \

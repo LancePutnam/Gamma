@@ -1,5 +1,5 @@
 include config.mk
-
+CFLAGS += -I./include/
 SRCDIR = ./src
 
 SRC = \
@@ -26,14 +26,18 @@ libgamma.a: ${OBJ}
 	@${RANLIB} $@
 
 .PHONY: tests
-
 tests: libgamma.a
 	@cd tests && make all
+
+.PHONY: tutorial
+tutorial: libgamma.a
+	@cd tutorial && make all
 
 clean:
 #	@rm -f ${SRCDIR}/*.o *.a
 	@rm -f ${SRCDIR}/*.o
 	@cd tests && make clean
+	@cd tutorial && make clean
 
-all: libgamma.a tests
+all: libgamma.a tests tutorial
 

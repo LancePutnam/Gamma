@@ -194,7 +194,7 @@ There are two policies generators can follow when returning a value from their g
 
 	struct RAdd{
 
-		int genNext(){ return val++; }
+		int genNext(){ return ++val; }
 		int genPrev(){ int t=val; val++; return t; }
 
 		int val;

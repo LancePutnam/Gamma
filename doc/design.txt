@@ -96,6 +96,21 @@ class Synced{
 
 
 
+Set + Operations = Group
+--------------------------------------------------------------------------------
+
+class Elem2{
+	Elem2()
+	
+	union{
+		struct{ T r, i; };
+		struct{ T x, y; };
+		T elems[2];
+	};
+};
+
+
+
 
 On Mathematical Terminology
 --------------------------------------------------------------------------------
