@@ -560,7 +560,7 @@ TEM inline void differentiate(T * arr, ULONG len, T & prev){
 }
 
 TEM inline void expBase(T * arr, ULONG len, double base){
-	LOOP(len, arr[i] = pow(base, arr[i]);)
+	LOOP(len, arr[i] = ::pow(base, arr[i]);)
 }
 
 TEM inline void filter1P(T * arr, const T * src, ULONG len, T b0, T a1){
