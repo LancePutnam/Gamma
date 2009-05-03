@@ -84,7 +84,7 @@ double freq(const char * note){
 		else if(c == '-'){ result--; c = *note; }
 		else if(c == ' '){ c = *note; }
 		
-		return pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		
+		return ::pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		
 	}
 	return 0.;
 }

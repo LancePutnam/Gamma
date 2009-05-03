@@ -214,8 +214,8 @@ TEM void cosine(T * dst, ULONG len){
 }
 
 TEM void decay(T * dst, ULONG len, double order){
-	double final = pow(2., order);
-	double lambda = log(final) / (float)len;
+	double final = ::pow(2., order);
+	double lambda = ::log(final) / (float)len;
 	double time = 1.;
 	double scale = 1. / (1. - final);
 	double offset = -final;

@@ -1074,7 +1074,7 @@ TEMS inline float LFO<Ts>::line2U(){
 
 DEF(down(),		scl::rampDown(phaseI()))
 DEF(even3(),	scl::rampUp(phaseI()); static float c=-1.50*sqrt(3.); r *= (1-r*r)*c;)
-DEF(even5(),	scl::rampUp(phaseI()); static float c=-1.25*pow(5.,0.25); r *= (1-scl::pow4(r))*c;)
+DEF(even5(),	scl::rampUp(phaseI()); static float c=-1.25*::pow(5.,0.25); r *= (1-scl::pow4(r))*c;)
 DEF(pulse(),	scl::pulse(phaseI(), modi))
 DEF(cos(),		scl::triangle(phaseI()); r *= 0.5f * r*r - 1.5f)
 DEF(stair(),	scl::stair(phaseI(), modi))

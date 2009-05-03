@@ -918,7 +918,7 @@ inline float log2Fast(float v){
 	return (float)((u.i - 0x3f800000)) * 0.0000001192092896f;// / 8388608.f;
 }
 
-TEM inline T mapInvPow2(T v){ return T(1) - scl::pow2(T(1) - v); }
+TEM inline T mapInvPow2(T v){ return v*(T(2)-v); }
 
 TEM inline void mapLin(T i0, T i1, T o0, T o1, T& scale, T& offset){
 	scale = slope(i0, o0, i1, o1);
@@ -931,7 +931,7 @@ TEM inline T mapLin(T v, T i0, T i1, T o0, T o1){
 }
 
 inline double mapNormal(double v, double b1, double b0, double power){
-	if(power != 1.) v = pow(v, power);
+	if(power != 1.) v = ::pow(v, power);
 	return b0 + (b1 - b0) * v;
 }
 
@@ -995,7 +995,7 @@ inline unsigned char prime(ULONG n){ return mPrimes54[n]; }
 TEM inline T prime(ULONG n, T mul){ return (T)prime(n) * mul; }
 
 TEM inline T ratioET(T pc, T divisions, T interval){
-	return (T)pow((double)interval, (double)pc / (double)divisions);
+	return (T)::pow((double)interval, (double)pc / (double)divisions);
 }
 
 //TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
@@ -1184,7 +1184,7 @@ inline float recSqrtFast(float v){
 	return v; 
 } 
 
-inline double t60(double samples){ return pow(0.001, 1./samples); }
+inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
 TEM inline T trunc(T v){ return round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
 TEM inline T trunc(T v, T s){ return trunc(v/s)*s; }
