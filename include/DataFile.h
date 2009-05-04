@@ -27,6 +27,12 @@ public:
 	/// Returns whether file is open
 	bool opened() const { return 0 != mFP; }
 	
+	/// Returns file i/o mode string
+	const char * mode() const { return mMode; }
+	
+	/// Returns path string
+	const char * path() const { return mPath; }
+	
 	/// Returns size (in bytes) of file contents
 	int size() const { return mSizeBytes; }
 

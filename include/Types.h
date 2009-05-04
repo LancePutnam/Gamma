@@ -449,6 +449,86 @@ struct Vec4 : public Vec<4, T> {
 };
 
 
+/*
+template <class T>
+struct ElemData2{
+	union{
+		struct{ T r,i; };
+		struct{ T x,y; };
+		T elems[2];
+	};
+};
+
+
+template <uint32_t N, class T, template <class> class E>
+struct ElemN : public E<T>{
+	using E<T>::elems;
+
+	/// Set element at index (no bounds checking)
+	T& operator[](uint32_t i){ return elems[i]; }
+	
+	/// Get element at index (no bounds checking)
+	const T& operator[](uint32_t i) const { return elems[i]; }
+
+	/// Returns size of array
+	static uint32_t size(){ return N; }
+};
+
+template <class T>
+struct Elem2 : public ElemN<2, T, ElemData2>{
+	using ElemN<2, T, ElemData2>::elems;
+	Elem2(const T& v1, const T& v2){ elems[0]=v1; elems[1]=v2; }
+};
+*/
+
+// Two-value element
+//template <class T>
+//struct Elem2{
+//
+//	// aliases to data
+//	union{
+//		struct{ T r,i; };
+//		struct{ T x,y; };
+//		T elems[2];
+//	};
+//	
+//	/// Set element at index (no bounds checking)
+//	T& operator[](uint32_t i){ return elems[i]; }
+//	
+//	/// Get element at index (no bounds checking)
+//	const T& operator[](uint32_t i) const { return elems[i]; }
+//
+//	/// Returns size of array
+//	static uint32_t size(){ return 2; }
+//	
+//	Elem2& swap10(){ T t=x; x=y; y=t; return *this; }
+//};
+//
+//
+//
+// Three-value element
+//template <class T>
+//struct Elem2{
+//
+//	// aliases to data
+//	union{
+//		struct{ T r,i,j; };
+//		struct{ T x,y,z; };
+//		T elems[3];
+//	};
+//	
+//	/// Set element at index (no bounds checking)
+//	T& operator[](uint32_t i){ return elems[i]; }
+//	
+//	/// Get element at index (no bounds checking)
+//	const T& operator[](uint32_t i) const { return elems[i]; }
+//
+//	/// Returns size of array
+//	static uint32_t size(){ return 2; }
+//	
+//	Elem2& swap10(){ T t=x; x=y; y=t; return *this; }
+//};
+
 
 
 // We want this thing to be able to provide a standard interface to indexing
