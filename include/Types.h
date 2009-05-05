@@ -128,7 +128,8 @@ struct Complex{
 	const C pow(const C& v) const { return exp(v*log(*this)); }
 	const C recip() const { return conj()/norm(); }			///< Return multiplicative inverse
 	const C sgn() const { return (*this)/abs(); }			///< Returns signum, z/|z|, the closest point on unit circle
-
+	const C sqr() const { return C(r*r-i*i, (T)2*r*i); }	///< Returns square
+	
 	T dot() const { return norm(); }
 	T mag() const { return abs(); }
 	T phase() const { return arg(); }
