@@ -404,7 +404,7 @@ struct Vec2 : public Vec<2, T> {
 	Vec2(const Vec<2, T>& v){ (*this)=v; }
 	Vec2(const T& v=T(0)){ (*this)(v,v); }
 	Vec2(const T& v1, const T& v2){ (*this)(v1,v2); }
-	void operator()(const T& v1, const T& v2){ (*this)[0]=v1; (*this)[1]=v2; }
+	Vec2& operator()(const T& v1, const T& v2){ (*this)[0]=v1; (*this)[1]=v2; return *this; }
 };
 
 
@@ -417,7 +417,7 @@ struct Vec3 : public Vec<3, T> {
 	Vec3(const T& v=T(0)){ (*this)(v,v,v); }
 	Vec3(const T& v1, const T& v2, const T& v3=T(0)){ (*this)(v1,v2,v3); }
 
-	void operator()(const T& v1, const T& v2, const T& v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; }
+	Vec3& operator()(const T& v1, const T& v2, const T& v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; return *this; }
 	
 	T dot() const { return dot(*this); }
 	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
@@ -440,8 +440,8 @@ struct Vec4 : public Vec<4, T> {
 	Vec4(const T& v=T(0)){ (*this)(v,v,v,v); }
 	Vec4(const T& v1, const T& v2, const T& v3, const T& v4){ (*this)(v1,v2,v3,v4); }
 
-	void operator()(const T& v1, const T& v2, const T& v3, const T& v4){
-		(*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; (*this)[3]=v4; }
+	Vec4& operator()(const T& v1, const T& v2, const T& v3, const T& v4){
+		(*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; (*this)[3]=v4; return *this; }
 	
 	T dot() const { return dot(*this); }
 	T dot(const Vec4& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2] + v[3]*(*this)[3]; }
