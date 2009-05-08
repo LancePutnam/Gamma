@@ -1,4 +1,4 @@
-include config.mk
+include Makefile.config
 CFLAGS += -I./include/
 SRCDIR = ./src
 

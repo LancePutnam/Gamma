@@ -1,4 +1,4 @@
-include ../config.mk
+include ../Makefile.config
 LDFLAGS += ../libgamma.a
 CFLAGS += -I../include/
 
