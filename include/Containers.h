@@ -247,7 +247,7 @@ public:
 	}
 	
 	/// Reset fill to zero.
-	void reset(){ mFill=0; }
+	void reset(){ mFill=0; super::reset(); }
 	
 	/// Returns current fill of buffer.
 	uint32_t fill() const { return mFill; }
