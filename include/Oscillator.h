@@ -851,7 +851,7 @@ TEM void Quadra<Tv, Ts>::freq(Tv v){
 
 TEM void Quadra<Tv, Ts>::phase(Tv v){
 	// set phase without changing current magnitude
-	val.fromPolar(sqrt(val.dot()), v*(Tv)M_2PI);
+	val.fromPolar(val.norm(), v*(Tv)M_2PI);
 }
 
 TEM void Quadra<Tv, Ts>::reset(){ val(mAmp, (Tv)0); }
