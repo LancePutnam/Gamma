@@ -90,8 +90,8 @@ struct Complex{
 
 	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if real and imaginary components are equal
 	bool operator !=(const C& v) const { return (r!=v.r) || (i!=v.i); }		///< Returns true if real or imaginary components are not equal
-	bool operator > (const C& v) const { return norm() > v.norm(); }		///< Returns true if norm is greater than argument's norm
-	bool operator < (const C& c) const { return norm() < c.norm(); }		///< Returns true if norm is less than argument's norm
+	bool operator > (const C& v) const { return norm2() > v.norm2(); }		///< Returns true if norm is greater than argument's norm
+	bool operator < (const C& c) const { return norm2() < c.norm2(); }		///< Returns true if norm is less than argument's norm
 
 	C& operator = (const Polar& v){ r=v.m*cos(v.p); i=v.m*sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
@@ -114,23 +114,22 @@ struct Complex{
 	const C operator * (const T& v) const { return C(*this) *= v; }
 	const C operator / (const C& v) const { return C(*this) /= v; }
 	const C operator / (const T& v) const { return C(*this) /= v; }
-
-	C  conj() const { return C(r,-i); }
-
-	T abs() const { return sqrt(norm()); }					///< Returns absolute value (radius)
-	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
-	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns dot product
-	const C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
-	const C log() const { return Complex<T>(T(0.5)*::log(norm()), arg()); } ///< Returns log(z)
-	C mul2(const C& v) const { return C(r*v.r, i*v.i); }
-	T norm() const { return dot(*this); }					///< Returns norm, r*r + i*i, the square of the absolute value
-	C& normalize(){ return *this /= abs(); }				///< Sets absolute value to 1
-	const C pow(const C& v) const { return exp(v*log(*this)); }
-	const C recip() const { return conj()/norm(); }			///< Return multiplicative inverse
-	const C sgn() const { return (*this)/abs(); }			///< Returns signum, z/|z|, the closest point on unit circle
-	const C sqr() const { return C(r*r-i*i, (T)2*r*i); }	///< Returns square
 	
-	T dot() const { return norm(); }
+	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
+	C conj() const { return C(r,-i); }						///< Returns conjugate
+	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
+	const C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
+	const C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
+	//C mul2(const C& v) const { return C(r*v.r, i*v.i); }
+	T norm() const { return sqrt(norm2()); }				///< Returns norm (radius)
+	T norm2() const { return dot(*this); }					///< Returns square of norm, r*r + i*i
+	C& normalize(){ return *this /= norm(); }				///< Sets absolute value to 1
+	const C pow(const C& v) const { return exp(v*log(*this)); }
+	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse
+	const C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
+	const C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
+
+	T abs() const { return norm(); }						///< Returns absolute value (radius)
 	T mag() const { return abs(); }
 	T phase() const { return arg(); }
 };
@@ -190,20 +189,27 @@ struct Quat{
 		r*v.k + i*v.j - j*v.i + k*v.r);
 	}
 	Q& operator *=(const T& v){ r*=v; i*=v; j*=v; k*=v; return *this; }
-	Q& operator /=(const T& v){ r/=v; i/=v; j/=v; k/=v; return *this; }	
+	Q& operator /=(const Q& v){ return (*this) *= v.recip(); }
+	Q& operator /=(const T& v){ r/=v; i/=v; j/=v; k/=v; return *this; }
 
 	Q operator - () const { return Q(-r, -i, -j, -k); }
-	Q operator - (const Q& v) const { return Q(*this) -= v; }
-	Q operator - (const T& v) const { return Q(*this) -= v; }
-	Q operator + (const Q& v) const { return Q(*this) += v; }
-	Q operator + (const T& v) const { return Q(*this) += v; }
-	Q operator * (const Q& v) const { return Q(*this) *= v; }
-	Q operator * (const T& v) const { return Q(*this) *= v; }
-	Q operator / (const Q& v) const { return Q(*this) /= v; }
-	Q operator / (const T& v) const { return Q(*this) /= v; }
+	Q operator - (const Q& v) const {return Q(*this)-=v;}
+	Q operator - (const T& v) const {return Q(*this)-=v;}
+	Q operator + (const Q& v) const {return Q(*this)+=v;}
+	Q operator + (const T& v) const {return Q(*this)+=v;}
+	Q operator * (const Q& v) const {return Q(*this)*=v;}
+	Q operator * (const T& v) const {return Q(*this)*=v;}
+	Q operator / (const Q& v) const {return Q(*this)/=v;}
+	Q operator / (const T& v) const {return Q(*this)/=v;}
 
-	Q conj() const { return Q(r,-i,-j,-k); }
-	T dot() const { return r*r + i*i + j*j + k*k; }
+	Q conj() const { return Q(r,-i,-j,-k); }				///< Returns conjugate
+	T dot(const Q& v) const { return r*v.r + i*v.i + j*v.j + k*v.k; }		///< Returns vector dot product
+	Q& identity(){ return (*this)(1,0,0,0); }
+	T norm() const { return sqrt(norm2()); }				///< Returns norm (length)
+	T norm2() const { return dot(*this); }					///< Returns square of norm
+	Q& normalize(){ return *this /= norm(); }				///< Sets norm to 1
+	const Q recip() const { return conj()/norm2(); }		///< Return multiplicative inverse
+	const Q sgn() const { return Q(*this).normalize(); }	///< Returns signum, q/|q|, the closest point on unit 3-sphere
 	
 	// Set from angle (radians) and unit vector (x,y,z)
 	Q& fromAxis(T a, T x, T y, T z){
@@ -225,11 +231,6 @@ struct Quat{
 		T s1s2 = s1*s2;
 		return (*this)(c1c2*c3 - s1s2*s3, c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3);
 	}
-	
-	Q& identity(){ return (*this)(1,0,0,0); }
-	
-	T mag() const { return sqrt(dot()); }
-	Q& normalize(){ return *this /= mag(); }
 	
 	/// Rotate a vector by current quaternion
 	void rotate(T& x, T& y, T& z) const {
@@ -311,7 +312,7 @@ struct Quat{
 TEM const Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
 TEM const Quat<T> operator - (T r, const Quat<T>& q){ return -q+r; }
 TEM const Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
-TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm()); }
+TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); }
 #undef TEM
 
 
@@ -465,85 +466,8 @@ struct Vec4 : public Vec<4, T> {
 };
 
 
-/*
-template <class T>
-struct ElemData2{
-	union{
-		struct{ T r,i; };
-		struct{ T x,y; };
-		T elems[2];
-	};
-};
 
 
-template <uint32_t N, class T, template <class> class E>
-struct ElemN : public E<T>{
-	using E<T>::elems;
-
-	/// Set element at index (no bounds checking)
-	T& operator[](uint32_t i){ return elems[i]; }
-	
-	/// Get element at index (no bounds checking)
-	const T& operator[](uint32_t i) const { return elems[i]; }
-
-	/// Returns size of array
-	static uint32_t size(){ return N; }
-};
-
-template <class T>
-struct Elem2 : public ElemN<2, T, ElemData2>{
-	using ElemN<2, T, ElemData2>::elems;
-	Elem2(const T& v1, const T& v2){ elems[0]=v1; elems[1]=v2; }
-};
-*/
-
-// Two-value element
-//template <class T>
-//struct Elem2{
-//
-//	// aliases to data
-//	union{
-//		struct{ T r,i; };
-//		struct{ T x,y; };
-//		T elems[2];
-//	};
-//	
-//	/// Set element at index (no bounds checking)
-//	T& operator[](uint32_t i){ return elems[i]; }
-//	
-//	/// Get element at index (no bounds checking)
-//	const T& operator[](uint32_t i) const { return elems[i]; }
-//
-//	/// Returns size of array
-//	static uint32_t size(){ return 2; }
-//	
-//	Elem2& swap10(){ T t=x; x=y; y=t; return *this; }
-//};
-//
-//
-//
-// Three-value element
-//template <class T>
-//struct Elem2{
-//
-//	// aliases to data
-//	union{
-//		struct{ T r,i,j; };
-//		struct{ T x,y,z; };
-//		T elems[3];
-//	};
-//	
-//	/// Set element at index (no bounds checking)
-//	T& operator[](uint32_t i){ return elems[i]; }
-//	
-//	/// Get element at index (no bounds checking)
-//	const T& operator[](uint32_t i) const { return elems[i]; }
-//
-//	/// Returns size of array
-//	static uint32_t size(){ return 2; }
-//	
-//	Elem2& swap10(){ T t=x; x=y; y=t; return *this; }
-//};
 
 
 
@@ -608,6 +532,41 @@ private:
 	uint * mElems;
 };
 
+
+
+
+// Trying to abstract too many things. Hard to write subclasses of templates
+//template <class T>
+//struct ElemData2{
+//	union{
+//		struct{ T r,i; };
+//		struct{ T x,y; };
+//		T elems[2];
+//	};
+//};
+//
+//
+//template <uint32_t N, class T, template <class> class E>
+//struct ElemN : public E<T>{
+//	using E<T>::elems;
+//
+//	/// Set element at index (no bounds checking)
+//	T& operator[](uint32_t i){ return elems[i]; }
+//	
+//	/// Get element at index (no bounds checking)
+//	const T& operator[](uint32_t i) const { return elems[i]; }
+//
+//	/// Returns size of array
+//	static uint32_t size(){ return N; }
+//};
+//
+//template <class T>
+//struct Elem2 : public ElemN<2, T, ElemData2>{
+//	using ElemN<2, T, ElemData2>::elems;
+//	using ElemData2<T>::x;
+//	//Elem2(const T& v1, const T& v2): x(v1), y(v2){}
+//	Elem2(const T& v1, const T& v2){ elems[0]=v1; elems[1]=v2; }
+//};
 
 
 

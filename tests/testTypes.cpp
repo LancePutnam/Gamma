@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Types.h"
+#include "scl.h"
 
 using namespace gam;
 
@@ -43,12 +44,26 @@ int main(int argc, char* argv[]){
 	
 	
 	{
-//		//Elem2<int> elem2 = {1,2};
+		//Elem2<int> elem2 = {1,2};
 //		Elem2<int> elem2(1,2);
 //		printf("Elem2<int>: sizeof=%d B, size=%d\n", sizeof(elem2), elem2.size());
 //		printf("x,y\t{%d,%d}\n", elem2.x, elem2.y);
 //		printf("r,i\t{%d,%d}\n", elem2.r, elem2.i);
 //		printf("[0],[1]\t{%d,%d}\n", elem2[0], elem2[1]);
+
+		
+//		GComplex<float> vec2(1,2);
+//		printf("Thing: sizeof=%d B, size=%d\n", sizeof(vec2), vec2.size());
+//		vec2 += GComplex<float>(5,5);
+//		vec2 += 1;
+//		vec2 -= 1;
+//		vec2 -= GComplex<float>(5,5);
+//		vec2 *= GComplex<float>(2,2);
+//		vec2 *= 3;
+//		printf("x,y\t{%f,%f}\n", vec2.x, vec2.y);
+//		printf("r,i\t{%f,%f}\n", vec2.r, vec2.i);
+//		printf("[0],[1]\t{%f,%f}\n", vec2[0], vec2[1]);
+//		//sss;sss
 	}
 	
 //	#define PRINT(obj, fnc) for(int i=0; i<obj.size(); ++i) cout << fnc; cout << endl;
@@ -67,15 +82,17 @@ int main(int argc, char* argv[]){
 //		PRINT(seq, seq()) }
 //
 //	
-//	{
-//		printf("\nComplex\n");
-//		Complex<double> c(Complex<double>::Polar(1, M_PI));
-//		
-//		for(int i=0; i<32; ++i){
-//			for(int i=0; i<2; ++i) scl::printPlot(c[i], 16); printf("\n");
-//			c *= c.normalize();
-//		}
-//	}
+	{
+		printf("\nComplex\n");
+		Complex<double> c(Complex<double>::Polar(0.5, 0.1));
+		
+		printf("real:  %f imag: %f\n", c.r, c.i);
+		printf("norm:  %f\n", c.norm());
+		printf("norm2: %f\n", c.norm2());
+		printf("arg:   %f\n", c.arg());
+		printf("sgn:   %f, %f\n", c.sgn().r, c.sgn().i);
+		printf("recip: %f, %f\n", c.recip().r, c.recip().i);
+	}
 //
 //
 //	{
