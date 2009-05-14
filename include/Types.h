@@ -170,32 +170,39 @@ struct Quat{
 	};
 	
 	//Quat(const Quat& q): r(q.r), i(q.i), j(q.j), k(q.k){}
-	Quat(const T& r=(T)1, const T& i=(T)0, const T& j=(T)0, const T& k=(T)0): r(r), i(i), j(j), k(k){}
+	Quat(const T& r=T(1), const T& i=T(0), const T& j=T(0), const T& k=T(0)): r(r), i(i), j(j), k(k){}
 	Quat(const T& a, const Unit3& u){ fromAxis(a,u); }
 
-	Q& operator ()(const T& vr, const T& vi, const T& vj, const T& vk){ r=vr; i=vi; j=vj; k=vk; return *this; }
+	Q& operator()(const T& vr, const T& vi, const T& vj, const T& vk){ r=vr; i=vi; j=vj; k=vk; return *this; }
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
 	
-//	Q& operator = (const Q& v){ r=v.r; i=v.i; j=v.j; k=v.k; return *this; }
-//	Q& operator = (const T& v){ r=v;   i=v;   j=v;   k=v;   return *this; }
-//	Q  operator - (const Q& v) const { return Q(r-v.r, i-v.i, j-v.j, k-v.k); }
-	Q  operator - () const { return Q(-r, -i, -j, -k); }
-	Q  operator - (const Q& v) const { return Q(r-v.r, i-v.i, j-v.j, k-v.k); }
+	Q& operator = (const Q& v){ r=v.r; i=v.i; j=v.j; k=v.k; return *this; }
+	Q& operator = (const T& v){ r=v;   i=T(0);j=T(0);k=T(0);return *this; }
 	Q& operator -=(const Q& v){ r-=v.r; i-=v.i; j-=v.j; k-=v.k; return *this; }
-	Q  operator + (const Q& v) const { return Q(r+v.r, i+v.i, j+v.j, k+v.k); }
+	Q& operator -=(const T& v){ r-=v; return *this; }
 	Q& operator +=(const Q& v){ r+=v.r; i+=v.i; j+=v.j; k+=v.k; return *this; }
-	Q  operator * (const Q& v) const { Q q(*this); return mul(q, v); }
-	Q  operator * (const T& v) const { return Q(r*v, i*v, j*v, k*v); }
-	Q& operator *=(const Q& v){ return mul(*this, v); }
+	Q& operator +=(const T& v){ r+=v; return *this; }
+	Q& operator *=(const Q& v){ return (*this)(
+		r*v.r - i*v.i - j*v.j - k*v.k,
+		r*v.i + i*v.r + j*v.k - k*v.j,
+		r*v.j - i*v.k + j*v.r + k*v.i,
+		r*v.k + i*v.j - j*v.i + k*v.r);
+	}
 	Q& operator *=(const T& v){ r*=v; i*=v; j*=v; k*=v; return *this; }
-//	Q  operator / (const Q& v) const { Q c(*this); return div(c, v); }
-	Q  operator / (const T& v) const { return Q(r/v, i/v, j/v, k/v); }
-//	Q& operator /=(const Q& v){ return div(*this, v); }
-	Q& operator /=(const T& v){ r/=v; i/=v; j/=v; k/=v; return *this; }
+	Q& operator /=(const T& v){ r/=v; i/=v; j/=v; k/=v; return *this; }	
+
+	Q operator - () const { return Q(-r, -i, -j, -k); }
+	Q operator - (const Q& v) const { return Q(*this) -= v; }
+	Q operator - (const T& v) const { return Q(*this) -= v; }
+	Q operator + (const Q& v) const { return Q(*this) += v; }
+	Q operator + (const T& v) const { return Q(*this) += v; }
+	Q operator * (const Q& v) const { return Q(*this) *= v; }
+	Q operator * (const T& v) const { return Q(*this) *= v; }
+	Q operator / (const Q& v) const { return Q(*this) /= v; }
+	Q operator / (const T& v) const { return Q(*this) /= v; }
 
 	Q conj() const { return Q(r,-i,-j,-k); }
-	
 	T dot() const { return r*r + i*i + j*j + k*k; }
 	
 	// Set from angle (radians) and unit vector (x,y,z)
@@ -277,15 +284,18 @@ struct Quat{
 		y = (j*k - i*r) * (T) 2;
 		z = (i*i + j*j) * (T)-2 + (T)1;
 	}
-
-	static Q& mul(Q& a, const Q& b){
-		return a(
-			a.r*b.r - a.i*b.i - a.j*b.j - a.k*b.k,
-			a.r*b.i + a.i*b.r + a.j*b.k - a.k*b.j,
-			a.r*b.j - a.i*b.k + a.j*b.r + a.k*b.i,
-			a.r*b.k + a.i*b.j - a.j*b.i + a.k*b.r
-		);
-	}
+	
+	/*
+		Quaternion mult can be broken down into 4 complex mult:
+		
+		A = Ari + Ajk
+		B = Bri + Bjk
+		
+		Ari Bri		-Ajk   Bjk*
+		Ari Bjk		 Ajk* -Bri
+		
+		'-' rotates 180 and '*' (conj) reflects around first axis
+	*/
 	
 //	static Q& mul3(Q& a, const Q& b){
 //		return a(
@@ -297,7 +307,12 @@ struct Quat{
 //	}
 };
 
-
+#define TEM template <class T>
+TEM const Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
+TEM const Quat<T> operator - (T r, const Quat<T>& q){ return -q+r; }
+TEM const Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
+TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm()); }
+#undef TEM
 
 
 
