@@ -282,7 +282,7 @@
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		1683FC410E283786001FAF43 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = design.txt; path = ../../doc/design.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../include/Access.h; sourceTree = SOURCE_ROOT; };
-		1686EA820F8DB1F100D0452F /* DataFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataFile.h; path = ../../include/DataFile.h; sourceTree = SOURCE_ROOT; };
+		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../include/File.h; sourceTree = SOURCE_ROOT; };
 		1686EA830F8DB1F100D0452F /* Dims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dims.h; path = ../../include/Dims.h; sourceTree = SOURCE_ROOT; };
 		168AAC9D0CD0025D00F36E4B /* libgamma.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libgamma.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		168B78F40B75C59100645F1F /* Sync.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Sync.cpp; path = ../../src/Sync.cpp; sourceTree = SOURCE_ROOT; };
@@ -731,7 +731,7 @@
 				16EDF9B9094F8C2600549AC9 /* Constants.h */,
 				16CCF9C00A9EC1650013D2BF /* Containers.h */,
 				16938ABF0FBD0C4400274B2A /* Conversion.h */,
-				1686EA820F8DB1F100D0452F /* DataFile.h */,
+				1686EA820F8DB1F100D0452F /* File.h */,
 				1686EA830F8DB1F100D0452F /* Dims.h */,
 				16CEF9120BBCDA0A0049666F /* Gamma.h */,
 				169536190C16890B00DB06A1 /* MacroD.h */,
