@@ -5,6 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include "scl.h"
+#include "Conversion.h"
 
 namespace gam{
 
@@ -151,7 +152,7 @@ protected:
 	// Direct conversion of position to dimension index
 	//int posToInd(float p, int d) const { return scl::wrap((p/mMax[d])*0.5f + 0.5f, 0.9999f) * n[d]; }
 	//int posToInd(float p, int d) const { return (p/mMax[d]*0.5f + 0.5f) * n[d]; }
-	int posToInd(float p, int d) const { return scl::castIntTrunc(posToIndFrac(p,d)); }
+	int posToInd(float p, int d) const { return castIntTrunc(posToIndFrac(p,d)); }
 	float posToIndFrac(float p, int d) const { return p*mMul[d] + mAdd[d]; }
 };
 
@@ -182,7 +183,7 @@ inline void Dims::indExpand(int i, int& i1, int& i2, int& i3) const {
 inline int Dims::indFlatten(int i1, int i2) const { return i1 + i2*size1(); }
 
 inline int Dims::indFlatten(int i1, int i2, int i3) const {
-	return scl::index3to1(i1,i2,i3, size1(),size2());
+	return index3to1(i1,i2,i3, size1(),size2());
 }
 
 inline void Dims::indNeighbors(int i1, int i2, int i3, int (&inds)[6], bool (&valid)[6]) const {

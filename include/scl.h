@@ -805,7 +805,7 @@ TEM inline T foldOnce(T v, T hi, T lo){
 template <class V2>
 void frenet(const V2& d1, V2& t, V2& n){
 	t = d1;
-	t *= recSqrtFast(t.dot());
+	t *= invSqrt<2>(t.dot());
 	n(-t[1], t[0]);	// normal according to right-hand rule
 }
 
@@ -815,9 +815,9 @@ void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){
 	cross(d2, d1, b);
 	cross(d1,  b, n);
 	
-	t *= recSqrtFast(t.dot());
-	b *= recSqrtFast(b.dot());
-	n *= recSqrtFast(n.dot());	
+	t *= invSqrt<2>(t.dot());
+	b *= invSqrt<2>(b.dot());
+	n *= invSqrt<2>(n.dot());	
 }
 
 template <class V3>
