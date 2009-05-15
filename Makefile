@@ -7,10 +7,10 @@ SRC = \
 	${SRCDIR}/arr.cpp\
 	${SRCDIR}/AudioIO.cpp\
 	${SRCDIR}/Conversion.cpp\
-	${SRCDIR}/DataFile.cpp\
 	${SRCDIR}/DFT.cpp\
 	${SRCDIR}/FFT_fftpack.cpp\
 	${SRCDIR}/fftpack.cpp\
+	${SRCDIR}/File.cpp\
 	${SRCDIR}/scl.cpp\
 	${SRCDIR}/SoundFile.cpp\
 	${SRCDIR}/Sync.cpp\
