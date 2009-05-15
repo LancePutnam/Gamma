@@ -15,6 +15,8 @@
 
 namespace gam{
 
+void colorRGB(float h, float s, float v, float &r, float &g, float &b);
+void colorHSV(float r, float g, float b, float &h, float &s, float &v);
 
 /// Returns an ASCII character most closely matching an intensity value in [0,1].
 char intensityToASCII(float v);

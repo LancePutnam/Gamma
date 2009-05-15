@@ -158,9 +158,6 @@ TEM T clip(T value, int & clipFlag, T hi, T lo);
 /// Returns value whose magnitude is clipped to [min, max].
 float clipMag(float value, float min, float max);
 
-void colorRGB(float h, float s, float v, float &r, float &g, float &b);
-void colorHSV(float r, float g, float b, float &h, float &s, float &v);
-
 /// Third order polynomial approximation to first half of cosine.
 
 /// 'normal' must be in the range [0, 0.5] which corresponds to the first half
