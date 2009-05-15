@@ -2,13 +2,14 @@
 #include "Oscillator.h"
 #include "gen.h"
 #include "scl.h"
+#include "Visual.h"
 #include <iostream>
 
 #define DO(fnc)\
 printf("\n%s:\n", #fnc);\
 for(int i=0; i<n; ++i){\
 	float v = fnc; \
-	printf("\t% 6.3f ", v); scl::printPlot(v, 32); printf("\n");\
+	printf("\t% 6.3f ", v); printPlot(v, 32); printf("\n");\
 }
 
 using namespace gam;

@@ -730,11 +730,11 @@ TEMS Accum<Ts>::Accum(float freq, float phase): mFreq(freq){
 TEMS inline uint32_t Accum<Ts>::phaseFI(float v) const {
 	//return scl::normalToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
-	return scl::castIntRound(v * 4294967296.);
+	return castIntRound(v * 4294967296.);
 }
 
 TEMS inline float Accum<Ts>::phaseIF(uint32_t v) const {
-	return scl::uintToNormal<float>(v);
+	return uintToNormal<float>(v);
 }
 
 TEMS void Accum<Ts>::onResync(double r){ //printf("Accum: onSyncChange\n");
@@ -900,7 +900,7 @@ TEM inline Tv TableOsc<Tv, Ts>::nextN(){
 
 TEM inline Tv TableOsc<Tv, Ts>::nextL(){
 	Tv output = ipl::linear(
-		tbl::fraction(mTblBits, phaseI()),
+		gam::fraction(mTblBits, phaseI()),
 		mem::at(mTable, mFracBits, phaseI()),
 		mem::at(mTable, mFracBits, phaseI() + mOneIndex)
 	);
@@ -910,7 +910,7 @@ TEM inline Tv TableOsc<Tv, Ts>::nextL(){
 
 TEM inline Tv TableOsc<Tv, Ts>::onceL(){
 	Tv output = ipl::linear(
-		tbl::fraction(mTblBits, phaseI()),
+		gam::fraction(mTblBits, phaseI()),
 		mem::at(mTable, mFracBits, phaseI()),
 		mem::at(mTable, mFracBits, phaseI() + mOneIndex)
 	);
@@ -950,7 +950,7 @@ TEMS inline float TableSine<Ts>::nextN(){
 
 TEMS inline float TableSine<Ts>::nextL(){
 	float output = ipl::linear(
-		tbl::fraction(mTblBits, phaseI()),
+		gam::fraction(mTblBits, phaseI()),
 		tbl::atQ(mTable, mFracBits, phaseI()),
 		tbl::atQ(mTable, mFracBits, phaseI() + mOneIndex)
 	);
@@ -987,8 +987,8 @@ TEM inline void MultiTableOsc<Tv, Ts>::freq(float value){
 	MTO::mFreq = value;
 	float ratio = value * MTO::mUPS;	// 0 to 1 of sample rate
 	if(ratio >= 0.5f || ratio <= -0.5f) ratio = 0.49999998f;
-	MTO::mPhaseInc = scl::normalToUInt(ratio);
-	uint32_t tableNum = scl::floatExponent(ratio) - 126 + mNumTables;
+	MTO::mPhaseInc = normalToUInt(ratio);
+	uint32_t tableNum = floatExponent(ratio) - 126 + mNumTables;
 	if(tableNum >= mNumTables) tableNum = 0;
 	MTO::mTable = mMultiTable + tableNum * (1<<MTO::mTblBits);
 }
@@ -998,8 +998,8 @@ TEM inline void MultiTableOsc<Tv, Ts>::freqLL(float value){
 	MTO::mFreq = value;
 	float ratio = value * MTO::ups();	// 0 to 1 of sample rate
 	if(ratio >= 0.5f || ratio <= -0.5f) ratio = 0.49999998f;
-	MTO::mPhaseInc = scl::normalToUInt(ratio);
-	uint32_t tableNum = scl::floatExponent(ratio) - 126 + mNumTables;
+	MTO::mPhaseInc = normalToUInt(ratio);
+	uint32_t tableNum = floatExponent(ratio) - 126 + mNumTables;
 	if(tableNum >= mNumTables){
 		MTO::mTable = mMultiTable;
 		mTableLo = MTO::mTable;
@@ -1011,14 +1011,14 @@ TEM inline void MultiTableOsc<Tv, Ts>::freqLL(float value){
 		tableNum++;
 		if(tableNum >= mNumTables) tableNum = mNumTables - 1;
 		mTableLo = mMultiTable + tableNum * (1<<MTO::mTblBits);;
-		mFracTbl = scl::floatMantissa(ratio);
+		mFracTbl = floatMantissa(ratio);
 		mFracTbl *= mFracTbl;	// warp fraction for faster fade-in
 		mFracTbl *= mFracTbl;
 	}
 }
 
 TEM inline Tv MultiTableOsc<Tv, Ts>::nextLL(){
-	float fracSmp = tbl::fraction(MTO::mTblBits, MTO::mPhase);
+	float fracSmp = fraction(MTO::mTblBits, MTO::mPhase);
 	Tv output = ipl::linear(
 		fracSmp,
 		mem::at(MTO::mTable, MTO::mFracBits, MTO::mPhase),
@@ -1043,7 +1043,7 @@ TEMS LFO<Ts>::LFO(): Accum<Ts>(){ mod(0.5); }
 TEMS LFO<Ts>::LFO(float f, float p, float m): Accum<Ts>(f, p){ mod(m); }
 
 TEMS inline void LFO<Ts>::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
-TEMS inline void LFO<Ts>::mod(double n){ modi = scl::castIntRound(n * 4294967296.); }
+TEMS inline void LFO<Ts>::mod(double n){ modi = castIntRound(n * 4294967296.); }
 
 #define DEF(name, exp) TEMS inline float LFO<Ts>::name{ float r = exp; incPhase(); return r; }
 

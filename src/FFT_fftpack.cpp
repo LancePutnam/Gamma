@@ -17,7 +17,7 @@ struct RFFTImpl{
 		freeMem();
 	}
 	
-	void resize(uint32_t size){
+	void resize(integer_t size){
 		if(size != n){
 			n = size;
 			freeMem();

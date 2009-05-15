@@ -4,29 +4,30 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+/*	File description:
+
+	Generator function objects
+
+	A generator is a lightweight object that generates a sequence of elements.
+	Generators have a standard interface specified by the Val class. The array
+	access operator, [], is overloaded so generators can be treated like
+	arrays. A const qualified generator only means that its generating function 
+	parameters are held constant; its current value can change.
+	A convention used is that generators' current value is the one most recently
+	generated. This means one must be careful when initializing a generator so 
+	that it generates the first element properly. Usually this means setting its
+	value to what would have been the previously generated value. For instance, 
+	to get the sequence 0,1,2,... from RAdd1, its value must be initialized to 
+	-1. Constructors 'rewind' the generator, so that the initial value argument
+	is returned on the next generate call.
+*/
+
 #include "scl.h"
 #include "Constants.h"
 #include "Types.h"
 //#include "MacroD.h"
 
 namespace gam{
-
-
-///	Generator function objects
-
-/// A generator is a lightweight object that generates a sequence of elements.
-/// Generators have a standard interface specified by the Val class. The array
-/// access operator, [], is overloaded so generators can be treated like
-/// arrays. A const qualified generator only means that its generating function 
-/// parameters are held constant; its current value can change.
-/// A convention used is that generators' current value is the one most recently
-/// generated. This means one must be careful when initializing a generator so 
-/// that it generates the first element properly. Usually this means setting its
-/// value to what would have been the previously generated value. For instance, 
-/// to get the sequence 0,1,2,... from RAdd1, its value must be initialized to 
-/// -1. Constructors 'rewind' the generator, so that the initial value argument
-/// is returned on the next generate call.
-
 namespace gen{
 
 /// Single value generator

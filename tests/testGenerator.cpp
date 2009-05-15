@@ -1,5 +1,6 @@
 #include "Gamma.h"
 #include "Constants.h"
+#include "Visual.h"
 
 #define GEN(fnc) mem::set(arr,fnc,Loop(n)); printf("\n"#fnc":\n"); PRINT_TABLE
 
@@ -7,7 +8,7 @@
 	for(uint32_t i=0; i<n; i++){\
 		float v = arr[i];\
 		printf("[%2d] % 5.3f  ", i, v);\
-		scl::printPlot(v, 32); printf("\n");\
+		printPlot(v, 32); printf("\n");\
 	}
 
 using namespace gam;

@@ -4,10 +4,15 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+/*	File description:
+	Mathematical scalar operations.
+*/
+
 #include <math.h>
-#include <stdio.h>				/* printf */
 #include <stdlib.h>				/* labs(long) */
 #include "Constants.h"
+#include "Types.h"
+#include "Conversion.h"
 #include "mem.h"
 
 #include "MacroD.h"
@@ -28,7 +33,86 @@ namespace gam{
 /// Scalar rank functions for numerical types.
 namespace scl{
 
-const float justUnder1f = 0.99999997f; //0x3f7fffff;
+
+template<int N, class T, template<class T> class F> struct NewtonIterator{
+	NewtonIterator(T& v, T v0){
+		F<T>(v,v0);
+		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
+	}
+};
+template<class T, template<class T> class F> struct NewtonIterator<0,T,F>{ NewtonIterator(T& v, T v0){} };
+
+template<class T> struct NewtonSqrtMap{ NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); } };
+template<int N, class T> struct SqrtNewton
+:	public NewtonIterator<N,T, NewtonSqrtMap>{
+	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0){}
+};
+
+
+template<class T> struct NewtonInvSqrtMap{ NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; } };
+template<int N, class T> struct InvSqrtNewton
+:	public NewtonIterator<N,T, NewtonInvSqrtMap>{
+	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0){}
+};
+
+template<class T> const FloatUInt<T> invSqrtMagic();
+template<> inline const FloatUInt<float > invSqrtMagic(){ return FloatUInt<float >(0x5f3759df); }
+template<> inline const FloatUInt<double> invSqrtMagic(){ return FloatUInt<double>(UINT64_C(0x5fe6ec85e7de30da)); }
+
+
+/// Approximate square root using a quick log base-2 method.
+inline float sqrtLog2(float v){
+	FloatUInt<float> u(v);
+	u.i=(1<<29) + (u.i>>1) - (1<<22);
+	return u.f;
+}
+
+/// Approximate square root using a quick log base-2 method.
+inline double sqrtLog2(double v){
+	FloatUInt<double> u(v);
+	u.i=((uint64_t(1))<<61) + (u.i>>1) - ((uint64_t(1))<<51);
+	return u.f;
+}
+
+/// Approximate square root using Newton's method.
+template<int N, class T> void sqrtNewton(T& v, T v0){ SqrtNewton<N,T>(v,v0); }
+
+/// Approximate square root using log base-2 and Newton methods.
+
+/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
+/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
+/// are applied to improve the result.
+template<uint32_t N, class T>
+inline T sqrt(T v){
+	T r=sqrtLog2(v);
+	sqrtNewton<N>(r,v);
+	return r;
+}
+
+/// Approximate inverse square root using Newton's method.
+template<int N, class T> void invSqrtNewton(T& v, T v0){ InvSqrtNewton<N,T>(v,v0); }
+
+/// Approximate inverse square root using a quick log base-2 method.
+template <class T>
+inline T invSqrtLog2(T v){
+	FloatUInt<T> u(v);
+	u.i = invSqrtMagic<T>().i - (u.i>>1);
+	return u.f;
+}
+
+/// Approximate inverse square root using log base-2 and Newton methods.
+
+/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
+/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
+/// are applied to improve the result.
+template<uint32_t N, class T>
+inline T invSqrt(T v){
+	T r=invSqrtLog2(v);
+	invSqrtNewton<N>(r, v*T(0.5));
+	return r;
+}
+
+
 
 /// Returns absolute value.
 TEM T abs(T value);
@@ -95,6 +179,9 @@ void cross(const T1& a, const T2& b, T3& r);
 
 /// Returns two element dot product x1 * y1 + x2 * y2.
 TEM T dot2(T x1, T x2, T y1, T y2);
+
+/// Returns relative error between a true and measured value.
+TEM inline double error(const T& truth, const T& measured){ return (measured-truth)/double(truth);}
 
 /// Returns weights for linear fade.
 TEM void fadeLin(T & weight1, T & weight2, T fade);
@@ -234,7 +321,7 @@ TEM void mulComplex(T& r1, T& i1, const T& r2, const T& i2);
 /// Perform quaternion multiplication, q1 = q1 q2.
 TEM void mulQuat(T& r1, T& i1, T& j1, T& k1, T r2, T i2, T j2, T k2);
 
-TEM T nearest(T val, const char * interval = "2212221", long div=12);
+TEM T nearest(T val, const char * interval="2212221", long div=12);
 
 /// Returns nearest integer division of one value to another
 TEM T nearestDiv(T of, T to);
@@ -282,12 +369,6 @@ inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups);
 /// Returns equal temperament ratio- octave^(pc/divisions)
 TEM T ratioET(T pc, T divisions=12, T octave=2);
 
-/// Fast reciprocal of square root of value.
-
-/// Lomont, C. 2003. "Fast inverse square root."
-///
-float recSqrtFast(float value);
-
 /// Returns floating point value rounded to nearest integer.
 TEM T round(T v);
 
@@ -316,12 +397,12 @@ TEM Complex<T> sharm(int l, int m, T theta, T phi);
 // The phi arguments should be of an angle m times the base phi angle.
 // For odd, negative m, the result should by multiplied by -1.
 
-DEF(sharm00){ static const T c= 0.50*sqrt(    M_1_PI ); return Complex<T>(c, 0); }
-DEF(sharm10){ static const T c= 0.50*sqrt( 3.*M_1_PI ); return Complex<T>(c*ct, 0); }
-DEF(sharm11){ static const T c=-0.50*sqrt( 3.*M_1_2PI); return Complex<T>(cp,sp)*c*st; }
-DEF(sharm20){ static const T c= 0.25*sqrt( 5.*M_1_PI ); return Complex<T>(c*(3.*ct*ct - 1.), 0); }
-DEF(sharm21){ static const T c=-0.50*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*ct*st; }
-DEF(sharm22){ static const T c= 0.25*sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*st*st; }
+DEF(sharm00){ static const T c= 0.50*::sqrt(    M_1_PI ); return Complex<T>(c, 0); }
+DEF(sharm10){ static const T c= 0.50*::sqrt( 3.*M_1_PI ); return Complex<T>(c*ct, 0); }
+DEF(sharm11){ static const T c=-0.50*::sqrt( 3.*M_1_2PI); return Complex<T>(cp,sp)*c*st; }
+DEF(sharm20){ static const T c= 0.25*::sqrt( 5.*M_1_PI ); return Complex<T>(c*(3.*ct*ct - 1.), 0); }
+DEF(sharm21){ static const T c=-0.50*::sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*ct*st; }
+DEF(sharm22){ static const T c= 0.25*::sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*st*st; }
 
 #undef DEF
 
@@ -499,9 +580,7 @@ TEM bool withinIE(T v, T lo, T hi);
 bool zeroCrossP(float prev, float now);
 
 
-//
-// Conversion
-//
+
 
 /// Convert decimal integer to ascii base-36 character
 char base10To36(int dec10);
@@ -509,110 +588,17 @@ char base10To36(int dec10);
 /// Convert ascii base-36 character to decimal integer 
 int base36To10(char ascii36);
 
-/// Convert 2-byte array to 16-bit unsigned integer.
-uint16_t bytesToUInt16(const uint8_t * bytes2);
-
-/// Convert 4-byte array to 32-bit unsigned integer.
-uint32_t bytesToUInt32(const uint8_t * bytes4);
-
-/// Cast value to signed integer using rounding.
-
-/// This is much faster than using a standard C style cast.  Floor or
-/// ceiling casts can be accomplished by subtracting or adding 0.5
-/// from the input, respectively.
-int32_t castIntRound(double value);
-
-TEM long castIntTrunc(T value);
-
-/// Returns biased decimal value of exponent field.
-
-/// The true exponent is the return value minus 127. \n
-/// For example, values in [0.5, 1) return 126 (01111110), so the true
-///	exponent is 126 - 127 = -1.
-ULONG floatExponent(float value);
-
-/// Returns mantissa field as float between [0, 1).
-float floatMantissa(float value);
-
-/// Cast float to unsigned long.
-
-/// Reliable up to 2^24 (16777216)
-///
-ULONG floatToUInt(float value);
-
-/// Cast float to long.
-
-/// Reliable up to 2^24 (16777216)
-///
-long floatToInt(float value);
-
-/// Compute 2-D array indices from 1-D array index
-template <class T>
-inline void index1to2(T index1, T sizeX, T& x, T& y){
-	y = index1 / sizeX; x = index1 % sizeX;
-}
-
-/// Compute 1-D array index from 3-D array indices
-
-/// The x indices move fastest followed by y, then z.
-///
-template <class T>
-inline T index3to1(T x, T y, T z, T sizeX, T sizeY){
-	return x + sizeX * (y + sizeY * z);
-}
-
-/// Convert 16-bit signed integer to signed floating point normal [-1, 1).
-float intToNormal(short value);
-
-/// Convert floating point normal [0, 1) to unsigned long [0, 2^32)
-
-/// This conversion is most accurate on an exponential scale.
-///	Input values outside [-1, 1) return 0.
-///	Values in [-1, 0] behave as positive values in [0, 1).
-ULONG normalToUInt(float normal);
-
-/// Convert floating point normal [0, 1) to unsigned long [0, 2^32)
-
-/// This conversion is most accurate on a linear scale.
-/// Input values outside [0, 1) result in undefined behavior.
-ULONG normalToUInt2(float normal);
-
+/// Convert polar to rectangular coordinates
 TEM void polarToRect(T mag, T phs, T& real, T& imag);
-
-/// Maps a position in [-1, 1] to an index in [0, n). No boundary operations are performed.
-inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
-
-/// Type-pun 32-bit unsigned int to 32-bit float
-
-/// This function uses a union to avoid problems with direct pointer casting
-/// when fstrict-aliasing is on.
-inline float punUF32(uint32_t v){ union{float f; uint32_t i;} u; u.i=v; return u.f; }
-
-/// Type-pun 32-bit float to 32-bit unsigned int
-
-/// This function uses a union to avoid problems with direct pointer casting
-/// when fstrict-aliasing is on.
-inline uint32_t punFU32(float v){ union{float f; uint32_t i;} u; u.f=v; return u.i; }
 
 /// Convert rectangular coordinates to polar.
 TEM void rectToPolar(T& r, T& i);
 
-/// Get fractional and integer parts from a float.
-
-/// Works reliably up to 2^24 == 16777216
-/// Useful for linearly interpolated table lookups
-float split(float value, long & intPart);
-
-float splitInt512(ULONG value, ULONG & intPart);
-
-/// Split integer accumulator into table index (size=1024) and interpolation fraction.
-float splitInt1024(ULONG value, ULONG & intPart);
-
 /// In-place spherical to cartesian conversion for floating point types.
 TEM void sphericalToCart(T & rho, T & phi, T & theta);
 
-TEM T uintToNormal (uint32_t value);
-TEM T uintToNormalS(uint32_t value);
+
+
 
 //---- Waveform generators
 
@@ -657,48 +643,6 @@ TEM T hann(T phase);					///< von Hann window function.
 TEM T raisedCosine(T phase, T a, T b);	///< Raised cosine f(x) = a - b cos(x).
 TEM T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
 
-//
-// I/O utilities
-//
-
-/// Returns an ASCII character most closely matching an intensity value in [0,1].
-inline char intensityToASCII(float v){
-	static const char map[] =
-	" .,;-~_+<>i!lI?/|)(1}{][rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@";
-	//"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
-//	 123456789.123456789.123456789.123456789.123456789.123456789.1234
-	const int N  = sizeof(map)-1;
-	return map[int((N*scl::clip(v, 0.9999999f)))];
-}
-
-TEM void print(T & v, const char * post="", const char * pre="", FILE * fp=stdout);
-
-// Binary printing methods
-void printBinary(ULONG value, const char * zero="0", const char * one="1", int msb=32);
-void printBinary(unsigned long long value, const char * zero="0", const char * one="1", int msb=64);
-void printBinary(float value, const char * zero="0", const char * one="1", int msb=32);
-void printBinary(void * value32, const char * zero="0", const char * one="1", int msb=32);
-
-
-TEM void print2D(T* pix, int nx, int ny, FILE * fp=stdout){
-	for(int j=0; j<nx; ++j){
-	for(int i=0; i<ny; ++i){
-		float v = pix[j*nx + i];
-		fprintf(fp, "%c ", scl::intensityToASCII(v));
-	} printf("\n"); }
-}
-
-/// Print signed normalized value on a horizontal plot.
-
-/// @param[in]	value	Normalized value to plot
-/// @param[in]	width	Character width of plot excluding center point
-/// @param[in]	spaces	Print extra filling spaces to the right
-/// @param[in]	point	The print character for points
-void printPlot(float value, ULONG width=50, bool spaces=true, const char * point="o");
-
-
-
-
 
 // internal
 namespace{
@@ -737,25 +681,8 @@ namespace{
 	TEM T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
 }
 
-TEM const T roundEps();
-
-inline bool isLittleEndian(){ return endian == 0; }
-
-
-
 
 // Implementation_______________________________________________________________
-
-
-namespace{
-	const double roundMagic = 6755399441055744.; // 2^52 * 1.5
-}
-
-	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
-	template<> inline const double roundEps<double>(){ return 0.499999985; }
-
-
-
 
 #define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
 GEN(int, ::abs) GEN(long, labs) GEN(float, fabsf) GEN(double, fabs)
@@ -904,7 +831,7 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
 	frenet(d1,d2, t,n,b);
 }
 
-TEM inline T hypot(T x, T y){ return sqrt(x*x + y*y); }
+TEM inline T hypot(T x, T y){ return ::sqrt(x*x + y*y); }
 
 TEM inline T linLog2(T v, T recMin){
 	v = log2Fast(scl::abs(v) + (T)0.000001);	// offset to avoid -inf
@@ -1167,22 +1094,7 @@ TEM inline T sinT9(T r){
 
 TEM T sinc(T r, T eps=(T)0.0001){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
 
-TEM inline void sort2(T & v1, T & v2){ if(v1 > v2) mem::swap(v1, v2); }
-
-inline float recSqrtFast(float v){
-	
-	union{float f; uint32_t i; } u;
-	
-	float v2 = v * 0.5f;
-	u.f = v;						// get bits for floating value 
-	u.i = 0x5f375a86 - (u.i>>1);	// gives initial guess y0 
-	v = u.f;						// convert bits back to float
-	
-	// Newton step, repeating increases accuracy 
-	v *= 1.5f - v2 * v * v;
-	
-	return v; 
-} 
+TEM inline void sort2(T & v1, T & v2){ if(v1 > v2) mem::swap(v1, v2); } 
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
@@ -1349,92 +1261,6 @@ inline bool zeroCrossP(float prev, float now){
 }
 
 
-inline int32_t castIntRound(double v){
-	v += roundMagic;
-	union{ double f; int32_t i[2]; } u; u.f = v;
-	return u.i[endian]; // result in lsb
-}
-
-TEM inline long castIntTrunc(T v){
-	return castIntRound( v + (v > (T)0 ? -roundEps<T>() : roundEps<T>()) );
-}
-
-inline ULONG floatExponent(float v){
-
-	return scl::punFU32(v) << 1 >> 24;
-
-//	PUN_F2I(v,u) ULONG exp = u.i; 
-//	return exp << 1 >> 24;
-}
-
-inline float floatMantissa(float v){
-	uint32_t frac = scl::punFU32(v);
-	frac = frac & MASK_F32_FRAC | 0x3f800000;
-	return scl::punUF32(frac) - 1.f;
-}
-
-inline float intToNormal(short v){
-//	ULONG vu = ((ULONG)v) + 32768;
-//	vu = vu << 7 | 0x40000000;
-//	return *(float *)&vu - 3.f;
-
-	uint32_t vu = (((uint32_t)v) + 0x808000) << 7; // set fraction in float [2, 4)
-	return scl::punUF32(vu) - 3.f;
-
-	//return (float)v / 32768.f; // naive method
-	//return (float)v * 0.000030517578125f; // less naive method
-}
-
-/*
-f32 range		u32 range		f32 exponent
-[0.50,  1.00)	[2^31, 2^32)	01111110 (126)	
-[0.25,  0.50)	[2^30, 2^31)	01111101 (125)	
-[0.125, 0.25)	[2^29, 2^30)	01111100 (124)	
-
-1. prepend 1 to fraction ( 'or' with 1<<24 (0x800000) )
-2. shift left by 8
-3. shift right according to exponent
-
-0 01111110 00000000000000000000000
-
-0 01111110 Fffffffffffffffffffffff	[1/2, 1/1)
-1 Ffffffff fffffffffffffff00000000
-
-0 01111101 Fffffffffffffffffffffff	[1/4, 1/2)
-0 1Fffffff ffffffffffffffff0000000
-
-0 01111100 Fffffffffffffffffffffff	[1/8, 1/4)
-0 01Ffffff fffffffffffffffff000000
-
-0 01111011 Fffffffffffffffffffffff	[1/16, 1/8)
-0 001Fffff ffffffffffffffffff00000
-
-effective  precision
-9 x 2^24 + 2^23 + 2^22 + ... + 1
-= 167,804,826
-
-2^24
-=  16,777,216
-
-*/
-
-inline ULONG normalToUInt(float v){
-	ULONG normalU = punFU32(v);
-	ULONG rbs = 126UL - (normalU >> 23UL);
-//	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
-//	printf("%x\n", 0x80000000UL >> rbs);
-	return (normalU | 0x800000UL) << 8UL >> rbs;
-
-//Her00	
-//float y = v + 1.f; 
-//return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
-}
-
-inline ULONG normalToUInt2(float v){
-	v++;	// go into [1,2] range, FP fraction is now result
-	return punFU32(v) << 9;
-}
-
 TEM inline void polarToRect(T m, T p, T& r, T& i){
 	r = m * cos(p);
 	i = m * sin(p);
@@ -1447,31 +1273,6 @@ TEM inline void rectToPolar(T& r, T& i){
 	T m = scl::hypot(i, r);
 	i = atan2(i, r);
 	r = m;
-}
-
-template<> inline float uintToNormal<float>(ULONG v){
-	v = v >> 9 | 0x3f800000; 
-	return punUF32(v) - 1.f;
-}
-
-template<> inline float uintToNormalS<float>(ULONG v){
-	v = v >> 9 | 0x40000000;
-	return punUF32(v) - 3.f;
-}
-
-inline float splitInt512(ULONG v, ULONG & intPart){
-	union{ float f; ULONG i; }u;
-	u.i = v & 0x007fffff | 0x3f800000;
-	intPart = v >> 22;
-	return u.f - 1.f;
-}
-
-inline float splitInt1024(ULONG v, ULONG & intPart){
-	union{ float f; ULONG i; }u;
-	//u.i = v << 10 >> 10 | 0x3F800000;
-	u.i = v << 1 & 0x007fffff | 0x3f800000;
-	intPart = v >> 22;
-	return u.f - 1.f;
 }
 
 TEM inline void sphericalToCart(T& r, T& p, T& t){
@@ -1516,7 +1317,7 @@ inline float triangle(ULONG p){
 	ULONG dir = p >> 31;
 	p = ((p^(-dir)) + dir);
 	p = (p >> 8) | 0x40000000;
-	return scl::punUF32(p) - 3.f;
+	return punUF32(p) - 3.f;
 }
 
 // Just another triangle wave algorithm
@@ -1540,7 +1341,7 @@ inline float pulse(ULONG p, ULONG w){
 	// output floating point exponent should be [1, 2)
 	ULONG saw1 = (p >> 9) | 0x3F800000;
 	ULONG saw2 = ((p+w) >> 9) | 0x3F800000;
-	return scl::punUF32(saw1) - scl::punUF32(saw2);
+	return punUF32(saw1) - punUF32(saw2);
 }
 
 inline float stair(ULONG p, ULONG w){
@@ -1633,20 +1434,8 @@ TEM inline T hann(T r){ return raisedCosine(r, (T)0.5, (T)0.5); }
 TEM inline T raisedCosine(T r, T a, T b){ return a - b * cos(r); }
 TEM inline T welch(T n){ return (T)1 - n*n; }
 
-#define DEF(type, spec)\
-template<>\
-inline void print<type>(type & v, const char * post, const char * pre, FILE * fp){\
-	fprintf(fp, "%s%"#spec"%s", pre, v, post);\
-}
-DEF(float, f) DEF(double, f) DEF(uint32_t, d) DEF(int, d)
-#undef DEF
-
 } // scl::
 } // gam::
-
-#undef PUN_F2I
-#undef PUN_I2F
-#undef ROUND_EPS
 
 #include "MacroU.h"
 

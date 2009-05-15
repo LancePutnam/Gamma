@@ -11,6 +11,7 @@
 #include "gen.h"
 #include "mem.h"
 #include "scl.h"
+#include "Conversion.h"
 #include "MacroD.h"
 
 namespace gam{
@@ -281,16 +282,16 @@ TEM inline float add2I_float(T & rng){
 #undef R
 
 TEM inline float uni_float(T& rng){
-	return scl::uintToNormal<float>(rng());
+	return uintToNormal<float>(rng());
 }
 
 TEM inline float uniS_float(T& rng){
-	return scl::uintToNormalS<float>(rng());
+	return uintToNormalS<float>(rng());
 }
 
 TEM inline float binS_float(T & rng){
 	ULONG r = rng() & 0x80000000 | 0x3f800000;
-	return scl::punUF32(r);
+	return punUF32(r);
 }
 
 TEM inline T & cond(T & v, const T & va, const T & vb, float pab, float pba){

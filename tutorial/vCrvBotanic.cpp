@@ -27,12 +27,12 @@ int main(int argc, char* argv[]){
 		
 		for(int i=0; i<NP; ++i){
 			Complex<> c = osc() * (1-w + oscAM());
-			int ix = scl::posToInd( c.r, N1);
-			int iy = scl::posToInd(-c.i, N1);
+			int ix = posToInd( c.r, N1);
+			int iy = posToInd(-c.i, N1);
 			pixels[iy*N1 + ix] += 0.1;
 		}
 
-		scl::print2D(pixels, N1, N1);
+		print2D(pixels, N1, N1);
 		printf("\n");
 	}}
 

@@ -30,12 +30,12 @@ int main(int argc, char* argv[]){
 
 		for(int i=0; i<NP; ++i){
 			Complex<> c = qua1() + qua2();
-			int ix = scl::posToInd( c.r * r, N1);	// map real component to x
-			int iy = scl::posToInd(-c.i * r, N1);	// map imag component to y
+			int ix = posToInd( c.r * r, N1);	// map real component to x
+			int iy = posToInd(-c.i * r, N1);	// map imag component to y
 			pixels[iy*N1 + ix] += 0.1;
 		}
 
-		scl::print2D(pixels, N1, N1);
+		print2D(pixels, N1, N1);
 		printf("\n");
 	}
 

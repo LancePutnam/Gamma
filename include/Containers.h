@@ -4,10 +4,15 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+/*	File description: 
+	Dynamically sized generic containers.
+*/
+
 #include <stdlib.h>
 #include <vector>
 
 #include "Types.h"
+#include "Conversion.h"
 #include "gen.h"
 #include "mem.h"
 #include "scl.h"
@@ -429,11 +434,9 @@ TEM inline uint32_t ArrayPow2<T>::index(uint32_t phase) const { return phase >> 
 TEM inline T ArrayPow2<T>::atPhase(uint32_t phase) const { return (*this)[index(phase)]; }
 TEM inline void ArrayPow2<T>::putPhase(uint32_t phase, T v){ (*this)[index(phase)] = v; }
 
-TEM inline float ArrayPow2<T>::fraction(uint32_t phase) const{	
-	phase = phase << log2Size() >> 9 | 0x3f800000;
-	return scl::punUF32(phase) - 1.f;
+TEM inline float ArrayPow2<T>::fraction(uint32_t phase) const{		
+	return gam::fraction(log2Size(), phase);
 }
-
 
 
 // Buffer

@@ -816,7 +816,7 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 }
 
 TM1 void Delay<TM2>::zero(){ 
-	for(int i=0; i<ArrayPow2<Tv>::size(); ++i) ArrayPow2<Tv>::elems()[i] = 0;
+	for(uint32_t i=0; i<ArrayPow2<Tv>::size(); ++i) ArrayPow2<Tv>::elems()[i] = 0;
 }
 
 
@@ -831,7 +831,7 @@ TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
 }
 
 TM1 inline uint32_t Delay<TM2>::delayFToI(float v){
-	return scl::castIntRound((v * mDelayFactor) * 4294967296.);
+	return castIntRound((v * mDelayFactor) * 4294967296.);
 	//return scl::normalToUInt(v * mDelayFactor);
 }
 
@@ -866,7 +866,7 @@ TM1 inline void Delay<TM2>::delay(float v){
 	mDelay = delayFToI(v);
 }
 
-TM1 inline void Delay<TM2>::delayNorm(float n){ mDelay = scl::normalToUInt(n); }
+TM1 inline void Delay<TM2>::delayNorm(float n){ mDelay = normalToUInt(n); }
 
 TM1 inline void Delay<TM2>::freq(float v){ delay(1.f/v); }
 
@@ -877,7 +877,7 @@ TM1 inline uint32_t Delay<TM2>::oldestIndex() const {
 TM1 inline float Delay<TM2>::delay() const { return mDelayLength; }
 
 TM1 inline float Delay<TM2>::delayNorm() const {
-	return scl::uintToNormal<float>(mDelay);
+	return uintToNormal<float>(mDelay);
 }
 
 TM1 inline uint32_t Delay<TM2>::delayIndex(uint32_t delay) const {

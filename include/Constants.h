@@ -1,14 +1,20 @@
-#ifndef GAMMA_CONSTANTS_H
-#define GAMMA_CONSTANTS_H
+#ifndef GAMMA_CONSTANTS_H_INC
+#define GAMMA_CONSTANTS_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
+
+/*	File description: 
+	Definitions of numerical constants.
+*/
 
 namespace gam{
 
 const unsigned long MASK_F32_SIGN = 0x80000000;
 const unsigned long MASK_F32_EXPO = 0x7f800000;
 const unsigned long MASK_F32_FRAC = 0x007fffff;
+
+const float justUnder1f = 0.99999997f; //0x3f7fffff;
 
 // const double pi = 4*atan(1.0);
 
@@ -18,6 +24,8 @@ const unsigned long MASK_F32_FRAC = 0x007fffff;
 #else
 	const int endian = 0;
 #endif
+
+inline bool isLittleEndian(){ return endian==0; }
 
 // constant macros
 

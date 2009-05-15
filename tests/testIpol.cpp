@@ -2,6 +2,7 @@
 #include "gen.h"
 #include "ipl.h"
 #include "scl.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -15,7 +16,7 @@ int main(int argc, char* argv[]){
 		frac = -frac.add; printf("\n"#fnc":\n");\
 		LOOP{\
 			float v = fnc;\
-			printf("\t[%3d] % 6.3f  ", i, v); scl::printPlot(v, 32); printf("\n");\
+			printf("\t[%3d] % 6.3f  ", i, v); printPlot(v, 32); printf("\n");\
 		}
 	
 	DO(ipl::nearest(frac(), -1., 1.))	

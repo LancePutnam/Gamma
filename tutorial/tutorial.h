@@ -13,5 +13,6 @@
 #include "Oscillator.h"
 #include "SoundFile.h"
 #include "Types.h"
+#include "Visual.h"
 
 using namespace gam;

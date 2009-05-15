@@ -257,12 +257,12 @@ void polarToRectFast(float * magA, float * phsA, ULONG len){
 		phs *= (float)M_1_2PI;
 		
 		//ULONG index = scl::normalToUInt(phs);
-		ULONG index = scl::normalToUInt2(phs);	// better cuz phase is on a linear scale
+		ULONG index = normalToUInt2(phs);	// better cuz phase is on a linear scale
 		
 //		float sn = MemOpF::at(sinTable, fracBits, index);
 //		float cs = MemOpF::at(sinTable, fracBits, index + quarter);
 
-		float frac = tbl::fraction(bits, index);
+		float frac = fraction(bits, index);
 		float sn = ipl::linear(frac,
 			mem::at(sinTable, fracBits, index),
 			mem::at(sinTable, fracBits, index + oneIndex)

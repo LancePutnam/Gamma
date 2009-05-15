@@ -20,7 +20,7 @@
 			Complex<float> &c = bins()[i];\
 			float m = c.norm2();\
 			float p = scl::atan2Fast(c.i,c.r);\
-			c(1.f/scl::recSqrtFast(m), p);\
+			c(scl::sqrt<1>(m), p);\
 		}\
 	}
 

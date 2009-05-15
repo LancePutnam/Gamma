@@ -1,5 +1,6 @@
 #include "Chaos.h"
 #include "scl.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -23,7 +24,7 @@ int main(int argc, char ** argv){
 	for(int i=0; i<32; i++){
 		//ln1.x = SclOp::wrap(ln1.x);
 		//printf("[% 3i] %.12f\n", i, ln1.x);
-		scl::printPlot(l2.v[0]); printf("\n");
+		printPlot(l2.v[0]); printf("\n");
 		l2();
 	}
 

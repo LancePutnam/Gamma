@@ -35,98 +35,98 @@ inline float fast_log2 (float val)
 
 int main(int argc, char* argv[]){
 	
-	arr::conversionInit();
-	
-	printf("2 10987654 32109876543210987654321\n");
-	scl::printBinary(1.f);
-	printf("\n\n");
-
-	for(float f=-64.f; f<64.f; f+=1.1f){
-		printf("% 6.2f ", f);
-
-		scl::printBinary(f);
-
-		long intPart;
-		float frac;
-		frac = scl::split(f, intPart);
-		printf(" %li % 8.6f", intPart, frac);
-
-		printf(" %d", scl::floatToUInt(f));
-		printf(" %li", scl::floatToInt(f));
-		printf(" %g",  scl::trunc(f));
-
-		printf("\n");
-	}
-
-	printf(" %d\n", scl::floatToUInt(16777218.f));
-	//printf(" %lu\n", normalToIndex(1.f, 23));
-
-
-	uint32_t ul = 0x80000000;
-	int32_t sl = 0x80000000;
-	printf("\n"); scl::printBinary(ul); printf(" [>>31] "); scl::printBinary(ul >> 31);
-	//printf("\n"); scl::printBinary(sl); printf(" [>>31] "); scl::printBinary(sl >> 31);
-	printf("\n");
-
-	printf("\nCast double to int (round)\n");
-	for(double i=-1.5; i<1.5; i+=0.125){
-		printf("%6.3f -> %d\n", i, scl::castIntRound(i));
-	}
-
-	printf("\nCast float to int (round)\n");
-	for(float i=-1.5f; i<1.5f; i+=0.125f){
-		printf("%6.3f -> %d\n", i, scl::castIntRound(i));
-	}
-
-	printf("\nFloat exponent\n");
-	for(float i=-4.f; i<4.f; i+=0.25f){
-		printf("%6.3f -> %d\n", i, scl::floatExponent(i));
-	}
-	
-	printf("\nFloat mantissa\n");
-	for(float i=-4.f; i<4.f; i+=0.25f){
-		printf("%6.3f -> %.3f\n", i, scl::floatMantissa(i));
-	}
-
-	printf("\nInt16 to normal\n");
-	for(long i=-32768; i<32767; i+=4096){
-		printf("% 6li -> % f\n", i, scl::intToNormal(i));
-	}
-	printf("% 6d -> % f\n", 0x7fff, scl::intToNormal(0x7fff));
-		
-	printf("\nNumber\tTrailing Zeroes\n");
-	for(unsigned long i=0; i<32; i++){
-		unsigned long num = 1<<i;
-		printf("%10lu%4d\n", num, scl::trailingZeroes(num));
-	}
-	
-	printf("\nNormal to UInt\n");
-	for(double i=-1.5; i<1.5; i+=0.125){
-		printf("%6.3f -> %d\n", i, scl::normalToUInt(i));
-		//printf("%6.3f -> %lu\n", i, (unsigned long)(((double)i) * 4294967296.));
-	}
-	
-//	printf("\nNormal to UInt (2)\n");
-//	for(double i=-1.5; i<1.5; i+=0.125){
-//		printf("%6.3f -> %lu\n", i, scl::normalToUInt2(i));
+//	arr::conversionInit();
+//	
+//	printf("2 10987654 32109876543210987654321\n");
+//	scl::printBinary(1.f);
+//	printf("\n\n");
+//
+//	for(float f=-64.f; f<64.f; f+=1.1f){
+//		printf("% 6.2f ", f);
+//
+//		scl::printBinary(f);
+//
+//		long intPart;
+//		float frac;
+//		frac = gam::split(f, intPart);
+//		printf(" %li % 8.6f", intPart, frac);
+//
+//		printf(" %d", floatToUInt(f));
+//		printf(" %li", floatToInt(f));
+//		printf(" %g",  scl::trunc(f));
+//
+//		printf("\n");
 //	}
-
-	printf("\nNormal to UInt (using castIntRound(double))\n");
-	for(double i=-1.5; i<1.5; i+=0.125)
-		printf("%6.3f -> %lu\n", i, (unsigned long)scl::castIntRound(i * 4294967296.));
-	
-	printf("\nNormal to UInt (using castIntRound(float))\n");
-	for(float i=-1.5f; i<1.5f; i+=0.125f)
-		printf("%6.3f -> %lu\n", i, (unsigned long)scl::castIntRound(i * 4294967296.f));
-	
-	long x = (1<<23 - 1);
-	printf("%ld %d\n", x, scl::castIntRound((float)x));
-	
-	printf("\n");
-	ul = 0x1234567;
-	printf("value              = "); scl::printBinary(ul); printf("\n");
-	printf("~value             = "); scl::printBinary(~ul); printf("\n");
-	printf("0xffffffff - value = "); scl::printBinary(0xffffffff - ul); printf("\n");
+//
+//	printf(" %d\n", floatToUInt(16777218.f));
+//	//printf(" %lu\n", normalToIndex(1.f, 23));
+//
+//
+//	uint32_t ul = 0x80000000;
+//	int32_t sl = 0x80000000;
+//	printf("\n"); scl::printBinary(ul); printf(" [>>31] "); scl::printBinary(ul >> 31);
+//	//printf("\n"); scl::printBinary(sl); printf(" [>>31] "); scl::printBinary(sl >> 31);
+//	printf("\n");
+//
+//	printf("\nCast double to int (round)\n");
+//	for(double i=-1.5; i<1.5; i+=0.125){
+//		printf("%6.3f -> %d\n", i, castIntRound(i));
+//	}
+//
+//	printf("\nCast float to int (round)\n");
+//	for(float i=-1.5f; i<1.5f; i+=0.125f){
+//		printf("%6.3f -> %d\n", i, castIntRound(i));
+//	}
+//
+//	printf("\nFloat exponent\n");
+//	for(float i=-4.f; i<4.f; i+=0.25f){
+//		printf("%6.3f -> %d\n", i, floatExponent(i));
+//	}
+//	
+//	printf("\nFloat mantissa\n");
+//	for(float i=-4.f; i<4.f; i+=0.25f){
+//		printf("%6.3f -> %.3f\n", i, floatMantissa(i));
+//	}
+//
+//	printf("\nInt16 to normal\n");
+//	for(long i=-32768; i<32767; i+=4096){
+//		printf("% 6li -> % f\n", i, intToNormal(i));
+//	}
+//	printf("% 6d -> % f\n", 0x7fff, intToNormal(0x7fff));
+//		
+//	printf("\nNumber\tTrailing Zeroes\n");
+//	for(unsigned long i=0; i<32; i++){
+//		unsigned long num = 1<<i;
+//		printf("%10lu%4d\n", num, scl::trailingZeroes(num));
+//	}
+//	
+//	printf("\nNormal to UInt\n");
+//	for(double i=-1.5; i<1.5; i+=0.125){
+//		printf("%6.3f -> %d\n", i, normalToUInt(i));
+//		//printf("%6.3f -> %lu\n", i, (unsigned long)(((double)i) * 4294967296.));
+//	}
+//	
+////	printf("\nNormal to UInt (2)\n");
+////	for(double i=-1.5; i<1.5; i+=0.125){
+////		printf("%6.3f -> %lu\n", i, scl::normalToUInt2(i));
+////	}
+//
+//	printf("\nNormal to UInt (using castIntRound(double))\n");
+//	for(double i=-1.5; i<1.5; i+=0.125)
+//		printf("%6.3f -> %lu\n", i, (unsigned long)castIntRound(i * 4294967296.));
+//	
+//	printf("\nNormal to UInt (using castIntRound(float))\n");
+//	for(float i=-1.5f; i<1.5f; i+=0.125f)
+//		printf("%6.3f -> %lu\n", i, (unsigned long)castIntRound(i * 4294967296.f));
+//	
+//	long x = (1<<23 - 1);
+//	printf("%ld %d\n", x, castIntRound((float)x));
+//	
+//	printf("\n");
+//	ul = 0x1234567;
+//	printf("value              = "); scl::printBinary(ul); printf("\n");
+//	printf("~value             = "); scl::printBinary(~ul); printf("\n");
+//	printf("0xffffffff - value = "); scl::printBinary(0xffffffff - ul); printf("\n");
 	//printf("value/0            = "); scl::printBinary(ul/0); printf("\n");
 	
 	/*
@@ -156,6 +156,14 @@ int main(int argc, char* argv[]){
 	}
 	*/
 	printf("\nendian: %d\n", endian);
+	
+	int N=5000;
+	for(int i=0; i<N; ++i){
+		float v = float(i)/N;
+		uint32_t m = normalToUInt(v);
+		uint32_t a = v*4294967295UL;
+		//if((m-a)!=0) printf("m=%d, a=%d\n", m,a);
+	}
 	
 	return 0;
 }

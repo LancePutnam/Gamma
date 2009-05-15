@@ -6,7 +6,7 @@
 #include "rnd.h"
 #include "scl.h"
 #include "tbl.h"
-//#include "MacroD.h"
+#include "Visual.h"
 
 //#define TEST_RFFT
 //#define TEST_CFFT
@@ -20,7 +20,7 @@
 	printf("\nTD samples...\n");\
 	for(uint32_t i=0; i<(uint32_t)len; i++){\
 		printf("[%2d] % 8.6f ", (int)i, src[i]);\
-		scl::printPlot(src[i], 20); printf("\n");\
+		printPlot(src[i], 20); printf("\n");\
 	}
 	
 #define PRINT_FREQ(obj)\

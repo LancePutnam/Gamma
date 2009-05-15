@@ -2,6 +2,7 @@
 #include "scl.h"
 #include "Envelope.h"
 #include "Noise.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]){
 		for(int i=0; i<n+4; ++i){\
 			double v = fnc;\
 			printf("[%2d] % 6.4f ", i, v);\
-			scl::printPlot(v, 32); printf("\n");\
+			printPlot(v, 32); printf("\n");\
 		}\
 	
 	DO(ad())

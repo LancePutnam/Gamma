@@ -1,16 +1,16 @@
-#ifndef AMBISONICS_H_INC
-#define AMBISONICS_H_INC
+#ifndef GAMMA_AMBISONICS_H_INC
+#define GAMMA_AMBISONICS_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
 /*
-Modified from the CSL Ambisonic code written by Florian Hollerweger, 
-Graham Wakefield, and Jorge Castellanos, 2005.
+	Modified from the CSL Ambisonic code written by Florian Hollerweger, 
+	Graham Wakefield, and Jorge Castellanos, 2005.
 */
 
 #include <stdio.h>
-#include "pstdint.h"			/* for uint32_t, uint16_t, etc... */
+#include "Types.h"
 #include "MacroD.h"
 
 #define USE_GAMMA

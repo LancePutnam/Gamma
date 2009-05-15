@@ -211,7 +211,7 @@ int main(int argc, char* argv[]){
 		using namespace gam::mem;
 		using namespace gam::gen;
 	
-		#define PRINT(obj) printf("\t"); for(int i=0;i<obj.size();++i) printf("%c", obj[i]); printf("\n");
+		#define PRINT(obj) printf("\t"); for(uint32_t i=0;i<obj.size();++i) printf("%c", obj[i]); printf("\n");
 	
 		Multi<8, char> multi;
 		

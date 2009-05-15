@@ -23,42 +23,6 @@ int base36To10(char v){
 }
 
 
-uint32_t bytesToUInt32(const uint8_t * bytes4){
-	uint32_t word = 0;
-
-	if(0 == endian){
-		word  = bytes4[3] << 24;
-		word |= (bytes4[2] & 0xff) << 16;
-		word |= (bytes4[1] & 0xff) << 8;
-		word |= bytes4[0] & 0xff;
-	}
-	else{
-		word  = bytes4[0] << 24;
-		word |= (bytes4[1] & 0xff) << 16;
-		word |= (bytes4[2] & 0xff) << 8;
-		word |= bytes4[3] & 0xff;
-	}
-	
-	return word;
-}
-
-
-uint16_t bytesToUInt16(const uint8_t * bytes2){
-	uint16_t word = 0;
-
-	if(0 == endian){
-		word  = bytes2[0] & 0xff;
-		word |= (bytes2[1] & 0xff) << 8;
-	}
-	else{
-		word  = bytes2[1] & 0xff;
-		word |= (bytes2[0] & 0xff) << 8;
-	}
-	
-	return word;
-}
-
-
 float clipMag(float value, float min, float max){
 	union {float f; ULONG i;} v;
 	v.f = value;
@@ -87,43 +51,6 @@ double freq(const char * note){
 		return ::pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		
 	}
 	return 0.;
-}
-
-
-ULONG floatToUInt(float value){
-	ULONG valueU = *(ULONG *)&value;
-
-	valueU += 0x800000;
-
-	if(valueU & 0x40000000){	// mag outside [0, 1)		
-		ULONG shift = (valueU >> 23) & 0x7F;	
-		return (1<<shift) | ((valueU & MASK_F32_FRAC) >> (23 - shift));
-	}
-	else{
-		return 0;
-	}
-}
-
-
-long floatToInt(float value){
-	union { float f; ULONG u; } word;
-	word.f = value;
-
-	word.u = (word.u + 0x800000);
-
-	if(word.u & 0x40000000){	// mag outside [0, 1)
-		long shift = ((word.u)>>23) & 0x7F;
-		long sign = word.u & 0x80000000;
-		long result = (1<<shift) | ((word.u & MASK_F32_FRAC)>>(23-shift));
-		
-		if(sign){	// negative number
-			result = ~result + 1;	// 2's complement
-		}
-		return result;
-	}
-	else{
-		return 0;
-	}
 }
 
 
@@ -185,85 +112,6 @@ double legendre(int l, int m, double t){
 	}
 
 	return P;
-}
-
-
-
-float split(float value, long & intPart){
-	//unsigned int * valueI = (unsigned int *)(&value);
-
-	union { float f; ULONG u; } word;
-	word.f = value;
-
-	word.u = (word.u + 0x800000);
-
-	if(word.u & 0x40000000){
-		long shift = ((word.u)>>23) & 0x7F;
-		intPart = (1<<shift) | ((word.u & MASK_F32_FRAC)>>(23-shift));
-		word.u = 0x3F800000 | ((word.u << shift) & MASK_F32_FRAC);
-		return word.f - 1.f;
-	}
-	else{
-		intPart = 0;
-		return value;
-	}
-}
-
-
-#define LOOP_BITS(exp) for(int i=(msb-1); i>=0; --i){ exp }
-
-void printBinary(ULONG v, const char * zero, const char * one, int msb){
-	LOOP_BITS(
-		0 == ((v>>i) & 1) ? printf(zero) : printf(one);
-	)
-}
-
-void printBinary(unsigned long long v, const char * zero, const char * one, int msb){
-	LOOP_BITS(
-		0 == ((v>>i) & 1) ? printf(zero) : printf(one);
-	)
-}
-
-void printBinary(float value, const char * zero, const char * one, int msb){
-	ULONG v = *(ULONG *)(&value);
-	LOOP_BITS(
-		0 == ((v>>i) & 1) ? printf(zero) : printf(one);
-		if((i==31) || (i==23)) printf(" ");
-	)
-}
-
-void printBinary(void * value32, const char * zero, const char * one, int msb){
-	printBinary(*(ULONG *)value32, zero, one, msb);
-}
-
-#undef LOOP_BITS
-
-void printPlot(float value, ULONG width, bool spaces, const char * point){
-	int clipFlag;
-	value = clip(value, clipFlag, 1.f, -1.f);
-	
-	const char * pt = clipFlag != 0 ? "+" : point;
-	
-	ULONG pos = castIntRound((value + 1.f) * 0.5f * (float)(width));
-	ULONG mid = width >> 1;
-	ULONG i=0;
-
-	if(pos < mid){	// [-1, 0)
-		for(; i<pos; ++i) printf(" ");
-		printf(pt); ++i;
-		for(; i<mid; ++i) printf("-");
-		printf("|");
-	}
-	else{			// (0, 1]
-		for(; i<mid; ++i) printf(" ");
-		if(pos == mid){ printf(pt); goto end; }
-		printf("|"); ++i;
-		for(; i<pos; ++i) printf("-");
-		printf(pt);
-	}
-	
-	end: 
-	if(spaces) for(; i<width; ++i) printf(" ");
 }
 
 
@@ -392,22 +240,6 @@ range		exp				zero lsb
 //	}
 //	else{
 //		return 0.f;
-//	}
-//}
-
-//ULONG SclOp::floatToUInt(float value){
-//	union { float f; ULONG u; } word;
-//	word.f = value;
-//
-//	word.u = (word.u + 0x800000);
-//
-//	if(word.u & 0x40000000){	// mag outside [0, 1)
-//		//int shift = ((word.u)>>23) & 0x7F;
-//		ULONG shift = ((word.u)>>23) & 0x7F;
-//		return (1<<shift) | ((word.u & MASK_F32_FRAC)>>(23-shift));
-//	}
-//	else{
-//		return 0;
 //	}
 //}
 

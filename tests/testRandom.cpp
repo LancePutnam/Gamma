@@ -11,6 +11,7 @@
 #include "arr.h"
 #include "rnd.h"
 #include "scl.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -114,7 +115,7 @@ int main(int argc, char* argv[]){
 		for(unsigned long i=0; i<numBins; i++){\
 			float amt = (float)bins[i] / (float)len;\
 			printf("[% 4.2f] %5.3f ", scl::mapLin((float)i, 0.f, (float)numBins, interval[0], interval[1]), amt);\
-			scl::printPlot(amt * normFactor, 30); printf("\n");\
+			printPlot(amt * normFactor, 30); printf("\n");\
 		}\
 	
 	HIST(add2) HIST(add2I) HIST(add3) HIST(lin) HIST(mul2) HIST(pow2) HIST(pow3) HIST(uni) //HIST(uniS)

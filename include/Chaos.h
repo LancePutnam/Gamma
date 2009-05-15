@@ -74,6 +74,7 @@ struct MapLin2 : public MapBase<2,6,T>{
 		T v0 = v[0];
 		v[0] = a[0] + v0 * a[1] + v[1] * a[2];
 		v[1] = a[3] + v0 * a[4] + v[1] * a[5];
+		return v[0];
 	}
 };
 

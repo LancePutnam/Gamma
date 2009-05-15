@@ -4,8 +4,27 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+/*	File description: 
+	Functions/objects for accessing and indexing arrays.
+*/
+
 namespace gam{
 
+
+/// Compute 2-D array indices from 1-D array index
+template <class T>
+inline void index1to2(T index1, T sizeX, T& x, T& y){
+	y = index1 / sizeX; x = index1 % sizeX;
+}
+
+/// Compute 1-D array index from 3-D array indices
+
+/// The x indices move fastest followed by y, then z.
+///
+template <class T>
+inline T index3to1(T x, T y, T z, T sizeX, T sizeY){
+	return x + sizeX * (y + sizeY * z);
+}
 
 inline void neighborsWrap(int x1, int N, int& x0, int& x2){
 	x0 = x1-1; if(x1< 0) x1+=N;

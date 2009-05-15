@@ -11,11 +11,11 @@ using namespace std;
 int main(int argc, char* argv[]){
 
 
-	#define PRINT(a) printf("%p: ", &a); for(int i=0; i<a.size(); i++) printf("%d ", a[i]); printf("\n");
+	#define PRINT(a) printf("%p: ", &a); for(uint32_t i=0; i<a.size(); i++) printf("%d ", a[i]); printf("\n");
 	{
 		Array<int> array(8);
 		PRINT(array)
-		for(int i=0; i<array.size(); i++) array[i]=i;
+		for(uint32_t i=0; i<array.size(); i++) array[i]=i;
 		PRINT(array)
 		
 		Array<int> array2(array);
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]){
 		
 		ArrayPow2<int> arrayPow2(8);
 		PRINT(arrayPow2)
-		for(int i=0; i<arrayPow2.size(); i++) arrayPow2[i]=i;
+		for(uint32_t i=0; i<arrayPow2.size(); i++) arrayPow2[i]=i;
 		PRINT(arrayPow2)		
 	}
 	#undef PRINT
@@ -59,11 +59,11 @@ int main(int argc, char* argv[]){
 		doubleRing(i+1);
 		
 		printf("\t[");
-		for(int j=0; j<doubleRing.size(); ++j) printf("%d ", doubleRing[j]);
+		for(uint32_t j=0; j<doubleRing.size(); ++j) printf("%d ", doubleRing[j]);
 		
 		printf("] [");
 		int * buf = doubleRing.copy();
-		for(int j=0; j<doubleRing.size(); ++j) printf("%d ", buf[j]);
+		for(uint32_t j=0; j<doubleRing.size(); ++j) printf("%d ", buf[j]);
 		
 		printf("]\n");
 	}
@@ -71,9 +71,9 @@ int main(int argc, char* argv[]){
 	
 	printf("\nMulti:\n");
 	{	Multi<5,char> multi = {'m','u','l','t','i'};
-		for(int i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}	
+		for(uint32_t i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}	
 	{	Multi<5,char> multi = {'z'};
-		for(int i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}
+		for(uint32_t i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}
 	
 	
 	{ printf("\nRing:\n");

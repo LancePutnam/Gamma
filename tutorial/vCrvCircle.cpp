@@ -20,12 +20,12 @@ int main(int argc, char* argv[]){
 	mem::zero(pixels, N2);
 	freq.fromPhase(M_2PI/NP);
 	for(int i=0; i<NP; ++i){
-		int ix = scl::posToInd(phase[0], N1);
-		int iy = scl::posToInd(phase[1], N1);
+		int ix = posToInd(phase[0], N1);
+		int iy = posToInd(phase[1], N1);
 		phase *= freq;
 		pixels[iy*N1 + ix] += 0.125;
 	}
-	scl::print2D(pixels, N1, N1);
+	print2D(pixels, N1, N1);
 
 
 	printf("\nHalf circle\n");
@@ -33,12 +33,12 @@ int main(int argc, char* argv[]){
 	phase(0.5, 0);
 	freq.fromPhase(M_2PI/NP);
 	for(int i=0; i<NP; ++i){
-		int ix = scl::posToInd(phase[0], N1);
-		int iy = scl::posToInd(phase[1], N1);
+		int ix = posToInd(phase[0], N1);
+		int iy = posToInd(phase[1], N1);
 		phase *= freq;
 		pixels[iy*N1 + ix] += 0.125;
 	}
-	scl::print2D(pixels, N1, N1);	
+	print2D(pixels, N1, N1);	
 
 	return 0;
 }

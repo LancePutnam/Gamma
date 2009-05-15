@@ -4,6 +4,7 @@
 #include "Oscillator.h"
 #include "gen.h"
 #include "scl.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -62,14 +63,14 @@ int main(int argc, char* argv[]){
 		printf("\n%s:\n", #f);\
 		sig = 1;\
 		/*f.zero();*/\
-		for(int i=0; i<dft.sizeWin(); ++i){ float v=sig(); v=f; dft(v); }\
+		for(uint32_t i=0; i<dft.sizeWin(); ++i){ float v=sig(); v=f; dft(v); }\
 		dft.bins(0)[0] *= 2; dft.bins(dft.numBins()-1)[0] *= 2;\
-		for(int i=0; i<dft.numBins(); ++i){\
+		for(uint32_t i=0; i<dft.numBins(); ++i){\
 			float m = dft.bins(i)[0];\
 			float p = dft.bins(i)[1] * M_1_PI;\
 			printf("% 6.3f %6.3f ", m, p);\
-			scl::printPlot(m*n*0.5, 32);\
-			scl::printPlot(p, 32);\
+			printPlot(m*n*0.5, 32);\
+			printPlot(p, 32);\
 			printf("\n");\
 		}
 	

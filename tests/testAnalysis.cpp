@@ -3,6 +3,7 @@
 
 #include "arr.h"
 #include "tbl.h"
+#include "Visual.h"
 
 using namespace gam;
 using namespace gam::gen;
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]){
 	// print out function
 	for(uint32_t i=0; i<size; i++){
 		printf("[%4d]\t% 7.4f ", i, table[i]);
-		scl::printPlot(table[i]);
+		printPlot(table[i]);
 		printf("\n");
 	}
 

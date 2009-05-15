@@ -1,14 +1,6 @@
-/*
- *  testNoise.cpp
- *  synthesize
- *
- *  Created by Lance Putnam on 1/22/07.
- *  Copyright 2007 __MyCompanyName__. All rights reserved.
- *
- */
-
 #include "Noise.h"
 #include "scl.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -27,13 +19,13 @@ int main(int argc, char* argv[]){
 		float vb = brown();
 		
 		printf("% 6.4f ", vw);
-		scl::printPlot(vw, 20, true, "o");
+		printPlot(vw, 20, true, "o");
 		
 		printf("% 6.4f ", vp);
-		scl::printPlot(vp, 20, true, "o");
+		printPlot(vp, 20, true, "o");
 		
 		printf("% 6.4f ", vb);
-		scl::printPlot(vb, 20, true, "o");
+		printPlot(vb, 20, true, "o");
 		
 		printf("\n");
 	}

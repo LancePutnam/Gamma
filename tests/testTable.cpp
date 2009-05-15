@@ -4,6 +4,7 @@
 #include "arr.h"
 #include "tbl.h"
 #include "Constants.h"
+#include "Visual.h"
 
 #define TEST_WINDOWS
 #define TEST_TABLEOSC
@@ -14,7 +15,7 @@
 	for(unsigned long i=0; i<len; i++){\
 		float v = arr[i];\
 		printf("[%4lu] % 5.3f %8lx  ", i, v, *(unsigned long *)&v);\
-		scl::printPlot(v); printf("\n");\
+		printPlot(v); printf("\n");\
 	}
 
 using namespace gam;

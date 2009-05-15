@@ -4,7 +4,13 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "pstdint.h"	/* for uint32_t, uint16_t, etc... */
+/*	File description: 
+	Static types
+*/
+
+
+//#define __STDC_CONSTANT_MACROS	// for appending UL, ULL, etc. to constants
+#include "pstdint.h"			// for cross-platform uint32_t, uint16_t, etc...
 #include <math.h>
 #include <stdlib.h>
 

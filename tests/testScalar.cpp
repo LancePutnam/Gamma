@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "rnd.h"
 #include "scl.h"
+#include "Visual.h"
 
 using namespace gam;
 
@@ -106,7 +107,7 @@ int main(int argc, char* argv[]){
 		f1 = 1.f; f2 = 0.f; f3 = 0.f; f4 = 0.f;
 		for(int i=0; i<33; i++){
 			printf("% 9.6f % 9.6f % 9.6f % 9.6f ", f1, f2, f3, f4);
-			scl::printPlot(f4, 20); printf("\n");
+			printPlot(f4, 20); printf("\n");
 			float ang = M_2PI/(float)16;
 			float m = sqrtf(0.5f);
 			scl::mulQuat(f1, f2, f3, f4, cosf(ang) * m, sinf(ang) * m, cosf(ang * 0.5f) * m, sinf(ang * 0.5f) * m);
@@ -120,10 +121,10 @@ int main(int argc, char* argv[]){
 	printf("\nNext multiple:\n");
 		printf("of 2 of %d = %d\n", 3, scl::nextMultiple(3U, 2U));		
 	
-	printf("\nrecSqrtFast\n");
+	printf("\nrecSqrtFast()\n");
 		for(int i=0; i<16; ++i){
 			float v = i+1;
-			printf("% 7.3f % 7.3f % 7.3f\n", v, 1./sqrt(v), scl::recSqrtFast(v));
+			printf("% 7.3f % 9.7f % 9.7f\n", v, 1./sqrt(v), scl::invSqrt<1>(v));
 		}
 	
 	printf("\nRound (0.5)\n");
@@ -139,6 +140,22 @@ int main(int argc, char* argv[]){
 	printf("\nSlope:\n");
 		f1 = 1; f2 = 1; f3 = 2; f4 = 3;
 		printf("(%.2f, %.2f), (%.2f, %.2f) = %f\n", f1, f2, f3, f4, scl::slope(f1, f2, f3, f4));
+
+	printf("\nsqrt<1>()\n");
+		for(int i=0; i<16; ++i){
+			float v = i+1;
+			float real = sqrt(v);
+			float apx = scl::sqrt<1>(v);
+			printf("% 7.3f % 9.7f % 9.7f, error= % 7.4g\n", v, real, apx, scl::error(real,apx)*100);
+		}
+
+	printf("\nsqrt<3>()\n");
+		for(int i=0; i<16; ++i){
+			double v = i+1;
+			double real = sqrt(v);
+			double apx = scl::sqrt<3>(v);
+			printf("% 7.3f % 9.7f % 9.7f, error= % 7.4g\n", v, real, apx, scl::error(real,apx)*100);
+		}
 
 	printf("\nTrunc:\n");
 		for(double d = -8; d < 8; d+=1.31){
@@ -186,7 +203,7 @@ int main(int argc, char* argv[]){
 		double v = rnd::uniS(10000000.);
 		//float v = i*1.379;
 		int rounded = int(v<0 ? v-0.5 : v+0.5);
-		result &= (rounded == scl::castIntRound(v));
+		result &= (rounded == castIntRound(v));
 		if(!result){ printf("%d", i); break; }
 	}
 	checkTest(result);
@@ -198,8 +215,8 @@ int main(int argc, char* argv[]){
 		float  v32 = v64;
 		int r64 = int(v64);
 		int r32 = int(v32);
-		result &= (r64 == scl::castIntTrunc(v64));
-		result &= (r32 == scl::castIntTrunc(v32));
+		result &= (r64 == castIntTrunc(v64));
+		result &= (r32 == castIntTrunc(v32));
 		if(!result) break;
 	}
 	checkTest(result);
@@ -219,6 +236,14 @@ int main(int argc, char* argv[]){
 		result &= (scl::log2(v) == i);
 	}
 	checkTest(result);
+
+	printf("\ninvSqrt<>()\n");
+		for(int i=0; i<16; ++i){
+			double v = i+1;
+			double real = 1./sqrt(v);
+			double apx = scl::invSqrt<1>(v);
+			printf("% 7.3f % 9.7f % 9.7f, error= % 7.4g\n", v, real, apx, scl::error(real,apx)*100);
+		}
 
 }
 

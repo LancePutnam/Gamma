@@ -9,9 +9,9 @@ int main(int argc, char* argv[]){
 
 	printf("\nMulti:\n");
 	{	Multi<5,char> multi = {'m','u','l','t','i'};
-		for(int i=0; i<multi.size(); ++i) printf("%c", multi[i]); printf("\n");}
+		for(uint32_t i=0; i<multi.size(); ++i) printf("%c", multi[i]); printf("\n");}
 	{	Multi<5,char> multi = {'z'};
-		for(int i=0; i<multi.size(); ++i) printf("%c", multi[i]); printf("\n");}
+		for(uint32_t i=0; i<multi.size(); ++i) printf("%c", multi[i]); printf("\n");}
 
 	
 	{ printf("\nVec:\n");

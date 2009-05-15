@@ -25,12 +25,12 @@ int main(int argc, char* argv[]){
 		printf("\nx:y = %d:%d\n\n", j,k);
 		
 		for(int i=0; i<NP; ++i){
-			int ix = scl::posToInd( sineX(), N1);
-			int iy = scl::posToInd(-sineY(), N1);
+			int ix = posToInd( sineX(), N1);
+			int iy = posToInd(-sineY(), N1);
 			pixels[iy*N1 + ix] += 0.125;
 		}
 
-		scl::print2D(pixels, N1, N1);
+		print2D(pixels, N1, N1);
 		printf("\n");
 	}}
 
