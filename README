@@ -1,0 +1,9 @@
+GAMMA README
+
+Compilation Instructions:
+
+Make sure to pass the -D__STDC_CONSTANT_MACROS option to the compiler to enable conversions of static types defined in stdint.h.
+
+For best performance, use optimization flags -finline-functions (or -O3), and -fpeel-loops.
+
+
