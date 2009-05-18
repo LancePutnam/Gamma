@@ -88,6 +88,10 @@ Tv cubic2(Tf d, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y);
 
+/// Linear interpolation between three elements.
+template <class Tf, class Tv>
+Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
+
 TEM void linear(T * dst, const T * xs, const T * xp1s, ULONG len, T frac);
 
 /// Nearest neighbor interpolation.
@@ -421,6 +425,12 @@ inline Tv linear(Tf f, const Tv& x, const Tv& y){
 	return (y - x) * f + x;
 }
 
+template <class Tf, class Tv>
+inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
+	frac *= Tf(2);
+	if(frac<Tf(1)) return ipl::linear(frac, x,y);
+	return ipl::linear(frac-Tf(1), y,z);
+}
 
 TEM void linear(T * dst, const T * xs, const T * xp1s, ULONG len, T f){
 	LOOP(len, dst[i] = linear(f, xs[i], xp1s[i]); )
