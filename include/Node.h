@@ -72,8 +72,8 @@ public:
 	//T * nextBreadth(T * terminate);		// Returns next node using breadth first traversal.
 										// If the next node is 'terminate', returns 0.
 
-	virtual void print(char * append = "");			///< Print my value.
-	void printDescendents(char * append = "");		///< Print indented outline of my descendents.
+	virtual void print(const char * append = "");			///< Print my value.
+	void printDescendents(const char * append = "");		///< Print indented outline of my descendents.
 };
 
 
@@ -259,12 +259,12 @@ TEM T * Node4<T>::nextPreorder(const T * terminal) const {
 //}
 
 
-TEM void Node4<T>::print(char * append){
+TEM void Node4<T>::print(const char * append){
 	cout << this << append;
 }
 
 
-TEM void Node4<T>::printDescendents(char * append){
+TEM void Node4<T>::printDescendents(const char * append){
 
 	T * node = (T *)this;
 
@@ -275,7 +275,7 @@ TEM void Node4<T>::printDescendents(char * append){
 		node = node->nextPreorder((T *)this);
 	}while(node);
 	
-	printf(append);
+	printf("%s",append);
 }
 
 

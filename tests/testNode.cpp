@@ -13,7 +13,7 @@ public:
 	int v;
 	
 	// Override Node4's print()
-	void print(char * append){ printf("%d", v); printf(append); }
+	void print(char * append){ printf("%d", v); printf("%s",append); }
 };
 
 

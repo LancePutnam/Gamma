@@ -62,20 +62,20 @@ void colorRGB(float h, float s, float v, float &r, float &g, float &b){
 #define LOOP_BITS(exp) for(int i=(msb-1); i>=0; --i){ exp }
 void printBinary(uint32_t v, const char * zero, const char * one, int msb){
 	LOOP_BITS(
-		0 == ((v>>i) & 1) ? printf(zero) : printf(one);
+		0 == ((v>>i) & 1) ? printf("%s", zero) : printf("%s", one);
 	)
 }
 
 void printBinary(uint64_t v, const char * zero, const char * one, int msb){
 	LOOP_BITS(
-		0 == ((v>>i) & 1) ? printf(zero) : printf(one);
+		0 == ((v>>i) & 1) ? printf("%s", zero) : printf("%s", one);
 	)
 }
 
 void printBinary(float value, const char * zero, const char * one, int msb){
 	FloatUInt<float> v(value);
 	LOOP_BITS(
-		0 == ((v.i>>i) & 1) ? printf(zero) : printf(one);
+		0 == ((v.i>>i) & 1) ? printf("%s", zero) : printf("%s", one);
 		if((i==31) || (i==23)) printf(" ");
 	)
 }
@@ -97,16 +97,16 @@ void printPlot(float value, uint32_t width, bool spaces, const char * point){
 
 	if(pos < mid){	// [-1, 0)
 		for(; i<pos; ++i) printf(" ");
-		printf(pt); ++i;
+		printf("%s", pt); ++i;
 		for(; i<mid; ++i) printf("-");
 		printf("|");
 	}
 	else{			// (0, 1]
 		for(; i<mid; ++i) printf(" ");
-		if(pos == mid){ printf(pt); goto end; }
+		if(pos == mid){ printf("%s", pt); goto end; }
 		printf("|"); ++i;
 		for(; i<pos; ++i) printf("-");
-		printf(pt);
+		printf("%s", pt);
 	}
 	
 	end: 
