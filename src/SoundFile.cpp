@@ -122,7 +122,7 @@ void SoundFile::formatInfoSubtype(){
 }
 
 int SoundFile::formatMajor(string sfpath){
-	unsigned int pos = sfpath.find_last_of(".");
+	size_t pos = sfpath.find_last_of(".");
 	
 	if(string::npos != pos){
 		string ext = sfpath.substr(pos+1);
