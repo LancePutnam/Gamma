@@ -947,7 +947,7 @@ TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 
 TEM Complex<T> sharm(int l, int m, T theta, T phi){
 	T c = T(factorial12(l-m)) / T(factorial12(l+m));
-	c = sqrt((2*l + 1) / M_4PI * c);
+	c = ::sqrt((2*l + 1) / M_4PI * c);
 	c *= legendre(l, m, theta);
 	
 	phi *= m;
