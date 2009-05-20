@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "scl.h"
+#include "Access.h"
 #include "Conversion.h"
 
 namespace gam{

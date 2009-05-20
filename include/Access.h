@@ -157,7 +157,7 @@ struct Neighbors2D : public Sneigh{
 	}
 
 private:
-	Sbounds bounds;
+	Sbounds mBounds;
 	int sizeX, sizeY;
 };
 
