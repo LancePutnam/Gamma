@@ -11,20 +11,20 @@
 	struct MyStuff{};
 	
 	void audioCB(AudioIOData& io){
-		float * output1	= io.out(0);
-		float * output2	= io.out(1);
-		float * input1	= io.in(0);
-		float * input2	= io.in(1);
+		float * out1 = io.out(0);
+		float * out2 = io.out(1);
+		const float * in1 = io.in(0);
+		const float * in2 = io.in(1);
 		
 		MyStuff& stuff = *(MyStuff *)io.user;
 
 		for(unsigned long i=0; i<io.numFrames(); ++i){
 
-			float inSample1 = input1[i];
-			float inSample2 = input2[i];
+			float inSample1 = in1[i];
+			float inSample2 = in2[i];
 
-			output1[i] =-inSample1;
-			output2[i] =-inSample2;
+			out1[i] =-inSample1;
+			out2[i] =-inSample2;
 		}
 	}
 	
