@@ -4,6 +4,39 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+
+/*	This is a simple example demonstrating how to set up a callback
+	and process input and output buffers.
+	
+	struct MyStuff{};
+	
+	void audioCB(AudioIOData& io){
+		float * output1	= io.out(0);
+		float * output2	= io.out(1);
+		float * input1	= io.in(0);
+		float * input2	= io.in(1);
+		
+		MyStuff& stuff = *(MyStuff *)io.user;
+
+		for(unsigned long i=0; i<io.numFrames(); ++i){
+
+			float inSample1 = input1[i];
+			float inSample2 = input2[i];
+
+			output1[i] =-inSample1;
+			output2[i] =-inSample2;
+		}
+	}
+	
+	int main(){
+		MyStuff stuff;
+		
+		AudioIO audioIO(128, 44100, audioCB, &stuff, 2,2);
+		audioIO.start();
+	}
+*/
+
+
 #include <string.h>		/* memset() */
 #include <portaudio.h>
 #include "mem.h"
@@ -211,22 +244,6 @@ inline void AudioIO::setOutDeviceChans(ULONG num){ mOutParams.channelCount = num
 inline PaDeviceIndex AudioIO::defaultInDevice(){ return Pa_GetDefaultInputDevice(); }
 inline PaDeviceIndex AudioIO::defaultOutDevice(){ return Pa_GetDefaultOutputDevice(); }
 
-/* Sample callback
-void audioCB(AudioIO * io){
-	unsigned long numFrames = io->framesPerBuffer();
-	float * output		= io->outBuffer(0);
-	float * input		= io->inBuffer(0);
-	
-	MyApplication * app = (MyApplication *)io->userData;
-	
-	float * out = output;
-	float * in = input;
-	
-	for(unsigned long i=numFrames; i>0; --i){
-
-	}
-}
-*/
 
 } // end namespace gam
 
