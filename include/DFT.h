@@ -143,7 +143,7 @@ protected:
 
 /// Discrete Fourier transform.
 
-/// Requires FFTW library (http://www.fftw.org/) in single-precision (32-bit) mode.
+///
 ///
 class DFT : public DFTBase<float>{
 public:
@@ -235,7 +235,7 @@ protected:
 
 /// Short-time Fourier transform.
 
-/// Requires FFTW library (http://www.fftw.org/) in single-precision (32-bit) mode.
+///
 ///
 class STFT : public DFT {
 public:

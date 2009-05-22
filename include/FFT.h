@@ -11,7 +11,7 @@ class RFFTImpl;
 
 
 
-/// Real fast Fourier transform
+/// Real-to-complex fast Fourier transform
 class RFFT{
 public:
 	RFFT();
