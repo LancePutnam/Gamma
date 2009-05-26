@@ -99,7 +99,7 @@ struct Complex{
 	bool operator > (const C& v) const { return norm2() > v.norm2(); }		///< Returns true if norm is greater than argument's norm
 	bool operator < (const C& c) const { return norm2() < c.norm2(); }		///< Returns true if norm is less than argument's norm
 
-	C& operator = (const Polar& v){ r=v.m*cos(v.p); i=v.m*sin(v.p); return *this; }
+	C& operator = (const Polar& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
 	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
 	C& operator -=(const C& v){ r-=v.r; i-=v.i; return *this; }
@@ -134,6 +134,9 @@ struct Complex{
 	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse
 	const C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
 	const C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
+
+	const C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); }
+	const C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); }
 
 	T abs() const { return norm(); }						///< Returns absolute value (radius)
 	T mag() const { return abs(); }
