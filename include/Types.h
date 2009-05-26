@@ -86,7 +86,7 @@ struct Complex{
 	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar(m,p); }
 
-	C& fromPhase(const T& p){ r=cos(p); i=sin(p); return *this; }
+	C& fromPhase(const T& p){ r=::cos(p); i=::sin(p); return *this; }
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar(m,p)); }
 
 	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
