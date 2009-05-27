@@ -359,6 +359,17 @@ struct OnOff{
 
 
 
+//template <class T>
+//class GenNode{
+//
+//	void operator()(){
+//		*o = func(*i);
+//	}
+//
+//	T * i, * o;
+//};
+
+
 //template <class T=uint32_t>
 //struct Wrapper{
 //	Wrapper(T max, T inc=1, T val=0) : val(val), max(max){}
