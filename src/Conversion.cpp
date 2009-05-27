@@ -42,12 +42,12 @@ uint16_t bytesToUInt16(const uint8_t * bytes2){
 
 
 uint32_t floatToUInt(float value){
-	FloatUInt<float> u(value);
-	u.i += 0x800000;
+	Twiddle<float> u(value);
+	u.u += 0x800000;
 
-	if(u.i & 0x40000000){	// mag outside [0, 1)		
-		uint32_t shift = (u.i >> 23) & 0x7F;	
-		return (1<<shift) | ((u.i & MASK_F32_FRAC) >> (23 - shift));
+	if(u.u & 0x40000000){	// mag outside [0, 1)		
+		uint32_t shift = (u.u >> 23) & 0x7F;	
+		return (1<<shift) | ((u.u & MASK_F32_FRAC) >> (23 - shift));
 	}
 	else{
 		return 0;
@@ -56,13 +56,13 @@ uint32_t floatToUInt(float value){
 
 
 long floatToInt(float value){
-	FloatUInt<float> word(value);
-	word.i = (word.i + 0x800000);
+	Twiddle<float> u(value);
+	u.u = (u.u + 0x800000);
 
-	if(word.i & 0x40000000){	// mag outside [0, 1)
-		long shift = ((word.i)>>23) & 0x7F;
-		long sign = word.i & 0x80000000;
-		long result = (1<<shift) | ((word.i & MASK_F32_FRAC)>>(23-shift));
+	if(u.u & 0x40000000){	// mag outside [0, 1)
+		long shift = ((u.u)>>23) & 0x7F;
+		long sign = u.u & 0x80000000;
+		long result = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
 		
 		if(sign){	// negative number
 			result = ~result + 1;	// 2's complement
@@ -76,15 +76,15 @@ long floatToInt(float value){
 
 
 float split(float value, long & intPart){
-	FloatUInt<float> word(value);
+	Twiddle<float> u(value);
 
-	word.i = (word.i + 0x800000);
+	u.u = (u.u + 0x800000);
 
-	if(word.i & 0x40000000){
-		long shift = ((word.i)>>23) & 0x7F;
-		intPart = (1<<shift) | ((word.i & MASK_F32_FRAC)>>(23-shift));
-		word.i = 0x3F800000 | ((word.i << shift) & MASK_F32_FRAC);
-		return word.f - 1.f;
+	if(u.u & 0x40000000){
+		long shift = ((u.u)>>23) & 0x7F;
+		intPart = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
+		u.u = 0x3F800000 | ((u.u << shift) & MASK_F32_FRAC);
+		return u.f - 1.f;
 	}
 	else{
 		intPart = 0;

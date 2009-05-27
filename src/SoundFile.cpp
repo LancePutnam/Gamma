@@ -3,10 +3,7 @@
 
 #include <string>
 #include <stdio.h>
-#include "mem.h"
 #include "SoundFile.h"
-
-#define ULONG unsigned long
 
 namespace gam{
 using std::string;
@@ -145,13 +142,10 @@ void SoundFile::print(){
 	printf("%s\n", formatInfo.name) ;
 	
 	printf("Frame rate: %f\n",  frameRate());
-	printf("Frames:     %lu\n", frames());
-	printf("Channels:   %lu\n", channels());
-	printf("Samples:    %lu\n", samples());
+	printf("Frames:     %d\n", frames());
+	printf("Channels:   %d\n", channels());
+	printf("Samples:    %d\n", samples());
 	printf("Length:     %f\n", frames()/frameRate());
 }
 
-} // end namespace gam
-
-#undef ULONG
-
+} // gam::

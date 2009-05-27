@@ -7,8 +7,8 @@
 #include <string>
 #include <sndfile.h>
 #include "mem.h"
+#include "Types.h"
 
-#define ULONG unsigned long
 #define TEM template<class T>
 
 namespace gam{
@@ -61,16 +61,16 @@ public:
 	/// the requested number of frames of data. The array must be large enough
 	/// to hold the product of frames and the number of channels.
 	//ULONG read(float * dst, ULONG numFrames);
-	TEM ULONG read(T * dst, ULONG numFrames);
+	TEM uint32_t read(T * dst, uint32_t numFrames);
 	
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
-	TEM ULONG readAll(T * dst);
+	TEM uint32_t readAll(T * dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 	
 	/// If the number of channels is > 1, memory will be dynamically allocated
 	///	and freed for the deinterleaving.
-	TEM ULONG readAllD(T * dst);
+	TEM uint32_t readAllD(T * dst);
 	
 	/// Writes interleaved frames from array to file.
 	
@@ -78,27 +78,27 @@ public:
 	/// The file write frames functions write the data in the array pointed to
 	/// by ptr to the file. The array must be large enough to hold the product
 	/// of frames and the number of channels.
-	TEM ULONG write(const T * src, ULONG numFrames);
+	TEM uint32_t write(const T * src, uint32_t numFrames);
 
 	// Sound file properties
-	double frameRate() const;			///< Returns frames/second.
-	ULONG frames() const;				///< Returns number of frames.
-	ULONG channels() const;				///< Returns number of channels.
-	ULONG samples() const;				///< Returns number of samples ( = frames x channels).
-	int format() const;					///< Returns format field.
+	double frameRate() const;			///< Returns frames/second
+	uint32_t frames() const;			///< Returns number of frames
+	uint32_t channels() const;			///< Returns number of channels
+	uint32_t samples() const;			///< Returns number of samples ( = frames x channels)
+	int format() const;					///< Returns format field
 	int formatMajor() const;
 	int formatMinor() const;
-	const char * extension();			///< Returns file extension.
-	std::string path() const;			///< Returns path of sound file.
+	const char * extension();			///< Returns file extension
+	std::string path() const;			///< Returns path of sound file
 	
-	void channels(ULONG num);			///< Set number of channels.
-	void frameRate(double hz);			///< Set frames/second.
-	void format(int newFormat);			///< Set format field.
+	void channels(uint32_t num);		///< Set number of channels
+	void frameRate(double hz);			///< Set frames/second
+	void format(int newFormat);			///< Set format field
 	void formatMajor(int major);		///< Set major format field
 	void formatMinor(int minor);		///< Set minor format field
-	void info(const SoundFile& src);	///< Copy file information from an other file.
-	void path(const char * path);		///< Set path of sound file.
-	void path(std::string path);		///< Set path of sound file.
+	void info(const SoundFile& src);	///< Copy file information from an other file
+	void path(const char * path);		///< Set path of sound file
+	void path(std::string path);		///< Set path of sound file
 	
 	/// Gets instrument data from file.
 	/// Returns whether or not it found the instrument data.
@@ -121,11 +121,11 @@ private:
 	void formatInfoMajor();
 	void formatInfoSubtype();
 	
-//	TEM static ULONG read(SoundFile * sf, T * dst, ULONG numFrames);
-//	TEM static ULONG readAll(SoundFile * sf, T * dst);
-//	TEM static ULONG readAllD(SoundFile * sf, T * dst);
+//	TEM static uint32_t read(SoundFile * sf, T * dst, uint32_t numFrames);
+//	TEM static uint32_t readAll(SoundFile * sf, T * dst);
+//	TEM static uint32_t readAllD(SoundFile * sf, T * dst);
 //	
-//	TEM static ULONG write(SoundFile * sf, const T * src, ULONG numFrames); 
+//	TEM static uint32_t write(SoundFile * sf, const T * src, uint32_t numFrames); 
 };
 
 
@@ -134,9 +134,9 @@ private:
 // Implementation_______________________________________________________________
 
 inline double SoundFile::frameRate() const { return (double)mInfo.samplerate; }
-inline ULONG SoundFile::frames() const { return (ULONG)mInfo.frames; }
-inline ULONG SoundFile::channels() const { return (ULONG)mInfo.channels; }
-inline ULONG SoundFile::samples() const { return frames() * channels(); }
+inline uint32_t SoundFile::frames() const { return (uint32_t)mInfo.frames; }
+inline uint32_t SoundFile::channels() const { return (uint32_t)mInfo.channels; }
+inline uint32_t SoundFile::samples() const { return frames() * channels(); }
 inline int SoundFile::format() const { return mInfo.format; }
 inline int SoundFile::formatMajor() const { return mInfo.format & SF_FORMAT_TYPEMASK; }
 inline int SoundFile::formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; }
@@ -144,7 +144,7 @@ inline int SoundFile::formatMinor() const { return mInfo.format & SF_FORMAT_SUBM
 inline const char * SoundFile::errorString() const { return sf_strerror(fp); }
 inline std::string SoundFile::path() const { return mPath; }
 
-inline void SoundFile::channels(ULONG num){ mInfo.channels = (int)num; }
+inline void SoundFile::channels(uint32_t num){ mInfo.channels = (int)num; }
 inline void SoundFile::frameRate(double hz){ mInfo.samplerate = (int)hz; }
 inline void SoundFile::format(int newFormat){ mInfo.format = newFormat; }
 
@@ -162,11 +162,11 @@ inline void SoundFile::path(std::string p){ mPath = p; }
 // specialized templates to hook into libsndfile functions
 #define DEFINE_SPECIAL(type) \
 	template<> \
-	inline ULONG SoundFile::read<type>(type * dst, ULONG numFrames){\
+	inline uint32_t SoundFile::read<type>(type * dst, uint32_t numFrames){\
 		return sf_readf_##type(fp, dst, numFrames);\
 	}\
 	template<> \
-	inline ULONG SoundFile::write<type>(const type * src, ULONG numFrames){\
+	inline uint32_t SoundFile::write<type>(const type * src, uint32_t numFrames){\
 		return sf_writef_##type(fp, src, numFrames);\
 	}
 	DEFINE_SPECIAL(float)
@@ -175,19 +175,19 @@ inline void SoundFile::path(std::string p){ mPath = p; }
 	DEFINE_SPECIAL(double)
 #undef DEFINE_SPECIAL
 
-TEM inline ULONG SoundFile::readAll(T * dst){
+TEM inline uint32_t SoundFile::readAll(T * dst){
 	sf_seek(fp, 0, SEEK_SET);
 	return read(dst, frames());
 }
 
-TEM ULONG SoundFile::readAllD(T * dst){
-	ULONG numChannels = channels();
+TEM uint32_t SoundFile::readAllD(T * dst){
+	uint32_t numChannels = channels();
 
 	if(1 == numChannels) return readAll(dst);
 	
 	// Allocate memory for deinterleaving.  Don't know of any in-place methods.
 	T * temp = new T[samples()];
-	ULONG framesRead = 0;
+	uint32_t framesRead = 0;
 	
 	if(temp){
 		framesRead = readAll(temp);
@@ -200,9 +200,8 @@ TEM ULONG SoundFile::readAllD(T * dst){
 	return framesRead;
 }
 
-} // end namespace gam
+} // gam::
 
-#undef ULONG
 #undef TEM
 #endif
 

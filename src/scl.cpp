@@ -24,11 +24,11 @@ int base36To10(char v){
 
 
 float clipMag(float value, float min, float max){
-	FloatUInt<float> v(value);
-	uint32_t sign = v.i & 0x80000000;
-	v.i |= 0x80000000;
+	Twiddle<float> v(value);
+	uint32_t sign = v.u & 0x80000000;
+	v.u |= 0x80000000;
 	v.f = clip(v.f, max, min);
-	v.i |= sign;
+	v.u |= sign;
 	return v.f;
 }
 

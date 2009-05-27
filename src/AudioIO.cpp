@@ -8,7 +8,6 @@
 #include "AudioIO.h"
 #include "scl.h"
 
-#define ULONG unsigned long
 #define SAFE_FREE(ptr) if(ptr){ free(ptr); ptr = 0; }
 
 namespace gam{
@@ -111,7 +110,7 @@ void AudioDevice::printAll(){
 void (* AudioIO::callback)(AudioIOData &) = 0;
 
 AudioIO::AudioIO(
-	ULONG framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * user,
+	uint32_t framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * user,
 	int outChansA, int inChansA )
 :	AudioIOData(user),
 	mIsOpen(false), mIsRunning(false), mInResizeDeferred(false), mOutResizeDeferred(false),
@@ -157,7 +156,7 @@ void AudioIO::init(){
 }
 
 
-void AudioIO::auxChans(ULONG num){
+void AudioIO::auxChans(uint32_t num){
 	if(mem::resize(mBufA, mNumA * mFramesPerBuffer, num * mFramesPerBuffer)){
 		mNumA = num;
 	}
@@ -299,7 +298,7 @@ void AudioIO::reopen(){
 void AudioIO::resizeBuffer(bool forOutput){
 
 	float ** buffer = forOutput ? &mBufO : &mBufI;
-	ULONG * chans   = forOutput ? &mNumO : &mNumI;
+	uint32_t * chans   = forOutput ? &mNumO : &mNumI;
 	bool * deferred = forOutput ? &mOutResizeDeferred : &mInResizeDeferred;
 
 	if(*deferred){
@@ -333,7 +332,7 @@ void AudioIO::setFPS(double v){	//printf("AudioIO::fps(%f)\n", v);
 }
 
 
-void AudioIO::setFramesPerBuffer(ULONG num){
+void AudioIO::setFramesPerBuffer(uint32_t num){
 	if(numFrames() != num){
 		mFramesPerBuffer = num;
 		auxChans(AudioIOData::auxChans());
@@ -374,9 +373,9 @@ bool AudioIO::supportsFPS(double fps){
 	return paFormatIsSupported == mErrNum;
 }
 
-//void AudioIO::virtualChans(ULONG num, bool forOutput){
+//void AudioIO::virtualChans(uint32_t num, bool forOutput){
 //
-//	ULONG * currNum = forOutput ? &mVOChans : &mVIChans;
+//	uint32_t * currNum = forOutput ? &mVOChans : &mVIChans;
 //
 //	if(num != *currNum){
 //		*currNum = num;
@@ -399,27 +398,20 @@ void AudioIO::print(){
 		printf("Out Device:  "); mOutDevice.print();
 	}
 
-		printf("In Chans:    %lu (%luD + %luV)\n", inChans(), inDeviceChans(), inChans() - inDeviceChans());
-		printf("Out Chans:   %lu (%luD + %luV)\n", outChans(), outDeviceChans(), outChans() - outDeviceChans());
+		printf("In Chans:    %d (%dD + %dV)\n", inChans(), inDeviceChans(), inChans() - inDeviceChans());
+		printf("Out Chans:   %d (%dD + %dV)\n", outChans(), outDeviceChans(), outChans() - outDeviceChans());
 
 	const PaStreamInfo * sInfo = Pa_GetStreamInfo(mStream);
 	if(sInfo){
 		printf("In Latency:  %.0f ms\nOut Latency: %0.f ms\nSample Rate: %0.f Hz\n",
 			sInfo->inputLatency * 1000., sInfo->outputLatency * 1000., sInfo->sampleRate);
 	}
-	printf("Frames/Buf:  %lu\n", mFramesPerBuffer);
+	printf("Frames/Buf:  %d\n", mFramesPerBuffer);
 }
-
-
-
-
-
 
 
 void AudioIO::printError(){
 	printf("%s \n", errorText(mErrNum));
 }
 
-} // end namespace gam
-
-#undef ULONG
+} // gam::

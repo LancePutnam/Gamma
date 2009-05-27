@@ -6,15 +6,13 @@
 
 #include "Types.h"
 
-#define ULONG	uint32_t
-
 #define TEM					template <class T>						/* single type */
 #define TEM2				template <class T1, class T2>			/* double type */
 #define TEM3				template <class T1, class T2, class T3>	/* triple type */
 #define LOOP_P(n, exp)		{for(; n>0; --n){ exp }}				/* pointer loop down */
-#define LOOP_1(n, exp)		{for(ULONG i=0; i<(n); ++i) { exp }}	/* array index loop up */
-#define LOOP_2(n, exp)		{for(ULONG i=0; i<(n); i+=2){ exp exp }}/* unrolled by 2 */
-#define LOOP_S(n, s, exp)	{for(ULONG i=0; i<(n); i+=s){ exp }}	/* strided loop */
+#define LOOP_1(n, exp)		{for(uint32_t i=0; i<(n); ++i) { exp }}	/* array index loop up */
+#define LOOP_2(n, exp)		{for(uint32_t i=0; i<(n); i+=2){ exp exp }}/* unrolled by 2 */
+#define LOOP_S(n, s, exp)	{for(uint32_t i=0; i<(n); i+=s){ exp }}	/* strided loop */
 #define LOOP				LOOP_1
 
 // Indexer loop

@@ -12,6 +12,7 @@
 #include "mem.h"
 #include "scl.h"
 #include "Conversion.h"
+#include "Types.h"
 #include "MacroD.h"
 
 namespace gam{
@@ -20,7 +21,7 @@ namespace gam{
 namespace rnd{
 	namespace{
 		static bool initSeed = false;
-		static ULONG mSeedPush[4];
+		static uint32_t mSeedPush[4];
 		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
 	}
 	
@@ -124,13 +125,13 @@ private:
 /// T distr(T bound2, T bound1 = 0);
 ///
 /// // Fills array with random numbers in [0, 1)
-/// void distr(T * dst, ULONG len);
+/// void distr(T * dst, uint32_t len);
 ///
 /// // Fills array with random numbers linearly mapped to [bound1, bound2)
-/// void distr(T * dst, ULONG len, T bound2, T bound1 = 0);
+/// void distr(T * dst, uint32_t len, T bound2, T bound1 = 0);
 ///
 /// // Copies random elements from 'src' to 'dst'.
-/// void distr(T * dst, ULONG len, T * src, ULONG srcLen);
+/// void distr(T * dst, uint32_t len, T * src, uint32_t srcLen);
 ///\endcode
 ///
 /// where "distr" is one of the following random number distributions:\n\n
@@ -180,9 +181,9 @@ namespace rnd{
 	#ifndef DOXYGEN_SHOULD_SKIP_THIS
 	#define FUNCS(name)\
 	TEM T name(T bound2, T bound1 = 0);\
-	TEM void name(T * dst, ULONG len);\
-	TEM void name(T * dst, ULONG len, T bound2, T bound1 = 0);\
-	TEM void name(T * dst, ULONG len, T * src, ULONG srcLen);\
+	TEM void name(T * dst, uint32_t len);\
+	TEM void name(T * dst, uint32_t len, T bound2, T bound1 = 0);\
+	TEM void name(T * dst, uint32_t len, T * src, uint32_t srcLen);\
 	TEM float name##_float(T & rng);
 	//template <class Tv, class Tr> Tv name(Tr & rng);
 
@@ -196,11 +197,11 @@ namespace rnd{
 	
 	/// After pushing, the current RNG is seeded with 'seed' unless 'seed' = 0.
 	///
-	void push(ULONG seed=0);
+	void push(uint32_t seed=0);
 	void pop();					///< Pop RNG state from stack.
 
 	/// Randomly permutes (shuffles) elements in array.
-	TEM void permute(T * arr, ULONG len);
+	TEM void permute(T * arr, uint32_t len);
 
 	/// Returns normal in [0, 1) quantized by q divisions.
 	float quan(uint32_t q);
@@ -212,10 +213,10 @@ namespace rnd{
 	void seed(uint32_t value=0);
 
 	/// Randomly set a certain amount of elements to a value.
-	TEM void set(T * arr, ULONG len, ULONG num, T val=1);
+	TEM void set(T * arr, uint32_t len, uint32_t num, T val=1);
 
 	/// Zeroes elements according to a probability.
-	TEM void thin(T * arr, ULONG len, float prob=0.5f);
+	TEM void thin(T * arr, uint32_t len, float prob=0.5f);
 	
 	/// Returns uniform random within interval [min, max) excluding 'exc' argument.
 	TEM T uniExc(const T& exc, const T& max, const T& min=T(0));
@@ -224,7 +225,7 @@ namespace rnd{
 	
 	/// If the weights are not normalized, then the proper weightsSum must
 	/// be passed in.
-	TEM ULONG weighted(T * weights, ULONG num, T weightsSum=(T)1);
+	TEM uint32_t weighted(T * weights, uint32_t num, T weightsSum=(T)1);
 	
 	static RNGTaus gen(rnd::getSeed());	///< Shared RNG
 }
@@ -237,7 +238,7 @@ namespace rnd{
 
 inline RNGTaus::RNGTaus(uint32_t sd){ (*this) = sd; }
 
-inline ULONG RNGTaus::operator()(){
+inline uint32_t RNGTaus::operator()(){
 	iterate();
 	return s1 ^ s2 ^ s3 ^ s4;
 }
@@ -290,7 +291,7 @@ TEM inline float uniS_float(T& rng){
 }
 
 TEM inline float binS_float(T & rng){
-	ULONG r = rng() & 0x80000000 | 0x3f800000;
+	uint32_t r = rng() & 0x80000000 | 0x3f800000;
 	return punUF32(r);
 }
 
@@ -337,11 +338,11 @@ inline bool prob(char c){
 	return prob((c-48) * 0.125f);
 }
 
-TEM inline void set(T * arr, ULONG len, ULONG num, T val){
+TEM inline void set(T * arr, uint32_t len, uint32_t num, T val){
 	LOOP_P(num, arr[rnd::uni(len)] = val;)
 }
 
-TEM inline void permute(T * arr, ULONG len){
+TEM inline void permute(T * arr, uint32_t len){
 	LOOP(len-1, mem::swap(arr[i], arr[rnd::uni(len, i)]); )
 }
 
@@ -349,7 +350,7 @@ inline float quan(uint32_t q){ return uni(q) / (float)q; }
 
 TEM inline T quanOct(uint32_t q, T o){ return quan(q) * o + o; }
 
-TEM inline void thin(T * arr, ULONG len, float p){
+TEM inline void thin(T * arr, uint32_t len, float p){
 	LOOP_P(len,	if(prob(p)) *arr = (T)0; arr++; )
 }
 
@@ -361,15 +362,15 @@ TEM inline T uniExc(const T& exc, const T& max, const T& min=T(0)){
 	TEM inline T fnc(T b2, T b1){\
 		return (T)( (rnd_t)b1 + fnc##_##rnd_t(gen) * (rnd_t)(b2-b1) );\
 	}\
-	TEM inline void fnc(T * dst, ULONG len){\
+	TEM inline void fnc(T * dst, uint32_t len){\
 		LOOP_P(len, *dst++ = (T) fnc##_##rnd_t (gen); )\
 	}\
-	TEM inline void fnc(T * dst, ULONG len, T bound2, T bound1){\
+	TEM inline void fnc(T * dst, uint32_t len, T bound2, T bound1){\
 		rnd_t b1 = (rnd_t)bound1;\
 		rnd_t df = (rnd_t)bound2 - b1;\
 		LOOP_P(len, *dst++ = (T)( b1 + fnc##_##rnd_t(gen) * df ); )\
 	}\
-	TEM inline void fnc(T * dst, ULONG len, T * src, ULONG srcLen){\
+	TEM inline void fnc(T * dst, uint32_t len, T * src, uint32_t srcLen){\
 		LOOP_P(len, *dst++ = src[rnd::fnc(srcLen)]; )\
 	}
 	DEF(float, add2) DEF(float, add2I) DEF(float, add3) DEF(float, lin)
@@ -377,7 +378,7 @@ TEM inline T uniExc(const T& exc, const T& max, const T& min=T(0)){
 	DEF(float, uniS)
 #undef DEF
 
-inline void push(ULONG seedA){
+inline void push(uint32_t seedA){
 	mSeedPush[0] = gen.s1;
 	mSeedPush[1] = gen.s2;
 	mSeedPush[2] = gen.s3;
@@ -395,14 +396,14 @@ inline void seed(uint32_t value){
 	gen = value ? value : getSeed();
 }
 
-TEM ULONG weighted(T * weights, ULONG num, T weightsSum){
+TEM uint32_t weighted(T * weights, uint32_t num, T weightsSum){
 	if(0 == num--) return 0;
 	T probSum = weights[0];
 	T rnd = (T)(uni_float(gen) * (float)weightsSum);
 	
 	if(rnd < probSum) return 0;
 	
-	for(ULONG i=1; i<num; ++i){
+	for(uint32_t i=1; i<num; ++i){
 		probSum += weights[i];
 		if(rnd < probSum) return i;
 	}
@@ -415,12 +416,12 @@ TEM ULONG weighted(T * weights, ULONG num, T weightsSum){
 // some distributions from old code
 
 inline float RandomLC::exp(){
-	ULONG rand = nextU() & 0x3fffffff;  // 00111111111111111111111111111111
+	uint32_t rand = nextU() & 0x3fffffff;  // 00111111111111111111111111111111
 	return AS_FLOAT(rand) * 0.5f;
 }
 
 inline float RandomLC::expS(){
-	ULONG rand = nextU() & 0xbfffffff;	// 10111111111111111111111111111111
+	uint32_t rand = nextU() & 0xbfffffff;	// 10111111111111111111111111111111
 	return AS_FLOAT(rand) * 0.5f;
 }
 
@@ -434,6 +435,4 @@ inline float RandomLC::gaussian(){
 } // gam::
 
 #include "MacroU.h"
-
 #endif
-

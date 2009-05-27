@@ -24,20 +24,21 @@ namespace{
 }
 
 
-template<class T> struct FloatUInt;
+/// Union for twiddling bits of floats
+template<class T> struct Twiddle;
 
-template<> struct FloatUInt<float>{
-	FloatUInt(const float& v): f(v){}
-	FloatUInt(const uint32_t& v): i(v){}
-	FloatUInt(const int& v): i(v){}
-	union{ uint32_t i; float f; };
+template<> struct Twiddle<float>{
+	Twiddle(const float& v): f(v){}
+	Twiddle(const uint32_t& v): u(v){}
+	Twiddle(const int32_t& v): i(v){}
+	union{ int32_t i; uint32_t u; float f; };
 };
 
-template<> struct FloatUInt<double>{
-	FloatUInt(const double& v): f(v){}
-	FloatUInt(const uint64_t& v): i(v){}
-	FloatUInt(const int& v): i(v){}
-	union{ uint64_t i; double f; };
+template<> struct Twiddle<double>{
+	Twiddle(const double& v): f(v){}
+	Twiddle(const uint64_t& v): u(v){}
+	Twiddle(const int64_t& v): i(v){}
+	union{ int64_t i; uint64_t u; double f; };
 };
 
 
@@ -104,13 +105,13 @@ inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
 
 /// This function uses a union to avoid problems with direct pointer casting
 /// when fstrict-aliasing is on.
-inline float punUF32(uint32_t v){ FloatUInt<float> u(v); return u.f; }
+inline float punUF32(uint32_t v){ Twiddle<float> u(v); return u.f; }
 
 /// Type-pun 32-bit float to 32-bit unsigned int
 
 /// This function uses a union to avoid problems with direct pointer casting
 /// when fstrict-aliasing is on.
-inline uint32_t punFU32(float v){ FloatUInt<float> u(v); return u.i; }
+inline uint32_t punFU32(float v){ Twiddle<float> u(v); return u.u; }
 
 /// Get fractional and integer parts from a float.
 
@@ -220,13 +221,13 @@ inline uint32_t normalToUInt2(float v){
 }
 
 inline float splitInt512(uint32_t v, uint32_t& intPart){
-	FloatUInt<float> u(v & 0x007fffff | 0x3f800000);
+	Twiddle<float> u(v & 0x007fffff | 0x3f800000);
 	intPart = v >> 22;
 	return u.f - 1.f;
 }
 
 inline float splitInt1024(uint32_t v, uint32_t& intPart){
-	FloatUInt<float> u((v<<1) & 0x007fffff | 0x3f800000);
+	Twiddle<float> u((v<<1) & 0x007fffff | 0x3f800000);
 	intPart = v >> 22;
 	return u.f - 1.f;
 }

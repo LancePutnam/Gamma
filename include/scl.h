@@ -15,7 +15,7 @@
 #include "Conversion.h"
 #include "mem.h"
 
-#include "MacroD.h"
+#define TEM template<class T>
 
 // undefine macros in windows.h
 #ifdef max
@@ -55,22 +55,22 @@ template<int N, class T> struct InvSqrtNewton
 	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0){}
 };
 
-template<class T> const FloatUInt<T> invSqrtMagic();
-template<> inline const FloatUInt<float > invSqrtMagic(){ return FloatUInt<float >(0x5f3759df); }
-template<> inline const FloatUInt<double> invSqrtMagic(){ return FloatUInt<double>(UINT64_C(0x5fe6ec85e7de30da)); }
+template<class T> const Twiddle<T> invSqrtMagic();
+template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(0x5f3759df); }
+template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(UINT64_C(0x5fe6ec85e7de30da)); }
 
 
 /// Approximate square root using a quick log base-2 method.
 inline float sqrtLog2(float v){
-	FloatUInt<float> u(v);
-	u.i=(1<<29) + (u.i>>1) - (1<<22);
+	Twiddle<float> u(v);
+	u.u=(1<<29) + (u.u>>1) - (1<<22);
 	return u.f;
 }
 
 /// Approximate square root using a quick log base-2 method.
 inline double sqrtLog2(double v){
-	FloatUInt<double> u(v);
-	u.i=((uint64_t(1))<<61) + (u.i>>1) - ((uint64_t(1))<<51);
+	Twiddle<double> u(v);
+	u.u=((uint64_t(1))<<61) + (u.u>>1) - ((uint64_t(1))<<51);
 	return u.f;
 }
 
@@ -95,8 +95,8 @@ template<int N, class T> void invSqrtNewton(T& v, T v0){ InvSqrtNewton<N,T>(v,v0
 /// Approximate inverse square root using a quick log base-2 method.
 template <class T>
 inline T invSqrtLog2(T v){
-	FloatUInt<T> u(v);
-	u.i = invSqrtMagic<T>().i - (u.i>>1);
+	Twiddle<T> u(v);
+	u.u = invSqrtMagic<T>().u - (u.u>>1);
 	return u.f;
 }
 
@@ -138,15 +138,15 @@ TEM T ceil(T val, T step, T recStep);
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-ULONG ceilPow2(ULONG value);
+uint32_t ceilPow2(uint32_t value);
 
-ULONG ceilEven(ULONG value);		///< Returns even number ceiling.
+uint32_t ceilEven(uint32_t value);		///< Returns even number ceiling.
 
 /// Returns value clipped to [lo, hi].
-TEM T clip(T value, T hi=(T)1, T lo=(T)0);
+TEM T clip(T value, T hi=T(1), T lo=T(0));
 
 /// Returns value clipped to [-hi, hi].
-TEM T clipS(T value, T hi=(T)1);
+TEM T clipS(T value, T hi=T(1));
 
 /// Returns value clipped to [lo, hi] and signifies clipping behavior.
 
@@ -194,7 +194,7 @@ TEM void fadeLin(T & weight1, T & weight2, T fade);
 TEM void fadeTri(T & weight1, T & weight2, T fade);
 
 //float factorial12(float value);				///< Returns factorial of value in [0, 12].
-ULONG factorial12(ULONG value);				///< Returns factorial of value in [0, 12].
+uint32_t factorial12(uint32_t value);				///< Returns factorial of value in [0, 12].
 
 /// Return Fejer weighting factor for kth harmonic in a Fourier series of length n.
 
@@ -211,7 +211,7 @@ TEM T floor(T val, T step, T recStep);
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-ULONG floorPow2(ULONG value);
+uint32_t floorPow2(uint32_t value);
 
 /// Returns value folded into [lo, hi].
 
@@ -288,7 +288,7 @@ TEM T linLog2(T v, T recMin);
 /// highest power of two will taken.
 /// This uses an algorithm devised by Eric Cole, Jan. 2006.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-ULONG log2(ULONG value);
+uint32_t log2(uint32_t value);
 
 /// Fast base 2 logarithm.  For value <= 0, behavior is undefined.
 float log2Fast(float value);
@@ -357,8 +357,8 @@ TEM T pow8(T value);			///< Returns value to the 8th power.
 TEM T pow16(T value);			///< Returns value to the 16th power.
 TEM T pow2S(T value);			///< Returns value to the 2nd power preserving sign.
 
-unsigned char prime(ULONG n);	///< Returns (n+1)th prime number up to n=53.
-TEM T prime(ULONG n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
+unsigned char prime(uint32_t n);	///< Returns (n+1)th prime number up to n=53.
+TEM T prime(uint32_t n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
 
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
@@ -527,7 +527,7 @@ TEM T peak1(T v, T bw){ return bw/(scl::abs(v)+bw); }
 
 /// From "Bit Twiddling Hacks", 
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-ULONG bitsSet(ULONG v);
+uint32_t bitsSet(uint32_t v);
 
 /// Returns whether or not an integer value is even.
 TEM bool even(T v);
@@ -564,7 +564,7 @@ TEM T slope(T x1, T y1, T x2, T y2);
 /// This implements an algorithm from the paper 
 /// "Using de Bruijn Sequences to Index 1 in a Computer Word"
 /// by Charles E. Leiserson, Harald Prokof, and Keith H. Randall.
-ULONG trailingZeroes(ULONG v);
+uint32_t trailingZeroes(uint32_t v);
 
 /// Returns whether value is within [lo, hi].
 TEM bool within(T v, T lo, T hi);
@@ -600,28 +600,28 @@ TEM void sphericalToCart(T & rho, T & phi, T & theta);
 //---- Waveform generators
 
 //---- Bipolar waveforms [-1, 1)
-float rampDown	(ULONG phase);	///< Returns value of bipolar downward ramp function.
-float rampUp	(ULONG phase);	///< Returns value of bipolar upward ramp function.
-float square	(ULONG phase);	///< Returns value of bipolar square function.
-float triangle	(ULONG phase);	///< Returns value of bipolar triangle function.
+float rampDown	(uint32_t phase);	///< Returns value of bipolar downward ramp function.
+float rampUp	(uint32_t phase);	///< Returns value of bipolar upward ramp function.
+float square	(uint32_t phase);	///< Returns value of bipolar square function.
+float triangle	(uint32_t phase);	///< Returns value of bipolar triangle function.
 
 /// Returns value of bipolar pulse function (rampDown() + rampUp()).
-float pulse		(ULONG phase, ULONG width);
+float pulse		(uint32_t phase, uint32_t width);
 
 /// Returns value of bipolar stair function (square() + square()).
-float stair		(ULONG phase, ULONG width);
+float stair		(uint32_t phase, uint32_t width);
 
 /// Returns value of bipolar dual upward ramp function (rampUp() + rampUp()).
-float rampUp2	(ULONG phase, ULONG width);	// rampUp + rampUp
+float rampUp2	(uint32_t phase, uint32_t width);	// rampUp + rampUp
 
 //---- Unipolar waveforms [0, 1)
-float pulseU	(ULONG phase, ULONG width);	///< Returns value of unipolar pulse function.
-float rampUpU	(ULONG phase);	///< Returns value of unipolar downward ramp function.
-float rampUp2U	(ULONG phase);	///< Returns value of unipolar upward ramp2 function.
-float rampDownU	(ULONG phase);	///< Returns value of unipolar upward ramp function.
-float squareU	(ULONG phase);	///< Returns value of unipolar square function.
-float stairU(ULONG phase, ULONG width); ///< Returns value of unipolar stair function.
-float triangleU	(ULONG phase);	///< Returns value of unipolar triangle function.
+float pulseU	(uint32_t phase, uint32_t width);	///< Returns value of unipolar pulse function.
+float rampUpU	(uint32_t phase);	///< Returns value of unipolar downward ramp function.
+float rampUp2U	(uint32_t phase);	///< Returns value of unipolar upward ramp2 function.
+float rampDownU	(uint32_t phase);	///< Returns value of unipolar upward ramp function.
+float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
+float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
+float triangleU	(uint32_t phase);	///< Returns value of unipolar triangle function.
 
 /// Dirichlet kernel, an impulse with n harmonics.
 
@@ -649,12 +649,12 @@ namespace{
 //		362880.f, 3628800.f, 39916800.f, 479001600.f
 //	};
 
-	const ULONG mFactorial12u[13] = {
+	const uint32_t mFactorial12u[13] = {
 		1, 1, 2, 6, 24, 120, 720, 5040, 40320, 
 		362880, 3628800, 39916800, 479001600
 	};
 
-	const ULONG deBruijnBitPosition[32] = {
+	const uint32_t deBruijnBitPosition[32] = {
 		 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8, 
 		31, 27, 13, 23, 21, 19, 16,  7, 26, 12, 18,  6, 11,  5, 10,  9
 	};
@@ -717,9 +717,9 @@ TEM inline T ceil(T v){ return round(v + roundEps<T>()); }
 TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
 TEM inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
 
-inline ULONG ceilEven(ULONG v){ return v += v & 1UL; }
+inline uint32_t ceilEven(uint32_t v){ return v += v & 1UL; }
 
-inline ULONG ceilPow2(ULONG v){
+inline uint32_t ceilPow2(uint32_t v){
 	v--;
 	v |= v >> 1;
 	v |= v >> 2;
@@ -774,13 +774,13 @@ TEM inline void fadeTri(T & w1, T & w2, T f){
 	}
 }
 
-//inline float factorial12(float v){ return mFactorial12f[(ULONG)v]; }
-inline ULONG factorial12(ULONG v){ return mFactorial12u[v]; }
+//inline float factorial12(float v){ return mFactorial12f[(uint32_t)v]; }
+inline uint32_t factorial12(uint32_t v){ return mFactorial12u[v]; }
 TEM inline T floor(T v){ return round(v - roundEps<T>()); }
 TEM inline T floor(T v, T s){ return floor(v/s)*s; }
 TEM inline T floor(T v, T s, T r){ return floor(v*r)*s; }
 
-inline ULONG floorPow2(ULONG v){
+inline uint32_t floorPow2(uint32_t v){
 	v |= v >> 1;
 	v |= v >> 2;
 	v |= v >> 4;
@@ -835,10 +835,10 @@ TEM inline T linLog2(T v, T recMin){
 	return scl::max(v * recMin, (T)-1) + (T)1;
 }
 
-inline ULONG log2(ULONG v){ return deBruijn(ceilPow2(v)); }
+inline uint32_t log2(uint32_t v){ return deBruijn(ceilPow2(v)); }
 
 inline float log2Fast(float v){
-	union{ float f; int32_t i; } u; u.f=v;
+	Twiddle<float> u(v);
 	return (float)((u.i - 0x3f800000)) * 0.0000001192092896f;// / 8388608.f;
 }
 
@@ -915,8 +915,8 @@ TEM inline T pow2S(T v){ return v*scl::abs(v); }
 
 TEM inline T pow3Abs(T v){ return scl::abs(pow3(v)); }
 
-inline unsigned char prime(ULONG n){ return mPrimes54[n]; }
-TEM inline T prime(ULONG n, T mul){ return (T)prime(n) * mul; }
+inline unsigned char prime(uint32_t n){ return mPrimes54[n]; }
+TEM inline T prime(uint32_t n, T mul){ return (T)prime(n) * mul; }
 
 TEM inline T ratioET(T pc, T divisions, T interval){
 	return (T)::pow((double)interval, (double)pc / (double)divisions);
@@ -1114,10 +1114,10 @@ TEM inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
 */
 
 //inline float wrap1(float value){
-//	ULONG valueU = *(ULONG *)&value;
+//	uint32_t valueU = *(uint32_t *)&value;
 //	
 //	if((valueU & 0x7fffffff) > 0x3f7fffff){
-//		ULONG shift = floatExponent(value) - 127;
+//		uint32_t shift = floatExponent(value) - 127;
 //		valueU = (valueU << shift) & 0x007fffff | 0x3f800000;
 //		return *(float *)&valueU - 1.f;
 //	}
@@ -1141,12 +1141,12 @@ TEM inline T wrap(T v, T hi, T lo){
 	if(!(v < hi)){
 		T diff = hi - lo;
 		v -= diff;
-		if(!(v < hi)) v -= diff * (T)(ULONG)((v - lo)/diff);
+		if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
 	}
 	else if(v < lo){
 		T diff = hi - lo;
 		v += diff;
-		if(v < lo) v += diff * (T)(ULONG)(((lo - v)/diff) + 1);
+		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
 	}
 	return v;
 }
@@ -1215,7 +1215,7 @@ inline T zero(T v, T bw, F f){ return bw/(f(v) + bw); }
 
 
 
-inline ULONG bitsSet(ULONG v){
+inline uint32_t bitsSet(uint32_t v){
 	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
 	return ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
@@ -1230,7 +1230,7 @@ TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
 TEM inline T min(T v1, T v2, T v3){ return (v1<v2 && v1<v3) ? v1 : scl::min(v2,v3); }
 
 TEM inline T nextMultiple(T v, T m){
-	ULONG div = (ULONG)(v / m);	
+	uint32_t div = (uint32_t)(v / m);	
 	return (T)(div + 1) * m;
 }
 
@@ -1238,7 +1238,7 @@ TEM inline bool odd(T v){ return v & T(1); }
 
 TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
-inline ULONG trailingZeroes(ULONG v){ return deBruijn(v & -v); }
+inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
 
 TEM inline bool within  (T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 TEM inline bool withinIE(T v, T lo, T hi){ return (!(v < lo)) && (v < hi); }
@@ -1285,7 +1285,7 @@ TEM inline void sphericalToCart(T& r, T& p, T& t){
 // [1, 0.5, 0, -0.5]
 // Freq precision:	32 bits
 // Amp precision:	24 bits
-inline float rampDown(ULONG p){
+inline float rampDown(uint32_t p){
 	p = (p >> 9) | 0x40000000;
 	return 3.f - punUF32(p);
 }
@@ -1293,7 +1293,7 @@ inline float rampDown(ULONG p){
 // [-1, -0.5, 0, 0.5]
 // Freq precision:	32 bits
 // Amp precision:	24 bits
-inline float rampUp(ULONG p){
+inline float rampUp(uint32_t p){
 	p = (p >> 9) | 0x40000000;
 	return punUF32(p) - 3.f;
 }
@@ -1301,7 +1301,7 @@ inline float rampUp(ULONG p){
 // [1, 1, -1, -1] 
 // Freq precision:	31 bits
 // Amp precision:	NA
-inline float square(ULONG p){
+inline float square(uint32_t p){
 //	phase = 0x3f800000 | (phase & 0x80000000);
 //	return *(float *)&phase;
 	return p & 0x80000000 ? 1.f : -1.f;
@@ -1310,16 +1310,16 @@ inline float square(ULONG p){
 // [-1, 0, 1, 0]
 // Freq precision:	31 bits
 // Amp precision:	25 bits
-inline float triangle(ULONG p){
-	ULONG dir = p >> 31;
+inline float triangle(uint32_t p){
+	uint32_t dir = p >> 31;
 	p = ((p^(-dir)) + dir);
 	p = (p >> 8) | 0x40000000;
 	return punUF32(p) - 3.f;
 }
 
 // Just another triangle wave algorithm
-//inline float triangle(ULONG phase){	
-//	ULONG dir = phase & 0x80000000;
+//inline float triangle(uint32_t phase){	
+//	uint32_t dir = phase & 0x80000000;
 //	dir |= 0x40000000;
 //	phase = (phase << 1 >> 9) | dir;
 //	dir |= 0x400000;	// make it +/-3
@@ -1327,63 +1327,63 @@ inline float triangle(ULONG p){
 //}
 
 // and another...
-//inline float triangle(ULONG phase){
+//inline float triangle(uint32_t phase){
 //	return rampUp(phase<<1) * square(phase);
 //}
 
 // Freq precision:	32 bits
 // Amp precision:	24 bits
 // Width precision:	32 bits
-inline float pulse(ULONG p, ULONG w){
+inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
-	ULONG saw1 = (p >> 9) | 0x3F800000;
-	ULONG saw2 = ((p+w) >> 9) | 0x3F800000;
+	uint32_t saw1 = (p >> 9) | 0x3F800000;
+	uint32_t saw2 = ((p+w) >> 9) | 0x3F800000;
 	return punUF32(saw1) - punUF32(saw2);
 }
 
-inline float stair(ULONG p, ULONG w){
-	ULONG sqr1 = 0x3f000000 | (p & 0x80000000);
-	ULONG sqr2 = 0x3f000000 | ((p+w) & 0x80000000);
+inline float stair(uint32_t p, uint32_t w){
+	uint32_t sqr1 = 0x3f000000 | (p & 0x80000000);
+	uint32_t sqr2 = 0x3f000000 | ((p+w) & 0x80000000);
 	return punUF32(sqr1) + punUF32(sqr2);
 }
 
-inline float stairU(ULONG p, ULONG w){
+inline float stairU(uint32_t p, uint32_t w){
 	return ((p & 0x80000000) ? 0.5f : 0.f) + (((p+w) & 0x80000000) ? 0.5f : 0.f);
 }
 	
-inline float pulseU(ULONG p, ULONG w){
+inline float pulseU(uint32_t p, uint32_t w){
 	return p > w ? 0.f : 1.f;
 }
 
-inline float rampUp2(ULONG p, ULONG w){
-	ULONG saw1 = (p >> 9) | 0x3f800000;
-	ULONG saw2 = ((p+w) >> 9) | 0x3f800000;
+inline float rampUp2(uint32_t p, uint32_t w){
+	uint32_t saw1 = (p >> 9) | 0x3f800000;
+	uint32_t saw2 = ((p+w) >> 9) | 0x3f800000;
 	return punUF32(saw1) + punUF32(saw2) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
 // Freq precision:	32 bits
 // Amp precision:	24 bits
-inline float rampUpU(ULONG p){
+inline float rampUpU(uint32_t p){
 	p = (p >> 9) | 0x3f800000;
 	return punUF32(p) - 1.f;
 }
 	
-inline float rampUp2U(ULONG p, ULONG w){
-	ULONG saw1 = (p >> 9) | 0x3F000000;
-	ULONG saw2 = ((p+w) >> 9) | 0x3F000000;
+inline float rampUp2U(uint32_t p, uint32_t w){
+	uint32_t saw1 = (p >> 9) | 0x3F000000;
+	uint32_t saw2 = ((p+w) >> 9) | 0x3F000000;
 	return punUF32(saw1) + punUF32(saw2) - 1.f;
 }
 
 // [1, 0.75, 0.5, 0.25]
 // Freq precision:	32 bits
 // Amp precision:	24 bits
-inline float rampDownU(ULONG p){
+inline float rampDownU(uint32_t p){
 	p = (p >> 9) | 0xbf800000;
 	return punUF32(p) + 2.f;
 }
 
-inline float squareU(ULONG p){
+inline float squareU(uint32_t p){
 //	phase = (phase & 0x80000000) >> 1;
 //	return *(float *)&phase * 0.5f;
 	return p & 0x80000000 ? 1.f : 0.f;
@@ -1392,8 +1392,8 @@ inline float squareU(ULONG p){
 // [1, 0.5, 0, 0.5]
 // Freq precision:	32 bits
 // Amp precision:	24 bits
-inline float triangleU(ULONG p){
-	union{ float f; ULONG i; } u;
+inline float triangleU(uint32_t p){
+	union{ float f; uint32_t i; } u;
 	u.i = (p >> 9) | 0x40000000;
 	u.f -= 3.f;
 	u.i &= 0x7fffffff;
@@ -1434,7 +1434,5 @@ TEM inline T welch(T n){ return (T)1 - n*n; }
 } // scl::
 } // gam::
 
-#include "MacroU.h"
-
+#undef TEM
 #endif
-

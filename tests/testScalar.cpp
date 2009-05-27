@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
 	printf("\nCeiling (power of 2):\n");
 	for(int i=1; i<33; i++){
 		unsigned long val = (1<<i) - i;
-		printf("of %lu = %lu\n", val, scl::ceilPow2(val));
+		printf("of %lu = %d\n", val, scl::ceilPow2(val));
 	}
 
 	printf("\nFloor\n");
@@ -61,8 +61,8 @@ int main(int argc, char* argv[]){
 
 	printf("\nFloor (power of 2):\n");
 	for(int i=1; i<33; i++){
-		unsigned long val = (1<<i) - i;
-		printf("of %lu = %lu\n", val, scl::floorPow2(val));
+		uint32_t val = (1<<i) - i;
+		printf("of %d = %d\n", val, scl::floorPow2(val));
 	}
 
 	printf("\nFold:\n");
@@ -78,8 +78,8 @@ int main(int argc, char* argv[]){
 
 	printf("\nLog (base 2):\n");
 	for(int i=1; i<33; i++){
-		unsigned long val = (1<<i) - i;
-		printf("of %lu = %lu\n", val, scl::log2(val));
+		uint32_t val = (1<<i) - i;
+		printf("of %d = %d\n", val, scl::log2(val));
 	}
 
 	printf("\nMax:\n");

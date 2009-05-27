@@ -73,9 +73,9 @@ void printBinary(uint64_t v, const char * zero, const char * one, int msb){
 }
 
 void printBinary(float value, const char * zero, const char * one, int msb){
-	FloatUInt<float> v(value);
+	Twiddle<float> v(value);
 	LOOP_BITS(
-		0 == ((v.i>>i) & 1) ? printf("%s", zero) : printf("%s", one);
+		0 == ((v.u>>i) & 1) ? printf("%s", zero) : printf("%s", one);
 		if((i==31) || (i==23)) printf(" ");
 	)
 }

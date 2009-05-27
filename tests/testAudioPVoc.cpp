@@ -15,15 +15,12 @@ LFO<> lfoA1(1./1000., 0, 0.2), lfoA2(1./800., 0, 0.2), lfoF1(1./1.3), lfoF2(1./1
 Biquad<> bq0(1./400., 10, Filter::BP);
 Biquad<> bq1(1./400., 10, Filter::BP);
 
-ULONG hopSize = 512;
+uint32_t hopSize = 512;
 STFT stft(hopSize * 4, hopSize, 0, WinType::Hann, Bin::Polar);
 
 void audioCB(AudioIOData & io){
-	float * out0 = io.out(0);
-	float * out1 = io.out(1);
-	ULONG numFrames = io.numFrames();
 
-	for(ULONG f=0; f<numFrames; ++f){
+	for(uint32_t f=0; f<io.numFrames(); ++f){
 		float smp = src() * 0.5f;
 		
 		if( stft(smp) ){
@@ -39,7 +36,7 @@ void audioCB(AudioIOData & io){
 				//f1 = bq1(s1);
 			}	
 		}
-		out0[f] = out1[f] = stft();
+		io.out(0)[f] = io.out(1)[f] = stft();
 	}
 }
 

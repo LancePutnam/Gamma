@@ -52,7 +52,7 @@ Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension,
 ///		'h' are the FIR coefficients and should be of size ('order' + 1). \n
 ///		'delay' is a fractional delay in samples. \n
 ///		As order increases, this converges to sinc interpolation.
-TEM void lagrange(T * h, T delay, ULONG order);
+TEM void lagrange(T * h, T delay, int order);
 
 /// Optimized lagrange() for first order.
 TEM void lagrange1(T * h, T delay);
@@ -92,7 +92,7 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
-TEM void linear(T * dst, const T * xs, const T * xp1s, ULONG len, T frac);
+TEM void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T frac);
 
 /// Nearest neighbor interpolation.
 template <class Tf, class Tv>
@@ -315,7 +315,7 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 	return ((c3 * f + c2) * f + c1) * f + x;
 }
 
-TEM void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, ULONG len, T f){
+TEM void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, uint32_t len, T f){
 	LOOP(len, dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]); )
 }
 
@@ -371,11 +371,11 @@ inline Tv hermite(Tp f,
 }
 
 
-TEM void lagrange(T * a, T delay, ULONG order){
-	for(ULONG i=0; i<=order; i++){
+TEM void lagrange(T * a, T delay, int order){
+	for(uint32_t i=0; i<=order; i++){
 		T coef = (T)1;
 		T i_f = (T)i; 
-		for(ULONG j=0; j<=order; j++){
+		for(uint32_t j=0; j<=order; j++){
 			if(j != i){
 				T j_f = (T)j;
 				coef *= (delay - j_f) / (i_f - j_f);
@@ -432,7 +432,7 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	return ipl::linear(frac-Tf(1), y,z);
 }
 
-TEM void linear(T * dst, const T * xs, const T * xp1s, ULONG len, T f){
+TEM void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T f){
 	LOOP(len, dst[i] = linear(f, xs[i], xp1s[i]); )
 }
 

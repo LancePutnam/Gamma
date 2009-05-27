@@ -6,7 +6,6 @@
 
 #include "mem.h"
 #include "scl.h"
-#include "MacroD.h"
 
 namespace gam{
 
@@ -23,8 +22,8 @@ struct MapBase{
 	Tv v[Nv];								///< Values
 	Tv a[Nc];								///< Coefficients
 
-	static ULONG numCoefs(){ return Nc; }	///< Returns number of coefficients
-	static ULONG numVals (){ return Nv; }	///< Returns number of values
+	static uint32_t numCoefs(){ return Nc; }	///< Returns number of coefficients
+	static uint32_t numVals (){ return Nv; }	///< Returns number of values
 };
 
 
@@ -227,7 +226,4 @@ struct MapQuad3 : public MapBase<3,30,T>{
 
 } // gam::
 
-#include "MacroU.h"
-
 #endif
-

@@ -16,12 +16,12 @@
 namespace gam{
 namespace arr{
 
-void linToDB(float * arr, ULONG len, float minDB){
+void linToDB(float * arr, uint32_t len, float minDB){
 	float normFactor = 20.f / minDB;
 	
 	LOOP(len,
-		ULONG * arrI = (ULONG *)arr;
-		ULONG sign = (*arrI) & MASK_F32_SIGN;
+		uint32_t * arrI = (uint32_t *)arr;
+		uint32_t sign = (*arrI) & MASK_F32_SIGN;
 		
 		float val = fabs(*arr);
 		
@@ -40,7 +40,7 @@ void linToDB(float * arr, ULONG len, float minDB){
 //inline T scl::linToDB(T v){ return (T)log10(v) * (T)20; }
 //inline T scl::dBToLin(T v){ return pow(10., v * 0.05); }
 
-void compact(float * dst, const float * src, ULONG len, ULONG chunkSize){
+void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 
 	if(chunkSize < 2){
 		mem::copy(dst, src, len);
@@ -50,8 +50,8 @@ void compact(float * dst, const float * src, ULONG len, ULONG chunkSize){
 		chunkSize = len;
 	}
 
-//	for(ULONG i=0; i<len; i+=chunkSize){
-//		ULONG min, max;
+//	for(uint32_t i=0; i<len; i+=chunkSize){
+//		uint32_t min, max;
 //		extrema(src, chunkSize, &min, &max);
 //		
 //		if(min < max){
@@ -65,8 +65,8 @@ void compact(float * dst, const float * src, ULONG len, ULONG chunkSize){
 //
 //		src += chunkSize;
 //	}
-	for(ULONG i=0; i<len; i+=chunkSize){
-		ULONG max;
+	for(uint32_t i=0; i<len; i+=chunkSize){
+		uint32_t max;
 		max = maxAbs(src, chunkSize);
 
 		*dst++ = src[max];
@@ -74,17 +74,17 @@ void compact(float * dst, const float * src, ULONG len, ULONG chunkSize){
 	}
 }
 
-ULONG fundHPS(float * tmp, const float * mag, ULONG len, ULONG downSample){
+uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSample){
 	hps(tmp, mag, len, downSample);
 	return max(tmp, len);
 }
 
-void hps(float * dst, const float * src, ULONG len, ULONG downSample){
+void hps(float * dst, const float * src, uint32_t len, uint32_t downSample){
 	
 	memcpy(dst, src, len * sizeof(float));
 	
-	for(ULONG d=2; d <= downSample; d++){
-		for(ULONG i=0; i<len; i++){
+	for(uint32_t d=2; d <= downSample; d++){
+		for(uint32_t i=0; i<len; i++){
 			dst[i/d] *= src[i];
 		}
 	}
@@ -95,14 +95,14 @@ void hps(float * dst, const float * src, ULONG len, ULONG downSample){
 
 
 
-//ULONG zeroCross(const float * src, ULONG len, float prevVal){
+//uint32_t zeroCross(const float * src, uint32_t len, float prevVal){
 //	
-//	ULONG count = 0;
-//	ULONG * srcI = (ULONG *)src;
-//	ULONG prev = *(ULONG *)(&prevVal);
+//	uint32_t count = 0;
+//	uint32_t * srcI = (uint32_t *)src;
+//	uint32_t prev = *(uint32_t *)(&prevVal);
 //
 //	LOOP(len,
-//		ULONG now = *srcI++;
+//		uint32_t now = *srcI++;
 //
 //		if((now > 0 && prev <= 0) || (now < 0 && prev >= 0)) count++;
 //		//count += (now ^ prev)>>31;
@@ -113,8 +113,8 @@ void hps(float * dst, const float * src, ULONG len, ULONG downSample){
 //	return count;
 //}
 
-ULONG zeroCross(const float * src, ULONG len, float prevVal){
-	ULONG count = 0;
+uint32_t zeroCross(const float * src, uint32_t len, float prevVal){
+	uint32_t count = 0;
 	float prev = prevVal;
 	LOOP(len,
 		float curr = *src++;
@@ -124,12 +124,12 @@ ULONG zeroCross(const float * src, ULONG len, float prevVal){
 	return count;
 }
 
-ULONG zeroCrossFirst(const float * src, ULONG len){
-	ULONG * srcI = (ULONG *)src;
-	ULONG prev = *srcI++;
+uint32_t zeroCrossFirst(const float * src, uint32_t len){
+	uint32_t * srcI = (uint32_t *)src;
+	uint32_t prev = *srcI++;
 
-	for(ULONG i=0; i<len-1; ++i){
-		ULONG now = *srcI++;
+	for(uint32_t i=0; i<len-1; ++i){
+		uint32_t now = *srcI++;
 		if((now ^ prev)>>31){
 			return i-1;
 		}
@@ -138,14 +138,14 @@ ULONG zeroCrossFirst(const float * src, ULONG len){
 	return 0;
 }
 
-ULONG zeroCrossN(const float * src, ULONG len, float prevVal){
+uint32_t zeroCrossN(const float * src, uint32_t len, float prevVal){
 	
-	ULONG count = 0;
-	ULONG * srcI = (ULONG *)src;
-	ULONG prev = *(ULONG *)(&prevVal);
+	uint32_t count = 0;
+	uint32_t * srcI = (uint32_t *)src;
+	uint32_t prev = *(uint32_t *)(&prevVal);
 
 	LOOP(len,
-		ULONG now = *srcI++;
+		uint32_t now = *srcI++;
 
 		//if((now > 0) && (prev <= 0))		count++;
 		//else if((now < 0) && (prev >= 0))	count++;
@@ -161,7 +161,7 @@ ULONG zeroCrossN(const float * src, ULONG len, float prevVal){
 }
 
 
-void magFrqToPolar(float * frq, float * phsAccum, ULONG len, float factorUnwrap){
+void magFrqToPolar(float * frq, float * phsAccum, uint32_t len, float factorUnwrap){
 
 //	float binFreq = fundFreq;
 //	float expPhaseDiff = fundRadians;
@@ -203,7 +203,7 @@ fundRadians := M_2PI * sizeHop / sizeDFT
 
 unitsHop := sizeHop * ups;
 */
-void polarToMagFrq(float * p0, float * p1, ULONG len, float factorWrap, float fundFreq, float fundRadians){
+void polarToMagFrq(float * p0, float * p1, uint32_t len, float factorWrap, float fundFreq, float fundRadians){
 	
 	float binFreq = fundFreq;			// center frequency of bin
 	float expPhaseDiff = fundRadians;	// expected phase difference based on bin number
@@ -222,7 +222,7 @@ void polarToMagFrq(float * p0, float * p1, ULONG len, float factorWrap, float fu
 	)
 }
 
-//TEM void phaseToFreq(T * p0, T * p1, ULONG len, T ups){
+//TEM void phaseToFreq(T * p0, T * p1, uint32_t len, T ups){
 //	T factor = (T)1 / (M_2PI * ups);
 //	LOOP_P(len,
 //		T dp = scl::wrapPhase(*p0 - *p1);		// wrap phase into [-pi, pi)
@@ -231,7 +231,7 @@ void polarToMagFrq(float * p0, float * p1, ULONG len, float factorWrap, float fu
 //	)
 //}
 
-void polarToRect(float * mag, float * phs, ULONG len){
+void polarToRect(float * mag, float * phs, uint32_t len){
 	LOOP_P(len,
 		float m = *mag;
 		float p = *phs;
@@ -241,12 +241,12 @@ void polarToRect(float * mag, float * phs, ULONG len){
 }
 
 
-void polarToRectFast(float * magA, float * phsA, ULONG len){
+void polarToRectFast(float * magA, float * phsA, uint32_t len){
 	
-	ULONG bits = sinLUT->log2Size();
-	ULONG fracBits = sinLUT->fracBits();
-	ULONG quarter = 0x40000000;
-	ULONG oneIndex = sinLUT->oneIndex();
+	uint32_t bits = sinLUT->log2Size();
+	uint32_t fracBits = sinLUT->fracBits();
+	uint32_t quarter = 0x40000000;
+	uint32_t oneIndex = sinLUT->oneIndex();
 	float * sinTable = sinLUT->elems();
 
 	LOOP(len,
@@ -256,8 +256,8 @@ void polarToRectFast(float * magA, float * phsA, ULONG len){
 		phs = scl::wrap(phs, (float)M_2PI);
 		phs *= (float)M_1_2PI;
 		
-		//ULONG index = scl::normalToUInt(phs);
-		ULONG index = normalToUInt2(phs);	// better cuz phase is on a linear scale
+		//uint32_t index = scl::normalToUInt(phs);
+		uint32_t index = normalToUInt2(phs);	// better cuz phase is on a linear scale
 		
 //		float sn = MemOpF::at(sinTable, fracBits, index);
 //		float cs = MemOpF::at(sinTable, fracBits, index + quarter);
@@ -280,12 +280,12 @@ void polarToRectFast(float * magA, float * phsA, ULONG len){
 }
 
 
-void rectToPolar(float * r, float * i, ULONG len){
+void rectToPolar(float * r, float * i, uint32_t len){
 	LOOP_P(len, scl::rectToPolar(*r, *i); r++; i++; )
 }
 
 
-void rectToPolarFast(float * realA, float * imagA, ULONG len){
+void rectToPolarFast(float * realA, float * imagA, uint32_t len){
 	
 	LOOP(len, 
 		float real = *realA;
@@ -298,9 +298,9 @@ void rectToPolarFast(float * realA, float * imagA, ULONG len){
 			float ratio = imag / real;	// (-1, 1)
 			//float ratio = 0.5f;
 			
-			ULONG index = (ULONG)(LUTSize2F + LUTSize2F * ratio);
-			//ULONG index = 10;
-			//ULONG index = normalToIndex(ratio * 0.5f + 0.5f, 11);
+			uint32_t index = (uint32_t)(LUTSize2F + LUTSize2F * ratio);
+			//uint32_t index = 10;
+			//uint32_t index = normalToIndex(ratio * 0.5f + 0.5f, 11);
 			//int index = roundFloatToInt(LUTSize2F + LUTSize2F * ratio);
 			
 			if(real > 0.f)  imag = atanLUT[index];				// -pi/4, pi/4
@@ -317,9 +317,9 @@ void rectToPolarFast(float * realA, float * imagA, ULONG len){
 			float ratio = real / imag;
 			//float ratio = 0.5f;
 			
-			ULONG index = (ULONG)(LUTSize2F + LUTSize2F * ratio);
-			//ULONG index = 10;
-			//ULONG index = normalToIndex(ratio * 0.5f + 0.5f, 11);
+			uint32_t index = (uint32_t)(LUTSize2F + LUTSize2F * ratio);
+			//uint32_t index = 10;
+			//uint32_t index = normalToIndex(ratio * 0.5f + 0.5f, 11);
 			//int index = roundFloatToInt(LUTSize2F + LUTSize2F * ratio);
 
 			if(imag > 0.f)  imag = M_PI_2 - atanLUT[index];		// pi/4, 3pi/4
@@ -348,7 +348,7 @@ void conversionInit(){
 		double ramp2 = -1.;
 		double ramp2Inc = 2. * LUTSizeRec;
 		
-		for(ULONG i=0; i<LUTSize; ++i){
+		for(uint32_t i=0; i<LUTSize; ++i){
 			
 			double angle = atan(ramp2);
 			atanLUT[i] = angle;
@@ -360,18 +360,18 @@ void conversionInit(){
 }
 
 
-void print(const float * src, ULONG len){
-	for(ULONG i=0; i<len; i++) printf("[%4d]\t% f\n", (int)i, *src++);
+void print(const float * src, uint32_t len){
+	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f\n", (int)i, *src++);
 }
 
-void print(const float * src1, const float * src2, ULONG len){
-	for(ULONG i=0; i<len; i++) printf("[%4d]\t% f % f\n", (int)i, *src1++, *src2++);
+void print(const float * src1, const float * src2, uint32_t len){
+	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f % f\n", (int)i, *src1++, *src2++);
 }
 
-void printHex(const float * src, ULONG len){
-	for(ULONG i=0; i<len; i++){
+void printHex(const float * src, uint32_t len){
+	for(uint32_t i=0; i<len; i++){
 		float v = *src++;
-		printf("[%4d] % 5.3f %8lx\n", (int)i, v, (unsigned long)*(ULONG *)&v);
+		printf("[%4d] % 5.3f %8lx\n", (int)i, v, (unsigned long)*(uint32_t *)&v);
 	}
 }
 
