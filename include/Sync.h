@@ -44,8 +44,10 @@ protected:
 /// By default, the reference Sync is Sync::master.
 class Synced : public Node2<Synced> {
 public:
-	/// Constructor.
+	/// Constructor
 	Synced();
+	
+	/// Constructor
 	Synced(bool zeroLinks, Sync& src);
 	virtual ~Synced(){}
 
@@ -95,23 +97,17 @@ public:
 
 	bool hasBeenSet() const;			///< Returns true if spu has been set at least once.
 	double spu() const;					///< Returns samples/unit, i.e. sample rate.
-	double ups() const;					///< Returns units/sample, i.e. sample interval.
-	
-	//static Sync master;		
+	double ups() const;					///< Returns units/sample, i.e. sample interval.	
 
 	/// Master sync. By default, Synceds will be synced to this.
 	static Sync& master(){
 	
 		// Note: This uses a Construct On First Use Idiom to avoid unpredictable
 		// static initialization order.  The memory allocated will get freed from 
-		// the heap when the program exits.
-//		static Sync* obj = new Sync;
-//		printf("new Sync %p\n", obj);
-//		
-//		return *obj;
-		
+		// the heap when the program exits.		
 		// Since we can't predict when a class variable is initialized, we
 		// will assume that uninitialized variables are set to 0.
+		// TODO: there may be a compiler flag to ensure this is the case
 		if(!mMaster){
 			mMaster = new Sync; //printf("new master %p\n", mMaster);
 		}

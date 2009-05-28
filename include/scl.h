@@ -129,6 +129,9 @@ TEM T atLeast(T v, T eps);
 /// Convert a string of 1s and 0s to an integer.
 uint32_t bits(const char * string);
 
+/// Returns bump function, psi(x)
+TEM T bump(T x);
+
 /// Returns floating point value rounded to next highest integer.
 TEM T ceil(T val);
 TEM T ceil(T val, T step);
@@ -712,6 +715,8 @@ inline uint32_t bits(const char * string){
 	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);
 	return v;
 }
+
+TEM inline T bump(T x){ return abs(x)<T(1) ? ::exp(T(-1)/(T(1) - x*x)) : T(0); }
 
 TEM inline T ceil(T v){ return round(v + roundEps<T>()); }
 TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
