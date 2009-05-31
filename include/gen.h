@@ -278,7 +278,7 @@ OF3(RSin,		rSin,		0,0,1)
 
 
 
-// Complex number with a frequency.
+// Complex resonator
 template <class T=double>
 class Spinner2 : public Complex<T>{
 public:
@@ -292,7 +292,7 @@ public:
 	C& operator()(){ return (*this) *= mFreq; }
 
 	void set(const T& frq, const T& amp, const T& phs){
-		this->fromPolar(amp, phs*M_2PI);
+		this->fromPolar(amp, (phs-frq)*M_2PI); // phase rewound by 1 iteration
 		mFreq.fromPhase(frq*M_2PI);
 	}
 

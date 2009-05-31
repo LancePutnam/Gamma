@@ -90,6 +90,8 @@ public:
 	/// @param[in]	spu		Initial samples/unit.
 	Sync(double spu);
 
+	~Sync();
+
 	Sync& operator<< (Synced& synced);	///< Move a Synced into list.
 	void notifySynceds(double r);		///< Calls onSyncChange() for all my Synceds.
 	void spu(double v);					///< Set samples/unit.  If changed, will notify Synceds.
@@ -131,12 +133,6 @@ friend class Synced;
 
 // Sync
 
-// Note:	We can't zero the head node's links because it might be constructed
-//			after nodes have been appended to it!
-//
-//			However, if no Synceds are added and notifySynceds() is called we get a crash!
-inline Sync::Sync(): mSPU(1.), mUPS(1.), mHeadSynced(true, *this), mHasBeenSet(false){}
-inline Sync::Sync(double spuA): mHeadSynced(true, *this){ spu(spuA); }
 inline bool Sync::hasBeenSet() const { return mHasBeenSet; }
 inline double Sync::spu() const { return mSPU; }
 inline double Sync::ups() const { return mUPS; }

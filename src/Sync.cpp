@@ -9,6 +9,28 @@ namespace gam{
 
 Sync * Sync::mMaster=0;
 
+
+// Note:	We can't zero the head node's links because it might be constructed
+//			after nodes have been appended to it!
+//
+//			However, if no Synceds are added and notifySynceds() is called we get a crash!
+Sync::Sync()
+:	mSPU(1.), mUPS(1.), mHeadSynced(true, *this), mHasBeenSet(false)
+{}
+
+Sync::Sync(double spuA)
+:	mHeadSynced(true, *this)
+{ spu(spuA); }
+
+Sync::Sync~(){
+//	Synced * s = mHeadSynced.nodeR;
+//
+//	while(s){
+//		s->sync(0);
+//		s = s->nodeR;
+//	}
+}
+
 Sync& Sync::operator<< (Synced& synced){ synced.sync(*this); return(*this); }
 
 void Sync::addSynced(Synced& synced){

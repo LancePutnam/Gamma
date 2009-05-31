@@ -62,6 +62,7 @@ public:
 	T& operator[](uint32_t i);
 	const T& operator[](uint32_t i) const;
 	
+	/// Sets all elements to argument
 	ArrayBase& operator=(const T& v){ for(uint32_t i=0; i<size(); ++i) (*this)[i] = v; return *this; }
 	
 	T * elems() const;				///< Returns pointer to first array element.
@@ -200,6 +201,77 @@ protected:
 	uint32_t mTap;
 };
 
+
+
+// Tabulated function with real number lookup.
+// TODO: move out of containers; this is more like a mathematical field
+template <class T /*, class Sacc=acc::Wrap, class Sipl=ipl::Linear*/>
+class FunctionTable : public Array<T>{
+	typedef Array<T> base;
+public:
+	using base::elems; using base::size; using base::operator=;
+
+	/// Constructor that alocates an internal table
+
+	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
+	/// @param[in] init		Initializes all elements to this value
+	FunctionTable(uint32_t size, const T& init=T(0))
+	:	base(size), mIndMap(size)
+	{
+		(*this) = init;
+	}
+	
+	virtual ~FunctionTable(){}
+	
+
+	/// Returns f(x) where x lies in the function domain, [0,1).
+	T operator()(double x) const {
+		x = scl::wrap(x);
+		float f;
+		int i1 = mIndMap(x, f);
+		int i2 = i1+1; if(i2==size()) i2=0;
+		return (*this)[i1]*(1.f-f) + (*this)[i2]*f;
+	}
+
+	/// Sums generator stream with table elements
+	template <class Gen>
+	FunctionTable& operator+=(Gen& g){
+		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
+		return *this;
+	}
+
+protected:
+
+	virtual void onResize(){ mIndMap.size(size()); }
+
+	// Maps from unit domain to indices and vice-versa
+	class IndexMap{
+	public:
+		IndexMap(int n): mSize(0), mMul(0){ size(n); }
+		
+		int operator()(float x) const { return castIntTrunc(x*mMul); }
+		
+		int operator()(float x, float& f) const {
+			f = x*mMul;
+			int i = castIntTrunc(f);
+			f -= i; 
+			return i;
+		}
+		
+		float operator()(int i) const { return float(i) * mRec; }
+	
+		void size(int n){ mSize=n; mMul=n; mRec=1/mMul; }
+	
+	private:
+		int mSize;
+		float mMul, mRec;
+	};
+	
+	IndexMap mIndMap;
+
+	//Sipol mIpol;
+	//Sacc mAcc;
+};
 
 
 
