@@ -130,7 +130,8 @@ struct Complex{
 	T norm() const { return sqrt(norm2()); }				///< Returns norm (radius)
 	T norm2() const { return dot(*this); }					///< Returns square of norm, r*r + i*i
 	C& normalize(){ return *this /= norm(); }				///< Sets absolute value to 1
-	const C pow(const C& v) const { return exp(v*log(*this)); }
+	const C pow(const C& v) const { return ((*this).log()*v).exp(); }
+	const C pow(const T& v) const { return ((*this).log()*v).exp(); }
 	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse
 	const C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
 	const C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
@@ -323,6 +324,7 @@ TEM const Quat<T> operator - (T r, const Quat<T>& q){ return -q+r; }
 TEM const Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
 TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); }
 #undef TEM
+
 
 
 
