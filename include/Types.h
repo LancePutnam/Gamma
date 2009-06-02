@@ -419,6 +419,8 @@ struct Vec : public Multi<N,T> {
 	T dot() const { return dot(*this); }
 	T dot(const V& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
 
+	V sgn() const { V(*this) /= sqrt(dot()); }
+
 	#undef DO
 };
 
