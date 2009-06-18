@@ -295,6 +295,46 @@ struct Quat{
 		y = (j*k - i*r) * (T) 2;
 		z = (i*i + j*j) * (T)-2 + (T)1;
 	}
+
+
+	/// Set quaternion from rotation matrix
+	template <class V3>
+	void fromMat3(const V3& vx, const V3& vy, const V3& vz){
+		
+		const T epsilon = 0.000001;
+		T trace = vx[0] + vy[1] + vz[2] + 1.;
+		
+		if(trace > epsilon){
+			T s = 0.5 / sqrt(trace);
+			r = 0.25 / s;
+			i = (vz[1] - vy[2]) * s;
+			j = (vx[2] - vz[0]) * s;
+			k = (vy[0] - vx[1]) * s;
+		} 
+		else{
+			if(vx[0] > vy[1] && vx[0] > vz[2]){
+				T s = 2. * sqrt(1. + vx[0] - vy[1] - vz[2]);
+				r = (vz[1] - vy[2]) / s;
+				i = 0.25 * s;
+				j = (vx[1] + vy[0]) / s;
+				k = (vx[2] + vz[0]) / s;
+			} 
+			else if(vy[1] > vz[2]){
+				T s = 2. * sqrt(1. + vy[1] - vx[0] - vz[2]);
+				r = (vx[2] - vz[0]) / s;
+				i = (vx[1] + vy[0]) / s;
+				j = 0.25 * s;
+				k = (vy[2] + vz[1]) / s;
+			} 
+			else{
+				T s = 2. * sqrt(1. + vz[2] - vx[0] - vy[1]);
+				r = (vy[0] - vx[1]) / s;
+				i = (vx[2] + vz[0]) / s;
+				j = (vy[2] + vz[1]) / s;
+				k = 0.25 * s;
+			}
+		}
+	}
 	
 	/*
 		Quaternion mult can be broken down into 4 complex mult:
@@ -418,8 +458,9 @@ struct Vec : public Multi<N,T> {
 
 	T dot() const { return dot(*this); }
 	T dot(const V& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
+	T norm() const { return sqrt(dot()); }
 
-	V sgn() const { V(*this) /= sqrt(dot()); }
+	V sgn() const { V(*this) /= norm(); }
 
 	#undef DO
 };

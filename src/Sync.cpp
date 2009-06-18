@@ -22,7 +22,7 @@ Sync::Sync(double spuA)
 :	mHeadSynced(true, *this)
 { spu(spuA); }
 
-Sync::Sync~(){
+Sync::~Sync(){
 //	Synced * s = mHeadSynced.nodeR;
 //
 //	while(s){
