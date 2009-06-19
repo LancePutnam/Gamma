@@ -273,66 +273,71 @@ struct Quat{
 	}
 	
 	void toAxis(T& a, T& x, T& y, T& z) const {
-		a = (T)2 * acos(r);
-		T s = 1./sqrt(i*i + j*j + k*k);
+		a = T(2) * acos(r);
+		T s = T(1)/sqrt(i*i + j*j + k*k);
 		x = i*s; y = j*s; z = k*s;
 	}
-	
+
 	void toVectorX(T& x, T& y, T& z) const {
-		x = (j*j + k*k) * (T)-2 + (T)1;
-		y = (i*j + k*r) * (T) 2;
-		z = (i*k - j*r) * (T) 2;	
+		x = (j*j + k*k) * T(-2) + T(1);
+		y = (i*j + k*r) * T( 2);
+		z = (i*k - j*r) * T( 2);	
 	}
 
 	void toVectorY(T& x, T& y, T& z) const {
-		x = (i*j - k*r) * (T) 2;
-		y = (i*i + k*k) * (T)-2 + (T)1;
-		z = (j*k + i*r) * (T) 2;
+		x = (i*j - k*r) * T( 2);
+		y = (i*i + k*k) * T(-2) + T(1);
+		z = (j*k + i*r) * T( 2);
 	}
 
 	void toVectorZ(T& x, T& y, T& z) const {
-		x = (i*k + j*r) * (T) 2;
-		y = (j*k - i*r) * (T) 2;
-		z = (i*i + j*j) * (T)-2 + (T)1;
+		x = (i*k + j*r) * T( 2);
+		y = (j*k - i*r) * T( 2);
+		z = (i*i + j*j) * T(-2) + T(1);
 	}
 
-
 	/// Set quaternion from rotation matrix
+	
+	/// Code taken from van Waveren (2005). 'From Quaternion to Matrix and Back'
+	///
 	template <class V3>
 	void fromMat3(const V3& vx, const V3& vy, const V3& vz){
 		
-		const T epsilon = 0.000001;
-		T trace = vx[0] + vy[1] + vz[2] + 1.;
+		const T& x0=vx[0], x1=vx[1], x2=vx[2];
+		const T& y0=vy[0], y1=vy[1], y2=vy[2];
+		const T& z0=vz[0], z1=vz[1], z2=vz[2];
 		
-		if(trace > epsilon){
-			T s = 0.5 / sqrt(trace);
-			r = 0.25 / s;
-			i = (vz[1] - vy[2]) * s;
-			j = (vx[2] - vz[0]) * s;
-			k = (vy[0] - vx[1]) * s;
+		if(x0 + y1 + z2 > T(0)){
+			T t = x0 + y1 + z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = t * s;
+			i = (y2 - z1) * s;
+			j = (z0 - x2) * s;
+			k = (x1 - y0) * s;
+		}
+		else if(x0 > y1 && x0 > z2){
+			T t = x0 - y1 - z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = (y2 - z1) * s;
+			i = t * s;
+			j = (x1 + y0) * s;
+			k = (x2 + z0) * s;
+		} 
+		else if(y1 > z2){
+			T t =-x0 + y1 - z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = (z0 - x2) * s;
+			i = (x1 + y0) * s;
+			j = t * s;
+			k = (y2 + z1) * s;
 		} 
 		else{
-			if(vx[0] > vy[1] && vx[0] > vz[2]){
-				T s = 2. * sqrt(1. + vx[0] - vy[1] - vz[2]);
-				r = (vz[1] - vy[2]) / s;
-				i = 0.25 * s;
-				j = (vx[1] + vy[0]) / s;
-				k = (vx[2] + vz[0]) / s;
-			} 
-			else if(vy[1] > vz[2]){
-				T s = 2. * sqrt(1. + vy[1] - vx[0] - vz[2]);
-				r = (vx[2] - vz[0]) / s;
-				i = (vx[1] + vy[0]) / s;
-				j = 0.25 * s;
-				k = (vy[2] + vz[1]) / s;
-			} 
-			else{
-				T s = 2. * sqrt(1. + vz[2] - vx[0] - vy[1]);
-				r = (vy[0] - vx[1]) / s;
-				i = (vx[2] + vz[0]) / s;
-				j = (vy[2] + vz[1]) / s;
-				k = 0.25 * s;
-			}
+			T t =-x0 - y1 + z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = (x1 - y0) * s;
+			i = (x2 + z0) * s;
+			j = (y2 + z1) * s;
+			k = t * s;
 		}
 	}
 	
