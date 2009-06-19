@@ -303,9 +303,9 @@ struct Quat{
 	template <class V3>
 	void fromMat3(const V3& vx, const V3& vy, const V3& vz){
 		
-		const T& x0=vx[0], x1=vx[1], x2=vx[2];
-		const T& y0=vy[0], y1=vy[1], y2=vy[2];
-		const T& z0=vz[0], z1=vz[1], z2=vz[2];
+		const T &x0=vx[0], &x1=vx[1], &x2=vx[2];
+		const T &y0=vy[0], &y1=vy[1], &y2=vy[2];
+		const T &z0=vz[0], &z1=vz[1], &z2=vz[2];
 		
 		if(x0 + y1 + z2 > T(0)){
 			T t = x0 + y1 + z2 + T(1);
