@@ -88,6 +88,33 @@ private:
 };
 
 
+
+template <class T>
+class IndexMap{
+public:
+	IndexMap(int indMax, const T& posMax){ max(indMax, posMax); }
+	
+	int operator()(const T& x) const { return cast(x*mMul); }
+	
+	int operator()(const T& x, T& f) const {
+		f = x*mMul;
+		int i = cast(f);
+		f -= cast(i); 
+		return i;
+	}
+	
+	T operator()(int i) const { return cast(i) * mRec; }
+
+	void max(int indMax, const T& posMax){ mMul=indMax/posMax; mRec=1/mMul; }
+
+private:
+	T mMul, mRec;
+	int cast(const T& v) const { return castIntTrunc(v); }
+	T cast(int v) const { return T(v); }
+};
+
+
+
 template <class SBounds>
 struct NeighborsCross2D{
 

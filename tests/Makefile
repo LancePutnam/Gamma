@@ -31,7 +31,8 @@ SRC = \
 	testScalar.cpp \
 	testTable.cpp \
 	testTimer.cpp \
-	testTypes.cpp
+	testTypes.cpp \
+	testUnits.cpp
 
 TARGETS = ${SRC:.cpp=}
 

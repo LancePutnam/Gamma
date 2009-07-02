@@ -60,9 +60,9 @@ public:
 	void indToPos(int i1, int i2, int i3, float& p1, float& p2, float& p3) const;
 	
 	float indToPos1(int i) const;	///< Converts index to position of dimension 1
-	float indToPos2(int i) const;	///< Converts index to position of dimension 1
-	float indToPos3(int i) const;	///< Converts index to position of dimension 1
-	float indToPos4(int i) const;	///< Converts index to position of dimension 1
+	float indToPos2(int i) const;	///< Converts index to position of dimension 2
+	float indToPos3(int i) const;	///< Converts index to position of dimension 3
+	float indToPos4(int i) const;	///< Converts index to position of dimension 4
 
 	/// Get neighboring indices. No bounds checking.
 	void indNeighbors(int i1, int i2, int i3, int (&inds)[6], bool (&valid)[6]) const;

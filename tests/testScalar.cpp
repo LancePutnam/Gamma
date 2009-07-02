@@ -5,17 +5,6 @@
 
 using namespace gam;
 
-void printName(const char * s){
-	int n = strlen(s);
-	printf(s);
-	for(int i=0; i<24-n; ++i) printf(" ");
-}
-
-void checkTest(bool r){
-	if(r){ printf("pass\n"); }
-	else{ printf("fail *\n"); /*exit(1);*/ }
-}
-
 int main(int argc, char* argv[]){
 
 	const int len = 12;
@@ -192,58 +181,6 @@ int main(int argc, char* argv[]){
 //		float p = (i/32.)*2-1;
 //		printf("% 6.4f: % 6.4f (% 6.4f)\n", p, sinFast(p*M_PI), sin(p*M_PI));
 //	}
-	
-	// unit tests
-	printf("\nUnit Tests\n"
-			 "----------\n");
-	bool result;
-
-	printName("castIntRound"); result=true;
-	for(int i=0; i<90000; ++i){
-		double v = rnd::uniS(10000000.);
-		//float v = i*1.379;
-		int rounded = int(v<0 ? v-0.5 : v+0.5);
-		result &= (rounded == castIntRound(v));
-		if(!result){ printf("%d", i); break; }
-	}
-	checkTest(result);
-
-
-	printName("castIntTrunc"); result=true;
-	for(int i=0; i<90000; ++i){
-		double v64 = rnd::uniS(10000000.);
-		float  v32 = v64;
-		int r64 = int(v64);
-		int r32 = int(v32);
-		result &= (r64 == castIntTrunc(v64));
-		result &= (r32 == castIntTrunc(v32));
-		if(!result) break;
-	}
-	checkTest(result);
-
-
-	printName("ceilPow2"); result=true;
-	result &= (scl::ceilPow2(0) == 0);
-	result &= (scl::ceilPow2(1) == 1);
-	result &= (scl::ceilPow2(2) == 2);
-	result &= (scl::ceilPow2(3) == 4);
-	result &= (scl::ceilPow2(500) == 512);
-	checkTest(result);
-	
-	printName("log2"); result=true;
-	for(uint32_t i=0; i<32; ++i){
-		uint32_t v = 1<<i;
-		result &= (scl::log2(v) == i);
-	}
-	checkTest(result);
-
-	printf("\ninvSqrt<>()\n");
-		for(int i=0; i<16; ++i){
-			double v = i+1;
-			double real = 1./sqrt(v);
-			double apx = scl::invSqrt<1>(v);
-			printf("% 7.3f % 9.7f % 9.7f, error= % 7.4g\n", v, real, apx, scl::error(real,apx)*100);
-		}
 
 }
 

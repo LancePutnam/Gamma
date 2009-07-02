@@ -131,21 +131,84 @@ On Name
 --------------------------------------------------------------------------------
 Nos
 Feed
-S (nice, but taken!)
-Strings
 Synz (contraction of synthesize)
 Spread
 Dialog
-Rota
-Motus (motion)
-Rotare
-P/F	(position/frequency)
-Xform
-Shift
-Slip
 Para
-MetaAtoms
-Ness-Ity-Hood
+
+
+
+Function Tables
+--------------------------------------------------------------------------------
+A function table is an array of values with a special mapping method that maps
+a value in the domain [0,1) to a value in the table.
+
+The mapping operation converts a real in [0,1) to an integer in [0,N). The naive
+method is:
+
+	int unitToIndex(double v, int n){
+		return int(v*double(n));
+	}
+
+We can make the int to double cast explicit by passing in the number of elements 
+as a double. This is better since the size will not change often and can 
+therefore be cached.
+
+	int unitToIndex(double v, double n){
+		return int(v*n);
+	}
+
+Since the index may be outside the bounds of the array, we need to apply a
+boundary operation.
+
+	T operator()(double v){
+		int i = unitToIndex(v, Nf);
+		i = boundOp(i);
+		return elems[i];
+	}
+	
+This, however, does not support any type of interpolation. We need to add
+an interpolation operation.
+
+	T operator()(double v){
+		int i = unitToIndex(v, Nf);
+		i = boundOp(i, N);
+		return interOp(elems, N, i, frac);
+	}
+
+Out of this, we can extract a UnitToIndex class (and its inverse).
+
+	template <class T>
+	class IndexMap{
+	public:
+		IndexMap(int indMax, const T& posMax){ max(indMax, posMax); }
+		
+		int operator()(const T& x) const { return cast(x*mMul); }
+		
+		int operator()(const T& x, T& f) const {
+			f = x*mMul;
+			int i = cast(f);
+			f -= cast(i); 
+			return i;
+		}
+		
+		T operator()(int i) const { return cast(i) * mRec; }
+	
+		void max(int indMax, const T& posMax){ mMul=indMax/posMax; mRec=1/mMul; }
+	
+	private:
+		T mMul, mRec;
+		int cast(const T& v){ return castIntTrunc(v); }
+		T cast(int v){ return T(v); }
+	};
+
+Dims; posToind
+
+
+
+
+
+
 
 
 
