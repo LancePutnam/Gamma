@@ -5,11 +5,10 @@
 	See COPYRIGHT file for authors and license information */
 
 /*	File description: 
-	Static types
+	Static (fixed size) types
 */
 
 
-//#define __STDC_CONSTANT_MACROS	// for appending UL, ULL, etc. to constants
 #include "pstdint.h"			// for cross-platform uint32_t, uint16_t, etc...
 #include <math.h>
 #include <stdlib.h>
@@ -49,7 +48,7 @@ public:
 	Bits& toggle(T bitMask){ mVal^=bitMask; return *this; }
 	
 	/// Zero all bits
-	Bits& zero(){ mVal = T(0); return *this; }
+	Bits& zero(){ mVal=T(0); return *this; }
 
 	/// Get mask from specific bit number where 0 is the LSB.
 	static T mask(T bitNum){ return 1<<bitNum; }
@@ -122,26 +121,26 @@ struct Complex{
 	const C operator / (const T& v) const { return C(*this) /= v; }
 	
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
-	C conj() const { return C(r,-i); }						///< Returns conjugate
+	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
 	const C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
 	const C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
 	//C mul2(const C& v) const { return C(r*v.r, i*v.i); }
-	T norm() const { return sqrt(norm2()); }				///< Returns norm (radius)
-	T norm2() const { return dot(*this); }					///< Returns square of norm, r*r + i*i
-	C& normalize(){ return *this /= norm(); }				///< Sets absolute value to 1
-	const C pow(const C& v) const { return ((*this).log()*v).exp(); }
-	const C pow(const T& v) const { return ((*this).log()*v).exp(); }
-	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse
+	T norm() const { return sqrt(norm2()); }				///< Returns norm (radius), |z|
+	T norm2() const { return dot(*this); }					///< Returns square of norm, |z|^2
+	C& normalize(){ return *this /= norm(); }				///< Sets norm (radius) to 1, |z|=1
+	const C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
+	const C pow(const T& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
+	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse, 1/z
 	const C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
 	const C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
 
-	const C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); }
-	const C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); }
+	const C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
+	const C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
 
-	T abs() const { return norm(); }						///< Returns absolute value (radius)
-	T mag() const { return abs(); }
-	T phase() const { return arg(); }
+	T abs() const { return norm(); }						///< Returns norm (radius), |z|
+	T mag() const { return norm(); }						///< Returns norm (radius), |z|
+	T phase() const { return arg(); }						///< Returns argument (angle)
 };
 
 typedef Complex<float > Complexf;
