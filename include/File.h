@@ -1,5 +1,12 @@
-#ifndef DATAFILE_H_INC
-#define DATAFILE_H_INC
+#ifndef GAMMA_FILE_H_INC
+#define GAMMA_FILE_H_INC
+
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+
+	File Description:
+	Basic file i/o classes.
+*/
 
 #include <stdio.h>
 

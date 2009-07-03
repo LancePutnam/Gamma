@@ -2,9 +2,9 @@
 #define GAMMA_CONVERSION_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
 
-/*	File description: 
+	File Description:
 	Functions/objects for converting between static data types.
 */
 
@@ -41,6 +41,8 @@ template<> struct Twiddle<double>{
 	union{ int64_t i; uint64_t u; double f; };
 };
 
+/// Converts bit string to unsigned integer
+uint32_t bitsToUInt(const char * bits);
 
 /// Convert 2-byte array to 16-bit unsigned integer.
 uint16_t bytesToUInt16(const uint8_t * bytes2);
@@ -67,13 +69,13 @@ uint32_t floatExponent(float v);
 /// Returns mantissa field as float between [0, 1).
 float floatMantissa(float v);
 
-/// Cast float to long.
+/// Cast float to int
 
 /// Reliable up to 2^24 (16777216)
 ///
 int32_t floatToInt(float v);
 
-/// Cast float to unsigned long.
+/// Cast float to unsigned int
 
 /// Reliable up to 2^24 (16777216)
 ///
@@ -82,32 +84,19 @@ uint32_t floatToUInt(float v);
 /// Converts linear integer phase to fraction
 float fraction(uint32_t bits, uint32_t phase);
 
-/// Convert 16-bit signed integer to signed floating point normal [-1, 1).
-float intToNormal(short v);
-
-/// Convert floating point normal [0, 1) to unsigned long [0, 2^32)
-
-/// This conversion is most accurate on an exponential scale.
-///	Input values outside [-1, 1) return 0.
-///	Values in [-1, 0] behave as positive values in [0, 1).
-uint32_t normalToUInt(float normal);
-
-/// Convert floating point normal [0, 1) to unsigned long [0, 2^32)
-
-/// This conversion is most accurate on a linear scale.
-/// Input values outside [0, 1) result in undefined behavior.
-uint32_t normalToUInt2(float normal);
+/// Convert 16-bit signed integer to floating point in [-1, 1)
+float intToUnit(int16_t v);
 
 /// Type-pun 32-bit unsigned int to 32-bit float
 
 /// This function uses a union to avoid problems with direct pointer casting
-/// when fstrict-aliasing is on.
+/// when the fstrict-aliasing compiler flag is on.
 inline float punUF(uint32_t v){ Twiddle<float> u(v); return u.f; }
 
 /// Type-pun 32-bit float to 32-bit unsigned int
 
 /// This function uses a union to avoid problems with direct pointer casting
-/// when fstrict-aliasing is on.
+/// when the fstrict-aliasing compiler flag is on.
 inline uint32_t punFU( float v){ Twiddle< float> u(v); return u.u; }
 inline  int32_t punFI( float v){ Twiddle< float> u(v); return u.i; }
 
@@ -127,8 +116,21 @@ float splitInt512(uint32_t v, uint32_t& intPart);
 /// Split integer accumulator into table index (size=1024) and interpolation fraction.
 float splitInt1024(uint32_t v, uint32_t& intPart);
 
-template<class T> T uintToNormal (uint32_t v);
-template<class T> T uintToNormalS(uint32_t v);
+template<class T> T uintToUnit (uint32_t v);
+template<class T> T uintToUnitS(uint32_t v);
+
+/// Convert floating point in [0, 1) to unsigned long in [0, 2^32)
+
+/// This conversion is most accurate on an exponential scale.
+///	Input values outside [-1, 1) return 0.
+///	Values in [-1, 0] behave as positive values in [0, 1).
+uint32_t unitToUInt(float u);
+
+/// Convert floating point in [0, 1) to unsigned long in [0, 2^32)
+
+/// This conversion is most accurate on a linear scale.
+/// Input values outside [0, 1) result in undefined behavior.
+uint32_t unitToUInt2(float u);
 
 
 
@@ -181,7 +183,7 @@ effective  precision
 */
 
 inline uint32_t floatExponent(float v){
-	return punFU(v) << 1 >> 24;
+	return punFU(v) >> 23 & 0xff;
 }
 
 inline float floatMantissa(float v){
@@ -195,32 +197,9 @@ inline float fraction(uint32_t bits, uint32_t phase){
 	return punUF(phase) - 1.f;
 }
 
-inline float intToNormal(short v){
-//	ULONG vu = ((ULONG)v) + 32768;
-//	vu = vu << 7 | 0x40000000;
-//	return *(float *)&vu - 3.f;
-
+inline float intToUnit(int16_t v){
 	uint32_t vu = (((uint32_t)v) + 0x808000) << 7; // set fraction in float [2, 4)
 	return punUF(vu) - 3.f;
-
-	//return (float)v / 32768.f; // naive method
-	//return (float)v * 0.000030517578125f; // less naive method
-}
-
-inline uint32_t normalToUInt(float v){
-	uint32_t normalU = punFU(v);
-	uint32_t rbs = 126UL - (normalU >> 23UL);
-//	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
-//	printf("%x\n", 0x80000000UL >> rbs);
-	return ((normalU | 0x800000UL) << 8UL) >> rbs;
-//Her00	
-//float y = v + 1.f; 
-//return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
-}
-
-inline uint32_t normalToUInt2(float v){
-	v++;	// go into [1,2] range, FP fraction is now result
-	return punFU(v) << 9;
 }
 
 inline float splitInt512(uint32_t v, uint32_t& intPart){
@@ -235,14 +214,30 @@ inline float splitInt1024(uint32_t v, uint32_t& intPart){
 	return u.f - 1.f;
 }
 
-template<> inline float uintToNormal<float>(uint32_t v){
+template<> inline float uintToUnit<float>(uint32_t v){
 	v = v >> 9 | 0x3f800000; 
 	return punUF(v) - 1.f;
 }
 
-template<> inline float uintToNormalS<float>(uint32_t v){
+template<> inline float uintToUnitS<float>(uint32_t v){
 	v = v >> 9 | 0x40000000;
 	return punUF(v) - 3.f;
+}
+
+inline uint32_t unitToUInt(float v){
+	uint32_t normalU = punFU(v);
+	uint32_t rbs = 126UL - (normalU >> 23UL);
+//	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
+//	printf("%x\n", 0x80000000UL >> rbs);
+	return ((normalU | 0x800000UL) << 8UL) >> rbs;
+//Her00	
+//float y = v + 1.f; 
+//return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
+}
+
+inline uint32_t unitToUInt2(float v){
+	v++;	// go into [1,2] range, FP fraction is now result
+	return punFU(v) << 9;
 }
 
 } // gam::

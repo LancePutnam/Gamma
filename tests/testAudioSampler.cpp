@@ -36,7 +36,7 @@ void audioCB(AudioIOData & io){
 
 	for(unsigned long f=0; f<numFrames; f++){
 		out0[f] = loops ? (*smpA)() : (*smpA)();
-		//out0[f] = scl::intToNormal(loops ? smpA->nextN() : smpA->nextClipN());
+		//out0[f] = scl::intToUnit(loops ? smpA->nextN() : smpA->nextClipN());
 		out1[f] = out0[f];
 	}
 }

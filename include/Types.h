@@ -2,9 +2,9 @@
 #define GAMMA_TYPES_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information 
 
-/*	File description: 
+	File Description: 
 	Static (fixed size) types
 */
 
@@ -25,6 +25,9 @@ class Bits{
 public:
 
 	Bits(): mVal(T(0)){}
+	
+	/// Returns current value
+	T operator()() const { return mVal; }
 	
 	/// Returns mask of enabled bits in input mask
 	T enabled(T bitMask) const { return mVal & bitMask; }

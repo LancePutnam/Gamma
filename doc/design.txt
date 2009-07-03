@@ -125,6 +125,8 @@ inclusive, is a closed, bounded interval.
 Domain		The set of possible input values to a function
 Range		The set of possible output values of a function
 
+The interval [0,1] is the (closed) unit interval, I. Geometrically, it is the 
+positive half of a unit 1-ball.
 
 
 On Name

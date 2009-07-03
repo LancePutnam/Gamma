@@ -5,6 +5,13 @@
 
 namespace gam{
 
+uint32_t bitsToUInt(const char * bits){
+	uint32_t i=0, r=0;
+	for(; bits[i] && i<32; ++i) r |= ((bits[i]=='1'?1:0) << (31-i));
+	return r>>(32-i);
+}
+
+
 uint32_t bytesToUInt32(const uint8_t * bytes4){
 	uint32_t word = 0;
 
@@ -75,13 +82,13 @@ int32_t floatToInt(float value){
 }
 
 
-float split(float value, long & intPart){
+float split(float value, int32_t& intPart){
 	Twiddle<float> u(value);
 
 	u.u = (u.u + 0x800000);
 
 	if(u.u & 0x40000000){
-		long shift = ((u.u)>>23) & 0x7F;
+		int32_t shift = ((u.u)>>23) & 0x7F;
 		intPart = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
 		u.u = 0x3F800000 | ((u.u << shift) & MASK_F32_FRAC);
 		return u.f - 1.f;

@@ -256,8 +256,8 @@ void polarToRectFast(float * magA, float * phsA, uint32_t len){
 		phs = scl::wrap(phs, (float)M_2PI);
 		phs *= (float)M_1_2PI;
 		
-		//uint32_t index = scl::normalToUInt(phs);
-		uint32_t index = normalToUInt2(phs);	// better cuz phase is on a linear scale
+		//uint32_t index = scl::unitToUInt(phs);
+		uint32_t index = unitToUInt2(phs);	// better cuz phase is on a linear scale
 		
 //		float sn = MemOpF::at(sinTable, fracBits, index);
 //		float cs = MemOpF::at(sinTable, fracBits, index + quarter);

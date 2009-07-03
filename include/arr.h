@@ -2,7 +2,11 @@
 #define GAMMA_ARR_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
+
+	File Description:
+	Functions for processing arrays of data.
+*/
 
 #include <math.h>
 #include <string.h>

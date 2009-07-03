@@ -2,7 +2,11 @@
 #define GAMMA_RND_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
+
+	File Description:
+	Random variable classes
+*/
 
 #include <math.h>
 #include <stdio.h>
@@ -203,7 +207,7 @@ namespace rnd{
 	/// Randomly permutes (shuffles) elements in array.
 	TEM void permute(T * arr, uint32_t len);
 
-	/// Returns normal in [0, 1) quantized by q divisions.
+	/// Returns value in [0, 1) quantized by q divisions.
 	float quan(uint32_t q);
 	
 	/// Returns value in [o, 2*o) quantized by q divisions.
@@ -283,11 +287,11 @@ TEM inline float add2I_float(T & rng){
 #undef R
 
 TEM inline float uni_float(T& rng){
-	return uintToNormal<float>(rng());
+	return uintToUnit<float>(rng());
 }
 
 TEM inline float uniS_float(T& rng){
-	return uintToNormalS<float>(rng());
+	return uintToUnitS<float>(rng());
 }
 
 TEM inline float binS_float(T & rng){

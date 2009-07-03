@@ -2,9 +2,9 @@
 #define GAMMA_SCL_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
 
-/*	File description:
+	File Description:
 	Mathematical scalar operations.
 */
 
@@ -172,9 +172,9 @@ float clipMag(float value, float min, float max);
 
 /// Third order polynomial approximation to first half of cosine.
 
-/// 'normal' must be in the range [0, 0.5] which corresponds to the first half
+/// 'u' must be in the range [0, 0.5] which corresponds to the first half
 /// of the cosine.
-TEM T cosP3(T normal);
+TEM T cosP3(T u);
 
 /// 8th order Taylor series approximation to a cosine.
 
@@ -316,8 +316,8 @@ TEM void mapLin(T i0, T i1, T o0, T o1, T & scale, T & offset);
 /// Linearly maps value from [i0, i1] to [o0, o1].
 TEM T mapLin(T v, T i0, T i1, T o0, T o1);
 
-/// Returns normal^power linearly mapped to [bound0, bound1].
-double mapNormal(double normal, double bound1, double bound0, double power=1.);
+/// Returns v^power linearly mapped to [bound0, bound1].
+double mapPower(double v, double bound1, double bound0, double power=1.);
 
 /// Mixes two values together (1 = thru, 0.5 = mono, 0 = swap).
 TEM void mix2(T& io1, T& io2, T mix);
@@ -865,8 +865,8 @@ TEM inline T mapLin(T v, T i0, T i1, T o0, T o1){
 	return (v - i0) * scale + o0;
 }
 
-inline double mapNormal(double v, double b1, double b0, double power){
-	if(power != 1.) v = ::pow(v, power);
+inline double mapPower(double v, double b1, double b0, double p){
+	if(p != 1.) v = ::pow(v, p);
 	return b0 + (b1 - b0) * v;
 }
 

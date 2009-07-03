@@ -2,7 +2,11 @@
 #define GAMMA_AUDIOIO_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
+
+	File Description:
+	Audio i/o class
+*/
 
 
 /*	This is a simple example demonstrating how to set up a callback

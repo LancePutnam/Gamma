@@ -2,9 +2,9 @@
 #define GAMMA_ACCESS_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
 
-/*	File description: 
+	File Description: 
 	Functions/objects for accessing and indexing arrays.
 */
 

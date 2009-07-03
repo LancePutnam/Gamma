@@ -278,7 +278,7 @@ template <class T=gam::real>
 class Pan{
 public:
 
-	/// @param[in] pos	Signed normalized position in [-1, 1]
+	/// @param[in] pos	Signed unit position in [-1, 1]
 	Pan(T pos=0){ this->pos(pos); }
 	
 	/// Filter sample (mono-to-stereo)

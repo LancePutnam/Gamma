@@ -2,7 +2,11 @@
 #define GAMMA_IPL_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
+
+	File Description:
+	Interpolation functions.
+*/
 
 #include "Containers.h"
 #include "Constants.h"
@@ -11,8 +15,7 @@
 
 namespace gam{
 
-///	Interpolation functions.
-
+/// Interpolation functions.
 
 /// The naming convention for values is that their alphabetical order is
 /// equivalent to their sequence order (oldest to newest).

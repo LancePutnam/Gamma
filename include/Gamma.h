@@ -2,7 +2,11 @@
 #define GAMMA_GAMMA_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
+
+	File Description:
+	Main Gamma includes
+*/
 
 #define GAMMA_VERSION 0.9.2
 //#define GAMMA_H_INC_ALL

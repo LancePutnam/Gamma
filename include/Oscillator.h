@@ -26,11 +26,11 @@ public:
 	Accum(float frq, float phs=0);
 	virtual ~Accum(){}
 
-	void freq(float value);			///< Set frequency.
-	void phase(float normal);		///< Set phase from [0, 1) of one period.
+	void freq(float v);				///< Set frequency.
+	void phase(float u);			///< Set phase from [0, 1) of one period.
 	void phaseMax();				///< Set phase to maximum value.
-	void phaseAdd(float normal);	///< Add value to phase [0, 1).		
-	void period(float value);		///< Set period length.
+	void phaseAdd(float u);			///< Add value to phase [0, 1).		
+	void period(float v);			///< Set period length.
 
 	float freq() const;				///< Returns frequency.
 	float phase() const;			///< Returns current unit phase
@@ -114,7 +114,7 @@ public:
 	/// Constructor that alocates an internal table
 
 	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phs			Initial normalized phase [0, 1)
+	/// @param[in]	phs			Initial phase in [0, 1)
 	/// @param[in]	size		Number of table elements (actual number is power of 2 ceiling)
 	Osc(float frq, float phs=0, uint32_t size=512)
 	:	Accum<Ts>(frq, phs), ArrayPow2<Tv>(size)
@@ -123,7 +123,7 @@ public:
 	/// Constructor that references an external table
 
 	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phs			Initial normalized phase [0, 1)
+	/// @param[in]	phs			Initial phase in [0, 1)
 	/// @param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, const ArrayPow2<Tv> & src)
 	:	Accum<Ts>(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
@@ -215,7 +215,7 @@ template<class Tv=gam::real, class Ts=Synced>
 class Sine : public AccumPhase<Tv, Ts> {
 public:
 	/// @param[in]	frq		Initial frequency.
-	/// @param[in]	phs		Initial normalized phase [0, 1).
+	/// @param[in]	phs		Initial phase in [0, 1).
 	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv, Ts>(frq, phs){}
 
 	/// Return next sample.
@@ -373,7 +373,7 @@ public:
 	/// @param[in]	table		Reference to array the oscillator will read from
 	/// @param[in]	log2Size	Number of table elements. The number of elements is 2^log2Size.
 	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phase		Initial normalized phase [0, 1)
+	/// @param[in]	phase		Initial phase in [0, 1)
 	TableOsc(Tv * table, uint32_t size, float frq=440, float phase=0);
 	virtual ~TableOsc(){}
 	
@@ -408,7 +408,7 @@ public:
 	ACCUM_INHERIT
 
 	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phase	Initial normalized phase [0, 1)
+	/// @param[in]	phase	Initial phase in [0, 1)
 	TableSine(float frq=440, float phase=0);
 	//virtual ~TableSine(){}
 
@@ -429,7 +429,7 @@ protected:
 /// Multiple table oscillator for making band-limited waveforms.
 
 /// Each table is mapped to an octave in the frequency spectrum.  The highest
-/// table maps to normalized frequencies [1/4, 1/2) and the lowest to [0, 1/m) 
+/// table maps to unit frequencies [1/4, 1/2) and the lowest to [0, 1/m) 
 /// where m = 2 ^ (numTables + 1).
 template<class Tv=gam::real, class Ts=Synced>
 class MultiTableOsc : public TableOsc<Tv, Ts> {
@@ -438,8 +438,8 @@ public:
 	/// @param[in]	table		Reference to matrix the oscillator will read from
 	/// @param[in]	log2Size	Log base-2 of the number of elements in each waveform table
 	/// @param[in]	numTables	Number of waveform tables
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phase		Initial normalized phase [0, 1)
+	/// @param[in]	frq			Initial frequency
+	/// @param[in]	phase		Initial phase in [0, 1)
 	MultiTableOsc(Tv * table, uint32_t log2Size, uint32_t numTables, float frq=220, float phase=0);
 	virtual ~MultiTableOsc(){}
 	
@@ -479,14 +479,14 @@ public:
 	LFO();
 	
 	/// @param[in] frq		Initial frequency
-	/// @param[in] phase	Initial normalized phase [0, 1).
-	/// @param[in] mod		Initial normalized modifier amount
+	/// @param[in] phase	Initial phase in [0, 1)
+	/// @param[in] mod		Initial modifier amount in [0, 1)
 	LFO(float frq, float phase=0, float mod=0.5);
 
 	uint32_t modi;			///< Modifier parameter
 
 	void operator()(float f, float p, float m);
-	void mod(double n);	///< Sets modifier parameter of waveform from normal
+	void mod(double n);	///< Sets modifier parameter of waveform from unit value
 
 	float cos();		///< Cosine based on 3rd order polynomial
 	float down();		///< Downward ramp (1 to -1)
@@ -529,7 +529,7 @@ class Impulse : public AccumPhase<Tv, Ts> {
 public:
 
 	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phase		Initial normalized phase [0, 1)
+	/// @param[in]	phase		Initial phase in [0, 1)
 	/// @param[in]	harmonics	Initial number of harmonics
 	Impulse(Tv frq=440, Tv phase=0, Tv harmonics=8);
 	virtual ~Impulse(){}
@@ -728,13 +728,13 @@ TEMS Accum<Ts>::Accum(float freq, float phase): mFreq(freq){
 }
 
 TEMS inline uint32_t Accum<Ts>::phaseFI(float v) const {
-	//return scl::normalToUInt(v);
+	//return scl::unitToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
 	return castIntRound(v * 4294967296.);
 }
 
 TEMS inline float Accum<Ts>::phaseIF(uint32_t v) const {
-	return uintToNormal<float>(v);
+	return uintToUnit<float>(v);
 }
 
 TEMS void Accum<Ts>::onResync(double r){ //printf("Accum: onSyncChange\n");
@@ -796,21 +796,21 @@ TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(){
 	return r;
 }
 
-TEM inline void AccumPhase<Tv, Ts>::freq(Tv value){
-	mFreq = value;
-	mPhaseInc = value * m2PiUPS;
+TEM inline void AccumPhase<Tv, Ts>::freq(Tv v){
+	mFreq = v;
+	mPhaseInc = v * m2PiUPS;
 }
 
-TEM inline void AccumPhase<Tv, Ts>::period(Tv value){ freq((Tv)1 / value); }
-TEM inline void AccumPhase<Tv, Ts>::phase(Tv normal){ mPhase = normal * (Tv)M_2PI; }
-TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv normal){ mPhase += normal * (Tv)M_2PI; }
+TEM inline void AccumPhase<Tv, Ts>::period(Tv v){ freq(Tv(1)/v); }
+TEM inline void AccumPhase<Tv, Ts>::phase(Tv u){ mPhase = u * Tv(M_2PI); }
+TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv u){ mPhase += u * Tv(M_2PI); }
 
 TEM inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq; }
-TEM inline Tv AccumPhase<Tv, Ts>::period(){ return (Tv)1 / mFreq; }
-TEM inline Tv AccumPhase<Tv, Ts>::phase(){ return mPhase * (Tv)M_1_2PI; }
+TEM inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / mFreq; }
+TEM inline Tv AccumPhase<Tv, Ts>::phase(){ return mPhase * Tv(M_1_2PI); }
 
 TEM void AccumPhase<Tv, Ts>::onResync(double r){ recache(); freq(mFreq); }
-TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = (Tv)(Ts::ups() * M_2PI); }
+TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
 
 TEM void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
 	fprintf(fp, "%f %f %f%s", freq(), phase(), mPhaseInc, append);
@@ -987,7 +987,7 @@ TEM inline void MultiTableOsc<Tv, Ts>::freq(float value){
 	MTO::mFreq = value;
 	float ratio = value * MTO::mUPS;	// 0 to 1 of sample rate
 	if(ratio >= 0.5f || ratio <= -0.5f) ratio = 0.49999998f;
-	MTO::mPhaseInc = normalToUInt(ratio);
+	MTO::mPhaseInc = unitToUInt(ratio);
 	uint32_t tableNum = floatExponent(ratio) - 126 + mNumTables;
 	if(tableNum >= mNumTables) tableNum = 0;
 	MTO::mTable = mMultiTable + tableNum * (1<<MTO::mTblBits);
@@ -998,7 +998,7 @@ TEM inline void MultiTableOsc<Tv, Ts>::freqLL(float value){
 	MTO::mFreq = value;
 	float ratio = value * MTO::ups();	// 0 to 1 of sample rate
 	if(ratio >= 0.5f || ratio <= -0.5f) ratio = 0.49999998f;
-	MTO::mPhaseInc = normalToUInt(ratio);
+	MTO::mPhaseInc = unitToUInt(ratio);
 	uint32_t tableNum = floatExponent(ratio) - 126 + mNumTables;
 	if(tableNum >= mNumTables){
 		MTO::mTable = mMultiTable;

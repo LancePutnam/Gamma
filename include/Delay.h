@@ -190,7 +190,7 @@ public:
 	virtual ~Delay(){}
 
 	void delay(float v);			///< Set delay length.
-	void delayNorm(float n);		///< Set normalized delay as (0, 1) of buffer size.
+	void delayUnit(float u);		///< Set delay as (0, 1) of buffer size.
 	void freq(float v);				///< Set natural frequency (1/delay()).
 	void maxDelay(float v);			///< Set maximum delay length.
 	void zero();					///< Sets all elements to zero.
@@ -215,7 +215,7 @@ public:
 	
 	float delay() const;				///< Returns current delay length.
 	uint32_t delayIndex(uint32_t delay) const;///< Returns index of delayed sample.
-	float delayNorm() const;			///< Returns normalized delay (to max delay).
+	float delayUnit() const;			///< Returns unit delay (to max delay).
 	float maxDelay() const;				///< Returns maximum delay length units.
 	uint32_t oldestIndex() const;			///< Returns index of oldest sample.
 
@@ -832,7 +832,7 @@ TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
 
 TM1 inline uint32_t Delay<TM2>::delayFToI(float v){
 	return castIntRound((v * mDelayFactor) * 4294967296.);
-	//return scl::normalToUInt(v * mDelayFactor);
+	//return scl::unitToUInt(v * mDelayFactor);
 }
 
 TM1 inline void Delay<TM2>::incPhase(){ mPhase += mPhaseInc; }
@@ -866,7 +866,7 @@ TM1 inline void Delay<TM2>::delay(float v){
 	mDelay = delayFToI(v);
 }
 
-TM1 inline void Delay<TM2>::delayNorm(float n){ mDelay = normalToUInt(n); }
+TM1 inline void Delay<TM2>::delayUnit(float n){ mDelay = unitToUInt(n); }
 
 TM1 inline void Delay<TM2>::freq(float v){ delay(1.f/v); }
 
@@ -876,8 +876,8 @@ TM1 inline uint32_t Delay<TM2>::oldestIndex() const {
 
 TM1 inline float Delay<TM2>::delay() const { return mDelayLength; }
 
-TM1 inline float Delay<TM2>::delayNorm() const {
-	return uintToNormal<float>(mDelay);
+TM1 inline float Delay<TM2>::delayUnit() const {
+	return uintToUnit<float>(mDelay);
 }
 
 TM1 inline uint32_t Delay<TM2>::delayIndex(uint32_t delay) const {

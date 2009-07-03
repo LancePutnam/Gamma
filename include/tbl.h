@@ -58,9 +58,9 @@ TEM void cosine(T * dst, uint32_t len);
 
 /// Fills table with section of an exponential decay.
 
-///		Values are normalized to descend from 1 to 0. \n
-///		Negative 'order' curves downward and positive 'order' curves upward. \n
-///		If 'order' is 0, you get a line.
+///	Values are normalized to descend from 1 to 0. \n
+///	Negative 'order' curves downward and positive 'order' curves upward. \n
+///	If 'order' is 0, you get a line.
 TEM void decay(T * dst, uint32_t len, double order);
 
 /// Fills array with one period of a sine wave.

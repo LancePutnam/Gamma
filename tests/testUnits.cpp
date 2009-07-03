@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "Gamma.h"
 #include "Access.h"
+#include "Conversion.h"
 #include "Types.h"
 
 using namespace gam;
@@ -11,14 +12,50 @@ int main(int argc, char* argv[]){
 	// errors in base functionality.
 
 	// Types
-	{	Bits<> bits;
+
+	{	Bits<> b;
 		#define T(x, y) assert(x == y);
-		bits.enable(1<<0); T(bits.enabled(1<<0), true)
-		bits.enable(1<<1); T(bits.enabled(1<<1), true)
-		#undef T	
+		b.enable(1<<0);				T(b.enabled(1<<0), 1<<0)
+		b.enable(1<<1);				T(b.enabled(1<<1), 1<<1)
+		b.toggle(1<<0);				T(b.enabled(1<<0), 0) T(b.enabled(1<<1), 1<<1)
+		b.set(1<<1, false);			T(b.enabled(1<<1), 0)
+		b.set(b.mask(0,1), true);	T(b.enabled(1<<0), 1<<0) T(b.enabled(1<<1), 1<<1)
+		b.disable(1<<0);			T(b.enabled(1<<0), 0) T(b.enabled(1<<1), 1<<1)
+		b.zero();					T(b(), 0)
+		#undef T
 	}
 
+	{	Complex<> c(0,0);
+		#define T(x, y) assert(x == y);
+		T(c, Complex<>(0,0))
+		c.fromPolar(1, 0.2);	T(c, Complex<>::Polar(1, 0.2))
+		c.fromPhase(2.3);		T(c, Complex<>::Polar(1, 2.3))
+		T(c != Complex<>(0,0), true)
+		c.normalize();			T(c.norm(), 1)
+
+		#undef T
+	}
+
+
 	// Conversion
+
+	#define T(x, y) assert(bitsToUInt(x) == y);
+	T("", 0) T("0", 0) T("1", 1) T("10", 2) T("11", 3)
+	T("0001", 1) T("11111111111111111111111111111111", 0xffffffff)
+	T("11111111111111111111111111111110", 0xfffffffe)
+	#undef T
+
+	{	Twiddle<float> t(0);
+		#define T(x, y) assert(x == y);
+		T(t.i, 0) T(t.u, 0) T(t.f, 0)
+		t.f = 0.5; T(t.u, bitsToUInt("001111110")<<23)
+		t.f = 1.0; T(t.u, bitsToUInt("001111111")<<23)
+		t.f = 2.0; T(t.u, bitsToUInt("010000000")<<23)
+		t.f =-0.5; T(t.u, bitsToUInt("101111110")<<23)
+		t.f =-1.0; T(t.u, bitsToUInt("101111111")<<23)
+		t.f =-2.0; T(t.u, bitsToUInt("110000000")<<23)
+		#undef T		
+	}
 
 	#define T(x, y) assert(castIntRound(x) == y);
 	T( 0.0, 0)	T( 0.2, 0) T( 1.0, 1) T( 1.2, 1) T( 1.5, 2) T( 1.8, 2)
@@ -33,6 +70,7 @@ int main(int argc, char* argv[]){
 	#define T(x, y) assert(floatExponent(x) == y);
 	T(0.125, 124) T(0.25, 125) T(0.50, 126) T(1.00, 127) T(2.00, 128) T(4.00, 129)
 	T(0.249, 124) T(0.49, 125) T(0.99, 126) T(1.99, 127) T(3.99, 128) T(7.99, 129)
+	T(-0.125, 124) T(-0.25, 125) T(-0.50, 126) T(-1.00, 127) T(-2.00, 128) T(-4.00, 129)
 	#undef T
 
 	#define T(x, y) assert(floatMantissa(x) == y);
@@ -43,12 +81,23 @@ int main(int argc, char* argv[]){
 	#define T(x, y) assert(floatToInt(x) == y);
 	T( 0.0, 0)	T( 0.2, 0) T( 1.0, 1) T( 1.2, 1) T( 1.5, 1) T( 1.8, 1)
 				T(-0.2, 0) T(-1.0,-1) T(-1.2,-1) T(-1.5,-1) T(-1.8,-1)
-	#undef T	
+	#undef T
 
 	#define T(x, y) assert(floatToUInt(x) == y);
-	T( 0.0, 0)	T( 0.2, 0) T( 1.0, 1) T( 1.2, 1) T( 1.5, 1) T( 1.8, 1) 
+	T( 0.0, 0)	T( 0.2, 0) T( 1.0, 1) T( 1.2, 1) T( 1.5, 1) T( 1.8, 1)
+	T(-0.0, 0)	T(-0.2, 0) T(-1.0, 1) T(-1.2, 1) T(-1.5, 1) T(-1.8, 1) 
+	#undef T
+
+	#define T(x, y) assert(intToUnit(int16_t(x)) == y);
+	T(0, 0) T(-32768, -1) T(32767, 32767./32768)
 	#undef T	
 
+	#define T(x, y) assert(uintToUnit<float>(x) == y);
+	T(0, 0.0) T(1<<9, 1.1920928955078125e-07) T(0xffffffff, 0.99999988079071044921875)
+	 T(1<<29, 0.125) T(1<<30, 0.25) T(1<<31, 0.5)
+	#undef T
+
+	
 
 	// Scalar
 

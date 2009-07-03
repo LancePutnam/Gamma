@@ -2,9 +2,9 @@
 #define GAMMA_CONTAINERS_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
 
-/*	File description: 
+	File Description:
 	Dynamically sized generic containers.
 */
 

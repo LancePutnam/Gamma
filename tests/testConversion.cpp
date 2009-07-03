@@ -88,11 +88,11 @@ int main(int argc, char* argv[]){
 //		printf("%6.3f -> %.3f\n", i, floatMantissa(i));
 //	}
 //
-//	printf("\nInt16 to normal\n");
+//	printf("\nInt16 to unit\n");
 //	for(long i=-32768; i<32767; i+=4096){
-//		printf("% 6li -> % f\n", i, intToNormal(i));
+//		printf("% 6li -> % f\n", i, intToUnit(i));
 //	}
-//	printf("% 6d -> % f\n", 0x7fff, intToNormal(0x7fff));
+//	printf("% 6d -> % f\n", 0x7fff, intToUnit(0x7fff));
 //		
 //	printf("\nNumber\tTrailing Zeroes\n");
 //	for(unsigned long i=0; i<32; i++){
@@ -102,13 +102,13 @@ int main(int argc, char* argv[]){
 //	
 //	printf("\nNormal to UInt\n");
 //	for(double i=-1.5; i<1.5; i+=0.125){
-//		printf("%6.3f -> %d\n", i, normalToUInt(i));
+//		printf("%6.3f -> %d\n", i, unitToUInt(i));
 //		//printf("%6.3f -> %lu\n", i, (unsigned long)(((double)i) * 4294967296.));
 //	}
 //	
 ////	printf("\nNormal to UInt (2)\n");
 ////	for(double i=-1.5; i<1.5; i+=0.125){
-////		printf("%6.3f -> %lu\n", i, scl::normalToUInt2(i));
+////		printf("%6.3f -> %lu\n", i, scl::unitToUInt2(i));
 ////	}
 //
 //	printf("\nNormal to UInt (using castIntRound(double))\n");
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]){
 		arr::print(arr1, arr2, len);
 	
 	scl::printBinary(0.f); printf("\n");
-	printf("%d\n", scl::normalToUInt(0.f));
+	printf("%d\n", scl::unitToUInt(0.f));
 	
 	for(float i=-32.f; i<=32.f; i++){
 		float v = i/16.f;
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]){
 	int N=5000;
 	for(int i=0; i<N; ++i){
 		float v = float(i)/N;
-		uint32_t m = normalToUInt(v);
+		uint32_t m = unitToUInt(v);
 		uint32_t a = v*4294967295UL;
 		//if((m-a)!=0) printf("m=%d, a=%d\n", m,a);
 	}

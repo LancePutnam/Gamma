@@ -2,9 +2,9 @@
 #define GAMMA_VISUAL_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
 
-/*	File description: 
+	File Description: 
 	Visual functions for printing and colors.
 */
 
