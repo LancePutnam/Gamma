@@ -117,6 +117,14 @@ inline T invSqrt(T v){
 /// Returns absolute value.
 TEM T abs(T value);
 
+/// Tests whether two values are close in value
+
+/// 'maxULP' (maximum units in the last place) is the maximum difference allowed
+/// between the values punned as integers.
+/// Code taken from Bruce Dawson, "Comparing floating point numbers."
+bool almostEqual(float a, float b, int maxULP=10);
+bool almostEqual(double a, double b, int maxUlps=10);
+
 /// Fast approximation to atan2().
 
 // Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
@@ -143,7 +151,8 @@ TEM T ceil(T val, T step, T recStep);
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
 uint32_t ceilPow2(uint32_t value);
 
-uint32_t ceilEven(uint32_t value);		///< Returns even number ceiling.
+/// Returns even number ceiling.
+uint32_t ceilEven(uint32_t value);
 
 /// Returns value clipped to [lo, hi].
 TEM T clip(T value, T hi=T(1), T lo=T(0));
@@ -184,7 +193,7 @@ TEM T dot2(T x1, T x2, T y1, T y2);
 TEM inline double error(const T& truth, const T& measured){ return (measured-truth)/double(truth);}
 
 /// Returns weights for linear fade.
-TEM void fadeLin(T & weight1, T & weight2, T fade);
+TEM void fadeLin(T& weight1, T& weight2, T fade);
 
 /// Returns weights for triangular window fade.
 
@@ -194,9 +203,8 @@ TEM void fadeLin(T & weight1, T & weight2, T fade);
 /// 0.25	1			0       \n
 /// 0.5		0.5			0.5		\n
 /// 0.75	0			1		
-TEM void fadeTri(T & weight1, T & weight2, T fade);
+TEM void fadeTri(T& weight1, T& weight2, T fade);
 
-//float factorial12(float value);				///< Returns factorial of value in [0, 12].
 uint32_t factorial12(uint32_t value);				///< Returns factorial of value in [0, 12].
 
 /// Return Fejer weighting factor for kth harmonic in a Fourier series of length n.
@@ -291,13 +299,13 @@ TEM T linLog2(T v, T recMin);
 /// highest power of two will taken.
 /// This uses an algorithm devised by Eric Cole, Jan. 2006.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-uint32_t log2(uint32_t value);
+uint32_t log2(uint32_t v);
 
 /// Fast base 2 logarithm.  For value <= 0, behavior is undefined.
-float log2Fast(float value);
+float log2Fast(float v);
 
 /// Maps value from [-1,1] to [depth, 1].
-TEM T mapDepth(T v, T depth){ return (v - (T)1) * (T)0.5 * depth + (T)1;  }
+TEM T mapDepth(T v, T depth){ return (v - T(1)) * T(0.5) * depth + T(1);  }
 
 /// Inverse 2nd power mapping for interval [0, 1].
 TEM T mapInvPow2(T v);
@@ -306,8 +314,7 @@ TEM T mapInvPow2(T v);
 TEM void mapLin(T i0, T i1, T o0, T o1, T & scale, T & offset);
 
 /// Linearly maps value from [i0, i1] to [o0, o1].
-TEM T mapLin(T value, T i0, T i1, T o0, T o1);
-//TEM T mapLin(T val, T i0, T i1=1, T o0=0, T o1=1);
+TEM T mapLin(T v, T i0, T i1, T o0, T o1);
 
 /// Returns normal^power linearly mapped to [bound0, bound1].
 double mapNormal(double normal, double bound1, double bound0, double power=1.);
@@ -318,10 +325,7 @@ TEM void mix2(T& io1, T& io2, T mix);
 /// Perform complex multiplication, c1 = c1 c2.
 TEM void mulComplex(T& r1, T& i1, const T& r2, const T& i2);
 
-/// Perform quaternion multiplication, q1 = q1 q2.
-TEM void mulQuat(T& r1, T& i1, T& j1, T& k1, T r2, T i2, T j2, T k2);
-
-TEM T nearest(T val, const char * interval="2212221", long div=12);
+TEM T nearest(T v, const char * interval="2212221", long div=12);
 
 /// Returns nearest integer division of one value to another
 TEM T nearestDiv(T of, T to);
@@ -351,14 +355,16 @@ TEM T poly(T x, T a0, T a1, T a2, T a3);
 /// The smoothness is controlled with the bw argument.
 TEM T positive(T v, T bw);
 
-TEM T pow2(T value);			///< Returns value to the 2nd power.
-TEM T pow3(T value);			///< Returns value to the 3rd power.
-TEM T pow4(T value);			///< Returns value to the 4th power.
-TEM T pow5(T value);			///< Returns value to the 5th power.
-TEM T pow6(T value);			///< Returns value to the 6th power.
-TEM T pow8(T value);			///< Returns value to the 8th power.
-TEM T pow16(T value);			///< Returns value to the 16th power.
-TEM T pow2S(T value);			///< Returns value to the 2nd power preserving sign.
+TEM T pow2(T v);			///< Returns value to the 2nd power.
+TEM T pow2S(T v);			///< Returns value to the 2nd power preserving sign.
+TEM T pow3(T v);			///< Returns value to the 3rd power.
+TEM T pow3Abs(T v);			///< Returns absolute value to the 3rd power.
+TEM T pow4(T v);			///< Returns value to the 4th power.
+TEM T pow5(T v);			///< Returns value to the 5th power.
+TEM T pow6(T v);			///< Returns value to the 6th power.
+TEM T pow8(T v);			///< Returns value to the 8th power.
+TEM T pow16(T v);			///< Returns value to the 16th power.
+TEM T pow64(T v);			///< Returns value to the 64th power.
 
 unsigned char prime(uint32_t n);	///< Returns (n+1)th prime number up to n=53.
 TEM T prime(uint32_t n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
@@ -409,7 +415,7 @@ DEF(sharm22){ static const T c= 0.25*::sqrt(15.*M_1_2PI); return Complex<T>(cp,s
 /// Continuous sign map.
 
 /// The return value is close to 1 if v > 0 and close to -1 if v < 0.
-///
+/// 'bw' controls the width of the transition region.
 TEM T sign(T v, T bw);
 
 //
@@ -437,7 +443,7 @@ TEM T sinT9(T radians);
 TEM T sinc(T radians, T eps=(T)0.0001);
 
 /// Sort values so that value1 <= value2.
-TEM void sort2(T & value1, T & value2);
+TEM void sort2(T& value1, T& value2);
 
 /// Sum of integers squared from 1 to n.
 TEM T sumOfSquares(T n){
@@ -685,8 +691,8 @@ namespace{
 // Implementation_______________________________________________________________
 
 #define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
-GEN(int, ::abs) GEN(long, labs) GEN(float, fabsf) GEN(double, fabs)
-TEM inline T abs(T v){ return v < (T)0 ? -v : v; }
+GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
+TEM inline T abs(T v){ return v < T(0) ? -v : v; }
 #undef GEN
 
 
@@ -879,14 +885,6 @@ TEM inline void mulComplex(T & r1, T & i1, const T & r2, const T & i2){
 	i1 = i1 * r2 + rt * i2;
 }
 
-TEM inline void mulQuat(T & r1, T & i1, T & j1, T & k1, T r2, T i2, T j2, T k2){
-	T rt = r1, it = i1, jt = j1;
-	r1 = r1 * r2 - i1 * i2 - j1 * j2 - k1 * k2;
-	i1 = rt * i2 + it * r2 + jt * k2 - k1 * j2;
-	j1 = rt * j2 - it * k2 + jt * r2 + k1 * i2;
-	k1 = rt * k2 + it * j2 - jt * i2 + k1 * r2;
-}
-
 TEM T nearest(T val, const char * interval, long div){
 	long vr = castIntRound(val);
 	long numWraps = 0;
@@ -908,17 +906,15 @@ TEM inline T poly(T v, T a0, T a1, T a2){ return a0 + v*(a1 + v*a2); }
 TEM inline T poly(T v, T a0, T a1, T a2, T a3){ return a0 + v*(a1 + v*(a2 + v*a3)); }
 TEM inline T positive(T v, T bw){ return T(0.5) + sign(v, bw)*T(0.5); }
 TEM inline T pow2 (T v){ return v*v; }
+TEM inline T pow2S(T v){ return v*scl::abs(v); }
 TEM inline T pow3 (T v){ return v*v*v; }
+TEM inline T pow3Abs(T v){ return scl::abs(pow3(v)); }
 TEM inline T pow4 (T v){ return pow2(pow2(v)); }
 TEM inline T pow5 (T v){ return v * pow4(v); }
 TEM inline T pow6 (T v){ return pow3(pow2(v)); }
 TEM inline T pow8 (T v){ return pow4(pow2(v)); }
 TEM inline T pow16(T v){ return pow4(pow4(v)); }
-TEM inline T pow64(T v){ v*=v; v*=v; v*=v; v*=v; v*v; return v*v; }
-
-TEM inline T pow2S(T v){ return v*scl::abs(v); }
-
-TEM inline T pow3Abs(T v){ return scl::abs(pow3(v)); }
+TEM inline T pow64(T v){ return pow8(pow8(v)); }
 
 inline unsigned char prime(uint32_t n){ return mPrimes54[n]; }
 TEM inline T prime(uint32_t n, T mul){ return (T)prime(n) * mul; }
@@ -1292,7 +1288,7 @@ TEM inline void sphericalToCart(T& r, T& p, T& t){
 // Amp precision:	24 bits
 inline float rampDown(uint32_t p){
 	p = (p >> 9) | 0x40000000;
-	return 3.f - punUF32(p);
+	return 3.f - punUF(p);
 }
 
 // [-1, -0.5, 0, 0.5]
@@ -1300,7 +1296,7 @@ inline float rampDown(uint32_t p){
 // Amp precision:	24 bits
 inline float rampUp(uint32_t p){
 	p = (p >> 9) | 0x40000000;
-	return punUF32(p) - 3.f;
+	return punUF(p) - 3.f;
 }
 
 // [1, 1, -1, -1] 
@@ -1319,7 +1315,7 @@ inline float triangle(uint32_t p){
 	uint32_t dir = p >> 31;
 	p = ((p^(-dir)) + dir);
 	p = (p >> 8) | 0x40000000;
-	return punUF32(p) - 3.f;
+	return punUF(p) - 3.f;
 }
 
 // Just another triangle wave algorithm
@@ -1343,13 +1339,13 @@ inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
 	uint32_t saw1 = (p >> 9) | 0x3F800000;
 	uint32_t saw2 = ((p+w) >> 9) | 0x3F800000;
-	return punUF32(saw1) - punUF32(saw2);
+	return punUF(saw1) - punUF(saw2);
 }
 
 inline float stair(uint32_t p, uint32_t w){
 	uint32_t sqr1 = 0x3f000000 | (p & 0x80000000);
 	uint32_t sqr2 = 0x3f000000 | ((p+w) & 0x80000000);
-	return punUF32(sqr1) + punUF32(sqr2);
+	return punUF(sqr1) + punUF(sqr2);
 }
 
 inline float stairU(uint32_t p, uint32_t w){
@@ -1363,7 +1359,7 @@ inline float pulseU(uint32_t p, uint32_t w){
 inline float rampUp2(uint32_t p, uint32_t w){
 	uint32_t saw1 = (p >> 9) | 0x3f800000;
 	uint32_t saw2 = ((p+w) >> 9) | 0x3f800000;
-	return punUF32(saw1) + punUF32(saw2) - 3.f;
+	return punUF(saw1) + punUF(saw2) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
@@ -1371,13 +1367,13 @@ inline float rampUp2(uint32_t p, uint32_t w){
 // Amp precision:	24 bits
 inline float rampUpU(uint32_t p){
 	p = (p >> 9) | 0x3f800000;
-	return punUF32(p) - 1.f;
+	return punUF(p) - 1.f;
 }
 	
 inline float rampUp2U(uint32_t p, uint32_t w){
 	uint32_t saw1 = (p >> 9) | 0x3F000000;
 	uint32_t saw2 = ((p+w) >> 9) | 0x3F000000;
-	return punUF32(saw1) + punUF32(saw2) - 1.f;
+	return punUF(saw1) + punUF(saw2) - 1.f;
 }
 
 // [1, 0.75, 0.5, 0.25]
@@ -1385,7 +1381,7 @@ inline float rampUp2U(uint32_t p, uint32_t w){
 // Amp precision:	24 bits
 inline float rampDownU(uint32_t p){
 	p = (p >> 9) | 0xbf800000;
-	return punUF32(p) + 2.f;
+	return punUF(p) + 2.f;
 }
 
 inline float squareU(uint32_t p){

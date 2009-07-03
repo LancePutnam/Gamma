@@ -31,6 +31,9 @@ inline void neighborsWrap(int x1, int N, int& x0, int& x2){
 	x2 = x1+1; if(x2>=N) x2-=N;
 }
 
+/// Maps a position in [-1, 1] to an index in [0, n). No boundary operations are performed.
+inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
+
 
 // Neighbor accessing strategies
 namespace acc{

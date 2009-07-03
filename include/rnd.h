@@ -292,7 +292,7 @@ TEM inline float uniS_float(T& rng){
 
 TEM inline float binS_float(T & rng){
 	uint32_t r = rng() & 0x80000000 | 0x3f800000;
-	return punUF32(r);
+	return punUF(r);
 }
 
 TEM inline T & cond(T & v, const T & va, const T & vb, float pab, float pba){

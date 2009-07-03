@@ -272,6 +272,14 @@ struct Quat{
 		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
 	}
 	
+	/// Perform spherical linear interpolation from this to target, q.
+	Q slerp(const Q& q, T f){
+		T dot = q.dot(*this);
+		if(dot > 0.9995) return (*this + f*(q - *this)).normalize(); // linear interpolation
+		T theta = acos(dot < T(-1) ? T(-1) : (dot > T(1) ? T(1) : dot)*f);
+		return (*this)*::cos(theta) + (q - (*this)*dot).normalize()*::sin(theta);
+	}
+	
 	void toAxis(T& a, T& x, T& y, T& z) const {
 		a = T(2) * acos(r);
 		T s = T(1)/sqrt(i*i + j*j + k*k);

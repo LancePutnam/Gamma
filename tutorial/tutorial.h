@@ -6,6 +6,7 @@
 
 #include <stdio.h>		// for printing to stdout
 #include "Gamma.h"		// core functions
+#include "Access.h"
 #include "AudioIO.h"
 #include "Delay.h"
 #include "Envelope.h"

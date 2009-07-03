@@ -9,6 +9,36 @@
 namespace gam{
 namespace scl{
 
+bool almostEqual(float a, float b, int maxUlps){
+	// Make sure maxUlps is non-negative and small enough that the
+	// default NAN won't compare as equal to anything.
+	//assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+
+	int32_t ai = punFI(a);
+	int32_t bi = punFI(b);
+
+	// Make aInt and bInt lexicographically ordered as a twos-complement int
+	if(ai < 0) ai = 0x80000000 - ai;
+	if(bi < 0) bi = 0x80000000 - bi;
+
+	return abs(ai - bi) <= maxUlps;
+}
+
+bool almostEqual(double a, double b, int maxUlps){
+	// Make sure maxUlps is non-negative and small enough that the
+	// default NAN won't compare as equal to anything.
+	//assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+
+	int64_t ai = punFI(a);
+	int64_t bi = punFI(b);
+
+	// Make aInt and bInt lexicographically ordered as a twos-complement int
+	if(ai < 0) ai = INT64_C(0x8000000000000000) - ai;
+	if(bi < 0) bi = INT64_C(0x8000000000000000) - bi;
+
+	return abs(ai - bi) <= maxUlps;
+}
+
 char base10To36(int v){
 	if(within(v, 0, 9)) return '0' + v;
 	if(within(v,10,35)) return 'a' + v - 10;

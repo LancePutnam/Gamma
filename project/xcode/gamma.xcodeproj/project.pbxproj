@@ -102,6 +102,7 @@
 		16C872AD0EFA152400449449 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16C872AE0EFA152400449449 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16C872BE0EFA156C00449449 /* testParticle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1656F5B209EEF313006E3FD7 /* testParticle.cpp */; };
+		16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16CEF92D0BBCDA0A0049666F /* Gamma.h in Headers */ = {isa = PBXBuildFile; fileRef = 16CEF9120BBCDA0A0049666F /* Gamma.h */; };
 		16CF8D5B0BD9921200A80471 /* Effects.h in Headers */ = {isa = PBXBuildFile; fileRef = 16CF8D5A0BD9921200A80471 /* Effects.h */; };
 		16D0F0500DCAF24E00EDF5CD /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
@@ -1632,6 +1633,7 @@
 				16BC61B80FFC896A00AF1B29 /* arr.cpp in Sources */,
 				16BC61B90FFC896A00AF1B29 /* scl.cpp in Sources */,
 				16BC61CB0FFC898D00AF1B29 /* testUnits.cpp in Sources */,
+				16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

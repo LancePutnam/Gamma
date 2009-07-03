@@ -55,14 +55,14 @@ uint32_t floatToUInt(float value){
 }
 
 
-long floatToInt(float value){
+int32_t floatToInt(float value){
 	Twiddle<float> u(value);
 	u.u = (u.u + 0x800000);
 
 	if(u.u & 0x40000000){	// mag outside [0, 1)
-		long shift = ((u.u)>>23) & 0x7F;
-		long sign = u.u & 0x80000000;
-		long result = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
+		int32_t shift = ((u.u)>>23) & 0x7F;
+		int32_t sign = u.u & 0x80000000;
+		int32_t result = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
 		
 		if(sign){	// negative number
 			result = ~result + 1;	// 2's complement

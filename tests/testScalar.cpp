@@ -92,16 +92,6 @@ int main(int argc, char* argv[]){
 			scl::mulComplex(f1, f2, cosf(ang), sinf(ang));
 		}
 		
-	printf("\nMul Quaternion:\n");
-		f1 = 1.f; f2 = 0.f; f3 = 0.f; f4 = 0.f;
-		for(int i=0; i<33; i++){
-			printf("% 9.6f % 9.6f % 9.6f % 9.6f ", f1, f2, f3, f4);
-			printPlot(f4, 20); printf("\n");
-			float ang = M_2PI/(float)16;
-			float m = sqrtf(0.5f);
-			scl::mulQuat(f1, f2, f3, f4, cosf(ang) * m, sinf(ang) * m, cosf(ang * 0.5f) * m, sinf(ang * 0.5f) * m);
-		}
-		
 	printf("\nNearest:\n");
 		for(float i=0.f; i<12.f; i+=0.77f){
 			printf("% 6.2f -> % 6.2f\n", i, scl::nearest(i));
