@@ -13,8 +13,8 @@ THREAD_FUNCTION(threadFunc){
 
 int main(int argc, char* argv[]){
 
-	// Unit tests are ordered from the least to most dependent in order to catch
-	// errors in base functionality.
+	// Unit tests are ordered from the least to most dependent functions/objects
+	// in order to catch errors in base functionality.
 
 	// Types
 
@@ -30,17 +30,24 @@ int main(int argc, char* argv[]){
 		#undef T
 	}
 
-	{	Complex<> c(0,0);
+	{	Complexd c(0,0);
 		#define T(x, y) assert(x == y);
-		T(c, Complex<>(0,0))
-		c.fromPolar(1, 0.2);	T(c, Complex<>::Polar(1, 0.2))
-		c.fromPhase(2.3);		T(c, Complex<>::Polar(1, 2.3))
-		T(c != Complex<>(0,0), true)
+		T(c, Complexd(0,0))
+		c.fromPolar(1, 0.2);	T(c, Complexd::Polar(1, 0.2))
+		c.fromPhase(2.3);		T(c, Complexd::Polar(1, 2.3))
+		T(c != Complexd(0,0), true)
 		c.normalize();			T(c.norm(), 1)
-
+		T(c.conj(), Complexd(c.r, -c.i))
+		double p=0.1; c(1,0); c *= Complexd::Polar(1, p); T(c.arg(), p)
 		#undef T
 	}
 
+	{	Quatd q(0,0,0,0);
+		#define T(x, y) assert(x == y);
+		T(q, Quatd(0,0,0,0))
+		T(q.conj(), Quatd(q.r, -q.i, -q.j, -q.k))
+		#undef T
+	}
 
 	// Conversion
 

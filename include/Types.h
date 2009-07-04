@@ -96,8 +96,8 @@ struct Complex{
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
 
-	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if real and imaginary components are equal
-	bool operator !=(const C& v) const { return (r!=v.r) || (i!=v.i); }		///< Returns true if real or imaginary components are not equal
+	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if all components are equal
+	bool operator !=(const C& v) const { return (r!=v.r) || (i!=v.i); }		///< Returns true if any components are not equal
 	bool operator > (const C& v) const { return norm2() > v.norm2(); }		///< Returns true if norm is greater than argument's norm
 	bool operator < (const C& c) const { return norm2() < c.norm2(); }		///< Returns true if norm is less than argument's norm
 
@@ -187,6 +187,9 @@ struct Quat{
 	Q& operator()(const T& vr, const T& vi, const T& vj, const T& vk){ r=vr; i=vi; j=vj; k=vk; return *this; }
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
+
+	bool operator ==(const Q& v) const { return (r==v.r) && (i==v.i) && (j==v.j) && (k==v.k); } ///< Returns true if all components are equal
+	bool operator !=(const Q& v) const { return (r!=v.r) || (i!=v.i) || (j!=v.j) || (k!=v.k); } ///< Returns true if any components are not equal
 	
 	Q& operator = (const Q& v){ r=v.r; i=v.i; j=v.j; k=v.k; return *this; }
 	Q& operator = (const T& v){ r=v;   i=T(0);j=T(0);k=T(0);return *this; }
@@ -380,6 +383,8 @@ TEM const Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
 TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); }
 #undef TEM
 
+typedef Quat<float> Quatf;
+typedef Quat<double> Quatd;
 
 
 
