@@ -10,7 +10,6 @@
 #include "SoundFile.h"
 #include "Strategy.h"
 #include "Sync.h"
-#include "MacroD.h"
 
 namespace gam{
 
@@ -148,8 +147,6 @@ PRE double CLS::sampleRate() const { return mSampleRate; }
 
 
 } // gam::
-
-#include "MacroU.h"
 
 #endif
 

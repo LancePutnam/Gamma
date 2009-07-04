@@ -25,7 +25,6 @@
 #include "scl.h"
 #include "Constants.h"
 #include "Types.h"
-//#include "MacroD.h"
 
 namespace gam{
 namespace gen{
@@ -433,7 +432,4 @@ struct OnOff{
 } // gen::
 } // gam::
 
-//#include "MacroU.h"
-
 #endif
-

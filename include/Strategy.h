@@ -7,7 +7,6 @@
 #include "Containers.h"
 #include "ipl.h"
 #include "scl.h"
-#include "MacroD.h"
 
 namespace gam{
 
@@ -262,7 +261,5 @@ namespace warp{
 } // warp::
 
 } // gam::
-
-#include "MacroU.h"
 
 #endif

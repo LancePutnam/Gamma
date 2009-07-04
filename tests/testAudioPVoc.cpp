@@ -5,7 +5,6 @@
 #include "Noise.h"
 #include "Oscillator.h"
 #include "Gamma.h"
-#include "MacroD.h"
 
 using namespace gam;
 
@@ -28,7 +27,7 @@ void audioCB(AudioIOData & io){
 			lfoA1.phase(lfoF1.upU());
 			lfoA2.phase(lfoF2.downU());
 			
-			for(int i=0; i<stft.numBins(); ++i){
+			for(unsigned i=0; i<stft.numBins(); ++i){
 			
 				stft.bins(i)[0] *= lfoA1.triU() - lfoA2.triU();
 				//f0 *= lfoA1.impulse();

@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <string.h>
 #include "scl.h"
-#include "MacroD.h"
 
 namespace gam{
 namespace scl{
@@ -231,8 +230,6 @@ range		exp				zero lsb
 //	return 0.f;
 //}
 
-} // end namespace scl
-} // end namespace gam
-
-#include "MacroU.h"
+} // scl::
+} // gam::
 
