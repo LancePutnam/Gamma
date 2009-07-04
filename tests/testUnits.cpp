@@ -36,8 +36,11 @@ int main(int argc, char* argv[]){
 		c.fromPolar(1, 0.2);	T(c, Complexd::Polar(1, 0.2))
 		c.fromPhase(2.3);		T(c, Complexd::Polar(1, 2.3))
 		T(c != Complexd(0,0), true)
-		c.normalize();			T(c.norm(), 1)
 		T(c.conj(), Complexd(c.r, -c.i))
+		#undef T
+
+		#define T(x, y) assert(scl::almostEqual(x,y,2));
+		c.normalize();			T(c.norm(), 1)
 		double p=0.1; c(1,0); c *= Complexd::Polar(1, p); T(c.arg(), p)
 		#undef T
 	}
@@ -235,8 +238,8 @@ int main(int argc, char* argv[]){
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(scl::pow64(x) == x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
-	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#define T(x) assert(scl::almostEqual(scl::pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x, 10));
+	T(0.) T(1.) T(1.01) T(1.02) T(-1.) T(-1.01) T(-1.02)
 	#undef T
 
 	#define T(x,y) assert(scl::round(x) == y);
