@@ -19,7 +19,7 @@ bool loops = false;
 void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);
 	float * out1 = io.out(1);
-	unsigned long numFrames = io.numFrames();
+	unsigned long numFrames = io.framesPerBuffer();
 	
 	using namespace gam::rnd;
 	if(prob(0.008)){						// Randomize sampler
@@ -43,7 +43,7 @@ void audioCB(AudioIOData & io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL, 2, 1);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	//if(!smpA.hasSource()){ printf("Can't open sound file...\n"); return -1; }
 	

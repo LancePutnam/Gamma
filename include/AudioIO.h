@@ -2,11 +2,7 @@
 #define GAMMA_AUDIOIO_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information
-
-	File Description:
-	Audio i/o class
-*/
+	See COPYRIGHT file for authors and license information */
 
 
 /*	This is a simple example demonstrating how to set up a callback
@@ -55,7 +51,7 @@ public:
 	AudioIOData(void * user);
 	~AudioIOData();
 
-	void * user;						///< User specified data
+	void * user;							///< User specified data
 	
 	float *       aux(uint32_t channel);	///< Returns an aux channel buffer.
 	const float * in (uint32_t channel);	///< Returns an in channel buffer.
@@ -65,16 +61,15 @@ public:
 	uint32_t outChans() const;				///< Returns effective number of output channels
 	uint32_t auxChans() const;				///< Returns number of aux channels
 
-	uint32_t inDeviceChans() const;		///< Returns number of channels opened on input device
+	uint32_t inDeviceChans() const;			///< Returns number of channels opened on input device
 	uint32_t outDeviceChans() const;		///< Returns number of channels opened on output device
-	uint32_t numFrames() const;			///< Returns frames/buffer of audio I/O stream
-	double secondsPerBuffer() const;	///< Returns seconds/buffer of audio I/O stream
-	double fps() const;					///< Returns frames/second of audio I/O streams
-	double spf() const;					///< Returns seconds/frame of audio I/O streams
-	double time() const;				///< Returns current stream time in seconds
+	uint32_t framesPerBuffer() const;		///< Returns frames/buffer of audio I/O stream
+	double framesPerSecond() const;			///< Returns frames/second of audio I/O streams
+	double secondsPerBuffer() const;		///< Returns seconds/buffer of audio I/O stream
+	double time() const;					///< Returns current stream time in seconds
 	double time(uint32_t frame) const;		///< Returns current stream time in seconds of frame
-	void zeroAux();						///< Zeros all the aux buffers
-	void zeroOut();						///< Zeros all the internal output buffers
+	void zeroAux();							///< Zeros all the aux buffers
+	void zeroOut();							///< Zeros all the internal output buffers
 	
 protected:
 	PaStreamParameters mInParams, mOutParams;	// Input and output stream parameters.
@@ -125,6 +120,10 @@ typedef void (*audioCallback)(AudioIOData& io);
 /// 
 class AudioIO : public AudioIOData {
 public:
+	using AudioIOData::inChans;
+	using AudioIOData::outChans;
+	using AudioIOData::framesPerBuffer;
+	using AudioIOData::framesPerSecond;
 
 	/// Creates AudioIO using default I/O devices.
 	///
@@ -158,8 +157,10 @@ public:
 	/// depending on how many channels the device supports. Passing in -1 for
 	/// the number of channels opens all available channels.
 	void chans(int num, bool forOutput);
-	void setFPS(double fps);
-	void setFramesPerBuffer(uint32_t numFrames);
+	void framesPerSecond(double v);
+	void framesPerBuffer(uint32_t n);
+	void inChans(uint32_t n){ chans(n,false); }
+	void outChans(uint32_t n){ chans(n,true); }
 	void auxChans(uint32_t num);
 
 	uint32_t chans(bool forOutput) const;
@@ -211,12 +212,12 @@ private:
 
 // Implementation_______________________________________________________________
 
-inline void AudioIOData::zeroAux(){ mem::zero(mBufA, numFrames() * mNumA); }
-inline void AudioIOData::zeroOut(){ mem::zero(mBufO, outChans() * numFrames()); }
+inline void AudioIOData::zeroAux(){ mem::zero(mBufA, framesPerBuffer() * mNumA); }
+inline void AudioIOData::zeroOut(){ mem::zero(mBufO, outChans() * framesPerBuffer()); }
 
-inline float *       AudioIOData::aux(uint32_t num){ return mBufA + num * numFrames(); }
-inline const float * AudioIOData::in (uint32_t chn){ return mBufI + chn * numFrames(); }
-inline float *       AudioIOData::out(uint32_t chn){ return mBufO + chn * numFrames(); }
+inline float *       AudioIOData::aux(uint32_t num){ return mBufA + num * framesPerBuffer(); }
+inline const float * AudioIOData::in (uint32_t chn){ return mBufI + chn * framesPerBuffer(); }
+inline float *       AudioIOData::out(uint32_t chn){ return mBufO + chn * framesPerBuffer(); }
 
 inline uint32_t AudioIOData:: inChans() const { return mNumI; }
 inline uint32_t AudioIOData::outChans() const { return mNumO; }
@@ -224,12 +225,11 @@ inline uint32_t AudioIOData::auxChans() const { return mNumA; }
 inline uint32_t AudioIOData::inDeviceChans() const { return (uint32_t)mInParams.channelCount; }
 inline uint32_t AudioIOData::outDeviceChans() const { return (uint32_t)mOutParams.channelCount; }
 
-inline double AudioIOData::fps() const { return mFramesPerSecond; }
-inline double AudioIOData::spf() const { return 1. / fps(); }
+inline double AudioIOData::framesPerSecond() const { return mFramesPerSecond; }
 inline double AudioIOData::time() const { return Pa_GetStreamTime(mStream); }
-inline double AudioIOData::time(uint32_t frame) const { return (double)frame * spf() + time(); }
-inline uint32_t AudioIOData::numFrames() const { return mFramesPerBuffer; }
-inline double AudioIOData::secondsPerBuffer() const { return (double)numFrames() * spf(); }
+inline double AudioIOData::time(uint32_t frame) const { return (double)frame / framesPerSecond() + time(); }
+inline uint32_t AudioIOData::framesPerBuffer() const { return mFramesPerBuffer; }
+inline double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() / framesPerSecond(); }
 
 inline void AudioIO::operator()(){ if(callback) callback(*this); }
 

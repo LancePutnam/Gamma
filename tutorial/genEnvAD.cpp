@@ -15,7 +15,7 @@ double tilt = 0;			// tilt of envelope; 0=percussive, 1=reversive
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 	
 		if(tmr()){
 			tilt += 0.1; if(tilt > 1) tilt=0;	// increment tilt amount
@@ -32,7 +32,7 @@ void audioCB(AudioIOData& io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 	
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

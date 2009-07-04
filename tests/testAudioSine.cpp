@@ -20,7 +20,7 @@ AccumPhase<> sineC3(440);					// direct math.h sin() (ground truth)
 void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);
 	float * out1 = io.out(1);
-	unsigned long numFrames = io.numFrames();
+	unsigned long numFrames = io.framesPerBuffer();
 
 	for(unsigned long f=0; f<numFrames; f++){
 		float s =	sineT1.nextL() +
@@ -39,7 +39,7 @@ void audioCB(AudioIOData & io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	tbl::sine(table, 1<<l2Size);	// generate 1 sine cycle
 	

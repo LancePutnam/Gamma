@@ -120,10 +120,10 @@ AudioIO::AudioIO(
 	callback = callbackA;
 	
 	init();
-	this->setFramesPerBuffer(framesPerBuf);
+	this->framesPerBuffer(framesPerBuf);
 	chans(inChansA, false);
 	chans(outChansA, true);
-	this->setFPS(framesPerSec);
+	this->framesPerSecond(framesPerSec);
 }
 
 		
@@ -268,22 +268,22 @@ int AudioIO::paCallback(const void *input,
 	bool deinterleave = true;
 
 	if(deinterleave){
-		mem::deinterleave((float *)io.in(0),  paI, io.numFrames(), io.inDeviceChans() );
-		mem::deinterleave(io.out(0), paO, io.numFrames(), io.outDeviceChans());
+		mem::deinterleave((float *)io.in(0),  paI, io.framesPerBuffer(), io.inDeviceChans() );
+		mem::deinterleave(io.out(0), paO, io.framesPerBuffer(), io.outDeviceChans());
 	}
 
 	io();	// call callback
 
 	// kill pesky nans so we don't hurt anyone's ears
 	if(io.killNANs()){
-		for(uint32_t i=0; i<io.numFrames()*io.outDeviceChans(); ++i){
+		for(uint32_t i=0; i<io.framesPerBuffer()*io.outDeviceChans(); ++i){
 			float& s = io.out(0)[i];
 			if(isnan(s)) s = 0.f;
 		}
 	}
 
 	if(deinterleave){
-		mem::interleave(paO, io.out(0), io.numFrames(), io.outDeviceChans());
+		mem::interleave(paO, io.out(0), io.framesPerBuffer(), io.outDeviceChans());
 	}
 
 	return 0;
@@ -321,8 +321,8 @@ void AudioIO::resizeBuffer(bool forOutput){
 }
 
 
-void AudioIO::setFPS(double v){	//printf("AudioIO::fps(%f)\n", v);
-	if(AudioIOData::fps() != v){
+void AudioIO::framesPerSecond(double v){	//printf("AudioIO::fps(%f)\n", v);
+	if(AudioIOData::framesPerSecond() != v){
                 
 		if(!supportsFPS(v)) v = mOutDevice.defaultSampleRate();
 
@@ -332,9 +332,9 @@ void AudioIO::setFPS(double v){	//printf("AudioIO::fps(%f)\n", v);
 }
 
 
-void AudioIO::setFramesPerBuffer(uint32_t num){
-	if(numFrames() != num){
-		mFramesPerBuffer = num;
+void AudioIO::framesPerBuffer(uint32_t n){
+	if(framesPerBuffer() != n){
+		mFramesPerBuffer = n;
 		auxChans(AudioIOData::auxChans());
 		reopen();
 	}

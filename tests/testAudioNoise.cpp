@@ -16,7 +16,7 @@ void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);
 	float * out1 = io.out(1);
 	
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 	
 		if(tmr()) cnt();
 	
@@ -34,7 +34,7 @@ void audioCB(AudioIOData & io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;

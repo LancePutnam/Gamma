@@ -12,7 +12,7 @@ SineD<> osc(440, 0.2, 1);
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 		
 		// Randomize frequency and decay time every so often...
 		if(tmr())
@@ -28,7 +28,7 @@ void audioCB(AudioIOData& io){
 int main(int argc, char* argv[]){
 
 	AudioIO io(256, 44100, audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

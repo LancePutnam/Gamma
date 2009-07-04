@@ -11,7 +11,7 @@ namespace fil{
 
 
 
-/// One element delay.
+/// One element delay
 template<class T = gam::real> 
 class Delay1{
 public:
@@ -26,7 +26,7 @@ public:
 
 
 
-/// Two element delay.
+/// Two element delay
 template <class T=gam::real>
 class Delay2{
 public:
@@ -40,6 +40,20 @@ public:
 
 private: T v0, v1, v2;
 };
+
+
+/// Integrator
+template <class T>
+class Integrator{
+
+	Integrator(const T& v=T(0)): o1(v){}
+
+	T operator()(const T& i0){ return o1+=i0; }
+
+protected:
+	T o1;
+};
+
 
 
 // Direct domain lowpass filter

@@ -13,7 +13,7 @@ SineRs<> oscs(512);
 void audioCB(AudioIOData& io){
 
 	// sample-based generation
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 
 		float s = oscs();
 		io.out(0)[i] = io.out(1)[i] = s;
@@ -24,7 +24,7 @@ void audioCB(AudioIOData& io){
 int main(int argc, char* argv[]){
 
 	AudioIO io(256, 44100, audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	float k1 = 0.;					// velocity
 	float k2 = 0.0001;				// dispersion

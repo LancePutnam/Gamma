@@ -9,7 +9,7 @@ void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);
 	float * out1 = io.out(1);
 	
-	for(unsigned long i=0; i<io.numFrames(); ++i){
+	for(unsigned long i=0; i<io.framesPerBuffer(); ++i){
 		out0[i] = out1[i] = -in0[i];
 	}
 }

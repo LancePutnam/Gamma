@@ -325,23 +325,6 @@ protected:
 
 
 
-template <class Tv>
-class Integrator{
-
-	Integrator(): o1(0){}
-
-	Tv operator()(const Tv& i0){
-		Tv o0 = i0 + o1;
-		o1=o0;
-		return o0;
-	}
-
-protected:
-	Tv o1;
-};
-
-
-
 //template <class Tv=gam::real, class Tp=gam::real>
 //class IIRCheby: public IIRSeries<Tv,Tp>{
 //public:

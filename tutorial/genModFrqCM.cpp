@@ -17,7 +17,7 @@ float modFreq = 1;				// modulator frequency as multiple of carrier frequency
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 
 		if(tmr()){
 			printf("c:m ratio = 1:% 5.2f\n", modFreq);
@@ -37,7 +37,7 @@ void audioCB(AudioIOData& io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 	
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

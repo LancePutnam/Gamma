@@ -16,7 +16,7 @@ Sine<> osc2(ff + freqBeat, 0.5);	// beat oscillator starting 180 out-of-phase
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 
 		io.out(0)[i] = osc1() * 0.1;
 		io.out(1)[i] = osc2() * 0.1;
@@ -27,7 +27,7 @@ void audioCB(AudioIOData& io){
 int main(int argc, char* argv[]){
 
 	AudioIO io(256, 44100, audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

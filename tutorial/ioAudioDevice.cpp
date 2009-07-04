@@ -21,7 +21,7 @@ void audioCB(AudioIOData& io){
 	float ampR = user.ampR;
 
 	// loop through the number of samples in the block
-	for(uint32_t i=0; i<io.numFrames(); i++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 		
 		float s = io.in(0)[i];		// get the line-in or microphone sample
 		
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]){
 	AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
 	
 	// set the global sample rate "subject"
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 	
 	// start the audio stream
 	io.start();

@@ -88,7 +88,7 @@ void audioCB(AudioIOData & io){
 
 	float * out0 = io.out(0);
 	float * out1 = io.out(1);
-	unsigned long numFrames = io.numFrames();
+	unsigned long numFrames = io.framesPerBuffer();
 
 
 	for(unsigned long f=0; f<numFrames; f++){
@@ -102,7 +102,7 @@ void audioCB(AudioIOData & io){
 int main(int argc, char* argv[]){
 
 	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	Grain<>::initTable();
 	Grain<>::fillTable();

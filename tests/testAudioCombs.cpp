@@ -18,7 +18,7 @@ LFO<> lfo(1./12.);
 void audioCB(AudioIOData & io){
 	float * out0 = io.out(0);
 	float * out1 = io.out(1);
-	unsigned long numFrames = io.numFrames();
+	unsigned long numFrames = io.framesPerBuffer();
 
 	// Fill buffer with white noise
 	rnd::uniS(out0, numFrames, rnd::prob(0.01) ? 0.15f : 0.f);
@@ -42,7 +42,7 @@ void audioCB(AudioIOData & io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;

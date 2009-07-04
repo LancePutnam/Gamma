@@ -20,7 +20,7 @@ STFT stft(hopSize * 4, hopSize, 0, WinType::Hann, Bin::Polar);
 
 void audioCB(AudioIOData & io){
 
-	for(uint32_t f=0; f<io.numFrames(); ++f){
+	for(uint32_t f=0; f<io.framesPerBuffer(); ++f){
 		float smp = src() * 0.5f;
 		
 		if( stft(smp) ){
@@ -42,7 +42,7 @@ void audioCB(AudioIOData & io){
 
 int main(int argc, char* argv[]){
 	AudioIO io(128, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.fps());
+	Sync::master().spu(io.framesPerSecond());
 
 	stft.syncHop()  << lfoF1 << lfoF2;
 	stft.syncFreq() << lfoA1 << lfoA2 << bq0 << bq1;
