@@ -83,7 +83,7 @@ typedef float real_t;            /* can be a float, double, or long-double */
 
 /* Depending on the 'real_t' typedef, use the appropriate definition below  */
 #define REAL_CONSTANT(x) x##f   // real_t <==> float                     */
-/* #define REAL_CONSTANT(x) x      /* real_t <==> double                    */
+/* #define REAL_CONSTANT(x) x      // real_t <==> double                    */
 /* #define REAL_CONSTANT(x) x##l   // real_t <==> long double               */
 
 /* Lastly, you will need to declare/define/alias the appropriate trig     */

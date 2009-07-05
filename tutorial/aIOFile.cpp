@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
 	{
 		const float sampleRate = 44100;
 		const float lenSec = 2;
-		const int numFrames = sampleRate * lenSec;
+		const unsigned numFrames = sampleRate * lenSec;
 		
 		float freq = 440;
 		float buf[numFrames*2];		// Buffer for storing samples.
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
 		if(sf.openWrite()){	printf("OK\n"); }
 		else{				printf("fail\n"); exit(-1); }
 
-		for(int i=0; i<numFrames; i++){
+		for(unsigned i=0; i<numFrames; i++){
 			
 			float s = i/float(numFrames) * lenSec;	// compute time in seconds
 			float p1 = s * freq * M_2PI;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]){
 	
 		//sf.print();
 		
-		int numFrames = sf.frames();
+		unsigned numFrames = sf.frames();
 		float * buf = new float[sf.samples()];
 		
 		//sf.readAll(buf);		// read all samples from sound file into buffer

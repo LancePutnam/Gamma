@@ -30,7 +30,7 @@ int main(int argc, char* argv[]){
 	float k2 = 0.0001;				// dispersion
 	float rs = 1./oscs.size();
 
-	for(int i=0; i<oscs.size(); ++i){
+	for(unsigned i=0; i<oscs.size(); ++i){
 	
 		float h = i+1 + i*k1 + i*i*k2;		
 		float a = 16 * rs/h;

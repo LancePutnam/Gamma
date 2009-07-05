@@ -86,14 +86,9 @@ Grain<>	grain(220, 2, 1.0, 0);
 
 void audioCB(AudioIOData & io){
 
-	float * out0 = io.out(0);
-	float * out1 = io.out(1);
-	unsigned long numFrames = io.framesPerBuffer();
-
-
-	for(unsigned long f=0; f<numFrames; f++){
+	for(uint32_t i=0; i<io.framesPerBuffer(); ++i){
 		float s = grain();
-		out0[f] = out1[f] = s * 0.5f;
+		io.out(0)[i] = io.out(1)[i] = s * 0.5f;
 	}
 }
 

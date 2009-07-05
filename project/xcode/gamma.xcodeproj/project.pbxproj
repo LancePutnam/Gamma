@@ -29,12 +29,20 @@
 		165906A80D0F9F6900EA3DB0 /* testRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDFA16094F8D9E00549AC9 /* testRandom.cpp */; };
 		165906A90D0F9F6900EA3DB0 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		165CB76C0CC4385F002B17A2 /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 160E7B3E0B36792200CE82F3 /* Timer.h */; };
-		168AACA80CD0030A00F36E4B /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
-		168AACAA0CD0030A00F36E4B /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
-		168AACAC0CD0030A00F36E4B /* AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F836E00A1E888200F05DF5 /* AudioIO.cpp */; };
-		168AACAE0CD0030A00F36E4B /* DFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D15CA309F0219B001AE497 /* DFT.cpp */; };
-		168AACB20CD0030A00F36E4B /* SoundFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E99A210A2A4B7800210497 /* SoundFile.cpp */; };
-		168AACB30CD0030A00F36E4B /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
+		16827CF710012D2B001088E7 /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
+		16827CF810012D2C001088E7 /* fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D2EC810E91D07A00845626 /* fftpack.cpp */; };
+		16827D5C10014013001088E7 /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
+		16827D5D10014013001088E7 /* AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F836E00A1E888200F05DF5 /* AudioIO.cpp */; };
+		16827D5E10014013001088E7 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
+		16827D5F10014013001088E7 /* DFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D15CA309F0219B001AE497 /* DFT.cpp */; };
+		16827D6010014013001088E7 /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
+		16827D6110014013001088E7 /* fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D2EC810E91D07A00845626 /* fftpack.cpp */; };
+		16827D6210014013001088E7 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
+		16827D6310014013001088E7 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
+		16827D6410014013001088E7 /* SoundFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E99A210A2A4B7800210497 /* SoundFile.cpp */; };
+		16827D6510014013001088E7 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
+		16827D6610014013001088E7 /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
+		16827D671001402E001088E7 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
 		168AAD760CD0033700F36E4B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB463F30825DCE7002E1A73 /* libportaudio.a */; };
 		168AAD770CD0033700F36E4B /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464C80825E7B4002E1A73 /* libsndfile.a */; };
 		168AAD780CD0033700F36E4B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16D24FA80A9BA77100415E9E /* Carbon.framework */; };
@@ -47,10 +55,6 @@
 		16938AC10FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938B510FBD1E5E00274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
-		16938B7D0FBD1EDB00274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
-		16938B7E0FBD1EE300274B2A /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
-		16938B7F0FBD1EE400274B2A /* fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D2EC810E91D07A00845626 /* fftpack.cpp */; };
-		16938B800FBD1EF200274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938B8C0FBD1F5B00274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938BA40FBD1F8C00274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938BBE0FBD201200274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
@@ -286,6 +290,7 @@
 		1656F5B209EEF313006E3FD7 /* testParticle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testParticle.cpp; path = ../../tests/testParticle.cpp; sourceTree = "<group>"; };
 		1656F5D809EEF3D7006E3FD7 /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Particle.h; path = ../../include/Particle.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
+		16827D5810013FEE001088E7 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		1683FC410E283786001FAF43 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = design.txt; path = ../../doc/design.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../include/Access.h; sourceTree = SOURCE_ROOT; };
 		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../include/File.h; sourceTree = SOURCE_ROOT; };
@@ -786,11 +791,13 @@
 				16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */,
 				16DEEFB40E4ABA10001292EF /* fftpack.h */,
 				16D2EC810E91D07A00845626 /* fftpack.cpp */,
+				16827D5810013FEE001088E7 /* File.cpp */,
 				16E99A210A2A4B7800210497 /* SoundFile.cpp */,
 				168B78F40B75C59100645F1F /* Sync.cpp */,
 				16938B410FBD1CCF00274B2A /* Visual.cpp */,
 			);
 			name = src;
+			path = ../../src;
 			sourceTree = "<group>";
 		};
 		7EB463CC0825DC05002E1A73 = {
@@ -1533,7 +1540,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sudo mv $BUILT_PRODUCTS_DIR/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION /usr/local/lib/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION\nsudo mkdir /usr/local/include/synz\nsudo cp ../../include/* /usr/local/include/synz";
+			shellScript = "sudo mv $BUILT_PRODUCTS_DIR/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION /usr/local/lib/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION\nsudo mkdir /usr/local/include/gamma\nsudo cp ../../include/* /usr/local/include/gamma";
 		};
 		16D10D3D0BB9C4B70028EFF9 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1546,7 +1553,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sudo mv $BUILT_PRODUCTS_DIR/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION /usr/local/lib/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION\nsudo mkdir /usr/local/include/synz\nsudo cp ../../include/* /usr/local/include/synz";
+			shellScript = "sudo mv $BUILT_PRODUCTS_DIR/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION /usr/local/lib/$EXECUTABLE_PREFIX$PRODUCT_NAME.$EXECUTABLE_EXTENSION\nsudo mkdir /usr/local/include/gamma\nsudo cp ../../include/* /usr/local/include/gamma";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1575,16 +1582,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				168AACA80CD0030A00F36E4B /* arr.cpp in Sources */,
-				168AACAA0CD0030A00F36E4B /* scl.cpp in Sources */,
-				168AACAC0CD0030A00F36E4B /* AudioIO.cpp in Sources */,
-				168AACAE0CD0030A00F36E4B /* DFT.cpp in Sources */,
-				168AACB20CD0030A00F36E4B /* SoundFile.cpp in Sources */,
-				168AACB30CD0030A00F36E4B /* Sync.cpp in Sources */,
-				16938B7D0FBD1EDB00274B2A /* Conversion.cpp in Sources */,
-				16938B7E0FBD1EE300274B2A /* FFT_fftpack.cpp in Sources */,
-				16938B7F0FBD1EE400274B2A /* fftpack.cpp in Sources */,
-				16938B800FBD1EF200274B2A /* Visual.cpp in Sources */,
+				16827D5C10014013001088E7 /* arr.cpp in Sources */,
+				16827D5D10014013001088E7 /* AudioIO.cpp in Sources */,
+				16827D5E10014013001088E7 /* Conversion.cpp in Sources */,
+				16827D5F10014013001088E7 /* DFT.cpp in Sources */,
+				16827D6010014013001088E7 /* FFT_fftpack.cpp in Sources */,
+				16827D6110014013001088E7 /* fftpack.cpp in Sources */,
+				16827D6210014013001088E7 /* File.cpp in Sources */,
+				16827D6310014013001088E7 /* scl.cpp in Sources */,
+				16827D6410014013001088E7 /* SoundFile.cpp in Sources */,
+				16827D6510014013001088E7 /* Sync.cpp in Sources */,
+				16827D6610014013001088E7 /* Visual.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1816,6 +1824,8 @@
 				16ECB2730D3EB7E6005A06AE /* DFT.cpp in Sources */,
 				16ECB2750D3EB7E6005A06AE /* SoundFile.cpp in Sources */,
 				16ECB2760D3EB7E6005A06AE /* Sync.cpp in Sources */,
+				16827CF710012D2B001088E7 /* FFT_fftpack.cpp in Sources */,
+				16827CF810012D2C001088E7 /* fftpack.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1918,6 +1928,7 @@
 				C0F9EF720BB0598F0069B343 /* DFT.cpp in Sources */,
 				16F133F00FFF4A8600DE56F6 /* FFT_fftpack.cpp in Sources */,
 				16F133F10FFF4A8600DE56F6 /* fftpack.cpp in Sources */,
+				16827D671001402E001088E7 /* File.cpp in Sources */,
 				C0F9EF860BB059AE0069B343 /* SoundFile.cpp in Sources */,
 				C0F9EF880BB059AF0069B343 /* Sync.cpp in Sources */,
 				16F133F20FFF4A8600DE56F6 /* Visual.cpp in Sources */,

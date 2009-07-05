@@ -1,9 +1,12 @@
+#=========================================================================
+# Gamma tests Makefile
+#=========================================================================
+
 include ../Makefile.config
-LDFLAGS += ../libgamma.a
+LFLAGS += ../libgamma.a
 CFLAGS += -I../include/
 
-SRC = \
-	testAnalysis.cpp \
+SRC = 	testAnalysis.cpp \
 	testArray.cpp \
 	testAudioBiquad.cpp \
 	testAudioChannels.cpp \
@@ -34,13 +37,13 @@ SRC = \
 	testTypes.cpp \
 	testUnits.cpp
 
-TARGETS = ${SRC:.cpp=}
+TARGETS = $(SRC:.cpp=)
 
-all: ${TARGETS}
+all: $(TARGETS)
 
 %: %.cpp
 	@echo CC $<
-	@${CC} ${CFLAGS} -o $@ $@.cpp ${LDFLAGS}
+	@$(CC) $(CFLAGS) -o $@ $@.cpp $(LFLAGS)
 
 clean:
-	@rm -f *.o ${TARGETS}
+	@rm -f *.o $(TARGETS)

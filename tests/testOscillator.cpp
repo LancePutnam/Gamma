@@ -28,9 +28,9 @@ int main(int argc, char* argv[]){
 	Saw<> saw(1);
 	Sine<> sine(1);
 	SineD<> sineD(1,1,2,0.25);
-	SineDs<> sineDs(4); for(int i=0; i<sineDs.size(); ++i) sineDs.set(i, i+1, 1./(i+1), 2.);
+	SineDs<> sineDs(4); for(uint32_t i=0; i<sineDs.size(); ++i) sineDs.set(i, i+1, 1./(i+1), 2.);
 	SineR<> sineR(1);
-	SineRs<> sineRs(4); for(int i=0; i<sineRs.size(); ++i) sineRs.set(i, i+1, 1./(i+1));
+	SineRs<> sineRs(4); for(uint32_t i=0; i<sineRs.size(); ++i) sineRs.set(i, i+1, 1./(i+1));
 	Square<> square(1);
 	TableSine<> tableSine(1);
 	

@@ -428,7 +428,7 @@ TEM2 ArrayBase<T,S>::ArrayBase(T * src, uint32_t size)
 {	source(src, size); }
 
 TEM2 ArrayBase<T,S>::ArrayBase(const ArrayBase<T,S>& src)
-:	mSize(src.size()), mElems(src.elems()), mOwner(false){}
+:	mElems(src.elems()), mSize(src.size()), mOwner(false){}
 
 #undef ARRAYBASE_INIT
 

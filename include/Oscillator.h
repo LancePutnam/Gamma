@@ -136,7 +136,7 @@ public:
 		Tv o0 = val(); mTap(this->mPhase, phaseIncI()); return o0;
 	}
 	
-	void zero(){ for(int i=0; i<this->size(); ++i) (*this)[i] = 0; }
+	void zero(){ for(unsigned i=0; i<this->size(); ++i) (*this)[i] = 0; }
 
 	Tv val() const { return mIpol(*this, phaseI()); }
 	

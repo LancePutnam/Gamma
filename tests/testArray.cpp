@@ -11,12 +11,12 @@
 				mem::zero(arrO, lenO);
 
 #define PRINT_BOTH \
-	for(i=0; i<lenE; i++){\
+	for(uint32_t i=0; i<lenE; i++){\
 		printf("\t[%2i] % 5.2f  % 5.2f\n", i, arrO[i], arrE[i]);\
 	} printf("\t[%2i] % 5.2f\n", lenO-1, arrO[lenO-1]);
 
 #define PRINT_EVEN \
-	for(i=0; i<lenE; i++){\
+	for(uint32_t i=0; i<lenE; i++){\
 		printf("\t[%2i] % 5.2f\n", i, arrE[i]);\
 	}
 	
@@ -27,17 +27,16 @@
 using namespace gam;
 
 int main(int argc, char* argv[]){
-	int i=0;
 
 	const uint32_t lenE = 8;
 	const uint32_t lenO = lenE + 1;
-	const uint32_t lenE2 = lenE>>1;
-	const uint32_t lenO2 = lenO>>1;
+//	const uint32_t lenE2 = lenE>>1;
+//	const uint32_t lenO2 = lenO>>1;
 	
 	float arrE[lenE + 1];
 	float arrO[lenO + 1];
-	float tempE[lenE];
-	float tempO[lenO];
+//	float tempE[lenE];
+//	float tempO[lenO];
 
 	// Set guard elements
 	arrE[lenE] = 100.f;

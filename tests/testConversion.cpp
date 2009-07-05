@@ -157,13 +157,13 @@ int main(int argc, char* argv[]){
 	*/
 	printf("\nendian: %d\n", endian);
 	
-	int N=5000;
-	for(int i=0; i<N; ++i){
-		float v = float(i)/N;
-		uint32_t m = unitToUInt(v);
-		uint32_t a = v*4294967295UL;
-		//if((m-a)!=0) printf("m=%d, a=%d\n", m,a);
-	}
+//	int N=5000;
+//	for(int i=0; i<N; ++i){
+//		float v = float(i)/N;
+//		uint32_t m = unitToUInt(v);
+//		uint32_t a = v*4294967295UL;
+//		if((m-a)!=0) printf("m=%d, a=%d\n", m,a);
+//	}
 	
 	return 0;
 }

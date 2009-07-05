@@ -113,9 +113,10 @@ AudioIO::AudioIO(
 	uint32_t framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * user,
 	int outChansA, int inChansA )
 :	AudioIOData(user),
+	mErrNum(0),
+	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
 	mIsOpen(false), mIsRunning(false), mInResizeDeferred(false), mOutResizeDeferred(false),
-	mKillNANs(true),
-	mOutDevice(AudioDevice::defaultOutput()), mInDevice(AudioDevice::defaultInput())
+	mKillNANs(true)
 {
 	callback = callbackA;
 	

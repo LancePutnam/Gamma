@@ -74,7 +74,7 @@ void DFT::resize(uint newWindowSize, uint newPadSize){ //printf("DFT::resize()\n
 		
 		if(mAux) mem::resize(mAux, oldDFTSize + 2, newDFTSize + 2);
 
-		uint newNumBins = (newDFTSize>>1) + 1;
+		//uint newNumBins = (newDFTSize>>1) + 1;
 
 		mFFT.resize(newDFTSize);
 		mem::zero(mBuf, newDFTSize + 2);
@@ -112,7 +112,7 @@ void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n
 	mBuf[1] = 0.f;
 	mBuf[numBins()*2-1] = 0.f;
 		
-	uint nbins = numBins();
+	//uint nbins = numBins();
 	
 	switch(mSpctFormat){
 	case Bin::Polar:
@@ -129,7 +129,7 @@ void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n
 void DFT::inverse(float * output){
 	//printf("DFT::inverse(float *)\n");
 
-	uint nbins = numBins();
+	//uint nbins = numBins();
 	
 	switch(mSpctFormat){
 	case Bin::Polar:

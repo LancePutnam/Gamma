@@ -15,7 +15,7 @@ void File::close(){ if(opened()){ fclose(mFP); mFP = 0; } }
 
 bool File::open(){
 	if(0 == mFP){
-		if(mFP = fopen(mPath, mMode)){
+		if((mFP = fopen(mPath, mMode))){
 			getSize();
 			return true;
 		}
@@ -27,7 +27,7 @@ char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
 		allocContent(n);
-		size_t numRead = fread(mContent, sizeof(char), n, mFP);
+		/*size_t numRead =*/ fread(mContent, sizeof(char), n, mFP);
 	}
 	return mContent;
 }
@@ -85,11 +85,11 @@ bool DataFile::openRead(){
 }
 
 void DataFile::read4(void * element){
-	size_t n = fscanf(fp, formatString<float >(), element);
+	/*size_t n =*/ fscanf(fp, formatString<float >(), element);
 }
 
 void DataFile::read8(void * element){
-	size_t n = fscanf(fp, formatString<double>(), element);
+	/*size_t n =*/ fscanf(fp, formatString<double>(), element);
 }
 
 void DataFile::read4(void * dst, ULONG len){

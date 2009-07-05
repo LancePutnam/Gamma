@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
 	const int lenE = 8;
 	const int lenO = lenE + 1;
 	const int lengthE2 = lenE>>1;
-	const int lengthO2 = lenO>>1;
+	//const int lengthO2 = lenO>>1;
 	
 	int arrE[lenE + 1];
 	int arrO[lenO + 1];

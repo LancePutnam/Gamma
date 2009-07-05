@@ -33,7 +33,7 @@ using namespace gam;
 int main(int argc, char* argv[]){
 
 	const int winSize = 16;
-	const int hopSize = winSize/4;
+	//const int hopSize = winSize/4;
 	const int padSize = winSize * 0;
 	const int tableSize = winSize * 4;
 

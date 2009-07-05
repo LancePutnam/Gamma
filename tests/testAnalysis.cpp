@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
 
 	const uint32_t size = 32;
 	float table[size];
-	uint32_t indices[size];
+	//uint32_t indices[size];
 
 	tbl::sinusoid(table, size, 0.f, 2.f); arr::add(table, val(1), Loop(size));
 	//arr::lineSlope1(table, size); arr::add(table, size, -8.f);
