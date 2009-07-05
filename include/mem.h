@@ -209,6 +209,9 @@ TEM void scale(T * dst, const T * src, uint32_t lenSrc, float stride);
 TEM void scaleCrop(T * dst, const T * src, uint32_t len, float stride);
 
 /// Set all values in array to specified value.
+TEM void set(T * dst, uint32_t len, const T& value, uint32_t stride=1){
+	for(uint32_t i=0; i<len; i+=stride) dst[i] = value;
+}
 //TEM void set(T * dst, uint32_t len, const T& value, uint32_t stride=1);
 //TEM void set(T * dst, uint32_t len, const T& value, uint32_t stride, uint32_t offset);
 

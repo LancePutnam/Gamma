@@ -47,12 +47,6 @@ public:
 /// Table functions
 namespace tbl{
 
-/// Fills array with arbitrary # of periods of cosine and sine waves.
-
-/// Cosine starts at dst[0], sine starts at dst[len].
-///
-TEM void cosSin(T * dst, uint32_t len, double periods);
-
 /// Fills array with one period of a cosine wave.
 TEM void cosine(T * dst, uint32_t len);
 
@@ -104,10 +98,7 @@ TEM void triangleSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi);
 TEM void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uint32_t, uint32_t, uint32_t));
 
 /// Returns maximum number of harmonics that will fit in array.
-uint32_t maxHarmonics(uint32_t len);
-
-/// Fills array with polynomial a0 + a1 i + a2 i^2.
-TEM void poly(T * dst, uint32_t len, T a0, T a1, T a2);
+inline uint32_t maxHarmonics(uint32_t len){ return len>>1; }
 
 /// Fills array with specified window type.
 TEM void window			(T * dst, uint32_t len, WinType::type type);
@@ -152,12 +143,6 @@ float atH(const float * src, uint32_t fbits, uint32_t phase);
 //	[ b, 0]:	phase fractional part
 float atQ(const float * src, uint32_t fbits, uint32_t phase);
 
-/// Return fractional part of integer phasor as float in [0, 1).
-
-///	'bits' is the effective size of the lookup table. \n
-///	Note: the fraction only has 24-bits of precision.
-float fraction(uint32_t bits, uint32_t phase);
-
 // Get interpolation data from integer phasor.
 //float getIpol2(uint32_t bits, uint32_t phase, uint32_t &i, uint32_t &ip1);
 
@@ -167,32 +152,9 @@ float fraction(uint32_t bits, uint32_t phase);
 ///
 float phaseIncFactor(double framesPerSec);
 
-//
-//	Printing
-//
-
-/// Prints array as hexidecimal values.
-void printHexArray(float * table, uint32_t len, uint32_t valuesPerLine);
-
-
 
 
 // Implementation_______________________________________________________________
-
-TEM void cosSin(T * dst, uint32_t len, double periods){
-	T * cos = dst;
-	T * sin = dst + len;
-	double radInc = (periods * M_2PI) / (double)len;
-	double cos1 = cos(radInc);
-	double sin1 = sin(radInc);
-	double cs = 1.;
-	double sn = 0.;
-
-	LOOP_P(len,
-		*cos++ = cs; *sin++ = sn;
-		scl::mulComplex(cs, sn, cos1, sin1);
-	)
-}
 
 TEM void cosine(T * dst, uint32_t len){
 	double inc = M_2PI / (double)len;
@@ -254,10 +216,6 @@ TEM void sinusoid(T * dst, uint32_t len, double phase, double periods){
 	for(double i = 0.; i < (double)len; i++){
 		*dst++ = (T)sin(inc * i + phase);
 	}
-}
-
-TEM void poly(T * dst, uint32_t len, T a0, T a1, T a2){
-	LOOP(len, *dst++ = scl::poly((T)i, a0, a1, a2); )
 }
 
 TEM void impulseSum(T * dst, uint32_t len){
@@ -468,8 +426,6 @@ TEM void nyquist(T * dst, uint32_t len){
 //	)
 //}
 
-inline uint32_t maxHarmonics(uint32_t len){ return len>>1; }
-
 
 // Return value from a table containing the first quarter of a sine wave.
 // The table size must be a power of two.
@@ -558,7 +514,7 @@ inline uint32_t maxHarmonics(uint32_t len){ return len>>1; }
 //}
 ///*
 inline float atQ(const float * src, uint32_t fbits, uint32_t phase){
-	uint32_t sign = phase & 0x80000000;
+	uint32_t sign = phase & MaskSign<float>();
 	uint32_t dir  = (phase & 0x40000000) >> 30;	// 0 = fwd or 1 = bwd
 	Twiddle<float> v(src[(((phase^-dir) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
 	v.i |= sign;	// sign bit
@@ -577,7 +533,7 @@ inline float TblOp::atQ(float * table, uint32_t bits, uint32_t phase){
 
 inline float atH(const float * src, uint32_t bits, uint32_t phase){
 	Twiddle<float> v(src[(phase & 0x7fffffff) >> bits]);
-	v.i |= phase & 0x80000000;				// sign bit
+	v.i |= phase & MaskSign<float>();				// sign bit
 	return v.f;
 }
 
@@ -591,15 +547,6 @@ inline float atH(const float * src, uint32_t bits, uint32_t phase){
 inline float phaseIncFactor(double framesPerSec){
 	//return float(4294967296. / framesPerSec);
 	return float(65536. / framesPerSec) * 65536.;
-}
-
-
-inline void printHexArray(float * table, uint32_t len, uint32_t valuesPerLine){
-	printf("{");
-	LOOP(len,
-		if((i % valuesPerLine) == 0) printf("\n\t");
-		printf("0x%08x%s", *(unsigned int *)(table + i), i == len-1 ? "\n};" : ",");
-	)
 }
 
 } // tbl::

@@ -17,8 +17,8 @@ bool almostEqual(float a, float b, int maxUlps){
 	int32_t bi = punFI(b);
 
 	// Make aInt and bInt lexicographically ordered as a twos-complement int
-	if(ai < 0) ai = 0x80000000 - ai;
-	if(bi < 0) bi = 0x80000000 - bi;
+	if(ai < 0) ai = MaskSign<float>() - ai;
+	if(bi < 0) bi = MaskSign<float>() - bi;
 
 	return abs(ai - bi) <= maxUlps;
 }
@@ -54,8 +54,8 @@ int base36To10(char v){
 
 float clipMag(float value, float min, float max){
 	Twiddle<float> v(value);
-	uint32_t sign = v.u & 0x80000000;
-	v.u |= 0x80000000;
+	uint32_t sign = v.u & MaskSign<float>();
+	v.u |= MaskSign<float>();
 	v.f = clip(v.f, max, min);
 	v.u |= sign;
 	return v.f;

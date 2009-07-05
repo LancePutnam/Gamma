@@ -23,13 +23,17 @@ char intensityToASCII(float v);
 
 template<class T> void print(const T& v, const char * post="", const char * pre="", FILE * fp=stdout);
 
+/// Prints 2D pixel array
+template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
+
 // Binary printing methods
 void printBinary(uint32_t value, const char * zero="0", const char * one="1", int msb=32);
 void printBinary(uint64_t value, const char * zero="0", const char * one="1", int msb=64);
 void printBinary(float value, const char * zero="0", const char * one="1", int msb=32);
 void printBinary(void * value32, const char * zero="0", const char * one="1", int msb=32);
 
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
+/// Prints array as hexidecimal values.
+void printHexArray(float * table, uint32_t len, uint32_t valuesPerLine);
 
 /// Print signed normalized value on a horizontal plot.
 
@@ -38,7 +42,6 @@ template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
 /// @param[in]	spaces	Print extra filling spaces to the right
 /// @param[in]	point	The print character for points
 void printPlot(float value, uint32_t width=50, bool spaces=true, const char * point="o");
-
 
 
 

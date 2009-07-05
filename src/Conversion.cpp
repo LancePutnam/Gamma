@@ -54,7 +54,7 @@ uint32_t floatToUInt(float value){
 
 	if(u.u & 0x40000000){	// mag outside [0, 1)		
 		uint32_t shift = (u.u >> 23) & 0x7F;	
-		return (1<<shift) | ((u.u & MASK_F32_FRAC) >> (23 - shift));
+		return (1<<shift) | ((u.u & MaskFrac<float>()) >> (23 - shift));
 	}
 	else{
 		return 0;
@@ -68,8 +68,8 @@ int32_t floatToInt(float value){
 
 	if(u.u & 0x40000000){	// mag outside [0, 1)
 		int32_t shift = ((u.u)>>23) & 0x7F;
-		int32_t sign = u.u & 0x80000000;
-		int32_t result = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
+		int32_t sign = u.u & MaskSign<float>();
+		int32_t result = (1<<shift) | ((u.u & MaskFrac<float>())>>(23-shift));
 		
 		if(sign){	// negative number
 			result = ~result + 1;	// 2's complement
@@ -89,8 +89,8 @@ float split(float value, int32_t& intPart){
 
 	if(u.u & 0x40000000){
 		int32_t shift = ((u.u)>>23) & 0x7F;
-		intPart = (1<<shift) | ((u.u & MASK_F32_FRAC)>>(23-shift));
-		u.u = 0x3F800000 | ((u.u << shift) & MASK_F32_FRAC);
+		intPart = (1<<shift) | ((u.u & MaskFrac<float>())>>(23-shift));
+		u.u = Expo1<float>() | ((u.u << shift) & MaskFrac<float>());
 		return u.f - 1.f;
 	}
 	else{

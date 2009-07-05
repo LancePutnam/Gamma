@@ -14,16 +14,6 @@
 
 namespace gam{
 
-
-namespace{
-	const double roundMagic = 6755399441055744.; // 2^52 * 1.5
-	
-	template<class T> const T roundEps();
-	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
-	template<> inline const double roundEps<double>(){ return 0.499999985; }
-}
-
-
 /// Union for twiddling bits of floats
 template<class T> struct Twiddle;
 
@@ -82,6 +72,9 @@ int32_t floatToInt(float v);
 uint32_t floatToUInt(float v);
 
 /// Converts linear integer phase to fraction
+
+///	2^bits is the effective size of the lookup table. \n
+///	Note: the fraction only has 24-bits of precision.
 float fraction(uint32_t bits, uint32_t phase);
 
 /// Convert 16-bit signed integer to floating point in [-1, 1)
@@ -188,12 +181,12 @@ inline uint32_t floatExponent(float v){
 
 inline float floatMantissa(float v){
 	uint32_t frac = punFU(v);
-	frac = frac & MASK_F32_FRAC | 0x3f800000;
+	frac = frac & MaskFrac<float>() | Expo1<float>();
 	return punUF(frac) - 1.f;
 }
 
 inline float fraction(uint32_t bits, uint32_t phase){	
-	phase = phase << bits >> 9 | 0x3f800000;
+	phase = phase << bits >> 9 | Expo1<float>();
 	return punUF(phase) - 1.f;
 }
 
@@ -203,19 +196,19 @@ inline float intToUnit(int16_t v){
 }
 
 inline float splitInt512(uint32_t v, uint32_t& intPart){
-	Twiddle<float> u(v & 0x007fffff | 0x3f800000);
+	Twiddle<float> u(v & MaskFrac<float>() | Expo1<float>());
 	intPart = v >> 22;
 	return u.f - 1.f;
 }
 
 inline float splitInt1024(uint32_t v, uint32_t& intPart){
-	Twiddle<float> u((v<<1) & 0x007fffff | 0x3f800000);
+	Twiddle<float> u((v<<1) & MaskFrac<float>() | Expo1<float>());
 	intPart = v >> 22;
 	return u.f - 1.f;
 }
 
 template<> inline float uintToUnit<float>(uint32_t v){
-	v = v >> 9 | 0x3f800000; 
+	v = v >> 9 | Expo1<float>(); 
 	return punUF(v) - 1.f;
 }
 

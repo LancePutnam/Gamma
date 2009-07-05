@@ -12,9 +12,9 @@ int main(int argc, char* argv[]){
 	p.print();
 
 	printf("\nSet positions...\n");
-	mem::set(p.pos(0), val(1), p.size());
-	mem::set(p.pos(1), val(2), p.size());
-	mem::set(p.pos(2), val(3), p.size());
+	mem::set(p.pos(0), p.size(), 1.f);
+	mem::set(p.pos(1), p.size(), 2.f);
+	mem::set(p.pos(2), p.size(), 3.f);
 	p.print();
 
 	printf("\nSet velocities...\n");

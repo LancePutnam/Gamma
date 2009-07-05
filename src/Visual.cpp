@@ -85,6 +85,15 @@ void printBinary(void * value32, const char * zero, const char * one, int msb){
 }
 #undef LOOP_BITS
 
+void printHexArray(float * a, uint32_t len, uint32_t valuesPerLine){
+	printf("{");
+	for(uint32_t i=0; i<len; ++i){
+		if((i % valuesPerLine) == 0) printf("\n\t");
+		Twiddle<float> t(a[i]);
+		printf("0x%08x%s", t.u, i == len-1 ? "\n};" : ",");
+	}
+}
+
 void printPlot(float value, uint32_t width, bool spaces, const char * point){
 	int clipFlag;
 	value = scl::clip(value, clipFlag, 1.f, -1.f);

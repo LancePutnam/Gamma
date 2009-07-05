@@ -8,15 +8,23 @@
 	Definitions of numerical constants.
 */
 
+#include "pstdint.h"
+
 namespace gam{
 
-const unsigned long MASK_F32_SIGN = 0x80000000;
-const unsigned long MASK_F32_EXPO = 0x7f800000;
-const unsigned long MASK_F32_FRAC = 0x007fffff;
+#define CONST(N, vf, vd)\
+	template <class T> struct N;\
+	template<> struct N< float>{ operator uint32_t() const { return UINT32_C(vf); } };\
+	template<> struct N<double>{ operator uint64_t() const { return UINT64_C(vd); } };
+
+	CONST(MaskExpo, 0x7F800000, 0x7FF0000000000000)	// IEEE-754 floating-point exponent bit mask
+	CONST(MaskFrac, 0x007FFFFF, 0x000FFFFFFFFFFFFF) // IEEE-754 floating-point fraction bit mask
+	CONST(MaskSign, 0x80000000, 0x8000000000000000) // IEEE-754 floating-point sign bit mask
+	CONST(Expo1   , 0x3F800000, 0x3FF0000000000000) // IEEE-754 floating-point [1-2) exponent interval
+#undef CONST
 
 const float justUnder1f = 0.99999997f; //0x3f7fffff;
 
-// const double pi = 4*atan(1.0);
 
 /// 0 if little-endian, 1 if big-endian.
 #if defined(__ppc__)
@@ -27,7 +35,18 @@ const float justUnder1f = 0.99999997f; //0x3f7fffff;
 
 inline bool isLittleEndian(){ return endian==0; }
 
+namespace{
+	const double roundMagic = 6755399441055744.; // 2^52 * 1.5
+	
+	template<class T> const T roundEps();
+	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
+	template<> inline const double roundEps<double>(){ return 0.499999985; }
+}
+
+
 // constant macros
+
+// const double pi = 4*atan(1.0);
 
 // math.h sometimes does not include these ANSI C macros.
 #ifndef M_E

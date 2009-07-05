@@ -16,6 +16,15 @@ int main(int argc, char* argv[]){
 	// Unit tests are ordered from the least to most dependent functions/objects
 	// in order to catch errors in base functionality.
 
+	// Constants
+	
+	#define T(x, y) assert(x == y);
+	T(MaskSign< float>(), 0x80000000)
+	T(MaskSign<double>(), UINT64_C(0x8000000000000000))
+	#undef T
+	
+
+
 	// Types
 
 	{	Bits<> b;

@@ -286,20 +286,15 @@ TEM inline float add2I_float(T & rng){
 }
 #undef R
 
-TEM inline float uni_float(T& rng){
-	return uintToUnit<float>(rng());
-}
-
-TEM inline float uniS_float(T& rng){
-	return uintToUnitS<float>(rng());
-}
+TEM inline float uni_float(T& rng){ return uintToUnit<float>(rng()); }
+TEM inline float uniS_float(T& rng){ return uintToUnitS<float>(rng()); }
 
 TEM inline float binS_float(T & rng){
-	uint32_t r = rng() & 0x80000000 | 0x3f800000;
+	uint32_t r = rng() & MaskSign<float>() | Expo1<float>();
 	return punUF(r);
 }
 
-TEM inline T & cond(T & v, const T & va, const T & vb, float pab, float pba){
+TEM inline T & cond(T& v, const T& va, const T& vb, float pab, float pba){
 	     if(v == va) v = pick(vb, va, pba);
 	else if(v == vb) v = pick(va, vb, pab);
 	return v;

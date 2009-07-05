@@ -150,8 +150,6 @@ TEM void mulAdd(T * arr, uint32_t len, T mul, T add);
 ///
 TEM void mulBartlett(T * arr, uint32_t len);
 
-TEM void mulComplex(T * arrR, T * arrI, const T * srcR, const T * srcI, uint32_t len);
-
 /// Multiply 'arr' by 'src' where 'src' is the first 'len'/2 + 1 elements
 /// of a symmetric window.
 TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
@@ -626,10 +624,6 @@ TEM inline void mulBartlett(T * arr, uint32_t len){
 	)
 }
 
-TEM inline void mulComplex(T * arrR, T * arrI, const T * srcR, const T * srcI, uint32_t len){
-	LOOP_P(len, scl::mulComplex(*arrR++, *arrI++, *srcR++, *srcI++); )
-}
-
 TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 	T * end = arr + len - 1;
 	len >>= 1;
@@ -696,11 +690,11 @@ inline void clip1(float * arr, uint32_t len){
 	uint32_t * arrUI = (uint32_t *)arr;
 	LOOP(len,
 		uint32_t val = *arrUI;
-		uint32_t sign = val & 0x80000000;
+		uint32_t sign = val & MaskSign<float>();
 		val &= 0x7fffffff;	// mask off the sign to catch infs and NaNs
 		uint32_t above = (val + 0x00800000) >> 30;
 		
-		if(above) val = 0x3f800000;
+		if(above) val = Expo1<float>();
 		
 		//val = -above | 
 		

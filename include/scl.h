@@ -850,7 +850,7 @@ inline uint32_t log2(uint32_t v){ return deBruijn(ceilPow2(v)); }
 
 inline float log2Fast(float v){
 	Twiddle<float> u(v);
-	return (float)((u.i - 0x3f800000)) * 0.0000001192092896f;// / 8388608.f;
+	return (float)((u.i - int32_t(Expo1<float>()))) * 0.0000001192092896f;// / 8388608.f;
 }
 
 TEM inline T mapInvPow2(T v){ return v*(T(2)-v); }
@@ -1305,7 +1305,8 @@ inline float rampUp(uint32_t p){
 inline float square(uint32_t p){
 //	phase = 0x3f800000 | (phase & 0x80000000);
 //	return *(float *)&phase;
-	return p & 0x80000000 ? 1.f : -1.f;
+	//return p & 0x80000000 ? 1.f : -1.f;
+	return p & MaskSign<float>() ? 1.f : -1.f;
 }
 
 // [-1, 0, 1, 0]
@@ -1337,19 +1338,19 @@ inline float triangle(uint32_t p){
 // Width precision:	32 bits
 inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
-	uint32_t saw1 = (p >> 9) | 0x3F800000;
-	uint32_t saw2 = ((p+w) >> 9) | 0x3F800000;
+	uint32_t saw1 = ( p    >> 9) | Expo1<float>();
+	uint32_t saw2 = ((p+w) >> 9) | Expo1<float>();
 	return punUF(saw1) - punUF(saw2);
 }
 
 inline float stair(uint32_t p, uint32_t w){
-	uint32_t sqr1 = 0x3f000000 | (p & 0x80000000);
-	uint32_t sqr2 = 0x3f000000 | ((p+w) & 0x80000000);
+	uint32_t sqr1 = 0x3f000000 | ( p    & MaskSign<float>());
+	uint32_t sqr2 = 0x3f000000 | ((p+w) & MaskSign<float>());
 	return punUF(sqr1) + punUF(sqr2);
 }
 
 inline float stairU(uint32_t p, uint32_t w){
-	return ((p & 0x80000000) ? 0.5f : 0.f) + (((p+w) & 0x80000000) ? 0.5f : 0.f);
+	return ((p & MaskSign<float>()) ? 0.5f : 0.f) + (((p+w) & MaskSign<float>()) ? 0.5f : 0.f);
 }
 	
 inline float pulseU(uint32_t p, uint32_t w){
@@ -1357,8 +1358,8 @@ inline float pulseU(uint32_t p, uint32_t w){
 }
 
 inline float rampUp2(uint32_t p, uint32_t w){
-	uint32_t saw1 = (p >> 9) | 0x3f800000;
-	uint32_t saw2 = ((p+w) >> 9) | 0x3f800000;
+	uint32_t saw1 = ( p    >> 9) | Expo1<float>();
+	uint32_t saw2 = ((p+w) >> 9) | Expo1<float>();
 	return punUF(saw1) + punUF(saw2) - 3.f;
 }
 
@@ -1366,12 +1367,12 @@ inline float rampUp2(uint32_t p, uint32_t w){
 // Freq precision:	32 bits
 // Amp precision:	24 bits
 inline float rampUpU(uint32_t p){
-	p = (p >> 9) | 0x3f800000;
+	p = (p >> 9) | Expo1<float>();
 	return punUF(p) - 1.f;
 }
 	
 inline float rampUp2U(uint32_t p, uint32_t w){
-	uint32_t saw1 = (p >> 9) | 0x3F000000;
+	uint32_t saw1 = ( p    >> 9) | 0x3F000000;
 	uint32_t saw2 = ((p+w) >> 9) | 0x3F000000;
 	return punUF(saw1) + punUF(saw2) - 1.f;
 }

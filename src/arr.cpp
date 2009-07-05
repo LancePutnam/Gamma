@@ -21,7 +21,7 @@ void linToDB(float * arr, uint32_t len, float minDB){
 	
 	LOOP(len,
 		uint32_t * arrI = (uint32_t *)arr;
-		uint32_t sign = (*arrI) & MASK_F32_SIGN;
+		uint32_t sign = (*arrI) & MaskSign<float>();
 		
 		float val = fabs(*arr);
 		

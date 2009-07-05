@@ -1,10 +1,10 @@
 #include "Gamma.h"
-#include "scratch.h"
+#include "../doc/scratch.h"
 #include "Effects.h"
 
 #define ONES	mem::set(buf, gen::Val<>(1), Loop(size));
 #define ZEROS	mem::zero(buf, size);
-#define PRINT	for(int i=0; i<size; i++) printf("% 5.2f ", buf[i]); printf("\n");
+#define PRINT	for(uint32_t i=0; i<size; i++) printf("% 5.2f ", buf[i]); printf("\n");
 
 int main(int argc, char** argv){
 
