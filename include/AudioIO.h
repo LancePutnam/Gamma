@@ -18,13 +18,13 @@
 		
 		MyStuff& stuff = *(MyStuff *)io.user;
 
-		for(unsigned long i=0; i<io.numFrames(); ++i){
+		for(unsigned i=0; i<io.framesPerBuffer(); ++i){
 
 			float inSample1 = in1[i];
 			float inSample2 = in2[i];
 
-			out1[i] =-inSample1;
-			out2[i] =-inSample2;
+			out1[i] = -inSample1;
+			out2[i] = -inSample2;
 		}
 	}
 	
