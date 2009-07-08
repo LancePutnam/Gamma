@@ -2,6 +2,7 @@
 #include "Gamma.h"
 #include "Access.h"
 #include "Conversion.h"
+#include "SmartObject.h"
 #include "Types.h"
 #include "Thread.h"
 
@@ -11,10 +12,27 @@ THREAD_FUNCTION(threadFunc){
 	*(int *)user = 1; return NULL;
 }
 
+
+struct TestSmartObject : public SmartObject<TestSmartObject>{};
+
+
 int main(int argc, char* argv[]){
 
 	// Unit tests are ordered from the least to most dependent functions/objects
 	// in order to catch errors in base functionality.
+
+
+	// Memory management
+	{
+		auto TestSmartObject a;
+		static TestSmartObject s;
+		TestSmartObject * d = new TestSmartObject;
+		
+		assert(!a.dynamicAlloc());
+		assert(!s.dynamicAlloc());
+		assert(d->dynamicAlloc());
+	}
+
 
 	// Constants
 	
