@@ -1,3 +1,4 @@
+--------------------------------------------------------------------------------
 Composite Systems
 --------------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@ while those of type 1 are not.
 
 
 
-
+--------------------------------------------------------------------------------
 Sampled Generators
 --------------------------------------------------------------------------------
 
@@ -96,6 +97,7 @@ class Synced{
 
 
 
+--------------------------------------------------------------------------------
 Set + Operations = Group
 --------------------------------------------------------------------------------
 
@@ -111,8 +113,8 @@ class Elem2{
 
 
 
-
-On Mathematical Terminology
+--------------------------------------------------------------------------------
+Mathematical Terminology
 --------------------------------------------------------------------------------
 The formal mathematical terminology for the set of numbers between -1 and 1,
 inclusive, is a closed, bounded interval.
@@ -129,17 +131,21 @@ The interval [0,1] is the (closed) unit interval, I. Geometrically, it is the
 positive half of a unit 1-ball.
 
 
-On Name
+
 --------------------------------------------------------------------------------
-Nos
-Feed
-Synz (contraction of synthesize)
-Spread
-Dialog
-Para
+Memory Management
+--------------------------------------------------------------------------------
+The Gamma Array has the ability to reference rather than own a primitive T * 
+array of elements. The T * will hereafter be referred to as the subject and an
+Array which references it as an observer. In order to ensure the subject is 
+always valid when multiple observers reference it, we need to keep track of how 
+many observers there are. When the last observer is deleted, then the subject
+can be freed. One possible design is for none of the observers to actually own
+the subject, but for the subject to be managed by an external entity. We can
+utilize an external map with subjects as keys and observer counts as values.
 
 
-
+--------------------------------------------------------------------------------
 Function Tables
 --------------------------------------------------------------------------------
 A function table is an array of values with a special mapping method that maps
@@ -205,7 +211,6 @@ Out of this, we can extract a UnitToIndex class (and its inverse).
 	};
 
 Dims; posToind
-
 
 
 

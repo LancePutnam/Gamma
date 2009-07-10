@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <vector>
+#include <map>
 
 #include "Types.h"
 #include "Conversion.h"
@@ -59,14 +60,16 @@ public:
 
 	virtual ~ArrayBase();
 
+	/// Writable element access
 	T& operator[](uint32_t i);
+	
+	/// Read-only element access
 	const T& operator[](uint32_t i) const;
 	
 	/// Sets all elements to argument
 	ArrayBase& operator=(const T& v){ for(uint32_t i=0; i<size(); ++i) (*this)[i] = v; return *this; }
 	
 	T * elems() const;				///< Returns pointer to first array element.
-	bool owner() const;				///< Returns whether element memory is owned.
 	uint32_t size() const;			///< Returns number of elements in array.
 
 	void freeElements();			///< Frees memory
@@ -83,10 +86,21 @@ public:
 
 	virtual void onResize(){}
 
+	static int references(T * const m){ return managing(m) ? refCount()[m] : 0; }
+
 protected:
 	T * mElems;
 	S mSize;
-	bool mOwner;
+
+	typedef std::map<T *, int> RefCount;
+
+	static RefCount& refCount(){
+		static RefCount * o = new RefCount;
+		return *o;
+	}
+	
+	// is memory being managed automatically?
+	static bool managing(T* const m){ return refCount().count(m) != 0; }
 };
 
 
@@ -413,22 +427,23 @@ private:
 #define ARRAYBASE_INIT mElems(0), mSize(0)
 
 TEM2 ArrayBase<T,S>::ArrayBase()
-:	ARRAYBASE_INIT, mOwner(true){}
+:	ARRAYBASE_INIT{}
 
 TEM2 ArrayBase<T,S>::ArrayBase(uint32_t size)
-:	ARRAYBASE_INIT, mOwner(true)
+:	ARRAYBASE_INIT
 {	resize(size); }
 
 TEM2 ArrayBase<T,S>::ArrayBase(uint32_t size, const T& initial)
-:	ARRAYBASE_INIT, mOwner(true)
+:	ARRAYBASE_INIT
 {	resize(size); for(uint32_t i=0;i<this->size();++i) (*this)[i] = initial; }
 
 TEM2 ArrayBase<T,S>::ArrayBase(T * src, uint32_t size)
-:	ARRAYBASE_INIT, mOwner(false)
+:	ARRAYBASE_INIT
 {	source(src, size); }
 
 TEM2 ArrayBase<T,S>::ArrayBase(const ArrayBase<T,S>& src)
-:	mElems(src.elems()), mSize(src.size()), mOwner(false){}
+:	ARRAYBASE_INIT
+{	source(src); }
 
 #undef ARRAYBASE_INIT
 
@@ -441,36 +456,53 @@ TEM2 inline const T&  ArrayBase<T,S>::operator[](uint32_t i) const { return elem
 TEM2 inline T * ArrayBase<T,S>::elems() const { return mElems; }
 
 TEM2 void ArrayBase<T,S>::freeElements(){ //printf("ArrayBase::freeElements(): mElems=%p\n", mElems);
-	//if(owner()){ mem::free(mElems); mSize(0); }
-	//if(owner()){ delete[] mElems; mElems=0; mSize(0); }	// TODO: delete[] is causing crash
 	
-	if(owner()){
-		//printf("(%p) ArrayBase::freeElements(): mElems=%p\n", this, mElems);
-		delete [] mElems; 
+//	if(owner()){
+//		//printf("(%p) ArrayBase::freeElements(): mElems=%p\n", this, mElems);
+//		
+//		delete [] mElems; 
+//		mElems=0; mSize(0);
+//	}
+	
+	// we are managing this memory
+	if(mElems && managing(mElems)){
+		int& c = refCount()[mElems];
+		--c;
+		if(0 == c){
+			refCount().erase(mElems);
+			delete[] mElems;
+		}
 		mElems=0; mSize(0);
 	}
 }
 
 TEM2 void ArrayBase<T,S>::own(){
-	if(!owner()){
-		mOwner = true;
-		uint32_t refSize = size();
-		T * refElems = elems();
-		mElems = 0;
-		mSize(0);
-		resize(refSize);						// allocate new memory
-		mem::copy(elems(), refElems, size());	// copy referenced elements
+//	if(!owner()){
+//		mOwner = true;
+//		uint32_t refSize = size();
+//		T * refElems = elems();
+//		mElems = 0;
+//		mSize(0);
+//		resize(refSize);						// allocate new memory
+//		mem::copy(elems(), refElems, size());	// copy referenced elements
+//	}
+	
+	T * oldElems = elems();
+	if(references(oldElems) != 1){
+		uint32_t oldSize = size();
+		freeElements();
+		resize(oldSize);
+		for(uint32_t i=0; i<size(); ++i) (*this)[i] = oldElems[i];
 	}
 }
 
-TEM2 inline bool ArrayBase<T,S>::owner() const { return mOwner; }
-
 TEM2 void ArrayBase<T,S>::resize(uint32_t newSize){
 	newSize = mSize.convert(newSize);
-	//if(owner() && mem::resize(mElems, size(), newSize)){
-	if(owner() && (newSize != size())){
+
+	if(newSize != size()){
 		freeElements();
 		mElems = new T[newSize];
+		refCount()[mElems] = 1;
 		mSize(newSize);
 		onResize();
 	}
@@ -485,12 +517,12 @@ TEM2 void ArrayBase<T,S>::source(const ArrayBase<T,S>& src){
 
 TEM2 void ArrayBase<T,S>::source(T * src, uint32_t size){
 	freeElements();
-	mOwner = false;
+	if(managing(src)){
+		++refCount()[src];
+	}
 	mElems = src;
 	mSize(size);
 }
-
-//TEM2 void ArrayBase<T,S>::zero(){ if(owner()) mem::zero(elems(), size()); }
 
 #undef TEM2
 

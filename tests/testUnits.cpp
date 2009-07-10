@@ -5,6 +5,7 @@
 #include "SmartObject.h"
 #include "Types.h"
 #include "Thread.h"
+#include <map>
 
 using namespace gam;
 
@@ -31,6 +32,28 @@ int main(int argc, char* argv[]){
 		assert(!a.dynamicAlloc());
 		assert(!s.dynamicAlloc());
 		assert(d->dynamicAlloc());
+
+//		struct A{
+//			
+//			A& operator*(){ printf("*\n"); return *this; }
+//			const A& operator*() const { printf("*\n"); return *this; }
+//			
+//			//const A& operator*() const { printf("* const\n"); return *this; }
+//			A* operator&(){ printf("&\n"); return this; }
+//			
+//			int count;
+//		};
+//		
+//		A as;
+//		
+//		A * ap = &as;
+//		A& ar = *ap;
+//		
+//		std::list<double> testList;
+//		std::map<float, float> testMap;
+//		printf("%d\n", sizeof(testList));
+//		printf("%d\n", sizeof(testMap));
+
 	}
 
 
@@ -78,6 +101,49 @@ int main(int argc, char* argv[]){
 		T(q.conj(), Quatd(q.r, -q.i, -q.j, -q.k))
 		#undef T
 	}
+	
+	
+	// Containers
+	{
+		typedef int t;
+		typedef Array<t> array_t;
+		array_t * a = new array_t(16);
+		array_t * b = new array_t(*a);
+
+		(*a)[0] = 123;
+		assert((*a)[0] == 123);
+		assert(a->elems() == b->elems());
+		assert(array_t::references(a->elems()) == 2);
+
+		delete a;
+		assert(array_t::references(b->elems()) == 1);
+		
+		array_t * c = new array_t(b->elems(), b->size());
+		assert(array_t::references(b->elems()) == 2);
+
+		delete b;
+		assert(array_t::references(c->elems()) == 1);
+		
+		t * elemsC = c->elems();
+		delete c;
+		assert(array_t::references(elemsC) == 0);
+		
+		a = new array_t(16);
+		b = new array_t(*a);
+		
+		b->own();
+		assert(a->elems() != b->elems());
+		assert(array_t::references(a->elems()) == 1);
+		assert(array_t::references(b->elems()) == 1);
+		
+		t * elemsA = a->elems();
+		t * elemsB = b->elems();
+		a->source(*b);
+		assert(a->elems() == b->elems());
+		assert(array_t::references(elemsA) == 0);
+		assert(array_t::references(elemsB) == 2);		
+	}
+	
 
 	// Conversion
 
