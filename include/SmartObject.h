@@ -73,6 +73,12 @@ private:
 		static NewObjectList * l = new NewObjectList;
 		return *l;
 	}
+	
+//	A& operator*(){ printf("*\n"); return *this; }
+//	const A& operator*() const { printf("*\n"); return *this; }
+//	
+//	//const A& operator*() const { printf("* const\n"); return *this; }
+//	A* operator&(){ printf("&\n"); return this; }
 };
 
 

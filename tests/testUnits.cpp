@@ -32,28 +32,6 @@ int main(int argc, char* argv[]){
 		assert(!a.dynamicAlloc());
 		assert(!s.dynamicAlloc());
 		assert(d->dynamicAlloc());
-
-//		struct A{
-//			
-//			A& operator*(){ printf("*\n"); return *this; }
-//			const A& operator*() const { printf("*\n"); return *this; }
-//			
-//			//const A& operator*() const { printf("* const\n"); return *this; }
-//			A* operator&(){ printf("&\n"); return this; }
-//			
-//			int count;
-//		};
-//		
-//		A as;
-//		
-//		A * ap = &as;
-//		A& ar = *ap;
-//		
-//		std::list<double> testList;
-//		std::map<float, float> testMap;
-//		printf("%d\n", sizeof(testList));
-//		printf("%d\n", sizeof(testMap));
-
 	}
 
 
@@ -107,12 +85,12 @@ int main(int argc, char* argv[]){
 	{
 		typedef int t;
 		typedef Array<t> array_t;
-		array_t * a = new array_t(16);
+		array_t * a = new array_t(16, 123);
 		array_t * b = new array_t(*a);
 
-		(*a)[0] = 123;
-		assert((*a)[0] == 123);
+		for(uint32_t i=0; i<a->size(); ++i) assert((*a)[i] == 123);
 		assert(a->elems() == b->elems());
+		assert(a->size() == b->size());
 		assert(array_t::references(a->elems()) == 2);
 
 		delete a;
@@ -128,13 +106,14 @@ int main(int argc, char* argv[]){
 		delete c;
 		assert(array_t::references(elemsC) == 0);
 		
-		a = new array_t(16);
+		a = new array_t(16, 123);
 		b = new array_t(*a);
 		
 		b->own();
 		assert(a->elems() != b->elems());
 		assert(array_t::references(a->elems()) == 1);
 		assert(array_t::references(b->elems()) == 1);
+		for(uint32_t i=0; i<a->size(); ++i) assert((*b)[i] == 123);
 		
 		t * elemsA = a->elems();
 		t * elemsB = b->elems();
