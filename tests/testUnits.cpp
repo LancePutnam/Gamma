@@ -184,7 +184,9 @@ int main(int argc, char* argv[]){
 	 T(1<<29, 0.125) T(1<<30, 0.25) T(1<<31, 0.5)
 	#undef T
 
-	
+	#define T(x, y) assert(unitToUInt8(x) == y);
+	T(0, 0) T(1./4, 64) T(1./2, 128) T(3./4, 192)
+	#undef T
 
 	// Scalar
 

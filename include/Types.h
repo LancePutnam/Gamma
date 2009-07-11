@@ -247,12 +247,13 @@ struct Quat{
 		return (*this)(c1c2*c3 - s1s2*s3, c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3);
 	}
 	
-	/// Rotate a vector by current quaternion
+
 	void rotate(T& x, T& y, T& z) const {
 		Q p(-i*x - j*y - k*z, r*x + j*z - k*y, r*y - i*z + k*x,	r*z + i*y - j*x);
 		p *= conj(); x=p.i; y=p.j; z=p.k;
 	}
 	
+	/// Rotate a vector by current quaternion
 	template <class V3>
 	void rotate(V3& v) const {
 		Q p(-i*v[0] - j*v[1] - k*v[2], r*v[0] + j*v[2] - k*v[1], r*v[1] - i*v[2] + k*v[0], r*v[2] + i*v[1] - j*v[0]);
@@ -260,20 +261,23 @@ struct Quat{
 	}
 
 	// Rotates a vector assuming input z component is zero
-	void rotateXY(T& x, T& y, T& z) const {
-		Q p(-i*x - j*y, r*x - k*y, r*y + k*x, i*y - j*x);
-		p *= conj(); x=p.i; y=p.j; z=p.k;
-	}
-	
-	// Rotates a vector assuming input y and z components are zero
-	void rotateX(T& x, T& y, T& z) const {
-		Q p(-i*x, r*x, k*x, -j*x);
-		p *= conj(); x=p.i; y=p.j; z=p.k;
+	template <class V3>
+	void rotateXY(V3& v) const {
+		Q p(-i*v[0] - j*v[1], r*v[0] - k*v[1], r*v[1] + k*v[0], i*v[1] - j*v[0]);
+		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
 	}
 
+	// Rotates a vector assuming input y and z components are zero
 	template <class V3>
 	void rotateX(V3& v) const {
 		Q p(-i*v[0], r*v[0], k*v[0], -j*v[0]);
+		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
+	}
+	
+	// Rotates a vector assuming input x and y components are zero
+	template <class V3>
+	void rotateZ(V3& v) const {
+		Q p(-k*v[2], j*v[2], -i*v[2], r*v[2]);
 		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
 	}
 	

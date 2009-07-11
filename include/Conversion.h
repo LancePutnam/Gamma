@@ -125,6 +125,8 @@ uint32_t unitToUInt(float u);
 /// Input values outside [0, 1) result in undefined behavior.
 uint32_t unitToUInt2(float u);
 
+/// Convert unit float in [0,1) to 8-bit unsigned int in [0, 256).
+uint8_t unitToUInt8(float u);
 
 
 
@@ -229,8 +231,13 @@ inline uint32_t unitToUInt(float v){
 }
 
 inline uint32_t unitToUInt2(float v){
-	v++;	// go into [1,2] range, FP fraction is now result
+	++v;	// go into [1,2] range, FP fraction is now result
 	return punFU(v) << 9;
+}
+
+inline uint8_t unitToUInt8(float u){
+	++u;
+	return (punFU(u) >> 15) & MaskFrac<float>();
 }
 
 } // gam::

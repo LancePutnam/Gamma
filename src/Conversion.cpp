@@ -64,7 +64,7 @@ uint32_t floatToUInt(float value){
 
 int32_t floatToInt(float value){
 	Twiddle<float> u(value);
-	u.u = (u.u + 0x800000);
+	u.u += 0x800000;
 
 	if(u.u & 0x40000000){	// mag outside [0, 1)
 		int32_t shift = ((u.u)>>23) & 0x7F;
@@ -84,8 +84,7 @@ int32_t floatToInt(float value){
 
 float split(float value, int32_t& intPart){
 	Twiddle<float> u(value);
-
-	u.u = (u.u + 0x800000);
+	u.u += 0x800000;
 
 	if(u.u & 0x40000000){
 		int32_t shift = ((u.u)>>23) & 0x7F;
