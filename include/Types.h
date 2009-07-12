@@ -19,6 +19,8 @@ typedef unsigned long	uint;	// default natural number type
 typedef float			real;	// default real number type
 
 
+template <class T> class Mat3;
+
 /// Integer-based bit field
 template <class T=uint32_t>
 class Bits{
@@ -246,7 +248,51 @@ struct Quat{
 		T s1s2 = s1*s2;
 		return (*this)(c1c2*c3 - s1s2*s3, c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3);
 	}
+
+	/// Set quaternion from rotation matrix
 	
+	/// Code taken from van Waveren (2005). 'From Quaternion to Matrix and Back'
+	///
+	template <class V3>
+	void fromMat3(const V3& vx, const V3& vy, const V3& vz){
+		
+		const T &x0=vx[0], &x1=vx[1], &x2=vx[2];
+		const T &y0=vy[0], &y1=vy[1], &y2=vy[2];
+		const T &z0=vz[0], &z1=vz[1], &z2=vz[2];
+		
+		if(x0 + y1 + z2 > T(0)){
+			T t = x0 + y1 + z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = t * s;
+			i = (y2 - z1) * s;
+			j = (z0 - x2) * s;
+			k = (x1 - y0) * s;
+		}
+		else if(x0 > y1 && x0 > z2){
+			T t = x0 - y1 - z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = (y2 - z1) * s;
+			i = t * s;
+			j = (x1 + y0) * s;
+			k = (x2 + z0) * s;
+		} 
+		else if(y1 > z2){
+			T t =-x0 + y1 - z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = (z0 - x2) * s;
+			i = (x1 + y0) * s;
+			j = t * s;
+			k = (y2 + z1) * s;
+		} 
+		else{
+			T t =-x0 - y1 + z2 + T(1);
+			T s = T(0.5)/sqrt(t);
+			r = (x1 - y0) * s;
+			i = (x2 + z0) * s;
+			j = (y2 + z1) * s;
+			k = t * s;
+		}
+	}
 
 	void rotate(T& x, T& y, T& z) const {
 		Q p(-i*x - j*y - k*z, r*x + j*z - k*y, r*y - i*z + k*x,	r*z + i*y - j*x);
@@ -294,6 +340,16 @@ struct Quat{
 		T s = T(1)/sqrt(i*i + j*j + k*k);
 		x = i*s; y = j*s; z = k*s;
 	}
+	
+	/// Convert to 3x3 rotation matrix
+	void toMat3(Mat3<T>& m){
+		T ri=r*i, rj=r*j, rk=r*k, ii=i*i, ij=i*j, ik=i*k, jj=j*j, jk=j*k, kk=k*k;
+		static const T _2 = T(2);
+		static const T _1 = T(1);
+		m(	_2*(-kk-jj)+_1,	_2*( ij-rk),	_2*( rj+ik),
+			_2*( rk+ij),	_2*(-kk-ii)+_1,	_2*( jk-ri),
+			_2*( ik-rj),	_2*( ri+jk),	_2*(-jj-ii)+_1);
+	}
 
 	void toVectorX(T& x, T& y, T& z) const {
 		x = (j*j + k*k) * T(-2) + T(1);
@@ -311,51 +367,6 @@ struct Quat{
 		x = (i*k + j*r) * T( 2);
 		y = (j*k - i*r) * T( 2);
 		z = (i*i + j*j) * T(-2) + T(1);
-	}
-
-	/// Set quaternion from rotation matrix
-	
-	/// Code taken from van Waveren (2005). 'From Quaternion to Matrix and Back'
-	///
-	template <class V3>
-	void fromMat3(const V3& vx, const V3& vy, const V3& vz){
-		
-		const T &x0=vx[0], &x1=vx[1], &x2=vx[2];
-		const T &y0=vy[0], &y1=vy[1], &y2=vy[2];
-		const T &z0=vz[0], &z1=vz[1], &z2=vz[2];
-		
-		if(x0 + y1 + z2 > T(0)){
-			T t = x0 + y1 + z2 + T(1);
-			T s = T(0.5)/sqrt(t);
-			r = t * s;
-			i = (y2 - z1) * s;
-			j = (z0 - x2) * s;
-			k = (x1 - y0) * s;
-		}
-		else if(x0 > y1 && x0 > z2){
-			T t = x0 - y1 - z2 + T(1);
-			T s = T(0.5)/sqrt(t);
-			r = (y2 - z1) * s;
-			i = t * s;
-			j = (x1 + y0) * s;
-			k = (x2 + z0) * s;
-		} 
-		else if(y1 > z2){
-			T t =-x0 + y1 - z2 + T(1);
-			T s = T(0.5)/sqrt(t);
-			r = (z0 - x2) * s;
-			i = (x1 + y0) * s;
-			j = t * s;
-			k = (y2 + z1) * s;
-		} 
-		else{
-			T t =-x0 - y1 + z2 + T(1);
-			T s = T(0.5)/sqrt(t);
-			r = (x1 - y0) * s;
-			i = (x2 + z0) * s;
-			j = (y2 + z1) * s;
-			k = t * s;
-		}
 	}
 	
 	/*
@@ -390,6 +401,40 @@ TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm
 typedef Quat<float> Quatf;
 typedef Quat<double> Quatd;
 
+
+template <class T>
+struct Mat3{
+	
+	Mat3(	const T& v00=T(0), const T& v01=T(0), const T& v02=T(0),
+			const T& v10=T(0), const T& v11=T(0), const T& v12=T(0),
+			const T& v20=T(0), const T& v21=T(0), const T& v22=T(0))
+	:	a00(v00), a01(v01), a02(v02),
+		a10(v10), a11(v11), a12(v12),
+		a20(v20), a21(v21), a22(v22)
+	{}
+	
+	T& operator()(	const T& v00, const T& v01, const T& v02,
+					const T& v10, const T& v11, const T& v12,
+					const T& v20, const T& v21, const T& v22){
+		a00=v00; a01=v01; a02=v02; a10=v10; a11=v11; a12=v12; a20=v20; a21=v21; a22=v22;			
+	}
+	
+	/// Set element at index with no bounds checking
+	T& operator[](uint32_t i){ return elems[i];}
+
+	/// Get element at index with no bounds checking
+	const T& operator[](uint32_t i) const { return elems[i]; }
+	
+	union{
+		T elems[9];
+		struct { T x[3], y[3], z[3]; };
+		struct{ 
+			T a00, a01, a02;
+			T a10, a11, a12;
+			T a20, a21, a22;
+		};
+	};
+};
 
 
 /// Multi-element container
@@ -506,12 +551,25 @@ struct Vec2 : public Vec<2, T> {
 template <class T>
 struct Vec3 : public Vec<3, T> {
 	using Vec<3,T>::operator=;
+	using Vec<3,T>::operator*;
+	using Vec<3,T>::operator*=;
 
 	Vec3(const Vec<3, T>& v){ (*this)=v; }
 	Vec3(const T& v=T(0)){ (*this)(v,v,v); }
 	Vec3(const T& v1, const T& v2, const T& v3=T(0)){ (*this)(v1,v2,v3); }
 
 	Vec3& operator()(const T& v1, const T& v2, const T& v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; return *this; }
+	
+	Vec3& operator*= (const Mat3<T>& m){
+		Vec3& t = *this;
+		return t(
+			t[0]*m[0] + t[1]*m[1] + t[2]*m[2],
+			t[0]*m[3] + t[1]*m[4] + t[2]*m[5],
+			t[0]*m[6] + t[1]*m[7] + t[2]*m[8]			
+		);
+	}
+	
+	Vec3 operator * (const Mat3<T>& m){ return Vec3(*this) *= m; }
 	
 	T dot() const { return dot(*this); }
 	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
