@@ -177,7 +177,14 @@ int main(int argc, char* argv[]){
 
 	#define T(x, y) assert(intToUnit(int16_t(x)) == y);
 	T(0, 0) T(-32768, -1) T(32767, 32767./32768)
-	#undef T	
+	#undef T
+	
+	{
+	int32_t i;
+	#define T(x) assert((split(x, i) == (x - int32_t(x))) && (i == int32_t(x)));
+	T(0.f) T(0.1f) T(0.9f) T(1.f) T(1.1f) T(10.7f) T(1000.4512331f) T(16777216.f) T(16777216.5f) T(16777217.f)
+	#undef T
+	}
 
 	#define T(x, y) assert(uintToUnit<float>(x) == y);
 	T(0, 0.0) T(1<<9, 1.1920928955078125e-07) T(0xffffffff, 0.99999988079071044921875)

@@ -102,7 +102,7 @@ inline   double punIF( int64_t v){ Twiddle<double> u(v); return u.f; }
 
 /// Works reliably up to 2^24 == 16777216
 /// Useful for linearly interpolated table lookups
-float split(float value, long& intPart);
+float split(float value, int32_t& intPart);
 
 float splitInt512(uint32_t v, uint32_t& intPart);
 
