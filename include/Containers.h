@@ -266,10 +266,16 @@ protected:
 		int operator()(float x) const { return castIntTrunc(x*mMul); }
 		
 		int operator()(float x, float& f) const {
+			// C-style casts seems to be much faster...
 			f = x*mMul;
-			int i = castIntTrunc(f);
+			//int i = castIntTrunc(f);
+			int i = int(f);
 			f -= i; 
 			return i;
+			
+//			int32_t i;
+//			f = split(x*mMul, i);
+//			return i;
 		}
 		
 		float operator()(int i) const { return float(i) * mRec; }
