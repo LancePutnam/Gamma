@@ -218,6 +218,116 @@ private:
 
 
 
+// 1-D arithmetic series index generator
+// for(Series1 i(N); i();)
+//struct Series1{
+//	Series1(int end, int stride=1, int start=0)
+//	:	i(start-stride), n(end-start), mEnd(end), mStride(stride){}
+//
+//	bool operator()(){ i += mStride; return i < mEnd; }
+//	
+//	int flat() const { return i; }
+//	double frac() const { return double(i)/n; }
+//	double fracS() const { return double(i<<1)/n - 1.; }
+//	
+//	operator int(){ return flat(); }
+//	
+//	int i, n;
+//private:
+//	int mEnd, mStride;
+//};
+
+//struct Series3{
+//	Series1(int end1, int end2, int end3, int stride=1)
+//	:	i(start-stride), n(end-start), mEnd(end), mStride(stride){}
+//
+//	bool operator()(){ i += mStride; return i < mEnd; }
+//	
+//	int flat() const { return i; }
+//	double frac() const { return double(i)/n; }
+//	double fracS() const { return double(i<<1)/n - 1.; }
+//	
+//	operator int(){ return flat(); }
+//	
+//private:
+//	int mEnd, mStride;
+//};
+
+
+struct Scan1{
+	Scan1(int size): n(size),i(-1){}
+
+	bool operator()(){
+		return ((++i)<n);
+	}
+	
+	int flat() const { return i; }
+	double frac() const { return double(i)/n; }
+	double fracS() const { return double(i<<1)/n - 1.; }
+
+	operator int() const { return flat(); }
+
+	int n, i;
+};
+
+struct Scan2{
+	Scan2(int size): s1(size),s2(size),i(-1),j(0){}
+	Scan2(int size1, int size2): s1(size1),s2(size2),i(-1),j(0){}
+
+	bool operator()(){
+		if(++i==s1){
+			i=0;
+			if(++j==s2) return false;
+		}
+		return true;
+	}
+	
+	int flat() const { return i + j*s1; }
+	double frac1() const { return double(i)/s1; }
+	double frac2() const { return double(j)/s2; }
+	double frac1S() const { return double(i<<1)/s1 - 1.; }
+	double frac2S() const { return double(j<<1)/s2 - 1.; }
+
+	operator int() const { return flat(); }
+
+	int s1, s2;
+	int i, j;
+};
+
+
+struct Scan3{
+	Scan3(int size): s1(size),s2(size),s3(size),i(-1),j(0),k(0){}
+	Scan3(int size1, int size2, int size3): s1(size1),s2(size2),s3(size3),i(-1),j(0),k(0){}
+
+	bool operator()(){
+		if(++i==s1){
+			i=0;
+			if(++j==s2){
+				j=0;
+				if(++k==s3)	return false;
+			}
+		}
+		return true;
+	}
+	
+	int flat() const { return index3to1(i,j,k, s1,s2); }
+	double frac1() const { return double(i)/s1; }
+	double frac2() const { return double(j)/s2; }
+	double frac3() const { return double(k)/s3; }
+	double frac1S() const { return double(i<<1)/s1 - 1.; }
+	double frac2S() const { return double(j<<1)/s2 - 1.; }
+	double frac3S() const { return double(k<<1)/s3 - 1.; }
+
+	operator int() const { return flat(); }
+
+	int s1, s2, s3;
+	union{
+		struct{ int i, j, k; };
+		struct{ int x, y, z; };
+	};
+};
+
+
 
 /*
 
