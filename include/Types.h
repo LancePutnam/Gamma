@@ -569,7 +569,7 @@ struct Vec3 : public Vec<3, T> {
 		);
 	}
 	
-	Vec3 operator * (const Mat3<T>& m){ return Vec3(*this) *= m; }
+	Vec3 operator * (const Mat3<T>& m) const { return Vec3(*this) *= m; }
 	
 	T dot() const { return dot(*this); }
 	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
