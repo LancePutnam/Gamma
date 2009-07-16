@@ -131,7 +131,7 @@ struct Complex{
 	const C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
 	const C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
 	//C mul2(const C& v) const { return C(r*v.r, i*v.i); }
-	T norm() const { return sqrt(norm2()); }				///< Returns norm (radius), |z|
+	T norm() const { return ::sqrt(norm2()); }				///< Returns norm (radius), |z|
 	T norm2() const { return dot(*this); }					///< Returns square of norm, |z|^2
 	C& normalize(){ return *this /= norm(); }				///< Sets norm (radius) to 1, |z|=1
 	const C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
@@ -139,6 +139,19 @@ struct Complex{
 	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse, 1/z
 	const C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
 	const C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
+
+//	C sqrt() const {
+//		return C(Polar(::sqrt(norm()), arg()*T(0.5)));
+//	}
+
+	/// Returns square root
+	C sqrt() const {
+		const T c = T(1)/::sqrt(T(2));
+		T n = norm();
+		T a = ::sqrt(n+r) * c;
+		T b = ::sqrt(n-r) * (i<T(0) ? -c : c);		
+		return C(a,b);
+	}
 
 	const C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
 	const C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)

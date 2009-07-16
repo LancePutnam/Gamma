@@ -393,6 +393,9 @@ TEM T roundAway(T v, T step);
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
+/// Signum function for real numbers.
+TEM inline T sgn(const T& v, const T& norm=T(1)){ return v<T(0) ? -norm : norm; }
+
 /// Returns value of spherical harmonic Y{l,m}(theta, phi).
 TEM Complex<T> sharm(int l, int m, T theta, T phi);
 
