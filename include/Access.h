@@ -282,7 +282,8 @@ struct Scan2{
 		return true;
 	}
 	
-	int flat() const { return i + j*s1; }
+	int flat() const { return flat(i,j); }
+	int flat(int i1, int i2) const { return i1 + i2*s1; }
 	double frac1() const { return double(i)/s1; }
 	double frac2() const { return double(j)/s2; }
 	double frac1S() const { return double(i<<1)/s1 - 1.; }
@@ -310,7 +311,8 @@ struct Scan3{
 		return true;
 	}
 	
-	int flat() const { return index3to1(i,j,k, s1,s2); }
+	int flat() const { return flat(i,j,k); }
+	int flat(int i1, int i2, int i3) const { return index3to1(i1,i2,i3, s1,s2); }
 	double frac1() const { return double(i)/s1; }
 	double frac2() const { return double(j)/s2; }
 	double frac3() const { return double(k)/s3; }
