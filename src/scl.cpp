@@ -93,7 +93,8 @@ double laguerre(int n, int k, double x) {
 }
 
 
-double legendre(int l, int m, double t){
+
+double legendre(int l, int m, double ct, double st){
 
 	if(l<0){ /*printf("l=%d. l must be non-negative.\n");*/ return 0; }
 	if(m<-l || m>l){ /*printf("m=%d. m must be -l <= m <= l.\n");*/ return 0; }
@@ -105,18 +106,16 @@ double legendre(int l, int m, double t){
 	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
 
 	double P = 0;
-	double cs = cos(t);
-	double sn = sin(t);
 	int mm = scl::abs(m);			/*   mm = |m|   */
 	double y1 = 1.;
 	
 	for(int i=1; i<=mm; ++i)
-		y1 *= -((i<<1) - 1) * sn;
+		y1 *= -((i<<1) - 1) * st;
 	
 	if(l==mm) P = y1;
 
 	else{
-		double y = ((mm<<1) + 1) * cs * y1;
+		double y = ((mm<<1) + 1) * ct * y1;
 		if(l==(mm+1)) P = y;
 
 		else{
@@ -125,7 +124,7 @@ double legendre(int l, int m, double t){
 				double y2 = y1;
 				y1 = y;
 				double d = c / (k - mm);
-				y = (2. + d) * cs * y1 - (1. + d) * y2;
+				y = (2. + d) * ct * y1 - (1. + d) * y2;
 			}
 			P = y;
 		}
@@ -140,6 +139,11 @@ double legendre(int l, int m, double t){
 	}
 
 	return P;
+}
+
+
+double legendre(int l, int m, double t){
+	return legendre(l,m,cos(t),sin(t));
 }
 
 

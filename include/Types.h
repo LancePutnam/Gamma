@@ -144,7 +144,6 @@ struct Complex{
 //		return C(Polar(::sqrt(norm()), arg()*T(0.5)));
 //	}
 
-	/// Returns square root
 	C sqrt() const {
 		const T c = T(1)/::sqrt(T(2));
 		T n = norm();
@@ -483,6 +482,20 @@ struct Multi3: public Multi<3,T>{
 	Multi3(T v1=0, T v2=0, T v3=0){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; }
 };
 
+
+
+template <class T=double>
+struct PowerVal{
+	PowerVal(const T& base=2, const T& expo=0){ (*this)(base, expo); }
+	
+	T operator()(){ return mVal; }
+	PowerVal& operator()(const T& base, const T& expo){ mBase=base; mExpo=expo; computeVal(); }
+	void incExpo(float v){ mExpo+=v; computeVal(); }
+
+private:
+	T mBase, mExpo, mVal;
+	void computeVal(){ mVal=::pow(mBase, mExpo); }
+};
 
 
 

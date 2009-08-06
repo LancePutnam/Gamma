@@ -289,6 +289,7 @@ double laguerre(int n, int k, double x);
 ///
 /// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
 double legendre(int l, int m, double t);
+double legendre(int l, int m, double ct, double st);
 
 /// Convert linear value to log2 in range [0, 1]
 TEM T linLog2(T v, T recMin);
@@ -693,8 +694,8 @@ namespace{
 
 // Implementation_______________________________________________________________
 
-#define GEN(t, f) template<> inline t abs<t>(t v){ return ::f(v); }
-GEN(int, abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
+#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
+GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
 TEM inline T abs(T v){ return v < T(0) ? -v : v; }
 #undef GEN
 

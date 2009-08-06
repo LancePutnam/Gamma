@@ -1,10 +1,53 @@
 #include <stdio.h>
 #include "Types.h"
+#include "ipl.h"
 #include "scl.h"
 
 using namespace gam;
 
+
+template <uint32_t N, class T, class S>
+struct TVec : public Multi<N,T> {
+
+	//typedef Vec<N,T> V;
+
+	TVec(const T& v=T(0)){ (*this) = v; }
+
+	#define DO for(uint32_t i=0; i<N; ++i)
+	S& operator +=(const S& v){ DO (*this)[i] += v[i]; return *this; }
+
+	T dot() const { return dot(*this); }
+	T dot(const S& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
+	T norm() const { return sqrt(dot()); }
+
+	S sgn() const { S(*this) /= norm(); }
+
+	#undef DO
+};
+
+
+
+template <class T>
+struct TVec3 : public TVec<3, T, TVec3<T> >{
+
+	//typedef TVec<3, T, TVec3<T> > base;
+	typedef TVec<3, T, TVec3<T> > V;
+	//using base::base();
+	TVec3(const V& v){ (*this)=v; }
+	TVec3(const T& v=T(0)){ (*this)(v,v,v); }
+	TVec3(const T& v1, const T& v2, const T& v3=T(0)){ (*this)(v1,v2,v3); }
+	
+	TVec3& operator()(const T& v1, const T& v2, const T& v3){ TVec3& t=*this; t[0]=v1; t[1]=v2; t[2]=v3; return t; }
+};
+
+
 int main(int argc, char* argv[]){
+
+	{
+		Vec3<float> v(1,0,0), u(0,1,0);
+
+		//v = ipl::linear(0.5, v, u*0.5);
+	}
 
 
 	printf("\nMulti:\n");
