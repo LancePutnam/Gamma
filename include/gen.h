@@ -277,30 +277,31 @@ OF3(RSin,		rSin,		0,0,1)
 
 
 
-// Complex resonator
+/// Complex phasor
 template <class T=double>
-class Spinner2 : public Complex<T>{
+class Phasor : public Complex<T>{
 public:
 	typedef Complex<T> C;
 	using C::operator();
 
-	Spinner2(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0)){
+	Phasor(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0)){
 		set(frq, amp, phs);
 	}
 
 	C& operator()(){ return (*this) *= mFreq; }
 
+	void freq(const T& v){ mFreq.fromPhase(v*M_2PI); }
+
 	void set(const T& frq, const T& amp, const T& phs){
 		this->fromPolar(amp, (phs-frq)*M_2PI); // phase rewound by 1 iteration
-		mFreq.fromPhase(frq*M_2PI);
+		freq(frq);
 	}
 
 	void set(const T& frq, const Complex<T>& phs){
-		(*this)(phs.r, phs.i);
-		mFreq.fromPhase(frq*M_2PI);
+		(*this)(phs.r, phs.i); freq(frq);
 	}
 	
-	float freq() const { return mFreq.phase()*M_1_2PI; }
+	T freq() const { return mFreq.phase()*M_1_2PI; }
 
 protected:
 	C mFreq;
