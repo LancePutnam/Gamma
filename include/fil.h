@@ -1,7 +1,7 @@
 #ifndef GAMMA_FIL_H_INC
 #define GAMMA_FIL_H_INC
 
-/*	Synz (synthesize) - Signal processing library
+/*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
 #include "scl.h"

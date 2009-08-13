@@ -1,5 +1,5 @@
-#ifndef GAMMA_TIMER_H_INC
-#define GAMMA_TIMER_H_INC
+#ifndef GAMMA_THREAD_H_INC
+#define GAMMA_THREAD_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */

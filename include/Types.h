@@ -488,14 +488,39 @@ template <class T=double>
 struct PowerVal{
 	PowerVal(const T& base=2, const T& expo=0){ (*this)(base, expo); }
 	
-	T operator()(){ return mVal; }
-	PowerVal& operator()(const T& base, const T& expo){ mBase=base; mExpo=expo; computeVal(); }
-	void incExpo(float v){ mExpo+=v; computeVal(); }
+	T operator()() const { return mVal; }
+	T base() const { return mBase; }
+	T expo() const { return mExpo; }
+	
+	void operator()(const T& base, const T& expo){ mBase=base; mExpo=expo; computeVal(); }
+	void base(const T& v){ mBase=v; computeVal(); }
+	void expo(const T& v){ mExpo=v; computeVal(); }
+	void expoAdd(const T& v){ expo(mExpo+v); }
 
 private:
 	T mBase, mExpo, mVal;
 	void computeVal(){ mVal=::pow(mBase, mExpo); }
 };
+
+
+
+
+/// Fixed size shift buffer
+template <int N, class T>
+struct ShiftBuffer : public Multi<N,T>{
+
+	typedef Multi<N,T> base;
+	using base::elems;
+
+	ShiftBuffer(const T& v=0){ base::set(0); }
+
+	/// Push new element onto buffer. Newest element is at index 0.
+	void operator()(const T& v){
+		for(int i=N-1; i>0; --i) elems[i] = elems[i-1];
+		elems[0]=v;
+	}
+};
+
 
 
 
