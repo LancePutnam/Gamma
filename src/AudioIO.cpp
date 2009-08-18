@@ -116,7 +116,7 @@ AudioIO::AudioIO(
 	mErrNum(0),
 	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
 	mIsOpen(false), mIsRunning(false), mInResizeDeferred(false), mOutResizeDeferred(false),
-	mKillNANs(true)
+	mZeroNANs(true), mClipOut(true)
 {
 	callback = callbackA;
 	
@@ -276,11 +276,19 @@ int AudioIO::paCallback(const void *input,
 	io();	// call callback
 
 	// kill pesky nans so we don't hurt anyone's ears
-	if(io.killNANs()){
+	if(io.zeroNANs()){
 		for(uint32_t i=0; i<io.framesPerBuffer()*io.outDeviceChans(); ++i){
 			float& s = io.out(0)[i];
 			if(isnan(s)) s = 0.f;
 		}
+	}
+	
+	if(io.clipOut()){
+		for(uint32_t i=0; i<io.framesPerBuffer()*io.outDeviceChans(); ++i){
+			float& s = io.out(0)[i];
+			if		(s<-1.f) s =-1.f;
+			else if	(s> 1.f) s = 1.f;
+		}		
 	}
 
 	if(deinterleave){

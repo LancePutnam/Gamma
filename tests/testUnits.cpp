@@ -23,6 +23,11 @@ int main(int argc, char* argv[]){
 	// in order to catch errors in base functionality.
 
 
+	const double pinf = 1e800;			// + infinity
+	const double ninf = -pinf;			// - infinity
+	const double nan  = pinf * 0.;		// not-a-number
+
+
 	// Memory management
 	{
 		auto TestSmartObject a;
@@ -221,7 +226,7 @@ int main(int argc, char* argv[]){
 	#undef T
 
 	#define T(x, y) assert(scl::clip(x) == y);
-	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, 0.)
+	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, 0.) T(pinf, 1.) T(ninf, 0.)
 	#undef T
 
 	#define T(x, y) assert(scl::clipS(x) == y);

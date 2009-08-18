@@ -144,32 +144,35 @@ public:
 		
 	static audioCallback callback;	///< User specified callback function.
 	
-	void operator()();	// Calls callback manually
+	void operator()();				///< Calls callback manually
 
-	bool open();	///< Opens audio device.
-	bool close();	///< Closes audio device. Will stop active IO.
-	bool start();	///< Starts the audio IO.  Will open audio device if necessary.
-	bool stop();	///< Stops the audio IO.
-	
+	bool open();					///< Opens audio device.
+	bool close();					///< Closes audio device. Will stop active IO.
+	bool start();					///< Starts the audio IO.  Will open audio device if necessary.
+	bool stop();					///< Stops the audio IO.
+
 	/// Sets number of effective channels on input or output device depending on 'forOutput' flag.
 	
 	/// An effective channel is either a real device channel or virtual channel 
 	/// depending on how many channels the device supports. Passing in -1 for
 	/// the number of channels opens all available channels.
 	void chans(int num, bool forOutput);
-	void framesPerSecond(double v);
-	void framesPerBuffer(uint32_t n);
-	void inChans(uint32_t n){ chans(n,false); }
-	void outChans(uint32_t n){ chans(n,true); }
-	void auxChans(uint32_t num);
+	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
+	void framesPerSecond(double v);				///< Set number of frames per second
+	void framesPerBuffer(uint32_t n);			///< Set number of frames per processing buffer
+	void inChans(uint32_t n){ chans(n,false); }	///< Set number of input channels
+	void outChans(uint32_t n){ chans(n,true); }	///< Set number of output channels
+	void auxChans(uint32_t num);				///< Set number of auxiliary channels
+	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer
 
 	uint32_t chans(bool forOutput) const;
-	double cpu() const;					///< Returns current CPU usage of audio thread
-	bool killNANs() const;
-	bool supportsFPS(double fps);
+	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
+	double cpu() const;							///< Returns current CPU usage of audio thread
+	bool supportsFPS(double fps);				///< Return true if fps supported, otherwise false
+	bool zeroNANs() const;						///< Returns zeroNANs setting
 
-	void print();				///< Prints info about current i/o devices to stdout.
-	void printError();			///< Prints info about current error status to stdout.
+	void print();								///< Prints info about current i/o devices to stdout.
+	void printError();							///< Prints info about current error status to stdout.
 
 	static const char * errorText(int errNum);		// Returns error string.
 	
@@ -181,7 +184,8 @@ private:
 	bool mIsOpen;			// An audio device is open
 	bool mIsRunning;		// An audio stream is running
 	bool mInResizeDeferred, mOutResizeDeferred;
-	bool mKillNANs;			// whether to zero NANs
+	bool mZeroNANs;			// whether to zero NANs
+	bool mClipOut;			// whether to clip output between -1 and 1
 
 	void init();		// Initializes PortAudio and member variables.
 	
@@ -235,7 +239,7 @@ inline void AudioIO::operator()(){ if(callback) callback(*this); }
 
 inline uint32_t AudioIO::chans(bool forOutput) const { return forOutput ? outChans() : inChans(); }
 inline double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mStream); }
-inline bool AudioIO::killNANs() const { return mKillNANs; }
+inline bool AudioIO::zeroNANs() const { return mZeroNANs; }
 inline const char * AudioIO::errorText(int errNum){ return Pa_GetErrorText(errNum); }
 
 inline bool AudioIO::error() const { return mErrNum != paNoError; }
