@@ -16,6 +16,8 @@
 #define UI8 unsigned long long
 
 
+namespace gam{
+
 class File{
 public:
 
@@ -27,6 +29,8 @@ public:
 
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
+
+	int write(double v){ return fwrite(&v, sizeof(double), 1, mFP); }
 
 	/// Returns character string of file contents (read mode only)
 	char * readAll();
@@ -159,6 +163,8 @@ private:
 	//DEFINE_SPECIAL(unsigned long, u04)
 	//DEFINE_SPECIAL(long, s04)
 #undef DEFINE_SPECIAL
+
+} // gam::
 
 #undef ULONG
 #undef UI4

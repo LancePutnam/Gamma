@@ -4,6 +4,7 @@
 #define UI4 unsigned long
 #define UI8 unsigned long long
 
+namespace gam{
 
 File::File(const char * path, const char * mode)
 :	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
@@ -119,6 +120,8 @@ void DataFile::write8(const void * src, ULONG len){
 	UI8 * s = (UI8 *)src;
 	for(ULONG i=0; i<len; i++) write8(s + i);
 }
+
+} // gam::
 
 #undef ULONG
 #undef UI4

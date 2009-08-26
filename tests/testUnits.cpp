@@ -28,6 +28,11 @@ int main(int argc, char* argv[]){
 	const double nan  = pinf * 0.;		// not-a-number
 
 
+	// File I/O
+	{
+		
+	}
+
 	// Memory management
 	{
 		auto TestSmartObject a;
