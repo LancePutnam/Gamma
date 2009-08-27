@@ -358,6 +358,15 @@ struct OnOff{
 };
 
 
+struct OneOff{
+	OneOff(bool v=true): mVal(v) {}
+	bool operator()(){ bool r=mVal; mVal=false; return r; }
+	void set(){ mVal=true; }
+	
+private:
+	bool mVal;
+};
+
 
 //template <class T>
 //class GenNode{
