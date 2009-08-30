@@ -15,7 +15,6 @@
 #define UI4 unsigned long
 #define UI8 unsigned long long
 
-
 namespace gam{
 
 class File{
@@ -23,14 +22,18 @@ public:
 
 	/// @param[in] path		path of file
 	/// @param[in] mode		i/o mode w, r, wb, rb
-	File(const char * path, const char * mode);
+	File(const char * path, const char * mode, bool open=false);
 
 	~File();
 
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
 
-	int write(double v){ return fwrite(&v, sizeof(double), 1, mFP); }
+	/// Write memory elements to file
+	uint32_t write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
+
+	/// Quick and dirty write memory to file
+	static uint32_t write(const char * path, const void * v, int size, int items=1);
 
 	/// Returns character string of file contents (read mode only)
 	char * readAll();
