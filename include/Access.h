@@ -8,6 +8,8 @@
 	Functions/objects for accessing and indexing arrays.
 */
 
+#include "pstdint.h"
+
 namespace gam{
 
 
@@ -36,26 +38,31 @@ inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
 
 
 // Neighbor accessing strategies
+// Valid index interval is [mn, mx]. The max value is inclusive to speed up
+// checks of closest neighbors, which is done most often.
 namespace acc{
 
 	struct None{
-		static int checkM1(int i, int mx, int mn){ return i; }
-		static int checkP1(int i, int mx, int mn){ return i; }
+		static int mapM1(int v, int mx, int mn){ return v; }
+		static int mapP1(int v, int mx, int mn){ return v; }
+		static int map  (int v, int mx, int mn){ return v; }
 	};
 
 	struct Wrap{
-		static int checkM1(int i, int mx, int mn){ return i<mn ? mx : i; }
-		static int checkP1(int i, int mx, int mn){ return i>mx ? mn : i; }
+		static int mapM1(int v, int mx, int mn){ return v<mn ? mx : v; }
+		static int mapP1(int v, int mx, int mn){ return v>mx ? mn : v; }
+		static int map  (int v, int mx, int mn){ return v<mn ? v+mx+1-mn : (v>mx ? v-(mx+1-mn) : v); }
 	};
 
 	struct Clip{
-		static int checkM1(int i, int mx, int mn){ return i>mn ? i : mn; }
-		static int checkP1(int i, int mx, int mn){ return i<mx ? i : mx; }
+		static int mapM1(int v, int mx, int mn){ return v>mn ? v : mn; }
+		static int mapP1(int v, int mx, int mn){ return v<mx ? v : mx; }
+		static int map  (int v, int mx, int mn){ return v>mn ? (v<mx ? v : mx) : mn; }
 	};
 
 //	struct Fold{
 //		static int checkM1(int i, int mx, int mn){ return i>=mn ? i : mn+1; }
-//		static int checkP1(int i, int mx, int mn){ return i<=mx ? i : mx-1; }
+//		static int mapP1(int i, int mx, int mn){ return i<=mx ? i : mx-1; }
 //	};
 };
 
@@ -73,11 +80,11 @@ public:
 	:	i0(0), i1(0), i2(0), mMax((size-1)*stride + min), mMin(min), mStride(stride)
 	{
 		begin += min;
-		i1=checkM1(begin-mStride);
+		i1=mapM1(begin-mStride);
 		i2=begin;
 	}
 
-	void operator()(){ i0=i1; i1=i2; i2=checkP1(i2+mStride); }
+	void operator()(){ i0=i1; i1=i2; i2=mapP1(i2+mStride); }
 	void operator()(int& a0, int& a1, int& a2){	(*this)(); a0=i0; a1=i1; a2=i2; }
 	bool valid(int i){ return (i<mMin) || (i>mMax); }
 
@@ -86,16 +93,102 @@ public:
 private:
 	int mMax, mMin, mStride;
 	
-	int checkM1(int i){ return Tacc::checkM1(i, mMax, mMin); }
-	int checkP1(int i){ return Tacc::checkP1(i, mMax, mMin); }
+	int mapM1(int i){ return Tacc::mapM1(i, mMax, mMin); }
+	int mapP1(int i){ return Tacc::mapP1(i, mMax, mMin); }
 };
 
 
 
+struct BoundaryClip{
+	int operator()(int ix, int sizeX) const{
+		return ix < 0 ? 0 : ix >= sizeX ? sizeX-1 : ix;
+	}
+
+	int operator()(int ix, int iy, int sizeX, int sizeY) const{		
+		return (*this)(ix, sizeX) + (*this)(iy, sizeY)*sizeX;
+	}
+};
+
+struct BoundaryWrap{
+	int operator()(int ix, int sizeX) const{
+		return ix < 0 ? sizeX+ix : ix >= sizeX ? ix-sizeX : ix;
+	}
+
+	int operator()(int ix, int iy, int sizeX, int sizeY) const{
+		return (*this)(ix, sizeX) + (*this)(iy, sizeY)*sizeX;
+	}
+};
+
+
+
+// We want this thing to be able to provide a standard interface to indexing
+// classes without relying heavily (or at all) on virtual functions.
+
+class Indexer{
+public:
+	Indexer(uint32_t end=1, uint32_t stride=1, uint32_t begin=0)
+	:	mEnd(end), mBegin(begin), mStride(stride)
+	{}
+	
+	virtual ~Indexer(){}
+	
+	uint32_t begin() const { return mBegin; }			// Begin index (inclusive)
+	bool cond(uint32_t i) const { return i < end(); }	// Continuation condition
+	uint32_t end() const { return mEnd; }				// End index (exclusive)
+	virtual uint32_t index(uint32_t i) const { return i; }	// Iteration to index map 
+	uint32_t stride() const { return mStride; }			// Index stride amount
+
+protected:
+	uint32_t mEnd, mBegin, mStride;
+};
+
+typedef Indexer Loop;
+
+
+class Indices : public Indexer{
+public:
+
+	Indices(uint32_t maxSize)
+	:	Indexer(0), mMaxSize(maxSize)
+	{	mElems = new uint32_t[maxSize]; }
+
+	~Indices(){ delete[] mElems; }
+
+	// add value to indices
+	void operator+= (uint32_t v){
+		for(uint32_t i=0; i<end(); ++i)
+			mElems[i] = (mElems[i] + v) % mMaxSize;
+	}
+
+	// multiply indices by value
+	void operator*= (double v){
+		for(uint32_t i=0; i<end(); ++i)
+			mElems[i] = ((uint32_t)((double)mElems[i] * v + 0.5)) % mMaxSize;
+	}
+
+	// add new index
+	Indices& operator<< (uint32_t index){
+		if(end() < mMaxSize && index < mMaxSize) mElems[mEnd++] = index;
+		return *this;
+	}
+
+	void clear(){ mEnd=0; }
+	uint32_t * elems() const { return mElems; }
+
+	uint32_t index(uint32_t i) const { return mElems[i]; }
+
+private:
+	uint32_t mMaxSize;
+	uint32_t * mElems;
+};
+
+
+
+/// Maps a real number in [0, pmax) to an integer in [0, imax).
 template <class T>
 class IndexMap{
 public:
-	IndexMap(int indMax, const T& posMax){ max(indMax, posMax); }
+	IndexMap(int indMax, const T& posMax=T(1)){ max(indMax, posMax); }
 	
 	int operator()(const T& x) const { return cast(x*mMul); }
 	
@@ -112,85 +205,10 @@ public:
 
 private:
 	T mMul, mRec;
-	int cast(const T& v) const { return castIntTrunc(v); }
+	//int cast(const T& v) const { return castIntTrunc(v); }
+	int cast(const T& v) const { return int(v); }	// use native cast, usually optimized
 	T cast(int v) const { return T(v); }
 };
-
-
-
-template <class SBounds>
-struct NeighborsCross2D{
-
-	void operator()(int ix, int iy, int sizeX, int sizeY, const SBounds& sBounds){
-		l = sBounds(ix-1,iy, sizeX, sizeY);
-		r = sBounds(ix+1,iy, sizeX, sizeY);
-		t = sBounds(ix,iy-1, sizeX, sizeY);
-		b = sBounds(ix,iy+1, sizeX, sizeY);
-	}
-
-	union{
-		struct{ int l, r, t, b; }; 
-		int indices[4];
-	};
-};
-
-
-template <class SBounds>
-struct NeighborsDiag2D{
-
-	void operator()(int ix, int iy, int sizeX, int sizeY, const SBounds& sBounds){
-		tl = sBounds(ix-1,iy-1, sizeX, sizeY);
-		br = sBounds(ix+1,iy+1, sizeX, sizeY);
-		tr = sBounds(ix+1,iy-1, sizeX, sizeY);
-		bl = sBounds(ix-1,iy+1, sizeX, sizeY);
-	}
-
-	union{
-		struct{ int tl, br, tr, bl; }; 
-		int indices[4];
-	};
-};
-
-
-
-struct BoundaryClip{
-	int operator()(int ix, int sizeX) const{
-		return ix < 0 ? 0 : ix >= sizeX ? sizeX-1 : ix;
-	}
-
-	int operator()(int ix, int iy, int sizeX, int sizeY) const{		
-		return (*this)(ix, sizeX) + (*this)(iy, sizeY)*sizeX;
-	}
-};
-
-
-struct BoundaryWrap{
-	int operator()(int ix, int sizeX) const{
-		return ix < 0 ? sizeX+ix : ix >= sizeX ? ix-sizeX : ix;
-	}
-
-	int operator()(int ix, int iy, int sizeX, int sizeY) const{
-		return (*this)(ix, sizeX) + (*this)(iy, sizeY)*sizeX;
-	}
-};
-
-
-
-
-template <class Sneigh, class Sbounds=BoundaryWrap>
-struct Neighbors2D : public Sneigh{
-
-	Neighbors2D(int sizeX, int sizeY): sizeX(sizeX), sizeY(sizeY){}
-
-	void operator()(int ix, int iy){
-		(*this)(ix, iy, sizeX, sizeY, mBounds);
-	}
-
-private:
-	Sbounds mBounds;
-	int sizeX, sizeY;
-};
-
 
 
 
@@ -214,6 +232,58 @@ struct Neighbors1D {
 private:
 	Sbounds bounds;
 	int sizeX;
+};
+
+
+
+template <class Sneigh, class Sbounds=BoundaryWrap>
+struct Neighbors2D : public Sneigh{
+
+	Neighbors2D(int sizeX, int sizeY): sizeX(sizeX), sizeY(sizeY){}
+
+	void operator()(int ix, int iy){
+		(*this)(ix, iy, sizeX, sizeY, mBounds);
+	}
+
+private:
+	Sbounds mBounds;
+	int sizeX, sizeY;
+};
+
+
+
+template <class SBounds>
+struct NeighborsCross2D{
+
+	void operator()(int ix, int iy, int sizeX, int sizeY, const SBounds& sBounds){
+		l = sBounds(ix-1,iy, sizeX, sizeY);
+		r = sBounds(ix+1,iy, sizeX, sizeY);
+		t = sBounds(ix,iy-1, sizeX, sizeY);
+		b = sBounds(ix,iy+1, sizeX, sizeY);
+	}
+
+	union{
+		struct{ int l, r, t, b; }; 
+		int indices[4];
+	};
+};
+
+
+
+template <class SBounds>
+struct NeighborsDiag2D{
+
+	void operator()(int ix, int iy, int sizeX, int sizeY, const SBounds& sBounds){
+		tl = sBounds(ix-1,iy-1, sizeX, sizeY);
+		br = sBounds(ix+1,iy+1, sizeX, sizeY);
+		tr = sBounds(ix+1,iy-1, sizeX, sizeY);
+		bl = sBounds(ix-1,iy+1, sizeX, sizeY);
+	}
+
+	union{
+		struct{ int tl, br, tr, bl; }; 
+		int indices[4];
+	};
 };
 
 
@@ -348,6 +418,75 @@ for(int j=0; j<sy; ++j){
 }
 
 */
+
+
+/*
+// Upward counting indexer
+class Loop{
+public:
+	Loop(uint end=1, uint stride=1, uint begin=0)
+	:	mEnd(end), mBegin(begin), mStride(stride)
+	{}
+	
+	Loop& operator()(uint end, uint stride=1, uint begin=0){
+		mEnd = end; mBegin = begin; mStride = stride; return *this;
+	}
+	
+	uint begin() const { return mBegin; }			// Begin index (inclusive)
+	bool cond(uint i) const { return i < end(); }	// Continuation condition
+	uint end() const { return mEnd; }				// End index (exclusive)
+	uint index(uint i) const { return i; }			// Iteration to index map 
+	uint stride() const { return mStride; }			// Index stride amount
+
+private:
+	uint mEnd, mBegin, mStride;
+};
+*/
+
+
+// experimental index set
+// similar to vector, but without auto-memory management
+//class Indices{
+//public:
+//
+//	Indices(uint maxSize)
+//	:	mSize(0), mMaxSize(maxSize)
+//	{	mElems = new uint[maxSize]; }
+//
+//	~Indices(){ delete[] mElems; }
+//
+//	// add value to indices
+//	void operator+= (uint v){
+//		for(uint i=0; i<size(); ++i)
+//			mElems[i] = (mElems[i] + v) % mMaxSize;
+//	}
+//
+//	// multiply indices by value
+//	void operator*= (double v){
+//		for(uint i=0; i<size(); ++i)
+//			mElems[i] = ((uint)((double)mElems[i] * v + 0.5)) % mMaxSize;
+//	}
+//
+//	// add new index
+//	Indices& operator<< (uint index){
+//		if(mSize < mMaxSize && index < mMaxSize) mElems[mSize++] = index;
+//		return *this;
+//	}
+//
+//	void clear(){ mSize=0; }
+//	uint * elems() const { return mElems; }
+//	uint size() const { return mSize; }
+//
+//	uint begin() const { return 0; }
+//	uint end() const { return mSize; }
+//	uint index(uint i) const { return mElems[i]; }
+//	uint stride() const { return 1; }
+//
+//private:
+//	uint mSize, mMaxSize;
+//	uint * mElems;
+//};
+
 
 
 } // gam::

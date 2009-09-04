@@ -5,7 +5,8 @@
 	See COPYRIGHT file for authors and license information 
 
 	File Description: 
-	Static (fixed size) types
+	Static (fixed size) types including complex numbers, quaternions, 
+	2,3,4-vectors, 3x3 matrix, and fixed-size array.
 */
 
 
@@ -504,7 +505,6 @@ private:
 
 
 
-
 /// Fixed size shift buffer
 template <int N, class T>
 struct ShiftBuffer : public Multi<N,T>{
@@ -655,73 +655,6 @@ struct Vec4 : public Vec<4, T> {
 
 
 
-
-
-
-// We want this thing to be able to provide a standard interface to indexing
-// classes without relying heavily (or at all) on virtual functions.
-
-class Indexer{
-public:
-	Indexer(uint end=1, uint stride=1, uint begin=0)
-	:	mEnd(end), mBegin(begin), mStride(stride)
-	{}
-	
-	virtual ~Indexer(){}
-	
-	uint begin() const { return mBegin; }			// Begin index (inclusive)
-	bool cond(uint i) const { return i < end(); }	// Continuation condition
-	uint end() const { return mEnd; }				// End index (exclusive)
-	virtual uint index(uint i) const { return i; }	// Iteration to index map 
-	uint stride() const { return mStride; }			// Index stride amount
-
-protected:
-	uint32_t mEnd, mBegin, mStride;
-};
-
-typedef Indexer Loop;
-
-
-class Indices : public Indexer{
-public:
-
-	Indices(uint maxSize)
-	:	Indexer(0), mMaxSize(maxSize)
-	{	mElems = new uint[maxSize]; }
-
-	~Indices(){ delete[] mElems; }
-
-	// add value to indices
-	void operator+= (uint v){
-		for(uint i=0; i<end(); ++i)
-			mElems[i] = (mElems[i] + v) % mMaxSize;
-	}
-
-	// multiply indices by value
-	void operator*= (double v){
-		for(uint i=0; i<end(); ++i)
-			mElems[i] = ((uint)((double)mElems[i] * v + 0.5)) % mMaxSize;
-	}
-
-	// add new index
-	Indices& operator<< (uint index){
-		if(end() < mMaxSize && index < mMaxSize) mElems[mEnd++] = index;
-		return *this;
-	}
-
-	void clear(){ mEnd=0; }
-	uint * elems() const { return mElems; }
-
-	uint index(uint i) const { return mElems[i]; }
-
-private:
-	uint mMaxSize;
-	uint * mElems;
-};
-
-
-
-
 // Trying to abstract too many things. Hard to write subclasses of templates
 //template <class T>
 //struct ElemData2{
@@ -756,79 +689,6 @@ private:
 //};
 
 
-
-/*
-// Upward counting indexer
-class Loop{
-public:
-	Loop(uint end=1, uint stride=1, uint begin=0)
-	:	mEnd(end), mBegin(begin), mStride(stride)
-	{}
-	
-	Loop& operator()(uint end, uint stride=1, uint begin=0){
-		mEnd = end; mBegin = begin; mStride = stride; return *this;
-	}
-	
-	uint begin() const { return mBegin; }			// Begin index (inclusive)
-	bool cond(uint i) const { return i < end(); }	// Continuation condition
-	uint end() const { return mEnd; }				// End index (exclusive)
-	uint index(uint i) const { return i; }			// Iteration to index map 
-	uint stride() const { return mStride; }			// Index stride amount
-
-private:
-	uint mEnd, mBegin, mStride;
-};
-*/
-
-
-// experimental index set
-// similar to vector, but without auto-memory management
-//class Indices{
-//public:
-//
-//	Indices(uint maxSize)
-//	:	mSize(0), mMaxSize(maxSize)
-//	{	mElems = new uint[maxSize]; }
-//
-//	~Indices(){ delete[] mElems; }
-//
-//	// add value to indices
-//	void operator+= (uint v){
-//		for(uint i=0; i<size(); ++i)
-//			mElems[i] = (mElems[i] + v) % mMaxSize;
-//	}
-//
-//	// multiply indices by value
-//	void operator*= (double v){
-//		for(uint i=0; i<size(); ++i)
-//			mElems[i] = ((uint)((double)mElems[i] * v + 0.5)) % mMaxSize;
-//	}
-//
-//	// add new index
-//	Indices& operator<< (uint index){
-//		if(mSize < mMaxSize && index < mMaxSize) mElems[mSize++] = index;
-//		return *this;
-//	}
-//
-//	void clear(){ mSize=0; }
-//	uint * elems() const { return mElems; }
-//	uint size() const { return mSize; }
-//
-//	uint begin() const { return 0; }
-//	uint end() const { return mSize; }
-//	uint index(uint i) const { return mElems[i]; }
-//	uint stride() const { return 1; }
-//
-//private:
-//	uint mSize, mMaxSize;
-//	uint * mElems;
-//};
-
-
-}
-
-
-
-
+} // gam::
 
 #endif

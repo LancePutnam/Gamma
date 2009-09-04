@@ -11,6 +11,7 @@
 #include <math.h>
 #include <string.h>
 #include "Containers.h"
+#include "gen.h"
 #include "ipl.h"
 #include "mem.h"
 #include "scl.h"

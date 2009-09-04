@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include "Access.h"
 #include "Containers.h"
 #include "ipl.h"
 #include "scl.h"
@@ -21,10 +22,15 @@ struct Trunc{
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return a.atPhase(phase);
 	}
-	
+
+	template <class T, class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+		return a[iInt];
+	}
+
 	template <class T>
 	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
-		return a[iInt];
+		return (*this)(acc::Wrap(), a,iInt,iFrac, max,min);
 	}
 };
 
@@ -40,13 +46,18 @@ struct Round{
 		return a.atPhase(phase + (a.oneIndex()>>1));
 	}
 	
-	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	template <class T, class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
 		return ipl::nearest(
 			iFrac,
 			a[iInt],
-			a[scl::wrapOnce(iInt + 1, max, min)]
+			a[s.mapP1(iInt+1, max, min)]
 		);
+	}
+
+	template <class T>
+	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
 	}
 };
 
@@ -63,15 +74,26 @@ struct Linear{
 			a.atPhase(phase + a.oneIndex())
 		);
 	}
-	
-	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+
+	template <class T, class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{		
 		return ipl::linear(
 			iFrac,
 			a[iInt],
-			a[scl::wrapOnce(iInt + 1, max, min)]
+			a[s.mapP1(iInt+1, max, min)]
 		);
 	}
+
+	template <class T>
+	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+//		return ipl::linear(
+//			iFrac,
+//			a[iInt],
+//			a[scl::wrapOnce(iInt + 1, max, min)]
+//		);
+		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
+	}	
+
 };
 
 
@@ -91,15 +113,20 @@ struct Cubic{
 		);
 	}
 	
-	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	template <class T, class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{		
 		return ipl::cubic(
 			iFrac,
-			a[scl::wrapOnce(iInt - 1, max, min)],
+			a[s.mapM1(iInt-1, max, min)],
 			a[iInt],
-			a[scl::wrapOnce(iInt + 1, max, min)],
-			a[scl::wrapOnce(iInt + 2, max, min)]
+			a[s.mapP1(iInt+1, max, min)],
+			a[s.map  (iInt+2, max, min)]
 		);
+	}
+	
+	template <class T>
+	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
 	}
 };
 
@@ -120,14 +147,19 @@ struct AllPass{
 			prev
 		);
 	}
-
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	
+	template <class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{		
 		return ipl::allpass(
 			iFrac,
 			a[iInt],
-			a[scl::wrapOnce(iInt + 1, max, min)],
+			a[s.mapP1(iInt+1, max, min)],
 			prev
 		);
+	}
+
+	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
 	}
 	
 	mutable T prev;

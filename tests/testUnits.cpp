@@ -2,9 +2,12 @@
 #include "Gamma.h"
 #include "Access.h"
 #include "Conversion.h"
+#include "File.h"
 #include "SmartObject.h"
+#include "Strategy.h"
 #include "Types.h"
 #include "Thread.h"
+#include "UnitMapper.h"
 #include <map>
 
 using namespace gam;
@@ -30,8 +33,23 @@ int main(int argc, char* argv[]){
 
 	// File I/O
 	{
+		const char * path = "test.txt";
+		File f(path, "w");
+		assert(f.open());
 		
+		char buf[] = {'H','e','l','l','o',' ','W','o','r','l','d','!'};
+		assert(f.write(buf, 1, sizeof(buf)) == sizeof(buf));
+		f.close();
+		assert(!f.opened());
+		
+		f.mode("r");
+		assert(f.open());
+		
+		char * bufR = f.readAll();
+		for(int i=0; i<f.size(); ++i) assert(buf[i] == bufR[i]);
+		f.close();
 	}
+
 
 	// Memory management
 	{
@@ -44,6 +62,24 @@ int main(int argc, char* argv[]){
 		assert(d->dynamicAlloc());
 	}
 
+
+	// Data Accessing
+	{
+		using namespace acc;
+
+		assert(None::map(0,2,1) == 0);
+		assert(Wrap::map(0,2,1) == 2);
+		assert(Clip::map(0,2,1) == 1);
+
+		assert(None::map(2,2,1) == 2);
+		assert(Wrap::map(2,2,1) == 2);
+		assert(Clip::map(2,2,1) == 2);
+
+		assert(None::map(3,2,1) == 3);
+		assert(Wrap::map(3,2,1) == 1);
+		assert(Clip::map(3,2,1) == 2);
+	}
+	
 
 	// Constants
 	
@@ -357,6 +393,33 @@ int main(int argc, char* argv[]){
 				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)
 	#undef T
 
+	// Interpolation
+	{
+		const int N=4;
+		Array<double> a(N);
+		for(int i=0; i<N; ++i) a[i]=i;
+		
+		assert(ipl::linear(0.5, a[0], a[1]) == 0.5);
+		assert(ipl::Linear()(acc::Wrap(), a,   0, 0.5, N-1,0) == 0.5);
+		assert(ipl::Linear()(acc::Wrap(), a, N-1, 0.5, N-1,0) == (N-1)/2.);
+		assert(ipl::Linear()(acc::Clip(), a,   0, 0.5, N-1,0) == 0.5);
+		assert(ipl::Linear()(acc::Clip(), a, N-1, 0.5, N-1,0) == (N-1));
+	}
+
+	
+	// FunctionTable
+	{
+		const int N=4;
+		FunctionTable<double, ipl::Linear, acc::Wrap> ft(N);
+		for(int i=0; i<N; ++i) ft[i]=i;
+		
+		assert(ft(0./N) == 0);
+		assert(ft(1./N) == 1);
+		
+		assert(ft(0.5/N) == 0.5);
+		assert(ft(1.5/N) == 1.5);
+	}
+	
 
 	// Thread
 	{	int x=0;

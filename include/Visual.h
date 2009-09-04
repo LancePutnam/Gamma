@@ -35,7 +35,7 @@ void printBinary(void * value32, const char * zero="0", const char * one="1", in
 /// Prints array as hexidecimal values.
 void printHexArray(float * table, uint32_t len, uint32_t valuesPerLine);
 
-/// Print signed normalized value on a horizontal plot.
+/// Print signed unit value on a horizontal plot.
 
 /// @param[in]	value	Normalized value to plot
 /// @param[in]	width	Character width of plot excluding center point

@@ -14,7 +14,6 @@
 
 #include "Types.h"
 #include "Conversion.h"
-#include "gen.h"
 #include "mem.h"
 #include "scl.h"
 
@@ -217,84 +216,6 @@ protected:
 
 
 
-// Tabulated function with real number lookup.
-// TODO: move out of containers; this is more like a mathematical field
-template <class T /*, class Sacc=acc::Wrap, class Sipl=ipl::Linear*/>
-class FunctionTable : public Array<T>{
-	typedef Array<T> base;
-public:
-	using base::elems; using base::size; using base::operator=;
-
-	/// Constructor that alocates an internal table
-
-	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
-	/// @param[in] init		Initializes all elements to this value
-	FunctionTable(uint32_t size, const T& init=T(0))
-	:	base(size), mIndMap(size)
-	{
-		(*this) = init;
-	}
-	
-	virtual ~FunctionTable(){}
-	
-
-	/// Returns f(x) where x lies in the function domain, [0,1).
-	T operator()(double x) const {
-		x = scl::wrap(x);
-		float f;
-		int i1 = mIndMap(x, f);
-		int i2 = i1+1; if(i2==size()) i2=0;
-		return (*this)[i1]*(1.f-f) + (*this)[i2]*f;
-	}
-
-	/// Sums generator stream with table elements
-	template <class Gen>
-	FunctionTable& operator+=(Gen& g){
-		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
-		return *this;
-	}
-
-protected:
-
-	virtual void onResize(){ mIndMap.size(size()); }
-
-	// Maps from unit domain to indices and vice-versa
-	class IndexMap{
-	public:
-		IndexMap(int n): mSize(0), mMul(0){ size(n); }
-		
-		int operator()(float x) const { return castIntTrunc(x*mMul); }
-		
-		int operator()(float x, float& f) const {
-			// C-style casts seems to be much faster...
-			f = x*mMul;
-			//int i = castIntTrunc(f);
-			int i = int(f);
-			f -= i; 
-			return i;
-			
-//			int32_t i;
-//			f = split(x*mMul, i);
-//			return i;
-		}
-		
-		float operator()(int i) const { return float(i) * mRec; }
-	
-		void size(int n){ mSize=n; mMul=n; mRec=1/mMul; }
-	
-	private:
-		int mSize;
-		float mMul, mRec;
-	};
-	
-	IndexMap mIndMap;
-
-	//Sipol mIpol;
-	//Sacc mAcc;
-};
-
-
-
 /// Ring buffer
 template <class T>
 class Ring : public Array<T> {
@@ -396,27 +317,6 @@ struct DelayN: public Ring<T>{
 		(*this)[pos()] = input;	// write new element
 		return dly;				//	... write pos left at last written element
 	}
-};
-
-
-
-
-/// Fixed-sized array with a sequence generator
-template <uint32_t N, class T=gam::real, class G=gen::RAdd1<uint32_t> >
-class Seq: public Multi<N,T>{
-public:
-
-	Seq(const T& value){ mem::set(this->elems, gen::val(value), N); }
-	Seq(const T * values){ mem::copy(this->elems, values, N); }
-
-	/// Generate next array element
-	T operator()(){ return (*this)[((uint32_t)mTap())%N]; }
-
-	/// Get reference to index generator
-	G& tap(){ return mTap; }
-	
-private:
-	G mTap;
 };
 
 

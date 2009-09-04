@@ -55,7 +55,7 @@ public:
 		double p = mPos;
 		mPos = mTap(mPos + mInc, max(), min());
 		uint32_t i = (uint32_t)p;
-		return mIpol(*this, i, p-i, size());
+		return mIpol(*this, i, p-i, size()-1);
 	}
 
 	void free();							///< Free sample buffer (if owner)

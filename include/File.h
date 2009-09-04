@@ -9,6 +9,7 @@
 */
 
 #include <stdio.h>
+#include "pstdint.h"
 
 #define TEM template<class T>
 #define ULONG unsigned long
@@ -28,6 +29,8 @@ public:
 
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
+
+	void mode(const char * v){ mMode=v; }
 
 	/// Write memory elements to file
 	uint32_t write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }

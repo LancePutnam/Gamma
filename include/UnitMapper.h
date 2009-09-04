@@ -8,6 +8,9 @@
 #include <map>
 #include <vector>
 #include "scl.h"
+#include "Access.h"
+#include "Strategy.h"
+
 #include "MacroD.h"
 
 namespace gam{
@@ -19,6 +22,59 @@ namespace MapType{
 			Exp2		/**< p 2^[b0 + u * (b1-b0)]	*/
 	};
 };
+
+
+
+/// Tabulated function with real number lookup.
+template <class T, class Sipl=ipl::Linear, class Sacc=acc::Wrap>
+class FunctionTable : public Array<T>{
+	typedef Array<T> base;
+public:
+	using base::elems; using base::size; using base::operator=;
+
+	/// Constructor that alocates an internal table
+
+	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
+	/// @param[in] init		Initializes all elements to this value
+	FunctionTable(uint32_t size, const T& init=T(0))
+	:	base(size), mIndMap(size)
+	{
+		(*this) = init;
+	}
+	
+	virtual ~FunctionTable(){}
+	
+
+	/// Returns f(x) where x lies in the function domain, [0,1).
+	T operator()(double x) const {
+
+		x = scl::wrap(x);
+		double f;
+		int i1 = mIndMap(x, f);
+		return mIpl(mAcc, *this, i1,f, size()-1);
+		//int i2 = i1+1; if(i2==size()) i2=0;
+		//return (*this)[i1]*(1.f-f) + (*this)[i2]*f;
+	}
+
+	/// Sums generator stream with table elements
+	template <class Gen>
+	FunctionTable& operator+=(Gen& g){
+		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
+		return *this;
+	}
+
+protected:
+
+	virtual void onResize(){ mIndMap.max(size(), 1.); }
+	
+	IndexMap<double> mIndMap;
+
+	Sipl mIpl;
+	Sacc mAcc;
+};
+
+
+
 
 // Maps a normalized value to a warped, ranged value.
 template <class T>
@@ -100,12 +156,12 @@ TEM T UnitMapper<T>::mapLin(T u){
 }
 
 TEM T UnitMapper<T>::mapPow(T u){
-	doClip(u); return (T)scl::mapNormal(u, bound1, bound0, p1);
+	doClip(u); return (T)scl::mapPower(u, bound1, bound0, p1);
 }
 
 TEM T UnitMapper<T>::mapExp2(T u){
 	doClip(u);
-	return (T)(pow(2., scl::mapNormal(u, bound1, bound0, 1.)) * p1);
+	return (T)(pow(2., scl::mapPower(u, bound1, bound0, 1.)) * p1);
 }
 
 } // gam::

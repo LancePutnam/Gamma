@@ -326,20 +326,6 @@ struct Counter{
 };
 
 
-/// Triggers after a specified number of iterations and then resets
-struct Trigger{
-	Trigger(uint32_t num, uint32_t val=0) : val(val), num(num){}
-	
-	/// Returns (triggers) true upon reset
-	bool operator()(){
-		if(++val >= num){ val = 0; return true; }
-		return false;
-	}
-	uint32_t val;		///< Value
-	uint32_t num;		///< Maximum value
-};
-
-
 struct OnOff{
 	OnOff(uint32_t max, uint32_t ons) : max(max), ons(ons), cnt(0){}
 	
@@ -365,6 +351,39 @@ struct OneOff{
 	
 private:
 	bool mVal;
+};
+
+
+/// Fixed-sized array with a sequence generator
+template <uint32_t N, class T=gam::real, class G=gen::RAdd1<uint32_t> >
+class Seq: public Multi<N,T>{
+public:
+
+	Seq(const T& value){ mem::set(this->elems, gen::val(value), N); }
+	Seq(const T * values){ mem::copy(this->elems, values, N); }
+
+	/// Generate next array element
+	T operator()(){ return (*this)[((uint32_t)mTap())%N]; }
+
+	/// Get reference to index generator
+	G& tap(){ return mTap; }
+	
+private:
+	G mTap;
+};
+
+
+/// Triggers after a specified number of iterations and then resets
+struct Trigger{
+	Trigger(uint32_t num, uint32_t val=0) : val(val), num(num){}
+	
+	/// Returns (triggers) true upon reset
+	bool operator()(){
+		if(++val >= num){ val = 0; return true; }
+		return false;
+	}
+	uint32_t val;		///< Value
+	uint32_t num;		///< Maximum value
 };
 
 
