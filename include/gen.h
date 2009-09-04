@@ -292,14 +292,21 @@ public:
 
 	void freq(const T& v){ mFreq.fromPhase(v*M_2PI); }
 
+	/// Set unit frequency, amplitude, and unit phase
+	
+	/// The phase will be rewound 1 iteration so the first function call
+	/// will return a complex number at the desired phase.
 	void set(const T& frq, const T& amp, const T& phs){
-		this->fromPolar(amp, (phs-frq)*M_2PI); // phase rewound by 1 iteration
+		this->fromPolar(amp, (phs-frq)*M_2PI);
 		freq(frq);
 	}
 
 	void set(const T& frq, const Complex<T>& phs){
 		(*this)(phs.r, phs.i); freq(frq);
 	}
+	
+	C forward1() const { return (*this)*mFreq; }
+	C reverse1() const { return (*this)/mFreq; }
 	
 	T freq() const { return mFreq.phase()*M_1_2PI; }
 
