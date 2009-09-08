@@ -17,7 +17,7 @@ AudioIOData::AudioIOData(void * user) :
 	user(user),
 	mStream(0),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
-	mBufI(0), mBufO(0), mBufA(0), mNumI(0), mNumO(0), mNumA(0)
+	mBufI(0), mBufO(0), mBufA(0), mBufT(0), mNumI(0), mNumO(0), mNumA(0)
 {
 }
 
@@ -25,6 +25,7 @@ AudioIOData::~AudioIOData(){
 	SAFE_FREE(mBufI);
 	SAFE_FREE(mBufO);
 	SAFE_FREE(mBufA);
+	SAFE_FREE(mBufT);
 }
 
 
@@ -227,6 +228,8 @@ bool AudioIO::open(){
 
 		resizeBuffer(false);
 		resizeBuffer(true);
+
+		mem::resize(mBufT, 0, mFramesPerBuffer);
 		
 		PaStreamParameters * inParams = &mInParams;
 		PaStreamParameters * outParams = &mOutParams;
@@ -306,25 +309,25 @@ void AudioIO::reopen(){
 
 void AudioIO::resizeBuffer(bool forOutput){
 
-	float ** buffer = forOutput ? &mBufO : &mBufI;
-	uint32_t * chans   = forOutput ? &mNumO : &mNumI;
-	bool * deferred = forOutput ? &mOutResizeDeferred : &mInResizeDeferred;
+	float *& buffer = forOutput ? mBufO : mBufI;
+	uint32_t& chans   = forOutput ? mNumO : mNumI;
+	bool& deferred = forOutput ? mOutResizeDeferred : mInResizeDeferred;
 
-	if(*deferred){
-		if(*chans > 0){
-			float * ptr = (float *)realloc(*buffer, *chans * mFramesPerBuffer * sizeof(float));
+	if(deferred){
+		if(chans > 0){
+			float * ptr = (float *)realloc(buffer, chans * mFramesPerBuffer * sizeof(float));
 			if(ptr){
-				*buffer = ptr;
-				*deferred = false;
+				buffer = ptr;
+				deferred = false;
 			}
 			else{
-				*chans = 0;
-				*buffer = 0;
+				chans = 0;
+				buffer = 0;
 			}
 		}
 		else{
-			SAFE_FREE(*buffer);
-			*deferred = false;
+			SAFE_FREE(buffer);
+			deferred = false;
 		}
 	}
 }

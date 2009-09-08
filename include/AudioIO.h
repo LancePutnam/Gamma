@@ -49,13 +49,14 @@ namespace gam{
 class AudioIOData {
 public:
 	AudioIOData(void * user);
-	~AudioIOData();
+	virtual ~AudioIOData();
 
 	void * user;							///< User specified data
 	
-	float *       aux(uint32_t channel);	///< Returns an aux channel buffer.
-	const float * in (uint32_t channel);	///< Returns an in channel buffer.
-	float *       out(uint32_t channel);	///< Returns an out channel buffer.
+	float *       aux(uint32_t channel);	///< Returns an aux channel buffer
+	const float * in (uint32_t channel);	///< Returns an in channel buffer
+	float *       out(uint32_t channel);	///< Returns an out channel buffer
+	float *		  temp();					///< Returns single channel temporary buffer
 	
 	uint32_t inChans() const;				///< Returns effective number of input channels
 	uint32_t outChans() const;				///< Returns effective number of output channels
@@ -77,7 +78,8 @@ protected:
 	uint32_t mFramesPerBuffer;
 	double mFramesPerSecond;
 	
-	float *mBufI, *mBufO, *mBufA;	// input, output, and aux buffers
+	float *mBufI, *mBufO, *mBufA;		// input, output, and aux buffers
+	float * mBufT;						// temporary one channel buffer
 	uint32_t mNumI, mNumO, mNumA;		// input, output, and aux channels
 };
 
@@ -140,7 +142,7 @@ public:
 		void (* callback)(AudioIOData &) = 0, void * userData = 0,
 		int outChans = 2, int inChans = 0 );
 
-	~AudioIO();
+	virtual ~AudioIO();
 		
 	static audioCallback callback;	///< User specified callback function.
 	
@@ -222,6 +224,7 @@ inline void AudioIOData::zeroOut(){ mem::zero(mBufO, outChans() * framesPerBuffe
 inline float *       AudioIOData::aux(uint32_t num){ return mBufA + num * framesPerBuffer(); }
 inline const float * AudioIOData::in (uint32_t chn){ return mBufI + chn * framesPerBuffer(); }
 inline float *       AudioIOData::out(uint32_t chn){ return mBufO + chn * framesPerBuffer(); }
+inline float *       AudioIOData::temp(){ return mBufT; }
 
 inline uint32_t AudioIOData:: inChans() const { return mNumI; }
 inline uint32_t AudioIOData::outChans() const { return mNumO; }
