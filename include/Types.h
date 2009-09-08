@@ -457,7 +457,7 @@ struct Mat3{
 /// arrays. It also lacks a constructor to allow C-style struct initializations.
 template <uint32_t N, class T>
 struct Multi{
-
+	typedef Multi M;
 //	Multi(){}
 //	Multi(const T& e ){ mem::set(elems, N, e); }
 //	Multi(const T* es){ mem::copy(elems, es, N); }
@@ -469,6 +469,17 @@ struct Multi{
 	
 	/// Get element at index with no bounds checking
 	const T& operator[](uint32_t i) const { return elems[i]; }
+
+	#define DO for(uint32_t i=0; i<N; ++i)
+
+	bool operator !=(const M& v){ DO{ if((*this)[i] == v[i]) return false; } return true; }
+	bool operator !=(const T& v){ DO{ if((*this)[i] == v   ) return false; } return true; }
+	M& operator   = (const M& v){ DO{ (*this)[i] = v[i]; } return *this; }
+	M& operator   = (const T& v){ DO{ (*this)[i] = v;    } return *this; }
+	bool operator ==(const M& v){ DO{ if((*this)[i] != v[i]) return false; } return true; }
+	bool operator ==(const T& v){ DO{ if((*this)[i] != v   ) return false; } return true; }
+
+	#undef DO
 
 	/// Returns size of array
 	static uint32_t size(){ return N; }
@@ -511,8 +522,9 @@ struct ShiftBuffer : public Multi<N,T>{
 
 	typedef Multi<N,T> base;
 	using base::elems;
+	using base::operator=;
 
-	ShiftBuffer(const T& v=0){ base::set(0); }
+	ShiftBuffer(const T& v=0){ *this = v; }
 
 	/// Push new element onto buffer. Newest element is at index 0.
 	void operator()(const T& v){
@@ -621,9 +633,7 @@ struct Vec3 : public Vec<3, T> {
 	}
 	
 	Vec3 operator * (const Mat3<T>& m) const { return Vec3(*this) *= m; }
-	
-	T dot() const { return dot(*this); }
-	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
+
 	Vec3 cross(const Vec3& v) const {
 		Vec3 r; const Vec3& t = *this;
 		r[0] = t[1]*v[2] - t[2]*v[1];
@@ -631,6 +641,9 @@ struct Vec3 : public Vec<3, T> {
 		r[2] = t[0]*v[1] - t[1]*v[0];
 		return r;
 	}
+
+	T dot() const { return dot(*this); }
+	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
 };
 
 
