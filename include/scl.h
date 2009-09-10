@@ -186,6 +186,10 @@ TEM T cosT8(T radians);
 template <class T1, class T2, class T3>
 void cross(const T1& a, const T2& b, T3& r);
 
+/// Compute curvature around point b of three successive points a, b, and c.
+template <class T, template <class T> class V>
+T curvature(const V<T>& a, const V<T>& b, const V<T>& c);
+
 /// Returns two element dot product x1 * y1 + x2 * y2.
 TEM T dot2(T x1, T x2, T y1, T y2);
 
@@ -764,6 +768,20 @@ inline void cross(const T1& a, const T2& b, T3& r){
 	r[0] = a[1] * b[2] - a[2] * b[1];
 	r[1] = a[2] * b[0] - a[0] * b[2];
 	r[2] = a[0] * b[1] - a[1] * b[0];
+}
+
+template <class T, template <class T> class V>
+T curvature(const V<T>& a, const V<T>& b, const V<T>& c){
+
+	V<T> d1b = b-a;				// first backward difference
+	V<T> d1f = c-b;				// first forward difference
+	V<T> d1  = (d1f+d1b) * 0.5;	// first mid difference
+	
+	V<T> d2  = d1f - d1b;		// second difference
+	
+	T d1n = d1.norm();
+	
+	return (d1.cross(d2)).norm() / (d1n*d1n*d1n);
 }
 
 TEM inline T dot2(T x1, T x2, T y1, T y2){ return x1 * y1 + x2 * y2; }
