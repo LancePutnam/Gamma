@@ -312,6 +312,7 @@
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169D40E30A81694200605E51 /* testAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioIO.cpp; path = ../../tests/testAudioIO.cpp; sourceTree = SOURCE_ROOT; };
 		169E1E780B97F02A0011870A /* testAudioPVoc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioPVoc.cpp; path = ../../tests/testAudioPVoc.cpp; sourceTree = SOURCE_ROOT; };
+		16A94B171064111D000B942A /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Serialize.h; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BC61B50FFC895A00AF1B29 /* testUnits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testUnits.cpp; path = ../../tests/testUnits.cpp; sourceTree = SOURCE_ROOT; };
 		16BC61C00FFC896A00AF1B29 /* testUnits */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testUnits; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -769,6 +770,7 @@
 				1656F5D809EEF3D7006E3FD7 /* Particle.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
 				1633FB1F0A9E1EB1003F9A50 /* Sampler.h */,
+				16A94B171064111D000B942A /* Serialize.h */,
 				16D219CA10048AEB00302C47 /* SmartObject.h */,
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
