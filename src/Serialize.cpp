@@ -89,10 +89,7 @@ const std::vector<char>& Serializer::buf() const { return mBuf; }
 	
 
 
-
-///
-	
-Deserializer::Deserializer(const std::vector<char>& b): mBuf(b), mStart(0){}
+Deserializer::Deserializer(const std::vector<char>& b): mStart(0), mBuf(b){}
 
 Deserializer::Deserializer(const char * b, uint32_t n)
 :	mStart(0)
@@ -110,12 +107,6 @@ Deserializer& Deserializer::operator>> (std::string& v){
 	if(v.size() < need) v.resize(need);
 	return *this >> &v[0];
 }
-	
-//template <class T>
-//Deserializer& decode(const T * v, uint32_t num){
-//	uint32_t n = decode(bufDec(), v);
-//	return *this;		
-//}
 
 const std::vector<char>& Deserializer::buf() const { return mBuf; }
 

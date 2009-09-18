@@ -315,6 +315,12 @@ template <class T> Deserializer& Deserializer::operator>> (T& v){
 	return *this;
 }
 
+//template <class T>
+//Deserializer& decode(const T * v, uint32_t num){
+//	uint32_t n = decode(bufDec(), v);
+//	return *this;		
+//}
+
 } // ser::
 
 

@@ -15,6 +15,7 @@ SRCS = 	$(SRCDIR)/Ambisonics.cpp\
 	$(SRCDIR)/fftpack.cpp\
 	$(SRCDIR)/File.cpp\
 	$(SRCDIR)/scl.cpp\
+	$(SRCDIR)/Serialize.cpp\
 	$(SRCDIR)/SoundFile.cpp\
 	$(SRCDIR)/Sync.cpp\
 	$(SRCDIR)/Visual.cpp
