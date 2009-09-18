@@ -54,6 +54,7 @@ int main(int argc, char* argv[]){
 
 	// Serialization
 	{	using namespace ser;
+
 		// Single element tests
 		{
 			Serializer s;
@@ -95,7 +96,6 @@ int main(int argc, char* argv[]){
 
 			//printf("\n%f, %f, %d, %s\n", of1, od1, ob1, ostr.c_str());
 		}
-
 
 		// Multi-element tests
 		{
