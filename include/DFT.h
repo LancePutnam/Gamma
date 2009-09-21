@@ -296,6 +296,10 @@ protected:
 
 
 /// Sliding discrete Fourier transform
+
+/// This transform computes the DFT with a fixed hop size of 1 sample.
+/// Its computational complexity is O(N), where N is the number of bins
+/// to compute.
 template <class T>
 class SDFT : public DFTBase<T> {
 public:
@@ -514,10 +518,13 @@ TEM inline void SDFT<T>::forward(T input){
 	T smp = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
 	Complex<T> c = mFL;							// phasor at low bin
 	
+	// multiply freq samples by 1st harmonic (shift time signal)
+	// add time sample to all bins (set time sample at n=0)
+	
 	for(uint k=mBinLo; k<mBinHi; ++k){
-		this->bins(k) *= c;
+		Complex<T>& b = this->bins(k);
+		b = b*c + smp;
 		c *= mF1;
-		this->bins(k) += smp;
 	}
 }
 
