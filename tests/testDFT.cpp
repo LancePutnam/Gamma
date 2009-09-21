@@ -289,24 +289,24 @@ int main(int argc, char* argv[]){
 	)
 */
 
-/*
+///*
 	SDFT<float> sdft(winSize, 0, winSize/2 + 1);
 	//MemOp::set(table, tableSize, 1.f);
 	//MemOp::zero(table, tableSize); table[0] = 1.f;
 
-	LOOP(tableSize,
+	for(int i=0; i<tableSize; ++i){
 		sdft.forward(table[i]);
 		
-		{ LOOP(sdft.numBins(),
-			float rl = sdft.bins0()[i]; float im = sdft.bins1()[i];
+		{ for(int i=0; i<sdft.numBins(); ++i){
+			Complexf& c = sdft.bins(i);
 			printf("[%d] ", i);
-			printf("% 5.3f ", rl); printf("% 5.3f ", im);
-			SclOp::printPlot(rl, 20); printf(" ");
-			SclOp::printPlot(im, 20); printf("\n");
-		)} printf("\n");
+			printf("% 5.3f ", c.r); printf("% 5.3f ", c.i);
+			printPlot(c.r, 20); printf(" ");
+			printPlot(c.i, 20); printf("\n");
+		}} printf("\n");
 		
-	)
-*/
+	}
+//*/
 
 	return 0;
 }

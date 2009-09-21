@@ -117,7 +117,8 @@ public:
 //	T * bins1();			///< Returns pointer to second elements of spectral bins
 	
 	Complex<T> * bins() const { return mBins; }
-	Complex<T>& bins(uint32_t i) const { return mBins[i]; }
+	Complex<T>& bins(uint32_t i){ return mBins[i]; }
+	const Complex<T>& bins(uint32_t i) const { return mBins[i]; }
 	
 	double binFreq() const;	///< Returns width of frequency bins
 	uint numBins() const;	///< Returns number of frequency bins
@@ -298,18 +299,20 @@ protected:
 template <class T>
 class SDFT : public DFTBase<T> {
 public:
-	SDFT(uint sizeDFT, uint binLo, uint binHi);
+	SDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
 	
 	void forward(T input);
-	void range(uint binLo, uint binHi);
-	void resize(uint sizeDFT, uint binLo, uint binHi);
+	void range(uint32_t binLo, uint32_t binHi);
+	void resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
 		
 protected:
-	uint mBinLo, mBinHi;
+	uint32_t mBinLo, mBinHi;
 	DelayN<T> mDelay;
-	T * mBufI;				// alias to imaginaries
-	double mC0, mS0;		// phasor rotators
-	double mCL, mSL;		// low bin phasor
+	//T * mBufI;				// alias to imaginaries
+	Complex<T> mF1;
+	Complex<T> mFL;
+	//double mC0, mS0;		// phasor rotators
+	//double mCL, mSL;		// low bin phasor
 	T mNorm;				// fwd transform normalization
 };
 
@@ -475,52 +478,46 @@ inline float * STFT::phases(){ return mPhases; }
 
 //---- SDFT
 
-TEM SDFT<T>::SDFT(uint sizeDFT, uint binLo, uint binHi)
+TEM SDFT<T>::SDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
 	: DFTBase<T>(), mBinLo(0), mBinHi(0), mDelay(0)
 {
 	resize(sizeDFT, binLo, binHi);
 }
 
-TEM void SDFT<T>::resize(uint sizeDFT, uint binLo, uint binHi){
+TEM void SDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	// may be able to keep these smaller?
 	mem::resize(this->mBuf, this->mSizeDFT + 2, sizeDFT + 2);
 	mem::zero(this->mBuf, sizeDFT + 2);
 	
 	mDelay.resize(sizeDFT);
-	mDelay.zero();
+	mDelay = 0;
 	
 	this->mSizeDFT = sizeDFT;
-	mBufI = this->mBuf + this->numBins();
 	
 	range(binLo, binHi);
-	this->onSyncChange();
+	
+	//this->onSyncChange();
 }
 
-#define COS cos
-#define SIN sin
-TEM void SDFT<T>::range(uint binLo, uint binHi){
+TEM void SDFT<T>::range(uint32_t binLo, uint32_t binHi){
 	mBinLo = binLo;
 	mBinHi = binHi;
 	
 	double theta = M_2PI / (double)this->sizeDFT();
-	mC0 = COS(theta); 
-	mS0 = SIN(theta);
-	theta *= (double)mBinLo;
-	mCL = COS(theta);
-	mSL = SIN(theta);
+
+	mF1.fromPhase(theta);
+	mFL.fromPhase(theta*mBinLo);
 	mNorm = (T)2 / (T)this->sizeDFT();
 }
-#undef COS
-#undef SIN
 
 TEM inline void SDFT<T>::forward(T input){
 	T smp = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
-	double cs = mCL; double sn = mSL;			// phasor at low bin
+	Complex<T> c = mFL;							// phasor at low bin
 	
 	for(uint k=mBinLo; k<mBinHi; ++k){
-		scl::mulComplex(DFTBase<T>::mBuf[k], mBufI[k], (T)cs, (T)sn);
-		scl::mulComplex(cs, sn, mC0, mS0);
-		DFTBase<T>::mBuf[k] += smp;
+		this->bins(k) *= c;
+		c *= mF1;
+		this->bins(k) += smp;
 	}
 }
 

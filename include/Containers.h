@@ -224,21 +224,33 @@ public:
 	typedef Array<T> super; using super::elems; using super::size;
 
 	/// @param[in]	size		Number of elements in ring.
-	Ring(uint32_t size);
+	/// @param[in]	value		Initial value of all elements.
+	Ring(uint32_t size, const T& value=0);
 	
+	/// Sets all elements to value
 	Ring& operator=(const T& v){ super::operator=(v); return *this; }
 
-	const T& atPrev(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
-	const T& atEnd() const { return (*this)[indexEnd()]; }
+	/// Returns reference to backmost element
+	T& atBack(){ return (*this)[indexBack()]; }
+	const T& atBack() const { return (*this)[indexBack()]; }
 	
+	/// Returns reference to frontmost element
+	T& atFront(){ return (*this)[indexFront()]; }
+	const T& atFront() const { return (*this)[indexFront()]; }
+	
+	/// Returns reference to element 'ago' indices from front
+	T& atPrev(uint32_t ago){ return (*this)[indexPrev(ago)]; }
+	const T& atPrev(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
+
 	/// Copies len elements starting from element pos() - delay into dst.
 	void copy(T * dst, uint32_t len, uint32_t delay) const;
 	
 	/// Copy elements starting from last in into dst unwrapping from ring
 	void copyUnwrap(T * dst, uint32_t len) const;
 	
-	uint32_t pos() const;			///< Return absolute index of last written element
-	uint32_t indexEnd() const;		///< Returns absolute index of end element
+	uint32_t pos() const;			///< Return absolute index of frontmost (newest) element
+	uint32_t indexBack() const;		///< Returns absolute index of backmost (oldest) element
+	uint32_t indexFront() const;	///< Returns absolute index of frontmost (newest) element
 	uint32_t indexPrev(uint32_t ago) const;	///< Returns absolute index of a previously written element
 
 	void operator()(const T& v);	///< Write new element
@@ -257,7 +269,10 @@ template <class T>
 class RingFill : public Ring<T> {
 public:
 	typedef Ring<T> super;
-	RingFill(uint32_t size): super(size), mFill(0){}
+	
+	/// @param[in]	size		Number of elements in ring.
+	/// @param[in]	value		Initial value of all elements.
+	RingFill(uint32_t size, const T& value=0): super(size, value), mFill(0){}
 
 	void operator()(const T& v){
 		this->super::operator()(v);
@@ -280,7 +295,10 @@ protected:
 /// Double buffered ring-buffer
 template <class T>
 struct DoubleRing : public Ring<T>{
-	DoubleRing(uint32_t size): Ring<T>(size), read(size){}
+
+	/// @param[in]	size		Number of elements in ring.
+	/// @param[in]	value		Initial value of all elements.
+	DoubleRing(uint32_t size, const T& value=0): Ring<T>(size, value), read(size){}
 	
 	/// Copy elements into read buffer unwrapping from ring
 	
@@ -306,7 +324,8 @@ struct DelayN: public Ring<T>{
 	using Ring<T>::incPos; using Ring<T>::pos;
 
 	/// @param[in]	size		Number of elements to delay.
-	DelayN(uint32_t size): Ring<T>(size){}
+	/// @param[in]	value		Initial value of all elements.
+	DelayN(uint32_t size, const T& value=0): Ring<T>(size, value){}
 	
 	DelayN& operator=(const T& v){ Ring<T>::operator=(v); return *this; }
 
@@ -478,7 +497,7 @@ TEM inline bool Buffer<T>::isUnlocked(){ return !mLocked; }
 
 //---- Ring
 
-TEM Ring<T>::Ring(uint32_t size) : Array<T>(size), mPos(size-1){}
+TEM Ring<T>::Ring(uint32_t size, const T& v) : Array<T>(size,v), mPos(size-1){}
 
 TEM inline void Ring<T>::operator()(const T& v){
 	incPos();				// inc write pos; do first to avoid out-of-bounds access
@@ -500,10 +519,12 @@ TEM void Ring<T>::copy(T * dst, uint32_t len, uint32_t delay) const{
 
 TEM void Ring<T>::copyUnwrap(T * dst, uint32_t len) const { copy(dst, len, size() - 1); }
 
-TEM inline uint32_t Ring<T>::indexEnd() const {
+TEM inline uint32_t Ring<T>::indexBack() const {
 	uint32_t i = pos() + 1;
 	return (i != size()) ? i : 0;
 }
+
+TEM inline uint32_t Ring<T>::indexFront() const { return pos(); }
 
 TEM inline uint32_t Ring<T>::indexPrev(uint32_t v) const {
 	return scl::wrapOnce<int>(pos() - v, size());
