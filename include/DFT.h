@@ -515,15 +515,17 @@ TEM void SDFT<T>::range(uint32_t binLo, uint32_t binHi){
 }
 
 TEM inline void SDFT<T>::forward(T input){
-	T smp = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
+	T dif = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
+												// difference between temporal 'frames'
 	Complex<T> c = mFL;							// phasor at low bin
 	
+	// apply complex resonators:
 	// multiply freq samples by 1st harmonic (shift time signal)
 	// add time sample to all bins (set time sample at n=0)
 	
 	for(uint k=mBinLo; k<mBinHi; ++k){
 		Complex<T>& b = this->bins(k);
-		b = b*c + smp;
+		b = b*c + dif;
 		c *= mF1;
 	}
 }
