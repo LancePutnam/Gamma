@@ -42,6 +42,30 @@ private: T v0, v1, v2;
 };
 
 
+
+/// Returns every nth input n times.
+template <class T>
+struct Hold{
+
+	Hold(uint32_t n=1): mCount(0), mPeriod(n){}
+
+	T operator()(const T& v){
+		if(mCount==0) mVal=v;
+		if((++mCount) >= mPeriod) mCount=0;
+		return mVal;
+	}
+
+	void period(uint32_t v){ mPeriod=v; }
+	void reset(){ mCount=0; }
+
+private:
+	uint32_t mCount;
+	uint32_t mPeriod;
+	T mVal;
+};
+
+
+
 /// Integrator
 template <class T>
 class Integrator{
