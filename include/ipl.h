@@ -256,9 +256,9 @@ inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
 //	return allpass(f, x, xp1, ym1);	// apply filter
 	
 	//f = f / (2.f - f);	// warp down
-	f = ((Tf)2 * f) / ((Tf)1 + f);	// warp up
+	f = (Tf(2) * f) / (Tf(1) + f);	// warp up
 	//f = (1.5f * f) / (0.5f + f);
-	f -= (Tf)0.1;				// avoid pole near z = -1
+	f -= Tf(0.1);				// avoid pole near z = -1
 	return allpass(f, x, y, o1);	// apply filter
 }
 //
@@ -268,9 +268,9 @@ inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
 
 TEM inline T bezier(T d, T x2, T x1, T x0){
 	T d2 = d * d;
-	T dm1 = (T)1 - d;
+	T dm1 = T(1) - d;
 	T dm12 = dm1 * dm1;
-	return x2 * dm12 + (T)2 * x1 * dm1 * d + x0 * d2;
+	return x2 * dm12 + T(2) * x1 * dm1 * d + x0 * d2;
 
 //	x2 (1-d)(1-d) + 2 x1 (1-d) d + x0 d d
 //	x2 - d 2 x2 + d d x2 + d 2 x1 - d d 2 x1 + d d x0
@@ -284,8 +284,8 @@ TEM inline T bezier(T d, T x2, T x1, T x0){
 
 
 TEM inline T bezier(T d, T x3, T x2, T x1, T x0){
-	T c1 = (T)3 * (x2 - x3);
-	T c2 = (T)3 * (x1 - x2) - c1;
+	T c1 = T(3) * (x2 - x3);
+	T c2 = T(3) * (x1 - x2) - c1;
 	T c3 = x0 - x3 - c1 - c2;
 	return ((c3 * d + c2) * d + c1) * d + x3;
 }
@@ -312,8 +312,8 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 //	Tv c1 = (y - w)*(Tf)0.5;	
 //	return ((c3 * f + c2) * f + c1) * f + x;
 
-	Tv c1 = (y - w)*(Tf)0.5;
-	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
+	Tv c1 = (y - w)*Tf(0.5);
+	Tv c3 = (x - y)*Tf(1.5) + (z - w)*Tf(0.5);
 	Tv c2 = c1 + w - x - c3;
 	return ((c3 * f + c2) * f + c1) * f + x;
 }
@@ -345,13 +345,13 @@ inline Tv hermite(Tp f,
 	const Tv& w, const Tv& x, const Tv& y, const Tv& z,
 	Tp tension, Tp bias)
 {
-	tension = ((Tp)1 - tension)*(Tp)0.5;
+	tension = (Tp(1) - tension)*Tp(0.5);
 
 	// compute endpoint tangents
 	//Tv m0 = ((x-w)*(1+bias) + (y-x)*(1-bias))*tension;
 	//Tv m1 = ((y-x)*(1+bias) + (z-y)*(1-bias))*tension;
-	Tv m0 = ((x*2 - w - y)*bias + y - w)*tension;
-	Tv m1 = ((y*2 - x - z)*bias + z - x)*tension;
+	Tv m0 = ((x*Tv(2) - w - y)*bias + y - w)*tension;
+	Tv m1 = ((y*Tv(2) - x - z)*bias + z - x)*tension;
 	
 //	x - w + x b - w b + y - x - y b + x b
 //	-w + 2x b - w b + y - y b
@@ -365,10 +365,10 @@ inline Tv hermite(Tp f,
 	Tp f3 = f2 * f;
 
 	// compute hermite basis functions
-	Tp a3 = -2*f3 + 3*f2;
-	Tp a0 = 1 - a3;
+	Tp a3 = Tp(-2)*f3 + Tp(3)*f2;
+	Tp a0 = Tp(1) - a3;
 	Tp a2 = f3 - f2;
-	Tp a1 = f3 - 2*f2 + f;
+	Tp a1 = f3 - Tp(2)*f2 + f;
 
 	return x*a0 + m0*a1 + m1*a2 + y*a3;
 }
@@ -376,8 +376,8 @@ inline Tv hermite(Tp f,
 
 TEM void lagrange(T * a, T delay, int order){
 	for(uint32_t i=0; i<=order; i++){
-		T coef = (T)1;
-		T i_f = (T)i; 
+		T coef = T(1);
+		T i_f = T(i); 
 		for(uint32_t j=0; j<=order; j++){
 			if(j != i){
 				T j_f = (T)j;
@@ -390,26 +390,26 @@ TEM void lagrange(T * a, T delay, int order){
 
 
 TEM inline void lagrange1(T * h, T d){
-	h[0] = (T)1 - d;
+	h[0] = T(1) - d;
 	h[1] = d;
 }
 
 
 TEM inline void lagrange2(T * h, T d){
-	h[0] =      (d - (T)1) * (d - (T)2) * (T)0.5;
-	h[1] = -d              * (d - (T)2)         ;
-	h[2] =  d * (d - (T)1)              * (T)0.5;
+	h[0] =      (d - T(1)) * (d - T(2)) * T(0.5);
+	h[1] = -d              * (d - T(2))         ;
+	h[2] =  d * (d - T(1))              * T(0.5);
 }
 
 
 TEM inline void lagrange3(T * h, T d){
-	T d1 = d - (T)1;
-	T d2 = d - (T)2;
-	T d3 = d - (T)3;
-	h[0] =     -d1 * d2 * d3 * (T)0.16666666667;
-	h[1] =  d      * d2 * d3 * (T)0.5;
-	h[2] = -d * d1      * d3 * (T)0.5;
-	h[3] =  d * d1 * d2      * (T)0.16666666667;
+	T d1 = d - T(1);
+	T d2 = d - T(2);
+	T d3 = d - T(3);
+	h[0] =     -d1 * d2 * d3 * T(1./6.);
+	h[1] =  d      * d2 * d3 * T(0.5);
+	h[2] = -d * d1      * d3 * T(0.5);
+	h[3] =  d * d1 * d2      * T(1./6.);
 }
 
 /*
@@ -442,20 +442,20 @@ TEM void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T f){
 
 template <class Tf, class Tv>
 inline Tv nearest(Tf f, const Tv& x, const Tv& y){
-	return (f < (Tf)0.5) ? x : y;
+	return (f < Tf(0.5)) ? x : y;
 }
 
 
 TEM inline T parabolic(T xm1, T x, T xp1){
 	T numer = xm1 - xp1;
 	T denom = x - xp1 + x - xm1;
-	return (T)-0.5 * numer / denom;
+	return T(-0.5) * numer / denom;
 }
 
 
 template <class Tf, class Tv>
 inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
-	Tv c2 = (x + z)*(Tf)0.5 - y;
+	Tv c2 = (x + z)*Tf(0.5) - y;
 	//Tv c1 = x*(Tf)-1.5 + y*(Tf)2 - z*(Tf)0.5;
 	Tv c1 = -x + y - c2;
 	return (c2 * f + c1) * f + x;
