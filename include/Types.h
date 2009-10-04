@@ -524,7 +524,7 @@ struct ShiftBuffer : public Multi<N,T>{
 	using base::elems;
 	using base::operator=;
 
-	ShiftBuffer(const T& v=0){ *this = v; }
+	ShiftBuffer(const T& v=T(0)){ *this = v; }
 
 	/// Push new element onto buffer. Newest element is at index 0.
 	void operator()(const T& v){
