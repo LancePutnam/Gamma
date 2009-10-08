@@ -94,30 +94,55 @@ typedef float real_t;            /* can be a float, double, or long-double */
 extern "C" {
 #endif
 
+/* Backward transform (synthesis) of a complex Fourier coefficient array */
 void cfftb( integer_t *n, real_t *c, real_t *wsave, integer_t *ifac );
+/* Forward transform of a complex periodic sequence */
 void cfftf( integer_t *n, real_t *c, real_t *wsave, integer_t *ifac );
+/* Initialization routine for (fftpack/cfftf) and (fftpack/cfftb) */
 void cffti( integer_t *n, real_t *wsave, integer_t *ifac );
 
+
+/* Backward cosine transform (synthesis) with odd wave numbers */
 void cosqb( integer_t *n, real_t *x, real_t *wsave, integer_t *ifac );
+/* Forward cosine transform with odd wave numbers */
 void cosqf( integer_t *n, real_t *x, real_t *wsave, integer_t *ifac );
+/* Initialization routine for (fftpack/cosqf) and (fftpack/cosqb) */
 void cosqi( integer_t *n, real_t *wsave, integer_t *ifac );
 
+
+/* Discrete cosine transform of a real even sequence */
 void cost( integer_t *n, real_t *x, real_t *wsave, integer_t *ifac );
+/* Initialization routine for (fftpack/cost) */
 void costi( integer_t *n, real_t *wsave, integer_t *ifac );
 
+
+/* Backward transform (synthesis) of a real Fourier coefficient array, simplified and slower version of (fftpack/rfftb) */
 void ezfftb( integer_t *n, real_t *r, real_t *azero, real_t *a, real_t *b, real_t *wsave, integer_t *ifac );
+/* Forward transform of a real periodic sequence, simplified and slower version of (fftpack/rfftf) */
 void ezfftf( integer_t *n, real_t *r, real_t *azero, real_t *a, real_t *b, real_t *wsave, integer_t *ifac );
+/* Initialization routine for (fftpack/ezfftf) and (fftpack/ezfftb) */
 void ezffti( integer_t *n, real_t *wsave, integer_t *ifac );
 
+
+/* Backward transform (synthesis) of a real Fourier coefficient array */
 void rfftb( integer_t *n, real_t *r, real_t *wsave, integer_t *ifac );
+/* Forward transform of a real periodic sequence */
 void rfftf( integer_t *n, real_t *r, real_t *wsave, integer_t *ifac );
+/* Initialization routine for (fftpack/rfftf) and (ftpack/rfftb) */
 void rffti( integer_t *n, real_t *wsave, integer_t *ifac );
 
+
+/* Backward sine transform (synthesis) with odd wave numbers */
 void sinqb( integer_t *n, real_t *x, real_t *wsave, integer_t *ifac );
+/* Forward sine transform with odd wave numbers */
 void sinqf( integer_t *n, real_t *x, real_t *wsave, integer_t *ifac );
+/* Initialization routtine for (fftpack/sinqf) and (fftpack/sinqb) */
 void sinqi( integer_t *n, real_t *wsave, integer_t *ifac );
 
+
+/* Discrete sine transform of a real odd sequence */
 void sint( integer_t *n, real_t *x, real_t *wsave, integer_t *ifac );
+/* Initialization routine for (fftpack/sint) */
 void sinti( integer_t *n, real_t *wsave, integer_t *ifac );
 
 #ifdef __cplusplus
