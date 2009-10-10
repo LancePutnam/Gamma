@@ -23,6 +23,7 @@ bool almostEqual(float a, float b, int maxUlps){
 	return abs(ai - bi) <= maxUlps;
 }
 
+
 bool almostEqual(double a, double b, int maxUlps){
 	// Make sure maxUlps is non-negative and small enough that the
 	// default NAN won't compare as equal to anything.
@@ -36,19 +37,6 @@ bool almostEqual(double a, double b, int maxUlps){
 	if(bi < 0) bi = INT64_C(0x8000000000000000) - bi;
 
 	return abs(ai - bi) <= maxUlps;
-}
-
-char base10To36(int v){
-	if(within(v, 0, 9)) return '0' + v;
-	if(within(v,10,35)) return 'a' + v - 10;
-	return '0';
-}
-
-int base36To10(char v){
-	v = tolower(v);
-	if(within(v, '0', '9')) return v - '0';
-	if(within(v, 'a', 'z')) return v - 'a' + 10;
-	return 0;	// non-alphanumeric
 }
 
 

@@ -134,9 +134,6 @@ TEM T atan2Fast(T y, T x);
 /// Returns value clipped ouside of range [-eps, eps]
 TEM T atLeast(T v, T eps);
 
-/// Convert a string of 1s and 0s to an integer.
-uint32_t bits(const char * string);
-
 /// Returns bump function, psi(x)
 TEM T bump(T x);
 
@@ -595,13 +592,6 @@ bool zeroCrossP(float prev, float now);
 
 
 
-
-/// Convert decimal integer to ascii base-36 character
-char base10To36(int dec10);
-
-/// Convert ascii base-36 character to decimal integer 
-int base36To10(char ascii36);
-
 /// Convert polar to rectangular coordinates
 TEM void polarToRect(T mag, T phs, T& real, T& imag);
 
@@ -723,12 +713,6 @@ TEM T atan2Fast(T y, T x){
 }
 
 TEM inline T atLeast(T v, T e){	return v > (T)0 ? max(v, e) : min(v, -e); }
-
-inline uint32_t bits(const char * string){
-	uint32_t v=0; int n = strlen(string);
-	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);
-	return v;
-}
 
 TEM inline T bump(T x){ return abs(x)<T(1) ? ::exp(T(-1)/(T(1) - x*x)) : T(0); }
 

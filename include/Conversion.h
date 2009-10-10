@@ -5,7 +5,7 @@
 	See COPYRIGHT file for authors and license information
 
 	File Description:
-	Functions/objects for converting between static data types.
+	Functions/objects for converting amongst standard data types and strings.
 */
 
 #include <stdio.h>
@@ -30,6 +30,15 @@ template<> struct Twiddle<double>{
 	Twiddle(const int64_t& v): i(v){}
 	union{ int64_t i; uint64_t u; double f; };
 };
+
+/// Convert decimal integer to ascii base-36 character
+char base10To36(int dec10);
+
+/// Convert ascii base-36 character to decimal integer 
+int base36To10(char ascii36);
+
+/// Convert a string of 1s and 0s to an integer.
+uint32_t bits(const char * string);
 
 /// Converts bit string to unsigned integer
 uint32_t bitsToUInt(const char * bits);

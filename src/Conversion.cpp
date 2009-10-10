@@ -2,15 +2,35 @@
 	See COPYRIGHT file for authors and license information */
 
 #include "Conversion.h"
+#include <ctype.h>
+#include <string.h>
 
 namespace gam{
+
+char base10To36(int v){
+	static const char * c = "0123456789abcdefghijklmnopqrstuvwxyz";
+	if(v>=0 && v<=35) return c[v];
+	return '0';
+}
+
+int base36To10(char v){
+	v = tolower(v);
+	if(v>='0' && v<='9') return v - '0';
+	if(v>='a' && v<='z') return v - 'a' + 10;
+	return 0;	// non-alphanumeric
+}
+
+uint32_t bits(const char * string){
+	uint32_t v=0; int n = strlen(string);
+	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);
+	return v;
+}
 
 uint32_t bitsToUInt(const char * bits){
 	uint32_t i=0, r=0;
 	for(; bits[i] && i<32; ++i) r |= ((bits[i]=='1'?1:0) << (31-i));
 	return r>>(32-i);
 }
-
 
 uint32_t bytesToUInt32(const uint8_t * bytes4){
 	uint32_t word = 0;
@@ -31,7 +51,6 @@ uint32_t bytesToUInt32(const uint8_t * bytes4){
 	return word;
 }
 
-
 uint16_t bytesToUInt16(const uint8_t * bytes2){
 	uint16_t word = 0;
 
@@ -47,7 +66,6 @@ uint16_t bytesToUInt16(const uint8_t * bytes2){
 	return word;
 }
 
-
 uint32_t floatToUInt(float value){
 	Twiddle<float> u(value);
 	u.u += 0x800000;
@@ -60,7 +78,6 @@ uint32_t floatToUInt(float value){
 		return 0;
 	}
 }
-
 
 int32_t floatToInt(float value){
 	Twiddle<float> u(value);
@@ -80,7 +97,6 @@ int32_t floatToInt(float value){
 		return 0;
 	}
 }
-
 
 float split(float value, int32_t& intPart){
 	Twiddle<float> u(value);

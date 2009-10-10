@@ -320,6 +320,17 @@ int main(int argc, char* argv[]){
 		t.f =-2.0; T(t.u, bitsToUInt("110000000")<<23)
 		#undef T		
 	}
+	
+	#define T(x, y) assert(bits(x) == y);
+	T("0",0) T("1",1) T("01",1) T("10",2) T("1111", 15) T("1...", 8)
+	#undef T
+	{
+		const char * c = "0123456789abcdefghijklmnopqrstuvwxyz";
+		for(int i=0; i<36; ++i){
+			assert(base10To36(i) == c[i]);
+			assert(base36To10(c[i]) == i);
+		}
+	}
 
 	#define T(x, y) assert(castIntRound(x) == y);
 	T( 0.0, 0)	T( 0.2, 0) T( 1.0, 1) T( 1.2, 1) T( 1.5, 2) T( 1.8, 2)
