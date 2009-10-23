@@ -8,10 +8,7 @@
 	Interpolation functions.
 */
 
-#include "Containers.h"
 #include "Constants.h"
-
-#include "MacroD.h"
 
 namespace gam{
 
@@ -38,13 +35,13 @@ Tv allpassFixed(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 
 /// 'frac' [0, 1) is the value on the curve btw x2 and x0
 ///
-TEM T bezier(T frac, T x2, T x1, T x0);
+template <class T> T bezier(T frac, T x2, T x1, T x0);
 
 /// Bezier curve, 4-point cubic.
 
 /// 'frac' [0, 1) is the value on the curve btw x3 and x0
 ///
-TEM T bezier(T frac, T x3, T x2, T x1, T x0);
+template <class T> T bezier(T frac, T x3, T x2, T x1, T x0);
 
 template <class Tp, class Tv>
 Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
@@ -55,22 +52,22 @@ Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension,
 ///		'h' are the FIR coefficients and should be of size ('order' + 1). \n
 ///		'delay' is a fractional delay in samples. \n
 ///		As order increases, this converges to sinc interpolation.
-TEM void lagrange(T * h, T delay, int order);
+template <class T> void lagrange(T * h, T delay, int order);
 
 /// Optimized lagrange() for first order.
-TEM void lagrange1(T * h, T delay);
+template <class T> void lagrange1(T * h, T delay);
 
 /// Optimized lagrange() for second order.
-TEM void lagrange2(T * h, T delay);
+template <class T> void lagrange2(T * h, T delay);
 
 /// Optimized lagrange() for third order.
-TEM void lagrange3(T * h, T delay);
+template <class T> void lagrange3(T * h, T delay);
 
 /// Simplified parabolic interpolation of 3 points.
 
 /// This assumes the points are spaced evenly on the x axis from [-1, 1].
 /// The output is an offset from 0.
-TEM T parabolic(T xm1, T x, T xp1);
+template <class T> T parabolic(T xm1, T x, T xp1);
 
 // Various functions to perform Waring-Lagrange interpolation.
 //		These are much faster than using a general purpose FIR filter since
@@ -95,7 +92,7 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
-TEM void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T frac);
+template <class T> void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T frac);
 
 /// Nearest neighbor interpolation.
 template <class Tf, class Tv>
@@ -115,127 +112,6 @@ inline Tv trilinear(
 	const Tv& v001, const Tv& v101,
 	const Tv& v011, const Tv& v111
 );
-
-
-/// Truncating interpolation strategy
-//struct Trunc{
-//
-//	/// Return element from power-of-2 array
-//	template <class T>
-//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-//		return a.atPhase(phase);
-//	}
-//	
-//	template <class T>
-//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
-//		return a[iInt];
-//	}
-//};
-//
-//
-/// Nearest neighbor interpolation strategy
-//struct Round{
-//
-//	/// Return element from power-of-2 array
-//	template <class T>
-//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-//
-//		// accessing normally truncates, so add half fraction to round
-//		return a.atPhase(phase + (a.oneIndex()>>1));
-//	}
-//	
-//	template <class T>
-//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
-//		return ipl::nearest(
-//			iFrac,
-//			a[iInt],
-//			a[scl::wrapOnce(iInt + 1, max, min)]
-//		);
-//	}
-//};
-//
-//
-/// Linear interpolation strategy
-//struct Linear{
-//
-//	/// Return element from power-of-2 array
-//	template <class T>
-//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-//		return ipl::linear(
-//			a.fraction(phase),
-//			a.atPhase(phase),
-//			a.atPhase(phase + a.oneIndex())
-//		);
-//	}
-//	
-//	template <class T>
-//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
-//		return ipl::linear(
-//			iFrac,
-//			a[iInt],
-//			a[scl::wrapOnce(iInt + 1, max, min)]
-//		);
-//	}
-//};
-//
-//
-/// Cubic interpolation strategy
-//struct Cubic{
-//
-//	/// Return element from power-of-2 array
-//	template <class T>
-//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-//		uint32_t one = a.oneIndex();
-//		return ipl::cubic(
-//			a.fraction(phase),
-//			a.atPhase(phase - one),
-//			a.atPhase(phase),
-//			a.atPhase(phase + one),
-//			a.atPhase(phase + (one<<1))
-//		);
-//	}
-//	
-//	template <class T>
-//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
-//		return ipl::cubic(
-//			iFrac,
-//			a[scl::wrapOnce(iInt - 1, max, min)],
-//			a[iInt],
-//			a[scl::wrapOnce(iInt + 1, max, min)],
-//			a[scl::wrapOnce(iInt + 2, max, min)]
-//		);
-//	}
-//};
-//
-//
-/// Allpass interpolation strategy
-//template <class T>
-//struct AllPass{
-//
-//	AllPass(T prev=0): prev(prev){}
-//
-//	/// Return element from power-of-2 array
-//	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-//		return ipl::allpass(					// Standard fraction
-//		//return Ipol::allpassFixed(				// Fixed fractional delay
-//			a.fraction(phase), 
-//			a.atPhase(phase), 
-//			a.atPhase(phase + a.oneIndex()),
-//			prev
-//		);
-//	}
-//
-//	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
-//		return ipl::allpass(
-//			iFrac,
-//			a[iInt],
-//			a[scl::wrapOnce(iInt + 1, max, min)],
-//			prev
-//		);
-//	}
-//	
-//	mutable T prev;
-//};
 
 
 
@@ -266,7 +142,7 @@ inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
 //	return (1.f - f) / (1.f + f) + offset;
 //}
 
-TEM inline T bezier(T d, T x2, T x1, T x0){
+template <class T> inline T bezier(T d, T x2, T x1, T x0){
 	T d2 = d * d;
 	T dm1 = T(1) - d;
 	T dm12 = dm1 * dm1;
@@ -283,7 +159,7 @@ TEM inline T bezier(T d, T x2, T x1, T x0){
 }
 
 
-TEM inline T bezier(T d, T x3, T x2, T x1, T x0){
+template <class T> inline T bezier(T d, T x3, T x2, T x1, T x0){
 	T c1 = T(3) * (x2 - x3);
 	T c2 = T(3) * (x1 - x2) - c1;
 	T c3 = x0 - x3 - c1 - c2;
@@ -318,8 +194,9 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 	return ((c3 * f + c2) * f + c1) * f + x;
 }
 
-TEM void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, uint32_t len, T f){
-	LOOP(len, dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]); )
+template <class T>
+void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, uint32_t len, T f){
+	for(uint32_t i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
 }
 
 
@@ -374,7 +251,7 @@ inline Tv hermite(Tp f,
 }
 
 
-TEM void lagrange(T * a, T delay, int order){
+template <class T> void lagrange(T * a, T delay, int order){
 	for(uint32_t i=0; i<=order; i++){
 		T coef = T(1);
 		T i_f = T(i); 
@@ -389,20 +266,20 @@ TEM void lagrange(T * a, T delay, int order){
 }
 
 
-TEM inline void lagrange1(T * h, T d){
+template <class T> inline void lagrange1(T * h, T d){
 	h[0] = T(1) - d;
 	h[1] = d;
 }
 
 
-TEM inline void lagrange2(T * h, T d){
+template <class T> inline void lagrange2(T * h, T d){
 	h[0] =      (d - T(1)) * (d - T(2)) * T(0.5);
 	h[1] = -d              * (d - T(2))         ;
 	h[2] =  d * (d - T(1))              * T(0.5);
 }
 
 
-TEM inline void lagrange3(T * h, T d){
+template <class T> inline void lagrange3(T * h, T d){
 	T d1 = d - T(1);
 	T d2 = d - T(2);
 	T d3 = d - T(3);
@@ -435,8 +312,9 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	return ipl::linear(frac-Tf(1), y,z);
 }
 
-TEM void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T f){
-	LOOP(len, dst[i] = linear(f, xs[i], xp1s[i]); )
+template <class T>
+void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T f){
+	for(uint32_t i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
 }
 
 
@@ -446,7 +324,7 @@ inline Tv nearest(Tf f, const Tv& x, const Tv& y){
 }
 
 
-TEM inline T parabolic(T xm1, T x, T xp1){
+template <class T> inline T parabolic(T xm1, T x, T xp1){
 	T numer = xm1 - xp1;
 	T denom = x - xp1 + x - xm1;
 	return T(-0.5) * numer / denom;
@@ -485,13 +363,6 @@ inline Tv trilinear(
 	);
 }
 
-
-
 } // ipl::
-
 } // gam::
-
-#include "MacroU.h"
-
 #endif
-

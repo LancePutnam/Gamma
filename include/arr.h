@@ -10,11 +10,10 @@
 
 #include <math.h>
 #include <string.h>
-#include "Containers.h"
-#include "gen.h"
 #include "ipl.h"
 #include "mem.h"
 #include "scl.h"
+#include "Containers.h"
 #include "MacroD.h"
 
 namespace gam{
@@ -251,7 +250,7 @@ TEM void zeroBelow(T * arr, uint32_t len, T threshold);
 /// @param[in]  numIndices	Number of source indices.
 /// @param[out] numIndices	Number of cluster indices.
 /// @param[in]  threshold	Magnitude threshold of cluster.
-TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T threshold);
+TEM void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T threshold);
 
 void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize);
 
@@ -271,7 +270,7 @@ TEM T dot4(const T * src1, const T * src2);
 TEM T energy(const T * src, uint32_t len);
 
 /// Get indices of min and max values.
-TEM void extrema(const T * src, uint32_t len, uint32_t & indexMin, uint32_t & indexMax);
+TEM void extrema(const T * src, uint32_t len, uint32_t& indexMin, uint32_t& indexMax);
 
 /// Perform linear least squares fitting of array.
 
@@ -343,7 +342,7 @@ TEM T meanWeightedIndex(const T * weights, uint32_t len);
 /// Returns index of minimum value in array.
 TEM uint32_t min(const T * src, uint32_t len);
 
-TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices);
+TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
 
 /// Returns norm of array values.
 
@@ -405,7 +404,7 @@ TEM uint32_t zeroCount(const T * src, uint32_t len);
 ///
 uint32_t zeroCross(const float * src, uint32_t len, float prev);
 
-TEM void zeroCross(const T * src, uint32_t len, uint32_t & nzc, uint32_t & pzc);
+TEM void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc);
 
 /// Returns index of first zero-crossing or 0 if none detected.
 uint32_t zeroCrossFirst(const float * src, uint32_t len);
@@ -646,7 +645,7 @@ TEM inline void mulLine(T * arr, uint32_t len, T start, T end, bool includeEnd){
 TEM T normalize(T * arr, uint32_t len){
 	T max = scl::abs(arr[maxAbs(arr, len)]);
 	T normFactor = T(1)/max;
-	if(max != T(0)){ mul(arr, gen::Val<T>(normFactor), len); }
+	if(max != T(0)){ for(uint32_t i=0; i<len; ++i){ arr[i]*=normFactor; } }
 	return normFactor;
 }
 

@@ -10,7 +10,6 @@
 
 #include <stdio.h>
 #include "Constants.h"
-#include "Types.h"
 
 namespace gam{
 

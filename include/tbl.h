@@ -401,7 +401,9 @@ TEM void welch         (T * dst, uint32_t len){ SYM_WIN(2.   ,-1., scl::welch(ph
 
 #undef SYM_WIN
 
-TEM void rectangle(T * dst, uint32_t len){ mem::set(dst, gen::val((T)1), len); }
+TEM void rectangle(T * dst, uint32_t len){
+	for(uint32_t i=0; i<len; ++i) dst[i]=T(1);
+}
 
 TEM void nyquist(T * dst, uint32_t len){
 	len >>= 1;

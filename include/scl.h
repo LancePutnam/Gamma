@@ -10,10 +10,8 @@
 
 #include <math.h>
 #include <stdlib.h>				/* labs(long) */
-#include "Constants.h"
-#include "Types.h"
 #include "Conversion.h"
-#include "mem.h"
+#include "Types.h"
 
 #define TEM template<class T>
 
@@ -1096,7 +1094,7 @@ TEM inline T sinT9(T r){
 
 TEM T sinc(T r, T eps=(T)0.0001){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
 
-TEM inline void sort2(T & v1, T & v2){ if(v1 > v2) mem::swap(v1, v2); } 
+TEM inline void sort2(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } } 
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 

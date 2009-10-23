@@ -31,11 +31,11 @@ int main(int argc, char* argv[]){
 
 	printf("\nbase36To10:\n");
 	for(char c='0'; c<='Z'; c++) printf("%2c ", c); printf("\n");
-	for(char c='0'; c<='Z'; c++) printf("%2d ", scl::base36To10(c)); printf("\n");
+	for(char c='0'; c<='Z'; c++) printf("%2d ", base36To10(c)); printf("\n");
 
 	printf("\nbase10To36:\n");
 	for(int i=0; i<36; i++) printf("%2d ", i); printf("\n");
-	for(int i=0; i<36; i++) printf("%2c ", scl::base10To36(i)); printf("\n");
+	for(int i=0; i<36; i++) printf("%2c ", base10To36(i)); printf("\n");
 
 	printf("\nCeiling (power of 2):\n");
 	for(int i=1; i<33; i++){

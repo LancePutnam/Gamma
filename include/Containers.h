@@ -12,7 +12,6 @@
 #include <vector>
 #include <map>
 
-#include "Types.h"
 #include "Conversion.h"
 #include "mem.h"
 #include "scl.h"

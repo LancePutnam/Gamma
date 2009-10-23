@@ -2,6 +2,7 @@
 #include <math.h>
 #include <float.h>
 #include "arr.h"
+#include "gen.h"
 
 #define LINE	arr::lineSlope1(arrE, lenE);\
 				arr::lineSlope1(arrO, lenO);
