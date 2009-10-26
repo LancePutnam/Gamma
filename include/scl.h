@@ -550,6 +550,9 @@ TEM bool lessAbs(T v, T eps=(T)0.000001);
 /// Returns maximum of two values.
 TEM T max(T v1, T v2);
 
+/// Returns maximum of three values.
+TEM T max(T v1, T v2, T v3);
+
 /// Returns mean of two values.
 TEM T mean(T v1, T v2);
 
@@ -1228,9 +1231,10 @@ TEM inline bool even(T v){ return 0 == odd(v); }
 
 TEM inline bool lessAbs(T v, T eps){ return scl::abs(v) < eps; }
 TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
+TEM inline T max(T v1, T v2, T v3){ return max(max(v1,v2),v3); }
 TEM inline T mean(T v1, T v2){ return (v1 + v2) * (T)0.5; }
 TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
-TEM inline T min(T v1, T v2, T v3){ return (v1<v2 && v1<v3) ? v1 : scl::min(v2,v3); }
+TEM inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
 
 TEM inline T nextMultiple(T v, T m){
 	uint32_t div = (uint32_t)(v / m);	
