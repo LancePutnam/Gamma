@@ -52,13 +52,17 @@ protected:
 
 
 
-// First-order IIR section (1 pole/ 1 zero)
+/// First-order IIR section (1 pole/ 1 zero)
+
+/// y[n] = ci0*x[n] + ci1*x[n-1] + co1*y[n-1]
+///
 template <class Tv, class Tp>
 class IIR1{
 public:
 
 	IIR1(): d1(0), ci0(0), ci1(0), co1(0){}
 
+	/// Filter input sample
 	Tv operator()(const Tv& i0){
 		Tv d0 = i0 + d1*co1;
 		Tv o0 = d0*ci0 + d1*ci1;
@@ -66,7 +70,10 @@ public:
 		return o0;
 	}
 
+	/// Set filter coefficients
 	void coefs(Tp vi0, Tp vi1, Tp vo1){ ci0=vi0; ci1=vi1; co1=vo1; }
+	
+	/// Zero internal delays
 	void zero(){ d1=0; }
 
 protected:
@@ -76,13 +83,17 @@ protected:
 
 
 
-// Second-order IIR section (2 poles, 2 zeros)
+/// Second-order IIR section (2 poles, 2 zeros)
+
+/// y[n] = ci0*x[n] + ci1*x[n-1] + ci2*x[n-2] + co1*y[n-1] + co2*y[n-2]
+///
 template <class Tv=gam::real, class Tp=gam::real>
 class IIR2{
 public:
 
 	IIR2(): d1(0), d2(0), ci0(0), ci1(0), ci2(0), co1(0), co2(0){}
 
+	/// Filter input sample
 	Tv operator()(const Tv& i0){	// direct form II
 		Tv d0 = i0 + d1*co1 + d2*co2;
 		Tv o0 = d0*ci0 + d1*ci1 + d2*ci2;
@@ -90,12 +101,15 @@ public:
 		return o0;
 	}
 
+	/// Get filter coefficients
 	Tp * coefs(){ return c; }
 
+	/// Set filter coefficients
 	void coefs(Tp vi0, Tp vi1, Tp vi2, Tp vo1, Tp vo2){
 		ci0=vi0; ci1=vi1; ci2=vi2; co1=vo1; co2=vo2;
 	}
 	
+	/// Zero internal delays
 	void zero(){ d1=0; d2=0; }
 
 protected:
@@ -105,7 +119,7 @@ protected:
 
 
 
-// General-purpose multi-staged IIR filter
+/// General-purpose multi-staged IIR filter
 
 // The process for designing an IIR is:
 //		1. pre-warp center frequency
@@ -150,7 +164,8 @@ public:
 		delete [] mIIR2; mIIR2=0;
 	}
 	
-	Tv operator()(Tv i0) {
+	/// Filter input sample
+	Tv operator()(const Tv& i0) {
 		Tv o0 = i0;
 		for(uint32_t i=0; i<numIIR2(); ++i) o0 = mIIR2[i](o0);
 		if(odd()) o0 = (*mIIR1)(o0);
@@ -181,10 +196,8 @@ protected:
 		}
 	}
 	
-	// Transform a pole from the s-plane to the z-plane
-	
-	// The transform is p = (1+p)/(1-p).
-	//
+	// Conformal map from s-plane to z-plane.
+	// The transform is p = (1+p)/(1-p), a special type of Mobius transform.
 	template <class T>
 	static void bilinear(Complex<T>& p){
 		Complex<T> den(T(1) - p.r, -p.i);
@@ -196,7 +209,6 @@ protected:
 	static void convertLP(IIR1<Tv,Tp>& f, Tp pr){
 		pr = (pr - Tp(1))/(pr + Tp(1));			
 		Tp ci = (Tp(1) + pr) * Tp(0.5);
-		
 		f.coefs(ci, ci, -pr);
 	}
 
@@ -205,7 +217,6 @@ protected:
 		Tp co2 = Tp(1)/p.dot();						// recip of mag squared
 		Tp co1 = Tp(-2)*p.r*co2;
 		Tp ci  = (Tp(1) + co1 + co2) * Tp(0.25);	// input gain compensation
-		
 		f.coefs(ci, ci*Tp(2), ci, -co1, -co2);
 	}
 };
@@ -225,7 +236,10 @@ protected:
 	using super::convertLP;
 
 
-// Butterworth filters are maximally flat in the pass- and stop-bands.
+/// Butterworth filter
+
+/// Maximally flat in the pass- and stop-bands.
+///
 template <class Tv=gam::real, class Tp=gam::real>
 class IIRButter: public IIRSeries<Tv,Tp>{
 public:
@@ -234,8 +248,7 @@ public:
 		freq(frq);
 	}
 
-
-	// frq - desired cutoff frequency (0, 0.5)
+	/// Set cutoff frequency (0, 0.5)
 	void freq(Tp v){
 
 		v = tan(M_PI*v);	// pre-warp frequency
@@ -262,10 +275,12 @@ protected:
 
 
 
-// Chebyshev is a special case of a Butterworth with a narrower transition band
-// but ripple in the passband.
+/// Chebyshev filter
 
-// Note: for some reason odd orders are unity gain, but even orders are not!
+/// A Chebyshev filter is a special case of a Butterworth filter with a narrower
+/// transition band but ripple in the passband.
+
+// TODO: odd orders are unity gain, but even orders are not...
 //
 template <class Tv=gam::real, class Tp=gam::real>
 class IIRCheby: public IIRSeries<Tv,Tp>{
@@ -276,7 +291,7 @@ public:
 		set(frq, rip);
 	}
 
-
+	/// Set cutoff frequency (0, 0.5)
 	void freq(Tp v){
 
 		v = tan(M_PI*v);		// pre-warp frequency
@@ -299,13 +314,10 @@ public:
 		if(odd()) convertLP(*mIIR1, Tp(mPoles[j].r) * mr);
 	}
 
-
-	// frq - desired cutoff frequency (0, 0.5)
-	// rip = passband ripple in dB
+	/// Set cutoff frequency (0, 0.5) and passband ripple (dB)
 	void set(Tp frq, Tp rip){
 		ripple(rip); freq(frq);
 	}
-
 
 protected:
 	INHERIT_IIRSERIES;
@@ -461,48 +473,6 @@ void get_coeff(long n2){
 
         R in the filters means resonance, steepness and narrowness.
 
-        *** Fastest and simplest "lowpass" ever! ***
-
-          c = 0..1  (1 = passes all, 0 = passes nothing)
-
-          output(t) = output(t-1) + c*(input(t)-output(t-1))
-
-        *** Fast lowpass with resonance v1 ***
-
-          Parameters:
-          resofreq = resonation frequency  (must be < SR/4)
-          r = 0..1, but not 1
-
-          Init:
-          c = 2-2*cos(2*pi*resofreq / samplerate)
-          pos = 0
-          speed = 0
-
-          Loop:
-          speed = speed + (input(t) - pos) * c
-          pos = pos + speed
-          speed = speed * r
-          output(t) = pos
-
-        *** Fast lowpass with resonance v2 ***
-
-          Parameters:
-          resofreq = resonation frequency  (must be < SR/4)
-          amp = magnitude at the resonation frequency
-
-          Init:
-          fx = cos(2*pi*resofreq / samplerate)
-          c = 2-2*fx
-          r = (sqrt(2)*sqrt(-(fx-1)^3)+amp*(fx-1))/(amp*(fx-1))
-          pos = 0
-          speed = 0
-
-          Loop:
-          speed = speed + (input(t) - pos) * c
-          pos = pos + speed
-          speed = speed * r
-          output(t) = pos
-
         *** Halfband lowpass ***
 
           b1  =  0.641339     b10 = -0.0227141
@@ -526,20 +496,6 @@ void get_coeff(long n2){
                     + b7*output(t-7) + b8*output(t-8) + b9*output(t-9)
                     + b10*output(t-10)
 
-        *** Notch ***
-
-          f = notch center frequency
-          r = 0..1, but not 1
-
-          z1x = cos(2*pi*f/samplerate)
-          a0a2 = (1-r)^2/(2*(|z1x|+1)) + r
-          a1 = -2*z1x*a0a2
-          b1 = 2*z1x*r
-          b2 = -r*r
-
-          output(t) = a0a2*(input(t)+input(t-2)) + a1*input(t-1)
-                    + b1*ouput(t-1) + b2*output(t-2)
-
         *** Fast bandpass ***
 
           freq = passband center frequency
@@ -553,42 +509,7 @@ void get_coeff(long n2){
           output(t) = a0*input(t)
                     + b1*output(t-1) + b2*output(t-2)
 
-        *** Allpass ***
 
-          freq = frequency of the steepest changes in phase
-          r = 0..1, but not 1
-
-          fx = cos(2*pi*freq/samplerate)
-          fy = sin(2*pi*freq/samplerate)
-          z1x = fx/r
-          z1y = fy/r
-          p1x = fx*r
-          p1y = fy*r
-          a0 = r^2
-          a1 = -2*z1x*a0
-          a2 = a0*(z1x^2+z1y^2)
-          b1 = 2*p1x
-          b2 = -p1y^2-p1x^2
-
-          output(t) = a0*input(t) + a1*input(t-1) + a2*input(t-2)
-                    + b1*output(t-1) + b2*output(t-2)
-
-        *** DC removal ***
-
-          Filters 0 Hz completely away, does not attenuate basses above 5Hz in
-          a 44100Hz sampling rate system. This is a realtime routine. For
-          example in sample editors, subtracting the average of all the
-          samplepoints from the whole sampledata usually does better job.
-
-          Init:
-          pos = 0
-          speed = 0
-
-          Loop:
-          speed = speed + (input(t) - pos) * 0.000004567
-          pos = pos + speed
-          speed = speed * 0.96
-          output(t) = (input(t)-pos)
 
         -------------------------------------- A collection of FIR filters ----
 
