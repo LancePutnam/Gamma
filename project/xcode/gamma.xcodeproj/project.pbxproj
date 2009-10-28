@@ -68,7 +68,6 @@
 		16938C1B0FBD214E00274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938C300FBD217200274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938C3D0FBD218900274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
-		1695361A0C16890B00DB06A1 /* MacroD.h in Headers */ = {isa = PBXBuildFile; fileRef = 169536190C16890B00DB06A1 /* MacroD.h */; };
 		16A94B3710641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
 		16A94B3810641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
 		16A94B3910641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
@@ -309,8 +308,6 @@
 		16938AC00FBD0C6700274B2A /* Conversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conversion.cpp; path = ../../src/Conversion.cpp; sourceTree = SOURCE_ROOT; };
 		16938B410FBD1CCF00274B2A /* Visual.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Visual.cpp; path = ../../src/Visual.cpp; sourceTree = SOURCE_ROOT; };
 		16938B420FBD1CDE00274B2A /* Visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Visual.h; path = ../../include/Visual.h; sourceTree = SOURCE_ROOT; };
-		169536190C16890B00DB06A1 /* MacroD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacroD.h; path = ../../include/MacroD.h; sourceTree = SOURCE_ROOT; };
-		1695361B0C168AD000DB06A1 /* MacroU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacroU.h; path = ../../include/MacroU.h; sourceTree = SOURCE_ROOT; };
 		1699F3860B9D1D2600ECB243 /* testNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testNode.cpp; path = ../../tests/testNode.cpp; sourceTree = SOURCE_ROOT; };
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169D40E30A81694200605E51 /* testAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioIO.cpp; path = ../../tests/testAudioIO.cpp; sourceTree = SOURCE_ROOT; };
@@ -756,8 +753,6 @@
 				16938ABF0FBD0C4400274B2A /* Conversion.h */,
 				1686EA830F8DB1F100D0452F /* Dims.h */,
 				16CEF9120BBCDA0A0049666F /* Gamma.h */,
-				169536190C16890B00DB06A1 /* MacroD.h */,
-				1695361B0C168AD000DB06A1 /* MacroU.h */,
 				16F7D07C0B5414A1008A2E29 /* Node.h */,
 				7EF76F910D10B49700F83B85 /* Ambisonics.h */,
 				16F836E10A1E888200F05DF5 /* AudioIO.h */,
@@ -946,7 +941,6 @@
 				C0F9EF8B0BB059B10069B343 /* tbl.h in Headers */,
 				16CEF92D0BBCDA0A0049666F /* Gamma.h in Headers */,
 				16CF8D5B0BD9921200A80471 /* Effects.h in Headers */,
-				1695361A0C16890B00DB06A1 /* MacroD.h in Headers */,
 				165CB76C0CC4385F002B17A2 /* Timer.h in Headers */,
 				160351A40D090B9C003CC766 /* gen.h in Headers */,
 			);

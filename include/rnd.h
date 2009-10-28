@@ -17,7 +17,8 @@
 #include "scl.h"
 #include "Conversion.h"
 #include "Types.h"
-#include "MacroD.h"
+
+#define TEM template <class T>
 
 namespace gam{
 
@@ -337,12 +338,14 @@ inline bool prob(char c){
 	return prob((c-48) * 0.125f);
 }
 
+#define LOOP(n) for(uint32_t i=0;i<n;++i)
+
 TEM inline void set(T * arr, uint32_t len, uint32_t num, T val){
-	LOOP_P(num, arr[rnd::uni(len)] = val;)
+	LOOP(num){ arr[rnd::uni(len)] = val; }
 }
 
 TEM inline void permute(T * arr, uint32_t len){
-	LOOP(len-1, mem::swap(arr[i], arr[rnd::uni(len, i)]); )
+	LOOP(len-1){ mem::swap(arr[i], arr[rnd::uni(len, i)]); }
 }
 
 inline float quan(uint32_t q){ return uni(q) / (float)q; }
@@ -350,7 +353,7 @@ inline float quan(uint32_t q){ return uni(q) / (float)q; }
 TEM inline T quanOct(uint32_t q, T o){ return quan(q) * o + o; }
 
 TEM inline void thin(T * arr, uint32_t len, float p){
-	LOOP_P(len,	if(prob(p)) *arr = (T)0; arr++; )
+	LOOP(len){ if(prob(p)) arr[i]=T(0); }
 }
 
 TEM inline T uniExc(const T& exc, const T& max, const T& min=T(0)){
@@ -362,20 +365,22 @@ TEM inline T uniExc(const T& exc, const T& max, const T& min=T(0)){
 		return (T)( (rnd_t)b1 + fnc##_##rnd_t(gen) * (rnd_t)(b2-b1) );\
 	}\
 	TEM inline void fnc(T * dst, uint32_t len){\
-		LOOP_P(len, *dst++ = (T) fnc##_##rnd_t (gen); )\
+		LOOP(len){ dst[i] = (T) fnc##_##rnd_t (gen); }\
 	}\
 	TEM inline void fnc(T * dst, uint32_t len, T bound2, T bound1){\
 		rnd_t b1 = (rnd_t)bound1;\
 		rnd_t df = (rnd_t)bound2 - b1;\
-		LOOP_P(len, *dst++ = (T)( b1 + fnc##_##rnd_t(gen) * df ); )\
+		LOOP(len){ dst[i] = (T)(b1 + fnc##_##rnd_t(gen) * df); }\
 	}\
 	TEM inline void fnc(T * dst, uint32_t len, T * src, uint32_t srcLen){\
-		LOOP_P(len, *dst++ = src[rnd::fnc(srcLen)]; )\
+		LOOP(len){ dst[i] = src[rnd::fnc(srcLen)]; }\
 	}
 	DEF(float, add2) DEF(float, add2I) DEF(float, add3) DEF(float, lin)
 	DEF(float, mul2) DEF(float, pow2 ) DEF(float, pow3) DEF(float, uni)
 	DEF(float, uniS)
 #undef DEF
+
+#undef LOOP
 
 inline void push(uint32_t seedA){
 	mSeedPush[0] = gen.s1;
@@ -433,5 +438,6 @@ inline float RandomLC::gaussian(){
 } // rnd::
 } // gam::
 
-#include "MacroU.h"
+#undef TEM
+
 #endif

@@ -374,5 +374,3 @@ void conversionInit(){
 } // gam::
 
 #undef LOOP
-//#include "MacroU.h"
-

@@ -6,13 +6,12 @@
 
 #include "rnd.h"
 #include "scl.h"
-#include "MacroD.h"
 
 namespace gam{
 
 
 /// 1/f^2 noise
-template <class T = RNGLinCon>
+template <class T=RNGLinCon>
 class NoiseBrown{
 public:
 
@@ -38,7 +37,7 @@ public:
 
 /// Summation of 12 octaves of white noise.
 ///
-template <class T = RNGLinCon>
+template <class T=RNGLinCon>
 class NoisePink{
 public:
 	NoisePink();
@@ -47,7 +46,6 @@ public:
 	NoisePink(uint32_t seed);
 	
 	float operator()();						///< Generate next value
-	void operator()(float * arr, uint32_t len);
 	void operator()(float * arr, uint32_t len, float mul);
 	void seed(uint32_t v){ rng = v; }		///< Set seed value of RNG
 	
@@ -63,7 +61,7 @@ private:
 
 
 /// Uniform noise
-template <class T = RNGLinCon>
+template <class T=RNGLinCon>
 class NoiseWhite{
 public:
 	NoiseWhite(): rng(){}
@@ -74,21 +72,6 @@ public:
 	
 	mutable T rng;
 };
-
-
-// Qubit
-template <class T = RNGLinCon>
-class Qubit{
-public:
-	Qubit(float p): rng(), prob(p){}
-	Qubit(float p, uint32_t seed) : rng(seed), prob(p){}
-	bool operator()(){ return rnd::prob(rng, prob); }	///< Generate next value
-	void seed(uint32_t v){ rng = v; }					///< Set seed value of RNG
-	
-	T rng;
-	float prob;
-};
-
 
 
 //typedef uint32_t randomGen();
@@ -120,6 +103,8 @@ public:
 
 // Implementation_______________________________________________________________
 
+#define TEM template<class T>
+
 // NoisePink
 
 TEM NoisePink<T>::NoisePink(): rng(){ init(); }
@@ -127,11 +112,11 @@ TEM NoisePink<T>::NoisePink(uint32_t seed): rng(seed){ init(); }
 
 TEM void NoisePink<T>::init(){
 	mRunningSum = 0.f;
-	LOOP(11,	/* init octaves with uniform randoms */
+	for(uint32_t i=0; i<11; ++i){	/* init octaves with uniform randoms */
 		float r = rnd::uniS_float(rng);
 		mOctave[i] = r;
 		mRunningSum += r;
-	)
+	}
 	mPhasor = 0;
 }
 
@@ -153,12 +138,8 @@ TEM inline float NoisePink<T>::operator()(){
 	return (mRunningSum + rnd::uniS_float(rng)) * 0.083333333f;
 }
 
-TEM inline void NoisePink<T>::operator()(float * arr, uint32_t len){
-	LOOP_P(len, *arr++ = (*this)(); )
-}
-
-TEM inline void NoisePink<T>::operator()(float * arr, uint32_t len, float mul){
-	LOOP_P(len,	*arr++ = (*this)() * mul; )
+TEM inline void NoisePink<T>::operator()(float * arr, uint32_t len, float mul){	
+	for(uint32_t i=0; i<len; ++i) arr[i] = (*this)() * mul;
 }
 
 /*
@@ -212,9 +193,8 @@ Pink Noise
 	
 */
 
-} // end namespace gam
+} // gam::
 
-#include "MacroU.h"
+#undef TEM
 
 #endif
-

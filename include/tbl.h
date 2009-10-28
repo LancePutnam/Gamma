@@ -10,7 +10,8 @@
 #include "scl.h"
 #include "Constants.h"
 
-#include "MacroD.h"
+#define TEM template<class T>
+#define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
 
 namespace gam{
 
@@ -109,7 +110,7 @@ TEM void hamming		(T * dst, uint32_t len); ///< Fills array with Hamming window.
 TEM void hann			(T * dst, uint32_t len); ///< Fills array with von Hann window.
 TEM void welch			(T * dst, uint32_t len); ///< Fills array with Welch window.
 TEM void rectangle		(T * dst, uint32_t len); ///< Fills array with Rectangle window.
-TEM void nyquist		(T * dst, uint32_t len); ///< Fills array with Nyquist window.
+TEM void nyquist		(T * dst, uint32_t len, uint32_t str=1); ///< Fills array with Nyquist window.
 
 
 //
@@ -167,12 +168,12 @@ TEM void cosine(T * dst, uint32_t len){
 	*dst2++ = (T)-1;
 
 	len -= 1;
-	LOOP_P(len,
+	LOOP(len, 1){
 		T val = (T)cos(phs);
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
-	)
+	}
 }
 
 TEM void decay(T * dst, uint32_t len, double order){
@@ -183,10 +184,10 @@ TEM void decay(T * dst, uint32_t len, double order){
 	double offset = -final;
 	*dst++ = (T)1;
 	len -= 1;
-	LOOP_P(len,
+	LOOP(len, 1){
 		*dst++ = (T)(::exp(lambda * time) + offset) * scale;
 		time++;
-	)
+	}
 }
 
 TEM void sine(T * dst, uint32_t len){
@@ -200,12 +201,12 @@ TEM void sine(T * dst, uint32_t len){
 	*dst2++ = (T)0;
 	
 	len -= 1;
-	LOOP_P(len,
+	LOOP(len, 1){
 		T val = (T)sin(phs);
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
-	)
+	}
 }
 
 // VERY accurate, but not so fast
@@ -222,10 +223,10 @@ TEM void impulseSum(T * dst, uint32_t len){
 	uint32_t harmonics = (len>>1) - 1;
 	*dst++ = (T)harmonics;
 	*dst++ = (T)0;
-	LOOP(harmonics,
+	LOOP(harmonics,1){
 		*dst++ = (T)-1;
 		*dst++ = (T) 0;
-	)
+	}
 }
 
 TEM void impulseSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
@@ -238,10 +239,10 @@ TEM void impulseSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 		
 		T * dst1 = dst;
 		
-		LOOP(hLen + 1, 
+		LOOP(hLen+1, 1){
 			*dst1++ += (T)(cos(phs));
 			phs += phaseInc;
-		)
+		}
 	}
 	
 	// Extrapolate remaining from [db] symmetry
@@ -385,12 +386,12 @@ TEM void window(T * dst, uint32_t len, WinType::type type){
 	double phs = phs0;\
 	T * dst2 = dst + len - 1;\
 	*dst++ = (T)eqn;\
-	LOOP(len >> 1,\
+	LOOP(len>>1, 1){\
 		phs += inc;\
 		T val = (T)eqn;\
 		*dst++  = val;\
 		*dst2-- = val;\
-	)
+	}
 	
 TEM void bartlett      (T * dst, uint32_t len){ SYM_WIN(2.   , 0., phs) }
 TEM void blackman      (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::blackman(phs)) }
@@ -405,12 +406,11 @@ TEM void rectangle(T * dst, uint32_t len){
 	for(uint32_t i=0; i<len; ++i) dst[i]=T(1);
 }
 
-TEM void nyquist(T * dst, uint32_t len){
-	len >>= 1;
-	LOOP_P(len,
-		*dst++ = (T) 1;
-		*dst++ = (T)-1;
-	)
+TEM void nyquist(T * dst, uint32_t len, uint32_t str){
+	LOOP(len>>1, str){
+		dst[i    ] = (T) 1;
+		dst[i+str] = (T)-1;
+	}
 }
 
 
@@ -554,5 +554,7 @@ inline float phaseIncFactor(double framesPerSec){
 } // tbl::
 } // gam::
 
-#include "MacroU.h"
+#undef TEM
+#undef LOOP
+
 #endif

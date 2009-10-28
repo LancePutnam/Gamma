@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "gen.h"
+#include "Access.h"
 #include "Particle.h"
 
 using namespace gam;
@@ -12,21 +14,22 @@ int main(int argc, char* argv[]){
 	p.print();
 
 	printf("\nSet positions...\n");
-	mem::set(p.pos(0), p.size(), 1.f);
-	mem::set(p.pos(1), p.size(), 2.f);
-	mem::set(p.pos(2), p.size(), 3.f);
+	
+	slice(p.pos(0), p.size()) = 1.f;
+	slice(p.pos(1), p.size()) = 2.f;
+	slice(p.pos(2), p.size()) = 3.f;
 	p.print();
 
 	printf("\nSet velocities...\n");
-	mem::set(p.vel(0), p.size(), 0.1f);
-	mem::set(p.vel(1), p.size(), 0.2f);
-	mem::set(p.vel(2), p.size(), 0.3f);
+	slice(p.vel(0), p.size()) = 0.1f;
+	slice(p.vel(1), p.size()) = 0.2f;
+	slice(p.vel(2), p.size()) = 0.3f;
 	p.print();
 
 	printf("\nSet accelerations...\n");
-	mem::set(p.acc(0), p.size(), 0.01f);
-	mem::set(p.acc(1), p.size(), 0.02f);
-	mem::set(p.acc(2), p.size(), 0.03f);
+	slice(p.acc(0), p.size()) = 0.01f;
+	slice(p.acc(1), p.size()) = 0.02f;
+	slice(p.acc(2), p.size()) = 0.03f;
 	p.print();
 
 	printf("\nRun update...\n");

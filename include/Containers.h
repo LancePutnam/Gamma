@@ -16,8 +16,6 @@
 #include "mem.h"
 #include "scl.h"
 
-#include "MacroD.h"
-
 namespace gam{
 
 
@@ -344,6 +342,8 @@ struct DelayN: public Ring<T>{
 
 // Implementation_______________________________________________________________
 
+#define TEM template<class T>
+
 // ArrayBase
 
 #undef TEM2
@@ -585,8 +585,6 @@ TEM inline void DoubleBuffer<T>::copyAll(T * dst){
 
 } // end namespace gam
 
-
-#include "MacroU.h"
+#undef TEM
 
 #endif
-

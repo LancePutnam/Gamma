@@ -8,7 +8,7 @@
 #include "Envelope.h"
 #include "Noise.h"
 #include "Oscillator.h"
-#include "MacroD.h"
+
 
 namespace gam{
 
@@ -459,9 +459,6 @@ struct Fract8{
 */
 
 
-} // end namespace gam
-
-#include "MacroU.h"
+} // gam::
 
 #endif
-

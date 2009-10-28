@@ -5,7 +5,8 @@
 	See COPYRIGHT file for authors and license information */
 
 #include "arr.h"
-#include "MacroD.h"
+
+#define TEM template<class T>
 
 namespace gam{
 
@@ -15,7 +16,7 @@ namespace ParticleOp{
 	TEM void boundNone(T * pos, T * dpos, long n, T lo, T hi){}
 	
 	TEM void boundWrap(T * pos, T * dpos, long n, T lo, T hi){
-		arr::wrap(pos, n, hi, lo);
+		for(long i=0; i<n; ++i) scl::wrap(pos[i], hi, lo);
 	}
 	
 	TEM void boundReflect(T * pos, T * dpos, long n, T lo, T hi){
@@ -40,7 +41,7 @@ namespace ParticleOp{
 	}
 	
 	TEM void boundClip(T * pos, T * dpos, long n, T lo, T hi){
-		arr::clip(pos, n, hi, lo);
+		for(long i=0; i<n; ++i) scl::clip(pos[i], hi, lo);
 	}
 	
 } // ParticleOp::
@@ -150,9 +151,9 @@ TEM inline uint32_t PointParticles<T>::dims(){ return mDims; }
 TEM inline uint32_t PointParticles<T>::rates(){ return mRates; }
 TEM inline uint32_t PointParticles<T>::size(){ return mSize; }
 
-} // end namespace gam
+} // gam::
 
-#include "MacroU.h"
+#undef TEM
 
 #endif
 
