@@ -8,7 +8,7 @@
 	Main Gamma includes
 */
 
-#define GAMMA_VERSION 0.9.2
+#define GAMMA_VERSION 0.9.3
 //#define GAMMA_H_INC_ALL
 
 // Core Functions

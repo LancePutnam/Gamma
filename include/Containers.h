@@ -309,7 +309,7 @@ struct DoubleRing : public Ring<T>{
 	
 	/// Returns a pointer to the read buffer
 	///
-	T * copy(){ mem::copy(read.elems(), Ring<T>::elems(), read.size()); return read.elems(); }
+	T * copy(){ mem::deepCopy(read.elems(), Ring<T>::elems(), read.size()); return read.elems(); }
 	
 	Array<T> read;
 };

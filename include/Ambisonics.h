@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "Types.h"
-#include "MacroD.h"
 
 #define USE_GAMMA
 
@@ -500,14 +499,10 @@ TEM void AmbiDecode<T>::print(FILE * fp, const char * append){
 
 } // gam::
 
-#include "MacroU.h"
-
 #undef TEM
 #undef SAFE_FREE
-
 #undef WRAP
 #undef COS
 #undef SIN
 
 #endif
-

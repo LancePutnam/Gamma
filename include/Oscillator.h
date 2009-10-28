@@ -147,8 +147,7 @@ public:
 	// Add [harmonic, amp, phs] triple to transfer function
 	template <class T1, class T2, class T3>
 	Osc& operator<<(const Tup3<T1, T2, T3> & t){
-		Tv * e = elems();
-		arr::add(e, gen::Sin<Tv>(t.v1 * M_2PI / (Tv)size(), t.v3 * M_2PI, t.v2), size());
+		slice(elems(), size()) += gen::Sin<Tv>(t.v1 * M_2PI / (Tv)size(), t.v3 * M_2PI, t.v2);
 		return *this;
 	}
 

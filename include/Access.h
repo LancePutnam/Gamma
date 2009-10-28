@@ -28,6 +28,9 @@ inline T index3to1(T x, T y, T z, T sizeX, T sizeY){
 	return x + sizeX * (y + sizeY * z);
 }
 
+/// Returns last index of an arithmetic iteration starting from 0
+inline uint32_t indexLast(uint32_t len, uint32_t str){ return ((len-1)/str)*str; }
+
 inline void neighborsWrap(int x1, int N, int& x0, int& x2){
 	x0 = x1-1; if(x1< 0) x1+=N;
 	x2 = x1+1; if(x2>=N) x2-=N;
@@ -398,6 +401,46 @@ struct Scan3{
 		struct{ int x, y, z; };
 	};
 };
+
+
+/// Uniformly strided section of an array
+template <class T>
+class Slice{
+public:
+
+	/// @param[in] src	pointer to array elements
+	/// @param[in] len	total length of array
+	/// @param[in] str	stride increment through array
+	Slice(T * src, uint32_t len, uint32_t str): a(src), n(len), s(str){}
+
+	#define DO for(uint32_t i=0; i<n; i+=s)
+
+	template <class Gen>
+	bool operator == (const Gen& g){ DO{ if(g() != a[i]) return false; } return true; }
+	bool operator == (const   T& v){ DO{ if(v   != a[i]) return false; } return true; }
+
+	template <class Gen>
+	Slice& operator  = (const Gen& g){ DO{ a[i] =g(); } return *this; }
+	Slice& operator  = (const   T& v){ DO{ a[i] =v  ; } return *this; }
+
+	template <class Gen>
+	Slice& operator += (const Gen& g){ DO{ a[i]+=g(); } return *this; }
+	Slice& operator += (const   T& v){ DO{ a[i]+=v  ; } return *this; }
+
+	template <class Gen>
+	Slice& operator *= (const Gen& g){ DO{ a[i]*=g(); } return *this; }
+	Slice& operator *= (const   T& v){ DO{ a[i]*=v  ; } return *this; }
+	
+	#undef DO
+
+protected:
+	T * a;
+	uint32_t n,s;
+};
+
+/// Slice object function
+template <class T>
+Slice<T> slice(T * src, uint32_t len, uint32_t str=1){ return Slice<T>(src,len,str); }
 
 
 

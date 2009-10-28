@@ -330,7 +330,7 @@ TEM SlidingWindow<T>::SlidingWindow(uint winSize, uint hopSize)
 	: mBuf(0), mSizeWin(0), mSizeHop(0), mHopCnt(0)
 {
 	resize(winSize, hopSize);
-	mem::zero(mBuf, sizeWin());
+	mem::deepZero(mBuf, sizeWin());
 }
 
 TEM SlidingWindow<T>::~SlidingWindow(){
@@ -372,7 +372,7 @@ TEM inline bool SlidingWindow<T>::operator()(T input){
 	
 	if(++mTapW >= sizeHop()){
 		mTapW = 0;
-		mem::rotateL(mBuf, sizeWin(), sizeHop());
+		mem::rotateLeft(mBuf, sizeWin(), sizeHop());
 		return true;
 	}
 	return false;
@@ -391,7 +391,7 @@ TEM inline bool SlidingWindow<T>::operator()(T * output, T input){
 }
 
 TEM inline void SlidingWindow<T>::slide(){
-	mem::move(mBuf, mBuf + sizeHop(), hopStart());
+	mem::deepMove(mBuf, mBuf + sizeHop(), hopStart());
 }
 
 TEM inline uint SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(); }
@@ -456,7 +456,7 @@ inline float DFT::operator()(){
 }
 
 inline bool DFT::inverseOnNext(){ return mTapR == (sizeHop() - 1); }
-inline void DFT::zero(){ mem::zero(mBuf, sizeDFT() + 2); }
+inline void DFT::zero(){ mem::deepZero(mBuf, sizeDFT() + 2); }
 inline void DFT::zeroEnds(){ 
 	//bins0()[0]=0; bins0()[numBins()-1]=0; 
 	//bins1()[0]=0; bins1()[numBins()-1]=0;
@@ -491,7 +491,7 @@ TEM SDFT<T>::SDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
 TEM void SDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	// may be able to keep these smaller?
 	mem::resize(this->mBuf, this->mSizeDFT + 2, sizeDFT + 2);
-	mem::zero(this->mBuf, sizeDFT + 2);
+	mem::deepZero(this->mBuf, sizeDFT + 2);
 	
 	mDelay.resize(sizeDFT);
 	mDelay = 0;

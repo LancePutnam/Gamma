@@ -601,44 +601,6 @@ protected:
 
 
 
-/// Group of one-pole smoothing filters sharing the same filter coefficients.
-template<class T = gam::real>
-class OnePoles : public Synced {
-public:
-
-	/// @param[in]	num		Number of inputs to filter
-	/// @param[in]	freq	Smoothing cutoff frequency
-	/// @param[in]	val		Initial value of outputs
-	OnePoles(uint32_t num, T freq, T val = (T)0);
-	
-	~OnePoles();
-	
-	void freq(T val);	///< Set -3 dB bandwidth of pole.
-	void smooth(T val);
-
-	/// Process parallel array of inputs.
-	
-	/// Returns pointer to current outputs.
-	///	
-	T * operator()(const T * input);
-										
-	/// Process sample at specific filter index.
-	T operator()(T input, uint32_t index);
-	
-	virtual void onResync(double r);
-	
-protected:
-	T mFreq;
-	uint32_t mNum;
-	T * o1s;		// prev values
-	T ci0, co1;		// feed coefs
-};
-
-
-
-
-
-
 
 // Implementation_______________________________________________________________
 
@@ -1014,44 +976,6 @@ T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::last() const { return o1; }
 T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::stored() const { return mStored; }
 T_VPS inline Tv& OnePole<Tv,Tp,Ts>::stored(){ return mStored; }
 T_VPS inline bool OnePole<Tv,Tp,Ts>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == (Tv)0; }
-
-
-
-//---- OnePoles
-
-TEM OnePoles<Tv>::OnePoles(uint32_t num, Tv freq, Tv val)
-:	mFreq(freq), mNum(num), o1s(0) 
-{
-	mem::resize(o1s, 0, mNum);
-	mem::set(o1s, gen::Val<Tv>(val), num);
-	initSynced();
-}
-
-TEM OnePoles<Tv>::~OnePoles(){
-	if(o1s){ free(o1s); o1s = 0; }
-}
-
-TEM inline void OnePoles<Tv>::freq(Tv v){
-	mFreq = v;
-	v = scl::max(v, (Tv)0);
-	smooth( scl::poleRadius((Tv)2 * v, ups()) );
-}
-
-TEM inline void OnePoles<Tv>::smooth(Tv v){ co1 = v; ci0 = (Tv)1 - scl::abs(v); }
-
-TEM inline Tv * OnePoles<Tv>::operator()(const Tv * i0s){
-	arr::filter1P(o1s, i0s, mNum, co1, ci0);
-	return o1s;
-}
-
-TEM inline Tv OnePoles<Tv>::operator()(Tv i0, uint32_t ind){	
-	o1s[ind] = scl::dot2(o1s[ind], i0, co1, ci0);
-	return o1s[ind];
-}
-
-TEM void OnePoles<Tv>::onResync(double r){ freq(mFreq); }
-
-
 
 
 #undef TEM

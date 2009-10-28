@@ -59,6 +59,21 @@ void colorRGB(float h, float s, float v, float &r, float &g, float &b){
 	}
 }
 
+void print(const float * src, uint32_t len){
+	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f\n", (int)i, *src++);
+}
+
+void print(const float * src1, const float * src2, uint32_t len){
+	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f % f\n", (int)i, *src1++, *src2++);
+}
+
+void printHex(const float * src, uint32_t len){
+	for(uint32_t i=0; i<len; i++){
+		float v = *src++;
+		printf("[%4d] % 5.3f %8lx\n", (int)i, v, (unsigned long)*(uint32_t *)&v);
+	}
+}
+
 #define LOOP_BITS(exp) for(int i=(msb-1); i>=0; --i){ exp }
 void printBinary(uint32_t v, const char * zero, const char * one, int msb){
 	LOOP_BITS(

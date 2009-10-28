@@ -11,8 +11,6 @@
 #include "Access.h"
 #include "Strategy.h"
 
-#include "MacroD.h"
-
 namespace gam{
 
 namespace MapType{
@@ -106,15 +104,15 @@ private:
 
 // Implementation ______________________________________________________________
 
-TEM UnitMapper<T>::UnitMapper(){
+template <class T> UnitMapper<T>::UnitMapper(){
 	set((T)1);
 }
 
-TEM UnitMapper<T>::UnitMapper(T bound1, T bound0, T p1, int type, bool clip){
+template <class T> UnitMapper<T>::UnitMapper(T bound1, T bound0, T p1, int type, bool clip){
 	set(bound1, bound0, p1, type, clip);
 }
 
-TEM void UnitMapper<T>::set(T bound1, T bound0, T p1, int type, bool clip){
+template <class T> void UnitMapper<T>::set(T bound1, T bound0, T p1, int type, bool clip){
 	this->bound1 = bound1;
 	this->bound0 = bound0;
 	this->p1 = p1;
@@ -122,7 +120,7 @@ TEM void UnitMapper<T>::set(T bound1, T bound0, T p1, int type, bool clip){
 	this->clip = clip;
 }
 
-TEM inline T UnitMapper<T>::map(T u){
+template <class T> inline T UnitMapper<T>::map(T u){
 	switch(type){
 	case MapType::Lin:	return mapLin(u);
 	case MapType::Pow:	return mapPow(u);
@@ -131,7 +129,7 @@ TEM inline T UnitMapper<T>::map(T u){
 	}
 }
 
-TEM T UnitMapper<T>::unmap(T value){
+template <class T> T UnitMapper<T>::unmap(T value){
 	switch(type){
 	case MapType::Lin:
 		return scl::mapLin(value, bound0, bound1, (T)0, (T)1);
@@ -151,21 +149,19 @@ TEM T UnitMapper<T>::unmap(T value){
 }
 
 
-TEM T UnitMapper<T>::mapLin(T u){
+template <class T> T UnitMapper<T>::mapLin(T u){
 	doClip(u); return bound0 + u * (bound1 - bound0);
 }
 
-TEM T UnitMapper<T>::mapPow(T u){
+template <class T> T UnitMapper<T>::mapPow(T u){
 	doClip(u); return (T)scl::mapPower(u, bound1, bound0, p1);
 }
 
-TEM T UnitMapper<T>::mapExp2(T u){
+template <class T> T UnitMapper<T>::mapExp2(T u){
 	doClip(u);
 	return (T)(pow(2., scl::mapPower(u, bound1, bound0, 1.)) * p1);
 }
 
 } // gam::
-
-#include "MacroU.h"
 
 #endif

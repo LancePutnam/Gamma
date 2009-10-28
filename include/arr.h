@@ -14,7 +14,9 @@
 #include "mem.h"
 #include "scl.h"
 #include "Containers.h"
-#include "MacroD.h"
+
+#define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
+#define TEM template <class T>
 
 namespace gam{
 
@@ -32,67 +34,15 @@ namespace gam{
 /// and/or relational operators <, <=, >, >=.
 namespace arr{
 
-// These functions take input, output, and/or filtered indexable objects along
-// with an indexer object.
-// f*  -- filtered (i/o) indexable
-// i*  -- input indexable
-// o*  -- output indexable
-// ind -- indexer object (begin, end, stride, index)
-
-/// f0[i] += i0[i]
-template <class Tf0, class Ti0>
-Tf0& add(Tf0& f0, const Ti0& i0, const Indexer& ind){
-	LOOP_IND(f0[i] += i0[i];) return f0;
+/// Add source array to destination array
+TEM void add(T * dst, const T * src, uint32_t len, uint32_t str=1){
+	LOOP(len,str){ dst[i] += src[i]; }
 }
 
-/// o0[i] = i0[i] + i1[i]
-template <class To0, class Ti0, class Ti1>
-To0& add(To0& o0, const Ti0& i0, const Ti1& i1, const Indexer& ind){
-	LOOP_IND(o0[i] = i0[i] + i1[i];) return o0;
+/// Add two source arrays into destination array
+TEM void add(T * dst, const T * src1, const T * src2, uint32_t len, uint32_t str=1){
+	LOOP(len,str){ dst[i] = src1[i] + src2[i]; }
 }
-
-/// f0[i] = -i0[i]
-template <class To0, class Ti0>
-To0& invert(To0& o0, const Ti0& i0, const Indexer& ind){
-	LOOP_IND(o0[i] = -i0[i];) return o0;
-}
-
-/// f0[i] *= i0[i]
-template <class Tf0, class Ti0>
-Tf0& mul(Tf0& f0, const Ti0& i0, const Indexer& ind){
-	LOOP_IND(f0[i] *= i0[i];) return f0;
-}
-
-/// o0[i] = i0[i] * i1[i]
-template <class To0, class Ti0, class Ti1>
-To0 & mul(To0& o0, const Ti0& i0, const Ti1& i1, const Indexer& ind){
-	LOOP_IND(o0[i] = i0[i] * i1[i];) return o0;
-}
-
-/// f0[i] -= i0[i]
-template <class Tf0, class Ti0>
-Tf0 & sub(Tf0& f0, const Ti0& i0, const Indexer& ind){
-	LOOP_IND(f0[i] -= i0[i];) return f0;
-}
-
-/// o0[i] = i0[i] - i1[i]
-template <class To0, class Ti0, class Ti1>
-To0 & sub(To0& o0, const Ti0& i0, const Ti1& i1, const Indexer& ind){
-	LOOP_IND(o0[i] = i0[i] - i1[i];) return o0;
-}
-
-
-//---- Below are old the school pointer type function prototypes
-//---- TODO: Convert these to interfaced object types as above.
-
-/// Add flipping value to even-sized array (i.e. a Nyquist amount).
-
-/// For instance if value is 1, it will add 1, -1, 1, -1, ...
-///
-TEM void addFlip(T * arr, uint32_t len, T value);
-
-/// Add then multiply array values by fixed amounts.
-TEM void addMul(T * arr, uint32_t len, T add, T mul);
 
 /// Sum elements from src into ring-buffer ring.
 
@@ -100,23 +50,11 @@ TEM void addMul(T * arr, uint32_t len, T add, T mul);
 ///
 TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len);
 
-/// Differentiate array.
-TEM void differentiate(T * arr, uint32_t len, T & prev);
+/// Clip array values between [-1, 1].
+void clip1(float * arr, uint32_t len, uint32_t str=1);
 
-/// Exponentiates base using array values as exponents.
-TEM void expBase(T * arr, uint32_t len, double base = 2.);
-
-/// One-pole filter.
-
-/// Performs equation: arr[i] = b0 * arr[i] + a1 * src[i]
-///
-TEM void filter1P(T * arr, const T * src, uint32_t len, T b0, T a1);
-
-/// Integrate array.
-TEM void integrate(T * arr, uint32_t len, T & prev);
-
-/// Linearly maps array values from [i0, i1) to [o0, o1).
-TEM void mapLin(T * arr, uint32_t len, T i0, T i1, T o0, T o1);
+/// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
+void linToDB(float * arr, uint32_t len, float minDB);
 
 //	/// Applies mirror isometry sequence [dbqp] from first quarter of array.
 //	
@@ -141,8 +79,10 @@ TEM void mirror_dp(T * arr, uint32_t len);
 /// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-1,-2,-3,-4]
 TEM void mirror_dq(T * arr, uint32_t len);
 
-/// Multiply then add to array values by fixed amounts.
-TEM void mulAdd(T * arr, uint32_t len, T mul, T add);
+/// Multiply destination array by source array
+TEM void mul(T * dst, const T * src, uint32_t len, uint32_t str=1){
+	LOOP(len,str){ dst[i] *= src[i]; }
+}
 
 /// Multiply array by a Bartlett (triangle) window.
 
@@ -154,9 +94,6 @@ TEM void mulBartlett(T * arr, uint32_t len);
 /// of a symmetric window.
 TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
 
-/// Multiply array by a line from [start, end]
-TEM void mulLine(T * arr, uint32_t len, T start, T end, bool includeEnd = false);
-
 /// Uniformly scale array values to fit in [-1, 1].
 
 /// Returns normalization factor.
@@ -165,82 +102,6 @@ TEM T normalize(T * arr, uint32_t len);
 
 TEM void overlapAdd(T * arr, const T * src, uint32_t len, uint32_t hop);
 
-TEM void pow2(T * arr, uint32_t len);	///< Raise array values to 2nd power
-TEM void pow3(T * arr, uint32_t len);	///< Raise array values to 3rd power
-TEM void pow4(T * arr, uint32_t len);	///< Raise array values to 4th power
-
-/// Weighted averaging of values between two arrays.
-
-/// Implements formula: arr[i] = arr[i] * weight + src[i] * (1 - weight)
-TEM void smooth(T * arr, const T * src, uint32_t len, T weight);
-
-TEM void smooth(T * arr, uint32_t len, T weight, T prev=0);
-
-//
-// Filling functions
-//
-
-/// Fills array with line from [start, end) or [start, end].
-TEM void line(T * dst, uint32_t len, T start, T end, bool includeEnd = false);
-
-/// Fills array with line from [start, start + 1).
-TEM void line1(T * dst, uint32_t len, T start=0);
-
-/// Fills array with line from [start, start + (slope * len)).
-TEM void lineSlope(T * dst, uint32_t len, T start, T slope);
-
-/// Fills array with line from [start, start + len).
-TEM void lineSlope1(T * dst, uint32_t len, T start = 0);
-
-
-//
-// Non-linear transformations
-//
-
-/// Make array values positive.
-template <class Tf0>
-inline void abs(Tf0& f0, const Indexer& ind){
-	LOOP_IND(f0[i] = scl::abs(f0[i]); )
-}
-
-/// Clip array values to range.
-template <class Tf0, class Tp>
-inline void clip(Tf0& f0, const Indexer& ind, const Tp& hi, const Tp& lo){
-	LOOP_IND(f0[i] = scl::clip<Tp>(f0[i], hi, lo); )
-}
-
-/// Clip array values between [-1, 1].
-void clip1(float * arr, uint32_t len);
-
-/// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
-void linToDB(float * arr, uint32_t len, float minDB);
-
-/// Perform max operation element-wise on array values with scalar value.
-TEM void max(T * arr, uint32_t len, T val);
-
-/// Perform min operation element-wise on array values with scalar value.
-TEM void min(T * arr, uint32_t len, T val);
-
-/// Round array values to integer multiples.
-TEM void round(T * arr, uint32_t len);
-
-/// Round array values to integer multiple of 'step'.
-TEM void round(T * arr, uint32_t len, T step);
-
-/// Wrap array values into range [lo, hi).
-TEM void wrap(T * arr, uint32_t len, T hi=(T)1, T lo=(T)0);
-
-/// Zero array values greater than 'threshold'.
-TEM void zeroAbove(T * arr, uint32_t len, T threshold);
-
-/// Zero array values less than 'threshold'.
-TEM void zeroBelow(T * arr, uint32_t len, T threshold);
-
-
-
-//
-// Analysis
-//
 
 /// Finds elements that are within a threshold of their nearest neighbors.
 
@@ -254,11 +115,10 @@ TEM void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T thre
 
 void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize);
 
-/// Measures distances from 2-d points to a single source point.
-void distance2(float * dst, const float * xFrom, const float * yFrom, uint32_t len, float xTo, float yTo);
-
 /// Returns dot-product of two arrays.
-TEM T dot(const T * src1, const T * src2, uint32_t len);
+TEM T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
+	T sum=T(0); LOOP(len, str){ sum += src1[i] * src2[i]; } return sum;
+}
 
 /// Returns dot-product of two arrays of length 4.
 TEM T dot4(const T * src1, const T * src2);
@@ -285,9 +145,6 @@ void fitLine(const T1 * src, uint32_t len, T2& slope, T3& inter);
 ///
 uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSample=4);
 
-//	uint32_t fundLowPeak
-
-
 /// Compute histogram of 'src'.
 
 /// Values in 'src' are tallied and placed in 'bins', where the index of the
@@ -307,22 +164,26 @@ void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts sca
 void hps(float * dst, const float * src, uint32_t len, uint32_t downSample);
 
 /// Returns index of maximum value.
-TEM uint32_t max(const T * src, uint32_t len);
+TEM uint32_t max(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns index of maximum absolute value (i.e. magnitude).
-TEM uint32_t maxAbs(const T * src, uint32_t len);
+TEM uint32_t maxAbs(const T * src, uint32_t len, uint32_t str=1);
 
 /// Locates local maxima and writes their indices into 'dst'.
 
 ///	Returns number of maxima found.
 ///
-TEM uint32_t maxima(const T * src, uint32_t len, uint32_t * dst);
+TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str=1);
 
-/// Returns the mean (average) value of array values.
-TEM T mean(const T * src, uint32_t len);
+/// Returns the mean (average) value of array values
+TEM inline T mean(const T * src, uint32_t len, uint32_t str=1){
+	return sum(src, len, str) / T(len/str);
+}
 
 /// Returns the mean absolute value of array values.
-TEM T meanAbs(const T * src, uint32_t len);
+TEM inline T meanAbs(const T * src, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len,str){ r += scl::abs(src[i]); } return r / T(len/str);
+}
 
 /// Returns mean absolute difference of array values.
 TEM T meanAbsDiff(const T * src, uint32_t len);
@@ -344,20 +205,41 @@ TEM uint32_t min(const T * src, uint32_t len);
 
 TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
 
-/// Returns norm of array values.
+//
+///// Returns norm of array values.
+//
+///// The norm is the square root of energy.
+/////
+//TEM T norm(const T * src, uint32_t len);
+//
+///// Returns taxicab norm of array values (sum of absolute values).
+//TEM T normTaxi(const T * src, uint32_t len);
+//
+///// Returns unnormalized Nyquist value for use with DFT.
+//TEM T nyquist(const T * src, uint32_t len);
+//
+///// Returns root mean square- the normalized norm.
+//TEM T rms(const T * src, uint32_t len);
 
-/// The norm is the square root of energy.
-///
-TEM T norm(const T * src, uint32_t len);
+/// Returns norm of array values.
+TEM inline T norm(const T * src, uint32_t len, uint32_t str=1){
+	return sqrt((double)sumSquares(src, len,str));
+}
 
 /// Returns taxicab norm of array values (sum of absolute values).
-TEM T normTaxi(const T * src, uint32_t len);
+TEM T normTaxi(const T * src, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len,str){ r+=scl::abs(src[i]); } return r;
+}
 
 /// Returns unnormalized Nyquist value for use with DFT.
-TEM T nyquist(const T * src, uint32_t len);
+TEM inline T nyquist(const T * src, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len,(str<<1)){ r += src[i] - src[i+str]; } return r;
+}
 
 /// Returns root mean square- the normalized norm.
-TEM T rms(const T * src, uint32_t len);
+TEM inline T rms(const T * src, uint32_t len, uint32_t str=1){
+	return norm(src, len,str) / T(len/str);	
+}
 
 /// Returns index of absolute maximum slope in array.
 TEM uint32_t slopeAbsMax(const T * src, uint32_t len);
@@ -383,11 +265,18 @@ TEM void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices);
 ///
 TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end);
 
-/// Returns sum of values in array (e.g. DC amount).
-TEM T sum(const T * src, uint32_t len);
+/// Returns sum of values
+TEM inline T sum(const T * src, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len, str){ r += src[i]; } return r;
+}
+
+/// Returns sum of values squared
+TEM inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len, str){ r += src[i] * src[i]; } return r;
+}
 
 /// Variance (deviation from mean).
-TEM T variance(const T * src, uint32_t len);
+TEM T variance(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns number of values within [-threshold, theshold].
 TEM uint32_t within(const T * src, uint32_t len, T threshold);
@@ -396,7 +285,7 @@ TEM uint32_t within(const T * src, uint32_t len, T threshold);
 TEM uint32_t within(const T * src, uint32_t len, T lo, T hi);
 
 /// Returns number of values that equal zero.
-TEM uint32_t zeroCount(const T * src, uint32_t len);
+TEM uint32_t zeroCount(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns number of zero-crossings in array.
 
@@ -465,7 +354,7 @@ void polarToRect(float * mag, float * phs, uint32_t len);
 void polarToRectFast(float * real, float * imag, uint32_t len);
 
 /// In-place rectangular to polar conversion.
-void rectToPolar(float * real, float * imag, uint32_t len);
+void rectToPolar(float * real, float * imag, uint32_t len, uint32_t str=1);
 
 /// Fast in-place rectangular to polar conversion.
 
@@ -473,14 +362,6 @@ void rectToPolar(float * real, float * imag, uint32_t len);
 ///
 void rectToPolarFast(float * real, float * imag, uint32_t len);
 
-
-//
-// Printing
-//
-
-void print(const float * src, uint32_t len);
-void print(const float * src1, const float * src2, uint32_t len);
-void printHex(const float * src, uint32_t len);
 
 namespace{
 	
@@ -513,18 +394,6 @@ namespace{
 
 // Implementation_______________________________________________________________
 
-TEM inline void addFlip(T * arr, uint32_t len, T value){
-	len >>= 1;
-	LOOP_P(len,
-		*arr++ += value;
-		*arr++ -= value;
-	)
-}
-
-TEM inline void addMul(T * arr, uint32_t len, T add, T mul){
-	LOOP_P(len, *arr = (*arr + add) * mul; arr++; )
-}
-
 TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len){
 	uint32_t endTap = ringTap + len;
 
@@ -538,47 +407,6 @@ TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * 
 		add(ring, src + samplesUnder, samplesOver);
 	}
 	return endTap;
-}
-
-TEM inline void smooth(T * arr, const T * src, uint32_t len, T weight){
-	LOOP(len, *arr = ipl::linear(weight, *src++, *arr); arr++; )
-}
-
-TEM inline void smooth(T * arr, uint32_t len, T weight, T prevValue){
-	T prev = prevValue;
-	LOOP(len,
-		T curr = ipl::linear(weight, *arr, prev);
-		*arr++ = curr;
-		prev = curr;
-	)
-}
-
-TEM inline void differentiate(T * arr, uint32_t len, T & prev){
-	LOOP(len,
-		T curr = *arr;
-		*arr++ = curr - prev;
-		prev = curr;
-	)
-}
-
-TEM inline void expBase(T * arr, uint32_t len, double base){
-	LOOP(len, arr[i] = ::pow(base, arr[i]);)
-}
-
-TEM inline void filter1P(T * arr, const T * src, uint32_t len, T b0, T a1){
-	LOOP_P(len, *arr = scl::dot2(*arr, *src, b0, a1); arr++; src++; )
-}
-
-TEM inline void integrate(T * arr, uint32_t len, T & prev){
-	LOOP_P(len,
-		T curr = *arr;
-		*arr++ = curr + prev;
-		prev = curr;
-	)
-}
-
-TEM inline void mapLin(T * arr, uint32_t len, T i0, T i1, T o0, T o1){
-	LOOP(len, arr[i] = scl::mapLin(arr[i], i0, i1, o0, o1);)
 }
 
 //TEM inline void mirror_dbqp(T * arr, uint32_t len){
@@ -598,16 +426,12 @@ TEM inline void mapLin(T * arr, uint32_t len, T i0, T i1, T o0, T o1){
 
 TEM inline void mirror_dp(T * arr, uint32_t len){
 	T * arr2 = arr + len - 1;	// 2nd half end
-	LOOP_S(len, 2, *arr2-- = -*arr++; )
+	LOOP(len, 2){ *arr2-- = -*arr++; }
 }
 
 TEM inline void mirror_dq(T * arr, uint32_t len){
 	T * arr2 = arr + (len>>1);	// 2nd half begin
-	LOOP_S(len, 2, *arr2++ = -*arr++; )
-}
-
-TEM inline void mulAdd(T * arr, uint32_t len, T mul, T add){
-	LOOP_P(len, *arr = *arr * mul + add; arr++; )
+	LOOP(len, 2){ *arr2++ = -*arr++; }
 }
 
 TEM inline void mulBartlett(T * arr, uint32_t len){
@@ -617,11 +441,11 @@ TEM inline void mulBartlett(T * arr, uint32_t len){
 	T line = slope;
 	
 	*arr++ = (T)0;
-	LOOP(len_2 - 1,
+	LOOP(len_2 - 1, 1){
 		*arr++ *= line;
 		*end-- *= line;
 		line += slope;
-	)
+	}
 }
 
 TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
@@ -629,17 +453,12 @@ TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 	len >>= 1;
 	
 	*arr++ *= *src++;
-	LOOP(len - 1,
+	LOOP(len - 1, 1){
 		const T val = *src++;
 		*arr++ *= val;
 		*end-- *= val;
-	)
+	}
 	*arr *= *src;
-}
-
-TEM inline void mulLine(T * arr, uint32_t len, T start, T end, bool includeEnd){
-	T slope = (end - start)/(T)(len - (includeEnd ? 1 : 0));
-	LOOP_P(len, *arr++ *= start; start += slope;)
 }
 
 TEM T normalize(T * arr, uint32_t len){
@@ -655,83 +474,6 @@ TEM inline void overlapAdd(T * arr, const T * src, uint32_t len, uint32_t hop){
 	mem::copy(arr + lap, src + lap, hop);
 }
 
-TEM inline void pow2(T * arr, uint32_t len){
-	LOOP_P(len, *arr *= *arr; arr++; )
-}
-
-TEM inline void pow3(T * arr, uint32_t len){
-	LOOP_P(len, *arr = scl::pow3(*arr); arr++; )
-}
-
-TEM inline void pow4(T * arr, uint32_t len){
-	LOOP_P(len, *arr = scl::pow4(*arr); arr++; )
-}
-
-TEM inline void line(T * dst, uint32_t len, T start, T end, bool includeEnd){
-	T slope = (end - start)/(T)(len - (includeEnd ? 1 : 0));
-	LOOP_P(len, *dst++ = start; start += slope;)
-}
-
-TEM inline void line1(T * dst, uint32_t len, T start){
-	T slope = 1/(T)len;
-	LOOP_P(len, *dst++ = start; start += slope;)
-}
-
-TEM inline void lineSlope(T * dst, uint32_t len, T start, T slope){
-	LOOP_P(len, *dst++ = start; start += slope;)
-}
-
-TEM inline void lineSlope1(T * dst, uint32_t len, T start){
-	T val = start;
-	LOOP_P(len, *dst++ = val; val++;)
-}
-
-inline void clip1(float * arr, uint32_t len){
-	uint32_t * arrUI = (uint32_t *)arr;
-	LOOP(len,
-		uint32_t val = *arrUI;
-		uint32_t sign = val & MaskSign<float>();
-		val &= 0x7fffffff;	// mask off the sign to catch infs and NaNs
-		uint32_t above = (val + 0x00800000) >> 30;
-		
-		if(above) val = Expo1<float>();
-		
-		//val = -above | 
-		
-		*arrUI++ = val | sign; 
-	)
-}
-
-TEM inline void max(T * arr, uint32_t len, T val){
-	LOOP_P(len, *arr = scl::max(*arr, val); arr++; )
-}
-
-TEM inline void min(T * arr, uint32_t len, T val){
-	LOOP_P(len, *arr = scl::min(*arr, val); arr++; )
-}
-
-TEM inline void round(T * arr, uint32_t len){
-	LOOP_P(len, *arr = scl::round(*arr); arr++; )
-}
-
-TEM inline void round(T * arr, uint32_t len, T step){
-	T stepRec = (T)1 / step;
-	LOOP_P(len, *arr = scl::round(*arr, step, stepRec); arr++; )
-}
-
-TEM inline void wrap(T * arr, uint32_t len, T hi, T lo){
-	LOOP_P(len, *arr = scl::wrap(*arr, hi, lo); arr++; )
-}
-
-TEM inline void zeroAbove(T * arr, uint32_t len, T threshold){
-	LOOP_P(len, if(*arr > threshold){ *arr = (T)0; } arr++; )
-}
-
-TEM inline void zeroBelow(T * arr, uint32_t len, T threshold){
-	LOOP_P(len, if(*arr < threshold){ *arr = (T)0; } arr++; )
-}
-
-
 TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T threshold){
 	
 	if(numIndices == 0) return;
@@ -742,7 +484,7 @@ TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T thr
 	T prev = src[*indices++];
 	bool inCluster = false;
 	
-	LOOP(numIndices - 1,
+	LOOP(numIndices - 1, 1){
 		uint32_t index = *indices++;
 		T curr = src[index];
 	
@@ -765,19 +507,9 @@ TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T thr
 		}
 		
 		prev = curr;
-	)
+	}
 	
 	numIndices = newNumIndices;
-}
-
-inline void distance2(float * dst, const float * xFrom, const float * yFrom, uint32_t len, float xTo, float yTo){
-	LOOP_P(len, *dst++ = hypot(*xFrom - xTo, *yFrom - yTo); xFrom++; yFrom++; )
-}
-
-TEM inline T dot(const T * src1, const T * src2, uint32_t len){
-	T sum = (T)0;
-	LOOP_P(len, sum += *src1 * *src2; src1++; src2++; )
-	return sum;
 }
 
 TEM inline T dot4(const T * src1, const T * src2){
@@ -785,12 +517,6 @@ TEM inline T dot4(const T * src1, const T * src2){
 		+	src1[1] * src2[1]
 		+	src1[2] * src2[2]
 		+	src1[3] * src2[3];
-}
-
-TEM inline T energy(const T * src, uint32_t len){
-	T nrg = (T)0;
-	LOOP_P(len, nrg += *src * *src; src++;)
-	return nrg;
 }
 
 TEM void extrema(const T * src, uint32_t len, uint32_t & indexMin, uint32_t & indexMax){
@@ -828,9 +554,9 @@ inline void fitLine(const T * src, uint32_t len, T2& slope, T3& inter){
 	T cov  = T(0);	// covariance
 	T dx   =-meanX;	// current distance from point to center along x
 
- 	LOOP_P(len,
+ 	LOOP(len, 1){
 		cov += dx++ * (*src++ - meanY);
- 	)
+ 	}
 
 	slope = cov / varX;
 	inter = meanY - slope * meanX;
@@ -860,64 +586,57 @@ void add(T * arr, Indices & ind, T val){
 
 template <class Ts, class Tb>
 inline void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts scale){
-	LOOP_P(len,
-		int32_t index = (int32_t)(*src++ * scale);
-		if(index >= 0 && index < (int32_t)numBins) bins[index]++;
-	)
+	LOOP(len, 1){
+		int32_t j = (int32_t)(src[i] * scale);
+		if(j >= 0 && j < (int32_t)numBins) bins[j]++;
+	}
 }
 
 template <class Ts, class Tb>
 inline void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts scale, Ts offset){
-	LOOP_P(len,
-		int32_t index = (int32_t)(*src++ * scale + offset);
-		if(index >= 0 && index < (int32_t)numBins) bins[index]++;
-	)
+	LOOP(len, 1){
+		int32_t j = (int32_t)(src[i] * scale + offset);
+		if(j >= 0 && j < (int32_t)numBins) bins[j]++;
+	}
 }
 
-TEM uint32_t max(const T * src, uint32_t len){
-	uint32_t index = 0;
+TEM uint32_t max(const T * src, uint32_t len, uint32_t str){
+	uint32_t r=0;
 	T max = src[0];
-
-	for(uint32_t i=1; i<len; i++){
-		T val = src[i];
-		if(val > max){
-			max = val;
-			index = i;
-		}
+	for(uint32_t i=str; i<len; i+=str){
+		const T& v = src[i];
+		if(v > max){ max=v; r=i; }
 	}
-	return index;
+	return r;
 }
 
-TEM uint32_t maxAbs(const T * src, uint32_t len){
-	uint32_t index = 0;
-	T max = scl::abs(*src++);
-
-	for(uint32_t i=1; i<len; i++){
-		T val = scl::abs(*src++);
-		if(val > max){
-			max = val;
-			index = i;
-		}
+TEM uint32_t maxAbs(const T * src, uint32_t len, uint32_t str){
+	uint32_t r = 0;
+	T max = scl::abs(src[0]);
+	for(uint32_t i=str; i<len; i+=str){
+		const T& v = scl::abs(src[i]);
+		if(v > max){ max=v; r=i; }
 	}
-	return index;
+	return r;
 }
 
-TEM uint32_t maxima(const T * src, uint32_t len, uint32_t * dst){
-	
-	T prev = *src++;
-	T curr = *src++;
+TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str){
+	T prev = src[0];
+	T curr = src[str];
 	
 	uint32_t numPeaks = 0;
 	
-	for(uint32_t i=1; i<len-1; ++i){
-		T next = *src++;
+	for(uint32_t i=(str<<1); i<len; i+=str){
+		T next = src[i];
 
 		if(curr > prev && curr > next){
-			*dst++ = i;
+			*dst++ = i-str;
 			numPeaks++;
-			i++;
-			prev = next;
-			curr = *src++;
+			i+=str;
+			if(i<len){
+				prev = next;
+				curr = src[i];
+			}
 		}
 		else{
 			prev = curr;
@@ -927,30 +646,21 @@ TEM uint32_t maxima(const T * src, uint32_t len, uint32_t * dst){
 	return numPeaks;
 }
 
-TEM inline T mean(const T * src, uint32_t len){
-	return sum(src, len) / (T)len;
-}
 
-TEM inline T meanAbs(const T * src, uint32_t len){
-	T mean = (T)0;
-	T rec = (T)1 / (T)len;
-	LOOP_P(len, mean += scl::abs(*src++); )
-	return mean * rec;
-}
 
 TEM T meanAbsDiff(const T * src, uint32_t len){
 	T sum = (T)0;
 	T mean = (T)0;
 	
 	T prev = *src++;
-    LOOP(len - 1,
+    LOOP(len - 1, 1){
 		T now = *src++;
 		T diff = now - prev;
 		T abs = scl::abs(now);
 		sum += scl::abs(diff);
 		mean += abs;
 		prev = now;
-    )
+    }
 	//if(mean < 0.0001f) mean = 0.0001f;
 	return mean < T(0.25) ? T(-1) : sum * T(0.5) / mean;
 
@@ -968,7 +678,7 @@ TEM T meanWeighted(const T * src, T * weights, uint32_t len){
 
 	// Two loops: slower, but avoids overflow
 	T normFactor = (T)1 / sum(weights, len);
-	LOOP(len, mean += *src++ * *weights++ * normFactor;)
+	LOOP(len,1){ mean += *src++ * *weights++ * normFactor; }
 	return mean;
 }
 
@@ -978,10 +688,10 @@ TEM T meanWeightedIndex(const T * weights, uint32_t len){
 	if(normFactor == (T)0) return (T)0;
 	normFactor = (T)1 / normFactor;
 	T weightFactor = normFactor;
-	LOOP(len,
+	LOOP(len,1){
 		mean += *weights++ * weightFactor;
 		weightFactor += normFactor;
-	)
+	}
 	return mean;
 }
 
@@ -1063,32 +773,13 @@ TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
 //	numIndices = newNumIndices;
 //}
 
-TEM inline T norm(const T * src, uint32_t len){
-	return (T)sqrt((double)energy(src, len));
-}
-
-TEM T normTaxi(const T * src, uint32_t len){
-	T v = (T)0;
-	LOOP(len, v += scl::abs(src[i]);)
-	return v;
-}
-
-TEM inline T nyquist(const T * src, uint32_t len){
-	T sum = (T)0;
-	LOOP_S(len, 2, sum += src[i] - src[i+1];)
-	return sum;
-}
-
-TEM inline T rms(const T * src, uint32_t len){
-	return norm(src, len) / (T)len;	
-}
 
 TEM uint32_t slopeAbsMax(const T * src, uint32_t len){
 	uint32_t index = 0;
 	T prev = *src++;
 	T maxSlope = (T)0;
 
-	LOOP(len-1,
+	LOOP(len-1,1){
 		T now = *src++;
 		T slope = scl::abs(now - prev);
 		if(slope > maxSlope){
@@ -1096,7 +787,7 @@ TEM uint32_t slopeAbsMax(const T * src, uint32_t len){
 			index = i;
 		}
 		prev = now;
-	)
+	}
 	return index;
 }
 
@@ -1170,58 +861,50 @@ TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end){
 	}
 }
 
-TEM inline T sum(const T * src, uint32_t len){
-	T result = (T)0;
-	LOOP_P(len, result += *src++;)
-	return result;
-}
-
-TEM inline T variance(const T * src, uint32_t len){
-	T rec = (T)1/(T)len;
-	T avg = sum(src, len) * rec;
-	T var = (T)0;
+TEM inline T variance(const T * src, uint32_t len, uint32_t str){
+	T rec = T(1)/T(len/str);
+	T avg = sum(src, len,str) * rec;
+	T r = T(0);
 	
-	LOOP_P(len,
-		T diff = *src++ - avg;
-		var += diff * diff;
-	)
-	return var * rec;
+	LOOP(len, str){
+		T d = src[i] - avg;
+		r += d*d;
+	}
+	return r * rec;
 }
 
 TEM uint32_t within(const T * src, uint32_t len, T threshold){
 	uint32_t count = 0;
-	LOOP(len,
+	LOOP(len, 1){
 		T val = src[i];
 		if((val <= threshold) && (val >= -threshold)) count++;
-	)
+	}
 	return count;
 }
 
 TEM uint32_t within(const T * src, uint32_t len, T lo, T hi){
 	uint32_t count = 0;
-	LOOP(len,
+	LOOP(len, 1){
 		T val = src[i];
 		if((val <= hi) && (val >= lo)) count++;
-	)
+	}
 	return count;
 }
 
-TEM inline uint32_t zeroCount(const T * src, uint32_t len){
-	uint32_t zeros = 0;
-	LOOP_P(len, if(*src == (T)0){ zeros++; } src++; )
-	return zeros;
+TEM inline uint32_t zeroCount(const T * src, uint32_t len, uint32_t str){
+	uint32_t r=0; LOOP(len,str){ if(src[i] == T(0)) r++; } return r;
 }
 
 TEM void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc){
 	pzc = 0;
 	nzc = 0;
 	T prev = *src++;
-	LOOP(len - 1,
+	LOOP(len - 1, 1){
 		T curr = src[i];
 		if		(curr > (T)0 && prev <= (T)0) pzc++;
 		else if	(curr <= (T)0 && prev > (T)0) nzc++;
 		prev = curr;
-	)
+	}
 }
 
 TEM uint32_t zeroCrossMax(const T * src, uint32_t len){
@@ -1229,7 +912,7 @@ TEM uint32_t zeroCrossMax(const T * src, uint32_t len){
 	T max = 0;
 	uint32_t ind = 0;
 	
-	LOOP(len - 1,
+	LOOP(len-1, 1){
 		T curr = src[i];
 		if(curr > (T)0 && prev <= (T)0){
 			T slope = curr - prev;
@@ -1239,7 +922,7 @@ TEM uint32_t zeroCrossMax(const T * src, uint32_t len){
 			}
 		}
 		prev = curr;
-	)
+	}
 	return ind;
 }
 
@@ -1259,70 +942,29 @@ inline void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t 
 
 TEM void phaseToFreq(T * p0, T * p1, uint32_t len, T ups){
 	T factor = (T)1 / (M_2PI * ups);
-	LOOP_P(len,
+	LOOP(len, 1){
 		T dp = scl::wrapPhase(*p0 - *p1);		// wrap phase into [-pi, pi)
 		*p1++ = *p0;							// prev phase = curr phase
 		*p0++ = dp * factor;
-	)
+	}
 }
 
 TEM void phaseToFreq(T * f, const T * p0, const T * p1, uint32_t len, T ups){
 	T factor = (T)1 / (M_2PI * ups);
-	LOOP_P(len,
+	LOOP(len, 1){
 		T dp = scl::wrapPhase(*p0 - *p1);		// wrap phase into [-pi, pi)
 		*f++ = dp * factor;
 		p0++; p1++;
-	)
+	}
 //	subtract(f, p0, p1, len);
 //	mul(f, len, factor);
 //	wrap(f, len, -0.5 / ups, 0.5 / ups);
 }
 
-
-/*
-00		00		0	0
-01		10		1	2
-10		01		2	1
-11		11		3	3
-
-000		000		0	0	
-001		100		1	4	x
-010		010		2	2	x
-011		110		3	6	x
-100		001		4	1	
-101		101		5	5	x
-110		011		6	3	
-111		111		7	7
-
-0000	0000	0	0	
-0001	1000	1	8	x
-0010	0100	2	4	x
-0011	1100	3	12	x
-0100	0010	4	2	
-0101	1010	5	10	x
-0110	0110	6	6	x
-0111	1110	7	14	x
-1000	0001	8	1	
-1001	1001	9	9	x
-1010	0101	10	5
-1011	1101	11	13	x
-1100	0011	12	3
-1101	1011	13	11	
-1110	0111	14	7
-1111	1111	15	15
-*/
-// In-place bit reversed reordering of array.
-//unsigned int bitReverse(float * arr, uint32_t len, uint32_t numBits){
-//	for(uint32_t i=1; i<len; i++){
-//	
-//	}
-//}
-
 } // arr::
-
 } // gam::
 
-#include "MacroU.h"
+#undef LOOP
+#undef TEM
 
 #endif
-

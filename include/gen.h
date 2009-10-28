@@ -366,8 +366,8 @@ template <uint32_t N, class T=gam::real, class G=gen::RAdd1<uint32_t> >
 class Seq: public Multi<N,T>{
 public:
 
-	Seq(const T& value){ mem::set(this->elems, gen::val(value), N); }
-	Seq(const T * values){ mem::copy(this->elems, values, N); }
+	Seq(const T& val){ for(int i=0; i<N; ++i){ this->elems[i]=val; } }
+	Seq(const T * vals){ for(int i=0; i<N; ++i){ this->elems[i]=vals[i]; } }
 
 	/// Generate next array element
 	T operator()(){ return (*this)[((uint32_t)mTap())%N]; }

@@ -2,7 +2,9 @@
 #include <string.h>
 
 #include "arr.h"
+#include "gen.h"
 #include "tbl.h"
+#include "Access.h"
 #include "Constants.h"
 #include "Visual.h"
 
@@ -159,7 +161,7 @@ int main(int argc, char* argv[]){
 //	}
 	{ using namespace gam::gen;
 		
-		#define GEN(fnc) mem::set(arr,fnc,Loop(len)); printf("\n\n"#fnc":\n"); PRINT_TABLE
+		#define GEN(fnc) slice(arr,len) = fnc; printf("\n\n"#fnc":\n"); PRINT_TABLE
 		
 		GEN(Val<>(1))
 		GEN(RMul<>(0.9))

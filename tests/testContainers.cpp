@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "arr.h"
+#include "gen.h"
 #include "mem.h"
 #include "Containers.h"
 
@@ -82,7 +83,8 @@ int main(int argc, char* argv[]){
 		bool r=false;
 		
 		mem::zero(ring.elems(), ring.size());
-		r = mem::equal(ring, Val<int>(0), N);
+		//r = mem::equal(ring, Val<int>(0), N);
+		r = slice(&ring[0], N) == Val<int>(0);
 		printf("\tzero(): %s\n", r ? "pass" : "fail");
 		
 		for(int i=0; i<N*2; ++i){

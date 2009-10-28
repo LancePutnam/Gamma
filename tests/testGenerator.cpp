@@ -2,7 +2,7 @@
 #include "Constants.h"
 #include "Visual.h"
 
-#define GEN(fnc) mem::set(arr,fnc,Loop(N)); printf("\n"#fnc":\n"); PRINT_TABLE
+#define GEN(fnc) slice(arr,N) = fnc; printf("\n"#fnc":\n"); PRINT_TABLE
 
 #define PRINT_TABLE \
 	for(int i=0; i<N; i++){\

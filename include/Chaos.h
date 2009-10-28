@@ -15,8 +15,8 @@ template <uint32_t Nv, uint32_t Nc, class Tv>
 struct MapBase{
 
 	MapBase(){
-		mem::zero(v, numVals());
-		mem::zero(a, numCoefs());
+		mem::deepZero(v, numVals());
+		mem::deepZero(a, numCoefs());
 	}
 	
 	Tv v[Nv];								///< Values

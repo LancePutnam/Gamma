@@ -9,8 +9,10 @@
 
 #include <stdio.h>
 #include "arr.h"
+#include "gen.h"
 #include "rnd.h"
 #include "scl.h"
+#include "Access.h"
 #include "Visual.h"
 
 using namespace gam;
@@ -41,7 +43,7 @@ int main(int argc, char* argv[]){
 
 	printf("\n\npermute:\n");
 		for(int i=0; i<16; i++){
-			arr::lineSlope1(ints, iterations);
+			slice(ints,iterations) = gen::RAdd1<int>();
 			rnd::permute(ints, iterations);
 			LOOP printf("%2i ", ints[i]);
 			printf("\n");
@@ -61,12 +63,12 @@ int main(int argc, char* argv[]){
 		for(int i=0; i<256; ++i) printf("%c", rnd::prob(0.8) ? '|' : '.');
 
 	printf("\n\nthin(0.2):\n");
-		mem::set(floats, gen::Val<>(1), Loop(iterations));
+		slice(floats, iterations) = gen::Val<>(1);
 		rnd::thin(floats, iterations, 0.2);
 		LOOP printf("%c", floats[i] != 0.f ? '|' : '.');
 
 	printf("\n\nthin(0.8):\n");
-		mem::set(floats, gen::Val<>(1), Loop(iterations));;
+		slice(floats, iterations) = gen::Val<>(1);
 		rnd::thin(floats, iterations, 0.8);
 		LOOP printf("%c", floats[i] != 0.f ? '|' : '.');
 

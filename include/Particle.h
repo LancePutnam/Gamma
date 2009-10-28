@@ -119,7 +119,7 @@ TEM void PointParticles<T>::operator()(){
 	}
 }
 
-TEM void PointParticles<T>::zero(){ mem::zero(dt, size() * dims() * rates()); }
+TEM void PointParticles<T>::zero(){ mem::deepZero(dt, size() * dims() * rates()); }
 
 TEM void PointParticles<T>::print(){
 	T * val = dt;

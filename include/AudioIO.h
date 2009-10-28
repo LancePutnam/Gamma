@@ -218,8 +218,8 @@ private:
 
 // Implementation_______________________________________________________________
 
-inline void AudioIOData::zeroAux(){ mem::zero(mBufA, framesPerBuffer() * mNumA); }
-inline void AudioIOData::zeroOut(){ mem::zero(mBufO, outChans() * framesPerBuffer()); }
+inline void AudioIOData::zeroAux(){ mem::deepZero(mBufA, framesPerBuffer() * mNumA); }
+inline void AudioIOData::zeroOut(){ mem::deepZero(mBufO, outChans() * framesPerBuffer()); }
 
 inline float *       AudioIOData::aux(uint32_t num){ return mBufA + num * framesPerBuffer(); }
 inline const float * AudioIOData::in (uint32_t chn){ return mBufI + chn * framesPerBuffer(); }

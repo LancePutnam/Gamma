@@ -11,7 +11,7 @@
 #include "mem.h"
 #include "tbl.h"
 
-#include "MacroD.h"
+#define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
 
 namespace gam{
 namespace arr{
@@ -19,7 +19,7 @@ namespace arr{
 void linToDB(float * arr, uint32_t len, float minDB){
 	float normFactor = 20.f / minDB;
 	
-	LOOP(len,
+	LOOP(len,1){
 		uint32_t * arrI = (uint32_t *)arr;
 		uint32_t sign = (*arrI) & MaskSign<float>();
 		
@@ -34,16 +34,28 @@ void linToDB(float * arr, uint32_t len, float minDB){
 			*arr++ = val;
 			*arrI |= sign;
 		}
-	)
+	}
 }
 
 //inline T scl::linToDB(T v){ return (T)log10(v) * (T)20; }
 //inline T scl::dBToLin(T v){ return pow(10., v * 0.05); }
 
+void clip1(float * arr, uint32_t len, uint32_t str){
+	//uint32_t * arrUI = (uint32_t *)arr;
+	LOOP(len, str){
+		uint32_t val = punFU(arr[i]);
+		uint32_t sign = val & MaskSign<float>();
+		val &= 0x7fffffff;	// mask off the sign to catch infs and NaNs
+		uint32_t above = (val + 0x00800000) >> 30;
+		if(above) val = Expo1<float>();
+		arr[i] = punUF(val | sign);
+	}
+}
+
 void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 
 	if(chunkSize < 2){
-		mem::copy(dst, src, len);
+		mem::deepCopy(dst, src, len);
 		return;
 	}
 	else if(chunkSize > len){
@@ -116,11 +128,11 @@ void hps(float * dst, const float * src, uint32_t len, uint32_t downSample){
 uint32_t zeroCross(const float * src, uint32_t len, float prevVal){
 	uint32_t count = 0;
 	float prev = prevVal;
-	LOOP(len,
+	LOOP(len,1){
 		float curr = *src++;
 		if((curr > 0.f && prev <= 0.f) || (curr < 0.f && prev >= 0.f)) count++;
 		prev = curr;
-	)
+	}
 	return count;
 }
 
@@ -144,7 +156,7 @@ uint32_t zeroCrossN(const float * src, uint32_t len, float prevVal){
 	uint32_t * srcI = (uint32_t *)src;
 	uint32_t prev = *(uint32_t *)(&prevVal);
 
-	LOOP(len,
+	LOOP(len,1){
 		uint32_t now = *srcI++;
 
 		//if((now > 0) && (prev <= 0))		count++;
@@ -155,7 +167,7 @@ uint32_t zeroCrossN(const float * src, uint32_t len, float prevVal){
 		count += ((now & ~prev)>>31);
 
 		prev = now;
-	)
+	}
 
 	return count;
 }
@@ -187,11 +199,11 @@ void magFrqToPolar(float * frq, float * phsAccum, uint32_t len, float factorUnwr
 //		expPhaseDiff += fundRadians;
 //	)
 	
-	LOOP(len,
+	LOOP(len,1){
 		float phaseNew = *phsAccum + *frq * factorUnwrap;
 		phaseNew = scl::wrapPhase(phaseNew);		// wrap to [-pi, pi) to retain precision
 		*frq++ = *phsAccum++ = phaseNew;
-	)
+	}
 	
 }
 
@@ -208,7 +220,7 @@ void polarToMagFrq(float * p0, float * p1, uint32_t len, float factorWrap, float
 	float binFreq = fundFreq;			// center frequency of bin
 	float expPhaseDiff = fundRadians;	// expected phase difference based on bin number
 	
-	LOOP(len,
+	LOOP(len,1){
 				
 		// Wrap phase difference into range [-pi, pi)		
 		float dp = scl::wrapPhase(*p0 - *p1 - expPhaseDiff);	// SB
@@ -219,7 +231,7 @@ void polarToMagFrq(float * p0, float * p1, uint32_t len, float factorWrap, float
 		
 		binFreq += fundFreq;
 		expPhaseDiff += fundRadians;
-	)
+	}
 }
 
 //TEM void phaseToFreq(T * p0, T * p1, uint32_t len, T ups){
@@ -232,12 +244,12 @@ void polarToMagFrq(float * p0, float * p1, uint32_t len, float factorWrap, float
 //}
 
 void polarToRect(float * mag, float * phs, uint32_t len){
-	LOOP_P(len,
+	LOOP(len,1){
 		float m = *mag;
 		float p = *phs;
 		*mag++ = m * cos(p);
 		*phs++ = m * sin(p);
-	)
+	}
 }
 
 
@@ -249,7 +261,7 @@ void polarToRectFast(float * magA, float * phsA, uint32_t len){
 	uint32_t oneIndex = sinLUT->oneIndex();
 	float * sinTable = sinLUT->elems();
 
-	LOOP(len,
+	LOOP(len,1){
 		float mag = *magA;
 		float phs = *phsA;
 		
@@ -276,18 +288,18 @@ void polarToRectFast(float * magA, float * phsA, uint32_t len){
 		
 		*magA++ = mag * cs;
 		*phsA++ = mag * sn;
-	)
+	}
 }
 
 
-void rectToPolar(float * r, float * i, uint32_t len){
-	LOOP_P(len, scl::rectToPolar(*r, *i); r++; i++; )
+void rectToPolar(float * re, float * im, uint32_t len, uint32_t str){
+	LOOP(len,str){ scl::rectToPolar(re[i], im[i]); }
 }
 
 
 void rectToPolarFast(float * realA, float * imagA, uint32_t len){
 	
-	LOOP(len, 
+	LOOP(len, 1){
 		float real = *realA;
 		float imag = *imagA;
 
@@ -329,8 +341,7 @@ void rectToPolarFast(float * realA, float * imagA, uint32_t len){
 		
 		*realA++ = real;
 		*imagA++ = imag;
-		
-	)
+	}
 }
 
 
@@ -359,24 +370,9 @@ void conversionInit(){
 	}
 }
 
-
-void print(const float * src, uint32_t len){
-	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f\n", (int)i, *src++);
-}
-
-void print(const float * src1, const float * src2, uint32_t len){
-	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f % f\n", (int)i, *src1++, *src2++);
-}
-
-void printHex(const float * src, uint32_t len){
-	for(uint32_t i=0; i<len; i++){
-		float v = *src++;
-		printf("[%4d] % 5.3f %8lx\n", (int)i, v, (unsigned long)*(uint32_t *)&v);
-	}
-}
-
 } // arr::
 } // gam::
 
-#include "MacroU.h"
+#undef LOOP
+//#include "MacroU.h"
 

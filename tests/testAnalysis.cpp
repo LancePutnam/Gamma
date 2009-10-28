@@ -2,7 +2,9 @@
 #include <string.h>
 
 #include "arr.h"
+#include "gen.h"
 #include "tbl.h"
+#include "Access.h"
 #include "Visual.h"
 
 using namespace gam;
@@ -14,11 +16,11 @@ int main(int argc, char* argv[]){
 	float table[size];
 	//uint32_t indices[size];
 
-	tbl::sinusoid(table, size, 0.f, 2.f); arr::add(table, val(1), Loop(size));
+	tbl::sinusoid(table, size, 0.f, 2.f);
+	slice(table, size) += val(1);
 	//arr::lineSlope1(table, size); arr::add(table, size, -8.f);
 	//arr::mul(table, size, 0.9999f);
-	//mem::set(table, val(1), Loop(size));
-	mem::set(table, rAdd(1./size, 0.), size);
+	slice(table, size) = rAdd(1./size, 0.);
 	
 	// print out function
 	for(uint32_t i=0; i<size; i++){
@@ -48,7 +50,7 @@ int main(int argc, char* argv[]){
 	printf("Max:               [%2d] %f\n", featureI, table[featureI]);
 
 	uint32_t peaks[size>>1];
-	featureI = arr::maxima(table, size, peaks);
+	featureI = arr::maxima(peaks, table, size);
 	printf("Maxima (%d):\n", featureI);
 	for(unsigned long i=0; i<featureI; i++) printf("\t[%2d] %f\n", peaks[i], table[peaks[i]]);
 

@@ -9,8 +9,9 @@
 #include <stdlib.h>
 
 #include "Access.h"
-#include "MacroD.h"
 
+#define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
+#define TEM template <class T>
 #define TEM2 template <class T1, class T2>
 
 namespace gam{
@@ -26,11 +27,6 @@ namespace mem{
 
 /// Copies every 'chunkSize'th element to 'dst'; akin to downsampling.
 TEM void compact(T * dst, const T * src, uint32_t len, uint32_t chunkSize);
-
-TEM2 void cast(T1 * dst, const T2 * src, uint32_t len);
-
-/// Copy elements from src to dst.
-TEM void copy(T * dst, const T * src, uint32_t len);
 
 //////
 ////// Ring buffer copying functions.
@@ -56,6 +52,20 @@ TEM void copyFromRing(const T * ring, uint32_t ringSize, uint32_t ringTap, T * d
 /// @param[in] dst			destination array (size must at least match ring size)
 TEM void copyAllFromRing(const T * ring, uint32_t ringSize, uint32_t ringTap, T * dst);
 
+/// Copy source 'src' array bytes to destination 'dst'.
+TEM void deepCopy(T * dst, const T * src, uint32_t len){ memcpy(dst, src, len*sizeof(T)); }
+
+/// Returns whether array bytes are equal (==).
+TEM bool deepEqual(const T * src1, const T * src2, uint32_t len){
+	return 0 == memcmp(src1, src2, len*sizeof(T));
+}
+
+/// Set elements' bytes to zero.
+TEM void deepZero(T * arr, uint32_t len){ memset(arr, 0, len*sizeof(T)); }
+
+/// Move source 'src' array bytes to destination 'dst'. Arrays can overlap.
+TEM void deepMove(T * dst, const T * src, uint32_t len){ memmove(dst, src, len*sizeof(T)); }
+
 /// Deinterleave an array of elements with any number of channels.
 
 /// numFrames = length / numChannels
@@ -67,15 +77,6 @@ TEM void deinterleave(T * dst, const T * src, uint32_t numFrames, uint32_t numCh
 /// numFrames = length / numChannels \n
 /// Example: abababab -> aaaabbbb
 TEM void deinterleave2(T * dst, const T * src, uint32_t numFrames);
-
-/// Returns whether arrays are element-wise equal (==).
-TEM bool equal(const T * src1, const T * src2, uint32_t len);
-
-template <class Ti0, class Ti1>
-bool equal(Ti0& i0, const Ti1& i1, const Indexer& ind){
-	LOOP_IND(if(i0[i] != i1[i]) return false; ) return true;
-}
-
 
 /// Expands elements from 'src' to 'dst'.
 
@@ -91,11 +92,11 @@ TEM void expand(T * dst, const T * src, uint32_t lenSrc, uint32_t amount);
 /// class-type objects.
 TEM void free(T *& ptr);
 
-/// Finds index of first element in 'src' equal to 'element'.
+/// Finds index 'ind' of first element in 'src' equal to 'elem'.
 
 /// Returns whether a match was found.
 ///
-TEM bool indexOf(const T * src, uint32_t len, const T& element, uint32_t& index);
+TEM bool indexOf(const T& elem, uint32_t& ind, const T * src, uint32_t len, uint32_t str=1);
 
 /// Interleave an array of elements with any number of channels.
 
@@ -117,21 +118,6 @@ TEM void interleave2(T * dst, const T * src, uint32_t numFrames);
 /// @param[in]	offset	Offset of spacing from start of array.
 TEM void keep(T * arr, uint32_t len, uint32_t stride, uint32_t offset=0);
 
-/// Mirror right half of array to left half.
-
-/// The first len/2 elements will be overwritten. \n
-/// Example: ....1234 -> 43211234
-TEM void mirrorL(T * arr, uint32_t len);
-
-/// Mirror left half of array to right half.
-
-/// The last len/2 elements will be overwritten. \n
-/// Example: 1234.... -> 12344321
-TEM void mirrorR(T * arr, uint32_t len);
-
-/// Moves elements from one array to another.  Arrays can overlap.
-TEM void move(T * dst, const T * src, uint32_t len);
-
 /// Perform kth permutation on array.
 
 ///	The length of the array must be <= 20.
@@ -139,20 +125,34 @@ TEM void move(T * dst, const T * src, uint32_t len);
 TEM void permute(T * arr, uint32_t len, uint64_t k);
 
 /// Pivot elements around 'index' element.
-TEM void pivot(T * arr, uint32_t len, uint32_t index);
+TEM void pivot(uint32_t index, T * arr, uint32_t len);
+
+/// Reflect right half of array to left half.
+
+/// The first len/2 elements will be overwritten. \n
+/// Example: ....1234 -> 43211234
+TEM void reflectLeft(T * arr, uint32_t len, uint32_t str=1);
+
+/// Reflect left half of array to right half.
+
+/// The last len/2 elements will be overwritten. \n
+/// Example: 1234.... -> 12344321
+TEM void reflectRight(T * arr, uint32_t len, uint32_t str=1);
 
 /// Repeats first 'chunkSize' elements until end of array.
 
 /// Example: 1234.... -> 12341234
 ///
-TEM void repeat(T * arr, uint32_t len, uint32_t chunkSize);
+TEM void repeat(uint32_t chunkSize, T * arr, uint32_t len);
 
-TEM void replace(T * arr, uint32_t len, const T & val, const T & with){
-	LOOP(len, if(arr[i] == val) arr[i] = with; )
+/// Replace instances of one element with another
+TEM void replace(const T& val, const T& with, T * arr, uint32_t len, uint32_t str=1){
+	LOOP(len,str){ if(arr[i] == val) arr[i] = with; }
 }
 
-TEM void replace(T * arr, uint32_t len, const T * val, const T * with, uint32_t num){
-	LOOP(num, replace(arr, len, val[i], with[i]); )
+/// Replace multiple instances of one element with another
+TEM void replace(const T * val, const T * with, uint32_t num, T * arr, uint32_t len, uint32_t str=1){
+	LOOP(num,1){ replace(val[i], with[i], arr, len,str); }
 }
 
 /// Resizes array.  Returns true if resized, false otherwise.
@@ -165,34 +165,34 @@ TEM bool resize(T *& arr, uint32_t sizeNow, uint32_t sizeNew);
 
 ///	Example: 1234 -> 4321
 ///
-TEM void reverse(T * arr, uint32_t len);
+TEM void reverse(T * arr, uint32_t len, uint32_t str=1);
 
 /// Reverse every two elements.
 
 /// Example: 1234 -> 2143
 ///
-TEM void reverse2(T * arr, uint32_t len);
+TEM void reverse2(T * arr, uint32_t len, uint32_t str=1);
 
 /// Rotate elements half the length of the array.
 
 /// Works only for even length arrays.
 ///
-TEM void rotateH(T * arr, uint32_t len);
+TEM void rotateHalf(T * arr, uint32_t len, uint32_t str=1);
 
 /// Rotate elements left by 1.
 
 /// Example: 1234 -> 2341
 ///
-TEM void rotateL1(T * arr, uint32_t len);
+TEM void rotateLeft1(T * arr, uint32_t len, uint32_t str=1);
 
 /// Rotate elements left by 'order' elements.
-TEM void rotateL(T * arr, uint32_t len, uint32_t order);
+TEM void rotateLeft(uint32_t order, T * arr, uint32_t len);
 
 /// Rotate elements right by 1.
 
 /// Example: 1234 -> 4123
 ///
-TEM void rotateR1(T * arr, uint32_t len);
+TEM void rotateRight1(T * arr, uint32_t len, uint32_t str=1);
 
 /// Copies elements from 'src' to fractionally strided locations in 'dst'. 
 
@@ -209,21 +209,6 @@ TEM void scale(T * dst, const T * src, uint32_t lenSrc, float stride);
 /// Ex.: 12345678 -> 12.34.56 (amount = 1.5) \n
 /// Ex.: 1234 -> 1..2 (amount = 3)
 TEM void scaleCrop(T * dst, const T * src, uint32_t len, float stride);
-
-/// Set all values in array to specified value.
-TEM void set(T * dst, uint32_t len, const T& value, uint32_t stride=1){
-	for(uint32_t i=0; i<len; i+=stride) dst[i] = value;
-}
-//TEM void set(T * dst, uint32_t len, const T& value, uint32_t stride=1);
-//TEM void set(T * dst, uint32_t len, const T& value, uint32_t stride, uint32_t offset);
-
-
-/// o0[i] = i0[i]
-template <class To0, class Ti0>
-To0& set(To0& o0, const Ti0& i0, const Indexer& ind){
-	LOOP_IND(o0[i] = i0[i];) return o0;
-}
-
 
 /// Stretches array by duplicating every element 'amount' times.
 
@@ -249,8 +234,11 @@ TEM void swap(T * arr1, T * arr2, uint32_t len);
 ///
 TEM void transpose2(T * arr, uint32_t len);
 
-/// Sets elements' bytes to zero.
-TEM inline void zero(T * arr, uint len){ memset(arr, 0, len * sizeof(T)); }
+/// Sets elements' to zero.
+TEM inline void zero(T * arr, uint32_t len, uint32_t str=1){
+	LOOP(len,str){ arr[i]=T(0); }
+}
+
 //TEM inline void zero(T * arr, unsigned int len){ zero(arr, (uint)len); }
 //
 //template <class To0> void zero(To0& o0){ zero(&o0[0], (uint)o0.size()); }
@@ -273,22 +261,12 @@ TEM T at(const T * src, uint32_t fbits, uint32_t phase);
 ///	'phase':	fixed-point phase of lookup (full period is [0, 2^32))	
 TEM void put(T * dst, uint32_t fbits, uint32_t phase, T value);
 
-TEM void print(const T * src, uint32_t len, const char * format);
-
-/// Print values in array from index table.
-TEM void print(const T * src, const uint32_t * indices, uint32_t indicesLen, const char * format);
-
 
 
 // Implementation_______________________________________________________________
 
-
-TEM2 inline void cast(T1 * dst, const T2 * src, uint32_t len){
-	LOOP_P(len, *dst++ = (T1)*src++; )
-}
-
 TEM inline void compact(T * dst, const T * src, uint32_t len, uint32_t chunkSize){
-	if(chunkSize < 2){			copy(dst, src, len); return;	}
+	if(chunkSize < 2){			deepCopy(dst, src, len); return;	}
 	else if(chunkSize > len){	*dst = *src; return; }
 	
 	for(uint32_t i=0; i<len; i+=chunkSize){
@@ -296,15 +274,11 @@ TEM inline void compact(T * dst, const T * src, uint32_t len, uint32_t chunkSize
 	}
 }
 
-TEM inline void copy(T * dst, const T * src, uint32_t len){
-	memcpy(dst, src, len * sizeof(T));
-}
-
 TEM void copy(T * dst, const T * src, const uint32_t * indices, uint32_t numIndices){
-	LOOP(numIndices,
+	LOOP(numIndices,1){
 		uint32_t index = *indices++;
 		dst[index] = src[index];
-	)
+	}
 }
 
 TEM uint32_t copyToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len){
@@ -312,13 +286,13 @@ TEM uint32_t copyToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T *
 	uint32_t endTap = ringTap + len;
 
 	if(endTap <= ringSize){		// haven't gone past end
-		copy(ring + ringTap, src, len);
+		deepCopy(ring + ringTap, src, len);
 	}
 	else{						// have gone past end, do wrapped copy
 		uint32_t under	= ringSize - ringTap;
 		uint32_t over	= endTap - ringSize;
-		copy(ring + ringTap, src, under);
-		copy(ring, src + under, over);
+		deepCopy(ring + ringTap, src, under);
+		deepCopy(ring, src + under, over);
 	}
 
 	return endTap;
@@ -329,38 +303,33 @@ TEM void copyFromRing(const T * ring, uint32_t ringSize, uint32_t ringTap, T * d
 	uint32_t endTap = ringTap + len;
 
 	if(endTap <= ringSize){
-		copy(dst, ring + ringTap, len);
+		deepCopy(dst, ring + ringTap, len);
 	}
 	else{
 		uint32_t under	= ringSize - ringTap;
 		uint32_t over	= endTap - ringSize;
-		copy(dst, ring + ringTap, under);
-		copy(dst + under, ring, over);
+		deepCopy(dst, ring + ringTap, under);
+		deepCopy(dst + under, ring, over);
 	}
 
 }
 
 TEM inline void copyAllFromRing(const T * ring, uint32_t ringSize, uint32_t ringTap, T * dst){
 	uint32_t under = ringSize - ringTap;
-	copy(dst, ring + ringTap, under);
-	copy(dst + under, ring, ringTap);
-}
-
-TEM inline bool equal(const T * src1, const T * src2, uint32_t len){
-	//LOOP(len, if(src1[i] != src2[i]) return false; ) return true;
-	return 0 == memcmp(src1, src2, len * sizeof(T));
+	deepCopy(dst, ring + ringTap, under);
+	deepCopy(dst + under, ring, ringTap);
 }
 
 TEM inline void expand(T * dst, const T * src, uint32_t lenSrc, uint32_t amount){	
-	LOOP(lenSrc, *dst = *src++; dst += amount; )
+	LOOP(lenSrc,1){ *dst = *src++; dst += amount; }
 }
 
 TEM inline void free(T *& ptr){
 	if(ptr){ ::free(ptr); ptr=0; }
 }
 
-TEM inline bool indexOf(const T * src, uint32_t len, const T& element, uint32_t& index){	
-	LOOP(len, if(src[i] == element){ index = i; return true; })
+TEM inline bool indexOf(const T& v, uint32_t& ind, const T * src, uint32_t len, uint32_t str){	
+	LOOP(len,str){ if(src[i] == v){ ind=i; return true; } }
 	return false;
 }
 
@@ -372,25 +341,11 @@ TEM inline bool indexOf(const T * src, uint32_t len, const T& element, uint32_t&
 
 TEM inline void keep(T * arr, uint32_t len, uint32_t stride, uint32_t offset){	
 	uint32_t c = offset % stride;
-	LOOP_P(len,		
+	LOOP(len,1){
 		if(0 == c){	arr++; c = stride; }
 		else		*arr++ = (T)0;
 		--c;
-	)
-}
-
-TEM inline void mirrorL(T * arr, uint32_t len){
-	T * end = arr + len;
-	LOOP(len>>1, *arr++ = *--end;)
-}
-
-TEM inline void mirrorR(T * arr, uint32_t len){
-	T * end = arr + len;
-	LOOP(len>>1, *--end = *arr++;)
-}	
-
-TEM inline void move(T * dst, const T * src, uint32_t len){
-	memmove(dst, src, len * sizeof(T));
+	}
 }
 
 TEM void permute(T * arr, uint32_t len, uint64_t k) {
@@ -402,29 +357,43 @@ TEM void permute(T * arr, uint32_t len, uint64_t k) {
      }
 }
 
-TEM inline void pivot(T * arr, uint32_t len, uint32_t index){
+TEM inline void pivot(uint32_t index, T * arr, uint32_t len){
 	
 	uint32_t lt = index - 1;
 	uint32_t rt = index + 1;
 	
-	LOOP((len-1)>>1,
+	LOOP((len-1)>>1,1){
 		if(lt >= len) lt = len - 1;
 		if(rt >= len) rt = 0;
 		swap(arr[lt], arr[rt]);
 		lt--;
 		rt++;
-	)
+	}
 }
 
-TEM inline void repeat(T * arr, uint32_t len, uint32_t chunkSize){
+TEM inline void reflectLeft(T * arr, uint32_t len, uint32_t str){	
+	uint32_t end = indexLast(len,str);
+	LOOP(len>>1, str){
+		arr[i] = arr[end-i];
+	}
+}
+
+TEM inline void reflectRight(T * arr, uint32_t len, uint32_t str){
+	uint32_t end = indexLast(len,str);
+	LOOP(len>>1, str){
+		arr[end-i] = arr[i];
+	}	
+}	
+
+TEM inline void repeat(uint32_t chunkSize, T * arr, uint32_t len){
 	uint32_t rd = 0;
 	uint32_t wr = chunkSize;
-	LOOP(len - chunkSize,
+	LOOP(len - chunkSize, 1){
 		if(rd == chunkSize) rd = 0;
 		arr[wr] = arr[rd];
 		wr++;
 		rd++;
-	)
+	}
 }
 
 /*	void * realloc(void *ptr, size_t size);
@@ -445,45 +414,21 @@ TEM bool resize(T *& arr, uint32_t sizeNow, uint32_t sizeNew){
 	return false;
 }
 
-TEM inline void reverse(T * arr, uint32_t len){
-	T * end = arr + len;
-	LOOP(len>>1,
-		T temp = *arr;
-		*arr++ = *--end;
-		*end = temp;
-	)
+TEM inline void reverse(T * arr, uint32_t len, uint32_t str){
+	uint32_t end = indexLast(len,str);
+	LOOP(len>>1, str){ swap(arr[i], arr[end-i]); }
 }
 
-TEM inline void reverse2(T * arr, uint32_t len){
-	T * next = arr + 1;
-	LOOP(len >> 1,
-		T temp = *arr;
-		*arr = *next;
-		*next = temp;
-		arr += 2;
-		next += 2;
-	)
+TEM inline void reverse2(T * arr, uint32_t len, uint32_t str){	
+	LOOP(len, 2){ swap(arr[i], arr[i+1]); }
 }
 
-TEM inline void rotateH(T * arr, uint32_t len){
-	T * next = arr + (len>>1);
-	LOOP(len>>1,
-		T temp = *arr;
-		*arr++ = *next;
-		*next++ = temp;
-	)
+TEM inline void rotateHalf(T * arr, uint32_t len, uint32_t str){	
+	T * half = arr + (((len>>1)/str)*str);
+	LOOP(len>>1, str){ swap(arr[i], half[i]); }
 }
 
-TEM inline void rotateL1(T * arr, uint32_t len){
-	T * next = arr + len - 1;
-	LOOP(len - 1,
-		T temp = *arr;
-		*arr = *next;
-		*next-- = temp; 
-	)
-}
-
-TEM void rotateL(T * arr, uint32_t len, uint32_t order){
+TEM void rotateLeft(uint32_t order, T * arr, uint32_t len){
 	
 	order %= len;
 
@@ -494,22 +439,24 @@ TEM void rotateL(T * arr, uint32_t len, uint32_t order){
 	uint32_t rt = (order + 1)>>1;
 	uint32_t lt = rt - 1 - (order & 1);
 	
-	LOOP(numSwaps,
+	LOOP(numSwaps, 1){
 		if(lt >= len) lt = len - 1;
 		if(rt >= len) rt = 0;
 		swap(arr[lt--], arr[rt++]);
-	)
+	}
 	
 	reverse(arr, len);
 }
 
-TEM inline void rotateR1(T * arr, uint32_t len){
-	T * next = arr + 1;
-	LOOP(len - 1,
-		T temp = *arr;
-		*arr = *next;
-		*next++ = temp;
-	)
+TEM inline void rotateLeft1(T * arr, uint32_t len, uint32_t str){
+	LOOP(len-str, str){	swap(arr[i], arr[i+str]); }
+}
+
+TEM inline void rotateRight1(T * arr, uint32_t len, uint32_t str){
+	uint32_t end = indexLast(len,str);
+	for(uint32_t i=end; i>=str; i-=str){
+		swap(arr[i], arr[i-str]);
+	}
 }
 
 TEM inline void scale(T * dst, const T * src, uint32_t lenSrc, float amount){
@@ -517,11 +464,11 @@ TEM inline void scale(T * dst, const T * src, uint32_t lenSrc, float amount){
 	float dstIndex = 0.5f;							// add offset to round
 	lenSrc--;
 
-	LOOP_P(lenSrc,
+	LOOP(lenSrc, 1){
 		dstIndex += amount;
 		dst[(uint32_t)dstIndex] = *src++;
 		//printf("%d\n", (uint32_t)dstIndex);
-	)
+	}
 }
 
 TEM inline void scaleCrop(T * dst, const T * src, uint32_t len, float amount){
@@ -531,15 +478,6 @@ TEM inline void scaleCrop(T * dst, const T * src, uint32_t len, float amount){
 	scale(dst, src, len, amount);
 }
 
-//TEM inline void set(T * dst, uint32_t len, const T & value, uint32_t stride){
-//	LOOP_S(len, stride, dst[i] = value;)
-//}
-//
-//TEM inline void set(T * dst, uint32_t len, const T & value, uint32_t stride, uint32_t offset){
-//	offset %= stride;
-//	set(dst + offset, len - offset, value, stride);
-//}
-
 TEM inline void stretch(T * arr, uint32_t len, uint32_t amount){
 
 	T * end = arr + len;
@@ -547,27 +485,27 @@ TEM inline void stretch(T * arr, uint32_t len, uint32_t amount){
 	len /= amount;
 	arr += len;
 
-	LOOP(len,
+	LOOP(len, 1){
 		end -= amount;
-		set(end, val(*--arr), amount);
-	)
+		T v = *--arr;
+		for(uint32_t k=0; k<amount; ++k) end[k]=v;
+	}
 }
 
 TEM inline void stretch(T * dst, const T * src, uint32_t lenSrc, uint32_t amount){
-	LOOP(lenSrc,
-		set(dst, val(*src++), amount);
+	LOOP(lenSrc, 1){
+		T v = *src++;
+		for(uint32_t k=0; k<amount; ++k) dst[k]=v;
 		dst += amount;
-	)
+	}
 }
 
-TEM inline void swap(T & elem1, T & elem2){
-	T temp = elem1;
-	elem1 = elem2;
-	elem2 = temp;
+TEM inline void swap(T& a, T& b){
+	T t=a; a=b; b=t;
 }
 
 TEM inline void swap(T * arr1, T * arr2, uint32_t len){
-	LOOP(len, swap(arr1[i], arr2[i]); )
+	LOOP(len,1){ swap(arr1[i], arr2[i]); }
 }
 
 TEM inline void transpose2(T * arr, uint32_t len){
@@ -587,10 +525,10 @@ TEM inline void deinterleave(T * dst, const T * src, uint32_t numFrames, uint32_
 
 TEM inline void deinterleave2(T * dst, const T * src, uint32_t numFrames){	
 	T * dst2 = dst + numFrames;
-	LOOP(numFrames,
+	LOOP(numFrames, 1){
 		*dst2++ = *src++;
 		*dst++  = *src++;
-	)
+	}
 }
 
 TEM inline void interleave(T * dst, const T * src, uint32_t numFrames, uint32_t numChannels){
@@ -604,10 +542,10 @@ TEM inline void interleave(T * dst, const T * src, uint32_t numFrames, uint32_t 
 
 TEM inline void interleave2(T * dst, const T * src, uint32_t numFrames){	
 	const T * src2 = src + numFrames;
-	LOOP(numFrames,
+	LOOP(numFrames, 1){
 		*dst++ = *src2++;
 		*dst++ = *src++;
-	)
+	}
 }
 
 TEM inline T at(const T * src, uint32_t fbits, uint32_t phase){
@@ -616,23 +554,6 @@ TEM inline T at(const T * src, uint32_t fbits, uint32_t phase){
 
 TEM inline void put(T * dst, uint32_t fbits, uint32_t phase, T value){
 	dst[phase >> fbits] = value;
-}
-
-TEM void print(const T * src, uint32_t len, const char * format){
-	LOOP(len, 
-		printf("[%4lu]\t", i);
-		printf(format, *src++);
-		printf("\n");
-	)
-}
-
-TEM void print(const T * src, const uint32_t * indices, uint32_t indicesLen, const char * format){
-	for(uint32_t i=0; i<indicesLen; i++){
-		uint32_t index = *indices++;
-		printf("[%4d]\t", index);
-		printf(format, src[index]);
-		printf("\n");
-	}
 }
 
 /// Duplicates strided elements in array
@@ -646,70 +567,11 @@ inline void arrayStridedDup(float * dst, const float * src, uint32_t numFrames, 
 	}
 }
 
-
-
-// 0-to-1 function call
-template <class Tf, class Tv>
-void call(Tf & f, Tv * o0, int len){
-	for(int i=0; i<len; ++i) o0[i] = (Tv)f();
-}
-
-// 1-to-1 function call
-template <class Tf, class Tv>
-void call(Tf & f, Tv * o0, const Tv * i0, int len){
-	for(int i=0; i<len; ++i) o0[i] = (Tv)f(i0[i]);
-}
-
-//template <class Tf>
-//void many(float * o0, float * i0, int n){
-//	for(int i=0; i<n; ++i) o0[i] = Tf(i0[i]);
-//}
-
-//template <class Tf, class Tv>
-//Tv call(Tf & f, Tv v){
-//	return (Tv)f(v);
-//}
-
-
-//for(int i=0; i<len; ++i){
-//	o0[i] = f.f(f(i0[i]));
-//}
-
-template<class Tf>
-struct function{
-	template <class Tv>
-	Tv operator()(Tv v){ return Tf(v); }
-};
-
-
-//struct many{
-//	template <class Tf>
-//	void operator() (Tf & f, float * o0, float * i0, int n){
-//		for(int i=0; i<n; ++i) o0[i] = f(i0[i]);
-//	}
-//};
-
-
-//template <class F, class Tv>
-//void many(Tv * o0, Tv * i0, int n){
-//	for(int i=0; i<n; ++i) o0[i] = (Tv)F(i0[i]);
-//}
-
-//Functor{
-//	T operator()(){ return x; }
-//}
-//
-//Functor f;
-//float * buf;
-//MemOp::call(f, buf, N);
-
-
 } // mem::
 } // gam::
 
-#include "MacroU.h"
-
-#undef TEM2
+#undef LOOP
+#undef TEM
 #undef SWAP
 
 #endif

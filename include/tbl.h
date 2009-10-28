@@ -245,7 +245,7 @@ TEM void impulseSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 	}
 	
 	// Extrapolate remaining from [db] symmetry
-	mem::mirrorR(dst + 1, len - 1);
+	mem::reflectRight(dst + 1, len - 1);
 }
 
 TEM void sawSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
@@ -301,7 +301,7 @@ TEM void squareSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 	}
 
 	// Extrapolate remaining from [dbqp] symmetry	
-	mem::mirrorR(dst, (len >> 1) - 1);
+	mem::reflectRight(dst, (len >> 1) - 1);
 	arr::mirror_dq(--dst, len);
 }
 
@@ -336,7 +336,7 @@ TEM void triangleSum(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 	}
 
 	// Extrapolate remaining from [dbqp] symmetry	
-	mem::mirrorR(dst, (len >> 1) - 1);
+	mem::reflectRight(dst, (len >> 1) - 1);
 	arr::mirror_dq(--dst, len);
 }
 
@@ -359,7 +359,7 @@ TEM void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uin
 	
 		T * dstPrev = dst;
 		dst -= len;
-		mem::copy(dst, dstPrev, len);
+		mem::deepCopy(dst, dstPrev, len);
 		func(dst, len, hrmLo, hrmHi);
 	
 		hrmLo = hrmHi + 1;
