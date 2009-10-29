@@ -53,56 +53,6 @@ TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * 
 /// Clip array values between [-1, 1].
 void clip1(float * arr, uint32_t len, uint32_t str=1);
 
-/// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
-void linToDB(float * arr, uint32_t len, float minDB);
-
-//	/// Applies mirror isometry sequence [dbqp] from first quarter of array.
-//	
-//	/// The sequence of mirror isometries are identity (d), reflection (b),
-//	/// glide reflection (q), and rotation (p). The array should hold the first
-//	/// len/4 + 1 elements of the signal.\n
-//	/// Ex.: [ 1, 2, 3, x, x, x, x, x] -> [ 1, 2, 3, 2, -1,-2,-3,-2]
-//	/// Ex.: [ 1, 2, x, x, x, x, x, x] -> [ 1, 2, 2, 1, -1,-2,-2,-1]
-//	TEM void mirror_dbqp(T * arr, uint32_t len);
-
-/// Applies mirror isometry sequence [dp] from first half of array.
-
-/// The sequence of mirror isometries are identity (d) and rotation (p).
-/// The first len/2 elements of the array are mirrored.\n
-/// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-4,-3,-2,-1]
-TEM void mirror_dp(T * arr, uint32_t len);
-
-/// Applies mirror isometry sequence [dq] from first half of array.
-
-/// The sequence of mirror isometries are identity (d) and glide relfection (q).
-/// The first len/2 elements of the array are mirrored.\n
-/// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-1,-2,-3,-4]
-TEM void mirror_dq(T * arr, uint32_t len);
-
-/// Multiply destination array by source array
-TEM void mul(T * dst, const T * src, uint32_t len, uint32_t str=1){
-	LOOP(len,str){ dst[i] *= src[i]; }
-}
-
-/// Multiply array by a Bartlett (triangle) window.
-
-/// Works only for even sized arrays.
-///
-TEM void mulBartlett(T * arr, uint32_t len);
-
-/// Multiply 'arr' by 'src' where 'src' is the first 'len'/2 + 1 elements
-/// of a symmetric window.
-TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
-
-/// Uniformly scale array values to fit in [-1, 1].
-
-/// Returns normalization factor.
-///
-TEM T normalize(T * arr, uint32_t len);
-
-TEM void overlapAdd(T * arr, const T * src, uint32_t len, uint32_t hop);
-
-
 /// Finds elements that are within a threshold of their nearest neighbors.
 
 /// @param[in]  src			Source array of elements
@@ -115,19 +65,13 @@ TEM void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T thre
 
 void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize);
 
-/// Returns dot-product of two arrays.
-TEM T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
-	T sum=T(0); LOOP(len, str){ sum += src1[i] * src2[i]; } return sum;
+/// Returns dot-product of two arrays
+TEM inline T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len, str){ r += src1[i]*src2[i]; } return r;
 }
 
 /// Returns dot-product of two arrays of length 4.
 TEM T dot4(const T * src1, const T * src2);
-
-/// Returns energy of array values.
-
-/// Energy is the sum of values squared.
-///
-TEM T energy(const T * src, uint32_t len);
 
 /// Get indices of min and max values.
 TEM void extrema(const T * src, uint32_t len, uint32_t& indexMin, uint32_t& indexMax);
@@ -138,12 +82,6 @@ TEM void extrema(const T * src, uint32_t len, uint32_t& indexMin, uint32_t& inde
 /// equation is y = inter + slope * i.
 template <class T1, class T2, class T3>
 void fitLine(const T1 * src, uint32_t len, T2& slope, T3& inter);
-
-/// Estimate the fundamental frequency of a spectrum using HPS.
-
-/// Returns index of detected fundamental.
-///
-uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSample=4);
 
 /// Compute histogram of 'src'.
 
@@ -157,11 +95,8 @@ void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts sca
 template <class Ts, class Tb>
 void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts scale, Ts offset);
 
-/// Computes harmonic product spectrum.
-
-/// 'downSample' specifies how many times to downsample and multiply
-///
-void hps(float * dst, const float * src, uint32_t len, uint32_t downSample);
+/// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
+void linToDB(float * arr, uint32_t len, float minDB);
 
 /// Returns index of maximum value.
 TEM uint32_t max(const T * src, uint32_t len, uint32_t str=1);
@@ -205,21 +140,49 @@ TEM uint32_t min(const T * src, uint32_t len);
 
 TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
 
-//
-///// Returns norm of array values.
-//
-///// The norm is the square root of energy.
-/////
-//TEM T norm(const T * src, uint32_t len);
-//
-///// Returns taxicab norm of array values (sum of absolute values).
-//TEM T normTaxi(const T * src, uint32_t len);
-//
-///// Returns unnormalized Nyquist value for use with DFT.
-//TEM T nyquist(const T * src, uint32_t len);
-//
-///// Returns root mean square- the normalized norm.
-//TEM T rms(const T * src, uint32_t len);
+//	/// Applies mirror isometry sequence [dbqp] from first quarter of array.
+//	
+//	/// The sequence of mirror isometries are identity (d), reflection (b),
+//	/// glide reflection (q), and rotation (p). The array should hold the first
+//	/// len/4 + 1 elements of the signal.\n
+//	/// Ex.: [ 1, 2, 3, x, x, x, x, x] -> [ 1, 2, 3, 2, -1,-2,-3,-2]
+//	/// Ex.: [ 1, 2, x, x, x, x, x, x] -> [ 1, 2, 2, 1, -1,-2,-2,-1]
+//	TEM void mirror_dbqp(T * arr, uint32_t len);
+
+/// Applies mirror isometry sequence [dp] from first half of array.
+
+/// The sequence of mirror isometries are identity (d) and rotation (p).
+/// The first len/2 elements of the array are mirrored.\n
+/// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-4,-3,-2,-1]
+TEM void mirror_dp(T * arr, uint32_t len);
+
+/// Applies mirror isometry sequence [dq] from first half of array.
+
+/// The sequence of mirror isometries are identity (d) and glide relfection (q).
+/// The first len/2 elements of the array are mirrored.\n
+/// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-1,-2,-3,-4]
+TEM void mirror_dq(T * arr, uint32_t len);
+
+/// Multiply destination array by source array
+TEM void mul(T * dst, const T * src, uint32_t len, uint32_t str=1){
+	LOOP(len,str){ dst[i] *= src[i]; }
+}
+
+/// Multiply array by a Bartlett (triangle) window.
+
+/// Works only for even sized arrays.
+///
+TEM void mulBartlett(T * arr, uint32_t len);
+
+/// Multiply 'arr' by 'src' where 'src' is the first 'len'/2 + 1 elements
+/// of a symmetric window.
+TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
+
+/// Uniformly scale array values to fit in [-1, 1].
+
+/// Returns the applied normalization multiplication factor.
+///
+TEM T normalize(T * arr, uint32_t len);
 
 /// Returns norm of array values.
 TEM inline T norm(const T * src, uint32_t len, uint32_t str=1){
@@ -235,6 +198,8 @@ TEM T normTaxi(const T * src, uint32_t len, uint32_t str=1){
 TEM inline T nyquist(const T * src, uint32_t len, uint32_t str=1){
 	T r=T(0); LOOP(len,(str<<1)){ r += src[i] - src[i+str]; } return r;
 }
+
+TEM void overlapAdd(T * arr, const T * src, uint32_t len, uint32_t hop);
 
 /// Returns root mean square- the normalized norm.
 TEM inline T rms(const T * src, uint32_t len, uint32_t str=1){
@@ -272,7 +237,7 @@ TEM inline T sum(const T * src, uint32_t len, uint32_t str=1){
 
 /// Returns sum of values squared
 TEM inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
-	T r=T(0); LOOP(len, str){ r += src[i] * src[i]; } return r;
+	return dot(src,src,len,str);
 }
 
 /// Variance (deviation from mean).
@@ -307,9 +272,7 @@ TEM uint32_t zeroCrossMax(const T * src, uint32_t len);
 uint32_t zeroCrossN(const float * src, uint32_t len, float prev);
 
 
-//
-// Conversion
-//
+
 
 /// Generates tables for fast conversion methods.
 void conversionInit();
@@ -361,6 +324,21 @@ void rectToPolar(float * real, float * imag, uint32_t len, uint32_t str=1);
 /// Call conversionInit() before using.
 ///
 void rectToPolarFast(float * real, float * imag, uint32_t len);
+
+
+//--- TODO: consider for removal or refactoring
+
+/// Estimate the fundamental frequency of a spectrum using HPS.
+
+/// Returns index of detected fundamental.
+///
+uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSample=4);
+
+/// Computes harmonic product spectrum.
+
+/// 'downSample' specifies how many times to downsample and multiply
+///
+void hps(float * dst, const float * src, uint32_t len, uint32_t downSample);
 
 
 namespace{
@@ -512,11 +490,8 @@ TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T thr
 	numIndices = newNumIndices;
 }
 
-TEM inline T dot4(const T * src1, const T * src2){
-	return	src1[0] * src2[0]
-		+	src1[1] * src2[1]
-		+	src1[2] * src2[2]
-		+	src1[3] * src2[3];
+TEM inline T dot4(const T * a, const T * b){
+	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 }
 
 TEM void extrema(const T * src, uint32_t len, uint32_t & indexMin, uint32_t & indexMax){

@@ -60,11 +60,11 @@ TEM bool deepEqual(const T * src1, const T * src2, uint32_t len){
 	return 0 == memcmp(src1, src2, len*sizeof(T));
 }
 
-/// Set elements' bytes to zero.
-TEM void deepZero(T * arr, uint32_t len){ memset(arr, 0, len*sizeof(T)); }
-
 /// Move source 'src' array bytes to destination 'dst'. Arrays can overlap.
 TEM void deepMove(T * dst, const T * src, uint32_t len){ memmove(dst, src, len*sizeof(T)); }
+
+/// Set elements' bytes to zero.
+TEM void deepZero(T * arr, uint32_t len){ memset(arr, 0, len*sizeof(T)); }
 
 /// Deinterleave an array of elements with any number of channels.
 
@@ -225,16 +225,13 @@ TEM void stretch(T * dst, const T * src, uint32_t lenSrc, uint32_t amount);
 /// Swaps two elements in memory.
 TEM void swap(T & elem1, T & elem2);
 
-/// Swap elements of two arrays.
-TEM void swap(T * arr1, T * arr2, uint32_t len);
-
 /// Transpose a 2 x (len/2) matrix.
 
 /// Example: 12121212 -> 11112222
 ///
 TEM void transpose2(T * arr, uint32_t len);
 
-/// Sets elements' to zero.
+/// Sets elements to zero
 TEM inline void zero(T * arr, uint32_t len, uint32_t str=1){
 	LOOP(len,str){ arr[i]=T(0); }
 }
@@ -502,10 +499,6 @@ TEM inline void stretch(T * dst, const T * src, uint32_t lenSrc, uint32_t amount
 
 TEM inline void swap(T& a, T& b){
 	T t=a; a=b; b=t;
-}
-
-TEM inline void swap(T * arr1, T * arr2, uint32_t len){
-	LOOP(len,1){ swap(arr1[i], arr2[i]); }
 }
 
 TEM inline void transpose2(T * arr, uint32_t len){

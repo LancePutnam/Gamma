@@ -409,19 +409,28 @@ class Slice{
 public:
 
 	/// @param[in] src	pointer to array elements
-	/// @param[in] len	total length of array
+	/// @param[in] len	size of parent array
 	/// @param[in] str	stride increment through array
-	Slice(T * src, uint32_t len, uint32_t str): a(src), n(len), s(str){}
+	Slice(T * src, uint32_t len, uint32_t str=1): a(src), n(len), s(str){}
 
 	#define DO for(uint32_t i=0; i<n; i+=s)
 
 	template <class Gen>
-	bool operator == (const Gen& g){ DO{ if(g() != a[i]) return false; } return true; }
-	bool operator == (const   T& v){ DO{ if(v   != a[i]) return false; } return true; }
+	bool operator == (const Gen& g) const { DO{ if(g() != a[i]) return false; } return true; }
+	bool operator == (const   T& v) const { DO{ if(v   != a[i]) return false; } return true; }
 
 	template <class Gen>
 	Slice& operator  = (const Gen& g){ DO{ a[i] =g(); } return *this; }
 	Slice& operator  = (const   T& v){ DO{ a[i] =v  ; } return *this; }
+	
+	/// Set elements from another slice.
+	
+	/// The number of elements copied will be the minimum of the two slices'
+	/// number of elements. Source elements are statically cast to the type of
+	/// the destination slice.
+	template <class Ts>
+	Slice& operator  = (const Slice<Ts>& src){ return equal(src); }
+	Slice& operator  = (const Slice& src){ return equal(src); }
 
 	template <class Gen>
 	Slice& operator += (const Gen& g){ DO{ a[i]+=g(); } return *this; }
@@ -433,9 +442,30 @@ public:
 	
 	#undef DO
 
+	T * elems() const { return a; }
+
+	/// Returns number elements in slice
+	uint32_t size() const { return n/s; }
+
+	/// Returns stride amount through parent array
+	uint32_t stride() const { return s; }
+
+	/// Returns number of elements in parent array
+	uint32_t supersize() const { return n; }
+
 protected:
 	T * a;
 	uint32_t n,s;
+	
+	template <class Ts>
+	Slice& equal(const Slice<Ts>& src){
+		uint32_t sd=size(), ss=src.size();
+		uint32_t m = sd<ss?sd:ss;
+		for(uint32_t id=0,is=0; id<m*stride(); id+=stride(), is+=src.stride()){
+			elems()[id] = T(src.elems()[is]);
+		}
+		return *this;
+	}
 };
 
 /// Slice object function

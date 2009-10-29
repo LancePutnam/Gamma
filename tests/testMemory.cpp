@@ -11,6 +11,7 @@
 #include "arr.h"
 #include "gen.h"
 #include "mem.h"
+#include "Access.h"
 
 //#define SET_M1 mem::set(arrE, val(-1), Loop(lenE)); mem::set(arrO, val(-1), Loop(lenO));
 //#define SET_LINE arr::lineSlope1(arrE, lenE); arr::lineSlope1(arrO, lenO);
@@ -36,6 +37,17 @@ int main(int argc, char* argv[]){
 	slice(T,N) = RAdd1<int>();
 	slice(A,N) = 0;
 	mem::deepCopy(A,T,N); ASSERT(A, 0,1,2,3,4,5,6,7)
+
+	slice(A,N) = slice(T,N) = RAdd1<int>();
+	assert(mem::deepEqual(A,T,N));
+
+	slice(T,N) = RAdd1<int>();
+	slice(A,N) = 0;
+	mem::deepMove(A,T,N); ASSERT(A, 0,1,2,3,4,5,6,7)
+	mem::deepMove(A,A+1,4); ASSERT(A, 1,2,3,4,4,5,6,7)
+
+	slice(A,N) = RAdd1<int>(1);
+	mem::deepZero(A,N); ASSERT(A, 0,0,0,0,0,0,0,0)
 
 	slice(A,N) = RAdd1<int>();
 	mem::pivot(3, A,N); ASSERT(A, 6,5,4,3,2,1,0,7)
@@ -85,6 +97,11 @@ int main(int argc, char* argv[]){
 	mem::rotateRight1(A,N,1); ASSERT(A, 7,0,1,2,3,4,5,6)
 	mem::rotateRight1(A,N,2); ASSERT(A, 5,0,7,2,1,4,3,6)
 
+	slice(A,N) = RAdd1<int>();
+	mem::zero(A,N,1); ASSERT(A, 0,0,0,0,0,0,0,0)
+	slice(A,N) = RAdd1<int>();
+	mem::zero(A,N,2); ASSERT(A, 0,1,0,3,0,5,0,7)
+
 //	int i=0;
 //
 //	const int lenE = 8;
@@ -114,15 +131,6 @@ int main(int argc, char* argv[]){
 //	mem::deinterleave2(arrE, tempE, lengthE2);
 //	PRINT_EVEN ASSERT_GUARDS
 //
-////	printf("\nEquals:\n");
-////	arr::lineSlope1(tempE, lenE);
-////	arr::lineSlope1(tempO, lenO);
-////	SET_LINE
-////	printf("%s %s\n", 
-////		mem::equal(arrE, tempE, lenE) ? "true" : "false",
-////		mem::equal(arrO, tempO, lenO) ? "true" : "false"
-////	);
-//
 //	printf("\nExpand (2):\n");
 //	arr::lineSlope1(tempE, lenE);
 //	SET_M1
@@ -141,86 +149,11 @@ int main(int argc, char* argv[]){
 //	mem::keep(arrO, lenO, 3, 2);
 //	PRINT_BOTH ASSERT_GUARDS
 //
-//	printf("\nMirror right:\n");
-//	SET_LINE
-//	mem::mirrorR(arrE, lenE);
-//	mem::mirrorR(arrO, lenO);
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nPivot around 2:\n");
-//	SET_LINE
-//	mem::pivot(arrE, lenE, 2);
-//	mem::pivot(arrO, lenO, 2);
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nReplace:\n");
-//	SET_M1
-//	mem::replace(arrE, lenE, -1, 0);
-//	mem::replace(arrO, lenO, -1, 0);
-//	PRINT_BOTH ASSERT_GUARDS
-//	
-////	char test[] = "abcdabcd";
-////	mem::replace(test, strlen(test), 'a', 'z');
-////	printf("%s\n", test);
-//
-//	printf("\nReverse:\n");
-//	SET_LINE
-//	mem::reverse(arrE, lenE);
-//	mem::reverse(arrO, lenO);
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nReverse every 2:\n");
-//	SET_LINE
-//	mem::reverse2(arrE, lenE);
-//	mem::reverse2(arrO, lenO);
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nRotate half:\n");
-//	SET_LINE
-//	mem::rotateH(arrE, lenE);
-//	mem::rotateH(arrO, lenO);
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nRotate left by 1:\n");
-//	SET_LINE
-//	mem::rotateL1(arrE, lenE);
-//	mem::rotateL1(arrO, lenO);
-//	PRINT_BOTH ASSERT_GUARDS
-//	
-//	printf("\nRotate left by 3:\n");
-//	SET_LINE
-//	mem::rotateL(arrE, lenE, 0);
-//	mem::rotateL(arrO, lenO, 0);
-//	PRINT_BOTH ASSERT_GUARDS
-//	
-//	printf("\nRotate right by 1:\n");
-//	SET_LINE
-//	mem::rotateR1(arrE, lenE);
-//	mem::rotateR1(arrO, lenO);
-//	PRINT_BOTH ASSERT_GUARDS
-//
 //	printf("\nScale (cropping) by 2.5:\n");
 //	arr::lineSlope1(tempE, lenE);
 //	SET_M1
 //	mem::scaleCrop(arrE, tempE, lenE, 2.5f);
 //	PRINT_EVEN ASSERT_GUARDS
-//
-//	printf("\nSet to 1:\n");
-//	mem::set(arrE, val(1), Loop(lenE));
-//	mem::set(arrO, val(1), Loop(lenO));
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nSet to 1 (stride=2, offset=0):\n");
-//	SET_M1
-//	mem::set(arrE, val(1), Loop(lenE,2));
-//	mem::set(arrO, val(1), Loop(lenO,2));
-//	PRINT_BOTH ASSERT_GUARDS
-//
-//	printf("\nSet to 1 (stride=2, offset=1):\n");
-//	SET_M1
-//	mem::set(arrE, val(1), Loop(lenE,2,1));
-//	mem::set(arrO, val(1), Loop(lenO,2,1));
-//	PRINT_BOTH ASSERT_GUARDS
 //
 //	printf("\nStretch (in-place):\n");
 //	SET_LINE
@@ -233,53 +166,11 @@ int main(int argc, char* argv[]){
 //	mem::stretch(arrE, tempE, lenE/2, 2);
 //	PRINT_EVEN ASSERT_GUARDS
 //
-//	printf("\nSwap (odd -line with even +line):\n");
-//	arr::lineSlope1(arrE, lenE, 1);
-//	arr::lineSlope(arrO, lenO, -1, -1);
-//	mem::swap(arrE, arrO, lenE);
-//	PRINT_BOTH ASSERT_GUARDS
-//	
 //	printf("\nTranspose2:\n");
 //	SET_LINE
 //	mem::transpose2(arrE, lenE);
 //	PRINT_EVEN ASSERT_GUARDS
-//
-//	printf("\nZero:\n");
-//	SET_M1
-//	mem::zero(arrE, lenE);
-//	PRINT_EVEN ASSERT_GUARDS
-//
-//	printf("\nZero (stride=2, offset=0):\n");
-//	SET_M1
-//	mem::set(arrE, val(0), Loop(lenE,2));
-//	PRINT_EVEN ASSERT_GUARDS
-//
-//	printf("\nZero (stride=2, offset=1):\n");
-//	SET_M1
-//	mem::set(arrE, val(0), Loop(lenE,2,1));
-//	PRINT_EVEN ASSERT_GUARDS
-//
-//
-//	{
-//		using namespace gam::mem;
-//		using namespace gam::gen;
-//	
-//		#define PRINT(obj) printf("\t"); for(uint32_t i=0;i<obj.size();++i) printf("%c", obj[i]); printf("\n");
-//	
-//		Multi<8, char> multi;
-//		
-//		printf("\nmem::set\n");
-//		set(multi, "12345678", Loop(multi.size())); PRINT(multi)		
-//		set(multi, val('1'), Loop(multi.size())); PRINT(multi)
-//		set(multi, rAdd1('a'), Loop(multi.size())); PRINT(multi)
-//		set(multi, rAdd((char)2,'a'), Loop(multi.size())); PRINT(multi)
-//		set(multi, rAdd((char)2,'b'), Loop(multi.size())); PRINT(multi)
-//		
-//		set(multi, val('.'), Loop(multi.size()));
-//		set(multi, val('1'), Loop(multi.size(),2)); PRINT(multi)
-//		set(multi, val('.'), Loop(multi.size()));
-//		set(multi, val('1'), Loop(multi.size(),3)); PRINT(multi)
-//	}	
+	
 
 	return 0;
 }
