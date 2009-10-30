@@ -32,9 +32,9 @@ namespace gen{
 /// Single value generator
 template <class T=gam::real>
 struct Val{
-	Val(): val((T)0){}								///< Constructor
-	Val(T v): val(v){}								///< Constructor
-	Val& operator = (T v){ val=v; return *this; }	///< Set value
+	Val(): val(T(0)){}								///< Constructor
+	Val(const T& v): val(v){}						///< Constructor
+	Val& operator = (const T& v){ val=v; return *this; }	///< Set value
 	T operator()() const { return val; }			///< Generate next value
 	T& operator[](uint i)      { return val; }		///< Array set; sets current value 
 	T  operator[](uint i) const{ return (*this)(); }///< Array get; generates next element
@@ -50,24 +50,24 @@ struct Val{
 	T   operator[](uint i) const { return (*this)(); }
 
 
-template<class T = gam::real>
+template<class T=gam::real>
 struct Impulse : public Val<T>{ INHERIT;
-	Impulse(T val=1): Val<T>(val){}						///< Constructor
+	Impulse(const T& val=T(1)): Val<T>(val){}			///< Constructor
 	T operator()() const {T t=val; val=0; return t;}	///< Generate next value
 };
 
 /// Nyquist sequence generator
-template<class T = gam::real>
+template<class T=gam::real>
 struct Nyquist : public Val<T>{ INHERIT;
-	Nyquist(T val=1): Val<T>(-val){}					///< Constructor
+	Nyquist(const T& val=T(1)): Val<T>(-val){}			///< Constructor
 	T operator()() const { return val = -val; }			///< Generate next value
 };
 
 /// Reciprocal sequence generator
 template <class T=gam::real>
 struct Recip : public Val<T>{ INHERIT;
-	Recip(T val=1): Val<T>(val){}						///< Constructor
-	T operator()() const { return (T)1/val++; }			///< Generate next value
+	Recip(const T& val=T(1)): Val<T>(val){}				///< Constructor
+	T operator()() const { return T(1)/val++; }			///< Generate next value
 };
 
 
@@ -76,7 +76,8 @@ template <class T=gam::real>
 struct RCos : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RCos(T frq=0, T amp=1): val2(0), c1(0){ set(frq,amp); }
+	RCos(const T& frq=T(0), const T& amp=T(1))
+	:	val2(0), c1(0){ set(frq,amp); }
 
 	/// Generate next value.
 	T operator()() const {
@@ -88,7 +89,7 @@ struct RCos : public Val<T>{ INHERIT;
 	T freq() const { return acos(c1*0.5) * M_1_2PI; }
 	
 	/// Set parameters from unit freq, phase, and amplitude.
-	RCos& set(T frq, T amp=(T)1){
+	RCos& set(const T& frq, const T& amp=T(1)){
 		c1  = T(cos(frq*M_2PI));
 		val2= c1*amp;
 		val = amp;
@@ -106,7 +107,8 @@ template <class T=gam::real>
 struct RSin : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RSin(T frq=0, T phs=0, T amp=1): val2(0), mul(0){ set(frq,phs,amp); }
+	RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1))
+	:	val2(0), mul(0){ set(frq,phs,amp); }
 
 	/// Generate next value.
 	T operator()() const {
@@ -126,11 +128,11 @@ struct RSin : public Val<T>{ INHERIT;
 	T freq() const { return acos(mul*0.5) * M_1_2PI; }
 	
 	/// Set parameters from unit freq, phase, and amplitude.
-	RSin& set(T frq, T phs, T amp=(T)1){
-		frq *= M_2PI; phs *= M_2PI;
-		mul  = (T)2 * (T)cos(frq);
-		val2 = (T)sin(phs - frq * (T)2) * amp;
-		val  = (T)sin(phs - frq       ) * amp;
+	RSin& set(const T& frq, const T& phs, const T& amp=T(1)){
+		T f=frq*M_2PI, p=phs*M_2PI;
+		mul  = (T)2 * (T)cos(f);
+		val2 = (T)sin(p - f * T(2))*amp;
+		val  = (T)sin(p - f       )*amp;
 		return *this;
 	}
 
@@ -143,7 +145,8 @@ template <class T=gam::real>
 struct RSin2 : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RSin2(T frq=0, T phs=0, T dcy=1, T amp=1){ set(frq,phs,dcy,amp); }
+	RSin2(const T& frq=T(0), const T& phs=T(0), const T& dcy=T(1), const T& amp=T(1))
+	{ set(frq,phs,dcy,amp); }
 
 	/// Generate next value
 	T operator()() const {
@@ -163,7 +166,7 @@ struct RSin2 : public Val<T>{ INHERIT;
 	T decay() const{ return sqrt(-mul2); }
 	
 	/// Set parameters from freq (rad/unit), phase (rad), decay, and amplitude.
-	RSin2& set(T frq, T phs, T dcy, T amp=(T)1){
+	RSin2& set(const T& frq, const T& phs, const T& dcy, const T& amp=T(1)){
 		frq *= M_2PI; phs *= M_2PI;
 		dcy = scl::atLeast(dcy, (T)0.00000001);
 		
@@ -183,7 +186,8 @@ struct RSin2 : public Val<T>{ INHERIT;
 /// Recursive add generator
 template <class T=gam::real>
 struct RAdd: public Val<T>{ INHERIT;
-	RAdd(T add=1, T val=0): Val<T>(val-add), add(add){}	///< Constructor
+	RAdd(const T& add=T(1), const T& val=T(0))
+	: Val<T>(val-add), add(add){}						///< Constructor
 	T operator()() const { return val += add; }			///< Generate next value
 	T add;												///< Addition amount
 };
@@ -191,21 +195,34 @@ struct RAdd: public Val<T>{ INHERIT;
 /// Recursive add 1 generator (iota function)
 template <class T=gam::real>
 struct RAdd1: public Val<T>{ INHERIT;
-	RAdd1(T val=0): Val<T>(val-1){}						///< Constructor
+	RAdd1(const T& val=T(0)): Val<T>(val-1){}			///< Constructor
 	T operator()() const { return ++val; }				///< Generate next value
 };
 
 /// Recursive add integer generator
 template <int N=1, class T=gam::real>
 struct RAddN: public Val<T>{ INHERIT;
-	RAddN(T val=0): Val<T>(val-N){}						///< Constructor
+	RAddN(const T& val=T(0)): Val<T>(val-N){}			///< Constructor
 	T operator()() const { return val+=N; }				///< Generate next value
+};
+
+/// Recursive addition wrapped in interval [min, max)
+template <class T=gam::real>
+struct RAddWrap: public RAdd<T>{ INHERIT;
+	RAddWrap(const T& add, const T& val=T(0), const T& max=T(1), const T& min=T(0))
+	:	RAdd<T>(add, val), max(max), min(min){}			///< Constructor
+	T operator()() const {								///< Generate next value
+		RAdd<T>::operator()();
+		return val=scl::wrap(val,max,min);
+	} 
+	T max, min;
 };
 
 /// Recursive multiply generator
 template <class T=gam::real>
 struct RMul: public Val<T>{ INHERIT;
-	RMul(T mul=1, T val=1): Val<T>(val/mul), mul(mul){}	///< Constructor
+	RMul(const T& mul=T(1), const T& val=T(1))
+	:	Val<T>(val/mul), mul(mul){}						///< Constructor
 	T operator()() const { return val *= mul; }			///< Generate next value
 	T mul;												///< Multiplication amount
 };
@@ -214,31 +231,21 @@ struct RMul: public Val<T>{ INHERIT;
 template <class T=gam::real>
 struct RMulAdd: public Val<T>{ INHERIT;
 	/// Constructor
-	RMulAdd(T mul=1, T add=0, T val=0): Val<T>((val-add)/mul), mul(mul), add(add){} 
+	RMulAdd(const T& mul=T(1), const T& add=T(0), const T& val=T(0))
+	:	Val<T>((val-add)/mul), mul(mul), add(add){}		///< Constructor
 	T operator()() const { return val=val*mul+add; }	///< Generate next value
 	T mul;												///< Multiplication amount
 	T add;												///< Addition amount
 };
 
-
-/// Sawtooth wave in interval [0, max)
-template <class T=gam::real>
-struct Saw: public RAdd<T>{ INHERIT;
-	Saw(T add, T val=0, T max=1): RAdd<T>(add, val), max(max){}
-	T operator()() const {
-		RAdd<T>::operator()();
-		if(val >= max) val -= max;
-		return val;
-	} 
-	T max;
-};
-
-
 /// Sinusoid sequence generator
 template <class T=gam::real>
 struct Sin: public RAdd<T>{ INHERIT;
-	Sin(T add, T val=0, T amp=1): RAdd<T>(add, val), amp(amp){}		///< Constructor
-	T operator()() const { return (T)sin(RAdd<T>::operator()()) * amp; }	///< Generate next value
+	Sin(const T& add, const T& val=T(0), const T& amp=T(1))
+	:	RAdd<T>(add, val), amp(amp){}					///< Constructor
+
+	T operator()() const
+	{ return (T)sin(RAdd<T>::operator()()) * amp; }		/// Generate next value
 	T amp;
 };
 
@@ -315,24 +322,6 @@ protected:
 };
 
 
-struct Counter{
-	Counter(int max, int min=0, int inc=1, int val=0)
-	:	val(val), inc(inc), min(min), max(max){}
-	
-	/// Increments
-	int operator()(){
-		int r = scl::wrap(val, max, min);
-		val = r+inc;
-		return r;
-	}
-	
-	int val;		///< Value
-	int inc;		///< Increment
-	int min;		///< Minimum value
-	int max;		///< Maximum value
-};
-
-
 struct OnOff{
 	OnOff(uint32_t max, uint32_t ons) : max(max), ons(ons), cnt(0){}
 	
@@ -392,77 +381,6 @@ struct Trigger{
 	uint32_t val;		///< Value
 	uint32_t num;		///< Maximum value
 };
-
-
-//template <class T>
-//class GenNode{
-//
-//	void operator()(){
-//		*o = func(*i);
-//	}
-//
-//	T * i, * o;
-//};
-
-
-//template <class T=uint32_t>
-//struct Wrapper{
-//	Wrapper(T max, T inc=1, T val=0) : val(val), max(max){}
-//
-//	bool operator()(){
-//		if((val += inc) >= max){ scl::wrap(val, max); return true; }
-//		return false;
-//	}
-//	T val, inc, max;
-//};
-
-//template <class Ta=gam::real, class Tv=gam::real>
-//struct TAdd{
-//	TAdd(Ta add, Tv val=0): val(val), add(add){}		
-//	Tv operator()(){ Tv r = val; val+=add(); return r; }
-//	Tv val;
-//	Ta add;
-//};
-//
-//template <class Ta=gam::real, class Tv=gam::real>
-//struct TSin : public TAdd<Ta, Tv>{
-//	TSin(Ta add, Tv val=0): TAdd<Ta, Tv>(add, val){}		
-//	Tv operator()(){ return (Tv)sin( TAdd<Ta, Tv>::operator()() ); }
-//};
-//
-//template <class Tg1, class Tg2, typename Tr=gam::real>
-//struct TMulOp{
-//	
-//	TMulOp(Tg1 gen1, Tg2 gen2): gen1(gen1), gen2(gen2){}
-//
-//	Tr operator()(){ return gen1() * gen2(); }
-//	
-//	Tg1 gen1;
-//	Tg2 gen2;
-//};
-//
-//template <class Tg1, class Tg2>
-//float mul(Tg1 & gen1, Tg2 & gen2){ return (float)(gen1() * gen2()); }
-
-
-//template <class T=gam::real>
-//struct Test : public Val<T>{ INHERIT;
-//
-//	/// Constructor
-//	Test(T val3=0, T val2=0, T val1=0, T mul3=1, T mul2=-1, T mul1=0)
-//	:	Val<T>(val1), val3(val3), val2(val2), mul3(mul3), mul2(mul2), mul1(mul1){}
-//
-//	///< Generate next value.
-//	T operator()() const {
-//		T v0 = mul1*val + mul2*val2 + mul3*val3;
-//		val3 = val2;
-//		val2 = val;
-//		return val = v0;
-//	}
-//
-//	mutable T val3, val2;
-//	T mul3, mul2, mul1;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
-//};
 
 
 } // gen::
