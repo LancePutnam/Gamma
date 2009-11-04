@@ -277,11 +277,10 @@ OF2(RMul,		rMul,		1,1)
 OF3(RMulAdd,	rMulAdd,	1,0,0)
 OF3(RSin,		rSin,		0,0,1)
 
-#undef INHERIT
 #undef OF1
 #undef OF2
 #undef OF3
-
+#undef INHERIT
 
 
 /// Complex phasor

@@ -16,7 +16,7 @@ template<class T = gam::real>
 class Delay1{
 public:
 	/// @param[in] iprev	Initial previous value.
-	Delay1(T iprev = 0) : prev(iprev){}
+	Delay1(T iprev = 0): prev(iprev){}
 
 	T prev;				///< The previous input sample.
 
@@ -76,6 +76,80 @@ class Integrator{
 
 protected:
 	T o1;
+};
+
+
+
+/// Complex resonator
+
+/// The complex resonator consists of two complex numbers- one is an absolute
+/// phase and amplitude and the other is a relative (differential) frequency 
+/// and decay/growth factor.
+template <class T=double>
+class Resonator : public Complex<T>{
+public:
+	typedef Complex<T> C;
+	using C::operator();
+	using C::operator=;
+
+	Resonator(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0), const T& dec=T(1)){
+		set(frq, amp, phs);
+	}
+
+	/// Generate next value
+	C operator()(){ return (*this)*=mFreq; }
+
+	/// Filter input
+	C operator()(const C& v){ return (*this) = (*this)*mFreq + v; }
+	C operator()(const T& v){ return (*this) = (*this)*mFreq + v; }
+
+	/// Set 60 dB decay interval
+	//void decay(const Tv& v){ width(T(2.198806796637603 /* -ln(0.001)/pi */)/v); }
+	
+	/// Set unit bandwidth
+	//void width(const Tv& v){ mDecay=::exp(-M_PI*v); freq(freq()); }
+	
+	/// Set amount to decay after N iterations
+	void decay(const T& target, const T& N=T(1)){
+		factor(freq(), (1==N) ? target : ::pow(target, 1./N));
+	}
+
+	/// Set recursive multiplication factor (frequency and decay/growth factor)
+	void factor(const T& frq, const T& dec=T(1)){
+		mFreq.fromPolar(dec, frq*M_2PI);
+	}
+
+	/// Set unit frequency
+	void freq(const T& v){ factor(v, decay()); }
+
+	/// Set unit frequency, amplitude, and unit phase
+	
+	/// The phase state will be rewound 1 iteration so the first function call
+	/// will return a complex number at the desired phase.
+	void set(const T& frq, const T& amp, const T& phs, const T& dec=T(1)){
+		this->fromPolar(amp, phs*M_2PI);
+		factor(frq, dec);
+		(*this) = behind();
+	}
+
+	void set(const T& frq, const Complex<T>& phs){
+		(*this)(phs.r, phs.i); freq(frq);
+	}
+
+	/// Get value one iteration ahead of current state
+	C ahead() const { return (*this)*mFreq; }
+	
+	/// Get value one iteration behind current state
+	C behind() const { return (*this)/mFreq; }
+
+	/// Get unit decay
+	T decay() const { return mFreq.mag(); }
+	
+	/// Get unit frequency
+	T freq() const { return mFreq.phase()*M_1_2PI; }
+
+protected:
+	C mFreq;
 };
 
 
