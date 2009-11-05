@@ -66,6 +66,48 @@ private:
 
 
 
+/// Transfer function of an arbitrary difference equation.
+class TransferFunc {
+public:
+
+	/// @param[in] gain		overall filter gain
+	TransferFunc(double gain=1): mGain(gain){}
+
+	/// Add feedforward sample delay
+	TransferFunc& addX(double c, double d){ mX.push_back(DelayUnit(c,d)); return *this; }
+
+	/// Add feedback sample delay
+	TransferFunc& addY(double c, double d){ mY.push_back(DelayUnit(c,d)); return *this; }
+	
+	/// Clear sample delays
+	TransferFunc& clear(){ mX.clear(); mY.clear(); return *this; }
+	
+	/// Set overall gain factor
+	TransferFunc& gain(double v){ mGain=v; return *this; }
+	
+	/// Returns frequency response at unit frequency [-0.5, 0.5]
+	Complexd operator()(double f){
+		Complexd X(0,0), Y(1,0);
+		f *= M_2PI;
+		for(uint32_t i=0; i<mX.size(); ++i) X += mX[i].response(f);
+		for(uint32_t i=0; i<mY.size(); ++i) Y -= mY[i].response(f);
+		return X/Y * mGain; // H(z) = X(z)/Y(z)
+	}
+
+protected:
+
+	struct DelayUnit{
+		DelayUnit(double c_, double d_): c(c_), d(d_){}
+		Complexd response(double f){ return Complexd::Polar(c, f*d); }
+		double c, d;
+	};
+
+	std::vector<DelayUnit> mX, mY;
+	double mGain;
+};
+
+
+
 /// Integrator
 template <class T>
 class Integrator{

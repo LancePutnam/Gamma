@@ -76,12 +76,15 @@ struct Complex{
 
 	struct Polar{
 		Polar(const T& m, const T& p): m(m), p(p){}
+		Polar(const C& v){ *this = v; }
+
+		Polar& operator = (const C& v){ m=v.norm(); p=v.arg(); return *this; }
+
 		T m, p;
 	};
 
 	union{
 		struct{ T r, i; };
-		//struct{ T x, y; };
 		T elems[2];
 	};
 	
