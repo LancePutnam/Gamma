@@ -100,6 +100,7 @@ struct Complex{
 	const T& operator[](uint32_t i) const { return elems[i]; }
 
 	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if all components are equal
+	bool operator ==(const T& v) const { return (r==v  ) && (i==T(0));}		///< Returns true if real and equals value
 	bool operator !=(const C& v) const { return (r!=v.r) || (i!=v.i); }		///< Returns true if any components are not equal
 	bool operator > (const C& v) const { return norm2() > v.norm2(); }		///< Returns true if norm is greater than argument's norm
 	bool operator < (const C& c) const { return norm2() < c.norm2(); }		///< Returns true if norm is less than argument's norm
@@ -116,45 +117,41 @@ struct Complex{
 	C& operator /=(const C& v){ return (*this) *= v.recip(); }
 	C& operator /=(const T& v){ r/=v; i/=v; return *this; }
 
-	const C operator - () const { return C(-r, -i); }
-	const C operator - (const C& v) const { return C(*this) -= v; }
-	const C operator - (const T& v) const { return C(*this) -= v; }
-	const C operator + (const C& v) const { return C(*this) += v; }
-	const C operator + (const T& v) const { return C(*this) += v; }
-	const C operator * (const C& v) const { return C(*this) *= v; }
-	const C operator * (const T& v) const { return C(*this) *= v; }
-	const C operator / (const C& v) const { return C(*this) /= v; }
-	const C operator / (const T& v) const { return C(*this) /= v; }
+	C operator - () const { return C(-r, -i); }
+	C operator - (const C& v) const { return C(*this) -= v; }
+	C operator - (const T& v) const { return C(*this) -= v; }
+	C operator + (const C& v) const { return C(*this) += v; }
+	C operator + (const T& v) const { return C(*this) += v; }
+	C operator * (const C& v) const { return C(*this) *= v; }
+	C operator * (const T& v) const { return C(*this) *= v; }
+	C operator / (const C& v) const { return C(*this) /= v; }
+	C operator / (const T& v) const { return C(*this) /= v; }
 	
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
-	const C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
-	const C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
-	//C mul2(const C& v) const { return C(r*v.r, i*v.i); }
+	C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
+	C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
 	T norm() const { return ::sqrt(norm2()); }				///< Returns norm (radius), |z|
 	T norm2() const { return dot(*this); }					///< Returns square of norm, |z|^2
 	C& normalize(){ return *this /= norm(); }				///< Sets norm (radius) to 1, |z|=1
-	const C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
-	const C pow(const T& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
-	const C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse, 1/z
-	const C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
-	const C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
+	C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
+	C pow(const T& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
+	C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse, 1/z
+	C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
+	C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
 
-//	C sqrt() const {
-//		return C(Polar(::sqrt(norm()), arg()*T(0.5)));
-//	}
-
+	/// Returns square root
 	C sqrt() const {
-		const T c = T(1)/::sqrt(T(2));
+		static const T c = T(1)/::sqrt(T(2));
 		T n = norm();
 		T a = ::sqrt(n+r) * c;
 		T b = ::sqrt(n-r) * (i<T(0) ? -c : c);		
 		return C(a,b);
 	}
 
-	const C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
-	const C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
+	C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
+	C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
 
 	T abs() const { return norm(); }						///< Returns norm (radius), |z|
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
@@ -165,13 +162,13 @@ typedef Complex<float > Complexf;
 typedef Complex<double> Complexd;
 
 #define TEM template <class T>
-TEM const Complex<T> exp(const Complex<T>& c){ return c.exp(); }
-TEM const Complex<T> log(const Complex<T>& c){ return c.log(); }
-TEM const Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
-TEM const Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
-TEM const Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
-TEM const Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
-TEM const Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
+TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
+TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
+TEM Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
+TEM Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
+TEM Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
+TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
 #undef TEM
 
 
@@ -350,8 +347,9 @@ struct Quat{
 	
 	void toAxis(T& a, T& x, T& y, T& z) const {
 		a = T(2) * acos(r);
-		T s = T(1)/sqrt(i*i + j*j + k*k);
-		x = i*s; y = j*s; z = k*s;
+		T s = sqrt(T(1) - r*r);
+		if(s > T(0.00000001)){ x = i*s; y = j*s; z = k*s; }
+		else{ x=T(1); y=z=T(0); }
 	}
 	
 	/// Convert to 3x3 rotation matrix
@@ -405,10 +403,10 @@ struct Quat{
 };
 
 #define TEM template <class T>
-TEM const Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
-TEM const Quat<T> operator - (T r, const Quat<T>& q){ return -q+r; }
-TEM const Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
-TEM const Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); }
+TEM Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
+TEM Quat<T> operator - (T r, const Quat<T>& q){ return -q+r; }
+TEM Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
+TEM Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); }
 #undef TEM
 
 typedef Quat<float> Quatf;

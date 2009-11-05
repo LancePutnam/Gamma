@@ -92,6 +92,10 @@ public:
 	using C::operator();
 	using C::operator=;
 
+	/// @param[in] frq	unit frequency
+	/// @param[in] amp	amplitude
+	/// @param[in] phs	unit phase
+	/// @param[in] dec	unit decay factor
 	Resonator(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0), const T& dec=T(1)){
 		set(frq, amp, phs);
 	}

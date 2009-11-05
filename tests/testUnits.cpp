@@ -226,6 +226,10 @@ int main(int argc, char* argv[]){
 		#define T(x, y) assert(scl::almostEqual(x,y,2));
 		c.normalize();			T(c.norm(), 1)
 		double p=0.1; c(1,0); c *= Complexd::Polar(1, p); T(c.arg(), p)
+
+		c.fromPolar(4,0.2);
+		T(c.sqrt().norm(), 2)
+		T(c.sqrt().arg(), 0.1)
 		#undef T
 	}
 
