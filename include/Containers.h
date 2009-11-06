@@ -222,7 +222,7 @@ public:
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	Ring(uint32_t size, const T& value=0);
+	Ring(uint32_t size, const T& value=T());
 	
 	/// Sets all elements to value
 	Ring& operator=(const T& v){ super::operator=(v); return *this; }
@@ -269,7 +269,7 @@ public:
 	
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	RingFill(uint32_t size, const T& value=0): super(size, value), mFill(0){}
+	RingFill(uint32_t size, const T& value=T()): super(size, value), mFill(0){}
 
 	void operator()(const T& v){
 		this->super::operator()(v);
@@ -295,7 +295,7 @@ struct DoubleRing : public Ring<T>{
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	DoubleRing(uint32_t size, const T& value=0): Ring<T>(size, value), read(size){}
+	DoubleRing(uint32_t size, const T& value=T()): Ring<T>(size, value), read(size){}
 	
 	/// Copy elements into read buffer unwrapping from ring
 	
