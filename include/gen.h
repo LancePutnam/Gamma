@@ -49,7 +49,6 @@ struct Val{
 	using Val<T>::val; using Val<T>::operator=;\
 	T   operator[](uint i) const { return (*this)(); }
 
-
 template<class T=gam::real>
 struct Impulse : public Val<T>{ INHERIT;
 	Impulse(const T& val=T(1)): Val<T>(val){}			///< Constructor
@@ -166,7 +165,7 @@ struct RSin2 : public Val<T>{ INHERIT;
 	T decay() const{ return sqrt(-mul2); }
 	
 	/// Set parameters from freq (rad/unit), phase (rad), decay, and amplitude.
-	RSin2& set(const T& frq, const T& phs, const T& dcy, const T& amp=T(1)){
+	RSin2& set(T frq, T phs, T dcy, T amp=T(1)){
 		frq *= M_2PI; phs *= M_2PI;
 		dcy = scl::atLeast(dcy, (T)0.00000001);
 		
