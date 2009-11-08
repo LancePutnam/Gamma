@@ -231,6 +231,20 @@ TEM void swap(T & elem1, T & elem2);
 ///
 TEM void transpose2(T * arr, uint32_t len);
 
+
+/// Returns true if all elements are different
+TEM bool unique(const T * src, uint32_t len, uint32_t str=1);
+TEM bool unique(const T * src, uint32_t len, uint32_t str){
+	for(uint32_t j=0; j<len-str; j+=str){
+		const T& v = src[j];
+		for(uint32_t i=j+str; i<len; i+=str){
+			if(v == src[i]) return false;
+		}
+	}
+	return true;
+}
+
+
 /// Sets elements to zero
 TEM inline void zero(T * arr, uint32_t len, uint32_t str=1){
 	LOOP(len,str){ arr[i]=T(0); }
