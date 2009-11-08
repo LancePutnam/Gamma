@@ -5,51 +5,95 @@
 	See COPYRIGHT file for authors and license information */
 
 #include "scl.h"
+#include "Types.h"
 
 namespace gam{
 namespace fil{
 
 
-
-/// One element delay
-template<class T = gam::real> 
-class Delay1{
+/// Fixed N-element delay
+template <uint32_t N, class T>
+class FixedDelay{
 public:
-	/// @param[in] iprev	Initial previous value.
-	Delay1(T iprev = 0): prev(iprev){}
+	#define DO for(uint32_t i=0; i<N; ++i)
 
-	T prev;				///< The previous input sample.
+	/// @param[in] v	Initial value of elements
+	FixedDelay(const T& v=T()){ DO mVals[i]=v; }
 
-	/// Returns next delayed sample.
-	T operator()(T v){ T p=prev; prev=v; return p; }
+	/// Set nth delayed element
+	T& operator[](uint32_t i){ return mVals[i]; }
+	
+	/// Get nth delayed element
+	const T& operator[](uint32_t i) const { return mVals[i]; }
+
+	/// Input element and return Nth delayed element
+	T operator()(const T& v) const {
+		const T r = mVals[N-1];
+		for(int i=N-1; i>0; --i) mVals[i] = mVals[i-1];
+		mVals[0]=v;
+		return r;
+	}
+
+	uint32_t size() const { return N; }
+
+	#undef DO
+
+protected:
+	mutable T mVals[N];
 };
 
+
+
+/// One element delay
+template<class T=gam::real> 
+class Delay1 : public FixedDelay<1,T>{
+public:
+
+	/// @param[in] v	Initial value of elements
+	Delay1(const T& v=T()): FixedDelay<1,T>(v){}
+};
 
 
 /// Two element delay
-template <class T=gam::real>
-class Delay2{
+template<class T=gam::real> 
+class Delay2 : public FixedDelay<2,T>{
 public:
-	Delay2(const T& v2=(T)0, const T& v1=(T)0, const T& v0=(T)0) : v0(v0), v1(v1), v2(v2){}
-	T operator()(const T& v){ v2=v1; v1=v0; v0=v; return v0; }
-	T operator()(){ return v0; }		///< Get current value
-	T d1f(){ return v0-v1; }			///< Get first forward difference
-	T d1b(){ return v1-v2; }			///< Get first backward difference
-	T d1c(){ return (v0-v2)*0.5; }		///< Get first center difference
-	T d2(){ return d1f() - d1b(); }		///< Get second difference
 
-private: T v0, v1, v2;
+	/// @param[in] v	Initial value of elements
+	Delay2(const T& v=T()): FixedDelay<2,T>(v){}
+	
+	/// @param[in] v2	Initial value of 2nd delayed element
+	/// @param[in] v1	Initial value of 1st delayed element
+	Delay2(const T& v2, const T& v1){ (*this)[1]=v2; (*this)[0]=v1; }
 };
+
+
+//
+//
+///// Two element delay
+//template <class T=gam::real>
+//class Delay2{
+//public:
+//	Delay2(const T& v2=(T)0, const T& v1=(T)0, const T& v0=(T)0) : v0(v0), v1(v1), v2(v2){}
+//	T operator()(const T& v){ v2=v1; v1=v0; v0=v; return v0; }
+//	T operator()(){ return v0; }		///< Get current value
+//	T d1f(){ return v0-v1; }			///< Get first forward difference
+//	T d1b(){ return v1-v2; }			///< Get first backward difference
+//	T d1c(){ return (v0-v2)*0.5; }		///< Get first center difference
+//	T d2(){ return d1f() - d1b(); }		///< Get second difference
+//
+//private: T v0, v1, v2;
+//};
 
 
 
 /// Returns every nth input n times.
-template <class T>
+template <class T=gam::real>
 struct Hold{
 
 	Hold(uint32_t n=1): mCount(0), mPeriod(n){}
 
-	T operator()(const T& v){
+	T operator()(const T& v) const {
 		if(mCount==0) mVal=v;
 		if((++mCount) >= mPeriod) mCount=0;
 		return mVal;
@@ -59,9 +103,22 @@ struct Hold{
 	void reset(){ mCount=0; }
 
 private:
-	uint32_t mCount;
+	mutable uint32_t mCount;
 	uint32_t mPeriod;
-	T mVal;
+	mutable T mVal;
+};
+
+
+/// Integrates input with previous output
+template <class T=double>
+class Integrate{
+public:
+	Integrate(const T& v=T(0)): o1(v){}
+
+	T operator()(const T& i0) const { return o1+=i0; }
+
+protected:
+	mutable T o1;
 };
 
 
@@ -108,17 +165,7 @@ protected:
 
 
 
-/// Integrator
-template <class T>
-class Integrator{
 
-	Integrator(const T& v=T(0)): o1(v){}
-
-	T operator()(const T& i0){ return o1+=i0; }
-
-protected:
-	T o1;
-};
 
 
 
