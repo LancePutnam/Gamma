@@ -62,6 +62,9 @@ uint32_t File::write(const char * path, const void * v, int size, int items){
 }
 
 
+bool File::exists(const char * path){ File f(path, "r"); return f.open(); }
+
+
 
 
 DataFile::DataFile(const char * path)

@@ -53,6 +53,9 @@ public:
 	/// Returns size (in bytes) of file contents
 	int size() const { return mSizeBytes; }
 
+	/// Returns whether file exists
+	static bool exists(const char * path);
+
 protected:
 	const char * mPath;
 	const char * mMode;
