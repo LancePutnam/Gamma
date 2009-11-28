@@ -46,7 +46,8 @@ char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
 		allocContent(n);
-		/*size_t numRead =*/ fread(mContent, sizeof(char), n, mFP);
+		int numRead = fread(mContent, sizeof(char), n, mFP);
+		if(numRead < n){}
 	}
 	return mContent;
 }
@@ -99,12 +100,12 @@ bool DataFile::openRead(){
 	return false;
 }
 
-void DataFile::read4(void * element){
-	/*size_t n =*/ fscanf(fp, formatString<float >(), element);
+int DataFile::read4(void * element){
+	return fscanf(fp, formatString<float >(), element);
 }
 
-void DataFile::read8(void * element){
-	/*size_t n =*/ fscanf(fp, formatString<double>(), element);
+int DataFile::read8(void * element){
+	return fscanf(fp, formatString<double>(), element);
 }
 
 void DataFile::read4(void * dst, ULONG len){

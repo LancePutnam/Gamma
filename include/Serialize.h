@@ -20,7 +20,7 @@ then pass in the preprocessor flag -DSER_IS_BIG_ENDIAN.
 #include <string.h>
 #include <vector>
 #include <string>
-
+#include "pstdint.h"
 
 
 //#define SER_IS_BIG_ENDIAN

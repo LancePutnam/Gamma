@@ -1224,7 +1224,7 @@ inline T zero(T v, T bw, F f){ return bw/(f(v) + bw); }
 inline uint32_t bitsSet(uint32_t v){
 	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-	return ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
 }
 
 TEM inline bool even(T v){ return 0 == odd(v); }

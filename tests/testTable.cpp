@@ -6,6 +6,7 @@
 #include "tbl.h"
 #include "Access.h"
 #include "Constants.h"
+#include "Conversion.h"
 #include "Visual.h"
 
 #define TEST_WINDOWS
@@ -16,7 +17,7 @@
 #define PRINT_TABLE \
 	for(unsigned long i=0; i<len; i++){\
 		float v = arr[i];\
-		printf("[%4lu] % 5.3f %8lx  ", i, v, *(unsigned long *)&v);\
+		printf("[%4lu] % 5.3f %8lx  ", i, v, (long unsigned int)punFU(v));\
 		printPlot(v); printf("\n");\
 	}
 

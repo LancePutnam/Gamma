@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "Gamma.h"
 #include "Access.h"
 #include "Constants.h"

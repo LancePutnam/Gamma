@@ -56,5 +56,6 @@ install: $(ALIB_FILE) $(SLIB_FILE)
 	$(INSTALL) -c -m 644 ./include/*.h $(PREFIX)/include/gamma
 	$(RANLIB) $(PREFIX)/lib/$(ALIB_FILE)
 
-all: $(ALIB_FILE) $(SLIB_FILE) tests tutorial
+#all: $(ALIB_FILE) $(SLIB_FILE) tests tutorial
+all: $(ALIB_FILE) tests tutorial
 

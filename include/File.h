@@ -95,8 +95,8 @@ public:
 	bool openRead();	///< Open file for reading
 	
 
-	void read4(void * element);								///< Read 4-byte element from file
-	void read8(void * element);								///< Read 8-byte element from file
+	int read4(void * element);								///< Read 4-byte element from file
+	int read8(void * element);								///< Read 8-byte element from file
 	template<ULONG N> void read(void * element);			///< Read N-byte element from file
 	void read4(void * dst, ULONG len);						///< Read 'len' 4-byte elements from file
 	void read8(void * dst, ULONG len);						///< Read 'len' 8-byte elements from file

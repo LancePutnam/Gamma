@@ -191,7 +191,7 @@ inline uint32_t floatExponent(float v){
 
 inline float floatMantissa(float v){
 	uint32_t frac = punFU(v);
-	frac = frac & MaskFrac<float>() | Expo1<float>();
+	frac = (frac & MaskFrac<float>()) | Expo1<float>();
 	return punUF(frac) - 1.f;
 }
 
@@ -206,13 +206,13 @@ inline float intToUnit(int16_t v){
 }
 
 inline float splitInt512(uint32_t v, uint32_t& intPart){
-	Twiddle<float> u(v & MaskFrac<float>() | Expo1<float>());
+	Twiddle<float> u((v & MaskFrac<float>()) | Expo1<float>());
 	intPart = v >> 22;
 	return u.f - 1.f;
 }
 
 inline float splitInt1024(uint32_t v, uint32_t& intPart){
-	Twiddle<float> u((v<<1) & MaskFrac<float>() | Expo1<float>());
+	Twiddle<float> u(((v<<1) & MaskFrac<float>()) | Expo1<float>());
 	intPart = v >> 22;
 	return u.f - 1.f;
 }
