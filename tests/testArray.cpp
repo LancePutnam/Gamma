@@ -30,27 +30,6 @@ int main(int argc, char* argv[]){
 }
 
 
-//#define LINE	arr::lineSlope1(arrE, lenE);\
-//				arr::lineSlope1(arrO, lenO);
-//#define ONES	mem::set(arrE, gen::Val<>(1), Loop(lenE));\
-//				mem::set(arrO, gen::Val<>(1), Loop(lenO));
-//#define ZEROS	mem::zero(arrE, lenE);\
-//				mem::zero(arrO, lenO);
-//
-//#define PRINT_BOTH \
-//	for(uint32_t i=0; i<lenE; i++){\
-//		printf("\t[%2i] % 5.2f  % 5.2f\n", i, arrO[i], arrE[i]);\
-//	} printf("\t[%2i] % 5.2f\n", lenO-1, arrO[lenO-1]);
-//
-//#define PRINT_EVEN \
-//	for(uint32_t i=0; i<lenE; i++){\
-//		printf("\t[%2i] % 5.2f\n", i, arrE[i]);\
-//	}
-//	
-//#define ASSERT_GUARDS \
-//	if(arrE[lenE] != 100.f){ printf("**arrE guard modified to % 5.2f\n", arrE[lenE]); return 1;}\
-//	if(arrO[lenO] != 100.f){ printf("**arrO guard modified to % 5.2f\n", arrO[lenO]); return 1;}
-//
 //using namespace gam;
 //
 //int main(int argc, char* argv[]){
