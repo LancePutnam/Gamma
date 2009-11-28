@@ -210,6 +210,16 @@ TEM void scale(T * dst, const T * src, uint32_t lenSrc, float stride);
 /// Ex.: 1234 -> 1..2 (amount = 3)
 TEM void scaleCrop(T * dst, const T * src, uint32_t len, float stride);
 
+/// Returns (n+1)th argument.
+TEM inline const T& select(int n, const T& v1, const T& v2, const T& v3){
+	return (n<=0)?v1 : (n==1)?v2 : v3;
+}
+
+/// Returns (n+1)th argument.
+TEM inline const T& select(int n, const T& v1, const T& v2, const T& v3, const T& v4){
+	return (n<=0)?v1 : (n==1)?v2 : (n==2)?v3 : v4;
+}
+
 /// Stretches array by duplicating every element 'amount' times.
 
 /// 'len' must be an integer multiple of 'amount'. \n

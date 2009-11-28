@@ -39,7 +39,8 @@ int main(int argc, char* argv[]){
 	slice(A,N) = 0;
 	mem::deepCopy(A,T,N); ASSERT(A, 0,1,2,3,4,5,6,7)
 
-	slice(A,N) = slice(T,N) = RAdd1<int>();
+	slice(A,N) = 0;
+	slice(A,N).copy(slice(T,N) = RAdd1<int>());
 	assert(mem::deepEqual(A,T,N));
 
 	slice(T,N) = RAdd1<int>();
@@ -99,9 +100,20 @@ int main(int argc, char* argv[]){
 	mem::rotateRight1(A,N,2); ASSERT(A, 5,0,7,2,1,4,3,6)
 
 	slice(A,N) = RAdd1<int>();
+	assert(mem::unique(A,N));
+
+	slice(A,N) = RAdd1<int>();
 	mem::zero(A,N,1); ASSERT(A, 0,0,0,0,0,0,0,0)
 	slice(A,N) = RAdd1<int>();
 	mem::zero(A,N,2); ASSERT(A, 0,1,0,3,0,5,0,7)
+
+	#define T(x) assert(mem::select(x, 0, 1, 2) == x);
+	T(0) T(1) T(2)
+	#undef T
+
+	#define T(x) assert(mem::select(x, 0, 1, 2, 3) == x);
+	T(0) T(1) T(2) T(3)
+	#undef T
 
 //	int i=0;
 //

@@ -13,13 +13,13 @@
 
 #define RECT_POLAR\
 	if(mPrecise){\
-		for(uint i=1; i<numBins()-1; ++i){\
+		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			c(c.mag(), c.phase());\
 		}\
 	}\
 	else{\
-		for(uint i=1; i<numBins()-1; ++i){\
+		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			float m = c.norm2();\
 			float p = scl::atan2Fast(c.i,c.r);\
@@ -29,13 +29,13 @@
 
 #define POLAR_RECT\
 	if(mPrecise){\
-		for(uint i=1; i<numBins()-1; ++i){\
+		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			c(c[0]*cos(c[1]), c[0]*sin(c[1]));\
 		}\
 	}\
 	else{\
-		for(uint i=1; i<numBins()-1; ++i){\
+		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			float p = scl::wrapPhase(c[1]);\
 			c(c[0]*scl::cosT8(p), c[0]*scl::sinT9(p));\
@@ -45,7 +45,7 @@
 
 namespace gam{
 
-DFT::DFT(uint winSize, uint padSize, Bin::t binT, uint numAuxA) :
+DFT::DFT(uint32_t winSize, uint32_t padSize, Bin::t binT, uint32_t numAuxA) :
 	mSizeWin(0), mSizeHop(0),
 	mFFT(0),
 	mPadOA(0), mTapW(0), mTapR(0), mPrecise(false)
@@ -64,12 +64,12 @@ DFT::~DFT(){
 	mem::free(mPadOA);
 }
 
-void DFT::resize(uint newWindowSize, uint newPadSize){ //printf("DFT::resize()\n");
+void DFT::resize(uint32_t newWindowSize, uint32_t newPadSize){ //printf("DFT::resize()\n");
 
 	if(0 == newWindowSize && 0 == newPadSize) return;
 
-	uint oldDFTSize = sizeDFT();
-	uint newDFTSize = newWindowSize + newPadSize;
+	uint32_t oldDFTSize = sizeDFT();
+	uint32_t newDFTSize = newWindowSize + newPadSize;
 
 	if(mem::resize(mBuf, oldDFTSize + 2, newDFTSize + 2)){
 	
@@ -77,7 +77,7 @@ void DFT::resize(uint newWindowSize, uint newPadSize){ //printf("DFT::resize()\n
 		
 		if(mAux) mem::resize(mAux, oldDFTSize + 2, newDFTSize + 2);
 
-		//uint newNumBins = (newDFTSize>>1) + 1;
+		//uint32_t newNumBins = (newDFTSize>>1) + 1;
 
 		mFFT.resize(newDFTSize);
 		mem::deepZero(mBuf, newDFTSize + 2);
@@ -115,7 +115,7 @@ void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n
 	mBuf[1] = 0.f;
 	mBuf[numBins()*2-1] = 0.f;
 		
-	//uint nbins = numBins();
+	//uint32_t nbins = numBins();
 	
 	switch(mSpctFormat){
 	case Bin::Polar:
@@ -132,7 +132,7 @@ void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n
 void DFT::inverse(float * output){
 	//printf("DFT::inverse(float *)\n");
 
-	//uint nbins = numBins();
+	//uint32_t nbins = numBins();
 	
 	switch(mSpctFormat){
 	case Bin::Polar:
@@ -147,13 +147,12 @@ void DFT::inverse(float * output){
 
 	// arrange/scale bins for inverse xfm
 	mem::deepMove(mBuf+1, mBuf+2, sizeDFT()-1);
-	for(uint i=1; i<sizeDFT()-1; ++i) mBuf[i] *= 0.5f;
+	for(uint32_t i=1; i<sizeDFT()-1; ++i) mBuf[i] *= 0.5f;
 
 	mFFT.inverse(mBuf);
 	
 	// o.a. inverse window with prev spill
 	if(sizePad() > 0){
-	
 		arr::add(mBuf, mPadOA, scl::min(sizePad(), sizeWin()));	// add prev spill
 	
 		if(sizePad() <= sizeWin()){	// no spill overlap
@@ -201,7 +200,7 @@ void DFT::print(FILE * f, const char * a){
 
 //---- STFT
 
-STFT::STFT(uint winSize, uint hopSize, uint padSize, WinType::type windowType, Bin::t binT, uint numAuxA) :
+STFT::STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize, WinType::type windowType, Bin::t binT, uint32_t numAuxA) :
 	DFT(0, 0, binT, numAuxA),
 	mSlide(winSize, hopSize), mFwdWin(0), mPhases(0),
 	mWinType(windowType),
@@ -226,7 +225,7 @@ void STFT::computeInvWinMul(){
 //		mInvWinMul = 1/max();
 		
 		float sum = 0.f;
-		for(uint i=0; i<sizeWin(); i+=sizeHop()){
+		for(uint32_t i=0; i<sizeWin(); i+=sizeHop()){
 			sum += mFwdWin[i] * (mWindowInverse ? scl::bartlett(2*i/(float)sizeWin() - 1.f): 1.f);
 		}
 		mInvWinMul = 1/sum;
@@ -253,10 +252,10 @@ void STFT::winType(WinType::type type){
 }
 
 
-void STFT::resize(uint winSize, uint padSize){
+void STFT::resize(uint32_t winSize, uint32_t padSize){
 	float * tmp = mBufInv;
-	uint oldWinSize = sizeWin();
-	uint oldNumBins = numBins();
+	uint32_t oldWinSize = sizeWin();
+	uint32_t oldNumBins = numBins();
 	
 	// resize DFT buffers
 	DFT::resize(winSize, padSize);
@@ -277,7 +276,7 @@ void STFT::resize(uint winSize, uint padSize){
 }
 
 
-void STFT::sizeHop(uint size){
+void STFT::sizeHop(uint32_t size){
 	mSlide.sizeHop(size);
 	mSizeHop = mSlide.sizeHop();
 	computeInvWinMul();
@@ -305,7 +304,7 @@ void STFT::forward(float * input){ //printf("STFT::forward(float *)\n");
 		// compute relative frequencies
 		//arr::phaseToFreq(phs, mPhases, numBins(), unitsHop());
 		float factor = 1.f / (M_2PI * unitsHop());
-		for(uint i=1; i<numBins()-1; ++i){
+		for(uint32_t i=1; i<numBins()-1; ++i){
 			float dp = scl::wrapPhase(bins()[i][1] - mPhases[i]);	// wrap phase into [-pi, pi)
 			mPhases[i] = bins()[i][1];							// prev phase = curr phase
 			bins()[i][1] = dp*factor;
@@ -323,7 +322,7 @@ void STFT::inverse(float * dst){
 	//printf("STFT::inverse(float *)\n");
 	if(Bin::MagFreq == mSpctFormat){
 		//mem::copy(bins1(), mPhases, numBins()); // not correct, need to unwrap frequencies
-		for(uint i=1; i<numBins()-1; ++i) bins()[i] = mPhases[i];
+		for(uint32_t i=1; i<numBins()-1; ++i) bins()[i] = mPhases[i];
 	}	
 	
 	DFT::inverse(0);	// result goes into mBuf
@@ -347,7 +346,7 @@ void STFT::inverse(float * dst){
 	}
 
 	// copy remaining non-overlapped portion of new output
-	uint sizeOverlap = sizeWin() - sizeHop();
+	uint32_t sizeOverlap = sizeWin() - sizeHop();
 	mem::deepCopy(mBufInv + sizeOverlap, mBuf + sizeOverlap, sizeHop());
 
 	// copy output if external buffer provided

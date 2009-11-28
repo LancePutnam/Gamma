@@ -263,16 +263,6 @@ TEM T gaussian(T v){ return ::exp(-v*v); }
 
 TEM T hypot(T x, T y);
 
-/// Returns (n+1)th argument.
-TEM inline const T& item(int n, const T& v1, const T& v2, const T& v3){
-	return (n<=0)?v1 : (n==1)?v2 : v3;
-}
-
-/// Returns (n+1)th argument.
-TEM inline const T& item(int n, const T& v1, const T& v2, const T& v3, const T& v4){
-	return (n<=0)?v1 : (n==1)?v2 : (n==2)?v3 : v4;
-}
-
 /// Generalized Laguerre polynomial L{n,k}
 ///
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
@@ -447,6 +437,9 @@ TEM T sinc(T radians, T eps=(T)0.0001);
 
 /// Sort values so that value1 <= value2.
 TEM void sort2(T& value1, T& value2);
+
+/// Returns spherical product of two complex numbers
+TEM Vec3<T> spherical(const Complex<T>& a, const Complex<T>& b){ return Vec3<T>(a.r*b.r, a.i*b.r, b.i); }
 
 /// Sum of integers squared from 1 to n.
 TEM T sumOfSquares(T n){

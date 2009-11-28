@@ -256,4 +256,70 @@ KISS		x
 
 
 
+11/7/09
+
+A generic approach to accessing/manipulating arrayed data:
+
+	index map + data pointer
+
+An indexer maps a natural number sequence (0, 1, 2, 3, etc.) onto on integer 
+sequence.
+There are 3 brands of index maps. 
+They are listed in order of increasing generality and processing time/memory usage.
+
+No-op					0 1 2 3
+Integer Stride			0 2 4 6, 0 -2 -4 -6
+Real Stride				0 2 4 6 1 3 5 7
+
+
+All indexers have:
+	- a count
+	- an index mapping operator
+	
+The size of the source array is always assumed to be floor(stride) * count.
+
+
+/// No-op index map
+class Indexer{
+
+	int32_t operator()(int32_t i) const { return i; }
+
+protected:
+	int32_t mCount;
+}
+
+
+/// Integer strided index generator
+class IndexerInt : public Indexer {
+
+	int32_t operator()(int32_t i) const { return i*stride(); }
+
+protected:
+	int32_t mStride;
+};
+
+
+/// Real strided index generator
+class IndexerReal : public Indexer {
+
+	int32_t operator()(int32_t i) const { return wrap(i*stride(), size()); }
+
+protected:
+	double mStride, mSize;
+};
+
+
+/// Table lookup index generator
+class IndexerTable : public Indexer {
+
+	int32_t operator()(int32_t i) const { return mTable[i]; }
+
+protected:
+	int32_t mTable;
+}
+
+
+
+
+
 

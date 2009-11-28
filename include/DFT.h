@@ -5,6 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <math.h>
+#include "pstdint.h"
 #include "mem.h"
 #include "scl.h"
 #include "tbl.h"
@@ -44,15 +45,15 @@ namespace Bin{
 template <class T=gam::real>
 class SlidingWindow{
 public:
-	SlidingWindow(uint winSize, uint hopSize);
+	SlidingWindow(uint32_t winSize, uint32_t hopSize);
 	~SlidingWindow();
 
-	void resize(uint winSize, uint hopSize);
-	void sizeHop(uint size);
-	void sizeWin(uint size);
+	void resize(uint32_t winSize, uint32_t hopSize);
+	void sizeHop(uint32_t size);
+	void sizeWin(uint32_t size);
 	
-	uint sizeHop() const;
-	uint sizeWin() const;
+	uint32_t sizeHop() const;
+	uint32_t sizeWin() const;
 	
 	/// Returns pointer to internal sample window
 	
@@ -77,12 +78,12 @@ protected:
 
 protected:
 	T * mBuf;
-	uint mSizeWin, mSizeHop;
-	uint mTapW;	// current index to write to
-	uint mHopCnt;	// counts samples for hop
+	uint32_t mSizeWin, mSizeHop;
+	uint32_t mTapW;	// current index to write to
+	uint32_t mHopCnt;	// counts samples for hop
 	
 private:
-	uint hopStart() const;
+	uint32_t hopStart() const;
 };
 
 
@@ -111,26 +112,23 @@ public:
 	DFTBase();
 	virtual ~DFTBase();
 
-	T * aux(uint num);		///< Returns pointer to an auxiliary buffer
-//	T *& bins0();			///< Returns pointer to first elements of spectral bins
-//	T& bins0(uint i);		///< Returns ith element of first spectral type
-//	T * bins1();			///< Returns pointer to second elements of spectral bins
+	T * aux(uint32_t num);		///< Returns pointer to an auxiliary buffer
 	
 	Complex<T> * bins() const { return mBins; }
 	Complex<T>& bins(uint32_t i){ return mBins[i]; }
 	const Complex<T>& bins(uint32_t i) const { return mBins[i]; }
 	
-	double binFreq() const;	///< Returns width of frequency bins
-	uint numBins() const;	///< Returns number of frequency bins
-	uint sizeDFT() const;	///< Returns size of forward transform
-	Sync& syncFreq();		///< Returns frequency domain synchronizer
+	double binFreq() const;		///< Returns width of frequency bins
+	uint32_t numBins() const;	///< Returns number of frequency bins
+	uint32_t sizeDFT() const;	///< Returns size of forward transform
+	Sync& syncFreq();			///< Returns frequency domain synchronizer
 	
-	void numAux(uint num);	///< Sets number of auxilliary buffers, each of size numBins()
+	void numAux(uint32_t num);	///< Sets number of auxilliary buffers, each of size numBins()
 
 	virtual void onResync(double r);
 
 protected:
-	uint mSizeDFT, mNumAux;
+	uint32_t mSizeDFT, mNumAux;
 	union{
 		T * mBuf;		// FFT buffer
 		Complex<T> * mBins;
@@ -154,21 +152,21 @@ public:
 	/// @param[in]	padSize		Number of zeros to append to window.
 	/// @param[in]	complexType	Form of complex spectral data.
 	/// @param[in]	numAux		Number of auxilliary buffers of size numBins() to create
-	DFT(uint winSize, uint padSize=0, Bin::t t = Bin::Rect, uint numAux=0);
+	DFT(uint32_t winSize, uint32_t padSize=0, Bin::t t = Bin::Rect, uint32_t numAux=0);
 	virtual ~DFT();
 
-	void binType(Bin::t t);						///< Sets format of complex spectrum data.
-	DFT& precise(bool whether);					///< Whether to use precise (but slower) math. Default is off.
-	void resize(uint windowSize, uint padSize);	///< Sets size parameters of transform.
+	void binType(Bin::t t);				///< Sets format of complex spectrum data.
+	DFT& precise(bool whether);			///< Whether to use precise (but slower) math. Default is off.
+	void resize(uint32_t windowSize, uint32_t padSize);	///< Sets size parameters of transform.
 
-	float freqRes() const;		///< Returns frequency resolution of analysis.
-	float overlap() const;		///< Returns degree of transform overlap
-	bool overlapping() const;	///< Whether the xform is overlapping
-	uint sizeHop() const;		///< Returns size of hop
-	uint sizePad() const;		///< Returns size of zero-padding
-	uint sizeWin() const;		///< Returns size of window
+	float freqRes() const;				///< Returns frequency resolution of analysis.
+	float overlap() const;				///< Returns degree of transform overlap
+	bool overlapping() const;			///< Whether the xform is overlapping
+	uint32_t sizeHop() const;			///< Returns size of hop
+	uint32_t sizePad() const;			///< Returns size of zero-padding
+	uint32_t sizeWin() const;			///< Returns size of window
 
-	Sync& syncHop();	///< Hop rate synchronizer
+	Sync& syncHop();					///< Hop rate synchronizer
 
 	/// Reads next sample in for a forward transform.
 	
@@ -214,8 +212,8 @@ public:
 	virtual void print(FILE * fp=stdout, const char * append="\n");
 	
 protected:
-	uint mSizeWin;					// samples in analysis window
-	uint mSizeHop;					// samples between forward transforms (= winSize() for DFT)
+	uint32_t mSizeWin;				// samples in analysis window
+	uint32_t mSizeHop;				// samples between forward transforms (= winSize() for DFT)
 	Bin::t mSpctFormat;				// complex format of spectrum
 	//FFTInfo mInfoFFT, mInfoIFFT;	// info for FFT
 	RFFT mFFT;
@@ -224,7 +222,7 @@ protected:
 	// Buffers
 	float * mPadOA;			// Overlap-add buffer (alloc'ed only if zero-padded)
 	float * mBufInv;		// Pointer to inverse sample buffer
-	uint mTapW, mTapR;		// DFT i/o read/write taps
+	uint32_t mTapW, mTapR;		// DFT i/o read/write taps
 	bool mPrecise;
 
 	// Magnitude normalization for inverse transform
@@ -251,10 +249,10 @@ public:
 	/// @param[in]	winType		Type of forward transform window.
 	/// @param[in]	complexType	Complex form of spectral data.
 	/// @param[in]	createAux	Whether to create an auxillary spectral buffer (see createAux()).
-	STFT(uint winSize, uint hopSize, uint padSize=0,
+	STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize=0,
 		WinType::type winType = WinType::Rectangle,
 		Bin::t t = Bin::Rect,
-		uint numAux=0);
+		uint32_t numAux=0);
 	
 	virtual ~STFT();
 	
@@ -266,8 +264,8 @@ public:
 	void forward(float * input);
 	virtual void inverse(float * dst);
 	
-	void resize(uint winSize, uint padSize);					///< Sets size parameters of transform.
-	void sizeHop(uint size);
+	void resize(uint32_t winSize, uint32_t padSize);					///< Sets size parameters of transform.
+	void sizeHop(uint32_t size);
 	void winType(WinType::type type);
 	void rotateForward(bool v){ mRotateForward = v; }
 	//void resetPhaseAccum(){  }
@@ -326,7 +324,7 @@ protected:
 
 //---- SlidingWindow
 #define TEM template<class T>
-TEM SlidingWindow<T>::SlidingWindow(uint winSize, uint hopSize)
+TEM SlidingWindow<T>::SlidingWindow(uint32_t winSize, uint32_t hopSize)
 	: mBuf(0), mSizeWin(0), mSizeHop(0), mHopCnt(0)
 {
 	resize(winSize, hopSize);
@@ -337,23 +335,23 @@ TEM SlidingWindow<T>::~SlidingWindow(){
 	if(mBuf){ free(mBuf); mBuf = 0; }
 }
 
-TEM void SlidingWindow<T>::resize(uint winSize, uint hopSize){
+TEM void SlidingWindow<T>::resize(uint32_t winSize, uint32_t hopSize){
 	sizeWin(winSize);
 	sizeHop(hopSize);
 	//mTapW = hopStart();	// for single-buffer slide mode
 	mTapW = 0;				// for single-buffer rotate mode
 }
 
-TEM void SlidingWindow<T>::sizeWin(uint size){
+TEM void SlidingWindow<T>::sizeWin(uint32_t size){
 	if(mem::resize(mBuf, sizeWin(), size)) mSizeWin = size;
 }
 
-TEM void SlidingWindow<T>::sizeHop(uint size){
-	mSizeHop = scl::clip(size, sizeWin(), (uint)1);
+TEM void SlidingWindow<T>::sizeHop(uint32_t size){
+	mSizeHop = scl::clip(size, sizeWin(), (uint32_t)1);
 }
 
-TEM inline uint SlidingWindow<T>::sizeHop() const { return mSizeHop; }
-TEM inline uint SlidingWindow<T>::sizeWin() const { return mSizeWin; }
+TEM inline uint32_t SlidingWindow<T>::sizeHop() const { return mSizeHop; }
+TEM inline uint32_t SlidingWindow<T>::sizeWin() const { return mSizeWin; }
 TEM inline const T * SlidingWindow<T>::window(){ return mBuf; }
 TEM inline const T * SlidingWindow<T>::operator()(){ return mBuf; }
 
@@ -394,7 +392,7 @@ TEM inline void SlidingWindow<T>::slide(){
 	mem::deepMove(mBuf, mBuf + sizeHop(), hopStart());
 }
 
-TEM inline uint SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(); }
+TEM inline uint32_t SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(); }
 
 
 
@@ -407,14 +405,14 @@ TEM DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
 	mem::free(mAux);
 }
 
-TEM inline T *		DFTBase<T>::aux(uint num){ return mAux + numBins() * num; }
+TEM inline T *		DFTBase<T>::aux(uint32_t num){ return mAux + numBins() * num; }
 TEM inline double	DFTBase<T>::binFreq() const { return spu() / (double)sizeDFT(); }
-TEM inline uint	    DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
-TEM inline uint	    DFTBase<T>::sizeDFT() const { return mSizeDFT; }
+TEM inline uint32_t	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
+TEM inline uint32_t	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
 TEM inline Sync&	DFTBase<T>::syncFreq(){ return mSyncFreq; }
 TEM inline T		DFTBase<T>::normForward() const { return (T)2 / (T)sizeDFT(); }
 
-TEM void DFTBase<T>::numAux(uint num){
+TEM void DFTBase<T>::numAux(uint32_t num){
 	if(mem::resize(mAux, mNumAux * numBins(), num * numBins())) mNumAux = num;
 }
 
@@ -429,9 +427,9 @@ TEM void DFTBase<T>::onResync(double r){
 inline float DFT::freqRes() const { return spu() / (float)sizeWin(); }
 inline float DFT::overlap() const { return (float)sizeWin() / (float)sizeHop(); }
 inline bool DFT::overlapping() const { return sizeHop() < sizeWin(); }
-inline uint DFT::sizeHop() const { return mSizeHop; }
-inline uint DFT::sizePad() const { return mSizeDFT - mSizeWin; }
-inline uint DFT::sizeWin() const { return mSizeWin; }
+inline uint32_t DFT::sizeHop() const { return mSizeHop; }
+inline uint32_t DFT::sizePad() const { return mSizeDFT - mSizeWin; }
+inline uint32_t DFT::sizeWin() const { return mSizeWin; }
 inline Sync& DFT::syncHop(){ return mSyncHop; }
 //inline float DFT::normInverse() const { return 0.5f * (float)sizeHop() / (float)sizeWin(); } /* o-a factor depends on window */
 inline float DFT::normInverse() const { return 0.5f; }
@@ -523,7 +521,7 @@ TEM inline void SDFT<T>::forward(T input){
 	// multiply freq samples by 1st harmonic (shift time signal)
 	// add time sample to all bins (set time sample at n=0)
 	
-	for(uint k=mBinLo; k<mBinHi; ++k){
+	for(uint32_t k=mBinLo; k<mBinHi; ++k){
 		Complex<T>& b = this->bins(k);
 		b = b*c + dif;
 		c *= mF1;

@@ -297,7 +297,7 @@ int main(int argc, char* argv[]){
 	for(int i=0; i<tableSize; ++i){
 		sdft.forward(table[i]);
 		
-		{ for(int i=0; i<sdft.numBins(); ++i){
+		{ for(unsigned i=0; i<sdft.numBins(); ++i){
 			Complexf& c = sdft.bins(i);
 			printf("[%d] ", i);
 			printf("% 5.3f ", c.r); printf("% 5.3f ", c.i);

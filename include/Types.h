@@ -584,9 +584,9 @@ struct Vec : public Multi<N,T> {
 	V& operator +=(const V& v){ DO (*this)[i] += v[i]; return *this; }
 	V& operator +=(const T& v){ DO (*this)[i] += v;    return *this; }
 
-	T dot() const { return dot(*this); }
 	T dot(const V& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
-	T norm() const { return sqrt(dot()); }
+	T norm() const { return sqrt(norm2()); }
+	T norm2() const { return dot(*this); }
 
 	V sgn() const { V(*this) /= norm(); }
 

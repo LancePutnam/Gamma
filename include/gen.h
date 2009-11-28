@@ -27,6 +27,8 @@
 #include "Types.h"
 
 namespace gam{
+
+/// Generator function objects
 namespace gen{
 
 /// Single value generator
@@ -280,44 +282,6 @@ OF3(RSin,		rSin,		0,0,1)
 #undef OF2
 #undef OF3
 #undef INHERIT
-
-
-/// Complex phasor
-template <class T=double>
-class Phasor : public Complex<T>{
-public:
-	typedef Complex<T> C;
-	using C::operator();
-
-	Phasor(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0)){
-		set(frq, amp, phs);
-	}
-
-	C& operator()(){ return (*this) *= mFreq; }
-
-	void freq(const T& v){ mFreq.fromPhase(v*M_2PI); }
-
-	/// Set unit frequency, amplitude, and unit phase
-	
-	/// The phase will be rewound 1 iteration so the first function call
-	/// will return a complex number at the desired phase.
-	void set(const T& frq, const T& amp, const T& phs){
-		this->fromPolar(amp, (phs-frq)*M_2PI);
-		freq(frq);
-	}
-
-	void set(const T& frq, const Complex<T>& phs){
-		(*this)(phs.r, phs.i); freq(frq);
-	}
-	
-	C forward1() const { return (*this)*mFreq; }
-	C reverse1() const { return (*this)/mFreq; }
-	
-	T freq() const { return mFreq.phase()*M_1_2PI; }
-
-protected:
-	C mFreq;
-};
 
 
 struct OnOff{

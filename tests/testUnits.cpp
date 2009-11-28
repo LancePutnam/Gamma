@@ -451,14 +451,6 @@ int main(int argc, char* argv[]){
 	T(0.50) T(4.0) T(8.0) T(1111.0)
 	#undef T
 
-	#define T(x) assert(scl::item(x, 0, 1, 2) == x);
-	T(0) T(1) T(2)
-	#undef T
-
-	#define T(x) assert(scl::item(x, 0, 1, 2, 3) == x);
-	T(0) T(1) T(2) T(3)
-	#undef T
-
 	#define T(x) assert(scl::log2(1<<x) == x);
 	T(0) T(1) T(2) T(3) T(4) T(29) T(30) T(31)
 	#undef T
