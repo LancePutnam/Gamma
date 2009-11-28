@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "AudioIO.h"
+#include "Visual.h"
 #include "scl.h"
 
 #define SAFE_FREE(ptr) if(ptr){ free(ptr); ptr = 0; }
@@ -141,7 +142,7 @@ void AudioIO::init(){
 	outDevice(defaultOutDevice());
 	
 	// Setup input stream parameters
-	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);
+	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);	
 	if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
 	mInParams.sampleFormat = paFloat32;// | paNonInterleaved;
 	//mInParams.sampleFormat = paInt16;
@@ -170,13 +171,18 @@ void AudioIO::chans(int num, bool forOutput){
 	PaStreamParameters * params = forOutput ? &mOutParams : &mInParams;
 	
 	if(num == 0){
-		params->device = paNoDevice;
+		//params->device = paNoDevice;
 		params->channelCount = 0;
 		return;
 	}
 
 	const PaDeviceInfo * info = Pa_GetDeviceInfo(params->device);
-	if(0 == info) return;	// this particular device is not open, so return
+	if(0 == info){
+		if(forOutput)	gam::warn("attempt to set number of channels on invalid output device", "gam::AudioIO");
+		else			gam::warn("attempt to set number of channels on invalid input device", "gam::AudioIO");
+		return;	// this particular device is not open, so return
+	}
+
 
 	// compute number of channels to give PortAudio
 	int maxChans = 
@@ -235,8 +241,9 @@ bool AudioIO::open(){
 		PaStreamParameters * outParams = &mOutParams;
 		
 		// Must pass in 0s for input- or output-only streams.
-		if(paNoDevice ==  inParams->device) inParams  = 0;
-		if(paNoDevice == outParams->device) outParams = 0;
+		// Stream will not be opened if no device or channel count is zero
+		if((paNoDevice ==  inParams->device) || (0 ==  inParams->channelCount)) inParams  = 0;
+		if((paNoDevice == outParams->device) || (0 == outParams->channelCount)) outParams = 0;
 
 		mErrNum = Pa_OpenStream(
 			&mStream,			// PortAudioStream **
