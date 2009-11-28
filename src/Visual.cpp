@@ -1,6 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <stdlib.h>
 #include "Visual.h"
 
 namespace gam{
@@ -56,21 +57,6 @@ void colorRGB(float h, float s, float v, float &r, float &g, float &b){
 		case 3:	r = p; g = q; b = v; break;
 		case 4: r = q; g = p; b = v; break;
 		default:r = v; g = p; b = q; break;
-	}
-}
-
-void print(const float * src, uint32_t len){
-	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f\n", (int)i, *src++);
-}
-
-void print(const float * src1, const float * src2, uint32_t len){
-	for(uint32_t i=0; i<len; i++) printf("[%4d]\t% f % f\n", (int)i, *src1++, *src2++);
-}
-
-void printHex(const float * src, uint32_t len){
-	for(uint32_t i=0; i<len; i++){
-		float v = *src++;
-		printf("[%4d] % 5.3f %8lx\n", (int)i, v, (unsigned long)*(uint32_t *)&v);
 	}
 }
 
@@ -135,6 +121,16 @@ void printPlot(float value, uint32_t width, bool spaces, const char * point){
 	
 	end: 
 	if(spaces) for(; i<width; ++i) printf(" ");
+}
+
+
+void err(const char * msg, const char * src, bool exits){
+	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
+	if(exits) exit(EXIT_FAILURE);
+}
+
+void warn(const char * msg, const char * src){
+	fprintf(stderr, "%s%swarning: %s\n", src, src[0]?" ":"", msg);
 }
 
 

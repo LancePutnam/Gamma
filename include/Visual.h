@@ -23,18 +23,6 @@ char intensityToASCII(float v);
 
 template<class T> void print(const T& v, const char * post="", const char * pre="", FILE * fp=stdout);
 
-void print(const float * src, uint32_t len);
-void print(const float * src1, const float * src2, uint32_t len);
-
-template <class T>
-void print(const T * src, uint32_t len, const char * format);
-
-/// Print values in array from index table.
-template <class T>
-void print(const T * src, const uint32_t * indices, uint32_t indicesLen, const char * format);
-
-void printHex(const float * src, uint32_t len);
-
 /// Prints 2D pixel array
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
 
@@ -54,6 +42,12 @@ void printHexArray(float * table, uint32_t len, uint32_t valuesPerLine);
 /// @param[in]	spaces	Print extra filling spaces to the right
 /// @param[in]	point	The print character for points
 void printPlot(float value, uint32_t width=50, bool spaces=true, const char * point="o");
+
+/// Prints error messge to stderr and optionally calls exit()
+void err(const char * msg, const char * src="", bool exits=true);
+
+/// Prints warning messge to stderr
+void warn(const char * msg, const char * src="");
 
 
 
@@ -76,25 +70,6 @@ inline void print<type>(const type& v, const char * post, const char * pre, FILE
 }
 DEF(float, f) DEF(double, f) DEF(uint32_t, d) DEF(int, d)
 #undef DEF
-
-template <class T>
-void print(const T * src, uint32_t len, const char * format){
-	for(uint32_t i=0; i<len; ++i){ 
-		printf("[%4lu]\t", i);
-		printf(format, *src++);
-		printf("\n");
-	}
-}
-
-template <class T>
-void print(const T * src, const uint32_t * indices, uint32_t indicesLen, const char * format){
-	for(uint32_t i=0; i<indicesLen; i++){
-		uint32_t index = *indices++;
-		printf("[%4d]\t", index);
-		printf(format, src[index]);
-		printf("\n");
-	}
-}
 
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout){
 	for(int j=0; j<nx; ++j){
