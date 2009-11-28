@@ -161,9 +161,6 @@ struct Complex{
 	T phase() const { return arg(); }						///< Returns argument (angle)
 };
 
-typedef Complex<float > Complexf;
-typedef Complex<double> Complexd;
-
 #define TEM template <class T>
 TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
 TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
@@ -412,8 +409,6 @@ TEM Quat<T> operator * (T r, const Quat<T>& q){ return  q*r; }
 TEM Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); }
 #undef TEM
 
-typedef Quat<float> Quatf;
-typedef Quat<double> Quatd;
 
 
 template <class T>
@@ -667,6 +662,18 @@ struct Vec4 : public Vec<4, T> {
 };
 
 
+typedef Complex<float > Complexf;
+typedef Complex<double> Complexd;
+typedef Mat3<float> Mat3f;
+typedef Mat3<double> Mat3d;
+typedef Vec2<float> Vec2f;
+typedef Vec2<double> Vec2d;
+typedef Vec3<float> Vec3f;
+typedef Vec3<double> Vec3d;
+typedef Vec4<float> Vec4f;
+typedef Vec4<double> Vec4d;
+typedef Quat<float> Quatf;
+typedef Quat<double> Quatd;
 
 
 // Trying to abstract too many things. Hard to write subclasses of templates
