@@ -124,69 +124,6 @@ struct BoundaryWrap{
 
 
 
-// We want this thing to be able to provide a standard interface to indexing
-// classes without relying heavily (or at all) on virtual functions.
-
-class Indexer{
-public:
-	Indexer(uint32_t end=1, uint32_t stride=1, uint32_t begin=0)
-	:	mEnd(end), mBegin(begin), mStride(stride)
-	{}
-	
-	virtual ~Indexer(){}
-	
-	uint32_t begin() const { return mBegin; }			// Begin index (inclusive)
-	bool cond(uint32_t i) const { return i < end(); }	// Continuation condition
-	uint32_t end() const { return mEnd; }				// End index (exclusive)
-	virtual uint32_t index(uint32_t i) const { return i; }	// Iteration to index map 
-	uint32_t stride() const { return mStride; }			// Index stride amount
-
-protected:
-	uint32_t mEnd, mBegin, mStride;
-};
-
-typedef Indexer Loop;
-
-
-class Indices : public Indexer{
-public:
-
-	Indices(uint32_t maxSize)
-	:	Indexer(0), mMaxSize(maxSize)
-	{	mElems = new uint32_t[maxSize]; }
-
-	~Indices(){ delete[] mElems; }
-
-	// add value to indices
-	void operator+= (uint32_t v){
-		for(uint32_t i=0; i<end(); ++i)
-			mElems[i] = (mElems[i] + v) % mMaxSize;
-	}
-
-	// multiply indices by value
-	void operator*= (double v){
-		for(uint32_t i=0; i<end(); ++i)
-			mElems[i] = ((uint32_t)((double)mElems[i] * v + 0.5)) % mMaxSize;
-	}
-
-	// add new index
-	Indices& operator<< (uint32_t index){
-		if(end() < mMaxSize && index < mMaxSize) mElems[mEnd++] = index;
-		return *this;
-	}
-
-	void clear(){ mEnd=0; }
-	uint32_t * elems() const { return mElems; }
-
-	uint32_t index(uint32_t i) const { return mElems[i]; }
-
-private:
-	uint32_t mMaxSize;
-	uint32_t * mElems;
-};
-
-
-
 /// Maps a real number in [0, pmax) to an integer in [0, imax).
 template <class T>
 class IndexMap{
@@ -291,40 +228,6 @@ struct NeighborsDiag2D{
 
 
 
-// 1-D arithmetic series index generator
-// for(Series1 i(N); i();)
-//struct Series1{
-//	Series1(int end, int stride=1, int start=0)
-//	:	i(start-stride), n(end-start), mEnd(end), mStride(stride){}
-//
-//	bool operator()(){ i += mStride; return i < mEnd; }
-//	
-//	int flat() const { return i; }
-//	double frac() const { return double(i)/n; }
-//	double fracS() const { return double(i<<1)/n - 1.; }
-//	
-//	operator int(){ return flat(); }
-//	
-//	int i, n;
-//private:
-//	int mEnd, mStride;
-//};
-
-//struct Series3{
-//	Series1(int end1, int end2, int end3, int stride=1)
-//	:	i(start-stride), n(end-start), mEnd(end), mStride(stride){}
-//
-//	bool operator()(){ i += mStride; return i < mEnd; }
-//	
-//	int flat() const { return i; }
-//	double frac() const { return double(i)/n; }
-//	double fracS() const { return double(i<<1)/n - 1.; }
-//	
-//	operator int(){ return flat(); }
-//	
-//private:
-//	int mEnd, mStride;
-//};
 
 
 struct Scan1{
@@ -403,76 +306,195 @@ struct Scan3{
 };
 
 
+
+
+
+
+/// Unbounded no-op index map
+class Indexer{
+public:
+	Indexer(int32_t count_, double stride_=1.)
+	:	mCount(count_)
+	{}
+
+	void count(int32_t v){ mCount=v; }
+	
+	int32_t operator()(int32_t i, int32_t max=-1) const { return i; }
+
+	int32_t count() const { return mCount; }
+
+protected:
+	int32_t mCount;
+};
+
+
+/// Unbounded integer strided index map
+class IndexerInt : public Indexer {
+public:
+	IndexerInt(int32_t count_, double stride_=1.)
+	:	Indexer(count_), mStride(stride_)
+	{}
+
+	void stride(int32_t v){ mStride=v; }
+
+	int32_t operator()(int32_t i, int32_t max=-1) const { return i*stride(); }
+
+	int32_t stride() const { return mStride; }
+
+protected:
+	int32_t mStride;
+};
+
+
+/// Bounded real strided index map
+class IndexerReal : public Indexer {
+public:
+	IndexerReal(int32_t count_, double stride_=1.)
+	:	Indexer(count_), mEps(0)
+	{ stride(stride_); }
+	
+	// This should be half of the smallest fractional component of stride
+	void eps(double v){ mEps=v; }
+
+	void stride(double v){ mStride=v; eps(0.); }
+	
+	void strides(int32_t s1, int32_t s2){ mStride=s1 + 1./s2; eps(0.5/s2); }
+	void strides(int32_t s1, int32_t s2, int32_t s3){ mStride=s1 + 1./s2 + 1./(s2*s1); eps(0.5/(s2*s1)); }
+
+	int32_t operator()(int32_t i, int32_t max) const {	
+		// conversion can fail on integer boundaries because fraction is not exact
+		// add offset equal to 1/2 the fractional part of the stride...
+		int32_t r = (i*stride() + mEps);
+		
+		// i*n1 + i/n2
+
+		int32_t d = max;
+		if(r>=max){ r-=max; if(r>=max){ r-=d*(r/d); } }
+		else if(r<0){ r+=max; if(r<0){ r+=d*(1 - r/d); } }
+		return r;
+	}
+
+	double stride() const { return mStride; }
+
+protected:
+	double mStride, mEps;
+};
+
+
+
+
+#define L1 for(int32_t i=0;i<count();++i)
+#define L2 int32_t n=minCount(v); for(int32_t i=0;i<n;++i)
+
+
 /// Uniformly strided section of an array
+
+/// For operations between different slices, the minimum count between the
+/// two slices will be used for iteration.
 template <class T>
 class Slice{
 public:
 
-	/// @param[in] src	pointer to array elements
-	/// @param[in] len	size of parent array
-	/// @param[in] str	stride increment through array
-	Slice(T * src, uint32_t len, uint32_t str=1): a(src), n(len), s(str){}
+	/// @param[in] src		pointer to array elements
+	/// @param[in] count	how many elements to iterate over
+	/// @param[in] stride	stride increment through array
+	/// @param[in] offset	absolute offset into array, -1 is last, -2 penultimate, etc.
+	Slice(T * src, int32_t count_, int32_t stride_=1, int32_t offset_=0)
+	:	A(src), C(count_), S(stride_)
+	{	offset(offset_);	}
 
-	#define DO for(uint32_t i=0; i<n; i+=s)
-
-	template <class Gen>
-	bool operator == (const Gen& g) const { DO{ if(g() != a[i]) return false; } return true; }
-	bool operator == (const   T& v) const { DO{ if(v   != a[i]) return false; } return true; }
-
-	template <class Gen>
-	Slice& operator  = (const Gen& g){ DO{ a[i] =g(); } return *this; }
-	Slice& operator  = (const   T& v){ DO{ a[i] =v  ; } return *this; }
+	/// Returns new sub-slice
+	Slice operator()(int32_t cnt, int32_t str=1, int32_t off=0) const { return Slice(A, cnt,str,off); }
 	
-	/// Set elements from another slice.
-	
-	/// The number of elements copied will be the minimum of the two slices'
-	/// number of elements. Source elements are statically cast to the type of
-	/// the destination slice.
-	template <class Ts>
-	Slice& operator  = (const Slice<Ts>& src){ return equal(src); }
-	Slice& operator  = (const Slice& src){ return equal(src); }
+	/// Returns ith count element
+	T& operator[](int32_t i) const { return B[i*S]; }
 
 	template <class Gen>
-	Slice& operator += (const Gen& g){ DO{ a[i]+=g(); } return *this; }
-	Slice& operator += (const   T& v){ DO{ a[i]+=v  ; } return *this; }
+	const Slice& operator  = (const Gen& v) const { L1{ (*this)[i] =v(); } return *this; }
+	const Slice& operator  = (const   T& v) const { L1{ (*this)[i] =v  ; } return *this; }
 
 	template <class Gen>
-	Slice& operator *= (const Gen& g){ DO{ a[i]*=g(); } return *this; }
-	Slice& operator *= (const   T& v){ DO{ a[i]*=v  ; } return *this; }
+	bool operator == (const Gen& v) const { L1{ if(v() != (*this)[i]) return false; } return true; }
+	bool operator == (const   T& v) const { L1{ if(v   != (*this)[i]) return false; } return true; }
+
+	template <class U>
+	const Slice& operator += (const Slice<U>& v) const { L2{ (*this)[i]+=T(v[i]); } return *this; }
+
+	template <class Gen>
+	const Slice& operator += (const Gen& v) const { L1{ (*this)[i]+=v(); } return *this; }
+	const Slice& operator += (const   T& v) const { L1{ (*this)[i]+=v  ; } return *this; }
+
+	template <class U>
+	const Slice& operator *= (const Slice<U>& v) const { L2{ (*this)[i]*=T(v[i]); } return *this; }
+
+	template <class Gen>
+	const Slice& operator *= (const Gen& v) const { L1{ (*this)[i]*=v(); } return *this; }
+	const Slice& operator *= (const   T& v) const { L1{ (*this)[i]*=v  ; } return *this; }
+
+	/// Copy elements from another slice.
 	
-	#undef DO
+	/// Source elements are statically cast to the type of the destination slice.
+	///
+	template <class U>
+	const Slice& copy(const Slice<U>& v) const { L2{ (*this)[i]=v[i]; } return *this; }
 
-	T * elems() const { return a; }
+	/// Apply filter in-place
+	template <class Fil>
+	const Slice& filter(const Fil& v) const { L1{ (*this)[i]=v((*this)[i]); } return *this; }
 
-	/// Returns number elements in slice
-	uint32_t size() const { return n/s; }
+	T mean() const { return sum()/C; }
 
-	/// Returns stride amount through parent array
-	uint32_t stride() const { return s; }
+	/// Reverse slice
+	const Slice& reverse(){ B=B+(C-1)*S; S=-S; return *this; }
+	
+	/// Returns reversed slice
+	Slice reversed() const { Slice r=*this; r.B=B+(C-1)*S; r.S=-r.S; return r; }
 
-	/// Returns number of elements in parent array
-	uint32_t supersize() const { return n; }
+	/// Set all elements to argument
+	const Slice& set(const T& v=T()) const { return (*this = v); }
+
+	/// Returns sum of elements in slice
+	T sum() const { T r=T(0); L1{ r+=(*this)[i]; } return r; }
+
+	/// Swaps elements
+	template <class U>
+	const Slice& swap(const Slice<U>& v) const {
+		L2{ T t=(*this)[i]; (*this)[i]=v[i]; v[i]=t; }
+		return *this;
+	}	
+
+	int32_t count() const { return C; }
+	int32_t offset() const { return B-A; }
+	int32_t stride() const { return S; }
+	int32_t N() const { return (S>0?S:-S)*C; }
+
+	Slice& count(int32_t v){ C=v; return *this; }
+	Slice& offset(int32_t v){ B=A+(v<0 ? N()+v : v); return *this; }
+	Slice& stride(int32_t v){ S=v; return *this; }
 
 protected:
-	T * a;
-	uint32_t n,s;
-	
-	template <class Ts>
-	Slice& equal(const Slice<Ts>& src){
-		uint32_t sd=size(), ss=src.size();
-		uint32_t m = sd<ss?sd:ss;
-		for(uint32_t id=0,is=0; id<m*stride(); id+=stride(), is+=src.stride()){
-			elems()[id] = T(src.elems()[is]);
-		}
-		return *this;
-	}
+	T * A, * B;		// absolute, relative pointers
+	int32_t C,S;	// count, stride
+	int32_t minCount(const Slice& o) const { return count()<o.count() ? count() : o.count(); }
 };
+
+#undef L1
+#undef L2
 
 /// Slice object function
 template <class T>
-Slice<T> slice(T * src, uint32_t len, uint32_t str=1){ return Slice<T>(src,len,str); }
+Slice<T> slice(T * src, int32_t cnt, int32_t str=1, int32_t off=0){ return Slice<T>(src,cnt,str,off); }
 
 
+/*
+1 2 3 4 5 6 7 8
+1 5 2 6 3 7 4 8		d = 4 + 1/2
+1 3 5 7 2 4 6 8		d = 2 + 1/4
+
+1 2 3 4 5 6 7 8 9
+1 4 7 2 5 8 3 6 9	d = 3 + 1/3
+
+*/
 
 /*
 
@@ -493,28 +515,44 @@ for(int j=0; j<sy; ++j){
 */
 
 
-/*
-// Upward counting indexer
-class Loop{
-public:
-	Loop(uint end=1, uint stride=1, uint begin=0)
-	:	mEnd(end), mBegin(begin), mStride(stride)
-	{}
-	
-	Loop& operator()(uint end, uint stride=1, uint begin=0){
-		mEnd = end; mBegin = begin; mStride = stride; return *this;
-	}
-	
-	uint begin() const { return mBegin; }			// Begin index (inclusive)
-	bool cond(uint i) const { return i < end(); }	// Continuation condition
-	uint end() const { return mEnd; }				// End index (exclusive)
-	uint index(uint i) const { return i; }			// Iteration to index map 
-	uint stride() const { return mStride; }			// Index stride amount
 
-private:
-	uint mEnd, mBegin, mStride;
-};
-*/
+//class Indices : public Indexer{
+//public:
+//
+//	Indices(uint32_t maxSize)
+//	:	Indexer(0), mMaxSize(maxSize)
+//	{	mElems = new uint32_t[maxSize]; }
+//
+//	~Indices(){ delete[] mElems; }
+//
+//	// add value to indices
+//	void operator+= (uint32_t v){
+//		for(uint32_t i=0; i<end(); ++i)
+//			mElems[i] = (mElems[i] + v) % mMaxSize;
+//	}
+//
+//	// multiply indices by value
+//	void operator*= (double v){
+//		for(uint32_t i=0; i<end(); ++i)
+//			mElems[i] = ((uint32_t)((double)mElems[i] * v + 0.5)) % mMaxSize;
+//	}
+//
+//	// add new index
+//	Indices& operator<< (uint32_t index){
+//		if(end() < mMaxSize && index < mMaxSize) mElems[mEnd++] = index;
+//		return *this;
+//	}
+//
+//	void clear(){ mEnd=0; }
+//	uint32_t * elems() const { return mElems; }
+//
+//	uint32_t index(uint32_t i) const { return mElems[i]; }
+//
+//private:
+//	uint32_t mMaxSize;
+//	uint32_t * mElems;
+//};
+
 
 
 // experimental index set
