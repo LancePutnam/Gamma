@@ -16,7 +16,6 @@
 
 namespace gam{
 
-typedef unsigned long	uint;	// default natural number type
 typedef float			real;	// default real number type
 
 

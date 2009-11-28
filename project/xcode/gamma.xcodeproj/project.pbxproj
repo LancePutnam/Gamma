@@ -71,6 +71,8 @@
 		16938C1B0FBD214E00274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938C300FBD217200274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
 		16938C3D0FBD218900274B2A /* Visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938B410FBD1CCF00274B2A /* Visual.cpp */; };
+		169F711310C1CFEE00FB2BA0 /* Chaos.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* Chaos.h */; };
+		169F711410C1CFEE00FB2BA0 /* Chaos.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* Chaos.h */; };
 		16A94B3710641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
 		16A94B3810641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
 		16A94B3910641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
@@ -240,7 +242,6 @@
 		C0F9EF6C0BB059770069B343 /* AudioIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F836E10A1E888200F05DF5 /* AudioIO.h */; };
 		C0F9EF6D0BB059840069B343 /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9B9094F8C2600549AC9 /* Constants.h */; };
 		C0F9EF6E0BB059850069B343 /* Containers.h in Headers */ = {isa = PBXBuildFile; fileRef = 16CCF9C00A9EC1650013D2BF /* Containers.h */; };
-		C0F9EF6F0BB059860069B343 /* Chaos.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C953970AC76986006AE787 /* Chaos.h */; };
 		C0F9EF710BB0598E0069B343 /* Delay.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9BD094F8C2600549AC9 /* Delay.h */; };
 		C0F9EF720BB0598F0069B343 /* DFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D15CA309F0219B001AE497 /* DFT.cpp */; };
 		C0F9EF730BB059900069B343 /* DFT.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D15CA209F0219B001AE497 /* DFT.h */; };
@@ -319,6 +320,7 @@
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169D40E30A81694200605E51 /* testAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioIO.cpp; path = ../../tests/testAudioIO.cpp; sourceTree = SOURCE_ROOT; };
 		169E1E780B97F02A0011870A /* testAudioPVoc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioPVoc.cpp; path = ../../tests/testAudioPVoc.cpp; sourceTree = SOURCE_ROOT; };
+		169F711210C1CFEE00FB2BA0 /* Chaos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chaos.h; sourceTree = "<group>"; };
 		16A94B171064111D000B942A /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Serialize.h; sourceTree = "<group>"; };
 		16A94B3610641689000B942A /* Serialize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serialize.cpp; sourceTree = "<group>"; };
 		16ABE5F810A62A1100B1096E /* testArray */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testArray; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -333,7 +335,6 @@
 		16C8729A0EFA14EA00449449 /* testNode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNode; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C872A70EFA151600449449 /* testNoise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNoise; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C872B60EFA154000449449 /* testParticle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testParticle; sourceTree = BUILT_PRODUCTS_DIR; };
-		16C953970AC76986006AE787 /* Chaos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Chaos.h; path = ../../include/Chaos.h; sourceTree = SOURCE_ROOT; };
 		16CB4CCC0A6C5DC400F94EC1 /* testScalar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testScalar.cpp; path = ../../tests/testScalar.cpp; sourceTree = SOURCE_ROOT; };
 		16CCF9C00A9EC1650013D2BF /* Containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Containers.h; path = ../../include/Containers.h; sourceTree = SOURCE_ROOT; };
 		16CDD4430ABF788300F66F1B /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mem.h; path = ../../include/mem.h; sourceTree = SOURCE_ROOT; };
@@ -771,6 +772,7 @@
 				16EDF9C9094F8C2600549AC9 /* scl.h */,
 				16EDF9EB094F8C2600549AC9 /* tbl.h */,
 				1686EA810F8DB1F100D0452F /* Access.h */,
+				169F711210C1CFEE00FB2BA0 /* Chaos.h */,
 				16EDF9B9094F8C2600549AC9 /* Constants.h */,
 				16CCF9C00A9EC1650013D2BF /* Containers.h */,
 				16938ABF0FBD0C4400274B2A /* Conversion.h */,
@@ -779,7 +781,6 @@
 				16F7D07C0B5414A1008A2E29 /* Node.h */,
 				7EF76F910D10B49700F83B85 /* Ambisonics.h */,
 				16F836E10A1E888200F05DF5 /* AudioIO.h */,
-				16C953970AC76986006AE787 /* Chaos.h */,
 				16EDF9BD094F8C2600549AC9 /* Delay.h */,
 				16D15CA209F0219B001AE497 /* DFT.h */,
 				16CF8D5A0BD9921200A80471 /* Effects.h */,
@@ -939,6 +940,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				160351A50D090B9D003CC766 /* gen.h in Headers */,
+				169F711410C1CFEE00FB2BA0 /* Chaos.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -950,7 +952,6 @@
 				C0F9EF6C0BB059770069B343 /* AudioIO.h in Headers */,
 				C0F9EF6D0BB059840069B343 /* Constants.h in Headers */,
 				C0F9EF6E0BB059850069B343 /* Containers.h in Headers */,
-				C0F9EF6F0BB059860069B343 /* Chaos.h in Headers */,
 				C0F9EF710BB0598E0069B343 /* Delay.h in Headers */,
 				C0F9EF730BB059900069B343 /* DFT.h in Headers */,
 				C0F9EF750BB059930069B343 /* Envelope.h in Headers */,
@@ -970,6 +971,7 @@
 				16CF8D5B0BD9921200A80471 /* Effects.h in Headers */,
 				165CB76C0CC4385F002B17A2 /* Timer.h in Headers */,
 				160351A40D090B9C003CC766 /* gen.h in Headers */,
+				169F711310C1CFEE00FB2BA0 /* Chaos.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3516,10 +3518,14 @@
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../../include;
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
@@ -3537,10 +3543,14 @@
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../../include;
 				PREBINDING = NO;
 			};
@@ -3554,10 +3564,14 @@
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../../include;
 				PREBINDING = NO;
 			};

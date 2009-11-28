@@ -391,6 +391,8 @@ protected:
 
 /// For operations between different slices, the minimum count between the
 /// two slices will be used for iteration.
+/// All operations requiring elements to be copied perform a shallow copy
+/// (i.e. use '=' operator) and therefore are safe to use with objects.
 template <class T>
 class Slice{
 public:
@@ -442,8 +444,6 @@ public:
 	template <class Fil>
 	const Slice& filter(const Fil& v) const { L1{ (*this)[i]=v((*this)[i]); } return *this; }
 
-	T mean() const { return sum()/C; }
-
 	/// Reverse slice
 	const Slice& reverse(){ B=B+(C-1)*S; S=-S; return *this; }
 	
@@ -453,15 +453,18 @@ public:
 	/// Set all elements to argument
 	const Slice& set(const T& v=T()) const { return (*this = v); }
 
-	/// Returns sum of elements in slice
-	T sum() const { T r=T(0); L1{ r+=(*this)[i]; } return r; }
-
 	/// Swaps elements
 	template <class U>
 	const Slice& swap(const Slice<U>& v) const {
 		L2{ T t=(*this)[i]; (*this)[i]=v[i]; v[i]=t; }
 		return *this;
-	}	
+	}
+	
+	/// Returns mean of elements
+	T mean() const { return sum()/C; }
+
+	/// Returns sum of elements in slice
+	T sum() const { T r=T(0); L1{ r+=(*this)[i]; } return r; }
 
 	int32_t count() const { return C; }
 	int32_t offset() const { return B-A; }

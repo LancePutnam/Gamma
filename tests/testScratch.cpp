@@ -10,7 +10,7 @@ int main(int argc, char** argv){
 
 	using namespace gam;
 
-	const gam::uint size = 8;
+	const uint32_t size = 8;
 	float buf[size];
 	Sync::master().spu(size);
 	

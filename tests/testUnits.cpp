@@ -26,7 +26,6 @@ int main(int argc, char* argv[]){
 	// Unit tests are ordered from the least to most dependent functions/objects
 	// in order to catch errors in base functionality.
 
-
 	const double pinf = 1e800;			// + infinity
 	const double ninf = -pinf;			// - infinity
 	const double nan  = pinf * 0.;		// not-a-number
@@ -42,6 +41,8 @@ int main(int argc, char* argv[]){
 		assert(f.write(buf, 1, sizeof(buf)) == sizeof(buf));
 		f.close();
 		assert(!f.opened());
+		
+		assert(File::exists(path));
 		
 		f.mode("r");
 		assert(f.open());

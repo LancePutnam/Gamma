@@ -34,13 +34,13 @@ namespace gen{
 /// Single value generator
 template <class T=gam::real>
 struct Val{
-	Val(): val(T(0)){}								///< Constructor
-	Val(const T& v): val(v){}						///< Constructor
+	Val(): val(T(0)){}										///< Constructor
+	Val(const T& v): val(v){}								///< Constructor
 	Val& operator = (const T& v){ val=v; return *this; }	///< Set value
-	T operator()() const { return val; }			///< Generate next value
-	T& operator[](uint i)      { return val; }		///< Array set; sets current value 
-	T  operator[](uint i) const{ return (*this)(); }///< Array get; generates next element
-	mutable T val;									///< Value
+	T operator()() const { return val; }					///< Generate next value
+	T& operator[](uint32_t i)      { return val; }			///< Array set; sets current value 
+	T  operator[](uint32_t i) const{ return (*this)(); }	///< Array get; generates next element
+	mutable T val;											///< Value
 	// Since this is a generator, we will allow its value to be modified if 
 	// it's a const.
 };
@@ -49,7 +49,7 @@ struct Val{
 // This is needed since templates are not always smart about inheriting super members.
 #define INHERIT\
 	using Val<T>::val; using Val<T>::operator=;\
-	T   operator[](uint i) const { return (*this)(); }
+	T   operator[](uint32_t i) const { return (*this)(); }
 
 template<class T=gam::real>
 struct Impulse : public Val<T>{ INHERIT;

@@ -408,7 +408,7 @@ struct Threshold{
 
 
 
-template <uint N, class T=gam::real>
+template <uint32_t N, class T=gam::real>
 struct Waveshaper{
 
 	Waveshaper(){ mem::zero(table, N); }
@@ -421,11 +421,11 @@ struct Waveshaper{
 	}
 
 	T operator()(T i0){
-		uint ind = scl::clip((uint)(i0 * (T)0.5 + (T)0.5), N-1);
+		uint32_t ind = scl::clip((uint32_t)(i0 * (T)0.5 + (T)0.5), N-1);
 		return table[ind];
 	}
 	
-	uint size(){ return N; }
+	uint32_t size(){ return N; }
 
 	T table[N];
 };
