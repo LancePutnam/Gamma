@@ -322,7 +322,7 @@ struct DelayN: public Ring<T>{
 
 	/// @param[in]	size		Number of elements to delay.
 	/// @param[in]	value		Initial value of all elements.
-	DelayN(uint32_t size, const T& value=0): Ring<T>(size, value){}
+	DelayN(uint32_t size, const T& value=T()): Ring<T>(size, value){}
 	
 	DelayN& operator=(const T& v){ Ring<T>::operator=(v); return *this; }
 
