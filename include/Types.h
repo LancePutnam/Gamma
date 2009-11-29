@@ -360,7 +360,7 @@ struct Quat{
 	}
 	
 	/// Convert to 3x3 rotation matrix
-	void toRotation(Mat3<T>& m){
+	void toMatrix(Mat3<T>& m){
 		static const T _2 = T(2);
 		static const T _1 = T(1);		
 		T _2r=_2*r, _2i=_2*i, _2j=_2*j;
