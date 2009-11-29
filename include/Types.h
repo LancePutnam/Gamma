@@ -19,7 +19,13 @@ namespace gam{
 typedef float			real;	// default real number type
 
 
-template <class T> class Mat3;
+template<class T> class Complex;
+template<class T> class Quat;
+template<class T> class Mat3;
+template<class T> class Vec2;
+template<class T> class Vec3;
+template<class T> class Vec4;
+
 
 /// Integer-based bit field
 template <class T=uint32_t>
@@ -251,11 +257,13 @@ struct Quat{
 	Q& fromAxis(T a, const Unit3& u){ return fromAxis(a, u.x, u.y, u.z); }
 	
 	Q& fromEuler(T a, T b, T c){
-		a*=(T)0.5; b*=(T)0.5; c*=(T)0.5;
+		a*=T(0.5); b*=T(0.5); c*=T(0.5);
 		T c1=cos(a), s1=sin(a), c2=cos(b), s2=sin(b), c3=cos(c), s3=sin(c);
 		T c1c2 = c1*c2;
 		T s1s2 = s1*s2;
-		return (*this)(c1c2*c3 - s1s2*s3, c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3);
+		T c1s2 = c1*s2;
+		T s1c2 = s1*c2;
+		return (*this)(c1c2*c3 - s1s2*s3, c1c2*s3 + s1s2*c3, s1c2*c3 + c1s2*s3, c1s2*c3 - s1c2*s3);
 	}
 
 	/// Set quaternion from rotation matrix
@@ -352,13 +360,14 @@ struct Quat{
 	}
 	
 	/// Convert to 3x3 rotation matrix
-	void toMat3(Mat3<T>& m){
-		T ri=r*i, rj=r*j, rk=r*k, ii=i*i, ij=i*j, ik=i*k, jj=j*j, jk=j*k, kk=k*k;
+	void toRotation(Mat3<T>& m){
 		static const T _2 = T(2);
-		static const T _1 = T(1);
-		m(	_2*(-kk-jj)+_1,	_2*( ij-rk),	_2*( rj+ik),
-			_2*( rk+ij),	_2*(-kk-ii)+_1,	_2*( jk-ri),
-			_2*( ik-rj),	_2*( ri+jk),	_2*(-jj-ii)+_1);
+		static const T _1 = T(1);		
+		T _2r=_2*r, _2i=_2*i, _2j=_2*j;
+		T ri=_2r*i, rj=_2r*j, rk=_2r*k, ii=_2i*i, ij=_2i*j, ik=_2i*k, jj=_2j*j, jk=_2j*k, kk=_2*k*k;
+		m(	(-kk-jj)+_1,( ij-rk),	( rj+ik),
+			( rk+ij),	(-kk-ii)+_1,( jk-ri),
+			( ik-rj),	( ri+jk),	(-jj-ii)+_1);
 	}
 
 	void toVectorX(T& x, T& y, T& z) const {
@@ -410,6 +419,7 @@ TEM Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); 
 
 
 
+
 template <class T>
 struct Mat3{
 	
@@ -421,10 +431,11 @@ struct Mat3{
 		a20(v20), a21(v21), a22(v22)
 	{}
 	
-	T& operator()(	const T& v00, const T& v01, const T& v02,
+	Mat3& operator()(	const T& v00, const T& v01, const T& v02,
 					const T& v10, const T& v11, const T& v12,
 					const T& v20, const T& v21, const T& v22){
-		a00=v00; a01=v01; a02=v02; a10=v10; a11=v11; a12=v12; a20=v20; a21=v21; a22=v22;			
+		a00=v00; a01=v01; a02=v02; a10=v10; a11=v11; a12=v12; a20=v20; a21=v21; a22=v22;
+		return *this;		
 	}
 	
 	/// Set element at index with no bounds checking
@@ -432,7 +443,23 @@ struct Mat3{
 
 	/// Get element at index with no bounds checking
 	const T& operator[](uint32_t i) const { return elems[i]; }
-	
+
+	Vec3<T> col0() const { return Vec3<T>(a00, a10, a20); }
+	Vec3<T> col1() const { return Vec3<T>(a01, a11, a21); }
+	Vec3<T> col2() const { return Vec3<T>(a02, a12, a22); }
+
+	void cols(Vec3<T>& c0, Vec3<T>& c1, Vec3<T>& c2) const {
+		c0(a00,a10,a20); c1(a01,a11,a21); c2(a02,a12,a22);
+	}
+
+	Vec3<T> row0() const { return Vec3<T>(a00, a01, a02); }
+	Vec3<T> row1() const { return Vec3<T>(a10, a11, a12); }
+	Vec3<T> row2() const { return Vec3<T>(a20, a21, a22); }
+
+	void rows(Vec3<T>& r0, Vec3<T>& r1, Vec3<T>& r2) const {
+		r0(a00,a01,a02); r1(a10,a11,a12); r2(a20,a21,a22);
+	}
+
 	union{
 		T elems[9];
 		struct { T x[3], y[3], z[3]; };
