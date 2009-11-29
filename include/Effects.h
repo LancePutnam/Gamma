@@ -9,6 +9,7 @@
 #include "Noise.h"
 #include "Oscillator.h"
 
+#define TEM template<class T>
 
 namespace gam{
 
@@ -460,5 +461,5 @@ struct Fract8{
 
 
 } // gam::
-
+#undef TEM
 #endif
