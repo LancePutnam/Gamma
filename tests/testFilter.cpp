@@ -73,5 +73,16 @@ int main(int argc, char* argv[]){
 //		printf("\n");
 //	}
 
+//	{
+//		//fil::FunctionObject1<float, scl::clipS<float> > f(1);
+//		fil::FunctionObject1<float, scl::clipS<float> > f(1);
+//		assert(f(10) == 1); assert(f(-10) == -1);
+//		
+//		fil::Function2<float, float, float> f2(scl::clipS<float>, 10, 1);
+//		
+//		assert(f2() == 1);
+//		assert(f2(-10) == -1);
+//	}
+
 	return 0;
 }

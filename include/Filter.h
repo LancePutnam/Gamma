@@ -26,7 +26,7 @@ public:
 	/// Set 60 dB decay length
 	void decay(const Tv& v){
 		//width(-M_LN001/(v * M_PI));
-		width(T(2.198806796637603 /* -ln(0.001)/pi */)/v);
+		width(Tv(2.198806796637603 /* -ln(0.001)/pi */)/v);
 	}
 	
 	void width(const Tv& v){

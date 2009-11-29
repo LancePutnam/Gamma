@@ -65,8 +65,8 @@ public:
 	/// @param[in] v	Initial value of elements
 	Delay2(const T& v=T()): FixedDelay<2,T>(v){}
 	
-	/// @param[in] v2	Initial value of twice delayed element
-	/// @param[in] v1	Initial value of once delayed element
+	/// @param[in] v2	Initial value of 2nd delayed element
+	/// @param[in] v1	Initial value of 1st delayed element
 	Delay2(const T& v2, const T& v1){ (*this)[1]=v2; (*this)[0]=v1; }
 };
 
@@ -113,6 +113,7 @@ public:
 protected:
 	mutable T o1;
 };
+
 
 
 
@@ -306,6 +307,43 @@ protected:
 //protected:
 //	T mFreq, mRes, mPhase;
 //	T mNum;
+//};
+
+
+// Maybe better to use Slice object for this kind of task...
+
+//template<class R, class T1, class T2>
+//class Function2{
+//public:
+//	typedef R (* function_t)(T1,T2);
+//
+//	Function2(const function_t func=0, const T1& arg1=T1(), const T2& arg2=T2())
+//	:	mFunc(func), m1(arg1), m2(arg2)
+//	{}
+//
+//	R operator()(){ return mFunc(m1,m2); }
+//	
+//	template <class V>
+//	R operator()(const V& v){ return mFunc(v,m2); }
+//
+//	Function2& operator=(const function_t v){ mFunc=v; return *this; }
+//
+//protected:
+//	R (*mFunc)(T1,T2);
+//	T1 m1;
+//	T2 m2;
+//};
+//
+///// Converts unary function to unary function object
+//template<class T, T (* F)(T,T)>
+//struct FunctionObject1{
+//
+//	FunctionObject1(const T& a1): arg1(a1){}
+//	
+//	template<class V>
+//	V operator()(const V& v) const { return F(v, arg1); }
+//
+//	T arg1;
 //};
 
 } // fil::
