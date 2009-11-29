@@ -443,6 +443,20 @@ public:
 	/// Apply filter in-place
 	template <class Fil>
 	const Slice& filter(const Fil& v) const { L1{ (*this)[i]=v((*this)[i]); } return *this; }
+	
+	/// Apply C-style unary function in-place, x = func(x, a1)
+	template <class R, class X, class A1>
+	const Slice& filter(R (* const func)(X, A1), const A1& a1){
+		L1{ (*this)[i] = func((*this)[i], a1); }
+		return *this;
+	}
+
+	/// Apply C-style binary function in-place, x = func(x, a1, a2)
+	template <class R, class X, class A1, class A2>
+	const Slice& filter(R (* const func)(X, A1,A2), const A1& a1, const A2& a2){
+		L1{ (*this)[i] = func((*this)[i], a1,a2); }
+		return *this;
+	}
 
 	/// Reverse slice
 	const Slice& reverse(){ B=B+(C-1)*S; S=-S; return *this; }
