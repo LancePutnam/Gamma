@@ -639,6 +639,14 @@ struct Vec3 : public Vec<3, T> {
 
 	T dot() const { return dot(*this); }
 	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
+	
+	Vec3& rotateX(const Complex<T>& v){ Complex<T> t(y(),z()); t*=v; return (*this)(x(),t.r,t.i); }
+	Vec3& rotateY(const Complex<T>& v){ Complex<T> t(z(),x()); t*=v; return (*this)(t.i,y(),t.r); }
+	Vec3& rotateZ(const Complex<T>& v){ Complex<T> t(x(),y()); t*=v; return (*this)(t.r,t.i,z()); }
+	
+	const T& x() const { return (*this)[0]; }
+	const T& y() const { return (*this)[1]; }
+	const T& z() const { return (*this)[2]; }
 };
 
 
