@@ -177,10 +177,6 @@ TEM T cosP3(T u);
 ///
 TEM T cosT8(T radians);
 
-/// Cross product of 3-element arrays.
-template <class T1, class T2, class T3>
-void cross(const T1& a, const T2& b, T3& r);
-
 /// Compute curvature around point b of three successive points a, b, and c.
 template <class T, template <class T> class V>
 T curvature(const V<T>& a, const V<T>& b, const V<T>& c);
@@ -741,13 +737,6 @@ TEM inline T clip(T v, int & clipFlag, T hi, T lo){
 
 TEM inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
 
-template <class T1, class T2, class T3>
-inline void cross(const T1& a, const T2& b, T3& r){
-	r[0] = a[1] * b[2] - a[2] * b[1];
-	r[1] = a[2] * b[0] - a[0] * b[2];
-	r[2] = a[0] * b[1] - a[1] * b[0];
-}
-
 template <class T, template <class T> class V>
 T curvature(const V<T>& a, const V<T>& b, const V<T>& c){
 
@@ -822,11 +811,11 @@ void frenet(const V2& d1, V2& t, V2& n){
 
 template <class V3>
 void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
-	cross(d2,d1, b);
-	cross(d1, b, n);
+	b = d2.cross(d1);
+	n = d1.cross(b);
 	t = d1 * invSqrt<2>(d1.dot());
-	b *= invSqrt<2>( b.dot());
-	n *= invSqrt<2>( n.dot());
+	b *= invSqrt<2>(b.dot());
+	n *= invSqrt<2>(n.dot());
 }
 
 template <class V3>
