@@ -42,6 +42,14 @@ uint32_t bits(const char * string);
 /// Converts bit string to unsigned integer
 uint32_t bitsToUInt(const char * bits);
 
+
+/// Sets argument to zero if subnormal
+void blockSubnormal(float& v);
+
+/// Sets argument to zero if subnormal
+void blockSubnormal(double& v);
+
+
 /// Convert 2-byte array to 16-bit unsigned integer.
 uint16_t bytesToUInt16(const uint8_t * bytes2);
 
@@ -139,6 +147,23 @@ uint8_t unitToUInt8(float u);
 
 
 // Implementation
+
+/// Sets argument to zero if subnormal
+inline void blockSubnormal(float& v){
+	const uint32_t i = punFU(v);
+	const uint32_t frac = i & MaskFrac<float>(); 
+	const uint32_t expo = i & MaskExpo<float>(); 
+	if(expo == 0 && frac != 0) v = 0.f;
+}
+
+/// Sets argument to zero if subnormal
+inline void blockSubnormal(double& v){
+	const uint64_t i = punFU(v);
+	const uint64_t frac = i & MaskFrac<double>(); 
+	const uint64_t expo = i & MaskExpo<double>(); 
+	if(expo == 0 && frac != 0) v = 0.;
+}
+
 
 inline int32_t castIntRound(double v){
 	v += roundMagic;
