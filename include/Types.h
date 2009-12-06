@@ -319,8 +319,14 @@ struct Quat{
 	/// Rotate a vector by current quaternion
 	template <class V3>
 	void rotate(V3& v) const {
-		Q p(-i*v[0] - j*v[1] - k*v[2], r*v[0] + j*v[2] - k*v[1], r*v[1] - i*v[2] + k*v[0], r*v[2] + i*v[1] - j*v[0]);
-		p *= conj(); v[0]=p.i; v[1]=p.j; v[2]=p.k;
+		Q p(
+			-i*v[0] - j*v[1] - k*v[2],
+			 r*v[0] + j*v[2] - k*v[1],
+			 r*v[1] - i*v[2] + k*v[0],
+			 r*v[2] + i*v[1] - j*v[0]
+		);
+		p *= conj();
+		v[0]=p.i; v[1]=p.j; v[2]=p.k;
 	}
 
 	// Rotates a vector assuming input z component is zero
@@ -613,8 +619,9 @@ struct Vec : public Multi<N,T> {
 	T dot(const V& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
 	T norm() const { return sqrt(norm2()); }
 	T norm2() const { return dot(*this); }
+	V& normalize() const { return *this /= norm(); }
 
-	V sgn() const { V(*this) /= norm(); }
+	V sgn() const { V(*this).normalize(); }
 
 	#undef DO
 };
