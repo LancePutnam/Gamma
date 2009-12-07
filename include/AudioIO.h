@@ -36,7 +36,7 @@
 	}
 */
 
-
+#include <string>
 #include <string.h>		/* memset() */
 #include <portaudio.h>
 #include "mem.h"
@@ -58,12 +58,12 @@ public:
 	float *       out(uint32_t channel);	///< Returns an out channel buffer
 	float *		  temp();					///< Returns single channel temporary buffer
 	
-	uint32_t inChans() const;				///< Returns effective number of input channels
-	uint32_t outChans() const;				///< Returns effective number of output channels
-	uint32_t auxChans() const;				///< Returns number of aux channels
+	uint32_t channelsIn () const;			///< Returns effective number of input channels
+	uint32_t channelsOut() const;			///< Returns effective number of output channels
+	uint32_t channelsAux() const;			///< Returns number of aux channels
 
-	uint32_t inDeviceChans() const;			///< Returns number of channels opened on input device
-	uint32_t outDeviceChans() const;		///< Returns number of channels opened on output device
+	uint32_t channelsInDevice() const;		///< Returns number of channels opened on input device
+	uint32_t channelsOutDevice() const;		///< Returns number of channels opened on output device
 	uint32_t framesPerBuffer() const;		///< Returns frames/buffer of audio I/O stream
 	double framesPerSecond() const;			///< Returns frames/second of audio I/O streams
 	double secondsPerBuffer() const;		///< Returns seconds/buffer of audio I/O stream
@@ -88,14 +88,19 @@ protected:
 class AudioDevice{
 public:
 	AudioDevice(int deviceNum);
+	AudioDevice(const std::string& nameKeyword, bool input=true, bool output=true);
+
 	~AudioDevice();
 
 	bool valid() const { return 0 != mImpl; }
 	int id() const { return mID; }
 	const char * name() const;
-	int maxInputChannels() const;
-	int maxOutputChannels() const;
+	int channelsInMax() const;
+	int channelsOutMax() const;
 	double defaultSampleRate() const;
+	
+	bool hasInput() const;
+	bool hasOutput() const;
 	
 	void print() const;	/// Prints info about specific i/o device to stdout.
 
@@ -122,8 +127,8 @@ typedef void (*audioCallback)(AudioIOData& io);
 /// 
 class AudioIO : public AudioIOData {
 public:
-	using AudioIOData::inChans;
-	using AudioIOData::outChans;
+	using AudioIOData::channelsIn;
+	using AudioIOData::channelsOut;
 	using AudioIOData::framesPerBuffer;
 	using AudioIOData::framesPerSecond;
 
@@ -144,7 +149,8 @@ public:
 
 	virtual ~AudioIO();
 		
-	static audioCallback callback;	///< User specified callback function.
+	//static audioCallback callback;	///< User specified callback function.
+	audioCallback callback;	///< User specified callback function.
 	
 	void operator()();				///< Calls callback manually
 
@@ -158,16 +164,20 @@ public:
 	/// An effective channel is either a real device channel or virtual channel 
 	/// depending on how many channels the device supports. Passing in -1 for
 	/// the number of channels opens all available channels.
-	void chans(int num, bool forOutput);
+	void channels(int num, bool forOutput);
+	void channelsIn(uint32_t n){ channels(n,false); }	///< Set number of input channels
+	void channelsOut(uint32_t n){ channels(n,true); }	///< Set number of output channels
+	void channelsAux(uint32_t num);				///< Set number of auxiliary channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
+	
+	void deviceIn(const AudioDevice& v);		///< Set input device
+	void deviceOut(const AudioDevice& v);		///< Set output device
+	
 	void framesPerSecond(double v);				///< Set number of frames per second
 	void framesPerBuffer(uint32_t n);			///< Set number of frames per processing buffer
-	void inChans(uint32_t n){ chans(n,false); }	///< Set number of input channels
-	void outChans(uint32_t n){ chans(n,true); }	///< Set number of output channels
-	void auxChans(uint32_t num);				///< Set number of auxiliary channels
 	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer
 
-	uint32_t chans(bool forOutput) const;
+	uint32_t channels(bool forOutput) const;
 	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
 	double cpu() const;							///< Returns current CPU usage of audio thread
 	bool supportsFPS(double fps);				///< Return true if fps supported, otherwise false
@@ -219,18 +229,18 @@ private:
 // Implementation_______________________________________________________________
 
 inline void AudioIOData::zeroAux(){ mem::zero(mBufA, framesPerBuffer() * mNumA); }
-inline void AudioIOData::zeroOut(){ mem::zero(mBufO, outChans() * framesPerBuffer()); }
+inline void AudioIOData::zeroOut(){ mem::zero(mBufO, channelsOut() * framesPerBuffer()); }
 
 inline float *       AudioIOData::aux(uint32_t num){ return mBufA + num * framesPerBuffer(); }
 inline const float * AudioIOData::in (uint32_t chn){ return mBufI + chn * framesPerBuffer(); }
 inline float *       AudioIOData::out(uint32_t chn){ return mBufO + chn * framesPerBuffer(); }
 inline float *       AudioIOData::temp(){ return mBufT; }
 
-inline uint32_t AudioIOData:: inChans() const { return mNumI; }
-inline uint32_t AudioIOData::outChans() const { return mNumO; }
-inline uint32_t AudioIOData::auxChans() const { return mNumA; }
-inline uint32_t AudioIOData::inDeviceChans() const { return (uint32_t)mInParams.channelCount; }
-inline uint32_t AudioIOData::outDeviceChans() const { return (uint32_t)mOutParams.channelCount; }
+inline uint32_t AudioIOData::channelsIn () const { return mNumI; }
+inline uint32_t AudioIOData::channelsOut() const { return mNumO; }
+inline uint32_t AudioIOData::channelsAux() const { return mNumA; }
+inline uint32_t AudioIOData::channelsInDevice() const { return (uint32_t)mInParams.channelCount; }
+inline uint32_t AudioIOData::channelsOutDevice() const { return (uint32_t)mOutParams.channelCount; }
 
 inline double AudioIOData::framesPerSecond() const { return mFramesPerSecond; }
 inline double AudioIOData::time() const { return Pa_GetStreamTime(mStream); }
@@ -240,7 +250,7 @@ inline double AudioIOData::secondsPerBuffer() const { return (double)framesPerBu
 
 inline void AudioIO::operator()(){ if(callback) callback(*this); }
 
-inline uint32_t AudioIO::chans(bool forOutput) const { return forOutput ? outChans() : inChans(); }
+inline uint32_t AudioIO::channels(bool forOutput) const { return forOutput ? channelsOut() : channelsIn(); }
 inline double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mStream); }
 inline bool AudioIO::zeroNANs() const { return mZeroNANs; }
 inline const char * AudioIO::errorText(int errNum){ return Pa_GetErrorText(errNum); }
