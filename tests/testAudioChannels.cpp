@@ -21,7 +21,7 @@ void audioCB(AudioIOData & io){
 
 		if(tmr()){
 			++chan;
-			if(chan >= io.outChans()) chan=0;
+			if(chan >= io.channelsOut()) chan=0;
 			osc.ampPhase(0.1);
 			printf("chan: %d\n", chan);
 		}
