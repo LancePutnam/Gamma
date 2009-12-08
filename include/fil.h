@@ -137,12 +137,15 @@ public:
 		set(frq, amp, phs);
 	}
 
-	/// Generate next value
-	C operator()(){ return (*this)*=mFreq; }
+	/// Advance one iteration and return value
+	C operator()(){ return (*this)*=mFactor; }
 
 	/// Filter input
-	C operator()(const C& v){ return (*this) = (*this)*mFreq + v; }
-	C operator()(const T& v){ return (*this) = (*this)*mFreq + v; }
+	C operator()(const C& v){ return (*this) = (*this)*mFactor + v; }
+	C operator()(const T& v){ return (*this) = (*this)*mFactor + v; }
+	
+	/// Recede one iteration and return value
+	C recede(){ return (*this)/=mFactor; }
 
 	/// Set amplitude
 	void amp(const T& v){ (*this).fromPolar(v, this->arg()); }
@@ -156,7 +159,7 @@ public:
 
 	/// Set recursive multiplication factor (frequency and decay/growth factor)
 	void factor(const T& frq, const T& dec=T(1)){
-		mFreq.fromPolar(dec, frq*M_2PI);
+		mFactor.fromPolar(dec, frq*M_2PI);
 	}
 
 	/// Set unit frequency
@@ -169,7 +172,7 @@ public:
 	void set(const T& frq, const T& amp, const T& phs, const T& dec=T(1)){
 		this->fromPolar(amp, phs*M_2PI);
 		factor(frq, dec);
-		(*this) = behind();
+		recede();
 	}
 
 	void set(const T& frq, const Complex<T>& phs){
@@ -177,22 +180,22 @@ public:
 	}
 
 	/// Get value one iteration ahead of current state
-	C ahead() const { return (*this)*mFreq; }
+	C ahead() const { return (*this)*mFactor; }
 	
 	/// Get value one iteration behind current state
-	C behind() const { return (*this)/mFreq; }
+	C behind() const { return (*this)/mFactor; }
 
 	/// Get unit decay
-	T decay() const { return mFreq.mag(); }
+	T decay() const { return mFactor.mag(); }
 	
 	/// Get unit frequency
-	T freq() const { return mFreq.phase()*M_1_2PI; }
+	T freq() const { return mFactor.phase()*M_1_2PI; }
 
-	const C& factor() const { return mFreq; }
-	C& factor(){ return mFreq; }
+	const C& factor() const { return mFactor; }
+	C& factor(){ return mFactor; }
 
 protected:
-	C mFreq;
+	C mFactor;
 	
 	// Set 60 dB decay interval
 	//void decay(const Tv& v){ width(T(2.198806796637603 /* -ln(0.001)/pi */)/v); }
@@ -307,43 +310,6 @@ protected:
 //protected:
 //	T mFreq, mRes, mPhase;
 //	T mNum;
-//};
-
-
-// Maybe better to use Slice object for this kind of task...
-
-//template<class R, class T1, class T2>
-//class Function2{
-//public:
-//	typedef R (* function_t)(T1,T2);
-//
-//	Function2(const function_t func=0, const T1& arg1=T1(), const T2& arg2=T2())
-//	:	mFunc(func), m1(arg1), m2(arg2)
-//	{}
-//
-//	R operator()(){ return mFunc(m1,m2); }
-//	
-//	template <class V>
-//	R operator()(const V& v){ return mFunc(v,m2); }
-//
-//	Function2& operator=(const function_t v){ mFunc=v; return *this; }
-//
-//protected:
-//	R (*mFunc)(T1,T2);
-//	T1 m1;
-//	T2 m2;
-//};
-//
-///// Converts unary function to unary function object
-//template<class T, T (* F)(T,T)>
-//struct FunctionObject1{
-//
-//	FunctionObject1(const T& a1): arg1(a1){}
-//	
-//	template<class V>
-//	V operator()(const V& v) const { return F(v, arg1); }
-//
-//	T arg1;
 //};
 
 } // fil::
