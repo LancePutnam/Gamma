@@ -427,11 +427,25 @@ public:
 	const Slice& operator += (const   T& v) const { L1{ (*this)[i]+=v  ; } return *this; }
 
 	template <class U>
+	const Slice& operator -= (const Slice<U>& v) const { L2{ (*this)[i]-=T(v[i]); } return *this; }
+
+	template <class Gen>
+	const Slice& operator -= (const Gen& v) const { L1{ (*this)[i]-=v(); } return *this; }
+	const Slice& operator -= (const   T& v) const { L1{ (*this)[i]-=v  ; } return *this; }
+
+	template <class U>
 	const Slice& operator *= (const Slice<U>& v) const { L2{ (*this)[i]*=T(v[i]); } return *this; }
 
 	template <class Gen>
 	const Slice& operator *= (const Gen& v) const { L1{ (*this)[i]*=v(); } return *this; }
 	const Slice& operator *= (const   T& v) const { L1{ (*this)[i]*=v  ; } return *this; }
+
+	template <class U>
+	const Slice& operator /= (const Slice<U>& v) const { L2{ (*this)[i]/=T(v[i]); } return *this; }
+
+	template <class Gen>
+	const Slice& operator /= (const Gen& v) const { L1{ (*this)[i]/=v(); } return *this; }
+	const Slice& operator /= (const   T& v) const { L1{ (*this)[i]/=v  ; } return *this; }
 
 	/// Copy elements from another slice.
 	
