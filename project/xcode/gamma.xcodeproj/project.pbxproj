@@ -359,7 +359,6 @@
 		16D219CA10048AEB00302C47 /* SmartObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartObject.h; sourceTree = "<group>"; };
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
-		16D28AA70D39674A0058930E /* vecLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = vecLib.framework; path = /System/Library/Frameworks/vecLib.framework; sourceTree = "<absolute>"; };
 		16D2C47C0B57695900BFA547 /* testAudioCombs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioCombs.cpp; path = ../../tests/testAudioCombs.cpp; sourceTree = SOURCE_ROOT; };
 		16D2EC810E91D07A00845626 /* fftpack.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fftpack.cpp; path = ../../src/fftpack.cpp; sourceTree = SOURCE_ROOT; };
 		16D3E2E20BC058E700734CB1 /* testAudioLFO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioLFO.cpp; path = ../../tests/testAudioLFO.cpp; sourceTree = SOURCE_ROOT; };
@@ -756,7 +755,6 @@
 				16D24F930A9BA74800415E9E /* AudioUnit.framework */,
 				7EB464320825DDF5002E1A73 /* AudioToolbox.framework */,
 				7EB464330825DDF5002E1A73 /* CoreAudio.framework */,
-				16D28AA70D39674A0058930E /* vecLib.framework */,
 			);
 			name = Libs;
 			sourceTree = "<group>";
