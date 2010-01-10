@@ -264,6 +264,12 @@ struct Quat{
 		T c1s2 = c1*s2;
 		T s1c2 = s1*c2;
 		return (*this)(c1c2*c3 - s1s2*s3, c1c2*s3 + s1s2*c3, s1c2*c3 + c1s2*s3, c1s2*c3 - s1c2*s3);
+		
+//		Q qa, qb, qc;
+//		qa.fromAxis(c, 1,0,0);
+//		qb.fromAxis(a, 0,1,0);
+//		qc.fromAxis(b, 0,0,1);
+//		return *this = qa*qb*qc;
 	}
 
 	/// Set quaternion from rotation matrix
@@ -429,17 +435,21 @@ TEM Quat<T> operator / (T r, const Quat<T>& q){ return  q.conj()*(r/q.norm2()); 
 template <class T>
 struct Mat3{
 	
-	Mat3(	const T& v00=T(0), const T& v01=T(0), const T& v02=T(0),
-			const T& v10=T(0), const T& v11=T(0), const T& v12=T(0),
-			const T& v20=T(0), const T& v21=T(0), const T& v22=T(0))
+	Mat3(
+		const T& v00=T(0), const T& v01=T(0), const T& v02=T(0),
+		const T& v10=T(0), const T& v11=T(0), const T& v12=T(0),
+		const T& v20=T(0), const T& v21=T(0), const T& v22=T(0)
+	)
 	:	a00(v00), a01(v01), a02(v02),
 		a10(v10), a11(v11), a12(v12),
 		a20(v20), a21(v21), a22(v22)
 	{}
 	
-	Mat3& operator()(	const T& v00, const T& v01, const T& v02,
-					const T& v10, const T& v11, const T& v12,
-					const T& v20, const T& v21, const T& v22){
+	Mat3& operator()(
+		const T& v00, const T& v01, const T& v02,
+		const T& v10, const T& v11, const T& v12,
+		const T& v20, const T& v21, const T& v22
+	){
 		a00=v00; a01=v01; a02=v02; a10=v10; a11=v11; a12=v12; a20=v20; a21=v21; a22=v22;
 		return *this;		
 	}
@@ -449,6 +459,24 @@ struct Mat3{
 
 	/// Get element at index with no bounds checking
 	const T& operator[](uint32_t i) const { return elems[i]; }
+
+	Mat3& operator *= (const Mat3& v){
+		return (*this)(
+			x[0]*v.x[0] + x[1]*v.y[0] + x[2]*v.z[0],
+			x[0]*v.x[1] + x[1]*v.y[1] + x[2]*v.z[1],
+			x[0]*v.x[2] + x[1]*v.y[2] + x[2]*v.z[2],
+			
+			y[0]*v.x[0] + y[1]*v.y[0] + y[2]*v.z[0],
+			y[0]*v.x[1] + y[1]*v.y[1] + y[2]*v.z[1],
+			y[0]*v.x[2] + y[1]*v.y[2] + y[2]*v.z[2],
+			
+			z[0]*v.x[0] + z[1]*v.y[0] + z[2]*v.z[0],
+			z[0]*v.x[1] + z[1]*v.y[1] + z[2]*v.z[1],
+			z[0]*v.x[2] + z[1]*v.y[2] + z[2]*v.z[2]
+		);
+	}
+	
+	Mat3 operator * (const Mat3& v) const { return Mat3(*this) *= v; }
 
 	Vec3<T> col0() const { return Vec3<T>(a00, a10, a20); }
 	Vec3<T> col1() const { return Vec3<T>(a01, a11, a21); }
@@ -619,7 +647,7 @@ struct Vec : public Multi<N,T> {
 	T dot(const V& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
 	T norm() const { return sqrt(norm2()); }
 	T norm2() const { return dot(*this); }
-	V& normalize() const { return *this /= norm(); }
+	V& normalize(){ return *this /= norm(); }
 
 	V sgn() const { V(*this).normalize(); }
 
