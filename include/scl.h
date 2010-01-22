@@ -355,6 +355,9 @@ TEM T pow64(T v);			///< Returns value to the 64th power.
 unsigned char prime(uint32_t n);	///< Returns (n+1)th prime number up to n=53.
 TEM T prime(uint32_t n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
 
+/// Returns spherical Euler product (ZXZ convention)
+TEM Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c);
+
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
 
@@ -1251,6 +1254,14 @@ TEM inline void polarToRect(T m, T p, T& r, T& i){
 	r = m * cos(p);
 	i = m * sin(p);
 	//printf("%f %f %f %f\n", m, p, r, i);
+}
+
+TEM Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c){
+	return Vec3<T>(
+		a.r*b.i - a.i*b.r*c.i,
+		a.i*b.i + a.r*b.r*c.i,
+		b.r*c.r
+	);
 }
 
 TEM inline void rectToPolar(T& r, T& i){
