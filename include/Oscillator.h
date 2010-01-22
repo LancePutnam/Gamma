@@ -245,14 +245,16 @@ public:
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, p); }
 
 	/// Set all control parameters
-	void set(Tv frq, Tv amp, Tv phs=0){ gen::RSin<Tv>::set(frq*Ts::ups(), phs, amp); }
+	void set(Tv frq, Tv amp, Tv phs=0){ gen::RSin<Tv>::set(frq*Ts::ups(), phs, amp); mAmp=amp; }
 	
 	/// Generate next samples adding into a buffer
 	template <class V>
 	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
 
 	// This might not be a good idea because we don't know amplitude...
-	//virtual void onResync(double ratio){ set(gen::RSin<Tv>::freq()/ratio, 1, 0); }
+	virtual void onResync(double ratio){ set(gen::RSin<Tv>::freq()/ratio, mAmp, 0); }
+protected:
+	Tv mAmp;
 };
 
 

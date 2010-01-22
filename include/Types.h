@@ -731,6 +731,31 @@ struct Vec4 : public Vec<4, T> {
 };
 
 
+
+/// Rotate vector towards perpendicular vector by angle using right-hand rule.
+template <class T>
+Vec3<T> rotate(const Vec3<T>& v, const Vec3<T>& p, Complex<T>& a){
+	return v*a.r + p*a.i;
+}
+
+
+template <class T>
+Vec3<T> rotateX(const Vec3<T>& v, const Complex<T>& a){
+	Complex<T> t(v[1], v[2]); t*=a; return Vec3<T>(v[0], t[0], t[1]);
+}
+
+template <class T>
+Vec3<T> rotateY(const Vec3<T>& v, const Complex<T>& a){
+	Complex<T> t(v[2], v[0]); t*=a; return Vec3<T>(t[1], v[1], t[0]);
+}
+
+template <class T>
+Vec3<T> rotateZ(const Vec3<T>& v, const Complex<T>& a){
+	Complex<T> t(v[0], v[1]); t*=a; return Vec3<T>(t[0], t[1], v[2]);
+}
+
+
+
 typedef Complex<float > Complexf;
 typedef Complex<double> Complexd;
 typedef Mat3<float> Mat3f;
