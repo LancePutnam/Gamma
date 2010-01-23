@@ -325,6 +325,9 @@ TEM T negative(T v, T bw);
 /// Same as negative(T,T), but 'amt' controls positive level (0,1) -> (-1,1).
 TEM T negative(T v, T bw, T amt);
 
+/// Returns the number of digits in the integer portion
+TEM T numInt(const T& v){ return scl::floor(::log10(v)) + 1; }
+
 /// Returns pole radius given a bandwidth and sampling interval
 TEM	inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02

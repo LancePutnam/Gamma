@@ -95,12 +95,14 @@ struct Complex{
 	
 	Complex(const Complex& v): r(v.r), i(v.i){}
 	Complex(const Polar& v){ *this = v; }
-
 	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar(m,p); }
 
-	C& fromPhase(const T& p){ r=::cos(p); i=::sin(p); return *this; }
-	C& fromPolar(const T& m, const T& p){ return (*this)(Polar(m,p)); }
+	
+	C& arg(const T& v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
+	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
+	C& fromPolar(const T& m, const T& p){ return (*this)(Polar(m,p)); }	///< Set magnitude and phase
+	C& norm(const T& v){ return (*this) = sgn()*v; }					///< Set magnitude leaving phase the same
 
 	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
 	C& operator()(const Polar& p){ return *this = p; }
@@ -145,9 +147,9 @@ struct Complex{
 	C& normalize(){ return *this /= norm(); }				///< Sets norm (radius) to 1, |z|=1
 	C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
 	C pow(const T& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
-	C recip() const { return conj()/norm2(); }		///< Return multiplicative inverse, 1/z
-	C sgn() const { return C(*this).normalize(); }	///< Returns signum, z/|z|, the closest point on unit circle
-	C sqr() const { return C(r*r-i*i, T(2)*r*i); }	///< Returns square
+	C recip() const { return conj()/norm2(); }				///< Return multiplicative inverse, 1/z
+	C sgn() const { return C(*this).normalize(); }			///< Returns signum, z/|z|, the closest point on unit circle
+	C sqr() const { return C(r*r-i*i, T(2)*r*i); }			///< Returns square
 
 	/// Returns square root
 	C sqrt() const {
@@ -729,7 +731,6 @@ struct Vec4 : public Vec<4, T> {
 	
 	Vec3<T> xyz() const { return Vec3<T>((*this)[0], (*this)[1], (*this)[2]); }
 };
-
 
 
 /// Rotate vector towards perpendicular vector by angle using right-hand rule.

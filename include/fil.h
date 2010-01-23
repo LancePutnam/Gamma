@@ -204,6 +204,8 @@ protected:
 	//void width(const Tv& v){ mDecay=::exp(-M_PI*v); freq(freq()); }
 };
 
+typedef Reson<float>	Resonf;
+typedef Reson<double>	Resond;
 
 
 /// Transfer function of an arbitrary difference equation.
