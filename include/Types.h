@@ -5,8 +5,9 @@
 	See COPYRIGHT file for authors and license information 
 
 	File Description: 
-	Static (fixed size) types including complex numbers, quaternions, 
+	Static (fixed size) POD types including complex numbers, quaternions, 
 	2,3,4-vectors, 3x3 matrix, and fixed-size array.
+	
 */
 
 
@@ -735,9 +736,19 @@ struct Vec4 : public Vec<4, T> {
 
 /// Rotate vector towards perpendicular vector by angle using right-hand rule.
 template <class T>
-Vec3<T> rotate(const Vec3<T>& v, const Vec3<T>& p, Complex<T>& a){
+Vec3<T> rotate(const Vec3<T>& v, const Vec3<T>& p, const Complex<T>& a){
 	return v*a.r + p*a.i;
 }
+
+//
+///// Returns complex mixture of v1 into v2.
+//
+///// The result is a point lying on the geodesic of a sphere whose poles are
+///// vectors v1 and v2.
+//template <class T1, class T2, class T3, class Tr>
+//Tr mix(const T1& v1, const T2& v2, const Complex<T3>& a){
+//	return v1*a.r + v2*a.i;
+//}
 
 
 template <class T>
