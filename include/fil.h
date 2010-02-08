@@ -115,6 +115,31 @@ protected:
 };
 
 
+/// One-pole filter
+template <class Tv=double, class Tp=double>
+class OnePole{
+public:
+
+	OnePole(const Tv& prev=Tv(0), const Tp& smooth=Tp(1), const Tp& gain=Tp(1))
+	:	mO1(prev)
+	{}
+
+	OnePole& set(const Tp& smooth, const Tp& gain=Tp(1)){
+		mO1 = gain * smooth;
+		mO0 = gain - mO1; // gain * (Tp(1) - smooth)
+		return *this;
+	}
+
+	Tv operator()(const Tv& v) const {
+		mO1 = mO0; mO0 = v;
+		return mO0*mA0 + mO1*mA1;
+	}
+
+protected:
+	mutable Tv mO0, mO1;
+	Tp mA0, mA1;
+};
+
 
 
 /// Complex resonator
@@ -208,6 +233,7 @@ typedef Reson<float>	Resonf;
 typedef Reson<double>	Resond;
 
 
+
 /// Transfer function of an arbitrary difference equation.
 class TransferFunc {
 public:
@@ -239,6 +265,8 @@ public:
 protected:
 
 	struct DelayUnit{
+		/// param[in] c		weighting coefficient
+		/// param[in] d		delay in samples
 		DelayUnit(double c_, double d_): c(c_), d(d_){}
 		Complexd response(double f){ return Complexd::Polar(c, f*d); }
 		double c, d;
