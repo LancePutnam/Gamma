@@ -178,46 +178,34 @@ public:
 
 	Delay();
 
-	/// @param[in]	delay		Initial delay length.
+	/// @param[in]	delay		Initial delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float delay);
 
-	/// @param[in]	maxDelay	Maximum delay length.
-	/// @param[in]	delay		Initial delay length.
+	/// @param[in]	maxDelay	Maximum delay length
+	/// @param[in]	delay		Initial delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float maxDelay, float delay);
 	
 	virtual ~Delay(){}
 
-	void delay(float v);			///< Set delay length.
-	void delayUnit(float u);		///< Set delay as (0, 1) of buffer size.
-	void freq(float v);				///< Set natural frequency (1/delay()).
-	void maxDelay(float v);			///< Set maximum delay length.
-	void zero();					///< Sets all elements to zero.
-		
-//	template <class I>
-//	Tv read(const I& ipol) const{
-//		return ipol(*this, mPhase - mDelay);
-//	}
-//
-//	template <class I>
-//	Tv operator()(const Tv& i0, const I& ipol){
-//		Tv o0 = read(ipol);	// read delayed element
-//		write(i0);			// write input element
-//		return o0;
-//	}
+	void delay(float v);						///< Set delay length
+	void delayUnit(float u);					///< Set delay as (0, 1) of buffer size
+	void freq(float v);							///< Set natural frequency (1/delay())
+	void maxDelay(float v);						///< Set maximum delay length
+	void zero();								///< Sets all elements to zero
+
+	Tv operator()(const Tv& v);					///< Returns next filtered value
+	Tv operator()() const;						///< Reads delayed element from buffer
+	Tv read(float ago);							///< Returns element 'ago' units ago
+	void write(const Tv& v);					///< Writes element into buffer. Tap is post-incremented.
+	void writePre(const Tv& v);					///< Writes element into buffer. Tap is pre-incremented.
 	
-	
-	Tv operator()(const Tv& v);		///< Returns next filtered value.
-	Tv operator()() const;			///< Reads delayed value from buffer.
-	void write(const Tv& v);		///< Writes value into buffer. Tap is post-incremented.
-	void writePre(const Tv& v);		///< Writes value into buffer. Tap is pre-incremented.
-	
-	float delay() const;				///< Returns current delay length.
-	uint32_t delayIndex(uint32_t delay) const;///< Returns index of delayed sample.
-	float delayUnit() const;			///< Returns unit delay (to max delay).
-	float maxDelay() const;				///< Returns maximum delay length units.
-	uint32_t oldestIndex() const;			///< Returns index of oldest sample.
+	float delay() const;						///< Returns current delay length
+	uint32_t delayIndex(uint32_t delay) const;	///< Returns index of delayed element
+	float delayUnit() const;					///< Returns unit delay (to max delay)
+	uint32_t indexBack() const;					///< Returns index of backmost element
+	float maxDelay() const;						///< Returns maximum delay length units
 
 	virtual void onResize();
 	virtual void onResync(double r);
@@ -227,12 +215,12 @@ public:
 protected:
 	Si mIpol;
 
-	float mMaxDelay;		// maximum delay length
-	float mDelayFactor;		// multiplication factor when setting delay
-	float mDelayLength;		// current delay length
-	uint32_t mPhase;		// write tap
-	uint32_t mPhaseInc;		// phase increment
-	uint32_t mDelay;		// read tap as delay from write tap
+	float mMaxDelay;				// maximum delay length
+	float mDelayFactor;				// multiplication factor when setting delay
+	float mDelayLength;				// current delay length
+	uint32_t mPhase;				// write tap
+	uint32_t mPhaseInc;				// phase increment
+	uint32_t mDelay;				// read tap as delay from write tap
 
 	void incPhase();				// increment phase
 	void refreshDelayFactor();
@@ -811,6 +799,8 @@ TM1 void Delay<TM2>::onResync(double r){ //printf("Delay::onSyncChange\n");
 	delay(mDelayLength);
 }
 
+TM1 inline Tv Delay<TM2>::read(float ago){ return mIpol(*this, mPhase - delayFToI(ago)); }
+
 TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1. / maxDelay(); }
 
 TM1 inline void Delay<TM2>::write(const Tv& v){
@@ -828,22 +818,22 @@ TM1 inline void Delay<TM2>::delay(float v){
 	mDelay = delayFToI(v);
 }
 
-TM1 inline void Delay<TM2>::delayUnit(float n){ mDelay = unitToUInt(n); }
-
-TM1 inline void Delay<TM2>::freq(float v){ delay(1.f/v); }
-
-TM1 inline uint32_t Delay<TM2>::oldestIndex() const {
-	return this->index(mPhase + this->oneIndex());
-}
-
 TM1 inline float Delay<TM2>::delay() const { return mDelayLength; }
 
 TM1 inline float Delay<TM2>::delayUnit() const {
 	return uintToUnit<float>(mDelay);
 }
 
+TM1 inline void Delay<TM2>::delayUnit(float n){ mDelay = unitToUInt(n); }
+
 TM1 inline uint32_t Delay<TM2>::delayIndex(uint32_t delay) const {
 	return this->index(mPhase - (delay << this->fracBits()));
+}
+
+TM1 inline void Delay<TM2>::freq(float v){ delay(1.f/v); }
+
+TM1 inline uint32_t Delay<TM2>::indexBack() const {
+	return this->index(mPhase + this->oneIndex());
 }
 
 TM1 inline float Delay<TM2>::maxDelay() const { return this->size() * Ts::ups(); }
