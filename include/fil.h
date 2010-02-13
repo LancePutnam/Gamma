@@ -268,7 +268,7 @@ protected:
 		/// param[in] c		weighting coefficient
 		/// param[in] d		delay in samples
 		DelayUnit(double c_, double d_): c(c_), d(d_){}
-		Complexd response(double f){ return Complexd::Polar(c, f*d); }
+		Complexd response(double f){ return Polard(c, f*d); }
 		double c, d;
 	};
 

@@ -74,20 +74,24 @@ private:
 
 
 
+/// Polar number
+template <class T>
+struct Polar{
+	Polar(const T& p): m(1.), p(p){}
+	Polar(const T& m, const T& p): m(m), p(p){}
+	Polar(const Complex<T>& v){ *this = v; }
+
+	Polar& operator = (const Complex<T>& v){ m=v.norm(); p=v.arg(); return *this; }
+
+	T m, p;
+};
+
+
 /// Complex number
 template <class T=gam::real>
 struct Complex{
 
 	typedef Complex<T> C;
-
-	struct Polar{
-		Polar(const T& m, const T& p): m(m), p(p){}
-		Polar(const C& v){ *this = v; }
-
-		Polar& operator = (const C& v){ m=v.norm(); p=v.arg(); return *this; }
-
-		T m, p;
-	};
 
 	union{
 		struct{ T r, i; };
@@ -95,18 +99,18 @@ struct Complex{
 	};
 	
 	Complex(const Complex& v): r(v.r), i(v.i){}
-	Complex(const Polar& v){ *this = v; }
+	Complex(const Polar<T>& v){ *this = v; }
 	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
-	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar(m,p); }
+	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar<T>(m,p); }
 
 	
 	C& arg(const T& v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
 	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
-	C& fromPolar(const T& m, const T& p){ return (*this)(Polar(m,p)); }	///< Set magnitude and phase
+	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
 	C& norm(const T& v){ return fromPolar(v, arg()); }					///< Set magnitude leaving phase the same
 
 	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
-	C& operator()(const Polar& p){ return *this = p; }
+	C& operator()(const Polar<T>& p){ return *this = p; }
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
 
@@ -116,7 +120,7 @@ struct Complex{
 	bool operator > (const C& v) const { return norm2() > v.norm2(); }		///< Returns true if norm is greater than argument's norm
 	bool operator < (const C& c) const { return norm2() < c.norm2(); }		///< Returns true if norm is less than argument's norm
 
-	C& operator = (const Polar& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
+	C& operator = (const Polar<T>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
 	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
 	C& operator -=(const C& v){ r-=v.r; i-=v.i; return *this; }
@@ -141,7 +145,7 @@ struct Complex{
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
-	C exp() const { return Polar(::exp(r), i); }		///< Returns e^z
+	C exp() const { return Polar<T>(::exp(r), i); }			///< Returns e^z
 	C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
 	T norm() const { return ::sqrt(norm2()); }				///< Returns norm (radius), |z|
 	T norm2() const { return dot(*this); }					///< Returns square of norm, |z|^2
@@ -759,6 +763,8 @@ Vec3<T> rotateZ(const Vec3<T>& v, const Complex<T>& a){
 
 
 
+typedef Polar<float > Polarf;
+typedef Polar<double> Polard;
 typedef Complex<float > Complexf;
 typedef Complex<double> Complexd;
 typedef Mat3<float> Mat3f;

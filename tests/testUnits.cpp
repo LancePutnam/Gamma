@@ -218,15 +218,15 @@ int main(int argc, char* argv[]){
 	{	Complexd c(0,0);
 		#define T(x, y) assert(x == y);
 		T(c, Complexd(0,0))
-		c.fromPolar(1, 0.2);	T(c, Complexd::Polar(1, 0.2))
-		c.fromPhase(2.3);		T(c, Complexd::Polar(1, 2.3))
+		c.fromPolar(1, 0.2);	T(c, Polard(0.2))
+		c.fromPhase(2.3);		T(c, Polard(2.3))
 		T(c != Complexd(0,0), true)
 		T(c.conj(), Complexd(c.r, -c.i))
 		#undef T
 
 		#define T(x, y) assert(scl::almostEqual(x,y,2));
 		c.normalize();			T(c.norm(), 1)
-		double p=0.1; c(1,0); c *= Complexd::Polar(1, p); T(c.arg(), p)
+		double p=0.1; c(1,0); c *= Polard(1, p); T(c.arg(), p)
 
 		c.fromPolar(4,0.2);
 		T(c.sqrt().norm(), 2)
