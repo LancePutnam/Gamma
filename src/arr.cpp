@@ -16,6 +16,19 @@
 namespace gam{
 namespace arr{
 
+
+static const uint32_t LUTSize = 2048 - 1; // power of two - 1
+static const uint32_t LUTMask = LUTSize;
+static const uint32_t LUTSize2 = LUTSize >> 1;
+static const uint32_t LUTSize4 = LUTSize >> 2;
+static const float LUTSize2F = (float)LUTSize2;
+static const float phaseToIndex = ((float)LUTSize) * M_1_2PI;	
+
+static float * atanLUT = 0;
+static float * magLUT = 0;
+static ArrayPow2<float> * sinLUT = 0;
+
+
 void linToDB(float * arr, uint32_t len, float minDB){
 	float normFactor = 20.f / minDB;
 	
@@ -345,7 +358,24 @@ void rectToPolarFast(float * realA, float * imagA, uint32_t len){
 }
 
 
+
 void conversionInit(){
+
+
+	
+//	ArrayPow2<float> sinLUT(11);
+//	float atanLUT[LUTSize + 1], magLUT[LUTSize + 1];
+
+//	ArrayPow2<float> * sinLUT;
+//	float * atanLUT, * magLUT;
+//	const uint32_t LUTSize;
+//	
+//	const uint32_t LUTMask;
+//	const uint32_t LUTSize2;
+//	const uint32_t LUTSize4;
+//	const float LUTSize2F;
+//	const float phaseToIndex;
+
 	if(0 == atanLUT){
 		atanLUT = new float[LUTSize + 1];
 		magLUT  = new float[LUTSize + 1];

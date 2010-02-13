@@ -375,7 +375,7 @@ struct Quat{
 	}
 	
 	/// Convert to 3x3 rotation matrix
-	void toMatrix(Mat3<T>& m){
+	void toMatrix(Mat3<T>& m) const {
 		static const T _2 = T(2);
 		static const T _1 = T(1);		
 		T _2r=_2*r, _2i=_2*i, _2j=_2*j;
@@ -485,7 +485,8 @@ struct Mat3{
 	Vec3<T> col1() const { return Vec3<T>(a01, a11, a21); }
 	Vec3<T> col2() const { return Vec3<T>(a02, a12, a22); }
 
-	void cols(Vec3<T>& c0, Vec3<T>& c1, Vec3<T>& c2) const {
+	template <class S>
+	void cols(Vec3<S>& c0, Vec3<S>& c1, Vec3<S>& c2) const {
 		c0(a00,a10,a20); c1(a01,a11,a21); c2(a02,a12,a22);
 	}
 
@@ -739,16 +740,6 @@ template <class T>
 Vec3<T> rotate(const Vec3<T>& v, const Vec3<T>& p, const Complex<T>& a){
 	return v*a.r + p*a.i;
 }
-
-//
-///// Returns complex mixture of v1 into v2.
-//
-///// The result is a point lying on the geodesic of a sphere whose poles are
-///// vectors v1 and v2.
-//template <class T1, class T2, class T3, class Tr>
-//Tr mix(const T1& v1, const T2& v2, const Complex<T3>& a){
-//	return v1*a.r + v2*a.i;
-//}
 
 
 template <class T>

@@ -341,33 +341,6 @@ uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSamp
 void hps(float * dst, const float * src, uint32_t len, uint32_t downSample);
 
 
-namespace{
-	
-	const uint32_t LUTSize = 2048 - 1; // power of two - 1
-	const uint32_t LUTMask = LUTSize;
-	const uint32_t LUTSize2 = LUTSize >> 1;
-	const uint32_t LUTSize4 = LUTSize >> 2;
-	const float LUTSize2F = (float)LUTSize2;
-	const float phaseToIndex = ((float)LUTSize) * M_1_2PI;	
-
-	float * atanLUT = 0;
-	float * magLUT = 0;
-	ArrayPow2<float> * sinLUT = 0;
-	
-//	ArrayPow2<float> sinLUT(11);
-//	float atanLUT[LUTSize + 1], magLUT[LUTSize + 1];
-
-//	ArrayPow2<float> * sinLUT;
-//	float * atanLUT, * magLUT;
-//	const uint32_t LUTSize;
-//	
-//	const uint32_t LUTMask;
-//	const uint32_t LUTSize2;
-//	const uint32_t LUTSize4;
-//	const float LUTSize2F;
-//	const float phaseToIndex;
-}
-
 
 
 // Implementation_______________________________________________________________

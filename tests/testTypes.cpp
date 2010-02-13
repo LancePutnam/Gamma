@@ -136,6 +136,16 @@ int main(int argc, char* argv[]){
 		printf("sgn:   %f, %f\n", c.sgn().r, c.sgn().i);
 		printf("recip: %f, %f\n", c.recip().r, c.recip().i);
 	}
+	
+	{
+		//Vec3f v1, v2;
+		//Vec3f t = (v1-v2).cross(v2);
+		Vector3<float> sub;
+		sub(1,2,3);
+		sub += sub;
+		printf("%f\n", sub.doSomething().noop(4));
+	}
+	
 //
 //
 //	{
