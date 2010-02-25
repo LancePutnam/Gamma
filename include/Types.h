@@ -624,9 +624,11 @@ public:
 	Interval& min(const T& v){ return endpoints(v, max()); }
 
 	T center() const { return (max()+min())/T(2); }	///< Returns center point
+	bool degenerate() const { return min()==max(); }///< Returns true if diameter is zero
 	T diameter() const { return max()-min(); }		///< Returns difference of endpoints
 	const T& max() const { return mMax; }			///< Returns maximum endpoint
 	const T& min() const { return mMin; }			///< Returns minimum endpoint
+	bool proper() const { return min()!=max(); }	///< Returns true if diameter is non-zero
 	T radius() const { return diameter()/T(2); }	///< Returns one-half the diameter
 
 private:
@@ -649,12 +651,14 @@ public:
 	{}
 	
 	V& operator= (const T& v){ val(v); }					///< Set value
-	V& operator+=(const T& v){ return (*this) = mVal+v; }	///< Add value
-	V& operator-=(const T& v){ return (*this) = mVal-v; }	///< Subtract value
+	V& operator+=(const T& v){ return val(mVal+v); }		///< Add value
+	V& operator+=(const V& v){ return (*this)+=v.val(); }	///< Add wrapped value
+	V& operator-=(const T& v){ return val(mVal-v); }		///< Subtract value
+	V& operator-=(const V& v){ return (*this)-=v.val(); }	///< Subtract wrapped value
 	V  operator++(int){ V r=*this; ++(*this); return r; }	///< Postfix increment value
 	V  operator--(int){ V r=*this; --(*this); return r; }	///< Postfix decrement value
-	V& operator++(){ return (*this) = ++mVal; }				///< Prefix increment value
-	V& operator--(){ return (*this) = --mVal; }				///< Prefix decrement value
+	V& operator++(){ return val(++mVal); }					///< Prefix increment value
+	V& operator--(){ return val(--mVal); }					///< Prefix decrement value
 
 	/// Set wrapping interval
 	ValWrap& endpoints(const T& min, const T& max){
@@ -667,17 +671,22 @@ public:
 
 	ValWrap& val(T v){
 	
-		if(!(v < I::max())){
-			T d = I::diameter();
-			v -= d;
-			if(!(v < I::max())) v -= d * (T)(uint32_t)((v - I::min())/d);
+		if(I::proper()){
+			if(!(v < I::max())){
+				T d = I::diameter();
+				v -= d;
+				if(!(v < I::max())) v -= d * (T)(uint32_t)((v - I::min())/d);
+			}
+			else if(v < I::min()){
+				T d = I::diameter();
+				v += d;
+				if(v < I::min()) v += d * (T)(uint32_t)(((I::min() - v)/d) + 1);
+			}
+			mVal = v;
 		}
-		else if(v < I::min()){
-			T d = I::diameter();
-			v += d;
-			if(v < I::min()) v += d * (T)(uint32_t)(((I::min() - v)/d) + 1);
+		else{
+			mVal = I::min();
 		}
-		mVal = v;
 		return *this;
 	}
 
@@ -685,7 +694,9 @@ public:
 	const T& operator()() const { return mVal; }
 
 	/// Returns positive unit fractional position in interval
-	T fraction() const { return val()/I::diameter(); }
+	double fraction() const {
+		return I::proper() ? double(val())/I::diameter() : 0.;
+	}
 
 	const T& val() const { return mVal; }
 	
