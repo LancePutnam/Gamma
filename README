@@ -1,9 +1,40 @@
 GAMMA README
 
-Compilation Instructions:
+About
+-----
 
-Make sure to pass the -D__STDC_CONSTANT_MACROS option to the compiler to enable conversions of static types defined in stdint.h.
+Gamma is a cross-platform, C++ library for doing generic synthesis and filtering of numerical data. It contains numerous mathematical functions, common algebraic types, such as vectors, complex numbers, and quaternions, an assortment of sequence generators and many objects for signal processing. It is oriented towards real-time sound and graphics rendering, but is equally useful for non-real-time tasks.
 
-For best performance, use optimization flags -finline-functions (or -O3), and -fpeel-loops.
+
+Compilation Instructions
+------------------------
+
+Gamma source can either be built into a library or directly compiled from source into an application.
+
+Building a library:
+
+OSX
+---
+Command-line:	1) make -PLATFORM=macosx
+Xcode:		1) open project/xcode/gamma.xcodeproj
+		2) Build libgamma{.a, .dylib}. The library will be in project build folder.
+
+Linux
+-----
+Command-line:	1) make -PLATFORM=linux
+
+
+There are several other build options with the makefile. These are:
+
+	make tests	- makes the unit tests and other empirical testing code
+	make tutorial	- makes the tutorial files in /tutorial
+	make all	- makes library, tests, and tutorial
+
+
+Compiling source directly:
+
+Make sure to pass the -D__STDC_CONSTANT_MACROS option to the compiler to enable conversions of static types defined in stdint.h. For best performance, use optimization flags -finline-functions (or -O3), and -fpeel-loops.
+
+
 
 

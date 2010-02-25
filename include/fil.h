@@ -186,6 +186,8 @@ public:
 	void factor(const T& frq, const T& dec=T(1)){
 		mFactor.fromPolar(dec, frq*M_2PI);
 	}
+	
+	void factor(const Complex<T>& v){ mFactor=v; }
 
 	/// Set unit frequency
 	void freq(const T& v){ factor(v, decay()); }
@@ -259,7 +261,7 @@ public:
 		f *= M_2PI;
 		for(uint32_t i=0; i<mX.size(); ++i) X += mX[i].response(f);
 		for(uint32_t i=0; i<mY.size(); ++i) Y -= mY[i].response(f);
-		return X/Y * mGain; // H(z) = X(z)/Y(z)
+		return X/Y * mGain; // H(z) = Y(z)/X(z)
 	}
 
 protected:
