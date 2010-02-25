@@ -581,15 +581,72 @@ private:
 
 
 
-/// A value wrapped to an interval [min, max)
+/// An interval [min, max)
+
+/// Mathematical correctness is strongly enforced. The min and max bounds will 
+/// always satisfy min < max.
 template <class T>
-class ValWrap{
+class Interval{
 public:
+
+	Interval(const T& min, const T& max)
+	{ endpoints(min,max); }
+
+	Interval& endpoints(const T& min, const T& max){
+		mMax=max; mMin=min;
+		if(mMin > mMax){ T t=mMin; mMin=mMax; mMax=t; }
+		return *this;
+	}
+	
+	template <class U>
+	Interval& operator +=(const Interval<U>& v){ mMin+=v.min(); mMax+=v.max(); return *this; }
+
+	template <class U>
+	Interval& operator -=(const Interval<U>& v){ mMin-=v.max(); mMax-=v.min(); return *this; }
+	
+//	template <class U>
+//	Interval& operator *=(const Interval<U>& v){
+//		T a=min()*v.min(), b=min()*v.max(), c=max()*v.min, d=max()*v.max();
+//		mMin = scl::min(a,b,c,d);
+//		mMax = scl::max(a,b,c,d);
+//		return *this;
+//	}
+//
+//	template <class U>
+//	Interval& operator /=(const Interval<U>& v){
+//		T a=min()/v.min(), b=min()/v.max(), c=max()/v.min, d=max()/v.max();
+//		mMin = scl::min(a,b,c,d);
+//		mMax = scl::max(a,b,c,d);
+//		return *this;
+//	}
+	
+	Interval& max(const T& v){ return endpoints(min(), v); }
+	Interval& min(const T& v){ return endpoints(v, max()); }
+
+	T center() const { return (max()+min())/T(2); }	///< Returns center point
+	T diameter() const { return max()-min(); }		///< Returns difference of endpoints
+	const T& max() const { return mMax; }			///< Returns maximum endpoint
+	const T& min() const { return mMin; }			///< Returns minimum endpoint
+	T radius() const { return diameter()/T(2); }	///< Returns one-half the diameter
+
+private:
+	T mMin, mMax;
+};
+
+
+/// A value wrapped to an interval [min, max)
+
+/// Mathematical correctness is strongly enforced. The value will always lie in 
+/// the interval.
+template <class T>
+class ValWrap : public Interval<T>{
+public:
+	typedef Interval<T> I;
 	typedef ValWrap<T> V;
 
 	ValWrap(const T& max, const T& min, const T& v=T(0))
-	: mVal(v)
-	{ interval(min,max); }
+	: I(min, max), mVal(v)
+	{}
 	
 	V& operator= (const T& v){ val(v); }					///< Set value
 	V& operator+=(const T& v){ return (*this) = mVal+v; }	///< Add value
@@ -599,18 +656,41 @@ public:
 	V& operator++(){ return (*this) = ++mVal; }				///< Prefix increment value
 	V& operator--(){ return (*this) = --mVal; }				///< Prefix decrement value
 
-	ValWrap& interval(const T& min, const T& max){ mMax=max; mMin=min; return val(val()); }
-	ValWrap& max(const T& v){ mMax=v; return val(val()); }
-	ValWrap& min(const T& v){ mMin=v; return val(val()); }
-	ValWrap& val(const T& v){ mVal=scl::wrap(v, max(), min()); return *this; }
+	/// Set wrapping interval
+	ValWrap& endpoints(const T& min, const T& max){
+		I::endpoints(min,max);
+		return val(val());
+	}
+
+	ValWrap& max(const T& v){ I::max(v); return val(val()); }
+	ValWrap& min(const T& v){ I::min(v); return val(val()); }
+
+	ValWrap& val(T v){
+	
+		if(!(v < I::max())){
+			T d = I::diameter();
+			v -= d;
+			if(!(v < I::max())) v -= d * (T)(uint32_t)((v - I::min())/d);
+		}
+		else if(v < I::min()){
+			T d = I::diameter();
+			v += d;
+			if(v < I::min()) v += d * (T)(uint32_t)(((I::min() - v)/d) + 1);
+		}
+		mVal = v;
+		return *this;
+	}
+
 
 	const T& operator()() const { return mVal; }
-	const T& max() const { return mMax; }
-	const T& min() const { return mMin; }
+
+	/// Returns positive unit fractional position in interval
+	T fraction() const { return val()/I::diameter(); }
+
 	const T& val() const { return mVal; }
 	
 protected:
-	T mVal, mMax, mMin;
+	T mVal;
 };
 
 
