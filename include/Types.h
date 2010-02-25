@@ -560,9 +560,10 @@ struct Multi3: public Multi<3,T>{
 
 
 
+/// A value in the form: base^expo
 template <class T=double>
-struct PowerVal{
-	PowerVal(const T& base=2, const T& expo=0){ (*this)(base, expo); }
+struct ValPower{
+	ValPower(const T& base=2, const T& expo=0){ (*this)(base, expo); }
 	
 	T operator()() const { return mVal; }
 	T base() const { return mBase; }
@@ -576,6 +577,40 @@ struct PowerVal{
 private:
 	T mBase, mExpo, mVal;
 	void computeVal(){ mVal=::pow(mBase, mExpo); }
+};
+
+
+
+/// A value wrapped to an interval [min, max)
+template <class T>
+class ValWrap{
+public:
+	typedef ValWrap<T> V;
+
+	ValWrap(const T& max, const T& min, const T& v=T(0))
+	: mVal(v)
+	{ interval(min,max); }
+	
+	V& operator= (const T& v){ val(v); }					///< Set value
+	V& operator+=(const T& v){ return (*this) = mVal+v; }	///< Add value
+	V& operator-=(const T& v){ return (*this) = mVal-v; }	///< Subtract value
+	V  operator++(int){ V r=*this; ++(*this); return r; }	///< Postfix increment value
+	V  operator--(int){ V r=*this; --(*this); return r; }	///< Postfix decrement value
+	V& operator++(){ return (*this) = ++mVal; }				///< Prefix increment value
+	V& operator--(){ return (*this) = --mVal; }				///< Prefix decrement value
+
+	ValWrap& interval(const T& min, const T& max){ mMax=max; mMin=min; return val(val()); }
+	ValWrap& max(const T& v){ mMax=v; return val(val()); }
+	ValWrap& min(const T& v){ mMin=v; return val(val()); }
+	ValWrap& val(const T& v){ mVal=scl::wrap(v, max(), min()); return *this; }
+
+	const T& operator()() const { return mVal; }
+	const T& max() const { return mMax; }
+	const T& min() const { return mMin; }
+	const T& val() const { return mVal; }
+	
+protected:
+	T mVal, mMax, mMin;
 };
 
 
