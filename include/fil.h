@@ -99,19 +99,49 @@ private:
 };
 
 
+
+//template <int N, class Tv, class Tc>
+//class FixedSeries{
+//public:
+//
+//protected:
+//	
+//};
+//
+//
+//template <int Ni, int No, class Tv, class Tp>
+//class LCCD{
+//public:
+//
+//private:
+//	Tv mi[Ni];
+//	Tp ma[Ni];
+//	Tv mo[No];
+//	Tp mb[No];
+//};
+
+
+
 /// Integrates input with previous output
-template <class T=double>
+template <class Tv=double, class Tp=double>
 class Integrator{
 public:
 
 	/// @param[in] v	Initial value
-	Integrator(const T& v=T(0)): o1(v){}
+	Integrator(const Tp& leakCoef=Tp(1), const Tv& v=Tv(0)){
+		mo[0]=v;
+		leak(leakCoef);
+	}
 
-	/// Add input to current value
-	T operator()(const T& i0) const { return o1+=i0; }
+	/// Filter input value
+	Tv operator()(const Tv& i0) const { return mo[0]=mo[0]*mb[0] + i0; }
+	
+	Integrator& leak(const Tp& v){ mb[0]=v; return *this; }
+	Integrator& zero(){ mo[0]=Tv(0); return *this; }
 
 protected:
-	mutable T o1;
+	mutable Tv mo[1];
+	Tp mb[1];
 };
 
 
@@ -121,24 +151,27 @@ class OnePole{
 public:
 
 	OnePole(const Tv& prev=Tv(0), const Tp& smooth=Tp(1), const Tp& gain=Tp(1))
-	:	mO1(prev)
-	{}
+	{
+		mo[1] = prev;
+		set(smooth, gain);
+	}
 
 	OnePole& set(const Tp& smooth, const Tp& gain=Tp(1)){
-		mO1 = gain * smooth;
-		mO0 = gain - mO1; // gain * (Tp(1) - smooth)
+		ma[0] = gain;
+		mb[0] = smooth;
 		return *this;
 	}
 
 	Tv operator()(const Tv& v) const {
-		mO1 = mO0; mO0 = v;
-		return mO0*mA0 + mO1*mA1;
+		mo[0] = mo[0]*mb[0] + v*ma[0];
+		return mo[0];
 	}
 
 protected:
-	mutable Tv mO0, mO1;
-	Tp mA0, mA1;
+	mutable Tv mo[1];
+	Tp ma[1], mb[1];
 };
+
 
 
 

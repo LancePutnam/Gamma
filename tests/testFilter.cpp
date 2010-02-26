@@ -17,6 +17,10 @@ int main(int argc, char* argv[]){
 	
 	#define ASSERT(A, a,b,c,d,e,f,g,h) assert(A[0]==a && A[1]==b && A[2]==c && A[3]==d && A[4]==e && A[5]==f && A[6]==g && A[7]==h);
 
+	
+	//fil::LCCD<0,1,double,double> lccd;
+
+
 	{
 		Slice<double> s(A,N);
 		s = 1.;
