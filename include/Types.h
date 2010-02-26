@@ -589,6 +589,8 @@ template <class T>
 class Interval{
 public:
 
+	Interval(){ endpoints(0,1); }
+
 	Interval(const T& min, const T& max)
 	{ endpoints(min,max); }
 
@@ -645,6 +647,8 @@ class ValWrap : public Interval<T>{
 public:
 	typedef Interval<T> I;
 	typedef ValWrap<T> V;
+
+	ValWrap(): I(0,1), mVal(0){}
 
 	ValWrap(const T& max, const T& min, const T& v=T(0))
 	: I(min, max), mVal(v)
