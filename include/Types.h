@@ -787,7 +787,7 @@ struct Vec : public Multi<N,T> {
 	T norm2() const { return dot(*this); }
 	V& normalize(){ return *this /= norm(); }
 
-	V sgn() const { V(*this).normalize(); }
+	V sgn() const { return V(*this).normalize(); }
 
 	#undef DO
 };

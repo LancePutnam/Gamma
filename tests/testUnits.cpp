@@ -253,13 +253,15 @@ int main(int argc, char* argv[]){
 		v(2);		assert(v[0]==2); assert(v[1]==1);
 	}
 	
-	{	Vec3<double> v(0,0,0);
+	{	Vec3d v(0,0,0);
 		assert(v == 0);
-		v  = 1;		assert(v == 1);
+		v  = 1;		assert(v == 1); assert(v == Vec3d(1,1,1));
 		v += 1;		assert(v == 2);
 		v -= 1;		assert(v == 1);
 		v *= 2;		assert(v == 2);
 		v /= 2;		assert(v == 1);
+		v(1,2,3).normalize(); assert(scl::almostEqual(v.norm(),1));
+		v(1,2,3);	assert(v.sgn() == v.normalize());
 	}
 	
 	
