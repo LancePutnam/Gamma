@@ -257,12 +257,18 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
 /// Returns e^(-v*v)
 TEM T gaussian(T v){ return ::exp(-v*v); }
 
+/// Return greatest common divisor of two arguments
+TEM T gcd(const T& x, const T& y);
+
 TEM T hypot(T x, T y);
 
 /// Generalized Laguerre polynomial L{n,k}
 ///
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
 double laguerre(int n, int k, double x);
+
+/// Returns least common multiple
+TEM inline T lcm(const T& x, const T& y){ return (x*y)/gcd(x,y); }
 
 /// Associated Legendre polynomial
 ///
@@ -367,6 +373,9 @@ inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups);
 /// Returns equal temperament ratio- octave^(pc/divisions)
 TEM T ratioET(T pc, T divisions=12, T octave=2);
 
+/// Returns the value r such that r = x - n*y.
+TEM T remainder(const T& x, const T& y);
+
 /// Returns floating point value rounded to nearest integer.
 TEM T round(T v);
 
@@ -438,7 +447,7 @@ TEM T sinT9(T radians);
 TEM T sinc(T radians, T eps=(T)0.0001);
 
 /// Sort values so that value1 <= value2.
-TEM void sort2(T& value1, T& value2);
+TEM void sort(T& value1, T& value2);
 
 /// Returns spherical product of two complex numbers
 TEM Vec3<T> spherical(const Complex<T>& a, const Complex<T>& b){ return Vec3<T>(a.r*b.r, a.i*b.r, b.i); }
@@ -832,6 +841,11 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
 	frenet(d1,d2, t,n,b);
 }
 
+TEM T gcd(const T& x, const T& y){
+	if(y==T(0)) return x;
+	return gcd(y, remainder(x,y));
+}
+
 TEM inline T hypot(T x, T y){ return ::sqrt(x*x + y*y); }
 
 TEM inline T linLog2(T v, T recMin){
@@ -915,6 +929,12 @@ TEM inline T prime(uint32_t n, T mul){ return (T)prime(n) * mul; }
 TEM inline T ratioET(T pc, T divisions, T interval){
 	return (T)::pow((double)interval, (double)pc / (double)divisions);
 }
+
+
+template<> inline float remainder<float>(const float& x, const float& y){ return ::remainderf(x,y); }
+template<> inline double remainder<double>(const double& x, const double& y){ return ::remainder(x,y); }
+template<> inline long double remainder<long double>(const long double& x, const long double& y){ return ::remainderl(x,y); }
+TEM inline T remainder(const T& x, const T& y){ return x-(x/y)*y; }
 
 //TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
 TEM inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
@@ -1085,7 +1105,7 @@ TEM inline T sinT9(T r){
 
 TEM T sinc(T r, T eps=(T)0.0001){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
 
-TEM inline void sort2(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } } 
+TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } } 
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 

@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
 	const double pinf = 1e800;			// + infinity
 	const double ninf = -pinf;			// - infinity
 	const double nan  = pinf * 0.;		// not-a-number
-
+	
 
 	// File I/O
 	{
@@ -390,6 +390,7 @@ int main(int argc, char* argv[]){
 	T(0, 0) T(1./4, 64) T(1./2, 128) T(3./4, 192)
 	#undef T
 
+
 	// Scalar
 
 	#define T(x, y) assert(scl::abs(x) == y);
@@ -448,10 +449,18 @@ int main(int argc, char* argv[]){
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 0.8) T(-0.2, 0.2)
 	T(2.2, 0.2) T(3.2, 0.8) T(4.2, 0.2) T(5.2, 0.8)
 	#undef T
+	
+	#define T(x,y,r) assert(scl::gcd(x,y) == r);
+	T(7,7,7) T(7,4,1) T(8,4,4)
+	#undef T
 
 	#define T(x) assert(scl::abs(scl::invSqrt<1>(x) - 1./sqrt(x)) < 0.002);
 	T(0.5f) T(1.f) T(4.f) T(8.f) T(1111.f)
 	T(0.50) T(4.0) T(8.0) T(1111.0)
+	#undef T
+	
+	#define T(x,y,r) assert(scl::lcm(x,y)==r);
+	T(7,3,21) T(8,4,8) T(0,0,0) T(3,1,3)
 	#undef T
 
 	#define T(x) assert(scl::log2(1<<x) == x);
@@ -508,6 +517,10 @@ int main(int argc, char* argv[]){
 
 	#define T(x) assert(scl::almostEqual(scl::pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x, 10));
 	T(0.) T(1.) T(1.01) T(1.02) T(-1.) T(-1.01) T(-1.02)
+	#undef T
+	
+	#define T(x,y,r) assert(scl::remainder(x,y) == r);
+	T(7,7,0) T(7,1,0) T(7,4,3) T(7,3,1) T(14,3,2)
 	#undef T
 
 	#define T(x,y) assert(scl::round(x) == y);
