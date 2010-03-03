@@ -467,6 +467,12 @@ struct Mat3{
 	/// Get element at index with no bounds checking
 	const T& operator[](uint32_t i) const { return elems[i]; }
 
+	/// Set element at row i, column j
+	T& operator()(uint32_t i, uint32_t j){ return elems2[i][j]; }
+	
+	/// Get element at row i, column j
+	const T& operator()(uint32_t i, uint32_t j) const { return elems2[i][j]; }
+
 	Mat3& operator *= (const Mat3& v){
 		return (*this)(
 			x[0]*v.x[0] + x[1]*v.y[0] + x[2]*v.z[0],
@@ -504,6 +510,7 @@ struct Mat3{
 
 	union{
 		T elems[9];
+		T elems2[3][3];
 		struct { T x[3], y[3], z[3]; };
 		struct{ 
 			T a00, a01, a02;
@@ -512,6 +519,27 @@ struct Mat3{
 		};
 	};
 };
+
+
+/// Returns product of matrix multiplied by column vector
+template <class T1, class T2>
+Vec3<T2> operator * (const Mat3<T1>& m, const Vec3<T2>& v){
+	return Vec3<T2>(
+		m(0,0)*v[0] + m(0,1)*v[1] + m(0,2)*v[2],
+		m(1,0)*v[0] + m(1,1)*v[1] + m(1,2)*v[2],
+		m(2,0)*v[0] + m(2,1)*v[1] + m(2,2)*v[2]
+	);
+}
+
+/// Returns product of row vector multiplied by matrix
+template <class T1, class T2>
+Vec3<T1> operator * (const Vec3<T1>& v, const Mat3<T2>& m){
+	return Vec3<T1>(
+		v[0]*m(0,0) + v[1]*m(1,0) + v[2]*m(2,0),
+		v[0]*m(0,1) + v[1]*m(1,1) + v[2]*m(2,1),
+		v[0]*m(0,2) + v[1]*m(1,2) + v[2]*m(2,2)
+	);
+}
 
 
 /// Multi-element container
