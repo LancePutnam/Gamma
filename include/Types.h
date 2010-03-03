@@ -466,7 +466,7 @@ struct Mat3{
 
 	/// Get element at index with no bounds checking
 	const T& operator[](uint32_t i) const { return elems[i]; }
-
+	
 	/// Set element at row i, column j
 	T& operator()(uint32_t i, uint32_t j){ return elems2[i][j]; }
 	
@@ -587,7 +587,6 @@ struct Multi3: public Multi<3,T>{
 };
 
 
-
 /// A value in the form: base^expo
 template <class T=double>
 struct ValPower{
@@ -676,7 +675,7 @@ public:
 	typedef Interval<T> I;
 	typedef ValWrap<T> V;
 
-	ValWrap(): I(0,1), mVal(0){}
+	ValWrap(): I(), mVal(0){}
 
 	ValWrap(const T& max, const T& min, const T& v=T(0))
 	: I(min, max), mVal(v)
@@ -737,7 +736,6 @@ protected:
 };
 
 
-
 /// Fixed size shift buffer
 template <int N, class T>
 struct ShiftBuffer : public Multi<N,T>{
@@ -783,6 +781,7 @@ struct Vec : public Multi<N,T> {
 	typedef Vec<N,T> V;
 
 	Vec(const T& v=T(0)){ (*this) = v; }
+	Vec(const V& v){ (*this) = v; }
 
 	#define DO for(uint32_t i=0; i<N; ++i)
 
@@ -901,6 +900,19 @@ struct Vec4 : public Vec<4, T> {
 template <class T>
 Vec3<T> rotate(const Vec3<T>& v, const Vec3<T>& p, const Complex<T>& a){
 	return v*a.r + p*a.i;
+}
+
+template <class VecN, class T>
+VecN rotate(const VecN& v, const VecN& p, const Complex<T>& a){
+	return v*a.r + p*a.i;
+}
+
+/// Rotates two vectors by angle in plane formed from bivector v1 ^ v2
+template <class VecN, class T>
+void rotatePlane(VecN& v1, VecN& v2, const Complex<T>& a){
+	VecN t = gam::rotate(v1, v2, a);
+	v2 = gam::rotate(v2, VecN(-v1), a);
+	v1 = t;
 }
 
 
