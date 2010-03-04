@@ -61,6 +61,12 @@ public:
 		return *this;
 	}
 
+	template <class Gen>
+	FunctionTable& operator+=(const Gen& g){
+		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
+		return *this;
+	}
+
 protected:
 
 	virtual void onResize(){ mIndMap.max(size(), 1.); }
