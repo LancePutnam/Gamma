@@ -30,6 +30,9 @@ int main(int argc, char* argv[]){
 	const double ninf = -pinf;			// - infinity
 	const double nan  = pinf * 0.;		// not-a-number
 	
+	//{ int x=0; printf("%d\n", (x-9) % 8); }
+	//{ unsigned x=0; printf("%ud\n", (x-1)); }
+	{ ValWrap<int> x(7); x=-1; x++; x+=14; x=(x+1)*8; printf("%f\n", x.fraction()); }
 
 	// File I/O
 	{

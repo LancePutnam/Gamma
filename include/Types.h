@@ -668,7 +668,7 @@ private:
 /// A value wrapped to an interval [min, max)
 
 /// Mathematical correctness is strongly enforced. The value will always lie in 
-/// the interval.
+/// the specified interval.
 template <class T>
 class ValWrap : public Interval<T>{
 public:
@@ -677,19 +677,30 @@ public:
 
 	ValWrap(): I(), mVal(0){}
 
-	ValWrap(const T& max, const T& min, const T& v=T(0))
+	ValWrap(const T& max, const T& min=T(0), const T& v=T(0))
 	: I(min, max), mVal(v)
 	{}
 	
-	V& operator= (const T& v){ val(v); }					///< Set value
-	V& operator+=(const T& v){ return val(mVal+v); }		///< Add value
-	V& operator+=(const V& v){ return (*this)+=v.val(); }	///< Add wrapped value
-	V& operator-=(const T& v){ return val(mVal-v); }		///< Subtract value
-	V& operator-=(const V& v){ return (*this)-=v.val(); }	///< Subtract wrapped value
-	V  operator++(int){ V r=*this; ++(*this); return r; }	///< Postfix increment value
-	V  operator--(int){ V r=*this; --(*this); return r; }	///< Postfix decrement value
-	V& operator++(){ return val(++mVal); }					///< Prefix increment value
-	V& operator--(){ return val(--mVal); }					///< Prefix decrement value
+	ValWrap& operator= (const T& v){ return val(v); }				///< Set value
+	ValWrap& operator+=(const T& v){ return val(mVal+v); }			///< Add value
+	//ValWrap& operator+=(const ValWrap& v){ return (*this)+=v(); }	///< Add wrapped value
+	ValWrap& operator-=(const T& v){ return val(mVal-v); }			///< Subtract value
+	//ValWrap& operator-=(const ValWrap& v){ return (*this)-=v(); }	///< Subtract wrapped value
+
+	ValWrap& operator*=(const T& v){ return val(mVal*v); }			///< Multiply value
+	//ValWrap& operator*=(const ValWrap& v){ return (*this)*=v(); }	///< Multiply wrapped value
+	ValWrap& operator/=(const T& v){ return val(mVal/v); }			///< Divide value
+	//ValWrap& operator/=(const ValWrap& v){ return (*this)/=v(); }	///< Divide wrapped value
+	
+	ValWrap  operator+ (const T& v) const { return V(*this)+=v; }
+	ValWrap  operator- (const T& v) const { return V(*this)-=v; }
+	ValWrap  operator* (const T& v) const { return V(*this)*=v; }
+	ValWrap  operator/ (const T& v) const { return V(*this)/=v; }
+	
+	ValWrap  operator++(int){ V r=*this; ++(*this); return r; }		///< Postfix increment value
+	ValWrap  operator--(int){ V r=*this; --(*this); return r; }		///< Postfix decrement value
+	ValWrap& operator++(){ return val(++mVal); }					///< Prefix increment value
+	ValWrap& operator--(){ return val(--mVal); }					///< Prefix decrement value
 
 	/// Set wrapping interval
 	ValWrap& endpoints(const T& min, const T& max){
@@ -730,6 +741,8 @@ public:
 	}
 
 	const T& val() const { return mVal; }
+	
+	operator T() const { return mVal; }
 	
 protected:
 	T mVal;
