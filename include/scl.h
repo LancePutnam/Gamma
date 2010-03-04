@@ -328,8 +328,11 @@ TEM T nearestDiv(T of, T to);
 /// The smoothness is controlled with the bw argument.
 TEM T negative(T v, T bw);
 
-/// Same as negative(T,T), but 'amt' controls positive level (0,1) -> (-1,1).
+/// Same as negative(T,T), but 'amt' controls positive level (0,1) -> (-1,1)
 TEM T negative(T v, T bw, T amt);
+
+/// Returns the next representable floating-point or integer value following x in the direction of y
+TEM T nextAfter(T x, T y);
 
 /// Returns the number of digits in the integer portion
 TEM T numInt(const T& v){ return scl::floor(::log10(v)) + 1; }
@@ -338,13 +341,13 @@ TEM T numInt(const T& v){ return scl::floor(::log10(v)) + 1; }
 TEM	inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
 
-/// Evaluates polynomial a0 + a1 x + a2 x^2.
+/// Evaluates polynomial a0 + a1 x + a2 x^2
 TEM T poly(T x, T a0, T a1, T a2);
 
-/// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3.
+/// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3
 TEM T poly(T x, T a0, T a1, T a2, T a3);
 
-/// Smooth positive map.
+/// Smooth positive map
 
 /// The return value is close to 1 if v > 0 and close to 0 if v < 0.
 /// The smoothness is controlled with the bw argument.
@@ -909,6 +912,10 @@ TEM T nearest(T val, const char * interval, long div){
 TEM inline T nearestDiv(T of, T to){ return to / round(to/of); }
 TEM inline T negative(T v, T bw){ return T(0.5) - sign(v, bw)*T(0.5); }
 TEM inline T negative(T v, T bw, T a){ return a - (T(1)-a)*sign(v, bw); }
+TEM inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
+template<> inline float nextAfter(float x, float y){ return nextafterf(x,y); }
+template<> inline double nextAfter(double x, double y){ return nextafter(x,y); }
+template<> inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
 TEM inline T poly(T v, T a0, T a1, T a2){ return a0 + v*(a1 + v*a2); }
 TEM inline T poly(T v, T a0, T a1, T a2, T a3){ return a0 + v*(a1 + v*(a2 + v*a3)); }
 TEM inline T positive(T v, T bw){ return T(0.5) + sign(v, bw)*T(0.5); }
@@ -1147,7 +1154,6 @@ TEM inline T warpSinSU(T v){ return v*((T)0.75 - v*v*(T)0.25) + (T)0.5; }
 TEM inline T warpSinUS(T v){ return v*v*((T)6 - v*(T)4) - (T)1; }
 TEM inline T warpSinUU(T v){ return v*v*(v*(T)-2 + (T)3); }
 
-
 TEM inline T wrap(T v, T hi, T lo){
 	if(lo == hi) return lo;
 	
@@ -1159,8 +1165,9 @@ TEM inline T wrap(T v, T hi, T lo){
 	}
 	else if(v < lo){
 		T diff = hi - lo;
-		v += diff;
+		v += diff;	// this might give diff if range is too large, so check at end of block...
 		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+		if(v==diff) return nextAfter(v, lo);
 	}
 	return v;
 }
