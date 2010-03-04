@@ -267,6 +267,13 @@ struct Scan2{
 
 	operator int() const { return flat(); }
 
+	int neighbor(int d1, int d2) const {
+		// These ops are identical interval arithmetic...
+		d1 += i; if(d1<0) d1+=s1; else if(d1>=s1) d1-=s1;
+		d2 += j; if(d2<0) d2+=s2; else if(d2>=s2) d2-=s2;
+		return flat(d1,d2);
+	}
+
 	int s1, s2;
 	int i, j;
 };
