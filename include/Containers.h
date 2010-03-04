@@ -189,26 +189,36 @@ protected:
 
 /// Container for reading and writing arrays using front and back buffers.
 template <class T>
-class DoubleBuffer{
+class DoubleBuffer : public Array<T>{
 public:
 	
 	/// @param[in]	singleBufSize	Number of elements in single buffer (allocated size will be twice this).
 	DoubleBuffer(uint32_t singleBufSize);
-	~DoubleBuffer();
 
-	/// Writes single buffer to back and performs swap().
-	void write(const T * singleBuffer);
-										
-	void swap();	///< Swaps the front and back buffers.
+	/// Set front buffer element
+	T& operator[](uint32_t i){ return front()[i]; }
+	
+	/// Get front buffer element
+	const T& operator[](uint32_t i) const { return front()[i]; }
 
-	T * front();	///< Returns a pointer to the front (newer) buffer.
-	T * back();		///< Returns a pointer to the back (older) buffer.
-	void copyAll(T * dst);	///< Copy contents to dst, back buffer first then front.
+	T * back();				///< Returns a pointer to the back (older) buffer
+	T * front();			///< Returns a pointer to the front (newer) buffer
+
+	void swap();			///< Swaps the front and back buffers
+
+	void copyAll(T * dst);	///< Copy contents to dst, back buffer first then front
 
 protected:
-	T * mBuffer;
 	uint32_t mSizeSingle;
-	uint32_t mTap;
+	T * mFront, * mBack;
+	
+	typedef Array<T> Base;
+	
+	virtual void onResize();
+	bool backIsFirst();
+
+	/// Writes single buffer to back and performs swap().
+	//void write(const T * singleBuffer);
 };
 
 
@@ -546,44 +556,50 @@ TEM	inline void Ring<T>::writeClip(const T& v){
 
 // DoubleBuffer
 
-TEM DoubleBuffer<T> :: DoubleBuffer(uint32_t singleBufSize){
-	mTap = 0;
-	mSizeSingle = singleBufSize;
-	mBuffer = (T *)malloc((singleBufSize<<1) * sizeof(T));
+TEM DoubleBuffer<T>::DoubleBuffer(uint32_t n)
+: Array<T>(n*2), mSizeSingle(n)
+{
+	mBack  = Base::mElems;
+	mFront = Base::mElems + n;
 }
 
-TEM DoubleBuffer<T> :: ~DoubleBuffer(){
-	free(mBuffer);
-}
+TEM inline bool DoubleBuffer<T>::backIsFirst(){ return mBack==Base::mElems; }
 
-TEM inline void DoubleBuffer<T>::write(const T * singleBuffer){
-	memcpy(mBuffer + mTap, singleBuffer, mSizeSingle * sizeof(T));
-	swap();
-}
-
+TEM inline T * DoubleBuffer<T>::back(){ return mBack; }
+TEM inline T * DoubleBuffer<T>::front(){ return mFront; }
 TEM inline void DoubleBuffer<T>::swap(){
-	mTap = mSizeSingle - mTap;
-}
-
-TEM inline T * DoubleBuffer<T>::front(){
-	return mBuffer + (mSizeSingle - mTap);
-}
-
-TEM inline T * DoubleBuffer<T>::back(){
-	return mBuffer + mTap;
-}
-
-TEM inline void DoubleBuffer<T>::copyAll(T * dst){
-	if(0 == mTap){
-		memcpy(dst, mBuffer, (mSizeSingle<<1) * sizeof(T));
+	if(backIsFirst()){
+		mFront= Base::mElems;
+		mBack = Base::mElems + mSizeSingle;
 	}
 	else{
-		memcpy(dst, mBuffer + mSizeSingle, mSizeSingle * sizeof(T));
-		memcpy(dst + mSizeSingle, mBuffer, mSizeSingle * sizeof(T));
+		mBack = Base::mElems;
+		mFront= Base::mElems + mSizeSingle;	
 	}
 }
 
-} // end namespace gam
+TEM void DoubleBuffer<T>::copyAll(T * dst){
+	if(backIsFirst()){
+		memcpy(dst, mBack, (mSizeSingle<<1) * sizeof(T));
+	}
+	else{
+		memcpy(dst, mBack, mSizeSingle * sizeof(T));
+		memcpy(dst + mSizeSingle, mFront, mSizeSingle * sizeof(T));
+	}
+}
+
+TEM void DoubleBuffer<T>::onResize(){
+	mSizeSingle = Base::size()/2;
+	mBack  = Base::mElems;
+	mFront = Base::mElems + mSizeSingle;
+}
+
+//TEM inline void DoubleBuffer<T>::write(const T * singleBuffer){
+//	memcpy(mBuffer + mTap, singleBuffer, mSizeSingle * sizeof(T));
+//	swap();
+//}
+
+} // gam::
 
 #undef TEM
 
