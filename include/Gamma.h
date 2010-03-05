@@ -15,16 +15,18 @@
 // Everything else depends on these so always include them.
 #include "arr.h"
 #include "gen.h"
+#include "fil.h"
 #include "ipl.h"
 #include "mem.h"
 #include "scl.h"
 #include "tbl.h"
 #include "rnd.h"
 
+#include "Containers.h"
+#include "Strategy.h"
+
 // Optional includes
 #ifdef GAMMA_H_INC_ALL
-
-	#include "Containers.h"
 
 	// State Functions
 	#include "AudioIO.h"

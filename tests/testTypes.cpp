@@ -127,7 +127,7 @@ int main(int argc, char* argv[]){
 //	
 	{
 		printf("\nComplex\n");
-		Complex<double> c(Complex<double>::Polar(0.5, 0.1));
+		Complex<double> c(Polar<double>(0.5, 0.1));
 		
 		printf("real:  %f imag: %f\n", c.r, c.i);
 		printf("norm:  %f\n", c.norm());

@@ -1,24 +1,9 @@
-#include <assert.h>
+#include "ut.h"
 
-#include "Gamma.h"
-#include "Access.h"
-#include "Constants.h"
-//#include "Visual.h"
+int ut_gen(){
 
-//#define GEN(fnc) slice(arr,N) = fnc; printf("\n"#fnc":\n"); PRINT_TABLE
-//
-//#define PRINT_TABLE \
-//	for(int i=0; i<N; i++){\
-//		float v = arr[i];\
-//		printf("[%2d] % 5.3f  ", i, v);\
-//		printPlot(v, 32); printf("\n");\
-//	}
+	using namespace gam::gen;
 
-using namespace gam;
-using namespace gam::gen;
-
-int main(int argc, char* argv[]){
-	
 	const int N = 8;
 	double A[N];
 	
@@ -66,7 +51,6 @@ int main(int argc, char* argv[]){
 
 	slice(A,N) = RMulAdd<>(2,1,0);
 	ASSERT(A, 0,1,3,7,15,31,63,127)
-
-	return 0;
+	
+	return 0;	
 }
-

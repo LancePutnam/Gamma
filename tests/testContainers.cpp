@@ -1,5 +1,7 @@
+#include <assert.h>
 #include <stdio.h>
 #include <iostream>
+
 #include "arr.h"
 #include "gen.h"
 #include "mem.h"

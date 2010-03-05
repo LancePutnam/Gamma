@@ -1,18 +1,4 @@
-/*
- *  Memory operations tests.
- *
- *  Created by Lance Putnam on 2/27/06.
- *  Copyright 2006 __MyCompanyName__. All rights reserved.
- *
- */
-
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include "arr.h"
-#include "gen.h"
-#include "mem.h"
-#include "Access.h"
+#include "ut.h"
 
 //#define SET_M1 mem::set(arrE, val(-1), Loop(lenE)); mem::set(arrO, val(-1), Loop(lenO));
 //#define SET_LINE arr::lineSlope1(arrE, lenE); arr::lineSlope1(arrO, lenO);
@@ -21,14 +7,12 @@
 //#define PRINT_IND  for(i=0; i<lenO; i++) printf("% 2d ", i); printf("\n");
 //#define PRINT_BOTH PRINT_IND PRINT_EVEN PRINT_ODD
 //	
-//#define ASSERT_GUARDS \
-//	if(arrE[lenE] != 100){ printf("**arrE guard modified to % 2d\n", arrE[lenE]); return 1;}\
+//#define ASSERT_GUARDS 
+//	if(arrE[lenE] != 100){ printf("**arrE guard modified to % 2d\n", arrE[lenE]); return 1;}
 //	if(arrO[lenO] != 100){ printf("**arrO guard modified to % 2d\n", arrO[lenO]); return 1;}
 
-using namespace gam;
-using namespace gam::gen;
-
-int main(int argc, char* argv[]){
+int ut_mem(){
+	using namespace gam::gen;
 
 	const uint32_t N=8;
 	int A[N], T[N];
@@ -183,8 +167,6 @@ int main(int argc, char* argv[]){
 //	SET_LINE
 //	mem::transpose2(arrE, lenE);
 //	PRINT_EVEN ASSERT_GUARDS
-	
 
-	return 0;
+	return 0;	
 }
-

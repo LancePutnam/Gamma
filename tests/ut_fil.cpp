@@ -1,12 +1,7 @@
-#include "Gamma.h"
-#include "Access.h"
-#include "scl.h"
-#include "fil.h"
-#include "Visual.h"
+#include "ut.h"
 
-using namespace gam;
+int ut_fil(){
 
-int main(int argc, char* argv[]){
 
 	const int N = 8;
 	double ds = 1./N;
@@ -88,5 +83,6 @@ int main(int argc, char* argv[]){
 //		assert(f2(-10) == -1);
 //	}
 
-	return 0;
+	
+	return 0;	
 }

@@ -5,7 +5,7 @@
 	See COPYRIGHT file for authors and license information
 
 	File Description:
-	Dynamically sized generic containers.
+	Dynamically sizable generic containers.
 */
 
 #include <stdlib.h>
@@ -24,7 +24,7 @@ struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
 	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
 	void operator()(uint32_t v){ mBitsI = scl::log2(convert(v)); mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/ }
-	uint32_t convert(uint32_t v){ v=scl::ceilPow2(v); return v!=1 ? v : 2; }	// should return 0,2,4,8,16,...
+	static uint32_t convert(uint32_t v){ v=scl::ceilPow2(v); return v!=1 ? v : 2; }	// should return 0,2,4,8,16,...
 	uint32_t mBitsI;	// integer portion # bits
 	uint32_t mBitsF;	// fraction portion # bits
 };
@@ -35,7 +35,7 @@ struct SizeArray{
 	SizeArray(uint32_t size): mSize(size){}
 	uint32_t operator()() const { return mSize; }
 	void operator()(uint32_t v){ mSize = v; }
-	uint32_t convert(uint32_t v){ return v; }
+	static uint32_t convert(uint32_t v){ return v; }
 	uint32_t mSize;
 };
 
@@ -49,7 +49,7 @@ template <class T, class S>
 class ArrayBase{
 public:
 	ArrayBase();
-	ArrayBase(uint32_t size);
+	explicit ArrayBase(uint32_t size);
 	ArrayBase(uint32_t size, const T& initial);
 	ArrayBase(T * src, uint32_t size);
 	ArrayBase(const ArrayBase<T,S>& src);
@@ -105,15 +105,15 @@ protected:
 template <class T>
 class Array : public ArrayBase<T, SizeArray>{
 public:
-	typedef ArrayBase<T, SizeArray> super;
+	typedef ArrayBase<T, SizeArray> Base;
 
-	Array(): super(){}
-	Array(uint32_t size): super(size){}
-	Array(uint32_t size, const T& initial): super(size, initial){}
-	Array(T * src, uint32_t size): super(src, size){}
-	Array(const Array<T>& src): super(src){}
+	Array(): Base(){}
+	explicit Array(uint32_t size): Base(size){}
+	Array(uint32_t size, const T& initial): Base(size, initial){}
+	Array(T * src, uint32_t size): Base(src, size){}
+	Array(const Array<T>& src): Base(src){}
 	
-	Array& operator=(const T& v){ super::operator=(v); return *this; }
+	Array& operator=(const T& v){ Base::operator=(v); return *this; }
 
 	virtual ~Array(){}
 };
@@ -124,13 +124,13 @@ public:
 template <class T>
 class ArrayPow2 : public ArrayBase<T, SizeArrayPow2>{
 public:
-	typedef ArrayBase<T, SizeArrayPow2> super;
+	typedef ArrayBase<T, SizeArrayPow2> Base;
 
-	ArrayPow2(): super(){}
-	ArrayPow2(uint32_t size): super(size){}
-	ArrayPow2(uint32_t size, const T& initial): super(size, initial){}
-	ArrayPow2(T * src, uint32_t size): super(src, size){}
-	ArrayPow2(const ArrayPow2<T>& src): super(src){}
+	ArrayPow2(): Base(){}
+	explicit ArrayPow2(uint32_t size): Base(size){}
+	ArrayPow2(uint32_t size, const T& initial): Base(size, initial){}
+	ArrayPow2(T * src, uint32_t size): Base(src, size){}
+	ArrayPow2(const ArrayPow2<T>& src): Base(src){}
 
 	virtual ~ArrayPow2(){}
 
@@ -144,7 +144,7 @@ public:
 	void putPhase(uint32_t phase, T v);
 	
 private:
-	using super::mSize;
+	using Base::mSize;
 };
 
 
@@ -155,7 +155,7 @@ class Buffer : public Array<T> {
 public:
 
 	/// @param[in]	size		Number of elements in buffer.
-	Buffer(uint32_t size);
+	explicit Buffer(uint32_t size);
 	virtual ~Buffer(){}
 	
 	/// Writes 'src' to buffer and locks buffer.
@@ -193,7 +193,7 @@ class DoubleBuffer : public Array<T>{
 public:
 	
 	/// @param[in]	singleBufSize	Number of elements in single buffer (allocated size will be twice this).
-	DoubleBuffer(uint32_t singleBufSize);
+	explicit DoubleBuffer(uint32_t singleBufSize);
 
 	/// Set front buffer element
 	T& operator[](uint32_t i){ return front()[i]; }
@@ -228,14 +228,14 @@ template <class T>
 class Ring : public Array<T> {
 public:
 
-	typedef Array<T> super; using super::elems; using super::size;
+	typedef Array<T> Base; using Base::elems; using Base::size;
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	Ring(uint32_t size, const T& value=T());
+	explicit Ring(uint32_t size, const T& value=T());
 	
 	/// Sets all elements to value
-	Ring& operator=(const T& v){ super::operator=(v); return *this; }
+	Ring& operator=(const T& v){ Base::operator=(v); return *this; }
 
 	/// Returns reference to backmost element
 	T& atBack(){ return (*this)[indexBack()]; }
@@ -275,19 +275,19 @@ protected:
 template <class T>
 class RingFill : public Ring<T> {
 public:
-	typedef Ring<T> super;
+	typedef Ring<T> Base;
 	
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	RingFill(uint32_t size, const T& value=T()): super(size, value), mFill(0){}
+	explicit RingFill(uint32_t size, const T& value=T()): Base(size, value), mFill(0){}
 
 	void operator()(const T& v){
-		this->super::operator()(v);
-		if(mFill < super::size()) ++mFill;
+		this->Base::operator()(v);
+		if(mFill < Base::size()) ++mFill;
 	}
 	
 	/// Reset fill to zero.
-	void reset(){ mFill=0; super::reset(); }
+	void reset(){ mFill=0; Base::reset(); }
 	
 	/// Returns current fill of buffer.
 	uint32_t fill() const { return mFill; }
@@ -305,7 +305,7 @@ struct DoubleRing : public Ring<T>{
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	DoubleRing(uint32_t size, const T& value=T()): Ring<T>(size, value), read(size){}
+	explicit DoubleRing(uint32_t size, const T& value=T()): Ring<T>(size, value), read(size){}
 	
 	/// Copy elements into read buffer unwrapping from ring
 	
@@ -332,7 +332,7 @@ struct DelayN: public Ring<T>{
 
 	/// @param[in]	size		Number of elements to delay.
 	/// @param[in]	value		Initial value of all elements.
-	DelayN(uint32_t size, const T& value=T()): Ring<T>(size, value){}
+	explicit DelayN(uint32_t size, const T& value=T()): Ring<T>(size, value){}
 	
 	DelayN& operator=(const T& v){ Ring<T>::operator=(v); return *this; }
 
@@ -390,13 +390,6 @@ TEM2 inline const T&  ArrayBase<T,S>::operator[](uint32_t i) const { return elem
 TEM2 inline T * ArrayBase<T,S>::elems() const { return mElems; }
 
 TEM2 void ArrayBase<T,S>::freeElements(){ //printf("ArrayBase::freeElements(): mElems=%p\n", mElems);
-	
-//	if(owner()){
-//		//printf("(%p) ArrayBase::freeElements(): mElems=%p\n", this, mElems);
-//		
-//		delete [] mElems; 
-//		mElems=0; mSize(0);
-//	}
 	
 	// we are managing this memory
 	if(mElems && managing(mElems)){

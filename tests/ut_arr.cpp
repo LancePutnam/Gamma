@@ -1,15 +1,6 @@
-#include <assert.h>
-#include <stdio.h>
-//#include <math.h>
-//#include <float.h>
-#include "arr.h"
-#include "gen.h"
-#include "Access.h"
+#include "ut.h"
 
-using namespace gam;
-using namespace gam::gen;
-
-int main(int argc, char* argv[]){
+int ut_arr(){
 
 	const uint32_t N=8;
 	double A[N], B[N];
@@ -19,16 +10,15 @@ int main(int argc, char* argv[]){
 	#define SET(A, a,b,c,d,e,f,g,h) A[0]=a; A[1]=b; A[2]=c; A[3]=d; A[4]=e; A[5]=f; A[6]=g; A[7]=h;
 	#define PRINT(A) for(uint32_t i=0;i<N;++i) printf("%g ", A[i]); printf("\n")
 
-	a.copy(b = RAdd1<>(0));
+	a.copy(b = gen::RAdd1<>(0));
 	assert(arr::dot(A,B,N) == (0*0+1*1+2*2+3*3+4*4+5*5+6*6+7*7));
 
-	a = RAdd1<>(0);
+	a = gen::RAdd1<>(0);
 	assert(arr::normalize(A,N) == 1./(N-1));
 	for(uint32_t i=0; i<N; ++i) assert(scl::almostEqual(A[i], i/double(N-1)));
 
-	return 0;
+	return 0;	
 }
-
 
 //using namespace gam;
 //
@@ -123,11 +113,4 @@ int main(int argc, char* argv[]){
 //	
 //	return 0;
 //}
-
-
-
-
-
-
-
 

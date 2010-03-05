@@ -1,16 +1,23 @@
-#include <assert.h>
-#include <stdio.h>
-#include "Access.h"
+#include "ut.h"
 
-#include <map>
-#include <vector>
-#include "Types.h"
-#include "mem.h"	// temp for unique()
+int utAccess(){
 
-using namespace gam;
+	{
+		using namespace acc;
 
-int main(int argc, char* argv[]){
+		assert(None::map(0,2,1) == 0);
+		assert(Wrap::map(0,2,1) == 2);
+		assert(Clip::map(0,2,1) == 1);
 
+		assert(None::map(2,2,1) == 2);
+		assert(Wrap::map(2,2,1) == 2);
+		assert(Clip::map(2,2,1) == 2);
+
+		assert(None::map(3,2,1) == 3);
+		assert(Wrap::map(3,2,1) == 1);
+		assert(Clip::map(3,2,1) == 2);
+	}
+	
 	const uint32_t N=8;
 	double A[N], B[N];
 	Slice<double> a(A,N), b(B,N);
@@ -137,11 +144,9 @@ a.swap(b);			// A = {0,0,0,0}, B = {1,2,3,4}
 //	}
 //	
 //	//ASSERT(A,1,5,2,6,3,7,4,8)
-
-	return 0;
+	
+	return 0;	
 }
-
-
 
 /*
 		{
@@ -183,8 +188,5 @@ a.swap(b);			// A = {0,0,0,0}, B = {1,2,3,4}
 		}
 		
 */
-
-
-
 
 
