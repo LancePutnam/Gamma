@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 
+#include "Allocator.h"
 #include "Conversion.h"
 #include "mem.h"
 #include "scl.h"
@@ -45,14 +46,14 @@ struct SizeArray{
 /// When the array is resized, if the elements are class-types, then their
 /// default constructors are called and if the elements are non-class-types,
 /// then they are left uninitialized.
-template <class T, class S>
-class ArrayBase{
+template <class T, class S, class A=gam::Allocator<T> >
+class ArrayBase : private A{
 public:
 	ArrayBase();
 	explicit ArrayBase(uint32_t size);
 	ArrayBase(uint32_t size, const T& initial);
 	ArrayBase(T * src, uint32_t size);
-	ArrayBase(const ArrayBase<T,S>& src);
+	explicit ArrayBase(const ArrayBase<T,S,A>& src);
 
 	virtual ~ArrayBase();
 
@@ -63,12 +64,12 @@ public:
 	const T& operator[](uint32_t i) const;
 	
 	/// Sets all elements to argument
-	ArrayBase& operator=(const T& v){ for(uint32_t i=0; i<size(); ++i) (*this)[i] = v; return *this; }
+	ArrayBase& operator=(const T& v);
 	
 	T * elems() const;				///< Returns pointer to first array element.
 	uint32_t size() const;			///< Returns number of elements in array.
 
-	void freeElements();			///< Frees memory
+	void clear();					///< Frees memory
 
 	/// Ensures ownership of elements.
 	
@@ -76,8 +77,13 @@ public:
 	/// referenced array elements are copied.
 	void own();
 	
-	void resize(uint32_t newSize);			///< Resizes number of elements in array
-	void source(const ArrayBase<T,S>& src);	///< Sets source of array elements to another array
+	/// Resizes number of elements in array
+	
+	/// If the new size is less than the old size, then elements are truncated.
+	/// If the new size is greater than the old size, then the argument value
+	/// is copied into the additional elements.
+	void resize(uint32_t newSize, const T& c=T());
+	void source(const ArrayBase<T,S,A>& src);	///< Sets source of array elements to another array
 	void source(T * src, uint32_t size);	///< Sets source of array elements to another array
 
 	virtual void onResize(){}
@@ -97,32 +103,36 @@ protected:
 	
 	// is memory being managed automatically?
 	static bool managing(T* const m){ return refCount().count(m) != 0; }
+
+private: ArrayBase& operator=(const ArrayBase& v);
 };
 
 
 
 /// Container for storing arrayed elements.
-template <class T>
-class Array : public ArrayBase<T, SizeArray>{
+template <class T, class A=gam::Allocator<T> >
+class Array : public ArrayBase<T, SizeArray, A>{
 public:
-	typedef ArrayBase<T, SizeArray> Base;
+	typedef ArrayBase<T, SizeArray, A> Base;
 
 	Array(): Base(){}
 	explicit Array(uint32_t size): Base(size){}
 	Array(uint32_t size, const T& initial): Base(size, initial){}
 	Array(T * src, uint32_t size): Base(src, size){}
-	Array(const Array<T>& src): Base(src){}
+	Array(const Array& src): Base(src){}
 	
 	Array& operator=(const T& v){ Base::operator=(v); return *this; }
 
 	virtual ~Array(){}
+
+private: Array& operator=(const Array& v);
 };
 
 
 
 /// Container for storing a power-of-two number of arrayed elements.
-template <class T>
-class ArrayPow2 : public ArrayBase<T, SizeArrayPow2>{
+template <class T, class A=gam::Allocator<T> >
+class ArrayPow2 : public ArrayBase<T, SizeArrayPow2, A>{
 public:
 	typedef ArrayBase<T, SizeArrayPow2> Base;
 
@@ -130,7 +140,7 @@ public:
 	explicit ArrayPow2(uint32_t size): Base(size){}
 	ArrayPow2(uint32_t size, const T& initial): Base(size, initial){}
 	ArrayPow2(T * src, uint32_t size): Base(src, size){}
-	ArrayPow2(const ArrayPow2<T>& src): Base(src){}
+	explicit ArrayPow2(const ArrayPow2& src): Base(src){}
 
 	virtual ~ArrayPow2(){}
 
@@ -145,13 +155,14 @@ public:
 	
 private:
 	using Base::mSize;
+private: ArrayPow2& operator=(const ArrayPow2& v);
 };
 
 
 
 /// Container for sharing arrays between threads.
-template <class T>
-class Buffer : public Array<T> {
+template <class T, class A=gam::Allocator<T> >
+class Buffer : public Array<T,A> {
 public:
 
 	/// @param[in]	size		Number of elements in buffer.
@@ -188,8 +199,8 @@ protected:
 
 
 /// Container for reading and writing arrays using front and back buffers.
-template <class T>
-class DoubleBuffer : public Array<T>{
+template <class T, class A=gam::Allocator<T> >
+class DoubleBuffer : public Array<T,A>{
 public:
 	
 	/// @param[in]	singleBufSize	Number of elements in single buffer (allocated size will be twice this).
@@ -212,7 +223,7 @@ protected:
 	uint32_t mSizeSingle;
 	T * mFront, * mBack;
 	
-	typedef Array<T> Base;
+	typedef Array<T,A> Base;
 	
 	virtual void onResize();
 	bool backIsFirst();
@@ -224,11 +235,11 @@ protected:
 
 
 /// Ring buffer
-template <class T>
-class Ring : public Array<T> {
+template <class T, class A=gam::Allocator<T> >
+class Ring : public Array<T,A> {
 public:
 
-	typedef Array<T> Base; using Base::elems; using Base::size;
+	typedef Array<T,A> Base; using Base::elems; using Base::size;
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
@@ -272,10 +283,10 @@ protected:
 
 
 /// Ring buffer that keeps track of its fill.
-template <class T>
-class RingFill : public Ring<T> {
+template <class T, class A=gam::Allocator<T> >
+class RingFill : public Ring<T,A> {
 public:
-	typedef Ring<T> Base;
+	typedef Ring<T,A> Base;
 	
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
@@ -300,8 +311,8 @@ protected:
 
 
 /// Double buffered ring-buffer
-template <class T>
-struct DoubleRing : public Ring<T>{
+template <class T, class A=gam::Allocator<T> >
+struct DoubleRing : public Ring<T,A>{
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
@@ -311,33 +322,37 @@ struct DoubleRing : public Ring<T>{
 	
 	/// Returns a pointer to the read buffer
 	///
-	T * copyUnwrap(){ Ring<T>::copyUnwrap(read.elems(), read.size()); return read.elems(); }
+	T * copyUnwrap(){ Ring<T,A>::copyUnwrap(read.elems(), read.size()); return read.elems(); }
 	
 	/// Copy elements into read buffer "as is" from ring
 	
 	/// Returns a pointer to the read buffer
 	///
-	T * copy(){ mem::deepCopy(read.elems(), Ring<T>::elems(), read.size()); return read.elems(); }
+	T * copy(){
+		mem::deepCopy(read.elems(), Ring<T,A>::elems(), read.size());
+		//for(uint32_t i=0; i<read.size(); ++i) construct(read.elems()+i, (*this)[i]);
+		return read.elems();
+	}
 	
-	Array<T> read;
+	Array<T,A> read;
 };
 
 
 
 
 /// Fixed N-sample delay
-template <class T>
-struct DelayN: public Ring<T>{
-	using Ring<T>::incPos; using Ring<T>::pos;
+template <class T, class A=gam::Allocator<T> >
+struct DelayN: public Ring<T,A>{
+	using Ring<T,A>::incPos; using Ring<T,A>::pos;
 
 	/// @param[in]	size		Number of elements to delay.
 	/// @param[in]	value		Initial value of all elements.
-	explicit DelayN(uint32_t size, const T& value=T()): Ring<T>(size, value){}
+	explicit DelayN(uint32_t size, const T& value=T()): Ring<T,A>(size, value){}
 	
 	DelayN& operator=(const T& v){ Ring<T>::operator=(v); return *this; }
 
 	/// Write new element, return oldest.
-	T operator()(T input){
+	T operator()(const T& input){
 		incPos();				// inc write pos
 		T dly = (*this)[pos()];	// read oldest element
 		(*this)[pos()] = input;	// write new element
@@ -352,98 +367,125 @@ struct DelayN: public Ring<T>{
 
 // Implementation_______________________________________________________________
 
-#define TEM template<class T>
 
 // ArrayBase
 
-#undef TEM2
-#define TEM2 template <class T, class S>
+#define TEM3 template <class T, class S, class A>
 #define ARRAYBASE_INIT mElems(0), mSize(0)
 
-TEM2 ArrayBase<T,S>::ArrayBase()
+TEM3 ArrayBase<T,S,A>::ArrayBase()
 :	ARRAYBASE_INIT{}
 
-TEM2 ArrayBase<T,S>::ArrayBase(uint32_t size)
+TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t size)
 :	ARRAYBASE_INIT
 {	resize(size); }
 
-TEM2 ArrayBase<T,S>::ArrayBase(uint32_t size, const T& initial)
+TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t size, const T& initial)
 :	ARRAYBASE_INIT
 {	resize(size); for(uint32_t i=0;i<this->size();++i) (*this)[i] = initial; }
 
-TEM2 ArrayBase<T,S>::ArrayBase(T * src, uint32_t size)
+TEM3 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t size)
 :	ARRAYBASE_INIT
 {	source(src, size); }
 
-TEM2 ArrayBase<T,S>::ArrayBase(const ArrayBase<T,S>& src)
+TEM3 ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
 :	ARRAYBASE_INIT
 {	source(src); }
 
 #undef ARRAYBASE_INIT
 
-TEM2 ArrayBase<T,S>::~ArrayBase(){ freeElements(); }
+TEM3 ArrayBase<T,S,A>::~ArrayBase(){ clear(); }
 
+TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::operator=(const T& v){
+	for(uint32_t i=0; i<size(); ++i) construct(mElems+i, v);
+	return *this;
+}
 
-TEM2 inline T& ArrayBase<T,S>::operator[](uint32_t i){ return elems()[i]; }
-TEM2 inline const T&  ArrayBase<T,S>::operator[](uint32_t i) const { return elems()[i]; }
+TEM3 inline T& ArrayBase<T,S,A>::operator[](uint32_t i){ return elems()[i]; }
+TEM3 inline const T& ArrayBase<T,S,A>::operator[](uint32_t i) const { return elems()[i]; }
 
-TEM2 inline T * ArrayBase<T,S>::elems() const { return mElems; }
+TEM3 inline T * ArrayBase<T,S,A>::elems() const { return mElems; }
 
-TEM2 void ArrayBase<T,S>::freeElements(){ //printf("ArrayBase::freeElements(): mElems=%p\n", mElems);
+TEM3 void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n", mElems);
 	
-	// we are managing this memory
+	// Is this memory being ref counted?
+	// NOTE: this check is only necessary because mElems can be assigned from
+	// a raw external pointer. Maybe having this functionality is not a good
+	// idea in the first place???
+	// The culprit method is source(T * src, uint32_t size).
 	if(mElems && managing(mElems)){
 		int& c = refCount()[mElems];
 		--c;
 		if(0 == c){
 			refCount().erase(mElems);
-			delete[] mElems;
+			for(uint32_t i=0; i<size(); ++i) destroy(mElems+i);
+			deallocate(mElems, size());
 		}
 		mElems=0; mSize(0);
 	}
 }
 
-TEM2 void ArrayBase<T,S>::own(){
-//	if(!owner()){
-//		mOwner = true;
-//		uint32_t refSize = size();
-//		T * refElems = elems();
-//		mElems = 0;
-//		mSize(0);
-//		resize(refSize);						// allocate new memory
-//		mem::copy(elems(), refElems, size());	// copy referenced elements
-//	}
-	
+TEM3 void ArrayBase<T,S,A>::own(){	
 	T * oldElems = elems();
+	
+	// Check to see if we are already the owner
 	if(references(oldElems) != 1){
 		uint32_t oldSize = size();
-		freeElements();
+		clear();
 		resize(oldSize);
-		for(uint32_t i=0; i<size(); ++i) (*this)[i] = oldElems[i];
+		for(uint32_t i=0; i<size(); ++i) construct(mElems+i, oldElems[i]);
 	}
 }
 
-TEM2 void ArrayBase<T,S>::resize(uint32_t newSize){
+TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 	newSize = mSize.convert(newSize);
 
+	if(0 == newSize){
+		clear();
+	}
+
 	if(newSize != size()){
-		freeElements();
-		mElems = new T[newSize];
-		refCount()[mElems] = 1;
-		mSize(newSize);
-		onResize();
+		//clear();
+		//mElems = new T[newSize];
+		
+		T * newElems = A::allocate(newSize);
+		
+		// If successful allocation...
+		if(newElems){
+		
+			uint32_t nOldToCopy = newSize<size() ? newSize : size();
+		
+			// Copy over old elements
+			for(uint32_t i=0; i<nOldToCopy; ++i){
+				construct(newElems+i, (*this)[i]);
+			}
+			
+			// Copy argument into any additional elements
+			if(newSize > size()){
+				for(uint32_t i=newSize-size(); i<newSize; ++i){
+					construct(newElems+i, c);
+				}
+			}
+			
+			clear();
+			mElems = newElems;
+			
+			refCount()[mElems] = 1;
+			mSize(newSize);
+			onResize();
+		}
 	}
 	//printf("ArrayBase::resize(): mElems=%p, size=%d\n", mElems, size());
 }
 
-TEM2 inline uint32_t ArrayBase<T,S>::size() const { return mSize(); }
+TEM3 inline uint32_t ArrayBase<T,S,A>::size() const { return mSize(); }
 
-TEM2 void ArrayBase<T,S>::source(const ArrayBase<T,S>& src){
+TEM3 void ArrayBase<T,S,A>::source(const ArrayBase<T,S,A>& src){
 	source(src.elems(), src.size());
 }
 
-TEM2 void ArrayBase<T,S>::source(T * src, uint32_t size){
-	freeElements();
+TEM3 void ArrayBase<T,S,A>::source(T * src, uint32_t size){
+	clear();
 	if(managing(src)){
 		++refCount()[src];
 	}
@@ -451,62 +493,63 @@ TEM2 void ArrayBase<T,S>::source(T * src, uint32_t size){
 	mSize(size);
 }
 
-#undef TEM2
+#undef TEM3
 
 
+#define TEM template<class T, class A>
 
 // ArrayPow2
 
-TEM inline uint32_t ArrayPow2<T>::oneIndex() const { return 1<<fracBits(); }
-TEM inline uint32_t ArrayPow2<T>::log2Size() const { return mSize.mBitsI; }
-TEM inline uint32_t ArrayPow2<T>::fracBits() const { return mSize.mBitsF; }
-TEM inline uint32_t ArrayPow2<T>::index(uint32_t phase) const { return phase >> fracBits(); }
+TEM inline uint32_t ArrayPow2<T,A>::oneIndex() const { return 1<<fracBits(); }
+TEM inline uint32_t ArrayPow2<T,A>::log2Size() const { return mSize.mBitsI; }
+TEM inline uint32_t ArrayPow2<T,A>::fracBits() const { return mSize.mBitsF; }
+TEM inline uint32_t ArrayPow2<T,A>::index(uint32_t phase) const { return phase >> fracBits(); }
 
-TEM inline T ArrayPow2<T>::atPhase(uint32_t phase) const { return (*this)[index(phase)]; }
-TEM inline void ArrayPow2<T>::putPhase(uint32_t phase, T v){ (*this)[index(phase)] = v; }
+TEM inline T ArrayPow2<T,A>::atPhase(uint32_t phase) const { return (*this)[index(phase)]; }
+TEM inline void ArrayPow2<T,A>::putPhase(uint32_t phase, T v){ (*this)[index(phase)] = v; }
 
-TEM inline float ArrayPow2<T>::fraction(uint32_t phase) const{		
+TEM inline float ArrayPow2<T,A>::fraction(uint32_t phase) const{		
 	return gam::fraction(log2Size(), phase);
 }
 
 
 // Buffer
 
-TEM Buffer<T>::Buffer(uint32_t size)
+TEM Buffer<T,A>::Buffer(uint32_t size)
 	: Array<T>(size)
 {
 	unlock();
 }
 
-TEM inline void Buffer<T>::writeLock(const T * src){
+TEM inline void Buffer<T,A>::writeLock(const T * src){
 	if(isLocked()) return;
 	lock();
 	memcpy(this->elems(), src, this->size() * sizeof(T));
 }
 
-TEM inline void Buffer<T>::writeLock(const T * src, uint32_t numRead, uint32_t writeOffset){
+TEM inline void Buffer<T,A>::writeLock(const T * src, uint32_t numRead, uint32_t writeOffset){
 	if(isLocked()) return;
 	lock();
 	memcpy(this->elems() + writeOffset, src, numRead * sizeof(T));
 }
 
-TEM inline void Buffer<T>::unlock(){ mLocked = false; }
-TEM inline void Buffer<T>::lock(){ mLocked = true; }
-TEM inline bool Buffer<T>::isLocked(){ return mLocked; }
-TEM inline bool Buffer<T>::isUnlocked(){ return !mLocked; }
+TEM inline void Buffer<T,A>::unlock(){ mLocked = false; }
+TEM inline void Buffer<T,A>::lock(){ mLocked = true; }
+TEM inline bool Buffer<T,A>::isLocked(){ return mLocked; }
+TEM inline bool Buffer<T,A>::isUnlocked(){ return !mLocked; }
 
 
 
 //---- Ring
 
-TEM Ring<T>::Ring(uint32_t size, const T& v) : Array<T>(size,v), mPos(size-1){}
+TEM Ring<T,A>::Ring(uint32_t size, const T& v) : Array<T,A>(size,v), mPos(size-1){}
 
-TEM inline void Ring<T>::operator()(const T& v){
+TEM inline void Ring<T,A>::operator()(const T& v){
 	incPos();				// inc write pos; do first to avoid out-of-bounds access
 	(*this)[pos()] = v;		// write new element
 }
 
-TEM void Ring<T>::copy(T * dst, uint32_t len, uint32_t delay) const{
+TEM void Ring<T,A>::copy(T * dst, uint32_t len, uint32_t delay) const{
 	// pos() points to most recently written slot
 	//uint32_t tap = (pos() - delay) % size();
 	uint32_t tap = (uint32_t)scl::wrap((int32_t)pos() - (int32_t)delay, (int32_t)size());
@@ -519,27 +562,27 @@ TEM void Ring<T>::copy(T * dst, uint32_t len, uint32_t delay) const{
 	mem::copyFromRing(elems(), size(), tap, dst, len);
 }
 
-TEM void Ring<T>::copyUnwrap(T * dst, uint32_t len) const { copy(dst, len, size() - 1); }
+TEM void Ring<T,A>::copyUnwrap(T * dst, uint32_t len) const { copy(dst, len, size() - 1); }
 
-TEM inline uint32_t Ring<T>::indexBack() const {
+TEM inline uint32_t Ring<T,A>::indexBack() const {
 	uint32_t i = pos() + 1;
 	return (i != size()) ? i : 0;
 }
 
-TEM inline uint32_t Ring<T>::indexFront() const { return pos(); }
+TEM inline uint32_t Ring<T,A>::indexFront() const { return pos(); }
 
-TEM inline uint32_t Ring<T>::indexPrev(uint32_t v) const {
+TEM inline uint32_t Ring<T,A>::indexPrev(uint32_t v) const {
 	return scl::wrapOnce<int>(pos() - v, size());
 }
 
-TEM inline uint32_t Ring<T>::pos() const { return mPos; }
+TEM inline uint32_t Ring<T,A>::pos() const { return mPos; }
 
-TEM inline void Ring<T>::incPos(){ if(++mPos >= size()) mPos = 0; }
-TEM void Ring<T>::pos(uint32_t index){ mPos = index; }
+TEM inline void Ring<T,A>::incPos(){ if(++mPos >= size()) mPos = 0; }
+TEM void Ring<T,A>::pos(uint32_t index){ mPos = index; }
 
-TEM void Ring<T>::reset(){ pos(size()-1); }
+TEM void Ring<T,A>::reset(){ pos(size()-1); }
 
-TEM	inline void Ring<T>::writeClip(const T& v){
+TEM	inline void Ring<T,A>::writeClip(const T& v){
 	if(mPos < size()){
 		(*this)[mPos] = v;
 		mPos++;
@@ -549,18 +592,18 @@ TEM	inline void Ring<T>::writeClip(const T& v){
 
 // DoubleBuffer
 
-TEM DoubleBuffer<T>::DoubleBuffer(uint32_t n)
+TEM DoubleBuffer<T,A>::DoubleBuffer(uint32_t n)
 : Array<T>(n*2), mSizeSingle(n)
 {
 	mBack  = Base::mElems;
 	mFront = Base::mElems + n;
 }
 
-TEM inline bool DoubleBuffer<T>::backIsFirst(){ return mBack==Base::mElems; }
+TEM inline bool DoubleBuffer<T,A>::backIsFirst(){ return mBack==Base::mElems; }
 
-TEM inline T * DoubleBuffer<T>::back(){ return mBack; }
-TEM inline T * DoubleBuffer<T>::front(){ return mFront; }
-TEM inline void DoubleBuffer<T>::swap(){
+TEM inline T * DoubleBuffer<T,A>::back(){ return mBack; }
+TEM inline T * DoubleBuffer<T,A>::front(){ return mFront; }
+TEM inline void DoubleBuffer<T,A>::swap(){
 	if(backIsFirst()){
 		mFront= Base::mElems;
 		mBack = Base::mElems + mSizeSingle;
@@ -571,7 +614,7 @@ TEM inline void DoubleBuffer<T>::swap(){
 	}
 }
 
-TEM void DoubleBuffer<T>::copyAll(T * dst){
+TEM void DoubleBuffer<T,A>::copyAll(T * dst){
 	if(backIsFirst()){
 		memcpy(dst, mBack, (mSizeSingle<<1) * sizeof(T));
 	}
@@ -581,7 +624,7 @@ TEM void DoubleBuffer<T>::copyAll(T * dst){
 	}
 }
 
-TEM void DoubleBuffer<T>::onResize(){
+TEM void DoubleBuffer<T,A>::onResize(){
 	mSizeSingle = Base::size()/2;
 	mBack  = Base::mElems;
 	mFront = Base::mElems + mSizeSingle;

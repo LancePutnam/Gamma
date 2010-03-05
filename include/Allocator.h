@@ -22,7 +22,7 @@ public:
   typedef const void* const_pointer;
   // reference to void members are impossible.
   typedef void value_type;
-  template <class U> struct rebind { typedef allocator<U> other; };
+  template <class U> struct rebind { typedef Allocator<U> other; };
 };
 
 template <class T> class Allocator{
@@ -34,7 +34,7 @@ public:
 	typedef T&        reference;
 	typedef const T&  const_reference;
 	typedef T         value_type;
-	template <class U> struct rebind { typedef allocator<U> other; };
+	template <class U> struct rebind { typedef Allocator<U> other; };
 
 public:
 	explicit Allocator(){}
@@ -55,66 +55,66 @@ public:
 		return static_cast<size_type>(-1) / sizeof(T);
 	}
 
-	void construct(pointer p, const T& val){ new(p) T(t); }
+	void construct(pointer p, const T& val){ new(p) T(val); }
 	void destroy(pointer p){ p->~T(); }
 };
 
 template <class T1, class T2>
-bool operator==(const Allocator<T1>&, const Allocator<T2>&){ return true }
+bool operator==(const Allocator<T1>&, const Allocator<T2>&){ return true; }
 
 template <class T1, class T2>
 bool operator!=(const Allocator<T1>&, const Allocator<T2>&){ return false; }
 
 
 
-template <class T, class Alloc=Allocator<T> >
-class Buffer : private Alloc{
+//template <class T, class Alloc=Allocator<T> >
+//class Buffer : private Alloc{
+//
+//	explicit Buffer(int n, const T& v=T(), const Alloc& a=Alloc())
+//	: Alloc(a), mMemBegin(0), mMemEnd(0)
+//	{
+//		resize(n);
+//	}
+//	
+//	~Buffer(){
+//		clear();
+//	}
+//	
+//	
+//	
+//	
+//	void clear(){
+//	
+//		
+//	
+////		if(mMemBegin != mMemEnd){
+////			for(T * i = mMemBegin; i<mMemEnd; ++i)
+////				Alloc::destroy(i);
+////			Alloc::deallocate(mMemBegin, mMemEnd - mMemBegin);
+////		}	
+//	}
+//	
+//	void resize(int n){
+//		if((mMemEnd - mMemBegin) < n){
+//			mMemBegin = Alloc::allocate(n);
+//			for(int i=0; i<n; ++i){
+//				Alloc::construct(mMemBegin + i, v);
+//			}		
+//		}
+//	}
+//	
+//	void reserve(int n){
+//		
+//	}
+//
+//protected:
+//	T * mMemBegin;		// First element in memory block
+//	T * mMemEnd;		// 1 past last allocated element
+//	T * mEnd;			// 1 past last element in buffer
+//	
+//};
 
-	explicit Buffer(int n, const T& v=T(), const Alloc& a=Alloc())
-	: Alloc(a), mMemBegin(0), mMemEnd(0)
-	{
-		resize(n);
-	}
-	
-	~Buffer(){
-		clear();
-	}
-	
-	
-	
-	
-	void clear(){
-	
-		
-	
-//		if(mMemBegin != mMemEnd){
-//			for(T * i = mMemBegin; i<mMemEnd; ++i)
-//				Alloc::destroy(i);
-//			Alloc::deallocate(mMemBegin, mMemEnd - mMemBegin);
-//		}	
-	}
-	
-	void resize(int n){
-		if((mMemEnd - mMemBegin) < n){
-			mMemBegin = Alloc::allocate(n);
-			for(int i=0; i<n; ++i){
-				Alloc::construct(mMemBegin + i, v);
-			}		
-		}
-	}
-	
-	void reserve(int n){
-		
-	}
-
-protected:
-	T * mMemBegin;		// First element in memory block
-	T * mMemEnd;		// 1 past last allocated element
-	T * mEnd;			// 1 past last element in buffer
-	
-};
-
-vector
+// vector
 
 
 /*
