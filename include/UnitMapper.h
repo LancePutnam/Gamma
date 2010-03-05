@@ -24,21 +24,21 @@ namespace MapType{
 
 
 /// Tabulated function with real number lookup.
-template <class T, class Sipl=ipl::Linear, class Sacc=acc::Wrap>
-class FunctionTable : public Array<T>{
-	typedef Array<T> base;
+template <class T, class Sipl=ipl::Linear, class Sacc=acc::Wrap, class A=gam::Allocator<T> >
+class FunctionTable : public Array<T,A>{
+	typedef Array<T,A> Base;
 public:
-	using base::elems; using base::size; using base::operator=;
+	using Base::elems; using Base::size;
 
-	/// Constructor that alocates an internal table
+	//explicit FunctionTable(): Base(){}
+
+	/// Constructor that allocates an internal table
 
 	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
 	/// @param[in] init		Initializes all elements to this value
-	FunctionTable(uint32_t size, const T& init=T(0))
-	:	base(size), mIndMap(size)
-	{
-		(*this) = init;
-	}
+	explicit FunctionTable(uint32_t size, const T& init=T(0))
+	:	Base(size, init), mIndMap(size)
+	{}
 	
 	virtual ~FunctionTable(){}
 	

@@ -51,7 +51,7 @@ class ArrayBase : private A{
 public:
 	ArrayBase();
 	explicit ArrayBase(uint32_t size);
-	ArrayBase(uint32_t size, const T& initial);
+	ArrayBase(uint32_t size, const T& init);
 	ArrayBase(T * src, uint32_t size);
 	explicit ArrayBase(const ArrayBase<T,S,A>& src);
 
@@ -117,7 +117,7 @@ public:
 
 	Array(): Base(){}
 	explicit Array(uint32_t size): Base(size){}
-	Array(uint32_t size, const T& initial): Base(size, initial){}
+	Array(uint32_t size, const T& init): Base(size, init){}
 	Array(T * src, uint32_t size): Base(src, size){}
 	Array(const Array& src): Base(src){}
 	
