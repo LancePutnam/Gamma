@@ -3,9 +3,9 @@ Test of the conversion functions.
 */
 
 #include <stdio.h>
-#include "arr.h"
-#include "ipl.h"
-#include "scl.h"
+#include "Gamma/arr.h"
+#include "Gamma/ipl.h"
+#include "Gamma/scl.h"
 
 using namespace gam;
 

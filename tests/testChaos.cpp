@@ -1,6 +1,6 @@
-#include "Chaos.h"
-#include "scl.h"
-#include "Visual.h"
+#include "Gamma/Chaos.h"
+#include "Gamma/scl.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;
 

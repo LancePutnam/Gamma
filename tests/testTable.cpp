@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "arr.h"
-#include "gen.h"
-#include "tbl.h"
-#include "Access.h"
-#include "Constants.h"
-#include "Conversion.h"
-#include "Visual.h"
+#include "Gamma/arr.h"
+#include "Gamma/gen.h"
+#include "Gamma/tbl.h"
+#include "Gamma/Access.h"
+#include "Gamma/Constants.h"
+#include "Gamma/Conversion.h"
+#include "Gamma/Visual.h"
 
 #define TEST_WINDOWS
 #define TEST_TABLEOSC

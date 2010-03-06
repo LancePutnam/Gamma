@@ -3,7 +3,6 @@
 #=========================================================================
 
 include Makefile.config
-CFLAGS += -I./include/
 SRCDIR = ./src
 
 SRCS = 	$(SRCDIR)/Ambisonics.cpp\

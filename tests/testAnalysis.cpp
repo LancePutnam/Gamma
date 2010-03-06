@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "arr.h"
-#include "gen.h"
-#include "tbl.h"
-#include "Access.h"
-#include "Visual.h"
+#include "Gamma/arr.h"
+#include "Gamma/gen.h"
+#include "Gamma/tbl.h"
+#include "Gamma/Access.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;
 using namespace gam::gen;

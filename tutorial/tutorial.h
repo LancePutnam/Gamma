@@ -5,15 +5,15 @@
 */
 
 #include <stdio.h>		// for printing to stdout
-#include "Gamma.h"		// core functions
-#include "Access.h"
-#include "AudioIO.h"
-#include "Delay.h"
-#include "Envelope.h"
-#include "Noise.h"
-#include "Oscillator.h"
-#include "SoundFile.h"
-#include "Types.h"
-#include "Visual.h"
+#include "Gamma/Gamma.h"		// core functions
+#include "Gamma/Access.h"
+#include "Gamma/AudioIO.h"
+#include "Gamma/Delay.h"
+#include "Gamma/Envelope.h"
+#include "Gamma/Noise.h"
+#include "Gamma/Oscillator.h"
+#include "Gamma/SoundFile.h"
+#include "Gamma/Types.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;

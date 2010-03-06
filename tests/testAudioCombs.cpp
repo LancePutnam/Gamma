@@ -3,10 +3,10 @@
 */
 
 #include <stdio.h>
-#include "Gamma.h"
-#include "AudioIO.h"
-#include "Delay.h"
-#include "Oscillator.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/AudioIO.h"
+#include "Gamma/Delay.h"
+#include "Gamma/Oscillator.h"
 
 using namespace gam;
 

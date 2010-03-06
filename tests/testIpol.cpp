@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "gen.h"
-#include "ipl.h"
-#include "scl.h"
-#include "Visual.h"
+#include "Gamma/gen.h"
+#include "Gamma/ipl.h"
+#include "Gamma/scl.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;
 

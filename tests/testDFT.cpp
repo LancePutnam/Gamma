@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "DFT.h"
-#include "FFT.h"
-#include "Sync.h"
-#include "rnd.h"
-#include "scl.h"
-#include "tbl.h"
-#include "Visual.h"
+#include "Gamma/DFT.h"
+#include "Gamma/FFT.h"
+#include "Gamma/Sync.h"
+#include "Gamma/rnd.h"
+#include "Gamma/scl.h"
+#include "Gamma/tbl.h"
+#include "Gamma/Visual.h"
 
 //#define TEST_RFFT
 //#define TEST_CFFT

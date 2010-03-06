@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "arr.h"
-#include "gen.h"
-#include "mem.h"
-#include "Containers.h"
+#include "Gamma/arr.h"
+#include "Gamma/gen.h"
+#include "Gamma/mem.h"
+#include "Gamma/Containers.h"
 
 using namespace gam;
 using namespace gam::gen;

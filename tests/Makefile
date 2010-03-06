@@ -4,7 +4,7 @@
 
 include ../Makefile.config
 LFLAGS += ../libgamma.a
-CFLAGS += -I../include/
+CFLAGS += -I../
 
 UTSRC = ut_arr.cpp \
 	ut_fil.cpp \

@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "Gamma.h"
-#include "AudioIO.h"
-#include "Noise.h"
-#include "Oscillator.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/AudioIO.h"
+#include "Gamma/Noise.h"
+#include "Gamma/Oscillator.h"
 
 using namespace gam;
 

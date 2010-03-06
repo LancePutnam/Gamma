@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "rnd.h"
-#include "scl.h"
-#include "Visual.h"
+#include "Gamma/rnd.h"
+#include "Gamma/scl.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;
 

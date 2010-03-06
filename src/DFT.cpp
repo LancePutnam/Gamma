@@ -1,14 +1,14 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "DFT.h"
+#include "Gamma/DFT.h"
 
-#include "arr.h"
-#include "gen.h"
-#include "mem.h"
-#include "scl.h"
-#include "Access.h"
-#include "Sync.h"
+#include "Gamma/arr.h"
+#include "Gamma/gen.h"
+#include "Gamma/mem.h"
+#include "Gamma/scl.h"
+#include "Gamma/Access.h"
+#include "Gamma/Sync.h"
 
 
 #define RECT_POLAR\

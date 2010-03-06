@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "scl.h"
-#include "Envelope.h"
-#include "Noise.h"
-#include "Visual.h"
+#include "Gamma/scl.h"
+#include "Gamma/Envelope.h"
+#include "Gamma/Noise.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;
 

@@ -8,12 +8,12 @@
  */
 
 #include <stdio.h>
-#include "arr.h"
-#include "gen.h"
-#include "rnd.h"
-#include "scl.h"
-#include "Access.h"
-#include "Visual.h"
+#include "Gamma/arr.h"
+#include "Gamma/gen.h"
+#include "Gamma/rnd.h"
+#include "Gamma/scl.h"
+#include "Gamma/Access.h"
+#include "Gamma/Visual.h"
 
 using namespace gam;
 

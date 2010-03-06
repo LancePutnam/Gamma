@@ -4,7 +4,7 @@
 
 include ../Makefile.config
 LFLAGS += ../libgamma.a
-CFLAGS += -I../include/
+CFLAGS += -I../
 
 SRC =	aEffFlanger.cpp \
 	aIOFile.cpp \

@@ -1,4 +1,4 @@
-#include "FFT.h"
+#include "Gamma/FFT.h"
 #include "fftpack.h"
 
 namespace gam{

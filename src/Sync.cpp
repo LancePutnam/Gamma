@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "Sync.h"
+#include "Gamma/Sync.h"
 
 namespace gam{
 

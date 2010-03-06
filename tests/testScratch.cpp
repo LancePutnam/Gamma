@@ -1,6 +1,6 @@
-#include "Gamma.h"
+#include "Gamma/Gamma.h"
 #include "../doc/scratch.h"
-#include "Effects.h"
+#include "Gamma/Effects.h"
 
 #define ONES	mem::set(buf, gen::Val<>(1), Loop(size));
 #define ZEROS	mem::zero(buf, size);

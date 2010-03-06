@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "Conversion.h"
+#include "Gamma/Conversion.h"
 #include <ctype.h>
 #include <string.h>
 

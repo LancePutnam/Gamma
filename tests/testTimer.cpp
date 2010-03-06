@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Timer.h"
+#include "Gamma/Timer.h"
 
 using namespace gam;
 

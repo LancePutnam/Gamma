@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "Types.h"
-#include "ipl.h"
-#include "scl.h"
+#include "Gamma/Types.h"
+#include "Gamma/ipl.h"
+#include "Gamma/scl.h"
 
 using namespace gam;
 

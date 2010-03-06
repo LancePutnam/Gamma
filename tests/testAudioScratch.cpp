@@ -20,8 +20,8 @@
 //}
 
 
-#include "Envelope.h"
-#include "Oscillator.h"
+#include "Gamma/Envelope.h"
+#include "Gamma/Oscillator.h"
 
 namespace gam{
 

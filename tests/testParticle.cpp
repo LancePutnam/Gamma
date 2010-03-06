@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "gen.h"
-#include "Access.h"
-#include "Particle.h"
+#include "Gamma/gen.h"
+#include "Gamma/Access.h"
+#include "Gamma/Particle.h"
 
 using namespace gam;
 using namespace gam::gen;

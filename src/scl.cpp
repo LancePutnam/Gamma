@@ -3,7 +3,7 @@
 
 #include <ctype.h>
 #include <string.h>
-#include "scl.h"
+#include "Gamma/scl.h"
 
 namespace gam{
 namespace scl{

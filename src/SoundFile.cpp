@@ -3,7 +3,7 @@
 
 #include <string>
 #include <stdio.h>
-#include "SoundFile.h"
+#include "Gamma/SoundFile.h"
 
 namespace gam{
 using std::string;

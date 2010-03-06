@@ -1,4 +1,4 @@
-#include "Node.h"
+#include "Gamma/Node.h"
 
 using namespace gam;
 

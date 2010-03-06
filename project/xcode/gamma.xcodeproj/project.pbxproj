@@ -296,11 +296,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		160351A30D090B9C003CC766 /* gen.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = gen.h; path = ../../include/gen.h; sourceTree = SOURCE_ROOT; };
-		16064BD30DFF02680043BC29 /* Strategy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Strategy.h; path = ../../include/Strategy.h; sourceTree = SOURCE_ROOT; };
+		160351A30D090B9C003CC766 /* gen.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = gen.h; path = ../../Gamma/gen.h; sourceTree = SOURCE_ROOT; };
+		16064BD30DFF02680043BC29 /* Strategy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Strategy.h; path = ../../Gamma/Strategy.h; sourceTree = SOURCE_ROOT; };
 		160D7A180B7FF02A007874D5 /* testAudioSampler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioSampler.cpp; path = ../../tests/testAudioSampler.cpp; sourceTree = SOURCE_ROOT; };
-		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../include/Timer.h; sourceTree = SOURCE_ROOT; };
-		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Allocator.h; sourceTree = "<group>"; };
+		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
+		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
 		161263D011409E0300E55446 /* utContainers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utContainers.cpp; path = ../../tests/utContainers.cpp; sourceTree = SOURCE_ROOT; };
 		161263D111409EA800E55446 /* ut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut.cpp; path = ../../tests/ut.cpp; sourceTree = SOURCE_ROOT; };
 		161263EA11409FE400E55446 /* ut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ut.h; path = ../../tests/ut.h; sourceTree = SOURCE_ROOT; };
@@ -313,32 +313,32 @@
 		161264B41140A78A00E55446 /* ut_fil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_fil.cpp; path = ../../tests/ut_fil.cpp; sourceTree = SOURCE_ROOT; };
 		161264B51140A78A00E55446 /* ut_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_gen.cpp; path = ../../tests/ut_gen.cpp; sourceTree = SOURCE_ROOT; };
 		161264BC1140A92300E55446 /* ut_mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_mem.cpp; path = ../../tests/ut_mem.cpp; sourceTree = SOURCE_ROOT; };
-		1633FB1F0A9E1EB1003F9A50 /* Sampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sampler.h; path = ../../include/Sampler.h; sourceTree = SOURCE_ROOT; };
-		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../include/Types.h; sourceTree = SOURCE_ROOT; };
+		1633FB1F0A9E1EB1003F9A50 /* Sampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sampler.h; path = ../../Gamma/Sampler.h; sourceTree = SOURCE_ROOT; };
+		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
 		1656F5B209EEF313006E3FD7 /* testParticle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testParticle.cpp; path = ../../tests/testParticle.cpp; sourceTree = "<group>"; };
-		1656F5D809EEF3D7006E3FD7 /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Particle.h; path = ../../include/Particle.h; sourceTree = SOURCE_ROOT; };
+		1656F5D809EEF3D7006E3FD7 /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Particle.h; path = ../../Gamma/Particle.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		16827D5810013FEE001088E7 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		1683FC410E283786001FAF43 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = design.txt; path = ../../doc/design.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
-		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../include/Access.h; sourceTree = SOURCE_ROOT; };
-		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../include/File.h; sourceTree = SOURCE_ROOT; };
-		1686EA830F8DB1F100D0452F /* Dims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dims.h; path = ../../include/Dims.h; sourceTree = SOURCE_ROOT; };
+		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../Gamma/Access.h; sourceTree = SOURCE_ROOT; };
+		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../Gamma/File.h; sourceTree = SOURCE_ROOT; };
+		1686EA830F8DB1F100D0452F /* Dims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dims.h; path = ../../Gamma/Dims.h; sourceTree = SOURCE_ROOT; };
 		168AAC9D0CD0025D00F36E4B /* libgamma.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libgamma.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		168B78F40B75C59100645F1F /* Sync.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Sync.cpp; path = ../../src/Sync.cpp; sourceTree = SOURCE_ROOT; };
-		168B78F50B75C59100645F1F /* Sync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Sync.h; path = ../../include/Sync.h; sourceTree = SOURCE_ROOT; };
+		168B78F50B75C59100645F1F /* Sync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Sync.h; path = ../../Gamma/Sync.h; sourceTree = SOURCE_ROOT; };
 		169387860FBC7EF400274B2A /* testTypes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTypes; sourceTree = BUILT_PRODUCTS_DIR; };
 		169387930FBC7F2E00274B2A /* testTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testTypes.cpp; path = ../../tests/testTypes.cpp; sourceTree = SOURCE_ROOT; };
-		169389570FBCCE4200274B2A /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pstdint.h; path = ../../include/pstdint.h; sourceTree = SOURCE_ROOT; };
-		16938ABF0FBD0C4400274B2A /* Conversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Conversion.h; path = ../../include/Conversion.h; sourceTree = SOURCE_ROOT; };
+		169389570FBCCE4200274B2A /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pstdint.h; path = ../../Gamma/pstdint.h; sourceTree = SOURCE_ROOT; };
+		16938ABF0FBD0C4400274B2A /* Conversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Conversion.h; path = ../../Gamma/Conversion.h; sourceTree = SOURCE_ROOT; };
 		16938AC00FBD0C6700274B2A /* Conversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conversion.cpp; path = ../../src/Conversion.cpp; sourceTree = SOURCE_ROOT; };
 		16938B410FBD1CCF00274B2A /* Visual.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Visual.cpp; path = ../../src/Visual.cpp; sourceTree = SOURCE_ROOT; };
-		16938B420FBD1CDE00274B2A /* Visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Visual.h; path = ../../include/Visual.h; sourceTree = SOURCE_ROOT; };
+		16938B420FBD1CDE00274B2A /* Visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Visual.h; path = ../../Gamma/Visual.h; sourceTree = SOURCE_ROOT; };
 		1699F3860B9D1D2600ECB243 /* testNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testNode.cpp; path = ../../tests/testNode.cpp; sourceTree = SOURCE_ROOT; };
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169D40E30A81694200605E51 /* testAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioIO.cpp; path = ../../tests/testAudioIO.cpp; sourceTree = SOURCE_ROOT; };
 		169E1E780B97F02A0011870A /* testAudioPVoc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioPVoc.cpp; path = ../../tests/testAudioPVoc.cpp; sourceTree = SOURCE_ROOT; };
-		169F711210C1CFEE00FB2BA0 /* Chaos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chaos.h; sourceTree = "<group>"; };
-		16A94B171064111D000B942A /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Serialize.h; sourceTree = "<group>"; };
+		169F711210C1CFEE00FB2BA0 /* Chaos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Chaos.h; path = ../Gamma/Chaos.h; sourceTree = "<group>"; };
+		16A94B171064111D000B942A /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serialize.h; path = ../Gamma/Serialize.h; sourceTree = "<group>"; };
 		16A94B3610641689000B942A /* Serialize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serialize.cpp; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BC61B50FFC895A00AF1B29 /* testUnits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testUnits.cpp; path = ../../tests/testUnits.cpp; sourceTree = SOURCE_ROOT; };
@@ -351,17 +351,17 @@
 		16C872A70EFA151600449449 /* testNoise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNoise; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C872B60EFA154000449449 /* testParticle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testParticle; sourceTree = BUILT_PRODUCTS_DIR; };
 		16CB4CCC0A6C5DC400F94EC1 /* testScalar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testScalar.cpp; path = ../../tests/testScalar.cpp; sourceTree = SOURCE_ROOT; };
-		16CCF9C00A9EC1650013D2BF /* Containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Containers.h; path = ../../include/Containers.h; sourceTree = SOURCE_ROOT; };
-		16CDD4430ABF788300F66F1B /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mem.h; path = ../../include/mem.h; sourceTree = SOURCE_ROOT; };
+		16CCF9C00A9EC1650013D2BF /* Containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Containers.h; path = ../../Gamma/Containers.h; sourceTree = SOURCE_ROOT; };
+		16CDD4430ABF788300F66F1B /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mem.h; path = ../../Gamma/mem.h; sourceTree = SOURCE_ROOT; };
 		16CE92EC0AAFB97900CEC0CF /* testContainers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testContainers.cpp; path = ../../tests/testContainers.cpp; sourceTree = SOURCE_ROOT; };
-		16CEF9120BBCDA0A0049666F /* Gamma.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Gamma.h; path = ../../include/Gamma.h; sourceTree = SOURCE_ROOT; };
-		16CF8D5A0BD9921200A80471 /* Effects.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Effects.h; path = ../../include/Effects.h; sourceTree = SOURCE_ROOT; };
+		16CEF9120BBCDA0A0049666F /* Gamma.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Gamma.h; path = ../../Gamma/Gamma.h; sourceTree = SOURCE_ROOT; };
+		16CF8D5A0BD9921200A80471 /* Effects.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Effects.h; path = ../../Gamma/Effects.h; sourceTree = SOURCE_ROOT; };
 		16CF96D60B8038B700598208 /* testAudioBiquad.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioBiquad.cpp; path = ../../tests/testAudioBiquad.cpp; sourceTree = SOURCE_ROOT; };
-		16D15CA209F0219B001AE497 /* DFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFT.h; path = ../../include/DFT.h; sourceTree = SOURCE_ROOT; };
+		16D15CA209F0219B001AE497 /* DFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFT.h; path = ../../Gamma/DFT.h; sourceTree = SOURCE_ROOT; };
 		16D15CA309F0219B001AE497 /* DFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DFT.cpp; path = ../../src/DFT.cpp; sourceTree = SOURCE_ROOT; };
 		16D15D4D09F068E4001AE497 /* testDFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testDFT.cpp; path = ../../tests/testDFT.cpp; sourceTree = SOURCE_ROOT; };
 		16D1CC230D4C45DD003F01C0 /* testScratch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testScratch.cpp; path = ../../tests/testScratch.cpp; sourceTree = SOURCE_ROOT; };
-		16D219CA10048AEB00302C47 /* SmartObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartObject.h; sourceTree = "<group>"; };
+		16D219CA10048AEB00302C47 /* SmartObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SmartObject.h; path = ../Gamma/SmartObject.h; sourceTree = "<group>"; };
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		16D2C47C0B57695900BFA547 /* testAudioCombs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioCombs.cpp; path = ../../tests/testAudioCombs.cpp; sourceTree = SOURCE_ROOT; };
@@ -377,7 +377,7 @@
 		16D5B1080B9F3B4C009284F6 /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = portaudio.h; path = /usr/local/include/portaudio.h; sourceTree = "<absolute>"; };
 		16D733960BBE17D300D7769F /* testChaos.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testChaos.cpp; path = ../../tests/testChaos.cpp; sourceTree = SOURCE_ROOT; };
 		16D8143B0B9D08BA00A4B638 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = notes.txt; path = ../../doc/notes.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
-		16D9B4BA0DDBEA100043A25B /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../../include/Filter.h; sourceTree = SOURCE_ROOT; };
+		16D9B4BA0DDBEA100043A25B /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../../Gamma/Filter.h; sourceTree = SOURCE_ROOT; };
 		16DBD81E0D1B1C220021DE8B /* testDelay.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testDelay.cpp; path = ../../tests/testDelay.cpp; sourceTree = SOURCE_ROOT; };
 		16DBD82C0D1B1C430021DE8B /* testDelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testDelay; sourceTree = BUILT_PRODUCTS_DIR; };
 		16DDFCE00B5801220076E3F7 /* testAudioSine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioSine.cpp; path = ../../tests/testAudioSine.cpp; sourceTree = SOURCE_ROOT; };
@@ -387,41 +387,41 @@
 		16E2B27E0D3AD1BD003E39D1 /* testIpol.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testIpol.cpp; path = ../../tests/testIpol.cpp; sourceTree = SOURCE_ROOT; };
 		16E2B28C0D3AD1F8003E39D1 /* testIpol */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testIpol; sourceTree = BUILT_PRODUCTS_DIR; };
 		16E54E890B5C2D82002555E3 /* testAudioMTOsc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioMTOsc.cpp; path = ../../tests/testAudioMTOsc.cpp; sourceTree = SOURCE_ROOT; };
-		16E99A200A2A4B7800210497 /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundFile.h; path = ../../include/SoundFile.h; sourceTree = SOURCE_ROOT; };
+		16E99A200A2A4B7800210497 /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundFile.h; path = ../../Gamma/SoundFile.h; sourceTree = SOURCE_ROOT; };
 		16E99A210A2A4B7800210497 /* SoundFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundFile.cpp; path = ../../src/SoundFile.cpp; sourceTree = SOURCE_ROOT; };
 		16EACA910D15BE150044B3CB /* testConversion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testConversion; sourceTree = BUILT_PRODUCTS_DIR; };
 		16EACAA90D15BE960044B3CB /* testTimer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTimer; sourceTree = BUILT_PRODUCTS_DIR; };
 		16ECB2580D3EB789005A06AE /* testAudioScratch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAudioScratch; sourceTree = BUILT_PRODUCTS_DIR; };
 		16ECB26D0D3EB7B1005A06AE /* testAudioScratch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioScratch.cpp; path = ../../tests/testAudioScratch.cpp; sourceTree = SOURCE_ROOT; };
 		16EDF9B5094F8C2600549AC9 /* arr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = arr.cpp; path = ../../src/arr.cpp; sourceTree = SOURCE_ROOT; };
-		16EDF9B6094F8C2600549AC9 /* arr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = arr.h; path = ../../include/arr.h; sourceTree = SOURCE_ROOT; };
-		16EDF9B9094F8C2600549AC9 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../../include/Constants.h; sourceTree = SOURCE_ROOT; };
-		16EDF9BD094F8C2600549AC9 /* Delay.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Delay.h; path = ../../include/Delay.h; sourceTree = SOURCE_ROOT; };
-		16EDF9C1094F8C2600549AC9 /* Envelope.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Envelope.h; path = ../../include/Envelope.h; sourceTree = SOURCE_ROOT; };
-		16EDF9C5094F8C2600549AC9 /* ipl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ipl.h; path = ../../include/ipl.h; sourceTree = SOURCE_ROOT; };
+		16EDF9B6094F8C2600549AC9 /* arr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = arr.h; path = ../../Gamma/arr.h; sourceTree = SOURCE_ROOT; };
+		16EDF9B9094F8C2600549AC9 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../../Gamma/Constants.h; sourceTree = SOURCE_ROOT; };
+		16EDF9BD094F8C2600549AC9 /* Delay.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Delay.h; path = ../../Gamma/Delay.h; sourceTree = SOURCE_ROOT; };
+		16EDF9C1094F8C2600549AC9 /* Envelope.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Envelope.h; path = ../../Gamma/Envelope.h; sourceTree = SOURCE_ROOT; };
+		16EDF9C5094F8C2600549AC9 /* ipl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ipl.h; path = ../../Gamma/ipl.h; sourceTree = SOURCE_ROOT; };
 		16EDF9C8094F8C2600549AC9 /* scl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = scl.cpp; path = ../../src/scl.cpp; sourceTree = SOURCE_ROOT; };
-		16EDF9C9094F8C2600549AC9 /* scl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = scl.h; path = ../../include/scl.h; sourceTree = SOURCE_ROOT; };
-		16EDF9D0094F8C2600549AC9 /* Noise.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Noise.h; path = ../../include/Noise.h; sourceTree = SOURCE_ROOT; };
-		16EDF9D2094F8C2600549AC9 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../../include/Oscillator.h; sourceTree = SOURCE_ROOT; };
-		16EDF9E9094F8C2600549AC9 /* rnd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rnd.h; path = ../../include/rnd.h; sourceTree = SOURCE_ROOT; };
-		16EDF9EB094F8C2600549AC9 /* tbl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tbl.h; path = ../../include/tbl.h; sourceTree = SOURCE_ROOT; };
+		16EDF9C9094F8C2600549AC9 /* scl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = scl.h; path = ../../Gamma/scl.h; sourceTree = SOURCE_ROOT; };
+		16EDF9D0094F8C2600549AC9 /* Noise.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Noise.h; path = ../../Gamma/Noise.h; sourceTree = SOURCE_ROOT; };
+		16EDF9D2094F8C2600549AC9 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../../Gamma/Oscillator.h; sourceTree = SOURCE_ROOT; };
+		16EDF9E9094F8C2600549AC9 /* rnd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rnd.h; path = ../../Gamma/rnd.h; sourceTree = SOURCE_ROOT; };
+		16EDF9EB094F8C2600549AC9 /* tbl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tbl.h; path = ../../Gamma/tbl.h; sourceTree = SOURCE_ROOT; };
 		16EDFA16094F8D9E00549AC9 /* testRandom.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testRandom.cpp; path = ../../tests/testRandom.cpp; sourceTree = SOURCE_ROOT; };
-		16F1305A0FFEE85900DE56F6 /* fil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fil.h; path = ../../include/fil.h; sourceTree = SOURCE_ROOT; };
-		16F133840FFF426400DE56F6 /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thread.h; sourceTree = "<group>"; };
-		16F133850FFF426400DE56F6 /* UnitMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnitMapper.h; sourceTree = "<group>"; };
+		16F1305A0FFEE85900DE56F6 /* fil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fil.h; path = ../../Gamma/fil.h; sourceTree = SOURCE_ROOT; };
+		16F133840FFF426400DE56F6 /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Thread.h; path = ../Gamma/Thread.h; sourceTree = "<group>"; };
+		16F133850FFF426400DE56F6 /* UnitMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnitMapper.h; path = ../Gamma/UnitMapper.h; sourceTree = "<group>"; };
 		16F5F6720CAD91C7003DD8DD /* testTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTimer.cpp; path = ../../tests/testTimer.cpp; sourceTree = SOURCE_ROOT; };
 		16F74C970A4E114600A34E6F /* testAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAnalysis.cpp; path = ../../tests/testAnalysis.cpp; sourceTree = SOURCE_ROOT; };
 		16F76AD60D11E01C001C3DCA /* testTable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTable; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76AFE0D11E23D001C3DCA /* testAnalysis */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAnalysis; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76B140D11E34A001C3DCA /* testChaos */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testChaos; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76C740D12058C001C3DCA /* testEnvelope */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testEnvelope; sourceTree = BUILT_PRODUCTS_DIR; };
-		16F7D07C0B5414A1008A2E29 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../include/Node.h; sourceTree = SOURCE_ROOT; };
+		16F7D07C0B5414A1008A2E29 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../Gamma/Node.h; sourceTree = SOURCE_ROOT; };
 		16F836E00A1E888200F05DF5 /* AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AudioIO.cpp; path = ../../src/AudioIO.cpp; sourceTree = SOURCE_ROOT; };
-		16F836E10A1E888200F05DF5 /* AudioIO.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AudioIO.h; path = ../../include/AudioIO.h; sourceTree = SOURCE_ROOT; };
+		16F836E10A1E888200F05DF5 /* AudioIO.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AudioIO.h; path = ../../Gamma/AudioIO.h; sourceTree = SOURCE_ROOT; };
 		16F9A1850D0DB63E00721CC7 /* testScalar */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testScalar; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F9A1B50D0DB74000721CC7 /* testContainers */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testContainers; sourceTree = BUILT_PRODUCTS_DIR; };
 		16FC1BBD0DED18E000B9AD13 /* testDFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testDFT; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E09511E0DECCE18000AF828 /* FFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FFT.h; path = ../../include/FFT.h; sourceTree = SOURCE_ROOT; };
+		7E09511E0DECCE18000AF828 /* FFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FFT.h; path = ../../Gamma/FFT.h; sourceTree = SOURCE_ROOT; };
 		7E8339A6087E4CF3004CC4F0 /* testTable.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTable.cpp; path = ../../tests/testTable.cpp; sourceTree = "<group>"; };
 		7EB463F30825DCE7002E1A73 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
 		7EB464320825DDF5002E1A73 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
@@ -429,7 +429,7 @@
 		7EB464C80825E7B4002E1A73 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = /usr/local/lib/libsndfile.a; sourceTree = "<absolute>"; };
 		7EBEB0490870F34A000EAC05 /* testConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testConversion.cpp; path = ../../tests/testConversion.cpp; sourceTree = "<group>"; };
 		7EBEB04A0870F34A000EAC05 /* testAudioNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioNoise.cpp; path = ../../tests/testAudioNoise.cpp; sourceTree = "<group>"; };
-		7EF76F910D10B49700F83B85 /* Ambisonics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Ambisonics.h; path = ../../include/Ambisonics.h; sourceTree = SOURCE_ROOT; };
+		7EF76F910D10B49700F83B85 /* Ambisonics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Ambisonics.h; path = ../../Gamma/Ambisonics.h; sourceTree = SOURCE_ROOT; };
 		C0F9EF680BB059670069B343 /* libgamma.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgamma.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -735,7 +735,7 @@
 			name = doc;
 			sourceTree = "<group>";
 		};
-		16F7DB390B812023001CABCE /* include */ = {
+		16F7DB390B812023001CABCE /* Gamma */ = {
 			isa = PBXGroup;
 			children = (
 				16EDF9B6094F8C2600549AC9 /* arr.h */,
@@ -780,8 +780,8 @@
 				16F133850FFF426400DE56F6 /* UnitMapper.h */,
 				16938B420FBD1CDE00274B2A /* Visual.h */,
 			);
-			name = include;
-			path = ../../include;
+			name = Gamma;
+			path = ../../Gamma;
 			sourceTree = "<group>";
 		};
 		16F7DB3C0B812041001CABCE /* src */ = {
@@ -819,7 +819,7 @@
 		7EB463D70825DC5D002E1A73 /* gamma */ = {
 			isa = PBXGroup;
 			children = (
-				16F7DB390B812023001CABCE /* include */,
+				16F7DB390B812023001CABCE /* Gamma */,
 				16F7DB3C0B812041001CABCE /* src */,
 			);
 			name = gamma;
@@ -3183,7 +3183,7 @@
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = ../../;
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = testArrayOps;
@@ -3208,7 +3208,7 @@
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = ../../;
 				PREBINDING = NO;
 			};
 			name = Deployment;
@@ -3229,7 +3229,7 @@
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = ../../;
 				PREBINDING = NO;
 			};
 			name = Default;

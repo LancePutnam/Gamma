@@ -4,12 +4,12 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
-#include "Constants.h"
 
-#include "arr.h"
-#include "ipl.h"
-#include "mem.h"
-#include "tbl.h"
+#include "Gamma/Constants.h"
+#include "Gamma/arr.h"
+#include "Gamma/ipl.h"
+#include "Gamma/mem.h"
+#include "Gamma/tbl.h"
 
 #define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
 

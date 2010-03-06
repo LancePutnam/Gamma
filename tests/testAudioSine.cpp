@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "AudioIO.h"
-#include "Oscillator.h"
+#include "Gamma/AudioIO.h"
+#include "Gamma/Oscillator.h"
 
 using namespace gam;
 

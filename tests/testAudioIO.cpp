@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "AudioIO.h"
+#include "Gamma/AudioIO.h"
 
 using namespace gam;
 

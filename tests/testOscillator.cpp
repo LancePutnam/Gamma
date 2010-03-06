@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "Oscillator.h"
-#include "gen.h"
-#include "scl.h"
-#include "Visual.h"
+#include "Gamma/Oscillator.h"
+#include "Gamma/gen.h"
+#include "Gamma/scl.h"
+#include "Gamma/Visual.h"
 #include <iostream>
 
 #define DO(fnc)\

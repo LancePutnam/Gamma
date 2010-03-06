@@ -1,14 +1,14 @@
 #include <assert.h>
-#include "Gamma.h"
-#include "Access.h"
-#include "Conversion.h"
-#include "File.h"
-#include "Serialize.h"
-#include "SmartObject.h"
-#include "Strategy.h"
-#include "Types.h"
-#include "Thread.h"
-#include "UnitMapper.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/Access.h"
+#include "Gamma/Conversion.h"
+#include "Gamma/File.h"
+#include "Gamma/Serialize.h"
+#include "Gamma/SmartObject.h"
+#include "Gamma/Strategy.h"
+#include "Gamma/Types.h"
+#include "Gamma/Thread.h"
+#include "Gamma/UnitMapper.h"
 #include <map>
 
 using namespace gam;

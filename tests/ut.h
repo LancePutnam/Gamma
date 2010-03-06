@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "../include/Gamma.h"
+#include "../Gamma/Gamma.h"
 
 using namespace gam;
 

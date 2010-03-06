@@ -1,6 +1,6 @@
-#include "rnd.h"
-#include "AudioIO.h"
-#include "Sampler.h"
+#include "Gamma/rnd.h"
+#include "Gamma/AudioIO.h"
+#include "Gamma/Sampler.h"
 
 using namespace gam;
 

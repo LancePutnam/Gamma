@@ -1,7 +1,7 @@
 #include <math.h>
 //#include <stdint.h>			/* for uint32_t, uint16_t, etc... */
 #include <stdio.h>
-#include "Ambisonics.h"
+#include "Gamma/Ambisonics.h"
 
 namespace gam{
 
