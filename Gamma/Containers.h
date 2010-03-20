@@ -389,17 +389,17 @@ struct DelayN: public Ring<T,A>{
 TEM3 ArrayBase<T,S,A>::ArrayBase()
 :	ARRAYBASE_INIT{}
 
-TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t size)
+TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t sz)
 :	ARRAYBASE_INIT
-{	resize(size); }
+{	resize(sz); }
 
-TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t size, const T& initial)
+TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t sz, const T& initial)
 :	ARRAYBASE_INIT
-{	resize(size); for(uint32_t i=0;i<this->size();++i) (*this)[i] = initial; }
+{	resize(sz); for(uint32_t i=0;i<this->size();++i) (*this)[i] = initial; }
 
-TEM3 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t size)
+TEM3 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t sz)
 :	ARRAYBASE_INIT
-{	source(src, size); }
+{	source(src, sz); }
 
 TEM3 ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
 :	ARRAYBASE_INIT
@@ -451,6 +451,7 @@ TEM3 void ArrayBase<T,S,A>::own(){
 }
 
 TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
+//printf("ArrayBase::resize() %p\n", this);
 	newSize = mSize.convert(newSize);
 
 	if(0 == newSize){
@@ -458,14 +459,12 @@ TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 	}
 
 	if(newSize != size()){
-		//clear();
-		//mElems = new T[newSize];
 		
 		T * newElems = A::allocate(newSize);
-		
+
 		// If successful allocation...
 		if(newElems){
-		
+
 			uint32_t nOldToCopy = newSize<size() ? newSize : size();
 		
 			// Copy over old elements
@@ -474,15 +473,13 @@ TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 			}
 			
 			// Copy argument into any additional elements
-			if(newSize > nOldToCopy){
-				for(uint32_t i=nOldToCopy; i<newSize; ++i){
-					construct(newElems+i, c);
-				}
+			for(uint32_t i=nOldToCopy; i<newSize; ++i){
+				construct(newElems+i, c);
 			}
-			
+		
 			clear();
 			mElems = newElems;
-			
+		
 			refCount()[mElems] = 1;
 			mSize(newSize);
 			onResize();
