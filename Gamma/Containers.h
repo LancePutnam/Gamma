@@ -474,8 +474,8 @@ TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 			}
 			
 			// Copy argument into any additional elements
-			if(newSize > size()){
-				for(uint32_t i=newSize-size(); i<newSize; ++i){
+			if(newSize > nOldToCopy){
+				for(uint32_t i=nOldToCopy; i<newSize; ++i){
 					construct(newElems+i, c);
 				}
 			}
