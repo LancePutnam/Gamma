@@ -2,7 +2,7 @@
 
 int ut_scl(){
 
-	const double pinf = 1e800;			// + infinity
+	const double pinf = HUGE_VAL;		// + infinity
 	const double ninf = -pinf;			// - infinity
 //	const double nan  = pinf * 0.;		// not-a-number
 

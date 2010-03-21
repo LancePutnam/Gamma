@@ -167,7 +167,7 @@ uint32_t zeroCrossN(const float * src, uint32_t len, float prevVal){
 	
 	uint32_t count = 0;
 	uint32_t * srcI = (uint32_t *)src;
-	uint32_t prev = *(uint32_t *)(&prevVal);
+	uint32_t prev = Twiddle<float>(prevVal).u;
 
 	LOOP(len,1){
 		uint32_t now = *srcI++;

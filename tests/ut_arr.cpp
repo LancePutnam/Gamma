@@ -14,7 +14,7 @@ int ut_arr(){
 	assert(arr::dot(A,B,N) == (0*0+1*1+2*2+3*3+4*4+5*5+6*6+7*7));
 
 	a = gen::RAdd1<>(0);
-	assert(arr::normalize(A,N) == 1./(N-1));
+	assert(scl::almostEqual(arr::normalize(A,N), 1./(N-1)));
 	for(uint32_t i=0; i<N; ++i) assert(scl::almostEqual(A[i], i/double(N-1)));
 
 	return 0;	

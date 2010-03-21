@@ -73,9 +73,9 @@ int main(int argc, char* argv[]){
 
 	
 	printf("\nMulti:\n");
-	{	Multi<5,char> multi = {'m','u','l','t','i'};
+	{	Multi<5,char> multi = {{'m','u','l','t','i'}};
 		for(uint32_t i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}	
-	{	Multi<5,char> multi = {'z'};
+	{	Multi<5,char> multi = {{'z'}};
 		for(uint32_t i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}
 	
 	

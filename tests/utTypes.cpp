@@ -31,7 +31,7 @@ int utTypes(){
 		T(c, Complexd(0,0))
 		c.fromPolar(1, 0.2);	T(c, Polard(0.2))
 		c.fromPhase(2.3);		T(c, Polard(2.3))
-		T(c != Complexd(0,0), true)
+		T((c != Complexd(0,0)), true)
 		T(c.conj(), Complexd(c.r, -c.i))
 		#undef T
 
@@ -52,7 +52,7 @@ int utTypes(){
 		#undef T
 	}
 
-	{	Multi<3, double> v = {0,0,0};
+	{	Multi<3, double> v = {{0,0,0}};
 		assert(v == 0);
 		assert(v != 1);
 		v = 1; assert(v == 1);
