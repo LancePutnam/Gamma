@@ -491,7 +491,7 @@ TEM void SDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	mem::deepZero(this->mBuf, sizeDFT + 2);
 	
 	mDelay.resize(sizeDFT);
-	mDelay = 0;
+	mDelay.assign(T(0));
 	
 	this->mSizeDFT = sizeDFT;
 	

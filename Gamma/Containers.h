@@ -63,8 +63,16 @@ public:
 	/// Get element
 	const T& operator[](uint32_t i) const;
 	
-	/// Sets all elements to argument
-	ArrayBase& operator=(const T& v);
+	/// Sets all elements to value
+	ArrayBase& assign(const T& v);
+
+	/// Sets linear slice of elements to value
+	
+	/// @param[in] v		value to be copied as new content
+	/// @param[in] end		end index (exclusive)
+	/// @param[in] stride	index stride amount
+	/// @param[in] start	start index (inclusive)
+	ArrayBase& assign(const T& v, uint32_t end, uint32_t stride=1, uint32_t start=0);
 	
 	T * elems() const;				///< Returns pointer to first array element.
 	uint32_t size() const;			///< Returns number of elements in array.
@@ -122,9 +130,6 @@ public:
 	Array(uint32_t size, const T& init): Base(size, init){}
 	Array(T * src, uint32_t size): Base(src, size){}
 	Array(const Array& src): Base(src){}
-	
-	/// Set elements to value
-	Array& operator=(const T& v){ Base::operator=(v); return *this; }
 
 	virtual ~Array(){}
 
@@ -247,9 +252,6 @@ public:
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
 	explicit Ring(uint32_t size, const T& value=T());
-	
-	/// Sets all elements to value
-	Ring& operator=(const T& v){ Base::operator=(v); return *this; }
 
 	/// Returns reference to backmost element
 	T& atBack(){ return (*this)[indexBack()]; }
@@ -360,9 +362,6 @@ struct DelayN: public Ring<T,A>{
 	/// @param[in]	size		Number of elements to delay.
 	/// @param[in]	value		Initial value of all elements.
 	explicit DelayN(uint32_t size, const T& value=T()): Ring<T,A>(size, value){}
-	
-	/// Set all elements to value
-	DelayN& operator=(const T& v){ Ring<T,A>::operator=(v); return *this; }
 
 	/// Write new element and return oldest
 	T operator()(const T& input){
@@ -409,8 +408,14 @@ TEM3 ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
 
 TEM3 ArrayBase<T,S,A>::~ArrayBase(){ clear(); }
 
-TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::operator=(const T& v){
-	for(uint32_t i=0; i<size(); ++i) construct(mElems+i, v);
+TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(const T& v){
+	return assign(v, size());
+}
+
+TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
+	const T& v, uint32_t end, uint32_t stride, uint32_t start
+){
+	for(uint32_t i=start; i<end; i+=stride) construct(mElems+i, v);
 	return *this;
 }
 
