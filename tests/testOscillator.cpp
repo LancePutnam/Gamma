@@ -2,7 +2,7 @@
 #include "Gamma/Oscillator.h"
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 #include <iostream>
 
 #define DO(fnc)\

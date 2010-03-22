@@ -4,7 +4,7 @@
 	Description:	Include files for Gamma tutorials.	
 */
 
-#include <stdio.h>		// for printing to stdout
+#include <stdio.h>				// for printing to stdout
 #include "Gamma/Gamma.h"		// core functions
 #include "Gamma/Access.h"
 #include "Gamma/AudioIO.h"
@@ -12,8 +12,8 @@
 #include "Gamma/Envelope.h"
 #include "Gamma/Noise.h"
 #include "Gamma/Oscillator.h"
+#include "Gamma/Print.h"
 #include "Gamma/SoundFile.h"
 #include "Gamma/Types.h"
-#include "Gamma/Visual.h"
 
 using namespace gam;

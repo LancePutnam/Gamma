@@ -6,7 +6,7 @@
 #include "Gamma/rnd.h"
 #include "Gamma/scl.h"
 #include "Gamma/tbl.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 
 //#define TEST_RFFT
 //#define TEST_CFFT

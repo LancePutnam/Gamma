@@ -7,7 +7,7 @@
 #include "Gamma/Access.h"
 #include "Gamma/Constants.h"
 #include "Gamma/Conversion.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 
 #define TEST_WINDOWS
 #define TEST_TABLEOSC

@@ -13,11 +13,12 @@ SRCS = 	$(SRCDIR)/Ambisonics.cpp\
 	$(SRCDIR)/FFT_fftpack.cpp\
 	$(SRCDIR)/fftpack.cpp\
 	$(SRCDIR)/File.cpp\
+	$(SRCDIR)/Print.cpp\
 	$(SRCDIR)/scl.cpp\
 	$(SRCDIR)/Serialize.cpp\
 	$(SRCDIR)/SoundFile.cpp\
 	$(SRCDIR)/Sync.cpp\
-	$(SRCDIR)/Visual.cpp
+	
 
 OBJS = $(SRCS:.cpp=.o)
 

@@ -6,7 +6,7 @@
 #include <math.h>
 
 #include "Gamma/AudioIO.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 #include "Gamma/scl.h"
 
 #define SAFE_FREE(ptr) if(ptr){ free(ptr); ptr = 0; }

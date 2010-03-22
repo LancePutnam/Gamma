@@ -2,7 +2,7 @@
 #include "Gamma/scl.h"
 #include "Gamma/Envelope.h"
 #include "Gamma/Noise.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 
 using namespace gam;
 

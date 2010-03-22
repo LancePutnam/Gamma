@@ -2,7 +2,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <stdlib.h>
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 
 namespace gam{
 

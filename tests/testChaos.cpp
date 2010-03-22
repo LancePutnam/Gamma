@@ -1,6 +1,6 @@
 #include "Gamma/Chaos.h"
 #include "Gamma/scl.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 
 using namespace gam;
 

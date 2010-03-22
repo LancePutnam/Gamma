@@ -5,7 +5,7 @@
 #include "Gamma/gen.h"
 #include "Gamma/tbl.h"
 #include "Gamma/Access.h"
-#include "Gamma/Visual.h"
+#include "Gamma/Print.h"
 
 using namespace gam;
 using namespace gam::gen;
