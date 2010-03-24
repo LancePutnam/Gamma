@@ -12,6 +12,7 @@
 
 namespace gam{
 
+typedef int32_t index_t;
 
 /// Compute 2-D array indices from 1-D array index
 template <class T>
@@ -31,13 +32,13 @@ inline T index3to1(T x, T y, T z, T sizeX, T sizeY){
 /// Returns last index of an arithmetic iteration starting from 0
 inline uint32_t indexLast(uint32_t len, uint32_t str){ return ((len-1)/str)*str; }
 
-inline void neighborsWrap(int x1, int N, int& x0, int& x2){
+inline void neighborsWrap(index_t x1, index_t N, index_t& x0, index_t& x2){
 	x0 = x1-1; if(x1< 0) x1+=N;
 	x2 = x1+1; if(x2>=N) x2-=N;
 }
 
 /// Maps a position in [-1, 1] to an index in [0, n). No boundary operations are performed.
-inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
+inline index_t posToInd(float v, index_t n){ return n * (v*0.49999f + 0.5f); }
 
 
 // Neighbor accessing strategies
@@ -46,26 +47,26 @@ inline int posToInd(float v, int n){ return n * (v*0.49999f + 0.5f); }
 namespace acc{
 
 	struct None{
-		static int mapM1(int v, int mx, int mn){ return v; }
-		static int mapP1(int v, int mx, int mn){ return v; }
-		static int map  (int v, int mx, int mn){ return v; }
+		static index_t mapM1(index_t v, index_t mx, index_t mn){ return v; }
+		static index_t mapP1(index_t v, index_t mx, index_t mn){ return v; }
+		static index_t map  (index_t v, index_t mx, index_t mn){ return v; }
 	};
 
 	struct Wrap{
-		static int mapM1(int v, int mx, int mn){ return v<mn ? mx : v; }
-		static int mapP1(int v, int mx, int mn){ return v>mx ? mn : v; }
-		static int map  (int v, int mx, int mn){ return v<mn ? v+mx+1-mn : (v>mx ? v-(mx+1-mn) : v); }
+		static index_t mapM1(index_t v, index_t mx, index_t mn){ return v<mn ? mx : v; }
+		static index_t mapP1(index_t v, index_t mx, index_t mn){ return v>mx ? mn : v; }
+		static index_t map  (index_t v, index_t mx, index_t mn){ return v<mn ? v+mx+1-mn : (v>mx ? v-(mx+1-mn) : v); }
 	};
 
 	struct Clip{
-		static int mapM1(int v, int mx, int mn){ return v>mn ? v : mn; }
-		static int mapP1(int v, int mx, int mn){ return v<mx ? v : mx; }
-		static int map  (int v, int mx, int mn){ return v>mn ? (v<mx ? v : mx) : mn; }
+		static index_t mapM1(index_t v, index_t mx, index_t mn){ return v>mn ? v : mn; }
+		static index_t mapP1(index_t v, index_t mx, index_t mn){ return v<mx ? v : mx; }
+		static index_t map  (index_t v, index_t mx, index_t mn){ return v>mn ? (v<mx ? v : mx) : mn; }
 	};
 
 //	struct Fold{
-//		static int checkM1(int i, int mx, int mn){ return i>=mn ? i : mn+1; }
-//		static int mapP1(int i, int mx, int mn){ return i<=mx ? i : mx-1; }
+//		static index_t checkM1(index_t i, index_t mx, index_t mn){ return i>=mn ? i : mn+1; }
+//		static index_t mapP1(index_t i, index_t mx, index_t mn){ return i<=mx ? i : mx-1; }
 //	};
 };
 
@@ -79,7 +80,7 @@ public:
 	/// @param[in] size		size of dimension
 	/// @param[in] min		minimum index
 	/// @param[in] begin	relative beginning index in [0, size)
-	AccessStream1(int size, int min=0, int stride=1, int begin=0)
+	AccessStream1(int size, index_t min=0, index_t stride=1, index_t begin=0)
 	:	i0(0), i1(0), i2(0), mMax((size-1)*stride + min), mMin(min), mStride(stride)
 	{
 		begin += min;
@@ -88,36 +89,36 @@ public:
 	}
 
 	void operator()(){ i0=i1; i1=i2; i2=mapP1(i2+mStride); }
-	void operator()(int& a0, int& a1, int& a2){	(*this)(); a0=i0; a1=i1; a2=i2; }
-	bool valid(int i){ return (i<mMin) || (i>mMax); }
+	void operator()(index_t& a0, index_t& a1, index_t& a2){	(*this)(); a0=i0; a1=i1; a2=i2; }
+	bool valid(index_t i){ return (i<mMin) || (i>mMax); }
 
-	int i0, i1, i2;
+	index_t i0, i1, i2;
 
 private:
-	int mMax, mMin, mStride;
+	index_t mMax, mMin, mStride;
 	
-	int mapM1(int i){ return Tacc::mapM1(i, mMax, mMin); }
-	int mapP1(int i){ return Tacc::mapP1(i, mMax, mMin); }
+	index_t mapM1(index_t i){ return Tacc::mapM1(i, mMax, mMin); }
+	index_t mapP1(index_t i){ return Tacc::mapP1(i, mMax, mMin); }
 };
 
 
 
 struct BoundaryClip{
-	int operator()(int ix, int sizeX) const{
+	index_t operator()(index_t ix, index_t sizeX) const{
 		return ix < 0 ? 0 : ix >= sizeX ? sizeX-1 : ix;
 	}
 
-	int operator()(int ix, int iy, int sizeX, int sizeY) const{		
+	index_t operator()(index_t ix, index_t iy, index_t sizeX, index_t sizeY) const{		
 		return (*this)(ix, sizeX) + (*this)(iy, sizeY)*sizeX;
 	}
 };
 
 struct BoundaryWrap{
-	int operator()(int ix, int sizeX) const{
+	index_t operator()(index_t ix, index_t sizeX) const{
 		return ix < 0 ? sizeX+ix : ix >= sizeX ? ix-sizeX : ix;
 	}
 
-	int operator()(int ix, int iy, int sizeX, int sizeY) const{
+	index_t operator()(index_t ix, index_t iy, index_t sizeX, index_t sizeY) const{
 		return (*this)(ix, sizeX) + (*this)(iy, sizeY)*sizeX;
 	}
 };
@@ -128,50 +129,50 @@ struct BoundaryWrap{
 template <class T>
 class IndexMap{
 public:
-	IndexMap(int indMax, const T& posMax=T(1)){ max(indMax, posMax); }
+	IndexMap(index_t indMax, const T& posMax=T(1)){ max(indMax, posMax); }
 	
-	int operator()(const T& x) const { return cast(x*mMul); }
+	index_t operator()(const T& x) const { return cast(x*mMul); }
 	
-	int operator()(const T& x, T& f) const {
+	index_t operator()(const T& x, T& f) const {
 		f = x*mMul;
-		int i = cast(f);
+		index_t i = cast(f);
 		f -= cast(i); 
 		return i;
 	}
 	
-	T operator()(int i) const { return cast(i) * mRec; }
+	T operator()(index_t i) const { return cast(i) * mRec; }
 
-	void max(int indMax, const T& posMax){ mMul=indMax/posMax; mRec=1/mMul; }
+	void max(index_t indMax, const T& posMax){ mMul=indMax/posMax; mRec=1/mMul; }
 
 private:
 	T mMul, mRec;
-	//int cast(const T& v) const { return castIntTrunc(v); }
-	int cast(const T& v) const { return int(v); }	// use native cast, usually optimized
-	T cast(int v) const { return T(v); }
+	//index_t cast(const T& v) const { return castIntTrunc(v); }
+	index_t cast(const T& v) const { return index_t(v); }	// use native cast, usually optimized
+	T cast(index_t v) const { return T(v); }
 };
 
 
 
-template <int N=1, class Sbounds=BoundaryWrap>
+template <index_t N=1, class Sbounds=BoundaryWrap>
 struct Neighbors1D {
 
-	Neighbors1D(int sizeX): sizeX(sizeX){}
+	Neighbors1D(index_t sizeX): sizeX(sizeX){}
 
-	void operator()(int ix){
-		for(int i=0; i<N; ++i){
+	void operator()(index_t ix){
+		for(index_t i=0; i<N; ++i){
 			l[i] = bounds(ix-(i+1), sizeX);
 			r[i] = bounds(ix+(i+1), sizeX);
 		}
 	}
 	
 	template <class T>
-	T access(const T * src, int ix){ return src[bounds(ix, sizeX)]; }
+	T access(const T * src, index_t ix){ return src[bounds(ix, sizeX)]; }
 	
-	int l[N], r[N];
+	index_t l[N], r[N];
 
 private:
 	Sbounds bounds;
-	int sizeX;
+	index_t sizeX;
 };
 
 
@@ -179,15 +180,15 @@ private:
 template <class Sneigh, class Sbounds=BoundaryWrap>
 struct Neighbors2D : public Sneigh{
 
-	Neighbors2D(int sizeX, int sizeY): sizeX(sizeX), sizeY(sizeY){}
+	Neighbors2D(index_t sizeX, index_t sizeY): sizeX(sizeX), sizeY(sizeY){}
 
-	void operator()(int ix, int iy){
+	void operator()(index_t ix, index_t iy){
 		(*this)(ix, iy, sizeX, sizeY, mBounds);
 	}
 
 private:
 	Sbounds mBounds;
-	int sizeX, sizeY;
+	index_t sizeX, sizeY;
 };
 
 
@@ -195,7 +196,7 @@ private:
 template <class SBounds>
 struct NeighborsCross2D{
 
-	void operator()(int ix, int iy, int sizeX, int sizeY, const SBounds& sBounds){
+	void operator()(index_t ix, index_t iy, index_t sizeX, index_t sizeY, const SBounds& sBounds){
 		l = sBounds(ix-1,iy, sizeX, sizeY);
 		r = sBounds(ix+1,iy, sizeX, sizeY);
 		t = sBounds(ix,iy-1, sizeX, sizeY);
@@ -203,8 +204,8 @@ struct NeighborsCross2D{
 	}
 
 	union{
-		struct{ int l, r, t, b; }; 
-		int indices[4];
+		struct{ index_t l, r, t, b; }; 
+		index_t indices[4];
 	};
 };
 
@@ -213,7 +214,7 @@ struct NeighborsCross2D{
 template <class SBounds>
 struct NeighborsDiag2D{
 
-	void operator()(int ix, int iy, int sizeX, int sizeY, const SBounds& sBounds){
+	void operator()(index_t ix, index_t iy, index_t sizeX, index_t sizeY, const SBounds& sBounds){
 		tl = sBounds(ix-1,iy-1, sizeX, sizeY);
 		br = sBounds(ix+1,iy+1, sizeX, sizeY);
 		tr = sBounds(ix+1,iy-1, sizeX, sizeY);
@@ -221,8 +222,8 @@ struct NeighborsDiag2D{
 	}
 
 	union{
-		struct{ int tl, br, tr, bl; }; 
-		int indices[4];
+		struct{ index_t tl, br, tr, bl; }; 
+		index_t indices[4];
 	};
 };
 
@@ -231,24 +232,24 @@ struct NeighborsDiag2D{
 
 
 struct Scan1{
-	Scan1(int size): n(size),i(-1){}
+	Scan1(index_t size): n(size),i(-1){}
 
 	bool operator()(){
 		return ((++i)<n);
 	}
 	
-	int flat() const { return i; }
+	index_t flat() const { return i; }
 	double frac() const { return double(i)/n; }
 	double fracS() const { return double(i<<1)/n - 1.; }
 
-	operator int() const { return flat(); }
+	operator index_t() const { return flat(); }
 
-	int n, i;
+	index_t n, i;
 };
 
 struct Scan2{
-	Scan2(int size): s1(size),s2(size),i(-1),j(0){}
-	Scan2(int size1, int size2): s1(size1),s2(size2),i(-1),j(0){}
+	Scan2(index_t size): s1(size),s2(size),i(-1),j(0){}
+	Scan2(index_t size1, index_t size2): s1(size1),s2(size2),i(-1),j(0){}
 
 	bool operator()(){
 		if(++i==s1){
@@ -258,30 +259,30 @@ struct Scan2{
 		return true;
 	}
 	
-	int flat() const { return flat(i,j); }
-	int flat(int i1, int i2) const { return i1 + i2*s1; }
+	index_t flat() const { return flat(i,j); }
+	index_t flat(index_t i1, index_t i2) const { return i1 + i2*s1; }
 	double frac1() const { return double(i)/s1; }
 	double frac2() const { return double(j)/s2; }
 	double frac1S() const { return double(i<<1)/s1 - 1.; }
 	double frac2S() const { return double(j<<1)/s2 - 1.; }
 
-	operator int() const { return flat(); }
+	operator index_t() const { return flat(); }
 
-	int neighbor(int d1, int d2) const {
+	index_t neighbor(index_t d1, index_t d2) const {
 		// These ops are identical interval arithmetic...
 		d1 += i; if(d1<0) d1+=s1; else if(d1>=s1) d1-=s1;
 		d2 += j; if(d2<0) d2+=s2; else if(d2>=s2) d2-=s2;
 		return flat(d1,d2);
 	}
 
-	int s1, s2;
-	int i, j;
+	index_t s1, s2;
+	index_t i, j;
 };
 
 
 struct Scan3{
-	Scan3(int size): s1(size),s2(size),s3(size),i(-1),j(0),k(0){}
-	Scan3(int size1, int size2, int size3): s1(size1),s2(size2),s3(size3),i(-1),j(0),k(0){}
+	Scan3(index_t size): s1(size),s2(size),s3(size),i(-1),j(0),k(0){}
+	Scan3(index_t size1, index_t size2, index_t size3): s1(size1),s2(size2),s3(size3),i(-1),j(0),k(0){}
 
 	bool operator()(){
 		if(++i==s1){
@@ -294,8 +295,8 @@ struct Scan3{
 		return true;
 	}
 	
-	int flat() const { return flat(i,j,k); }
-	int flat(int i1, int i2, int i3) const { return index3to1(i1,i2,i3, s1,s2); }
+	index_t flat() const { return flat(i,j,k); }
+	index_t flat(index_t i1, index_t i2, index_t i3) const { return index3to1(i1,i2,i3, s1,s2); }
 	double frac1() const { return double(i)/s1; }
 	double frac2() const { return double(j)/s2; }
 	double frac3() const { return double(k)/s3; }
@@ -303,12 +304,12 @@ struct Scan3{
 	double frac2S() const { return double(j<<1)/s2 - 1.; }
 	double frac3S() const { return double(k<<1)/s3 - 1.; }
 
-	operator int() const { return flat(); }
+	operator index_t() const { return flat(); }
 
-	int s1, s2, s3;
+	index_t s1, s2, s3;
 	union{
-		struct{ int i, j, k; };
-		struct{ int x, y, z; };
+		struct{ index_t i, j, k; };
+		struct{ index_t x, y, z; };
 	};
 };
 

@@ -24,12 +24,12 @@ struct Trunc{
 	}
 
 	template <class T, class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return a[iInt];
 	}
 
 	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a,iInt,iFrac, max,min);
 	}
 };
@@ -47,7 +47,7 @@ struct Round{
 	}
 	
 	template <class T, class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return ipl::nearest(
 			iFrac,
 			a[iInt],
@@ -56,7 +56,7 @@ struct Round{
 	}
 
 	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
 	}
 };
@@ -76,7 +76,7 @@ struct Linear{
 	}
 
 	template <class T, class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{		
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
 		return ipl::linear(
 			iFrac,
 			a[iInt],
@@ -85,7 +85,7 @@ struct Linear{
 	}
 
 	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 //		return ipl::linear(
 //			iFrac,
 //			a[iInt],
@@ -114,7 +114,7 @@ struct Cubic{
 	}
 	
 	template <class T, class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{		
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
 		return ipl::cubic(
 			iFrac,
 			a[s.mapM1(iInt-1, max, min)],
@@ -125,7 +125,7 @@ struct Cubic{
 	}
 	
 	template <class T>
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
 	}
 };
@@ -149,7 +149,7 @@ struct AllPass{
 	}
 	
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{		
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
 		return ipl::allpass(
 			iFrac,
 			a[iInt],
@@ -158,7 +158,7 @@ struct AllPass{
 		);
 	}
 
-	T operator()(const Array<T>& a, uint32_t iInt, double iFrac, uint32_t max, uint32_t min=0) const{
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
 	}
 	
@@ -221,8 +221,8 @@ namespace iplSeq{
 // Read tap strategies.
 
 // The expected strategy interface is:
-//	void operator()(uint32_t& pos, uint32_t inc);	// integer tap increment
-//	bool done(uint32_t pos);						// integer tap done reading
+//	void operator()(uint32_t& pos, uint32_t inc);	// fixed-point tap increment
+//	bool done(uint32_t pos);						// fixed-point tap done reading
 //	T operator()(T v, T max, T min);				// float tap post increment check
 namespace tap{
 
