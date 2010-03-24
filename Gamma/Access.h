@@ -129,7 +129,7 @@ struct BoundaryWrap{
 template <class T>
 class IndexMap{
 public:
-	IndexMap(index_t indMax, const T& posMax=T(1)){ max(indMax, posMax); }
+	IndexMap(index_t indMax=1, const T& posMax=T(1)){ max(indMax, posMax); }
 	
 	index_t operator()(const T& x) const { return cast(x*mMul); }
 	

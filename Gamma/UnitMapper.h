@@ -10,6 +10,7 @@
 #include "Gamma/scl.h"
 #include "Gamma/Access.h"
 #include "Gamma/Strategy.h"
+#include "Gamma/Types.h"
 
 namespace gam{
 
@@ -37,8 +38,10 @@ public:
 	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
 	/// @param[in] init		Initializes all elements to this value
 	explicit FunctionTable(uint32_t size, const T& init=T(0))
-	:	Base(size, init), mIndMap(size)
-	{}
+	:	Base(size, init)
+	{
+		endpoints(0, size);
+	}
 	
 	virtual ~FunctionTable(){}
 	
@@ -48,8 +51,11 @@ public:
 
 		x = scl::wrap(x);
 		double f;
-		int i1 = mIndMap(x, f);
-		return mIpl(mAcc, *this, i1,f, size()-1);
+//		index_t i1 = mIndMap(x, f);
+//		return mIpl(mAcc, *this, i1,f, size()-1);
+		index_t i1 = mIndMap(x, f) + mInterval.min();
+		return mIpl(mAcc, *this, i1,f, mInterval.max(), mInterval.min());
+
 		//int i2 = i1+1; if(i2==size()) i2=0;
 		//return (*this)[i1]*(1.f-f) + (*this)[i2]*f;
 	}
@@ -66,12 +72,19 @@ public:
 		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
 		return *this;
 	}
+	
+	/// Set indexing interval for look-up [min, max)
+	FunctionTable& endpoints(index_t min, index_t max){
+		mInterval.endpoints(min, max-1); // interpolator max index is inclusive
+		mIndMap.max(max-min, 1.);
+	}
 
 protected:
 
 	virtual void onResize(){ mIndMap.max(size(), 1.); }
 	
 	IndexMap<double> mIndMap;
+	Interval<index_t> mInterval;
 
 	Sipl mIpl;
 	Sacc mAcc;
