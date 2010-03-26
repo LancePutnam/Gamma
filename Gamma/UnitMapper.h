@@ -77,6 +77,7 @@ public:
 	FunctionTable& endpoints(index_t min, index_t max){
 		mInterval.endpoints(min, max-1); // interpolator max index is inclusive
 		mIndMap.max(max-min, 1.);
+		return *this;
 	}
 
 protected:

@@ -215,7 +215,7 @@ protected:
 	uint32_t mSizeHop;				// samples between forward transforms (= winSize() for DFT)
 	Bin::t mSpctFormat;				// complex format of spectrum
 	//FFTInfo mInfoFFT, mInfoIFFT;	// info for FFT
-	RFFT mFFT;
+	RFFT<float> mFFT;
 	Sync mSyncHop;
 	
 	// Buffers

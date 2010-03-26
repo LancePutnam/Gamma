@@ -11,7 +11,8 @@ SRCS = 	$(SRCDIR)/Ambisonics.cpp\
 	$(SRCDIR)/Conversion.cpp\
 	$(SRCDIR)/DFT.cpp\
 	$(SRCDIR)/FFT_fftpack.cpp\
-	$(SRCDIR)/fftpack.cpp\
+	$(SRCDIR)/fftpack++1.cpp\
+	$(SRCDIR)/fftpack++2.cpp\
 	$(SRCDIR)/File.cpp\
 	$(SRCDIR)/Print.cpp\
 	$(SRCDIR)/scl.cpp\

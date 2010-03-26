@@ -7,60 +7,91 @@
 namespace gam{
 
 
-class RFFTImpl;
+/// One-dimensional real-to-complex fast Fourier transform
 
-
-
-/// Real-to-complex fast Fourier transform
+/// The complex sequence format for forward and inverse transforms is
+/// [2r0, r1, i1, ... , r(n/2-1), i(n/2-1), 2r(n/2)]
+template <class T>
 class RFFT{
 public:
-	RFFT();
 
 	/// @param[in] size		size of real input sequence; most efficient when a product of small primes
-	RFFT(uint32_t size);
+	RFFT(int size=0);
 	
 	~RFFT();
 
 	/// Get size of transform
-	uint32_t size() const;
+	int size() const;
 	
-	/// Perform in-place, real-to-complex forward transform
+	/// Perform real-to-complex forward transform in-place
+	void forward(T * buf, bool normalize=true);
 	
-	/// Output format is [2r0, r1, i1, ... , r(n/2-1), i(n/2-1), 2r(n/2)]
-	///
-	void forward(float * buf, bool normalize=true);
-	
-	/// Perform in-place, complex-to-real inverse transform
-	void inverse(float * buf);
+	/// Perform complex-to-real inverse transform in-place
+	void inverse(T * buf);
 
 	/// Set size of transform
-	void resize(uint32_t n);
+	void resize(int n);
 	
 
-protected:
-	RFFTImpl * mImpl;
+private:
+	class Impl; Impl * mImpl;
 };
 
 
 
 
-/// Complex fast Fourier transform
+/// One-dimensional complex fast Fourier transform
 
-/// Modified from:
-/// http://www.jjj.de/fft/cplxfft.h
+/// The complex sequence format for forward and inverse transforms is
+/// [r0, i0, r1, i1, ... , r(n-1), i(n-1)]
 template <class T>
 class CFFT{
 public:
 
+	/// @param[in] size		size of complex input sequence; most efficient when a product of small primes
+	CFFT(int size=0);
+	
+	~CFFT();
+
+	/// Get size of transform
+	int size() const;
+	
+	/// Perform forward transform in-place
+	void forward(T * buf, bool normalize=true);
+	
+	/// Perform inverse transform in-place
+	void inverse(T * buf);
+
+	/// Set size of transform
+	void resize(int n);
+	
+
+private:
+	class Impl; Impl * mImpl;
+};
+
+
+
+
+
+/// One-dimensional, stridable complex fast Fourier transform
+
+/// Sizes must be powers or two. Transforms can operate on strided arrays.
+/// Modified from:
+/// http://www.jjj.de/fft/cplxfft.h
+template <class T>
+class CFFT2{
+public:
+
 	typedef Complex<T> complex;
 
-    CFFT(uint32_t size=0,						// size is power of 2
+    CFFT2(uint32_t size=0,						// size is power of 2
 		bool doBitRev=true,
 		T scalef1 = 0.5, T scalef2 = 1.0,	// fwd transform scalings
 		T scalei1 = 1.0, T scalei2 = 1.0	// rev xform
 	);
 
-    ~CFFT();
+    ~CFFT2();
 	
 	/// Perform in-place forward transform
     void forward(complex * buf, uint32_t stride=1){ fft(buf, 0, stride); }
@@ -93,7 +124,7 @@ private:
 
 
 
-//////////////////////////////  CFFT methods //////////////////////////////
+//////////////////////////////  CFFT2 methods //////////////////////////////
 
 /*
  * constructor takes an int, power-of-2.
@@ -102,7 +133,7 @@ private:
  * the same for the inverse transform.
  */
 template <class T>
-CFFT<T>::CFFT(uint32_t n, bool doBitRev, T scalef1, T scalef2, T scalei1, T scalei2)
+CFFT2<T>::CFFT2(uint32_t n, bool doBitRev, T scalef1, T scalef2, T scalei1, T scalei2)
 :	mN(0), mLog2N(0), mW(0), mBitRev(0), mDoBitRev(doBitRev)
 {
     mFScales[0] = scalef1;
@@ -114,11 +145,11 @@ CFFT<T>::CFFT(uint32_t n, bool doBitRev, T scalef1, T scalef2, T scalei1, T scal
 
 
 template <class T>
-CFFT<T>::~CFFT(){ freeMem(); }
+CFFT2<T>::~CFFT2(){ freeMem(); }
 
 
 template <class T>
-void CFFT<T>::freeMem(){
+void CFFT2<T>::freeMem(){
 	if(mBitRev){ delete[] mBitRev; mBitRev=0; }
     if(mW     ){ delete[] mW;      mW     =0; }
 }
@@ -130,7 +161,7 @@ void CFFT<T>::freeMem(){
  * conjugate-wise into the last half.
  */
 template <class T>
-void CFFT<T>::hermitian(complex * buf) const {
+void CFFT2<T>::hermitian(complex * buf) const {
 
     if(size() <= 2) return;		// nothing to do
     int i = (size()>>1)-1;		// input
@@ -145,7 +176,7 @@ void CFFT<T>::hermitian(complex * buf) const {
 
 
 template <class T>
-bool CFFT<T>::size(uint32_t n){
+bool CFFT2<T>::size(uint32_t n){
 
 	if(size() == n) return true;
 
@@ -156,7 +187,7 @@ bool CFFT<T>::size(uint32_t n){
     for(; ; ++k){
 		if((1UL<<k) == n) break;
 		if(k==14 || (1UL<<k) > n){
-			//throw "CFFT: size not power of 2";
+			//throw "CFFT2: size not power of 2";
 			return false;
 		}
 	}
@@ -167,7 +198,7 @@ bool CFFT<T>::size(uint32_t n){
 	mW = k>0 ? new complex[size()>>1] : 0;
 
 	if(mBitRev == 0 || ((k>0) && mW == 0)){
-		//throw "CFFT: out of memory";
+		//throw "CFFT2: out of memory";
 		return false;
 	}
 
@@ -200,12 +231,12 @@ bool CFFT<T>::size(uint32_t n){
 
 
 /*
- * CFFT::fft_func(buf,0) performs a forward fft on the data in the buffer specified.
- * CFFT::fft_func(buf,1) performs an inverse fft on the data in the buffer specified.
+ * CFFT2::fft_func(buf,0) performs a forward fft on the data in the buffer specified.
+ * CFFT2::fft_func(buf,1) performs an inverse fft on the data in the buffer specified.
  */
  /*
 template <class T>
-void CFFT<T>::fft(complex * buf, int iflag) const {
+void CFFT2<T>::fft(complex * buf, int iflag) const {
 
 	const T * sp = iflag ? mIScales : mFScales;
 	T s = sp[0];		// per-pass scale
@@ -269,7 +300,7 @@ void CFFT<T>::fft(complex * buf, int iflag) const {
 */
 
 template <class T>
-void CFFT<T>::fft(complex * buf, int iflag, uint32_t stride) const {
+void CFFT2<T>::fft(complex * buf, int iflag, uint32_t stride) const {
 
 	const T * sp = iflag ? mIScales : mFScales;
 	T s = sp[0];		// per-pass scale
@@ -341,7 +372,7 @@ void CFFT<T>::fft(complex * buf, int iflag, uint32_t stride) const {
 /*
 // real-to-complex
 template <class T>
-void CFFT<T>::fft(T * buf, int iflag) const {
+void CFFT2<T>::fft(T * buf, int iflag) const {
 
 	const T * sp = iflag ? mIScales : mFScales;
 	T s = sp[0];		// per-pass scale
