@@ -15,6 +15,7 @@ UTSRC = ut_arr.cpp \
 	utAccess.cpp \
 	utContainers.cpp \
 	utConversion.cpp \
+	utFFT.cpp \
 	utTypes.cpp
 
 SRC = 	testAnalysis.cpp \

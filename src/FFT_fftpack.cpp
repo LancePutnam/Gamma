@@ -19,7 +19,7 @@ struct CFFT<T>::Impl{
 			n = size;
 			freeMem();
 			wsave = new T[4*n+15];
-			fftpack::rffti(&n, wsave, ifac);
+			fftpack::cffti(&n, wsave, ifac);
 		}
 	}
 

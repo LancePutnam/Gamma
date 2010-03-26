@@ -11,6 +11,8 @@ int main(int argc, char* argv[]){
 	utConversion();
 	utContainers();
 	utAccess();
+	
+	utFFT();
 
 	ut_fil();
 	ut_gen();
