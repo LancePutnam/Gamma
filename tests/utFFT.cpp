@@ -13,8 +13,6 @@ int utFFT(){
 	fil::Reson<double> r1(1./N), r2(2./N);
 	for(int i=0; i<N; ++i){ ac[i] = r1()+r2()+1; ar[i] = ac[i].r; }
 
-	//slice(a,100) = r;
-	
 //	for(int i=0; i<N; ++i){
 //		printf("[%3d] % f % f\n", i, ac[i].r, ac[i].i);
 //	}
