@@ -289,8 +289,8 @@ public:
 	TransferFunc& gain(double v){ mGain=v; return *this; }
 	
 	/// Returns frequency response at unit frequency [-0.5, 0.5]
-	Complexd operator()(double f){
-		Complexd X(0,0), Y(1,0);
+	gam::Complex<double> operator()(double f){
+		gam::Complex<double> X(0,0), Y(1,0);
 		f *= M_2PI;
 		for(uint32_t i=0; i<mX.size(); ++i) X += mX[i].response(f);
 		for(uint32_t i=0; i<mY.size(); ++i) Y -= mY[i].response(f);
@@ -303,7 +303,7 @@ protected:
 		/// param[in] c		weighting coefficient
 		/// param[in] d		delay in samples
 		DelayUnit(double c_, double d_): c(c_), d(d_){}
-		Complexd response(double f){ return Polard(c, f*d); }
+		gam::Complex<double> response(double f){ return gam::Polar<double>(c, f*d); }
 		double c, d;
 	};
 

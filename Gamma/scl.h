@@ -829,11 +829,11 @@ void frenet(const V2& d1, V2& t, V2& n){
 
 template <class V3>
 void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
-	b = d2.cross(d1);
-	n = d1.cross(b);
-	t = d1 * invSqrt<2>(d1.dot());
-	b *= invSqrt<2>(b.dot());
-	n *= invSqrt<2>(n.dot());
+	b = cross(d2, d1);
+	n = cross(d1, b);
+	t = d1 * invSqrt<2>(d1.magSqr());
+	b *= invSqrt<2>(b.magSqr());
+	n *= invSqrt<2>(n.magSqr());
 }
 
 template <class V3>
