@@ -4,7 +4,7 @@ int ut_scl(){
 
 	const double pinf = HUGE_VAL;		// + infinity
 	const double ninf = -pinf;			// - infinity
-//	const double nan  = pinf * 0.;		// not-a-number
+	const double nan  = pinf * 0.;		// not-a-number
 
 	#define T(x, y) assert(scl::abs(x) == y);
 	T(1, 1) T(-1, 1) T(1.f, 1.f) T(-1.f, 1.f) T(1., 1.) T(-1., 1.)

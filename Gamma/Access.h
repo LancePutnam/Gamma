@@ -263,6 +263,12 @@ struct Scan2{
 	index_t flat(index_t i1, index_t i2) const { return i1 + i2*s1; }
 	double frac1() const { return double(i)/s1; }
 	double frac2() const { return double(j)/s2; }
+	double frac1II() const { return (double(i)/(s1-1)); }
+	double frac2II() const { return (double(j)/(s2-1)); }
+	double frac1II(double max) const { return frac1II()*max; }
+	double frac2II(double max) const { return frac2II()*max; }
+	double frac1II(double max, double min) const { return frac1II()*(max-min) + min; }
+	double frac2II(double max, double min) const { return frac2II()*(max-min) + min; }
 	double frac1S() const { return double(i<<1)/s1 - 1.; }
 	double frac2S() const { return double(j<<1)/s2 - 1.; }
 

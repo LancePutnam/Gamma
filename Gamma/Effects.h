@@ -293,17 +293,30 @@ public:
 		out2 = in1 * w2 + in2 * w1;
 	}
 
+	/// Set position
+//	void pos(T v){
+//		v = scl::clip(v, (T)1, (T)-1);
+//		v = (v+T(1))*M_PI_4;	// put in [0, ¹/2]
+//		w1 = cos(v);
+//		w2 = sin(v); 
+//	}
+
 	/// Set position using a quadratic approximation.
 	void pos(T v){
-		v = scl::clip(v, (T)1, (T)-1);
-		w1 = (T)-0.25 * v * (v + (T)2) + (T)0.75;
+		// gives correct result at -1, 0, and 1
+		static const T c0 = 1./sqrt(2);
+		static const T c1 = 0.5 - c0;
+		static const T c2 =-0.5/c1;
+		v = scl::clip(v, T(1), T(-1));
+		//w1 = (T)-0.25 * v * (v + (T)2) + (T)0.75;
+		w1 = c1 * v * (v + c2) + c0;
 		w2 = w1 + v;
 	}
-	
+
 	/// Set position using a linear approximation.
 	void posL(T v){
-		v = scl::clip(v, (T)1, (T)-1);
-		w1 = -v * (T)0.5 + (T)0.5;
+		v = scl::clip(v, T(1), T(-1));
+		w1 = -v * T(0.5) + T(0.5);
 		w2 = w1 + v; 
 	}
 

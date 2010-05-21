@@ -77,6 +77,33 @@ protected:
 
 
 
+template <int N, class Tv=gam::real, class Tp=gam::real>
+class IIRN{
+public:
+
+	Tv d[N];	///< delay buffer
+	Tp a[N];	///< feedforward coefficients
+	Tp b[N];	///< feedback coefficients
+
+	/// Filter input sample
+	Tv operator()(const Tv& i0){	// direct form II
+		d[0] = i0;
+		Tv o0 = 0;
+		for(int i=N-1; i>=1; --i){
+			d[0] += d[i]*b[i];	// sum feedback
+			o0   += d[i]*a[i];	// sum feedforward
+			d[i] = d[i-1];		// shift delay
+		}
+		o0 += d[0]*a[0];
+
+		return o0*b[0];
+	}
+	
+	/// Zero internal delays
+	void zero(){ for(int i=0; i<N; ++i) d[i]=Tv(0); }
+	
+};
+
 /// General-purpose multi-staged IIR filter
 
 // The process for designing an IIR is:
