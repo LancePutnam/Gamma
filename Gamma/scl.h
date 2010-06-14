@@ -178,7 +178,7 @@ TEM T cosP3(T u);
 TEM T cosT8(T radians);
 
 /// Compute curvature around point b of three successive points a, b, and c.
-template <class T, template <class T> class V>
+template <class T, template <class> class V>
 T curvature(const V<T>& a, const V<T>& b, const V<T>& c);
 
 /// Returns two element dot product x1 * y1 + x2 * y2.
@@ -755,7 +755,7 @@ TEM inline T clip(T v, int & clipFlag, T hi, T lo){
 
 TEM inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
 
-template <class T, template <class T> class V>
+template <class T, template <class> class V>
 T curvature(const V<T>& a, const V<T>& b, const V<T>& c){
 
 	V<T> d1b = b-a;				// first backward difference
