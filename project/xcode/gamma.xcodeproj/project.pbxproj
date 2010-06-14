@@ -2016,6 +2016,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				ZERO_LINK = YES;
 			};
 			name = Development;
@@ -2034,6 +2035,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
@@ -2050,6 +2052,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				ZERO_LINK = YES;
 			};
 			name = Default;
@@ -3238,6 +3241,7 @@
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = testArrayOps;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Development;
@@ -3260,6 +3264,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../../;
 				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Deployment;
 		};
@@ -3281,6 +3286,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../../;
 				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Default;
 		};
