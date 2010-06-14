@@ -32,13 +32,13 @@ namespace gam{
 namespace scl{
 
 
-template<int N, class T, template<class T> class F> struct NewtonIterator{
+template<int N, class T, template<class> class F> struct NewtonIterator{
 	NewtonIterator(T& v, T v0){
 		F<T>(v,v0);
 		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
 	}
 };
-template<class T, template<class T> class F> struct NewtonIterator<0,T,F>{ NewtonIterator(T& v, T v0){} };
+template<class T, template<class> class F> struct NewtonIterator<0,T,F>{ NewtonIterator(T& v, T v0){} };
 
 template<class T> struct NewtonSqrtMap{ NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); } };
 template<int N, class T> struct SqrtNewton
@@ -447,7 +447,7 @@ TEM T sinT7(T radians);
 TEM T sinT9(T radians);
 
 /// Unnormalized sinc function
-TEM T sinc(T radians, T eps=(T)0.0001);
+TEM T sinc(T radians, T eps=T(0.0001));
 
 /// Sort values so that value1 <= value2.
 TEM void sort(T& value1, T& value2);
@@ -1110,7 +1110,7 @@ TEM inline T sinT9(T r){
 #undef t92
 #undef t91
 
-TEM T sinc(T r, T eps=(T)0.0001){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
+TEM T sinc(T r, T eps){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
 
 TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } } 
 

@@ -313,10 +313,13 @@ struct Scan3{
 	operator index_t() const { return flat(); }
 
 	index_t s1, s2, s3;
-	union{
-		struct{ index_t i, j, k; };
-		struct{ index_t x, y, z; };
-	};
+	index_t i, j, k;
+	// TODO: gives 'multiple initializations given for non-static member 'j' ' error
+	// in ctor.
+//	union{
+//		struct{ index_t i, j, k; };
+//		struct{ index_t x, y, z; };
+//	};
 };
 
 

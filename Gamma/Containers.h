@@ -415,7 +415,7 @@ TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(const T& v){
 TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
 	const T& v, uint32_t end, uint32_t stride, uint32_t start
 ){
-	for(uint32_t i=start; i<end; i+=stride) construct(mElems+i, v);
+	for(uint32_t i=start; i<end; i+=stride) A::construct(mElems+i, v);
 	return *this;
 }
 
@@ -436,8 +436,8 @@ TEM3 void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n",
 		--c;
 		if(0 == c){
 			refCount().erase(mElems);
-			for(uint32_t i=0; i<size(); ++i) destroy(mElems+i);
-			deallocate(mElems, size());
+			for(uint32_t i=0; i<size(); ++i) A::destroy(mElems+i);
+			A::deallocate(mElems, size());
 		}
 		mElems=0; mSize(0);
 	}
@@ -451,7 +451,7 @@ TEM3 void ArrayBase<T,S,A>::own(){
 		uint32_t oldSize = size();
 		clear();
 		resize(oldSize);
-		for(uint32_t i=0; i<size(); ++i) construct(mElems+i, oldElems[i]);
+		for(uint32_t i=0; i<size(); ++i) A::construct(mElems+i, oldElems[i]);
 	}
 }
 
@@ -474,12 +474,12 @@ TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 		
 			// Copy over old elements
 			for(uint32_t i=0; i<nOldToCopy; ++i){
-				construct(newElems+i, (*this)[i]);
+				A::construct(newElems+i, (*this)[i]);
 			}
 			
 			// Copy argument into any additional elements
 			for(uint32_t i=nOldToCopy; i<newSize; ++i){
-				construct(newElems+i, c);
+				A::construct(newElems+i, c);
 			}
 		
 			clear();

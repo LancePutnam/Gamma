@@ -528,6 +528,7 @@ public:
 template<class Tv=gam::real, class Ts=Synced>
 class Impulse : public AccumPhase<Tv, Ts> {
 public:
+	typedef AccumPhase<Tv, Ts> Base;
 
 	/// @param[in]	frq		Initial frequency
 	/// @param[in]	phase		Initial phase in [0, 1)
@@ -1189,12 +1190,12 @@ TEM inline Tv Impulse<Tv, Ts>::saw(Tv i){ return mPrev = (*this)() + i * mPrev; 
 TEM inline Tv Impulse<Tv, Ts>::square(Tv i){ return mPrev = odd() + i * mPrev; }
 
 TEM void Impulse<Tv, Ts>::onResync(double r){
-	recache();
-	freq((*this).freq());
+	Base::recache();
+	Base::freq(Base::freq());
 }
 
 TEM void Impulse<Tv, Ts>::recache(){
-	AccumPhase<Tv, Ts>::recache();
+	Base::recache();
 	mSPU_2 = (Tv)(Synced::spu() * 0.5);
 }
 

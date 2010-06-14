@@ -356,7 +356,7 @@ TEM inline void thin(T * arr, uint32_t len, float p){
 	LOOP(len){ if(prob(p)) arr[i]=T(0); }
 }
 
-TEM inline T uniExc(const T& exc, const T& max, const T& min=T(0)){
+TEM inline T uniExc(const T& exc, const T& max, const T& min){
 	T r=exc; while(exc==r){ r=uni(max,min); } return r;
 }
 

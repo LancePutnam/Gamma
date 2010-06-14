@@ -6,6 +6,7 @@
 
 #include "Gamma/Access.h"
 #include "Gamma/Conversion.h"
+#include "Gamma/scl.h"
 
 namespace gam{
 

@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <vector>
 #include "Gamma/scl.h"
 #include "Gamma/Types.h"
 

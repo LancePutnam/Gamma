@@ -4,7 +4,7 @@ int utFFT(){
 
 	const int N=16;
 
-	Complexd ac[N];
+	Complex<double> ac[N];
 	double ar[N];
 
 	CFFT<double> cfft(N);

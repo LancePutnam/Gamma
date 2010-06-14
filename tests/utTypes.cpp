@@ -2,6 +2,11 @@
 
 int utTypes(){
 
+	typedef Complex<double> Complexd;
+	typedef Polar<double> Polard;
+	typedef Quat<double> Quatd;
+	typedef Vec3<double> Vec3d;
+
 	// Constants
 	
 	#define T(x, y) assert(x == y);
