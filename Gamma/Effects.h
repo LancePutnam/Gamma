@@ -422,33 +422,8 @@ struct Threshold{
 
 
 
-template <uint32_t N, class T=gam::real>
-struct Waveshaper{
-
-	Waveshaper(){ mem::zero(table, N); }
-
-	// Add [harmonic, amp, phs] triple to transfer function
-	template <class T1, class T2, class T3>
-	Waveshaper& operator<<(const Tup3<T1, T2, T3> & t){
-		arr::add(table, gen::Sin<T>(t.v1 * M_2PI / (T)N, t.v3 * M_2PI, t.v2), N);
-		return *this;
-	}
-
-	T operator()(T i0){
-		uint32_t ind = scl::clip((uint32_t)(i0 * (T)0.5 + (T)0.5), N-1);
-		return table[ind];
-	}
-	
-	uint32_t size(){ return N; }
-
-	T table[N];
-};
-
-
-
 /*
 // Generates 7 octaves of a unitary amplitude cosine input.
-// In actuality, it is faster to do additive synthesis of resonators.
 template <class T=gam::real> 
 struct Fract8{
 	T c[7];									///< 2nd-8th octave coefficients
@@ -469,9 +444,7 @@ struct Fract8{
 		return o0;
 	}
 };
-
 */
-
 
 } // gam::
 #undef TEM
