@@ -1,5 +1,5 @@
-#ifndef GAMMA_CHAOS_H_INC
-#define GAMMA_CHAOS_H_INC
+#ifndef GAMMA_RECURRENCEMAPS_H_INC
+#define GAMMA_RECURRENCEMAPS_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */

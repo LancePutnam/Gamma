@@ -64,7 +64,7 @@
 		167479F5115806C800A1556D /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 161263A21140691600E55446 /* Allocator.h */; };
 		167479F6115806C800A1556D /* arr.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9B6094F8C2600549AC9 /* arr.h */; };
 		167479F7115806C800A1556D /* AudioIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F836E10A1E888200F05DF5 /* AudioIO.h */; };
-		167479F8115806C800A1556D /* Chaos.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* Chaos.h */; };
+		167479F8115806C800A1556D /* RecurrenceMaps.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */; };
 		167479F9115806C800A1556D /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9B9094F8C2600549AC9 /* Constants.h */; };
 		167479FA115806C800A1556D /* Containers.h in Headers */ = {isa = PBXBuildFile; fileRef = 16CCF9C00A9EC1650013D2BF /* Containers.h */; };
 		167479FB115806C800A1556D /* Delay.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9BD094F8C2600549AC9 /* Delay.h */; };
@@ -120,7 +120,7 @@
 		16938AC10FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938BCA0FBD204700274B2A /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
-		169F711410C1CFEE00FB2BA0 /* Chaos.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* Chaos.h */; };
+		169F711410C1CFEE00FB2BA0 /* RecurrenceMaps.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */; };
 		16AEEFC20D3C41C400AFD3A4 /* testOscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */; };
 		16AEEFC30D3C41C900AFD3A4 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16AEEFC50D3C41CF00AFD3A4 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
@@ -349,7 +349,7 @@
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169D40E30A81694200605E51 /* testAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioIO.cpp; path = ../../tests/testAudioIO.cpp; sourceTree = SOURCE_ROOT; };
 		169E1E780B97F02A0011870A /* testAudioPVoc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioPVoc.cpp; path = ../../tests/testAudioPVoc.cpp; sourceTree = SOURCE_ROOT; };
-		169F711210C1CFEE00FB2BA0 /* Chaos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Chaos.h; path = ../Gamma/Chaos.h; sourceTree = "<group>"; };
+		169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BC61B50FFC895A00AF1B29 /* testUnits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testUnits.cpp; path = ../../tests/testUnits.cpp; sourceTree = SOURCE_ROOT; };
 		16BC61C00FFC896A00AF1B29 /* testUnits */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testUnits; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -749,7 +749,6 @@
 				16EDF9EB094F8C2600549AC9 /* tbl.h */,
 				1686EA810F8DB1F100D0452F /* Access.h */,
 				161263A21140691600E55446 /* Allocator.h */,
-				169F711210C1CFEE00FB2BA0 /* Chaos.h */,
 				16EDF9B9094F8C2600549AC9 /* Constants.h */,
 				16CCF9C00A9EC1650013D2BF /* Containers.h */,
 				16938ABF0FBD0C4400274B2A /* Conversion.h */,
@@ -768,6 +767,7 @@
 				16EDF9D2094F8C2600549AC9 /* Oscillator.h */,
 				167479501158052400A1556D /* Print.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
+				169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */,
 				1633FB1F0A9E1EB1003F9A50 /* Sampler.h */,
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
@@ -914,7 +914,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				160351A50D090B9D003CC766 /* gen.h in Headers */,
-				169F711410C1CFEE00FB2BA0 /* Chaos.h in Headers */,
+				169F711410C1CFEE00FB2BA0 /* RecurrenceMaps.h in Headers */,
 				161263A41140691600E55446 /* Allocator.h in Headers */,
 				16E3D2D6115C3B1A009165E6 /* fftpack++.h in Headers */,
 			);
@@ -934,7 +934,7 @@
 				16747A0C115806C800A1556D /* tbl.h in Headers */,
 				16747A10115806FF00A1556D /* Access.h in Headers */,
 				167479F5115806C800A1556D /* Allocator.h in Headers */,
-				167479F8115806C800A1556D /* Chaos.h in Headers */,
+				167479F8115806C800A1556D /* RecurrenceMaps.h in Headers */,
 				167479F9115806C800A1556D /* Constants.h in Headers */,
 				167479FA115806C800A1556D /* Containers.h in Headers */,
 				16747A11115806FF00A1556D /* Conversion.h in Headers */,
