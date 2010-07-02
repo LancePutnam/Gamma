@@ -67,6 +67,16 @@ protected:
 	using Accum<Ts>::incPhase;
 
 
+/// Linear sweep in interval [0,1)
+template <class Ts=Synced>
+class Sweep : public Accum<Ts> {
+	typedef Accum<Ts> Base;
+public:
+	Sweep(float frq=440, float phs=0): Base(frq, phs){}
+
+	float operator()(){ Base::cycle(); return Base::phase(); }
+};
+
 
 /// Floating point phase accumulator in [-pi, pi).
 template <class Tv=gam::real, class Ts=Synced>
