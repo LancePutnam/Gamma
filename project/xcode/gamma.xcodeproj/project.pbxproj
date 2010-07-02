@@ -90,7 +90,6 @@
 		16747A10115806FF00A1556D /* Access.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA810F8DB1F100D0452F /* Access.h */; };
 		16747A11115806FF00A1556D /* Conversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 16938ABF0FBD0C4400274B2A /* Conversion.h */; };
 		16747A12115806FF00A1556D /* Dims.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA830F8DB1F100D0452F /* Dims.h */; };
-		16747A13115806FF00A1556D /* Ambisonics.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EF76F910D10B49700F83B85 /* Ambisonics.h */; };
 		16747A14115806FF00A1556D /* FFT.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E09511E0DECCE18000AF828 /* FFT.h */; };
 		16747A15115806FF00A1556D /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA820F8DB1F100D0452F /* File.h */; };
 		16747A16115806FF00A1556D /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D9B4BA0DDBEA100043A25B /* Filter.h */; };
@@ -439,7 +438,6 @@
 		7EB464C80825E7B4002E1A73 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = /usr/local/lib/libsndfile.a; sourceTree = "<absolute>"; };
 		7EBEB0490870F34A000EAC05 /* testConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testConversion.cpp; path = ../../tests/testConversion.cpp; sourceTree = "<group>"; };
 		7EBEB04A0870F34A000EAC05 /* testAudioNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioNoise.cpp; path = ../../tests/testAudioNoise.cpp; sourceTree = "<group>"; };
-		7EF76F910D10B49700F83B85 /* Ambisonics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Ambisonics.h; path = ../../Gamma/Ambisonics.h; sourceTree = SOURCE_ROOT; };
 		C0F9EF680BB059670069B343 /* libgamma.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgamma.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -758,7 +756,6 @@
 				1686EA830F8DB1F100D0452F /* Dims.h */,
 				16CEF9120BBCDA0A0049666F /* Gamma.h */,
 				16F7D07C0B5414A1008A2E29 /* Node.h */,
-				7EF76F910D10B49700F83B85 /* Ambisonics.h */,
 				16F836E10A1E888200F05DF5 /* AudioIO.h */,
 				16EDF9BD094F8C2600549AC9 /* Delay.h */,
 				16D15CA209F0219B001AE497 /* DFT.h */,
@@ -944,7 +941,6 @@
 				16747A12115806FF00A1556D /* Dims.h in Headers */,
 				167479FF115806C800A1556D /* Gamma.h in Headers */,
 				16747A03115806C800A1556D /* Node.h in Headers */,
-				16747A13115806FF00A1556D /* Ambisonics.h in Headers */,
 				167479F7115806C800A1556D /* AudioIO.h in Headers */,
 				167479FB115806C800A1556D /* Delay.h in Headers */,
 				167479FC115806C800A1556D /* DFT.h in Headers */,
