@@ -238,6 +238,8 @@
 		16E3D2DD115C3B1A009165E6 /* fftpack++1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */; };
 		16E3D2DE115C3B1A009165E6 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
 		16E3D308115C3D72009165E6 /* utFFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D307115C3D72009165E6 /* utFFT.cpp */; };
+		16E5E76A11DDA66F00FE39EE /* fftpack++1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */; };
+		16E5E76B11DDA67000FE39EE /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
 		16EACA950D15BE390044B3CB /* testConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EBEB0490870F34A000EAC05 /* testConversion.cpp */; };
 		16EACA960D15BE390044B3CB /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16EACA9B0D15BE6B0044B3CB /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
@@ -1732,6 +1734,8 @@
 				16D157EE0DB344E2005281B2 /* arr.cpp in Sources */,
 				16938BCA0FBD204700274B2A /* FFT_fftpack.cpp in Sources */,
 				167479B31158061A00A1556D /* Print.cpp in Sources */,
+				16E5E76A11DDA66F00FE39EE /* fftpack++1.cpp in Sources */,
+				16E5E76B11DDA67000FE39EE /* fftpack++2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

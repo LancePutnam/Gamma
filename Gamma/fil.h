@@ -164,8 +164,7 @@ public:
 	}
 
 	Tv operator()(const Tv& v) const {
-		mo[0] = mo[0]*mb[0] + v*ma[0];
-		return mo[0];
+		return mo[0] = mo[0]*mb[0] + v*ma[0];
 	}
 
 protected:

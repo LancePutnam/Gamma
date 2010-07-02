@@ -4,8 +4,7 @@
 
 include Makefile.config
 
-SRCS = 	Ambisonics.cpp\
-	arr.cpp\
+SRCS = 	arr.cpp\
 	AudioIO.cpp\
 	Conversion.cpp\
 	DFT.cpp\
