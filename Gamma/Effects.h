@@ -161,7 +161,8 @@ struct Chorus{
 		m(); o1=comb1(i1); o2=comb2(i2);		
 	}
 
-	Comb<> comb1, comb2;	///< Comb filters
+	Comb<float, ipl::AllPass<float> > comb1, comb2;	///< Comb filters
+	//Comb<float, ipl::Linear> comb1, comb2;	///< Comb filters
 	Quadra<double> mod;	///< Modulator
 	float delay;		///< Delay interval
 	
@@ -245,6 +246,22 @@ struct Modulet{
 	Biquad<> fil;
 	LFO<> osc;
 	T depth;
+};
+
+
+
+/// Frequency shifter
+template <class T=gam::real>
+struct FreqShift{
+
+	FreqShift(float shift=1): mod(shift){}
+
+	T operator()(T in){
+		return (hil(in) * mod()).r;
+	}
+
+	Quadra<T> mod;
+	Hilbert<T> hil;
 };
 
 
@@ -350,7 +367,7 @@ struct Pluck{
 template <class T=gam::real>
 class Quantizer : public Synced{
 public:
-	/// @param[in] freq		Freqency of sequence quantization
+	/// @param[in] freq		Frequency of sequence quantization
 	/// @param[in] step		Step size of amplitude quantization
 	Quantizer(double freq, T step=0);
 
@@ -359,7 +376,6 @@ public:
 	void step(T value);			///< Set amplitude quantization amount
 
 	T operator()(T input);		///< Return next filtered sample
-	T next(T input);
 	
 	virtual void onSyncChange();
 
@@ -389,9 +405,7 @@ TEM inline void Quantizer<T>::step(T value){
 	if(mDoStep) mStepRec = 1./mStep;
 }
 
-TEM inline T Quantizer<T>::operator()(T input){ return next(input); }
-
-TEM inline T Quantizer<T>::next(T input){
+TEM inline T Quantizer<T>::operator()(T input){
 	if(++mCount >= mSamples){
 		mCount -= mSamples;
 		mHeld = mDoStep ? scl::round(input, mStep, mStepRec) : input;
