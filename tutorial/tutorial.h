@@ -16,6 +16,7 @@
 #include "Gamma/Print.h"
 #include "Gamma/SoundFile.h"
 #include "Gamma/Types.h"
+#include "Gamma/UnitMaps.h"
 
 using namespace gam;
 
