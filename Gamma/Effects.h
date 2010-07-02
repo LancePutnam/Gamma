@@ -88,6 +88,9 @@ struct Chirp{
 		return 0.f;
 	}
 	
+	void decay(T v){ env.decay(v); }
+	void freq(T start, T end){ freq1=start; freq2=end; }
+	
 	void operator()(T frq1, T frq2, T dcy, bool doReset=false){
 		freq1 = frq1; freq2 = frq2; env.decay(dcy); if(doReset) reset();
 	}
