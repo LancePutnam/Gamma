@@ -73,7 +73,7 @@ struct Recip : public Val<T>{ INHERIT;
 
 
 /// Cosine generator based on recursive formula x0 = c x1 - x2
-template <class T=gam::real>
+template <class T=double>
 struct RCos : public Val<T>{ INHERIT;
 
 	/// Constructor
@@ -104,7 +104,7 @@ struct RCos : public Val<T>{ INHERIT;
 
 
 /// Sinusoidal generator based on recursive formula x0 = c x1 - x2
-template <class T=gam::real>
+template <class T=double>
 struct RSin : public Val<T>{ INHERIT;
 
 	/// Constructor
@@ -142,7 +142,7 @@ struct RSin : public Val<T>{ INHERIT;
 };
 
 
-template <class T=gam::real>
+template <class T=double>
 struct RSin2 : public Val<T>{ INHERIT;
 
 	/// Constructor
@@ -242,8 +242,8 @@ struct RMulAdd: public Val<T>{ INHERIT;
 /// Sinusoid sequence generator
 template <class T=gam::real>
 struct Sin: public RAdd<T>{ INHERIT;
-	Sin(const T& add, const T& val=T(0), const T& amp=T(1))
-	:	RAdd<T>(add, val), amp(amp){}					///< Constructor
+	Sin(const T& frq, const T& phs=T(0), const T& amp=T(1))
+	:	RAdd<T>(frq, phs), amp(amp){}					///< Constructor
 
 	T operator()() const
 	{ return (T)sin(RAdd<T>::operator()()) * amp; }		/// Generate next value
