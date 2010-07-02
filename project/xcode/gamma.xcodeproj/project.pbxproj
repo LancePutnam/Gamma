@@ -78,7 +78,6 @@
 		16747A03115806C800A1556D /* Node.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F7D07C0B5414A1008A2E29 /* Node.h */; };
 		16747A04115806C800A1556D /* Noise.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9D0094F8C2600549AC9 /* Noise.h */; };
 		16747A05115806C800A1556D /* Oscillator.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9D2094F8C2600549AC9 /* Oscillator.h */; };
-		16747A06115806C800A1556D /* Particle.h in Headers */ = {isa = PBXBuildFile; fileRef = 1656F5D809EEF3D7006E3FD7 /* Particle.h */; };
 		16747A07115806C800A1556D /* rnd.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9E9094F8C2600549AC9 /* rnd.h */; };
 		16747A08115806C800A1556D /* Sampler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1633FB1F0A9E1EB1003F9A50 /* Sampler.h */; };
 		16747A09115806C800A1556D /* scl.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9C9094F8C2600549AC9 /* scl.h */; };
@@ -158,7 +157,6 @@
 		16C872AC0EFA152400449449 /* testNoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 169C11980B65CC78000D2A44 /* testNoise.cpp */; };
 		16C872AD0EFA152400449449 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16C872AE0EFA152400449449 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
-		16C872BE0EFA156C00449449 /* testParticle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1656F5B209EEF313006E3FD7 /* testParticle.cpp */; };
 		16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16D0F0500DCAF24E00EDF5CD /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16D157E90DB344C2005281B2 /* DFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D15CA309F0219B001AE497 /* DFT.cpp */; };
@@ -331,8 +329,6 @@
 		161264BC1140A92300E55446 /* ut_mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_mem.cpp; path = ../../tests/ut_mem.cpp; sourceTree = SOURCE_ROOT; };
 		1633FB1F0A9E1EB1003F9A50 /* Sampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sampler.h; path = ../../Gamma/Sampler.h; sourceTree = SOURCE_ROOT; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
-		1656F5B209EEF313006E3FD7 /* testParticle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testParticle.cpp; path = ../../tests/testParticle.cpp; sourceTree = "<group>"; };
-		1656F5D809EEF3D7006E3FD7 /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Particle.h; path = ../../Gamma/Particle.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		166DD72D117CD72A00A8BA12 /* fftpack++.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++.cpp"; sourceTree = "<group>"; };
 		167479501158052400A1556D /* Print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Print.h; sourceTree = "<group>"; };
@@ -364,7 +360,6 @@
 		16C8728D0EFA147E00449449 /* testAudioIO2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAudioIO2; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C8729A0EFA14EA00449449 /* testNode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNode; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C872A70EFA151600449449 /* testNoise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNoise; sourceTree = BUILT_PRODUCTS_DIR; };
-		16C872B60EFA154000449449 /* testParticle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testParticle; sourceTree = BUILT_PRODUCTS_DIR; };
 		16CB4CCC0A6C5DC400F94EC1 /* testScalar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testScalar.cpp; path = ../../tests/testScalar.cpp; sourceTree = SOURCE_ROOT; };
 		16CCF9C00A9EC1650013D2BF /* Containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Containers.h; path = ../../Gamma/Containers.h; sourceTree = SOURCE_ROOT; };
 		16CDD4430ABF788300F66F1B /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mem.h; path = ../../Gamma/mem.h; sourceTree = SOURCE_ROOT; };
@@ -534,13 +529,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		16C872A50EFA151600449449 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16C872B40EFA154000449449 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -781,7 +769,6 @@
 				16D9B4BA0DDBEA100043A25B /* Filter.h */,
 				16EDF9D0094F8C2600549AC9 /* Noise.h */,
 				16EDF9D2094F8C2600549AC9 /* Oscillator.h */,
-				1656F5D809EEF3D7006E3FD7 /* Particle.h */,
 				167479501158052400A1556D /* Print.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
 				1633FB1F0A9E1EB1003F9A50 /* Sampler.h */,
@@ -799,7 +786,6 @@
 		16F7DB3C0B812041001CABCE /* src */ = {
 			isa = PBXGroup;
 			children = (
-				167479511158054C00A1556D /* Print.cpp */,
 				16EDF9B5094F8C2600549AC9 /* arr.cpp */,
 				16EDF9C8094F8C2600549AC9 /* scl.cpp */,
 				16F836E00A1E888200F05DF5 /* AudioIO.cpp */,
@@ -811,6 +797,7 @@
 				16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */,
 				16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */,
 				16827D5810013FEE001088E7 /* File.cpp */,
+				167479511158054C00A1556D /* Print.cpp */,
 				16E99A210A2A4B7800210497 /* SoundFile.cpp */,
 				168B78F40B75C59100645F1F /* Sync.cpp */,
 			);
@@ -862,7 +849,6 @@
 				1699F3860B9D1D2600ECB243 /* testNode.cpp */,
 				169C11980B65CC78000D2A44 /* testNoise.cpp */,
 				16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */,
-				1656F5B209EEF313006E3FD7 /* testParticle.cpp */,
 				16EDFA16094F8D9E00549AC9 /* testRandom.cpp */,
 				16CB4CCC0A6C5DC400F94EC1 /* testScalar.cpp */,
 				16D1CC230D4C45DD003F01C0 /* testScratch.cpp */,
@@ -917,7 +903,6 @@
 				16C8728D0EFA147E00449449 /* testAudioIO2 */,
 				16C8729A0EFA14EA00449449 /* testNode */,
 				16C872A70EFA151600449449 /* testNoise */,
-				16C872B60EFA154000449449 /* testParticle */,
 				169387860FBC7EF400274B2A /* testTypes */,
 				16BC61C00FFC896A00AF1B29 /* testUnits */,
 			);
@@ -970,7 +955,6 @@
 				16747A16115806FF00A1556D /* Filter.h in Headers */,
 				16747A04115806C800A1556D /* Noise.h in Headers */,
 				16747A05115806C800A1556D /* Oscillator.h in Headers */,
-				16747A06115806C800A1556D /* Particle.h in Headers */,
 				16747A0E115806D500A1556D /* Print.h in Headers */,
 				16747A17115806FF00A1556D /* pstdint.h in Headers */,
 				16747A08115806C800A1556D /* Sampler.h in Headers */,
@@ -1147,22 +1131,6 @@
 			name = testNoise;
 			productName = testNoise;
 			productReference = 16C872A70EFA151600449449 /* testNoise */;
-			productType = "com.apple.product-type.tool";
-		};
-		16C872B50EFA154000449449 /* testParticle */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16C872BD0EFA156100449449 /* Build configuration list for PBXNativeTarget "testParticle" */;
-			buildPhases = (
-				16C872B30EFA154000449449 /* Sources */,
-				16C872B40EFA154000449449 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = testParticle;
-			productName = testParticle;
-			productReference = 16C872B60EFA154000449449 /* testParticle */;
 			productType = "com.apple.product-type.tool";
 		};
 		16D4286B0DC8030500BF3144 /* testAudioSine */ = {
@@ -1505,7 +1473,6 @@
 				16C872990EFA14EA00449449 /* testNode */,
 				16C872A60EFA151600449449 /* testNoise */,
 				16AEEFBD0D3C41AA00AFD3A4 /* testOscillator */,
-				16C872B50EFA154000449449 /* testParticle */,
 				165906A30D0F9F3E00EA3DB0 /* testRandom */,
 				16F9A1840D0DB63E00721CC7 /* testScalar */,
 				16F76AD50D11E01C001C3DCA /* testTable */,
@@ -1677,14 +1644,6 @@
 				16C872AD0EFA152400449449 /* scl.cpp in Sources */,
 				16C872AE0EFA152400449449 /* Sync.cpp in Sources */,
 				16747989115805D700A1556D /* Print.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16C872B30EFA154000449449 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				16C872BE0EFA156C00449449 /* testParticle.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2401,48 +2360,6 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = testNoise;
-			};
-			name = Default;
-		};
-		16C872B80EFA154000449449 /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = testParticle;
-			};
-			name = Development;
-		};
-		16C872B90EFA154000449449 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = testParticle;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		16C872BA0EFA154000449449 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = testParticle;
 			};
 			name = Default;
 		};
@@ -3446,16 +3363,6 @@
 				16C872A90EFA151600449449 /* Development */,
 				16C872AA0EFA151600449449 /* Deployment */,
 				16C872AB0EFA151600449449 /* Default */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
-		};
-		16C872BD0EFA156100449449 /* Build configuration list for PBXNativeTarget "testParticle" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16C872B80EFA154000449449 /* Development */,
-				16C872B90EFA154000449449 /* Deployment */,
-				16C872BA0EFA154000449449 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
