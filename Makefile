@@ -15,7 +15,6 @@ SRCS = 	Ambisonics.cpp\
 	File.cpp\
 	Print.cpp\
 	scl.cpp\
-	Serialize.cpp\
 	SoundFile.cpp\
 	Sync.cpp
 

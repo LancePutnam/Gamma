@@ -96,8 +96,6 @@
 		16747A15115806FF00A1556D /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA820F8DB1F100D0452F /* File.h */; };
 		16747A16115806FF00A1556D /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D9B4BA0DDBEA100043A25B /* Filter.h */; };
 		16747A17115806FF00A1556D /* pstdint.h in Headers */ = {isa = PBXBuildFile; fileRef = 169389570FBCCE4200274B2A /* pstdint.h */; };
-		16747A18115806FF00A1556D /* Serialize.h in Headers */ = {isa = PBXBuildFile; fileRef = 16A94B171064111D000B942A /* Serialize.h */; };
-		16747A19115806FF00A1556D /* SmartObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D219CA10048AEB00302C47 /* SmartObject.h */; };
 		16747A1A115806FF00A1556D /* Strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 16064BD30DFF02680043BC29 /* Strategy.h */; };
 		16747A1B115806FF00A1556D /* Thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F133840FFF426400DE56F6 /* Thread.h */; };
 		16747A1C115806FF00A1556D /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 164622960E0EEDD80011911A /* Types.h */; };
@@ -126,9 +124,6 @@
 		16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938BCA0FBD204700274B2A /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
 		169F711410C1CFEE00FB2BA0 /* Chaos.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* Chaos.h */; };
-		16A94B3710641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
-		16A94B3810641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
-		16A94B3910641689000B942A /* Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A94B3610641689000B942A /* Serialize.cpp */; };
 		16AEEFC20D3C41C400AFD3A4 /* testOscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */; };
 		16AEEFC30D3C41C900AFD3A4 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16AEEFC50D3C41CF00AFD3A4 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
@@ -361,8 +356,6 @@
 		169D40E30A81694200605E51 /* testAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioIO.cpp; path = ../../tests/testAudioIO.cpp; sourceTree = SOURCE_ROOT; };
 		169E1E780B97F02A0011870A /* testAudioPVoc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioPVoc.cpp; path = ../../tests/testAudioPVoc.cpp; sourceTree = SOURCE_ROOT; };
 		169F711210C1CFEE00FB2BA0 /* Chaos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Chaos.h; path = ../Gamma/Chaos.h; sourceTree = "<group>"; };
-		16A94B171064111D000B942A /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serialize.h; path = ../Gamma/Serialize.h; sourceTree = "<group>"; };
-		16A94B3610641689000B942A /* Serialize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serialize.cpp; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BC61B50FFC895A00AF1B29 /* testUnits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testUnits.cpp; path = ../../tests/testUnits.cpp; sourceTree = SOURCE_ROOT; };
 		16BC61C00FFC896A00AF1B29 /* testUnits */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testUnits; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -384,7 +377,6 @@
 		16D15CA309F0219B001AE497 /* DFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DFT.cpp; path = ../../src/DFT.cpp; sourceTree = SOURCE_ROOT; };
 		16D15D4D09F068E4001AE497 /* testDFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testDFT.cpp; path = ../../tests/testDFT.cpp; sourceTree = SOURCE_ROOT; };
 		16D1CC230D4C45DD003F01C0 /* testScratch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testScratch.cpp; path = ../../tests/testScratch.cpp; sourceTree = SOURCE_ROOT; };
-		16D219CA10048AEB00302C47 /* SmartObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SmartObject.h; path = ../Gamma/SmartObject.h; sourceTree = "<group>"; };
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		16D2C47C0B57695900BFA547 /* testAudioCombs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioCombs.cpp; path = ../../tests/testAudioCombs.cpp; sourceTree = SOURCE_ROOT; };
@@ -795,8 +787,6 @@
 				167479501158052400A1556D /* Print.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
 				1633FB1F0A9E1EB1003F9A50 /* Sampler.h */,
-				16A94B171064111D000B942A /* Serialize.h */,
-				16D219CA10048AEB00302C47 /* SmartObject.h */,
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
 				168B78F50B75C59100645F1F /* Sync.h */,
@@ -824,7 +814,6 @@
 				16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */,
 				16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */,
 				16827D5810013FEE001088E7 /* File.cpp */,
-				16A94B3610641689000B942A /* Serialize.cpp */,
 				16E99A210A2A4B7800210497 /* SoundFile.cpp */,
 				168B78F40B75C59100645F1F /* Sync.cpp */,
 			);
@@ -988,8 +977,6 @@
 				16747A0E115806D500A1556D /* Print.h in Headers */,
 				16747A17115806FF00A1556D /* pstdint.h in Headers */,
 				16747A08115806C800A1556D /* Sampler.h in Headers */,
-				16747A18115806FF00A1556D /* Serialize.h in Headers */,
-				16747A19115806FF00A1556D /* SmartObject.h in Headers */,
 				16747A0A115806C800A1556D /* SoundFile.h in Headers */,
 				16747A1A115806FF00A1556D /* Strategy.h in Headers */,
 				16747A0B115806C800A1556D /* Sync.h in Headers */,
@@ -1589,7 +1576,6 @@
 				16827D6310014013001088E7 /* scl.cpp in Sources */,
 				16827D6410014013001088E7 /* SoundFile.cpp in Sources */,
 				16827D6510014013001088E7 /* Sync.cpp in Sources */,
-				16A94B3810641689000B942A /* Serialize.cpp in Sources */,
 				167479531158054C00A1556D /* Print.cpp in Sources */,
 				16E3D2D7115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2D8115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
@@ -1626,7 +1612,6 @@
 				16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */,
 				16F133F90FFF4B0700DE56F6 /* FFT_fftpack.cpp in Sources */,
 				164F33B810508E77009FAD10 /* File.cpp in Sources */,
-				16A94B3710641689000B942A /* Serialize.cpp in Sources */,
 				161263D211409EF900E55446 /* ut.cpp in Sources */,
 				161263E011409FB500E55446 /* utContainers.cpp in Sources */,
 				161263F61140A0BF00E55446 /* utTypes.cpp in Sources */,
@@ -1935,7 +1920,6 @@
 				16827D671001402E001088E7 /* File.cpp in Sources */,
 				C0F9EF860BB059AE0069B343 /* SoundFile.cpp in Sources */,
 				C0F9EF880BB059AF0069B343 /* Sync.cpp in Sources */,
-				16A94B3910641689000B942A /* Serialize.cpp in Sources */,
 				167479521158054C00A1556D /* Print.cpp in Sources */,
 				16E3D2D4115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2D5115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
