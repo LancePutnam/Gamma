@@ -1,3 +1,11 @@
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+	
+	Tutorial:		Algorithmic / Quadra Tank
+	Description:	A single decaying complex sinusoid is fed into multiple
+					feedback delay-lines.
+*/
+
 #include "tutorial.h"
 
 Accum<> tmr(16, 2);
