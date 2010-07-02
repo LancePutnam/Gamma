@@ -30,12 +30,12 @@
 
 	// State Functions
 	#include "Gamma/AudioIO.h"
-	#include "Gamma/Chaos.h"
 	#include "Gamma/Delay.h"
 	#include "Gamma/DFT.h"
 	#include "Gamma/Envelope.h"
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
+	#include "Gamma/RecurrenceMaps.h"
 	#include "Gamma/Sampler.h"
 	#include "Gamma/SoundFile.h"
 	#include "Gamma/Sync.h"
