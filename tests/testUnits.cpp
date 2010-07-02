@@ -5,16 +5,10 @@
 #include "Gamma/File.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Types.h"
-#include "Gamma/Thread.h"
 #include "Gamma/UnitMapper.h"
 #include <map>
 
 using namespace gam;
-
-THREAD_FUNCTION(threadFunc){
-	*(int *)user = 1; return NULL;
-}
-
 
 int main(int argc, char* argv[]){
 
@@ -50,14 +44,6 @@ int main(int argc, char* argv[]){
 		
 		assert(ft(0.5/N) == 0.5);
 		assert(ft(1.5/N) == 1.5);
-	}
-	
-
-	// Thread
-	{	int x=0;
-		Thread t(threadFunc, &x);
-		t.wait();
-		assert(x == 1);
 	}
 
 	return 0;

@@ -97,7 +97,6 @@
 		16747A16115806FF00A1556D /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D9B4BA0DDBEA100043A25B /* Filter.h */; };
 		16747A17115806FF00A1556D /* pstdint.h in Headers */ = {isa = PBXBuildFile; fileRef = 169389570FBCCE4200274B2A /* pstdint.h */; };
 		16747A1A115806FF00A1556D /* Strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 16064BD30DFF02680043BC29 /* Strategy.h */; };
-		16747A1B115806FF00A1556D /* Thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F133840FFF426400DE56F6 /* Thread.h */; };
 		16747A1C115806FF00A1556D /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 164622960E0EEDD80011911A /* Types.h */; };
 		16747A1D115806FF00A1556D /* UnitMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F133850FFF426400DE56F6 /* UnitMapper.h */; };
 		16827CF710012D2B001088E7 /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
@@ -424,7 +423,6 @@
 		16EDF9EB094F8C2600549AC9 /* tbl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tbl.h; path = ../../Gamma/tbl.h; sourceTree = SOURCE_ROOT; };
 		16EDFA16094F8D9E00549AC9 /* testRandom.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testRandom.cpp; path = ../../tests/testRandom.cpp; sourceTree = SOURCE_ROOT; };
 		16F1305A0FFEE85900DE56F6 /* fil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fil.h; path = ../../Gamma/fil.h; sourceTree = SOURCE_ROOT; };
-		16F133840FFF426400DE56F6 /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Thread.h; path = ../Gamma/Thread.h; sourceTree = "<group>"; };
 		16F133850FFF426400DE56F6 /* UnitMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnitMapper.h; path = ../Gamma/UnitMapper.h; sourceTree = "<group>"; };
 		16F5F6720CAD91C7003DD8DD /* testTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTimer.cpp; path = ../../tests/testTimer.cpp; sourceTree = SOURCE_ROOT; };
 		16F74C970A4E114600A34E6F /* testAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAnalysis.cpp; path = ../../tests/testAnalysis.cpp; sourceTree = SOURCE_ROOT; };
@@ -790,7 +788,6 @@
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
 				168B78F50B75C59100645F1F /* Sync.h */,
-				16F133840FFF426400DE56F6 /* Thread.h */,
 				160E7B3E0B36792200CE82F3 /* Timer.h */,
 				164622960E0EEDD80011911A /* Types.h */,
 				16F133850FFF426400DE56F6 /* UnitMapper.h */,
@@ -980,7 +977,6 @@
 				16747A0A115806C800A1556D /* SoundFile.h in Headers */,
 				16747A1A115806FF00A1556D /* Strategy.h in Headers */,
 				16747A0B115806C800A1556D /* Sync.h in Headers */,
-				16747A1B115806FF00A1556D /* Thread.h in Headers */,
 				16747A0D115806C800A1556D /* Timer.h in Headers */,
 				16747A1C115806FF00A1556D /* Types.h in Headers */,
 				16747A1D115806FF00A1556D /* UnitMapper.h in Headers */,
