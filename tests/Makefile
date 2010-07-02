@@ -3,8 +3,8 @@
 #=========================================================================
 
 include ../Makefile.config
-LFLAGS += ../libgamma.a
-CFLAGS += -I../
+LFLAGS += -L../$(BIN_DIR)/ -l$(LIB_NAME)
+CFLAGS += -iquote../
 
 UTSRC = ut_arr.cpp \
 	ut_fil.cpp \
@@ -46,22 +46,23 @@ SRC = 	testAnalysis.cpp \
 	testTypes.cpp \
 	testUnits.cpp
 
-TARGETS = $(SRC:.cpp=) ut
+TARGETS = $(addprefix ../$(BIN_DIR)/, $(SRC:.cpp=) ut)
+OBJS = $(addprefix ../$(OBJ_DIR)/, $(UTSRC:.cpp=.o))
 
-.cpp.o:
-	@echo CC $<
-	@$(CC) -c $(CFLAGS) -o $*.o $<
+#--------------------------------------------------------------------------
+# Targets
+#--------------------------------------------------------------------------
+../$(OBJ_DIR)/%.o: %.cpp
+	@echo CC $< $@
+	@$(CC) -c $(CFLAGS) $< -o $@
 
 all: $(TARGETS)
 
-ut: $(UTSRC:.cpp=.o)
+../$(BIN_DIR)/ut: $(OBJS)
 	@echo CC $@
-	@$(CC) $(CFLAGS) $^ -o $@ $@.cpp $(LFLAGS)
+	@$(CC) $(CFLAGS) $^ -o $@ $(@F).cpp $(LFLAGS)
 
-
-%: %.cpp 
+../$(BIN_DIR)/%: %.cpp
 	@echo CC $<
-	@$(CC) $(CFLAGS) -o $@ $@.cpp $(LFLAGS)
+	@$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
-clean:
-	@rm -f *.o $(TARGETS)

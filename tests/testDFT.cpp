@@ -104,7 +104,7 @@ int main(int argc, char* argv[]){
 		
 		Complexf err=0;
 		for(int i=0; i<size; ++i){
-			err += Complexf(scl::abs(buf[i].r - src[i].r), scl::abs(buf[i].i - src[i].i));
+			err += Complex<float>(scl::abs(buf[i].r - src[i].r), scl::abs(buf[i].i - src[i].i));
 		}
 		err *= 100;
 		printf("\terror = (%f, %f) %%\n", err[0], err[1]);
@@ -298,7 +298,7 @@ int main(int argc, char* argv[]){
 		sdft.forward(table[i]);
 		
 		{ for(unsigned i=0; i<sdft.numBins(); ++i){
-			Complexf& c = sdft.bins(i);
+			Complex<float>& c = sdft.bins(i);
 			printf("[%d] ", i);
 			printf("% 5.3f ", c.r); printf("% 5.3f ", c.i);
 			printPlot(c.r, 20); printf(" ");

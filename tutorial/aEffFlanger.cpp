@@ -32,7 +32,7 @@ struct Flanger{
 
 
 Accum<> tmr(0.2,2);		// Switch between flanging types
-LFO<> src(110);			// A rich source
+LFO<> src(110/6);			// A rich source
 Flanger flanger;		// Flanger unit
 int flangeType=0;		// Flanging type
 
@@ -64,7 +64,6 @@ void audioCB(AudioIOData& io){
 		}
 		
 		float s = src.up();
-		
 		s = flanger(s);
 
 		io.out(0)[i] = io.out(1)[i] = s*0.2;

@@ -3,60 +3,87 @@
 #=========================================================================
 
 include Makefile.config
-SRCDIR = ./src
 
-SRCS = 	$(SRCDIR)/Ambisonics.cpp\
-	$(SRCDIR)/arr.cpp\
-	$(SRCDIR)/AudioIO.cpp\
-	$(SRCDIR)/Conversion.cpp\
-	$(SRCDIR)/DFT.cpp\
-	$(SRCDIR)/FFT_fftpack.cpp\
-	$(SRCDIR)/fftpack++1.cpp\
-	$(SRCDIR)/fftpack++2.cpp\
-	$(SRCDIR)/File.cpp\
-	$(SRCDIR)/Print.cpp\
-	$(SRCDIR)/scl.cpp\
-	$(SRCDIR)/Serialize.cpp\
-	$(SRCDIR)/SoundFile.cpp\
-	$(SRCDIR)/Sync.cpp\
-	
+SRCS = 	Ambisonics.cpp\
+	arr.cpp\
+	AudioIO.cpp\
+	Conversion.cpp\
+	DFT.cpp\
+	FFT_fftpack.cpp\
+	fftpack++1.cpp\
+	fftpack++2.cpp\
+	File.cpp\
+	Print.cpp\
+	scl.cpp\
+	Serialize.cpp\
+	SoundFile.cpp\
+	Sync.cpp
 
 OBJS = $(SRCS:.cpp=.o)
+OBJS := $(addprefix $(OBJ_DIR)/, $(OBJS))
 
-.cpp.o:
-	@echo CC $<
-	@$(CC) -c $(CFLAGS) -o $*.o $<
+CFLAGS		+= $(addprefix -iquote, $(INC_DIRS))
+DLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(DLIB_FILE))
+SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 
-$(ALIB_FILE): $(OBJS)
+#--------------------------------------------------------------------------
+# Targets
+#--------------------------------------------------------------------------
+# Build object file from C++ source
+$(OBJ_DIR)/%.o: %.cpp
+	@echo CC $< $@
+	@$(CC) -c $(CFLAGS) $< -o $@
+
+# Build static library
+$(SLIB_FILE): createFolders $(OBJS)
 	@echo AR $@
 	@$(AR) $@ $(OBJS)
 	@$(RANLIB) $@
 
-$(SLIB_FILE): $(OBJS)
+# Build dynamic (shared) library
+$(DLIB_FILE): createFolders $(OBJS)
 	@echo SH $@
-	@$(CC) $(SLIBFLAGS) $(LFLAGS) -o $@ $(OBJS)
+	@$(CC) $(DLIBFLAGS) $(LFLAGS) -o $@ $(OBJS)
 
 .PHONY: tests
-tests: $(ALIB_FILE)
-	@cd tests && make all
+tests: $(SLIB_FILE)
+	@make --directory $(TEST_DIR)
 
 .PHONY: tutorial
-tutorial: $(ALIB_FILE)
-	@cd tutorial && make all
+tutorial: $(SLIB_FILE)
+	@make --directory $(TUT_DIR)
 
+# Compile and run source files in examples/ folder
+tutorial/%.cpp: $(SLIB_FILE) FORCE
+	@$(CC) $(CFLAGS) -o $(BIN_DIR)/$(*F) $@ $(LFLAGS) $(SLIB_FILE)
+	@./$(BIN_DIR)/$(*F)
+
+# Remove active build configuration binary files
+.PHONY: clean
 clean:
-	@rm -f $(SRCDIR)/*.o *.$(ALIB_EXT) *.$(SLIB_EXT)
-	@cd tests && make clean
-	@cd tutorial && make clean
+	@find $(BIN_DIR) -type f ! -path '*.svn*' | xargs rm -f
+#	@rm -f $(SRCDIR)/*.o *.$(SLIB_EXT) *.$(DLIB_EXT)
+#	@cd tests && make clean
+#	@cd tutorial && make clean
 
-install: $(ALIB_FILE) $(SLIB_FILE)
+# Remove all build configuration binary files
+.PHONY: cleanall
+cleanall:
+	@find $(BUILD_DIR) -type f ! -path '*.svn*' | xargs rm -f
+
+install: $(SLIB_FILE) $(DLIB_FILE)
 	@$(INSTALL) -d $(PREFIX)/lib
 	@$(INSTALL) -d $(PREFIX)/include/gamma
-	$(INSTALL) -c -m 644 $(ALIB_FILE) $(PREFIX)/lib/$(ALIB_FILE)
 	$(INSTALL) -c -m 644 $(SLIB_FILE) $(PREFIX)/lib/$(SLIB_FILE)
+	$(INSTALL) -c -m 644 $(DLIB_FILE) $(PREFIX)/lib/$(DLIB_FILE)
 	$(INSTALL) -c -m 644 ./include/*.h $(PREFIX)/include/gamma
-	$(RANLIB) $(PREFIX)/lib/$(ALIB_FILE)
+	$(RANLIB) $(PREFIX)/lib/$(SLIB_FILE)
 
-#all: $(ALIB_FILE) $(SLIB_FILE) tests tutorial
-all: $(ALIB_FILE) tests tutorial
+#all: $(SLIB_FILE) $(DLIB_FILE) tests tutorial
+all: $(SLIB_FILE) tests tutorial
 
+createFolders:
+	@mkdir -p $(OBJ_DIR)
+
+# Dummy target to force rebuilds
+FORCE:

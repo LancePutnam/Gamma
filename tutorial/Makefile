@@ -3,8 +3,8 @@
 #=========================================================================
 
 include ../Makefile.config
-LFLAGS += ../libgamma.a
-CFLAGS += -I../
+LFLAGS += -L../$(BIN_DIR)/ -l$(LIB_NAME)
+CFLAGS += -iquote../
 
 SRC =	aEffFlanger.cpp \
 	aIOFile.cpp \
@@ -31,13 +31,13 @@ SRC =	aEffFlanger.cpp \
 	vCrvLissajous.cpp \
 	vCrvSpiral.cpp
 
-TARGETS = $(SRC:.cpp=)
+TARGETS = $(addprefix ../$(BIN_DIR)/, $(SRC:.cpp=))
 
+#--------------------------------------------------------------------------
+# Targets
+#--------------------------------------------------------------------------
 all: $(TARGETS)
 
-%: %.cpp
+../$(BIN_DIR)/%: %.cpp
 	@echo CC $<
-	@$(CC) $(CFLAGS) -o $@ $@.cpp $(LFLAGS)
-
-clean:
-	@rm -f *.o $(TARGETS)
+	@$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
