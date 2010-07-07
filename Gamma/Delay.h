@@ -931,7 +931,7 @@ TM1 inline float Comb<TM2>::normFfd() const { return 1.f/(1.f + scl::abs(ffd()))
 
 //---- OnePole
 T_VPS OnePole<Tv,Tp,Ts>::OnePole()
-:	mFreq(10), mStored((Tv)0), o1((Tv)0)
+:	mFreq(10), mStored(Tv(0)), o1(Tv(0))
 {	Ts::initSynced(); }
 
 T_VPS OnePole<Tv,Tp,Ts>::OnePole(Tp frq, const Tv& stored)

@@ -136,7 +136,7 @@ public:
 
 	/// Generates a new end point from a generator when the segment end is reached
 	
-	/// This is useful for creating interpolated noise
+	/// This is useful for creating pitched noise
 	///
 	template <class G>
 	Tv operator()(G& g){
