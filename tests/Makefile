@@ -4,7 +4,7 @@
 
 include ../Makefile.config
 LFLAGS += -L../$(BIN_DIR)/ -l$(LIB_NAME)
-CFLAGS += -iquote../
+CFLAGS += -I../
 
 UTSRC = ut_arr.cpp \
 	ut_fil.cpp \
