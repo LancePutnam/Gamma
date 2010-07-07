@@ -2,13 +2,13 @@
 	See COPYRIGHT file for authors and license information
 	
 	Tutorial:		Generator / Oscillator / Damped Sine
-	Description:	Damped sinusoial oscillator
+	Description:	Decaying sinusoid
 */
 
 #include "tutorial.h"
 
-Accum<> tmr(2, 2);
-SineD<> osc(440, 0.2, 1);
+Accum<> tmr(2, 2);			// Timer for randomizing parameters
+SineD<> osc(440, 0.2, 1);	// Decaying sinusoid
 
 void audioCB(AudioIOData& io){
 

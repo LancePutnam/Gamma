@@ -26,7 +26,7 @@ phasor		44.1					96						192
 64-bit		6.97e12 m / 1.16e11 h	3.2e12 m / 5.33e10 h	1.6e12 m / 2.67e10 h
 */
 
-template <class T=gam::real, class Tipol=ipl::Trunc, class Ttap=tap::Wrap>
+template <class T=gam::real, class Tipol=ipl::Trunc, class Ttap=tap::Clip>
 class Player: public Synced, public Array<T>{
 public:
 	using Array<T>::size; using Array<T>::elems;

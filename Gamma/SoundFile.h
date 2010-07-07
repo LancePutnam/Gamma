@@ -34,7 +34,7 @@ public:
 	SoundFile(std::string path="");
 	
 	/// Creates object given a path and an other object from which to get its header info.
-	SoundFile(std::string path, const SoundFile & src);
+	SoundFile(std::string path, const SoundFile& src);
 	
 	/// The destructor will automatically close any open files.
 	~SoundFile();

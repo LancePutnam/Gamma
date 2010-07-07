@@ -7,12 +7,12 @@
 
 #include "tutorial.h"
 
-Accum<> tmr(0.5,2);			// timer to switch between LFO types
-NoiseWhite<> noise;			// source noise
+Accum<> tmr(0.5,2);			// Timer to switch between LFO types
+NoiseWhite<> noise;			// Noise source
 LFO<> env(5,0,0.25);		// LFO as amplitude envelope
 LFO<> osc(100, 0, 0.25);    // Oscillator for pitch modulation
-LFO<> mod(0.5);				// modulator of envelope's modifier parameter
-gen::Trigger cnt(10,10);	// counter for LFO type
+LFO<> mod(0.5);				// Modulator of envelope's modifier parameter
+gen::Trigger cnt(10,10);	// Counter for changing LFO type
 
 bool modMode = false;		// True = amplitude modulation, False = Frequency Modulation
 
@@ -21,8 +21,7 @@ void audioCB(AudioIOData& io){
 	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
 	
 		if(tmr()){
-			if(cnt()) 
-			{
+			if(cnt()){
 				modMode ^= true;			// increment LFO type, switch mod mode when wraps
 				printf("\nMod mode: %s modulation\n", modMode? "Amp" : "Freq");
 			}
@@ -57,16 +56,8 @@ void audioCB(AudioIOData& io){
 			s = osc.cos();
 		}
 		
-		io.out(0)[i] = io.out(1)[i] = s * 0.4f; // apply envelope to noise generator
+		io.out(0)[i] = io.out(1)[i] = s*0.2;
 	}
 }
 
-
-int main(int argc, char* argv[]){
-	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());
-	
-	io.start();
-	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
-}
+RUN(audioCB);

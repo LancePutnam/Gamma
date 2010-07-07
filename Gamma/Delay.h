@@ -78,10 +78,10 @@ protected:
 /// 2-pole/2-zero IIR filter.
 
 /// The biquadratic filter contains 2 zeroes and 2 poles in its transfer
-/// function.  The zeroes provide a better response near the DC and Nyquist
+/// function. The zeroes provide a better response near the DC and Nyquist
 /// frequencies than an all-pole filter would. Second-order IIRs have a 12 
 /// dB/octave cutoff slope and are normally cascaded (run in series) to obtain
-/// a sharper response.  This particular implementation utilizes the Butterworth
+/// a sharper response. This particular implementation utilizes the Butterworth
 /// design.
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Biquad : public Ts{
@@ -582,7 +582,8 @@ public:
 
 protected:
 	Tp mFreq;
-	Tp ci0, co1;
+	//Tp ci0, co1;
+	Tp mA0, mB1;
 	Tv mStored;
 	Tv o1;
 };
@@ -950,22 +951,22 @@ T_VPS inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
 // @ 44.1 : 0.99999 <=>   0.0702
 T_VPS inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
 	mFreq = v;	
-	v = scl::max(v, (Tp)0);	// ensure positive freq
+	v = scl::max(v, Tp(0));	// ensure positive freq
 	
 	// freq is half the bandwidth of a pole at 0
-	smooth( scl::poleRadius((Tp)2 * v, Ts::ups()) );
+	smooth( scl::poleRadius(Tp(2) * v, Ts::ups()) );
 	//printf("%f, %f, %f\n", spu(), co1, v);
 }
 
-T_VPS inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ co1 = v; ci0 = (Tp)1 - scl::abs(v); }
+T_VPS inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
 
 T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::operator()(){ return (*this)(mStored); }
-T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::operator()(const Tv& i0){ o1 = o1 * co1 + i0 * ci0; return o1; }
+T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
 
 T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::last() const { return o1; }
 T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::stored() const { return mStored; }
 T_VPS inline Tv& OnePole<Tv,Tp,Ts>::stored(){ return mStored; }
-T_VPS inline bool OnePole<Tv,Tp,Ts>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == (Tv)0; }
+T_VPS inline bool OnePole<Tv,Tp,Ts>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == Tv(0); }
 
 
 #undef TEM

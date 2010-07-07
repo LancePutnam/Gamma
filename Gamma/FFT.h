@@ -64,7 +64,6 @@ public:
 
 	/// Set size of transform
 	void resize(int n);
-	
 
 private:
 	class Impl; Impl * mImpl;

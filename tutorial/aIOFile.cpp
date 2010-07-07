@@ -5,6 +5,8 @@
 	Description:	Writing and reading a sound file.
 */
 
+
+
 #include "tutorial.h"
 
 int main(int argc, char* argv[]){
@@ -13,7 +15,7 @@ int main(int argc, char* argv[]){
 	SoundFile sf(path);
 
 	
-	// Write a stereo beating sine wave to file
+	// Write a beating sine wave to file
 	{
 		const float sampleRate = 44100;
 		const float lenSec = 2;
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]){
 		//sf.print();
 		
 		unsigned numFrames = sf.frames();
-		float * buf = new float[sf.samples()];
+		float buf[sf.samples()];
 		
 		//sf.readAll(buf);		// read all samples from sound file into buffer
 

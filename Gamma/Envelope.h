@@ -104,7 +104,7 @@ protected:
 
 
 
-/// General purpose envelope segment
+/// Interpolation envelope segment
 template <class Tv=gam::real, template <class> class Si=iplSeq::Linear, class Tp=gam::real, class Ts=Synced>
 class Seg : public Ts{
 public:
@@ -134,11 +134,15 @@ public:
 		reset();
 	}
 
+	/// Generates a new end point from a generator when the segment end is reached
+	
+	/// This is useful for creating interpolated noise
+	///
 	template <class G>
 	Tv operator()(G& g){
 		Tp f = mAcc.val;
 		Tv v;
-		if(f >= (Tp)1){	v = mIpl.val(); (*this) = g(); }
+		if(f >= Tp(1)){	v = mIpl.val(); (*this) = g(); }
 		else{			v = val(); }
 		mAcc();
 		return v;
@@ -156,7 +160,7 @@ public:
 	/// Reset envelope
 	void reset(){ phase((Tp)0); }
 	
-	Tv val() const { return mIpl(scl::min(mAcc.val, (Tp)1)); }
+	Tv val() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
 	
 	Si<Tv>& ipol(){ return mIpl; }
 	

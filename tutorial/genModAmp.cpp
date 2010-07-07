@@ -7,7 +7,7 @@
 
 #include "tutorial.h"
 
-float ff = 220;			// fundamental frequency
+float ff = 440;			// fundamental frequency
 Sine<> oscC(ff);		// carrier
 Sine<> oscM;			// modulator
 LFO<> modFreq(1./20.);	// envelope for changing modulator frequency
@@ -24,12 +24,4 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-
-int main(int argc, char* argv[]){
-	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());
-	
-	io.start();
-	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
-}
+RUN(audioCB);

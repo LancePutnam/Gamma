@@ -9,6 +9,7 @@
 #include "Gamma/Access.h"
 #include "Gamma/AudioIO.h"
 #include "Gamma/Delay.h"
+#include "Gamma/DFT.h"
 #include "Gamma/Effects.h"
 #include "Gamma/Envelope.h"
 #include "Gamma/Noise.h"
@@ -25,6 +26,6 @@ int main(int argc, char* argv[]){\
 	AudioIO io(256, 44100, audioCB, NULL, 2);\
 	Sync::master().spu(io.framesPerSecond());\
 	io.start();\
-	printf("\nPress 'enter' to quit...\n"); getchar();\
+	printf("Press 'enter' to quit...\n"); getchar();\
 	return 0;\
 }
