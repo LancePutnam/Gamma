@@ -71,7 +71,7 @@ inline void print<type>(const type& v, const char * post, const char * pre, FILE
 DEF(float, f) DEF(double, f) DEF(uint32_t, d) DEF(int, d)
 #undef DEF
 
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout){
+template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
 	for(int j=0; j<nx; ++j){
 	for(int i=0; i<ny; ++i){
 		float v = pix[j*nx + i];
