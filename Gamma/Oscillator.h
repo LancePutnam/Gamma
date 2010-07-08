@@ -560,12 +560,14 @@ public:
 	virtual void onResync(double r);
 
 protected:
+	Tv mAmp;		//
 	Tv mN;			// # harmonics
 	Tv mNDesired;	// desired number of harmonics
 	Tv mNFrac;		
 	Tv mSPU_2;			// cached locals
 	Tv mPrev;			// previous output for integration
 	void recache();
+	void setAmp();
 };
 
 
@@ -1132,26 +1134,30 @@ TEMS inline bool LFO<Ts>::seq(){
 
 //---- Impulse
 
-TEM Impulse<Tv, Ts>::Impulse(Tv frq, Tv phase, Tv harmonics)
-:	AccumPhase<Tv, Ts>(frq, phase), mPrev((Tv)0)
+TEM Impulse<Tv,Ts>::Impulse(Tv frq, Tv phase, Tv harmonics)
+:	AccumPhase<Tv,Ts>(frq, phase), mAmp(0), mPrev((Tv)0)
 {
 	onResync(1);
 	this->harmonics(harmonics);
 }
 
-TEM inline void Impulse<Tv, Ts>::harmonics(Tv value){
+TEM inline void Impulse<Tv,Ts>::harmonics(Tv value){
 	mN = mNDesired = scl::floor(value);
+	setAmp();
 	mNFrac = value - mN;
 }
 
-TEM inline void Impulse<Tv, Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
+TEM inline void Impulse<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
 
-TEM inline void Impulse<Tv, Ts>::antialias(){
+TEM inline void Impulse<Tv,Ts>::antialias(){
 	float maxN = scl::floor(maxHarmonics());
 	mN = mNDesired > maxN ? maxN : mNDesired;
+	setAmp();
 }
 
-TEM inline Tv Impulse<Tv, Ts>::maxHarmonics(){ return mSPU_2 / this->mFreq; }
+TEM inline Tv Impulse<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->mFreq; }
+
+TEM inline void Impulse<Tv,Ts>::setAmp(){ mAmp = (mN != Tv(0)) ? (Tv(0.5) / mN) : 0; }
 
 #define EPS 0.000001
 TEM inline Tv Impulse<Tv, Ts>::operator()(){
@@ -1159,12 +1165,13 @@ TEM inline Tv Impulse<Tv, Ts>::operator()(){
 
 	Tv result;
 	Tv denom = scl::sinT9(theta * (Tv)0.5);
-	if( scl::abs(denom) < (Tv)EPS ){ result = (Tv)1; /*printf("Impulse::(): oops\n");*/ }
+	if( scl::abs(denom) < (Tv)EPS ){ result = Tv(1); /*printf("Impulse::(): oops\n");*/ }
 	else{
-		Tv nphase = scl::wrapPhase(theta * (mN + (Tv)0.5));
-		//result = (scl::sinT7(nphase) / denom - (Tv)1) * (Tv)0.5;
+		Tv nphase = scl::wrapPhase(theta * (mN + Tv(0.5)));
+		//result = (scl::sinT7(nphase) / denom - Tv(1)) * Tv(0.5);
 		
-		result = ((scl::sinT7(nphase) - denom) / (denom*mN)) * (Tv)0.5;
+		//result = ((scl::sinT7(nphase) - denom) / (denom*mN)) * Tv(0.5);
+		result = ((scl::sinT7(nphase) - denom) / denom) * mAmp;
 		
 //		(n/d - 1)*0.5/N
 //		n/d - d/d
@@ -1176,16 +1183,16 @@ TEM inline Tv Impulse<Tv, Ts>::operator()(){
 	return result;
 }
 
-TEM inline Tv Impulse<Tv, Ts>::odd(){
+TEM inline Tv Impulse<Tv,Ts>::odd(){
 	Tv theta = this->nextPhase();
 	
 	Tv result;
-	Tv n = scl::ceil(mN, (Tv)2, (Tv)0.5);	// get next highest even for formula
+	Tv n = scl::ceil(mN, Tv(2), Tv(0.5));	// get next highest even for formula
 										// wave has odd harmonics 1,3, ..., n-1 with peak amp n
 
 	Tv denom = scl::cosT8(scl::wrapPhaseOnce(theta - M_PI_2));	// this is more precise near zero-crossings
 	//Tv denom = scl::sinT9(theta);
-	if( scl::abs(denom) < (Tv)EPS ){
+	if( scl::abs(denom) < Tv(EPS) ){
 		if( theta > M_PI ) theta -= M_2PI;
 		result = (theta > -M_PI_2 && theta < M_PI_2) ? 1 : -1;
 		//printf("Impulse::odd(): oops\n");
@@ -1196,15 +1203,15 @@ TEM inline Tv Impulse<Tv, Ts>::odd(){
 }
 #undef EPS
 
-TEM inline Tv Impulse<Tv, Ts>::saw(Tv i){ return mPrev = (*this)() + i * mPrev; }
-TEM inline Tv Impulse<Tv, Ts>::square(Tv i){ return mPrev = odd() + i * mPrev; }
+TEM inline Tv Impulse<Tv,Ts>::saw(Tv i){ return mPrev = (*this)() + i * mPrev; }
+TEM inline Tv Impulse<Tv,Ts>::square(Tv i){ return mPrev = odd() + i * mPrev; }
 
-TEM void Impulse<Tv, Ts>::onResync(double r){
+TEM void Impulse<Tv,Ts>::onResync(double r){
 	Base::recache();
 	Base::freq(Base::freq());
 }
 
-TEM void Impulse<Tv, Ts>::recache(){
+TEM void Impulse<Tv,Ts>::recache(){
 	Base::recache();
 	mSPU_2 = (Tv)(Synced::spu() * 0.5);
 }
