@@ -4,10 +4,9 @@
 
 include ../Makefile.config
 LFLAGS += -L../$(BIN_DIR)/ -l$(LIB_NAME)
-CFLAGS += -iquote../
+CFLAGS += -I../
 
-SRC =	aEffFlanger.cpp \
-	aIOFile.cpp \
+SRC =	effFlanger.cpp \
 	genEnvAD.cpp \
 	genEnvDecay.cpp \
 	genEnvSeg.cpp \
@@ -24,6 +23,7 @@ SRC =	aEffFlanger.cpp \
 	genOscOsc.cpp \
 	genOscSineD.cpp \
 	ioAudioDevice.cpp \
+	ioSoundFile.cpp \
 	vCrvBotanic.cpp \
 	vCrvCircle.cpp \
 	vCrvEpicycloid.cpp \

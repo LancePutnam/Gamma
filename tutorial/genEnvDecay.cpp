@@ -21,7 +21,7 @@ void audioCB(AudioIOData& io){
 	
 		if(tmr()){
 			env.value(0.2);		// reset amplitude of envelope
-			osc.phase(0);		// reset phase of oscillator to avoid click
+//			osc.phase(0);		// reset phase of oscillator to avoid click
 		}
 
 		float s = src() * env();
