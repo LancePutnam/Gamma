@@ -79,7 +79,6 @@
 		16747A04115806C800A1556D /* Noise.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9D0094F8C2600549AC9 /* Noise.h */; };
 		16747A05115806C800A1556D /* Oscillator.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9D2094F8C2600549AC9 /* Oscillator.h */; };
 		16747A07115806C800A1556D /* rnd.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9E9094F8C2600549AC9 /* rnd.h */; };
-		16747A08115806C800A1556D /* Sampler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1633FB1F0A9E1EB1003F9A50 /* Sampler.h */; };
 		16747A09115806C800A1556D /* scl.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9C9094F8C2600549AC9 /* scl.h */; };
 		16747A0A115806C800A1556D /* SoundFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 16E99A200A2A4B7800210497 /* SoundFile.h */; };
 		16747A0B115806C800A1556D /* Sync.h in Headers */ = {isa = PBXBuildFile; fileRef = 168B78F50B75C59100645F1F /* Sync.h */; };
@@ -313,6 +312,7 @@
 /* Begin PBXFileReference section */
 		160351A30D090B9C003CC766 /* gen.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = gen.h; path = ../../Gamma/gen.h; sourceTree = SOURCE_ROOT; };
 		16064BD30DFF02680043BC29 /* Strategy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Strategy.h; path = ../../Gamma/Strategy.h; sourceTree = SOURCE_ROOT; };
+		1609E5A011E5B743001A3853 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
 		160D7A180B7FF02A007874D5 /* testAudioSampler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioSampler.cpp; path = ../../tests/testAudioSampler.cpp; sourceTree = SOURCE_ROOT; };
 		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
 		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
@@ -328,7 +328,6 @@
 		161264B41140A78A00E55446 /* ut_fil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_fil.cpp; path = ../../tests/ut_fil.cpp; sourceTree = SOURCE_ROOT; };
 		161264B51140A78A00E55446 /* ut_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_gen.cpp; path = ../../tests/ut_gen.cpp; sourceTree = SOURCE_ROOT; };
 		161264BC1140A92300E55446 /* ut_mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_mem.cpp; path = ../../tests/ut_mem.cpp; sourceTree = SOURCE_ROOT; };
-		1633FB1F0A9E1EB1003F9A50 /* Sampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sampler.h; path = ../../Gamma/Sampler.h; sourceTree = SOURCE_ROOT; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		166DD72D117CD72A00A8BA12 /* fftpack++.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++.cpp"; sourceTree = "<group>"; };
@@ -767,10 +766,10 @@
 				16D9B4BA0DDBEA100043A25B /* Filter.h */,
 				16EDF9D0094F8C2600549AC9 /* Noise.h */,
 				16EDF9D2094F8C2600549AC9 /* Oscillator.h */,
+				1609E5A011E5B743001A3853 /* Player.h */,
 				167479501158052400A1556D /* Print.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
 				169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */,
-				1633FB1F0A9E1EB1003F9A50 /* Sampler.h */,
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
 				168B78F50B75C59100645F1F /* Sync.h */,
@@ -955,7 +954,6 @@
 				16747A05115806C800A1556D /* Oscillator.h in Headers */,
 				16747A0E115806D500A1556D /* Print.h in Headers */,
 				16747A17115806FF00A1556D /* pstdint.h in Headers */,
-				16747A08115806C800A1556D /* Sampler.h in Headers */,
 				16747A0A115806C800A1556D /* SoundFile.h in Headers */,
 				16747A1A115806FF00A1556D /* Strategy.h in Headers */,
 				16747A0B115806C800A1556D /* Sync.h in Headers */,

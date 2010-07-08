@@ -1,5 +1,5 @@
-#ifndef GAMMA_SAMPLER_H_INC
-#define GAMMA_SAMPLER_H_INC
+#ifndef GAMMA_PLAYER_H_INC
+#define GAMMA_PLAYER_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */

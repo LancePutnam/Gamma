@@ -14,6 +14,7 @@
 #include "Gamma/Envelope.h"
 #include "Gamma/Noise.h"
 #include "Gamma/Oscillator.h"
+#include "Gamma/Player.h"
 #include "Gamma/Print.h"
 #include "Gamma/SoundFile.h"
 #include "Gamma/Types.h"
