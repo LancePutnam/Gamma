@@ -5,7 +5,7 @@
 #include "Gamma/File.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Types.h"
-#include "Gamma/UnitMapper.h"
+#include "Gamma/UnitMaps.h"
 #include <map>
 
 using namespace gam;
