@@ -92,7 +92,7 @@ public:
 	/// @param[in]	frq		Initial type of filter.
 	Biquad(Tp frq = 1000.f, Tp res = 4.f, int filterType = Filter::LP);
 
-	Tp ci0, ci1, ci2, co0, co1, co2;	// ffd and fbk coefficients
+	Tp mA0, mA1, mA2, mB0, mB1, mB2;	// ffd and fbk coefficients
 
 	void freq(Tp v);			///< Set center frequency. 
 	void res(Tp v);			///< Set resonance.
@@ -131,12 +131,12 @@ public:
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
-		i0 += d1 * co1; Tv o0 = i0 - d1; d1 = i0; return o0;
+		i0 += d1*mB1; Tv o0 = i0-d1; d1 = i0; return o0;
 	}
 
 	/// Set bandwidth of pole
 	void width(Tp v){
-		mWidth = v; co1 = scl::poleRadius(v, Ts::ups());
+		mWidth = v; mB1 = scl::poleRadius(v, Ts::ups());
 	}
 
 	void zero(){ d1=0; }
@@ -144,7 +144,7 @@ public:
 	virtual void onResync(double r){ width(mWidth); }
 
 protected:
-	Tv d1; Tp mWidth, co1;
+	Tv d1; Tp mWidth, mB1;
 };
 
 
@@ -156,16 +156,16 @@ class BlockNyq : public BlockDC<Tv,Tp,Ts>{
 public:
 
 	/// @param[in] width	Bandwidth of pole
-	BlockNyq(Tp width=35): super(width){}
+	BlockNyq(Tp width=35): Base(width){}
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
-		i0 += d1 * co1; Tv o0 = i0 - d1; d1 =-i0; return o0;
+		i0 += d1*mB1; Tv o0 = i0-d1; d1 =-i0; return o0;
 	}
 
 protected:
-	typedef BlockDC<Tv,Tp,Ts> super;
-	using super::d1; using super::co1;
+	typedef BlockDC<Tv,Tp,Ts> Base;
+	using Base::d1; using Base::mB1;
 };
 
 
@@ -232,10 +232,10 @@ protected:
 #define DELAY_DEF(l, Ti)\
 template <class Tv=gam::real, class Ts=Synced>\
 struct Delay##l : public Delay<Tv,Ti,Ts>{\
-	typedef Delay<Tv,Ti,Ts> super;\
-	Delay##l(): super(){}\
-	Delay##l(float delay): super(delay){}\
-	Delay##l(float maxDelay, float delay): super(maxDelay, delay){}\
+	typedef Delay<Tv,Ti,Ts> Base;\
+	Delay##l(): Base(){}\
+	Delay##l(float delay): Base(delay){}\
+	Delay##l(float maxDelay, float delay): Base(maxDelay, delay){}\
 };
 
 DELAY_DEF(R, ipl::Round)
@@ -378,7 +378,7 @@ protected:
 	void delay(Tv v){ d2 = d1; d1 = v; }
 	
 	Tp mFreq, mWidth;
-	Tp co0, cd1, cd2;
+	Tp mB0, cd1, cd2;
 	Tp mCos, mRad;
 	Tv d2, d1;
 };
@@ -392,7 +392,7 @@ public:
 
 	/// @param[in] frq	Center frequency
 	/// @param[in] wid	Bandwidth
-	AllPass2(Tp frq, Tp wid=100): super(frq, wid){ Ts::initSynced(); }
+	AllPass2(Tp frq, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){
@@ -402,8 +402,8 @@ public:
 	}
 
 protected:
-	#define USE(var) using super::var;
-	typedef Filter2<Tv,Tp,Ts> super; USE(d2) USE(d1) USE(co0) USE(cd1) USE(cd2)
+	#define USE(var) using Base::var;
+	typedef Filter2<Tv,Tp,Ts> Base; USE(d2) USE(d1) USE(mB0) USE(cd1) USE(cd2)
 	#undef USE
 };
 
@@ -417,17 +417,17 @@ public:
 	
 	/// @param[in] frq	Center frequency
 	/// @param[in] wid	Bandwidth
-	Notch(Tp frq=1000, Tp wid=100): super(frq, wid){ Ts::initSynced(); }
+	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Set center frequency
-	void freq(Tp v){ super::freq(v); computeGain(); }
+	void freq(Tp v){ Base::freq(v); computeGain(); }
 
 	/// Set bandwidth
-	void width(Tp v){ super::width(v); computeGain(); }
+	void width(Tp v){ Base::width(v); computeGain(); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){
-		i0 *= co0;
+		i0 *= mB0;
 		Tv o0 = i0 - d1*cd1 - d2*cd2; delay(i0); return o0;
 	}
 
@@ -435,13 +435,13 @@ public:
 
 protected:
 
-	#define USE(var) using super::var;
-	typedef Filter2<Tv,Tp> super;
-	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(co0) USE(cd1) USE(cd2) USE(mRad)
+	#define USE(var) using Base::var;
+	typedef Filter2<Tv,Tp> Base;
+	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(mB0) USE(cd1) USE(cd2) USE(mRad)
 	#undef USE
 
 	// compute constant gain factor
-	void computeGain(){ co0 = (Tv)1 / ((Tv)1 + scl::abs(cd1) - cd2); }
+	void computeGain(){ mB0 = Tp(1) / (Tp(1) + scl::abs(cd1) - cd2); }
 };
 
 
@@ -454,38 +454,38 @@ public:
 
 	/// @param[in] frq	Center frequency
 	/// @param[in] wid	Bandwidth	
-	Reson(Tp frq=440, Tp wid=100): super(frq, wid){ Ts::initSynced(); }
+	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Set center frequency
 	void freq(Tp v){
-		super::freqRef(v);
-		mSin = scl::cosP3<Tp>(scl::foldOnce<Tp>(v - (Tp)0.25, (Tp)0.5));
+		Base::freqRef(v);
+		mSin = scl::cosP3<Tp>(scl::foldOnce<Tp>(v - Tp(0.25), Tp(0.5)));
 		computeGain();
 	}
 
 	/// Set bandwidth
-	void width(Tp v){ super::width(v); computeGain(); }
+	void width(Tp v){ Base::width(v); computeGain(); }
 
-	void set(Tp frq, Tp wid){ super::width(wid); freq(frq); }
+	void set(Tp frq, Tp wid){ Base::width(wid); freq(frq); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){
-		i0 *= co0;
+		i0 *= mB0;
 		i0 += d1*cd1 + d2*cd2; delay(i0); return i0; 
 	}
 
 	void onResync(double r){ freq(mFreq); width(mWidth); }
 
 protected:
-	#define USE(var) using super::var;
-	typedef Filter2<Tv,Tp,Ts> super;
-	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(co0) USE(cd1) USE(cd2) USE(mRad)
+	#define USE(var) using Base::var;
+	typedef Filter2<Tv,Tp,Ts> Base;
+	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(mB0) USE(cd1) USE(cd2) USE(mRad)
 	#undef USE
 
 	Tp mSin;
 	
 	// compute constant gain factor
-	void computeGain(){ co0 = ((Tp)1 - mRad*mRad) * mSin; }
+	void computeGain(){ mB0 = (Tp(1) - mRad*mRad) * mSin; }
 };
 
 
@@ -531,18 +531,18 @@ template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
 
-	MovingAvg(uint32_t size): super(size), mSum(0), mRSize(0){ onResize(); }
+	MovingAvg(uint32_t size): Base(size), mSum(0), mRSize(0){ onResize(); }
 	
 	MovingAvg& operator=(const Tv& v){ DelayN<Tv>::operator=(v); return *this; }
 	
 	Tv operator()(const Tv& i0){
-		return (mSum += i0 - super::operator()(i0)) * mRSize;
+		return (mSum += i0 - Base::operator()(i0)) * mRSize;
 	}
 	
-	virtual void onResize(){ mRSize = 1./super::size(); }
+	virtual void onResize(){ mRSize = 1./Base::size(); }
 
 protected:
-	typedef DelayN<Tv> super;
+	typedef DelayN<Tv> Base;
 	
 	Tv mSum;
 	double mRSize;
@@ -582,7 +582,7 @@ public:
 
 protected:
 	Tp mFreq;
-	//Tp ci0, co1;
+	//Tp mA0, mB1;
 	Tp mA0, mB1;
 	Tv mStored;
 	Tv o1;
@@ -666,9 +666,9 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
 T_VPS inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	mRes = v;
 	mAlpha = mImag / mRes;
-	co0 = 1.f / (1.f + mAlpha);	// reciprical of co0
-	co1 = -2.f * mReal * co0;
-	co2 = (1.f - mAlpha) * co0;
+	mB0 = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of mB0
+	mB1 = Tp(-2) * mReal * mB0;
+	mB2 = (Tp(1) - mAlpha) * mB0;
 	
 	type(mType);
 }
@@ -680,34 +680,34 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::type(int typeA){
 	
 	switch(mType){
 	case Filter::LP:
-		ci1 = ((Tp)1 - mReal) * co0;
-		ci0 = ci1 * 0.5;
-		ci2 = ci0;
+		mA1 = (Tp(1) - mReal) * mB0;
+		mA0 = mA1 * Tp(0.5);
+		mA2 = mA0;
 		break;
 	case Filter::HP:
-		ci1 = -((Tp)1 + mReal) * co0;
-		ci0 = -ci1 * 0.5;
-		ci2 = ci0;
+		mA1 = -(Tp(1) + mReal) * mB0;
+		mA0 = -mA1 * Tp(0.5);
+		mA2 = mA0;
 		break;
 	case Filter::BP:
-		ci0 = mImag * 0.5 * co0;
-		ci1 = (Tp)0;
-		ci2 = -ci0;
+		mA0 = mImag * Tp(0.5) * mB0;
+		mA1 = Tp(0);
+		mA2 = -mA0;
 		break;
 	case Filter::BPC:
-        ci0 = mAlpha * co0;
-        ci1 = (Tp)0;
-        ci2 = -ci0;
+        mA0 = mAlpha * mB0;
+        mA1 = Tp(0);
+        mA2 = -mA0;
 		break;
 	case Filter::BR:
-        ci0 = co0;	// 1.f * a0
-        ci1 = co1;
-        ci2 = co0;	// 1.f * a0
+        mA0 = mB0;	// 1.f * a0
+        mA1 = mB1;
+        mA2 = mB0;	// 1.f * a0
 		break;
 	case Filter::AP:
-		ci0 = co2;
-		ci1 = co1;
-		ci2 = co0;
+		mA0 = mB2;
+		mA1 = mB1;
+		mA2 = mB0;
 		break;
 	default:;
 	};
@@ -715,15 +715,15 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::type(int typeA){
 
 T_VPS inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
 	// Direct form II
-	i0 = i0 - d1*co1 - d2*co2;
-	Tv o0 = i0*ci0 + d1*ci1 + d2*ci2;
+	i0 = i0 - d1*mB1 - d2*mB2;
+	Tv o0 = i0*mA0 + d1*mA1 + d2*mA2;
 	d2 = d1; d1 = i0;
 	return o0;
 }
 
 T_VPS inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
-	i0 = i0 - d1*co1 - d2*co2;	
-	Tv o0 = (i0 - d2)*ci0;
+	i0 = i0 - d1*mB1 - d2*mB2;	
+	Tv o0 = (i0 - d2)*mA0;
 	d2 = d1; d1 = i0;
 	return o0;
 }
@@ -943,7 +943,7 @@ T_VPS void OnePole<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
 T_VPS inline void OnePole<Tv,Tp,Ts>::operator  = (const Tv& v){ mStored  = v; }
 T_VPS inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
 
-// f = ln(co1) / -M_2PI * SR  ( @ 44.1 f = ln(c01) * -7018.733)
+// f = ln(mB1) / -M_2PI * SR  ( @ 44.1 f = ln(c01) * -7018.733)
 // @ 44.1 : 0.9     <=> 739.5
 // @ 44.1 : 0.99    <=>  70.54
 // @ 44.1 : 0.999   <=>   7.022
@@ -955,7 +955,7 @@ T_VPS inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
 	
 	// freq is half the bandwidth of a pole at 0
 	smooth( scl::poleRadius(Tp(2) * v, Ts::ups()) );
-	//printf("%f, %f, %f\n", spu(), co1, v);
+	//printf("%f, %f, %f\n", spu(), mB1, v);
 }
 
 T_VPS inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
