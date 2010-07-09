@@ -7,7 +7,7 @@
 
 #include "tutorial.h"
 
-Accum<> tmr(0.5);
+Accum<> tmr(1./2);
 NoiseWhite<> white;		// 1/f0 noise
 NoisePink<> pink;		// 1/f1 noise
 NoiseBrown<> brown;		// 1/f2 noise
@@ -26,7 +26,7 @@ void audioCB(AudioIOData& io){
 		switch(cnt.val){
 			case 0: s = white();	break;
 			case 1: s = pink();		break;
-			case 2: s = brown();	break;
+			case 2: s = brown()/2;	break;
 		}
 
 		io.out(0)[i] = io.out(1)[i] = s*0.2;

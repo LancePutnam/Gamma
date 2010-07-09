@@ -17,7 +17,7 @@ void audioCB(AudioIOData& io){
 		int nh = mod.triU() * 32;
 		impulse.harmonics(nh);
 	
-		float s = impulse();
+		float s = impulse.odd();
 
 		io.out(0)[i] = io.out(1)[i] = s*0.2;
 	}

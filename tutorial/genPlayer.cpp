@@ -10,6 +10,7 @@
 
 Accum<> tmr(1);
 Player<> player("sounds/water4.wav");
+//Player<float, ipl::Trunc, tap::Wrap> player("sounds/water4.wav", 0.1);
 
 void audioCB(AudioIOData& io){
 
