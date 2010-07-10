@@ -70,17 +70,14 @@ void DFT::resize(uint32_t newWindowSize, uint32_t newPadSize){ //printf("DFT::re
 
 	uint32_t oldDFTSize = sizeDFT();
 	uint32_t newDFTSize = newWindowSize + newPadSize;
+	uint32_t oldFrqSize = oldDFTSize+2;		// 2 extra for DC/Nyquist imaginary
+	uint32_t newFrqSize = newDFTSize+2;		// "
 
-	if(mem::resize(mBuf, oldDFTSize + 2, newDFTSize + 2)){
-	
+	if(mem::resize(mBuf, oldFrqSize, newFrqSize)){
 		mBufInv = mBuf;
-		
-		if(mAux) mem::resize(mAux, oldDFTSize + 2, newDFTSize + 2);
-
-		//uint32_t newNumBins = (newDFTSize>>1) + 1;
-
+		if(mAux) mem::resize(mAux, oldFrqSize, newFrqSize);
 		mFFT.resize(newDFTSize);
-		mem::deepZero(mBuf, newDFTSize + 2);
+		mem::deepZero(mBuf, newFrqSize);
 	}
 	
 	mem::resize(mPadOA, sizePad(), newPadSize);
@@ -100,22 +97,32 @@ void DFT::onResync(double r){
 }
 
 void DFT::binType(Bin::t type){ mSpctFormat = type; }
-DFT & DFT::precise(bool w){ mPrecise = w; return *this; }
+DFT& DFT::precise(bool w){ mPrecise=w; return *this; }
 
 void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n");
 
-	if(window != mBuf) mem::deepCopy(mBuf, window, sizeWin());
-	mem::deepZero(mBuf + sizeWin(), sizePad());	// zero pad
-	//... do zero-phase window (rotate buffer 180)
+	if(window != mBuf) mem::deepCopy(mBuf+1, window, sizeWin());
+	mem::deepZero(mBuf+1 + sizeWin(), sizePad());	// zero pad
+	// TODO: zero-phase window (rotate buffer 180)
 
-	mFFT.forward(mBuf, true);
+	mFFT.forward(mBuf+1, true);
 	
 	// re-arrange DC and Nyquist bins
-	mem::deepMove(mBuf+2, mBuf+1, sizeDFT()-1);
+	mBuf[0] = mBuf[1];
 	mBuf[1] = 0.f;
 	mBuf[numBins()*2-1] = 0.f;
-		
-	//uint32_t nbins = numBins();
+
+	// old code which did a mem move, rather offsetting input buffer pointer...
+//	if(window != mBuf) mem::deepCopy(mBuf, window, sizeWin());
+//	mem::deepZero(mBuf + sizeWin(), sizePad());	// zero pad
+//	//... do zero-phase window (rotate buffer 180)
+//
+//	mFFT.forward(mBuf, true);
+//	
+//	// re-arrange DC and Nyquist bins
+//	mem::deepMove(mBuf+2, mBuf+1, sizeDFT()-1);
+//	mBuf[1] = 0.f;
+//	mBuf[numBins()*2-1] = 0.f;
 	
 	switch(mSpctFormat){
 	case Bin::Polar:
@@ -131,8 +138,6 @@ void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n
 
 void DFT::inverse(float * output){
 	//printf("DFT::inverse(float *)\n");
-
-	//uint32_t nbins = numBins();
 	
 	switch(mSpctFormat){
 	case Bin::Polar:
@@ -146,8 +151,9 @@ void DFT::inverse(float * output){
 	}	
 
 	// arrange/scale bins for inverse xfm
+	// TODO: can we avoid this move by pointer offsetting?
 	mem::deepMove(mBuf+1, mBuf+2, sizeDFT()-1);
-	for(uint32_t i=1; i<sizeDFT()-1; ++i) mBuf[i] *= 0.5f;
+	slice(mBuf+1, sizeDFT()-2) *= 0.5f;
 
 	mFFT.inverse(mBuf);
 	
@@ -164,8 +170,7 @@ void DFT::inverse(float * output){
 			mem::deepCopy(mPadOA + sizePad() - sizeWin(), mBuf + sizePad(), sizeWin());
 		}
 	}
-	
-	//if(output) mem::copy(output, mBuf, sizeDFT());
+
 	if(output) mem::deepCopy(output, mBuf, sizeWin());
 }
 
@@ -220,10 +225,6 @@ void STFT::computeInvWinMul(){
 
 	// compute sum of overlapping elements of forward window
 	if(overlapping()){
-//		gen::Val<float> max;
-//		arr::add(max, mFwdWin, Loop(sizeWin(), sizeHop()));
-//		mInvWinMul = 1/max();
-		
 		float sum = 0.f;
 		for(uint32_t i=0; i<sizeWin(); i+=sizeHop()){
 			sum += mFwdWin[i] * (mWindowInverse ? scl::bartlett(2*i/(float)sizeWin() - 1.f): 1.f);
@@ -245,7 +246,7 @@ void STFT::winType(WinType::type type){
 	mFwdWinMul = 1.f / arr::mean(mFwdWin, sizeWin());	// compute mul factor for normalization
 	
 	// scale forward window?
-	//arr::mul(mFwdWin, gen::Val<>(mFwdWinMul), Loop(sizeWin()));
+	//slice(mFwdWin, sizeWin()) *= mFwdWinMul;
 	
 	computeInvWinMul();
 	mWinType = type;
@@ -296,10 +297,7 @@ void STFT::forward(float * input){ //printf("STFT::forward(float *)\n");
 		
 		// This will effectively subtract the expected phase difference from the computed.
 		// This extra step seems to give more precise frequency estimates.
-		//arr::add(mPhases, gen::Val<float>((M_2PI * sizeHop()) / sizeDFT()), numBins());
-		slice(mPhases,numBins()) += gen::Val<float>((M_2PI * sizeHop()) / sizeDFT());
-		
-		//float * phs = bins1();
+		slice(mPhases, numBins()) += float(M_2PI * sizeHop()) / sizeDFT();
 		
 		// compute relative frequencies
 		//arr::phaseToFreq(phs, mPhases, numBins(), unitsHop());
@@ -311,8 +309,6 @@ void STFT::forward(float * input){ //printf("STFT::forward(float *)\n");
 		}
 		
 		// compute absolute frequencies by adding respective bin center frequency
-		//arr::add(phs, gen::RAdd<float>(binFreq()), numBins());
-		//arr::add(mBuf, gen::RAdd<float>(binFreq()), Indexer(numBins(), 2, 1));
 		slice(mBuf, numBins(), 2) += gen::RAdd<float>(binFreq());
 	}
 }
@@ -339,7 +335,7 @@ void STFT::inverse(float * dst){
 	
 		// scale inverse so overlap-add is normalized
 		//arr::mul(mBuf, gen::val(mInvWinMul), sizeWin());
-		slice(mBuf, sizeWin()) *= gen::val(mInvWinMul);
+		slice(mBuf, sizeWin()) *= mInvWinMul;
 	
 		// shift old output left while adding new output
 		arr::add(mBufInv, mBuf, mBufInv + sizeHop(), sizeWin() - sizeHop());
