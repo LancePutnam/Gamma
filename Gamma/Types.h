@@ -785,24 +785,6 @@ struct ShiftBuffer : public Multi<N,T>{
 
 
 
-// 3-tuple
-template <class T1, class T2, class T3>
-struct Tup3{
-	Tup3(T1 v1=0, T2 v2=0, T3 v3=0): v1(v1), v2(v2), v3(v3){}
-	
-	void set(T1 a1, T2 a2, T3 a3){ v1=a1; v2=a2; v3=a3; }
-	
-	T1 v1; T2 v2; T3 v3;
-};
-
-typedef Tup3<float, float, float> Tup3f;
-
-template <class T1, class T2, class T3> 
-inline Tup3<T1,T2,T3> tup(T1 v1, T2 v2, T3 v3){ return Tup3<T1,T2,T3>(v1,v2,v3); }
-
-
-
-
 ///< Fixed size vector.
 template <uint32_t N, class T>
 struct Vec : public Multi<N,T> {
