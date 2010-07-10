@@ -33,8 +33,8 @@ There are several other build options with the makefile. These are:
 
 Compiling source directly:
 
-Make sure to pass the -D__STDC_CONSTANT_MACROS option to the compiler to enable conversions of static types defined in stdint.h. For best performance, use optimization flags -finline-functions (or -O3), and -fpeel-loops.
+Make sure to pass in the following flags to the compiler:
 
-
-
-
+	-D__STDC_CONSTANT_MACROS
+	-finline-functions (or -O3)
+	-fpeel-loops

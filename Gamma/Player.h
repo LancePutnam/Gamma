@@ -53,7 +53,7 @@ public:
 	/// Generate next sample
 	T operator()(){
 		double p = mPos;
-		mPos = mTap(mPos + mInc, max(), min());
+		mPos = mTap(mPos, mInc, max(), min());
 		uint32_t i = (uint32_t)p;
 		return mIpol(*this, i, p-i, size()-1);
 	}
@@ -65,6 +65,7 @@ public:
 	void phase(double v);					///< Set current read position [0, 1)
 	void rate(double v);					///< Set playback rate scalar
 	void range(double phs, double period);	///< Set range start phase and period
+	void reset();							///< Reset playback head
 	
 	double max() const;						///< Get max range point
 	double min() const;						///< Get min range point
@@ -132,6 +133,11 @@ PRE inline void CLS::range(double posn, double period){
 	phase(posn);
 	min(pos());
 	max(pos() + period * spu());	
+}
+
+PRE inline void CLS::reset(){
+	pos(rate()<0 ? max() : min());
+	mTap.reset();
 }
 
 PRE inline double CLS::max() const { return mMax; }

@@ -9,8 +9,7 @@
 #include "tutorial.h"
 
 Accum<> tmr(1);
-Player<> player("sounds/water4.wav");
-//Player<float, ipl::Trunc, tap::Wrap> player("sounds/water4.wav", 0.1);
+Player<float, ipl::Cubic, tap::Fold> player("sounds/water4.wav");
 
 void audioCB(AudioIOData& io){
 
@@ -18,18 +17,9 @@ void audioCB(AudioIOData& io){
 	
 		if(tmr()){
 			float r = pow(2, rnd::uniS(1.));
-
-			// play forward
-			if(rnd::prob(0.7)){
-				player.rate(r);
-				player.phase(0);
-			}
-			
-			// play backward
-			else{
-				player.rate(-r);
-				player.phase(1);			
-			}
+			player.range(rnd::uni(0.5), rnd::uni(1.));
+			player.rate(rnd::neg(r, 0.3));
+			player.reset();	
 		}
 
 		float s = player() * 0.2;

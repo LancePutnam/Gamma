@@ -622,47 +622,46 @@ protected:
 
 // This uses a fast, simplified formula for generating a band-limited impulse,
 // but only operates at integer divisions of the Nyquist frequency.
-class ImpulseLP : public Synced {
+class ImpulseFast : public Synced {
 public:
 	/// Constructor.
-	ImpulseLP(): mPhase(0), mOffset(0){ freq(0); }
+	ImpulseFast(): mPhase(0), mOffset(0){ freq(0); }
 
 
 	/// Set frequency of oscillation.
-	void freq(float v){
-		float samples = spu() / v;
+	void freq(double v){
+		double samples = spu() / v;
 		
 		uint32_t period = (uint32_t)(samples);
 		//period &= 0xfffffffe;		// force period to be even
 									// odd periods introduce DC
 
-		mPeriod = (float)period;
-		mPeriod = floor(samples);
+		mPeriod = (double)period;
 		
-		if(scl::even(period))	mOffset = 0.f;
+		if(scl::even(period))	mOffset = 0.;
 		//else					mOffset = 0.5f / mPeriod;
 	}
 
 
 	/// Generate next sample
 	float operator()(){
-		float result = 0.f;
+		float v = 0.f;
 
 		if(mPhase >= mPeriod){
 			mPhase -= mPeriod;
-			result = 1.f;
+			v = 1.f;
 		}
 		else if(scl::even((uint32_t)mPhase)){
-			result = -1.f/(mPeriod * 0.5f - 1.f);
+			v = -1.f/(mPeriod * 0.5f - 1.f);
 		}
 		
-		mPhase++;
-		return result + mOffset;
+		++mPhase;
+		return v + mOffset;
 	}
 	
 protected:
-	float mPhase;		// phase in samples
-	float mPeriod;		// period in samples;
+	double mPhase;		// phase in samples
+	double mPeriod;		// period in samples;
 	float mOffset;		// DC compensation
 };
 

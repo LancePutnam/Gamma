@@ -224,10 +224,11 @@ uint32_t floorPow2(uint32_t value);
 /// For out-of-range values, the boundaries act like mirrors reflecting
 /// the value into the range. For an even number of periods out of the range
 /// this is identical to a wrap().
-TEM T fold(T value, T hi=(T)1, T lo=(T)0);
+TEM T fold(T value, T hi=T(1), T lo=T(0));
+TEM T fold(T v, long& numFolds, T hi=T(1), T lo=T(0));
 
 /// Returns value folded into [lo, hi] one time.
-TEM T foldOnce(T value, T hi=(T)1, T lo=(T)0);
+TEM T foldOnce(T value, T hi=T(1), T lo=T(0));
 
 /// Returns frequency in Hz from a 12-TET note string.
 
@@ -808,9 +809,15 @@ inline uint32_t floorPow2(uint32_t v){
 }
 
 TEM inline T fold(T v, T hi, T lo){
+	long t;
+	return fold(v,t,hi,lo);
+}
+
+TEM inline T fold(T v, long& numFolds, T hi, T lo){
 	long numWraps;
 	v = wrap(v, numWraps, hi, lo);
 	if(numWraps & 1) v = hi + lo - v;
+	numFolds = numWraps;
 	return v;
 }
 
@@ -1182,17 +1189,17 @@ TEM inline T wrap(T v, long& numWraps, T hi, T lo){
 		v -= diff;
 		if(v >= hi){
 			numWraps = (long)((v - lo)/diff);
-			v -= diff * (T)numWraps;
+			v -= diff * T(numWraps);
 		}
-		numWraps++;
+		++numWraps;
 	}
 	else if(v < lo){
 		v += diff;
 		if(v < lo){
 			numWraps = (long)((v - lo)/diff) - 1;
-			v -= diff * (T)numWraps;
+			v -= diff * T(numWraps);
 		}
-		numWraps--;
+		--numWraps;
 	}
 	return v;
 }
