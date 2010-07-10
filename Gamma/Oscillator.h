@@ -201,13 +201,13 @@ public:
 	Quadra(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 	//virtual ~Quadra(){}
 
-	complex val;			///< Current complex output.
+	complex val;			///< Current complex output
 	
-	void amp(Tv val);		///< Set amplitude of sinusoids.
+	void amp(Tv val);		///< Set amplitude
 	void decay(Tv val);		///< Set number of units to decay -60 dB. Negative = no decay.
-	void freq(Tv val);		///< Set frequency of sinusoids.
-	void phase(Tv radians);	///< Set phase of sinusoids.
-	void reset();			///< Resets amplitude and sets phase to 0.
+	void freq(Tv val);		///< Set frequency
+	void phase(Tv radians);	///< Set phase
+	void reset();			///< Resets amplitude and sets phase to 0
 	void set(Tv frq, Tv phs, Tv amp, Tv dcy);
 
 	complex operator()();	///< Iterate and return current complex output.

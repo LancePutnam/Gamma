@@ -259,6 +259,8 @@ struct FreqShift{
 	T operator()(T in){
 		return (hil(in) * mod()).r;
 	}
+	
+	void freq(T v){ mod.freq(v); }
 
 	Quadra<T> mod;
 	Hilbert<T> hil;

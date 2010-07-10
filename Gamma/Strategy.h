@@ -234,7 +234,6 @@ namespace tap{
 			uint32_t prev = pos;
 			pos += inc;
 			if(~pos & prev & 0x80000000) pos = 0xffffffff;
-
 			// pos3:	1101	inc = 0001
 			// pos2:	1110
 			// pos1:	1111
@@ -254,7 +253,7 @@ namespace tap{
 		void operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += dir ? -inc : inc;
-			if(~pos & prev & 0x80000000) dir ^= 1;
+			if(~pos & prev & 0x80000000) dir^=1;
 		}
 
 		bool done(uint32_t pos){ return false; }
