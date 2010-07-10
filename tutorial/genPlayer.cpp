@@ -9,7 +9,7 @@
 #include "tutorial.h"
 
 Accum<> tmr(1);
-Player<float, ipl::Cubic, tap::Fold> player("sounds/water4.wav");
+Player<float, ipl::Cubic, tap::Rep<3> > player("sounds/water3.wav");
 
 void audioCB(AudioIOData& io){
 
