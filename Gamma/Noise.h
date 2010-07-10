@@ -10,12 +10,15 @@
 namespace gam{
 
 
-/// 1/f^2 noise
+/// Brownian noise
+
+/// Brownian noise has a power spectrum of 1/f^2.
+/// It is produced by integrating white (uniform) noise.
 template <class T=RNGLinCon>
 class NoiseBrown{
 public:
 
-	NoiseBrown(float val=0, float step=0.1, float min=-1, float max=1, uint32_t seed=0) 
+	NoiseBrown(float val=0, float step=0.04, float min=-1, float max=1, uint32_t seed=0) 
 	:	val(val), step(step), min(min), max(max)
 	{	if(seed) rng = seed; }
 	
@@ -32,11 +35,10 @@ public:
 };
 
 
+/// Pink Noise
 
-/// 1/f noise
-
-/// Summation of 12 octaves of white noise.
-///
+/// Pink noise has a power spectrum of 1/f.
+/// It is produced by summing together 12 octaves of white noise.
 template <class T=RNGLinCon>
 class NoisePink{
 public:
@@ -59,8 +61,10 @@ private:
 };
 
 
+/// White noise
 
-/// Uniform noise
+/// White noise has a uniform power spectrum.
+///
 template <class T=RNGLinCon>
 class NoiseWhite{
 public:
@@ -73,31 +77,6 @@ public:
 	mutable T rng;
 };
 
-
-//typedef uint32_t randomGen();
-//typedef float randomFunc(randomGen &);
-
-//template <class T = RNGLinCon>
-//class RndUni{ public:
-//	float operator()(T & rng){ return rnd::uni_float(rng); }
-//	T rng;
-//};
-//
-////
-////template <randomFunc F, class T = RNGLinCon>
-//template <class T = RNGLinCon>
-//class Noise{
-//public:
-//	Noise(uint32_t seed = rnd::gen()) : rng(seed){}
-//	//float operator()(){ return F(rng); }	///< Get next sample
-//	
-//	template <class Tf>
-//	float operator()(Tf & fnc){ return fnc(rng); }
-//	
-//	void seed(uint32_t v){ rng = v; }			///< Set seed value of PRNG
-//	
-//	T rng;
-//};
 
 
 
