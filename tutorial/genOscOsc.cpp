@@ -19,12 +19,12 @@ void audioCB(AudioIOData& io){
 	
 		if(tmr()){
 			osc1.zero();			// zero wavetable
-			osc1 << tup(1, 1, 0);	// add the fundamental
+			osc1.addSine(1,1);		// add the fundamental
 		
 			// add some 1/f overtones
 			int skip = rnd::uni(5, 1);
 			for(int i=1+skip; i<=rnd::uni(65, 16); i+=skip){
-				if(rnd::prob()) osc1 << tup(i, 1./i, 0);
+				if(rnd::prob()) osc1.addSine(i, 1./i, 0);
 			}
 		}
 
