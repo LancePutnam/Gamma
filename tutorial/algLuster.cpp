@@ -8,7 +8,7 @@
 #include "tutorial.h"
 
 int rng = 1;
-const int dftSize = 2048;
+const int dftSize = 2048*2;
 STFT stft(dftSize, dftSize/4, 0, WinType::Hann, Bin::Rect, 1);
 Accum<> tmr(1./10);
 LFO<> osc1(40), osc2(40.003);
@@ -50,6 +50,7 @@ void audioCB(AudioIOData& io){
 		}
 			
 		s = stft()*0.5;
+		//float s0=s, s1=s;
 		float s0 = chrA3(chrA2(chrA1(s)));
 		float s1 = chrB3(chrB2(chrB1(s)));
 
