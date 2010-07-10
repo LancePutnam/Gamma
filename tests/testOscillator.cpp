@@ -18,12 +18,12 @@ int main(int argc, char* argv[]){
 	
 	const int n = 16;
 	Sync::master().spu(n);
-	
+
 	Accum<> accum(1);
 	AccumPhase<> accumPhase(1);
 	Impulse<> impulse(1.);
 	LFO<> lfo(1, 0, 0.25);
-	Osc<> osc(1); osc << tup(1,1,0);
+	Osc<> osc(1); osc.addSine(1,1,0);
 	Quadra<> quadra(1);
 	Saw<> saw(1);
 	Sine<> sine(1);

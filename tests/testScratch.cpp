@@ -98,15 +98,6 @@ int main(int argc, char** argv){
 	
 	#undef DO
 /*
-	Waveshaper<16> waveshaper;
-	waveshaper << tup(1,1,0) << tup(2,0.5,0) << tup(3,0.33,0);
-
-	for(int i=0; i<waveshaper.size(); ++i){
-		float v = waveshaper.table[i];
-		printf("\n[%3d] % f ", i, v); scl::printPlot(v);
-	} printf("\n");
-
-
 	{	using namespace scratch;
 	
 		printf("\nDFT:\n");

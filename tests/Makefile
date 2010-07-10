@@ -24,7 +24,6 @@ SRC = 	testAnalysis.cpp \
 	testAudioCombs.cpp \
 	testAudioIO.cpp \
 	testAudioLFO.cpp \
-	testAudioMTOsc.cpp \
 	testAudioNoise.cpp \
 	testAudioPVoc.cpp \
 	testAudioSampler.cpp \

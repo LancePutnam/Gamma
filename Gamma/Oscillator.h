@@ -4,7 +4,6 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "Gamma/arr.h"
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"
 #include "Gamma/tbl.h"
@@ -70,11 +69,14 @@ protected:
 /// Linear sweep in interval [0,1)
 template <class Ts=Synced>
 class Sweep : public Accum<Ts> {
-	typedef Accum<Ts> Base;
 public:
+	/// @param[in] frq		Initial frequency
+	/// @param[in] phs		Initial unit phase in [0,1)
 	Sweep(float frq=440, float phs=0): Base(frq, phs){}
 
 	float operator()(){ Base::cycle(); return Base::phase(); }
+
+private: typedef Accum<Ts> Base;
 };
 
 
@@ -82,8 +84,8 @@ public:
 template <class Tv=gam::real, class Ts=Synced>
 class AccumPhase : public Ts{
 public:
-	/// @param[in]	frq		Initial frequency.
-	/// @param[in]	phs		Initial phase [0, 1).
+	/// @param[in]	frq		Initial frequency
+	/// @param[in]	phs		Initial unit phase in [0, 1)
 	AccumPhase(Tv frq=440, Tv phs=0);
 	virtual ~AccumPhase(){}
 	
@@ -118,13 +120,10 @@ template <class Tv=gam::real, class Sipol=ipl::Linear, class Stap=tap::Wrap, cla
 class Osc : public Accum<Ts>, public ArrayPow2<Tv>{
 public:
 
-	ACCUM_INHERIT
-	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
-
 	/// Constructor that alocates an internal table
 
 	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phs			Initial phase in [0, 1)
+	/// @param[in]	phs			Initial unit phase in [0, 1)
 	/// @param[in]	size		Number of table elements (actual number is power of 2 ceiling)
 	Osc(float frq, float phs=0, uint32_t size=512)
 	:	Accum<Ts>(frq, phs), ArrayPow2<Tv>(size)
@@ -133,7 +132,7 @@ public:
 	/// Constructor that references an external table
 
 	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phs			Initial phase in [0, 1)
+	/// @param[in]	phs			Initial unit phase in [0, 1)
 	/// @param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, const ArrayPow2<Tv> & src)
 	:	Accum<Ts>(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
@@ -154,16 +153,26 @@ public:
 	
 	Stap& tap(){ return mTap; }
 	
-	// Add [harmonic, amp, phs] triple to transfer function
-	template <class T1, class T2, class T3>
-	Osc& operator<<(const Tup3<T1, T2, T3> & t){
-		slice(elems(), size()) += gen::Sin<Tv>(t.v1 * M_2PI / (Tv)size(), t.v3 * M_2PI, t.v2);
+	/// Add sine to table
+	
+	/// @param[in] cycles	number of cycles
+	/// @param[in] amp		amplitude
+	/// @param[in] phs		unit phase, [0, 1)
+	Osc& addSine(double cycles, double amp=1, double phs=0){
+		double f = cycles/size();
+		for(unsigned i=0; i<size(); ++i){
+			double p = (f*i + phs)*M_2PI;
+			(*this)[i] += sin(p) * amp;
+		}
 		return *this;
 	}
 
 protected:
 	Sipol mIpol;
 	Stap mTap;
+private:
+	ACCUM_INHERIT
+	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 };
 
 
@@ -185,10 +194,10 @@ public:
 
 	typedef Complex<Tv> complex;
 
-	/// @param[in] frq		Initial frequency.
-	/// @param[in] amp		Initial amplitude.
+	/// @param[in] frq		Initial frequency
+	/// @param[in] amp		Initial amplitude
 	/// @param[in] dcy		Initial decay time. Negative means no decay.
-	/// @param[in] phs		Initial phase in [0, 1).
+	/// @param[in] phs		Initial unit phase in [0, 1)
 	Quadra(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 	//virtual ~Quadra(){}
 
@@ -223,8 +232,8 @@ protected:
 template<class Tv=gam::real, class Ts=Synced>
 class Sine : public AccumPhase<Tv, Ts> {
 public:
-	/// @param[in]	frq		Initial frequency.
-	/// @param[in]	phs		Initial phase in [0, 1).
+	/// @param[in]	frq		Initial frequency
+	/// @param[in]	phs		Initial unit phase in [0, 1)
 	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv, Ts>(frq, phs){}
 
 	/// Return next sample.
@@ -244,12 +253,14 @@ public:
 template <class Tv=double, class Ts=Synced>
 class SineR : public gen::RSin<Tv>, Ts{
 public:
-	typedef gen::RSin<Tv> super;
 
+	/// @param[in]	frq		Initial frequency
+	/// @param[in]	amp		Initial amplitude
+	/// @param[in]	phs		Initial unit phase in [0, 1)
 	SineR(Tv frq=440, Tv amp=1, Tv phs=0){ Ts::initSynced(); set(frq, amp, phs); }
 
 	/// Returns frequency
-	Tv freq() const { return super::freq() * Ts::spu(); }
+	Tv freq() const { return Base::freq() * Ts::spu(); }
 
 	/// Set amplitude and phase
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, p); }
@@ -263,8 +274,10 @@ public:
 
 	// This might not be a good idea because we don't know amplitude...
 	virtual void onResync(double ratio){ set(gen::RSin<Tv>::freq()/ratio, mAmp, 0); }
+
 protected:
 	Tv mAmp;
+private: typedef gen::RSin<Tv> Base;
 };
 
 
@@ -278,10 +291,8 @@ template <class Tv=double, class Ts=Synced>
 class SineRs : public Array<SineR<Tv, Synced1> >, Ts{
 public:
 
-	typedef Array<SineR<Tv, Synced1> > super;
-
 	/// @param[in]	num		Number of resonators
-	SineRs(uint32_t num): super(num){ Ts::initSynced(); }
+	SineRs(uint32_t num): Base(num){ Ts::initSynced(); }
 
 	/// Generate next sum of all oscillators
 	Tv operator()(){ Tv r=(Tv)0; for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j](); return r; }
@@ -299,6 +310,8 @@ public:
 
 	/// Set all control parameters
 	void set(uint32_t i, Tv frq, Tv amp, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, phs); }
+
+private: typedef Array<SineR<Tv, Synced1> > Base;
 };
 
 
@@ -310,28 +323,29 @@ public:
 template <class Tv=double, class Ts=Synced>
 class SineD : public gen::RSin2<Tv>, Ts{
 public:
-	typedef gen::RSin2<Tv> super;
 
-	/// @param[in]	frq		Initial frequency.
-	/// @param[in]	amp		Initial amplitude.
-	/// @param[in]	dcy		Initial T60 decay length.
-	/// @param[in]	phs		Initial unit phase [0, 1).
+	/// @param[in]	frq		Initial frequency
+	/// @param[in]	amp		Initial amplitude
+	/// @param[in]	dcy		Initial T60 decay length
+	/// @param[in]	phs		Initial unit phase in [0, 1)
 	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ Ts::initSynced(); set(frq, amp, dcy, phs); }
 
 	/// Returns frequency
-	Tv freq() const { return super::freq() * Ts::spu(); }
+	Tv freq() const { return Base::freq() * Ts::spu(); }
 
 	/// Set amplitude and phase
-	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, super::decay(), p); }
+	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, Base::decay(), p); }
 	
 	/// Set all control parameters
 	void set(Tv frq, Tv amp, Tv dcy, Tv phs=0){
-		super::set(frq*Ts::ups(), phs, dcy > (Tv)0 ? (Tv)scl::radius60(dcy, Ts::ups()) : (Tv)1, amp);
+		Base::set(frq*Ts::ups(), phs, dcy > (Tv)0 ? (Tv)scl::radius60(dcy, Ts::ups()) : (Tv)1, amp);
 	}
 	
 	/// Generate next samples adding into a buffer
 	template <class V>
 	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
+
+private: typedef gen::RSin2<Tv> Base;
 };
 
 
@@ -345,10 +359,8 @@ template <class Tv=double, class Ts=Synced>
 class SineDs : public Array<SineD<Tv, Synced1> >, Ts{
 public:
 
-	typedef Array<SineD<Tv, Synced1> > super;
-
 	/// @param[in]	num		Number of resonators
-	SineDs(uint32_t num): super(num){
+	SineDs(uint32_t num): Base(num){
 		Ts::initSynced(); 
 		for(uint32_t i=0; i<num; ++i) set(i, 0,0,0);
 	}
@@ -369,38 +381,8 @@ public:
 
 	/// Set all control parameters
 	void set(uint32_t i, Tv frq, Tv amp, Tv dcy, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, dcy*Ts::spu(), phs); }
-};
 
-
-
-
-
-/// Oscillator that reads values from a power-of-two table. Deprecated: use Osc.
-template<class Tv=gam::real, class Ts=Synced>
-class TableOsc : public Accum<Ts>{
-public:
-	ACCUM_INHERIT
-
-	/// @param[in]	table		Reference to array the oscillator will read from
-	/// @param[in]	log2Size	Number of table elements. The number of elements is 2^log2Size.
-	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phase		Initial phase in [0, 1)
-	TableOsc(Tv * table, uint32_t size, float frq=440, float phase=0);
-	virtual ~TableOsc(){}
-	
-	void table(Tv * src, uint32_t size);	///< Set my table reference.
-	
-	Tv nextN();				///< Return next non-interpolated sample.
-	Tv nextL();				///< Return next linearly-interpolated sample.
-	Tv onceL();
-	
-	//virtual void onResync(double r);
-	
-protected:
-	Tv * mTable;			// Reference to my sample table. Must be 1<<bits.
-	uint32_t mTblBits;
-	uint32_t mFracBits;	// # of bits in fractional part of phasor
-	uint32_t mOneIndex;
+private: typedef Array<SineD<Tv, Synced1> > Base;
 };
 
 
@@ -416,12 +398,10 @@ protected:
 template <class Ts=Synced>
 class TableSine : public Accum<Ts> {
 public:
-	ACCUM_INHERIT
 
 	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phase	Initial phase in [0, 1)
+	/// @param[in]	phase	Initial unit phase in [0, 1)
 	TableSine(float frq=440, float phase=0);
-	//virtual ~TableSine(){}
 
 	float operator()();
 	float nextN();				///< Return next non-interpolated sample
@@ -433,59 +413,19 @@ protected:
 	static uint32_t mTblBits;
 	static uint32_t mFracBits;	// # of bits in fractional part of phasor
 	static uint32_t mOneIndex;
+private: ACCUM_INHERIT
 };
 
 
 
-/// Multiple table oscillator for making band-limited waveforms.
 
-/// Each table is mapped to an octave in the frequency spectrum.  The highest
-/// table maps to unit frequencies [1/4, 1/2) and the lowest to [0, 1/m) 
-/// where m = 2 ^ (numTables + 1).
-template<class Tv=gam::real, class Ts=Synced>
-class MultiTableOsc : public TableOsc<Tv, Ts> {
-public:
+/// Low-frequency oscillator (non band-limited).
 
-	/// @param[in]	table		Reference to matrix the oscillator will read from
-	/// @param[in]	log2Size	Log base-2 of the number of elements in each waveform table
-	/// @param[in]	numTables	Number of waveform tables
-	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phase		Initial phase in [0, 1)
-	MultiTableOsc(Tv * table, uint32_t log2Size, uint32_t numTables, float frq=220, float phase=0);
-	virtual ~MultiTableOsc(){}
-	
-	void freq(float value);		///< Set frequency of oscillation.
-	void freqLL(float value);	///< Set frequency of oscillation when using nextLL().
-
-	/// Return next linearly-interpolated sample from linearly-interpolated table.
-	
-	/// Use freqLL() to update frequency.
-	///
-	Tv nextLL();				
-	
-	void table(Tv * src, uint32_t log2Size, uint32_t numTables);	///< Set my table reference.
-	
-	float freq(){ return this->mFreq; }
-	
-	virtual void onResync(double r);
-	
-protected:
-	uint32_t mNumTables;
-	Tv * mMultiTable;
-	Tv * mTableLo;
-	float mFracTbl;
-};
-
-
-
-/// Linear function oscillator (non band-limited).
-
-/// This object generates various waveform types by modifying
-/// the output of a single upward ramping accumulator.
+/// This object generates various waveform types by mapping the output of a 
+/// an accumulator through mathematical functions.
 template <class Ts=Synced>
 class LFO : public Accum<Ts>{
 public:
-	ACCUM_INHERIT
 
 	LFO();
 	
@@ -530,80 +470,86 @@ public:
 
 	bool seq();			// Returns 'mod' as sequence of triggers
 
+private: ACCUM_INHERIT
 };
 
 
 
-/// Variable harmonic impulse using the Dirichlet kernel.
+/// Variable harmonic impulse wave
 template<class Tv=gam::real, class Ts=Synced>
-class Impulse : public AccumPhase<Tv, Ts> {
+class Buzz : public AccumPhase<Tv,Ts> {
 public:
-	typedef AccumPhase<Tv, Ts> Base;
 
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phase		Initial phase in [0, 1)
+	/// @param[in]	frq			Initial frequency
+	/// @param[in]	phase		Initial unit phase in [0, 1)
 	/// @param[in]	harmonics	Initial number of harmonics
-	Impulse(Tv frq=440, Tv phase=0, Tv harmonics=8);
-	virtual ~Impulse(){}
+	Buzz(Tv frq=440, Tv phase=0, Tv harmonics=8);
+	virtual ~Buzz(){}
 
 	void antialias();			///< Adjust number of harmonics to prevent aliasing
 	void harmonics(Tv num);		///< Set number of harmonics
 	void harmonicsMax();		///< Set number of harmonics to fill Nyquist range
 
-	Tv operator()();				///< Returns next sample of even harmonic impulse
+	Tv operator()();			///< Returns next sample of all harmonic impulse
 	Tv odd();					///< Returns next sample of odd harmonic impulse
-	Tv saw(Tv intg = 0.993);		///< Returns next sample of saw waveform
-	Tv square(Tv intg = 0.993);	///< Returns next sample of square waveform
+	Tv saw(Tv intg=0.993);		///< Returns next sample of saw waveform
+	Tv square(Tv intg=0.993);	///< Returns next sample of square waveform
 	
 	Tv maxHarmonics();			///< Returns number of harmonics below Nyquist based on current settings
 
 	virtual void onResync(double r);
 
 protected:
-	Tv mAmp;		//
-	Tv mN;			// # harmonics
-	Tv mNDesired;	// desired number of harmonics
+	Tv mAmp;			// amplitude normalization factor
+	Tv mN;				// # harmonics
+	Tv mNDesired;		// desired number of harmonics
 	Tv mNFrac;		
 	Tv mSPU_2;			// cached locals
 	Tv mPrev;			// previous output for integration
 	void recache();
 	void setAmp();
+private: typedef AccumPhase<Tv,Ts> Base;
 };
 
 
 
-// Super-class for band-limited oscillators
-template <class Tv, class Ts=Synced>
-struct OscBL : public Impulse<Tv, Ts>{
-
-	typedef Impulse<Tv, Ts> super; using super::freq;
-
-	OscBL(Tv frq=440, Tv phase=0): Impulse<Tv, Ts>(frq, phase){ onResync(1); }
-
-	void freq(Tv v){ super::freq(v); super::harmonicsMax(); }
-
-	virtual void onResync(double r){ super::recache(); freq(AccumPhase<Tv, Ts>::freq()); }
-};
-
+/// Band-limited impulse wave
 template <class Tv=gam::real, class Ts=Synced>
-struct Saw : public OscBL<Tv, Ts> {
-	Saw(Tv frq=440, Tv phase=0): OscBL<Tv, Ts>(frq, phase){}
-	Tv operator()(Tv intg = 0.993){ return Impulse<Tv, Ts>::saw(intg); }
+struct Impulse : public Buzz<Tv,Ts>{
+public:
+	Impulse(Tv frq=440, Tv phase=0): Base(frq, phase){ onResync(1); }
+
+	/// Set frequency
+	void freq(Tv v){ Base::freq(v); Base::harmonicsMax(); }
+
+	virtual void onResync(double r){ Base::recache(); freq(AccumPhase<Tv, Ts>::freq()); }
+
+private: typedef Buzz<Tv,Ts> Base; using Base::freq;
 };
 
+
+
+/// Band-limited saw wave
 template <class Tv=gam::real, class Ts=Synced>
-struct Square : public OscBL<Tv, Ts> {
-	Square(Tv frq=440, Tv phase=0) : OscBL<Tv, Ts>(frq, phase){}
-	Tv operator()(Tv intg = 0.993){ return Impulse<Tv, Ts>::square(intg); }
+struct Saw : public Impulse<Tv,Ts> {
+	Saw(Tv frq=440, Tv phase=0): Impulse<Tv, Ts>(frq, phase){}
+	Tv operator()(Tv intg=0.993){ return Impulse<Tv,Ts>::saw(intg); }
 };
 
 
 
-/// Variable harmonic saw wave.
+/// Band-limited square wave
+template <class Tv=gam::real, class Ts=Synced>
+struct Square : public Impulse<Tv,Ts> {
+	Square(Tv frq=440, Tv phase=0) : Impulse<Tv,Ts>(frq, phase){}
+	Tv operator()(Tv intg=0.993){ return Impulse<Tv,Ts>::square(intg); }
+};
 
-/// This generator integrates a band-limited impulse using a leaky integrater
-/// to suppress DC build-up.  The integration amount can be adjusted to go
-/// between a pure impulse to a saw.
+// Variable harmonic saw wave.
+
+// This generator integrates a band-limited impulse using a leaky integrater
+// to suppress DC build-up.  The integration amount can be adjusted to go
+// between a pure impulse to a saw.
 //class Saw : public Impulse{
 //public:
 //	/// @param[in]	frq		Initial frequency in Hz.
@@ -629,9 +575,9 @@ struct Square : public OscBL<Tv, Ts> {
 
 
 
-/// Discrete summation formula (DSF) oscillator.
+/// Discrete summation formula (DSF) oscillator
 template<class Tv=gam::real, class Ts=Synced>
-class DSF : public AccumPhase<Tv, Ts> {
+class DSF : public AccumPhase<Tv,Ts> {
 public:
 
 	/// @param[in]	frq		Initial frequency in Hz
@@ -641,7 +587,7 @@ public:
 	DSF(Tv frq=440, Tv freqRatio=1, Tv ampRatio=0.5, Tv harmonics=8);
 	virtual ~DSF(){}
 	
-	Tv operator()();				///< Returns next sample
+	Tv operator()();			///< Returns next sample
 	
 	void ampRatio(Tv val);		///< Set amplitude ratio of partials
 	void antialias();			///< Adjust harmonics so partials do not alias
@@ -658,6 +604,8 @@ public:
 	virtual void onResync(double r);
 
 protected:
+	typedef AccumPhase<Tv,Ts> Base;
+
 	Tv mN, mNDesired;		// actual and desired # harmonics
 	Tv mFreqRatio;			// Frequency ratio
 	Tv mA;					// Partial amplitude ratio
@@ -717,10 +665,6 @@ protected:
 	float mPeriod;		// period in samples;
 	float mOffset;		// DC compensation
 };
-
-
-
-
 
 
 
@@ -891,52 +835,6 @@ TEM void Quadra<Tv, Ts>::onResync(double r){
 
 
 
-//---- TableOsc
-
-TEM TableOsc<Tv, Ts>::TableOsc(Tv * tableA, uint32_t log2Size, float frq, float phase)
-	: Accum<Ts>(frq, phase)
-{
-	table(tableA, log2Size);
-}
-
-TEM void TableOsc<Tv, Ts>::table(Tv * src, uint32_t log2Size){
-	mTable = src;
-	mTblBits = log2Size;
-	mFracBits = 32U - log2Size;		// for full-wave lookup
-	mOneIndex = 1<<mFracBits;
-}
-
-TEM inline Tv TableOsc<Tv, Ts>::nextN(){
-	Tv output = mem::at(mTable, mFracBits, phaseI());
-	incPhase();
-	return output;
-}
-
-TEM inline Tv TableOsc<Tv, Ts>::nextL(){
-	Tv output = ipl::linear(
-		gam::fraction(mTblBits, phaseI()),
-		mem::at(mTable, mFracBits, phaseI()),
-		mem::at(mTable, mFracBits, phaseI() + mOneIndex)
-	);
-	incPhase();
-	return output;
-}
-
-TEM inline Tv TableOsc<Tv, Ts>::onceL(){
-	Tv output = ipl::linear(
-		gam::fraction(mTblBits, phaseI()),
-		mem::at(mTable, mFracBits, phaseI()),
-		mem::at(mTable, mFracBits, phaseI() + mOneIndex)
-	);
-	
-	if(this->cycle()) this->phaseMax();
-	
-	return output;
-}
-
-
-
-
 //---- TableSine
 
 TEMS uint32_t TableSine<Ts>::mTblBits  = 9UL;	// actual table memory is a quarter of this
@@ -974,83 +872,6 @@ TEMS inline float TableSine<Ts>::nextL(){
 
 
 
-//---- MultiTableOsc
-
-TEM MultiTableOsc<Tv, Ts>::MultiTableOsc(Tv * table, uint32_t log2Size, uint32_t numTables, float frq, float phase)
-	: TableOsc<Tv, Ts>(table, log2Size, frq, phase)
-{	
-	this->table(table, log2Size, numTables);	
-	mFracTbl = 0.f;
-	onResync(1);
-}
-
-TEM void MultiTableOsc<Tv, Ts>::table(Tv * src, uint32_t log2Size, uint32_t numTables){
-	TableOsc<Tv, Ts>::table(src, log2Size);
-	mMultiTable = src;
-	mTableLo = src;
-	mNumTables = numTables;
-}
-
-#define MTO MultiTableOsc<Tv, Ts>
-TEM void MultiTableOsc<Tv, Ts>::onResync(double r){
-	//MTO::mUPS = MTO::ups();
-	freqLL(MTO::mFreq);
-}
-
-TEM inline void MultiTableOsc<Tv, Ts>::freq(float value){
-	MTO::mFreq = value;
-	float ratio = value * MTO::mUPS;	// 0 to 1 of sample rate
-	if(ratio >= 0.5f || ratio <= -0.5f) ratio = 0.49999998f;
-	MTO::mPhaseInc = unitToUInt(ratio);
-	uint32_t tableNum = floatExponent(ratio) - 126 + mNumTables;
-	if(tableNum >= mNumTables) tableNum = 0;
-	MTO::mTable = mMultiTable + tableNum * (1<<MTO::mTblBits);
-}
-
-// kinda getting big to inline???
-TEM inline void MultiTableOsc<Tv, Ts>::freqLL(float value){
-	MTO::mFreq = value;
-	float ratio = value * MTO::ups();	// 0 to 1 of sample rate
-	if(ratio >= 0.5f || ratio <= -0.5f) ratio = 0.49999998f;
-	MTO::mPhaseInc = unitToUInt(ratio);
-	uint32_t tableNum = floatExponent(ratio) - 126 + mNumTables;
-	if(tableNum >= mNumTables){
-		MTO::mTable = mMultiTable;
-		mTableLo = MTO::mTable;
-		mFracTbl = 0.f;
-	}
-	else{
-		MTO::mTable = mMultiTable + tableNum * (1<<MTO::mTblBits);
-		
-		tableNum++;
-		if(tableNum >= mNumTables) tableNum = mNumTables - 1;
-		mTableLo = mMultiTable + tableNum * (1<<MTO::mTblBits);;
-		mFracTbl = floatMantissa(ratio);
-		mFracTbl *= mFracTbl;	// warp fraction for faster fade-in
-		mFracTbl *= mFracTbl;
-	}
-}
-
-TEM inline Tv MultiTableOsc<Tv, Ts>::nextLL(){
-	float fracSmp = fraction(MTO::mTblBits, MTO::mPhase);
-	Tv output = ipl::linear(
-		fracSmp,
-		mem::at(MTO::mTable, MTO::mFracBits, MTO::mPhase),
-		mem::at(MTO::mTable, MTO::mFracBits, MTO::mPhase + MTO::mOneIndex)
-	);
-	Tv outputLo = ipl::linear(
-		fracSmp,
-		mem::at(mTableLo, MTO::mFracBits, MTO::mPhase),
-		mem::at(mTableLo, MTO::mFracBits, MTO::mPhase + MTO::mOneIndex)
-	);
-	output = ipl::linear(mFracTbl, output, outputLo);
-	MTO::incPhase();
-	return output;
-}
-#undef MTO
-
-
-
 //---- LFO
 
 TEMS LFO<Ts>::LFO(): Accum<Ts>(){ mod(0.5); }
@@ -1083,8 +904,6 @@ TEMS inline float LFO<Ts>::line2(){
 TEMS inline float LFO<Ts>::line2U(){
 	return line2()*0.5f+0.5f;
 }
-
-
 
 DEF(down(),		scl::rampDown(phaseI()))
 DEF(even3(),	scl::rampUp(phaseI()); static float c=-1.50*sqrt(3.); r *= (1-r*r)*c;)
@@ -1132,35 +951,35 @@ TEMS inline bool LFO<Ts>::seq(){
 
 
 
-//---- Impulse
+//---- Buzz
 
-TEM Impulse<Tv,Ts>::Impulse(Tv frq, Tv phase, Tv harmonics)
-:	AccumPhase<Tv,Ts>(frq, phase), mAmp(0), mPrev((Tv)0)
+TEM Buzz<Tv,Ts>::Buzz(Tv frq, Tv phase, Tv harmonics)
+:	Base(frq, phase), mAmp(0), mPrev((Tv)0)
 {
 	onResync(1);
 	this->harmonics(harmonics);
 }
 
-TEM inline void Impulse<Tv,Ts>::harmonics(Tv value){
+TEM inline void Buzz<Tv,Ts>::harmonics(Tv value){
 	mN = mNDesired = scl::floor(value);
 	setAmp();
 	mNFrac = value - mN;
 }
 
-TEM inline void Impulse<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
+TEM inline void Buzz<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
 
-TEM inline void Impulse<Tv,Ts>::antialias(){
+TEM inline void Buzz<Tv,Ts>::antialias(){
 	float maxN = scl::floor(maxHarmonics());
 	mN = mNDesired > maxN ? maxN : mNDesired;
 	setAmp();
 }
 
-TEM inline Tv Impulse<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->mFreq; }
+TEM inline Tv Buzz<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->mFreq; }
 
-TEM inline void Impulse<Tv,Ts>::setAmp(){ mAmp = (mN != Tv(0)) ? (Tv(0.5) / mN) : 0; }
+TEM inline void Buzz<Tv,Ts>::setAmp(){ mAmp = (mN != Tv(0)) ? (Tv(0.5) / mN) : 0; }
 
 #define EPS 0.000001
-TEM inline Tv Impulse<Tv, Ts>::operator()(){
+TEM inline Tv Buzz<Tv, Ts>::operator()(){
 	Tv theta = this->nextPhase();
 
 	Tv result;
@@ -1183,7 +1002,7 @@ TEM inline Tv Impulse<Tv, Ts>::operator()(){
 	return result;
 }
 
-TEM inline Tv Impulse<Tv,Ts>::odd(){
+TEM inline Tv Buzz<Tv,Ts>::odd(){
 	Tv theta = this->nextPhase();
 	
 	Tv result;
@@ -1203,15 +1022,15 @@ TEM inline Tv Impulse<Tv,Ts>::odd(){
 }
 #undef EPS
 
-TEM inline Tv Impulse<Tv,Ts>::saw(Tv i){ return mPrev = (*this)() + i * mPrev; }
-TEM inline Tv Impulse<Tv,Ts>::square(Tv i){ return mPrev = odd() + i * mPrev; }
+TEM inline Tv Buzz<Tv,Ts>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
+TEM inline Tv Buzz<Tv,Ts>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
 
-TEM void Impulse<Tv,Ts>::onResync(double r){
+TEM void Buzz<Tv,Ts>::onResync(double r){
 	Base::recache();
 	Base::freq(Base::freq());
 }
 
-TEM void Impulse<Tv,Ts>::recache(){
+TEM void Buzz<Tv,Ts>::recache(){
 	Base::recache();
 	mSPU_2 = (Tv)(Synced::spu() * 0.5);
 }
@@ -1220,8 +1039,8 @@ TEM void Impulse<Tv,Ts>::recache(){
 
 //---- DSF
 
-TEM DSF<Tv, Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
-	: AccumPhase<Tv, Ts>(frq)
+TEM DSF<Tv,Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
+	: Base(frq)
 {
 	freq(frq);
 	freqRatio(freqRatioA);
@@ -1231,17 +1050,17 @@ TEM DSF<Tv, Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
 	mBeta = 0.f;
 }
 
-TEM inline void DSF<Tv, Ts>::freq(Tv value){
-	AccumPhase<Tv, Ts>::freq(value);
+TEM inline void DSF<Tv,Ts>::freq(Tv value){
+	Base::freq(value);
 	updateBetaInc();	
 }
 
-TEM inline void DSF<Tv, Ts>::freqRatio(Tv value){
+TEM inline void DSF<Tv,Ts>::freqRatio(Tv value){
 	mFreqRatio = value;
 	updateBetaInc();
 }
 
-TEM inline void DSF<Tv, Ts>::ampRatio(Tv value){
+TEM inline void DSF<Tv,Ts>::ampRatio(Tv value){
 	if(value != mA){
 		mA = value;
 		mASqP1 = mA * mA + 1.f;
@@ -1249,28 +1068,28 @@ TEM inline void DSF<Tv, Ts>::ampRatio(Tv value){
 	}
 }
 
-TEM inline void DSF<Tv, Ts>::harmonics(Tv value){
+TEM inline void DSF<Tv,Ts>::harmonics(Tv value){
 	if(value != mN){
 		mN = mNDesired = value;
 		updateAPow();
 	}
 }
 
-TEM inline void DSF<Tv, Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
+TEM inline void DSF<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
 
-TEM inline void DSF<Tv, Ts>::antialias(){
+TEM inline void DSF<Tv,Ts>::antialias(){
 	Tv maxN = maxHarmonics();
 	if(mNDesired > maxN)	mN = maxN;
 	else					mN = mNDesired;
 	updateAPow();
 }
 
-TEM inline Tv DSF<Tv, Ts>::ampRatio(){ return mA; }
-TEM inline Tv DSF<Tv, Ts>::freqRatio(){ return mFreqRatio; }
-TEM inline Tv DSF<Tv, Ts>::harmonics(){ return mN; }
+TEM inline Tv DSF<Tv,Ts>::ampRatio(){ return mA; }
+TEM inline Tv DSF<Tv,Ts>::freqRatio(){ return mFreqRatio; }
+TEM inline Tv DSF<Tv,Ts>::harmonics(){ return mN; }
 
-TEM inline Tv DSF<Tv, Ts>::maxHarmonics(){
-	return scl::floor(((Tv)this->spu() * (Tv)0.5 / this->mFreq - (Tv)1) / mFreqRatio + (Tv)1);
+TEM inline Tv DSF<Tv,Ts>::maxHarmonics(){
+	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->mFreq - Tv(1))/mFreqRatio + Tv(1));
 }
 
 // Generalized DSF formula:
@@ -1284,8 +1103,8 @@ TEM inline Tv DSF<Tv, Ts>::maxHarmonics(){
 #define COS scl::cosT8
 //#define SIN sin
 //#define COS cos
-TEM inline Tv DSF<Tv, Ts>::operator()(){
-	Tv theta = this->nextPhase();
+TEM inline Tv DSF<Tv,Ts>::operator()(){
+	Tv theta = Base::nextPhase();
 	mBeta = scl::wrapPhase(mBeta);
 
 	Tv phs2 = scl::wrapPhaseOnce(theta - mBeta);
@@ -1302,12 +1121,12 @@ TEM inline Tv DSF<Tv, Ts>::operator()(){
 #undef SIN
 #undef COS
 
-TEM inline void DSF<Tv, Ts>::updateAPow(){ mAPow = pow(mA, mN); }
-TEM inline void DSF<Tv, Ts>::updateBetaInc(){ mBetaInc = this->mPhaseInc * mFreqRatio; }
+TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = pow(mA, mN); }
+TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mPhaseInc * mFreqRatio; }
 
-TEM void DSF<Tv, Ts>::onResync(double r){
-	AccumPhase<Tv, Ts>::onResync(r);
-	freq(this->mFreq);
+TEM void DSF<Tv,Ts>::onResync(double r){
+	Base::onResync(r);
+	freq(Base::mFreq);
 	harmonics(mNDesired);
 }
 
@@ -1328,188 +1147,8 @@ protected:
 
 
 
-
-/*
-template <class T=float, class Ts=Synced>
-class Sine : public Ts{
-public:
-	Sine(T f, T p=0){ set(f,p); Ts::initSynced(); }
-
-	void freq (T v){ p1 = v*M_2PI; }
-	void phase(T v){ p0 = v*M_2PI; }
-	void set(T f, T p){ freq(f); phase(p); }
-
-	float operator()(){
-		p0 = scl::wrap<T>(p0, M_2PI);
-		T r = sin(p0);
-		p0 += p1;
-		return r;
-	}
-	
-	// change in sampling rate (ratio = new/old)
-	virtual void onResync(double ratio){ p1 /= ratio; }
-
-protected:
-	T p0, p1;	// 0 and 1 derivative of phase
-};
-
-
-
-template <class T=double, class Ts=Synced>
-class SineAM : public Ts{
-public:
-	SineAM(T f1, T f2, T p1=0, T p2=0): osc1(f1, p1), osc2(f2, p2){ Ts::initSynced(); }
-
-	T operator()(){ return osc1() * osc2(); }
-
-	void freq(T v1, T v2){
-		osc1.freq(v1*Ts::ups());
-		osc2.freq(v2*Ts::ups());
-	}
-
-	virtual void onResync(double ratio){
-		osc1.onResync(ratio);
-		osc2.onResync(ratio);
-	}
-
-protected:
-	Sine<T, Synced1> osc1, osc2;
-};
-
-
-
-// Free resonator
-template <class T=double, class Ts=Synced>
-class SineRes : public gen::RSin<T>, Ts{
-public:
-
-	SineRes(T frq=440, T amp=1, T phs=0){ Ts::initSynced(); set(frq, amp, phs); }
-
-	/// Set all control parameters
-	void set(T frq, T amp, T phs=0){ gen::RSin<T>::set(frq*Ts::ups(), phs, amp); }
-	
-	/// Generate next samples adding into a buffer
-	template <class V>
-	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
-
-	// This might not be a good idea because we don't know amplitude...
-	// It also doesn't even work right!
-	//virtual void onResync(double ratio){ set(gen::RSin<T>::freq()/ratio, 1, 0); }
-
-};
-
-
-// Multiple SineRes (has-a)
-// This object contains an array of SineRes's.
-// Good:	can synchronize SineRes easily
-// Bad:		must rewrite all SineRes parameter setting methods
-
-template <class T=double, class Ts=Synced>
-class SineResN : public Ts{
-public:
-
-	SineResN(uint32_t n){ mSineRes.resize(n); }
-
-	/// Set all control parameters of an oscillator
-	void set(uint32_t i, T frq, T amp, T phs=0){ mSineRes[i].set(frq*Ts::ups(), amp, phs); }
-
-protected:
-	Array<SineRes<T, Synced1> > mSineRes;
-};
-
-
-// Multiple SineRes (is-a)
-// This object is an array of SineRes's.
-//
-// Good:	do not have to rewrite parameter setting methods
-// Bad:		how do SineRes know about the sampling rate?
-//
-// Here we have to explicitly rescale frequency parameters, i.e.:
-//		sineResN[i].set(f*Sync::master().spu(), 1, 0);
-//
-// The frequency value is rescaled to the interval [0, 0.5].
-
-template <class T=double, class Ts=Synced>
-class SineResN : public Array<SineRes<T, Synced1> >, Ts{
-public:
-	typedef Array<SineRes<T, Synced1> > super;
-
-	SineResN(uint32_t n): super(n){}
-};
-
-
-
-// An older, more complicated version...
-template <class T=double>
-class SineRes : public Synced{
-public:
-
-	/// @param[in]	frq		Initial frequency.
-	/// @param[in]	amp		Initial amplitude.
-	/// @param[in]	phs		Initial unit phase [0, 1).
-	SineRes(T frq=440, T amp=1, T phs=0): mFreq(frq), mAmp(amp){ initSynced(); phase(phs); }
-	
-	/// Set unit phase
-	void phase(T v){		
-		v = v*M_2PI - mAngle;
-		
-		// compute previous two phases
-		rsin.val2 = sin(v - mAngle) * mAmp;
-		rsin.val  = sin(v         ) * mAmp;
-	}
-	
-	/// Set all control parameters
-	void set(T frq, T amp, T phs=0){
-		freq(frq);
-		mAmp = amp;
-		phase(phs);
-	}
-	
-	/// Generate next sample
-	T operator()(){	return rsin(); }
-	
-	/// Generate next samples adding into a buffer
-	template <class V>
-	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
-	
-	virtual void onResync(double r){ freq(mFreq); }
-
-protected:
-	T mFreq, mAngle, mAmp;
-	gen::RSin<T> mRSin;	// recursive sinusoid generator
-
-
-	/// Set frequency
-	void freq(T v){
-		mFreq = v;
-		mAngle = M_2PI * v * ups();
-		rsin.mul = (T)2 * cos(mAngle);	// [-2, 2]
-		
-		//recomputePrev();	// recompute previous values so amplitude doesn't change
-	}
-
-	// recompute o2 assuming o1 was the last output
-	void recomputePrev(){
-		if(mAmp == (T)0) return;
-		T& v1 = rsin.val;
-		T& v2 = rsin.val2;
-		
-		// crux of the problem is we need to get the current phase
-		float phs = asin(v1 / mAmp);	// normalize o1 and get its angle
-		
-		// NOT WORKING: this still has degenerate cases
-		if(v1 < v2) phs = M_PI - phs;	// flip angle if real < 0
-		v2 = sin(phs - mAngle) * mAmp;
-	}
-};
-
-*/
-
-
-
 #undef TEM
 #undef TEMS
 
 } // gam::
 #endif
-

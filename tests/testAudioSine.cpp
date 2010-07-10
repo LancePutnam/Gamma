@@ -4,16 +4,13 @@
 
 using namespace gam;
 
-const unsigned long l2Size = 8;
-float table[1<<l2Size];
-
-// The many ways to skin a cat...
-TableOsc<>   sineT1(table, l2Size, 440);	// table look-up (full-wave)
-TableSine<>  sineT2(440);					// table look-up (quarter-wave)
-Quadra<>     sineQd(440);					// complex mul
-LFO<>        sineC1(440, -0.25f);			// computed 3rd order poly
-Sine<>       sineC2(440);					// computed taylor
-AccumPhase<> sineC3(440);					// direct math.h sin() (ground truth)
+// Several ways to produce a sine oscillator
+Osc<>        sineT1(440);			// Table look-up (full-wave)
+TableSine<>  sineT2(440);			// Table look-up (quarter-wave)
+Quadra<>     sineQd(440);			// Complex mul
+LFO<>        sineC1(440, -0.25f);	// Computed 3rd order poly
+Sine<>       sineC2(440);			// Computed taylor
+AccumPhase<> sineC3(440);			// Direct math.h sin() (ground truth)
 
 //SineRes< Multi<2> > sineRes(Multi<2>(220, 222));
 
@@ -23,7 +20,7 @@ void audioCB(AudioIOData & io){
 	unsigned long numFrames = io.framesPerBuffer();
 
 	for(unsigned long f=0; f<numFrames; f++){
-		float s =	sineT1.nextL() +
+		float s =	sineT1() +
 					sineT2.nextL() +
 					sineQd().i +
 					sineC1.cos() +
@@ -41,7 +38,7 @@ int main(int argc, char* argv[]){
 	AudioIO io(256, 44100., audioCB, NULL, 2);
 	Sync::master().spu(io.framesPerSecond());
 
-	tbl::sine(table, 1<<l2Size);	// generate 1 sine cycle
+	sineT1.addSine(1);
 	
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

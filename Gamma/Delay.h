@@ -73,7 +73,7 @@ protected:
 };
 
 
-
+// TODO: what filter design does this use? Butterworth?
 
 /// 2-pole/2-zero IIR filter.
 
@@ -92,8 +92,6 @@ public:
 	/// @param[in]	frq		Initial type of filter.
 	Biquad(Tp frq = 1000.f, Tp res = 4.f, int filterType = Filter::LP);
 
-	Tp mA0, mA1, mA2, mB0, mB1, mB2;	// ffd and fbk coefficients
-
 	void freq(Tp v);			///< Set center frequency. 
 	void res(Tp v);			///< Set resonance.
 	void set(Tp frq, Tp res);	///< Set filter center frequency and resonance.
@@ -111,6 +109,7 @@ public:
 	virtual void onResync(double r);
 
 protected:
+	Tp mA0, mA1, mA2, mB0, mB1, mB2;	// ffd and fbk coefficients
 	Tv d1, d2;		// inner sample delays
 	Tp mFreq, mRes;	// center frequency, resonance
 	int mType;
@@ -526,7 +525,6 @@ protected:
 
 
 
-
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
@@ -652,9 +650,9 @@ T_VPS void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, int typeA){
 T_VPS void Biquad<Tv,Tp,Ts>::zero(){ d1=d2=(Tv)0; }
 
 T_VPS inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
-//	float omega = freqA * mFrqToRad;	// radial frequency [0, pi)
-//	mReal = cos(omega);
-//	mImag = sin(omega);
+//	float w = freqA * mFrqToRad;	// radial frequency [0, pi)
+//	mReal = cos(w);
+//	mImag = sin(w);
 
 	mFreq = v;
 	float phs = scl::clip(mFreq * mFrqToRad, 3.11f);
@@ -674,6 +672,18 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 }
 
 T_VPS inline void Biquad<Tv,Tp,Ts>::set(Tp frq, Tp res){ set(frq, res, mType); }
+
+/*
+void setAllpass(float fr, float R){
+  R= 1.f/R;
+  double cs = -2*cos((2*PI*fr)/sr); 
+  mA1 = cs*R;
+  mA2 = R*R;
+  mB1 = cs/R;
+  mB2 = 1/m_a2;
+  mA0 = 1;
+}
+*/
 
 T_VPS inline void Biquad<Tv,Tp,Ts>::type(int typeA){
 	mType = typeA;
