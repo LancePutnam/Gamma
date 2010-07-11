@@ -15,20 +15,19 @@ namespace gam{
 namespace ipl{
 
 /// Truncating random-access interpolation strategy
+template <class T>
 struct Trunc{
 
 	/// Return element from power-of-2 array
-	template <class T>
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return a.atPhase(phase);
 	}
 
-	template <class T, class AccessStrategy>
+	template <class AccessStrategy>
 	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return a[iInt];
 	}
 
-	template <class T>
 	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a,iInt,iFrac, max,min);
 	}
@@ -36,17 +35,17 @@ struct Trunc{
 
 
 /// Nearest neighbor random-access interpolation strategy
+template <class T>
 struct Round{
 
 	/// Return element from power-of-2 array
-	template <class T>
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 
 		// accessing normally truncates, so add half fraction to round
 		return a.atPhase(phase + (a.oneIndex()>>1));
 	}
 	
-	template <class T, class AccessStrategy>
+	template <class AccessStrategy>
 	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return ipl::nearest(
 			iFrac,
@@ -55,7 +54,6 @@ struct Round{
 		);
 	}
 
-	template <class T>
 	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
 	}
@@ -63,10 +61,10 @@ struct Round{
 
 
 /// Linear random-access interpolation strategy
+template <class T>
 struct Linear{
 
 	/// Return element from power-of-2 array
-	template <class T>
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return ipl::linear(
 			a.fraction(phase),
@@ -75,7 +73,7 @@ struct Linear{
 		);
 	}
 
-	template <class T, class AccessStrategy>
+	template <class AccessStrategy>
 	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
 		return ipl::linear(
 			iFrac,
@@ -84,7 +82,6 @@ struct Linear{
 		);
 	}
 
-	template <class T>
 	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 //		return ipl::linear(
 //			iFrac,
@@ -98,10 +95,10 @@ struct Linear{
 
 
 /// Cubic random-access interpolation strategy
+template <class T>
 struct Cubic{
 
 	/// Return element from power-of-2 array
-	template <class T>
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		uint32_t one = a.oneIndex();
 		return ipl::cubic(
@@ -113,7 +110,7 @@ struct Cubic{
 		);
 	}
 	
-	template <class T, class AccessStrategy>
+	template <class AccessStrategy>
 	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
 		return ipl::cubic(
 			iFrac,
@@ -123,8 +120,7 @@ struct Cubic{
 			a[s.map  (iInt+2, max, min)]
 		);
 	}
-	
-	template <class T>
+
 	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
 	}

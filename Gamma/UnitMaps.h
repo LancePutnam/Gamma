@@ -25,7 +25,7 @@ namespace MapType{
 
 
 /// Tabulated function with real number lookup.
-template <class T, class Sipl=ipl::Linear, class Sacc=acc::Wrap, class A=gam::Allocator<T> >
+template <class T, template<class> class Sipl=ipl::Linear, class Sacc=acc::Wrap, class A=gam::Allocator<T> >
 class FunctionTable : public Array<T,A>{
 	typedef Array<T,A> Base;
 public:
@@ -87,7 +87,7 @@ protected:
 	IndexMap<double> mIndMap;
 	Interval<index_t> mInterval;
 
-	Sipl mIpl;
+	Sipl<T> mIpl;
 	Sacc mAcc;
 };
 

@@ -116,7 +116,7 @@ protected:
 
 /// Tv is the table element type, Sipol is an interpolation strategy, and
 /// Stap is a table reading strategy.
-template <class Tv=gam::real, class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
+template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
 class Osc : public Accum<Ts>, public ArrayPow2<Tv>{
 public:
 
@@ -168,7 +168,7 @@ public:
 	}
 
 protected:
-	Sipol mIpol;
+	Sipol<Tv> mIpol;
 	Stap mTap;
 private:
 	ACCUM_INHERIT

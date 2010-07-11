@@ -171,7 +171,7 @@ protected:
 
 
 /// Variable length delay-line.
-template <class Tv=gam::real, class Si=ipl::Linear, class Ts=Synced>
+template <class Tv=gam::real, template<class> class Si=ipl::Linear, class Ts=Synced>
 class Delay : public ArrayPow2<Tv>, Ts{
 public:
 
@@ -212,7 +212,7 @@ public:
 	void print();
 
 protected:
-	Si mIpol;
+	Si<Tv> mIpol;
 
 	float mMaxDelay;				// maximum delay length
 	float mDelayFactor;				// multiplication factor when setting delay
@@ -240,7 +240,7 @@ struct Delay##l : public Delay<Tv,Ti,Ts>{\
 DELAY_DEF(R, ipl::Round)
 DELAY_DEF(T, ipl::Trunc)
 DELAY_DEF(C, ipl::Cubic)
-DELAY_DEF(A, ipl::AllPass<Tv>)
+DELAY_DEF(A, ipl::AllPass)
 
 #undef DELAY_DEF
 
@@ -248,8 +248,8 @@ DELAY_DEF(A, ipl::AllPass<Tv>)
 
 
 /// Variable delay-line with multiple read taps.
-template <class Tv=gam::real, class Si=ipl::Linear, class Ts=Synced>
-class Delays : public Delay<Tv, Si, Ts> {
+template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
+class Delays : public Delay<Tv,Si,Ts> {
 public:
 
 	/// @param[in]	delay		Initial delay length. The size of the delay line will be the smallest possible power of two.
@@ -281,8 +281,8 @@ protected:
 /// odd harmonics. If the feedback and feedforward amounts are inverses of each
 /// other, an Nth order all-pass filter results. Comb filters are stable as
 /// long as |feedback| < 1.
-template <class Tv=gam::real, class Si=ipl::Linear, class Tf=gam::real, class Ts=Synced>
-class Comb : public Delay<Tv, Si, Ts> {
+template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Tf=gam::real, class Ts=Synced>
+class Comb : public Delay<Tv,Si,Ts> {
 public:
 
 	using Delay<Tv, Si, Ts>::operator();
@@ -336,7 +336,7 @@ protected:
 // Interpolation specialized comb filters
 typedef Comb<gam::real, ipl::Trunc> CombT;
 typedef Comb<gam::real, ipl::Cubic> CombC;
-typedef Comb<gam::real, ipl::AllPass<gam::real> > CombA;
+typedef Comb<gam::real, ipl::AllPass> CombA;
 
 
 
@@ -741,7 +741,7 @@ T_VPS inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
 
 
 //---- Delay
-#define TM1 template <class Tv, class Ti, class Ts>
+#define TM1 template <class Tv, template <class> class Ti, class Ts>
 #define TM2 Tv,Ti,Ts
 
 #define DELAY_INIT mPhase(0)
@@ -891,7 +891,7 @@ TM1 inline uint32_t Delays<TM2>::taps() const { return mTaps; }
 
 
 //---- Comb
-#define TM1 template<class Tv, class Si, class Tf, class Ts>
+#define TM1 template<class Tv, template<class> class Si, class Tf, class Ts>
 #define TM2 Tv,Si,Tf,Ts
 TM1 Comb<TM2>::Comb(): Delay<Tv,Si,Ts>(), mFFD(0), mFBK(0){}
 

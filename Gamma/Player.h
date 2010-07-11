@@ -26,7 +26,7 @@ phasor		44.1					96						192
 64-bit		6.97e12 m / 1.16e11 h	3.2e12 m / 5.33e10 h	1.6e12 m / 2.67e10 h
 */
 
-template <class T=gam::real, class Tipol=ipl::Trunc, class Ttap=tap::Clip>
+template <class T=gam::real, template<class> class Tipol=ipl::Trunc, class Ttap=tap::Clip>
 class Player: public Synced, public Array<T>{
 public:
 	using Array<T>::size; using Array<T>::elems;
@@ -81,7 +81,7 @@ protected:
 	static T sDummyElement;
 	static Array<T> sDummyArray;
 
-	Tipol mIpol;
+	Tipol<T> mIpol;
 	Ttap mTap;
 
 	double mPos, mInc;
@@ -95,8 +95,8 @@ protected:
 
 };
 
-#define PRE template <class T, class Tipol, class Ttap>
-#define CLS Player<T, Tipol, Ttap>
+#define PRE template <class T, template<class> class Ti, class Tt>
+#define CLS Player<T,Ti,Tt>
 
 PRE T CLS::sDummyElement = (T)0;
 PRE Array<T> CLS::sDummyArray(&sDummyElement, 1);

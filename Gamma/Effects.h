@@ -161,7 +161,7 @@ struct Chorus{
 		m(); o1=comb1(i1); o2=comb2(i2);		
 	}
 
-	Comb<float, ipl::AllPass<float> > comb1, comb2;	///< Comb filters
+	Comb<float, ipl::AllPass> comb1, comb2;		///< Comb filters
 	//Comb<float, ipl::Linear> comb1, comb2;	///< Comb filters
 	Quadra<double> mod;	///< Modulator
 	float delay;		///< Delay interval
@@ -174,7 +174,7 @@ private:
 
 /// Group of 4 comb filters.
 
-template <class Tipol=ipl::Linear>
+template <template<class> class Tipol=ipl::Linear>
 struct Combs4{
 
 	/// @param[in] d1		Delay length of filter 1
@@ -230,8 +230,8 @@ struct Diffuser{
 	/// Set 60 dB decay length of parallel combs.
 	void decay(float value){ comb4P.decay(value); }
 
-	Combs4<ipl::AllPass<float> > comb4P;	///< Parallel feedback comb filters.
-	Combs4<ipl::Trunc> comb4S;				///< Series allpass comb filters.		
+	Combs4<ipl::AllPass> comb4P;	///< Parallel feedback comb filters
+	Combs4<ipl::Trunc> comb4S;		///< Series allpass comb filters	
 };
 
 
