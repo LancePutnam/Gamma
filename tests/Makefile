@@ -19,7 +19,6 @@ UTSRC = ut_arr.cpp \
 	utTypes.cpp
 
 SRC = 	testAnalysis.cpp \
-	testAudioBiquad.cpp \
 	testAudioChannels.cpp \
 	testAudioCombs.cpp \
 	testAudioIO.cpp \
