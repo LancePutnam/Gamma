@@ -1,10 +1,12 @@
-#include <stdio.h>
-#include "Gamma/AudioIO.h"
-#include "Gamma/Delay.h"
-#include "Gamma/DFT.h"
-#include "Gamma/Noise.h"
-#include "Gamma/Oscillator.h"
-#include "Gamma/Gamma.h"
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+	
+	Tutorial:		Transform / STFT
+	Description:	Using frequency domain oscillators to filter a time domain
+					signal.
+*/
+
+#include "tutorial.h"
 
 using namespace gam;
 
@@ -40,12 +42,12 @@ void audioCB(AudioIOData & io){
 }
 
 int main(int argc, char* argv[]){
-	AudioIO io(128, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());
 
 	stft.syncHop()  << lfoF1 << lfoF2;
 	stft.syncFreq() << lfoA1 << lfoA2 << bq0 << bq1;
-		
+
+	AudioIO io(128, 44100., audioCB, NULL, 2);
+	Sync::master().spu(io.framesPerSecond());		
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;

@@ -20,14 +20,7 @@ UTSRC = ut_arr.cpp \
 
 SRC = 	testAnalysis.cpp \
 	testAudioChannels.cpp \
-	testAudioCombs.cpp \
-	testAudioIO.cpp \
-	testAudioLFO.cpp \
-	testAudioNoise.cpp \
-	testAudioPVoc.cpp \
-	testAudioSampler.cpp \
 	testAudioSine.cpp \
-	testChaos.cpp \
 	testContainers.cpp \
 	testConversion.cpp \
 	testDelay.cpp \
@@ -38,6 +31,7 @@ SRC = 	testAnalysis.cpp \
 	testNoise.cpp \
 	testOscillator.cpp \
 	testRandom.cpp \
+	testRecurrenceMap.cpp \
 	testScalar.cpp \
 	testTable.cpp \
 	testTimer.cpp \
