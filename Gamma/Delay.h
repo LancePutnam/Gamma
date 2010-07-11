@@ -333,13 +333,6 @@ protected:
 };
 
 
-// Interpolation specialized comb filters
-typedef Comb<gam::real, ipl::Trunc> CombT;
-typedef Comb<gam::real, ipl::Cubic> CombC;
-typedef Comb<gam::real, ipl::AllPass> CombA;
-
-
-
 
 // Base class for 2-pole or 2-zero filter
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>

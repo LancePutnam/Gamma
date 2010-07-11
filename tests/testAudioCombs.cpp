@@ -10,7 +10,7 @@
 
 using namespace gam;
 
-CombC cmbS1(1./220., 0, -0.97), cmbS2(1./330., 0, -0.97),
+Comb<float, ipl::Cubic> cmbS1(1./220., 0, -0.97), cmbS2(1./330., 0, -0.97),
 		cmbF(1./100., 1, 0.2), cmbE(0.28,0,0.9);
 Biquad<> biq(14000, 0.2, Filter::LP);
 LFO<> lfo(1./12.);
