@@ -14,9 +14,21 @@ namespace gam{
 
 namespace ipl{
 
+enum{
+	TRUNC=0,
+	ROUND,
+	LINEAR,
+	CUBIC,
+	ALLPASS
+};
+
+
 /// Truncating random-access interpolation strategy
 template <class T>
 struct Trunc{
+
+	int type() const { return TRUNC; }
+	void type(int v){}
 
 	/// Return element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
@@ -37,6 +49,9 @@ struct Trunc{
 /// Nearest neighbor random-access interpolation strategy
 template <class T>
 struct Round{
+
+	int type() const { return ROUND; }
+	void type(int v){}
 
 	/// Return element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
@@ -63,6 +78,9 @@ struct Round{
 /// Linear random-access interpolation strategy
 template <class T>
 struct Linear{
+
+	int type() const { return LINEAR; }
+	void type(int v){}
 
 	/// Return element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
@@ -97,6 +115,9 @@ struct Linear{
 /// Cubic random-access interpolation strategy
 template <class T>
 struct Cubic{
+
+	int type() const { return CUBIC; }
+	void type(int v){}
 
 	/// Return element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
@@ -133,6 +154,9 @@ struct AllPass{
 
 	AllPass(T prev=0): prev(prev){}
 
+	int type() const { return ALLPASS; }
+	void type(int v){}
+
 	/// Return element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return ipl::allpass(					// Standard fraction
@@ -161,6 +185,56 @@ struct AllPass{
 	mutable T prev;
 };
 
+
+//
+template <class T>
+struct Any{
+
+	Any(): mType(TRUNC){}
+	
+	int type() const { return mType; }
+	void type(int v){ mType=v; }
+
+	/// Return element from power-of-2 array
+	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{		
+		switch(mType){
+			case ROUND:		return round(a, phase);
+			case LINEAR:	return linear(a, phase);
+			case CUBIC:		return cubic(a, phase);
+			case ALLPASS:	return allpass(a, phase);
+			default:		return trunc(a, phase);
+		}
+	}
+
+	template <class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		switch(mType){
+			case ROUND:		return round(s,a,iInt,iFrac,max,min);
+			case LINEAR:	return linear(s,a,iInt,iFrac,max,min);
+			case CUBIC:		return cubic(s,a,iInt,iFrac,max,min);
+			case ALLPASS:	return allpass(s,a,iInt,iFrac,max,min);
+			default:		return trunc(s,a,iInt,iFrac,max,min);
+		}
+	}
+
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		switch(mType){
+			case ROUND:		return round(a,iInt,iFrac,max,min);
+			case LINEAR:	return linear(a,iInt,iFrac,max,min);
+			case CUBIC:		return cubic(a,iInt,iFrac,max,min);
+			case ALLPASS:	return allpass(a,iInt,iFrac,max,min);
+			default:		return trunc(a,iInt,iFrac,max,min);
+		}
+	}
+
+protected:
+	int mType;
+	Trunc<T> trunc;
+	Round<T> round;
+	Linear<T> linear;
+	Cubic<T> cubic;
+	AllPass<T> allpass;
+};
 
 } // ipl::
 

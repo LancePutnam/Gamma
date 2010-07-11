@@ -191,6 +191,7 @@ public:
 	void delay(float v);						///< Set delay length
 	void delayUnit(float u);					///< Set delay as (0, 1) of buffer size
 	void freq(float v);							///< Set natural frequency (1/delay())
+	void ipolType(int v){ mIpol.type(v); }		///< Set interpolation type
 	void maxDelay(float v);						///< Set maximum delay length
 	void zero();								///< Sets all elements to zero
 
@@ -285,8 +286,6 @@ template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Tf=ga
 class Comb : public Delay<Tv,Si,Ts> {
 public:
 
-	using Delay<Tv, Si, Ts>::operator();
-
 	Comb();
 
 	/// @param[in]	delay		Initial delay length. The size of the delay line will be the smallest possible power of two.
@@ -312,6 +311,7 @@ public:
 	void fbk(const Tf& v);					///< Set feedback amount (-1, 1).
 	void fbkAllPass(const Tf& v);			///< Set feedback amount (-1, 1) with feedforward set to opposite.
 	void ffd(const Tf& v);					///< Set feedforward amount [-1, 1].
+	void feeds(const Tf& fwd, const Tf& bwd){ ffd(fwd); fbk(bwd); }
 
 	void set(float delay, const Tf& ffd, const Tf& fbk); ///< Set several parameters.
 
@@ -330,6 +330,10 @@ public:
 
 protected:
 	Tf mFFD, mFBK;
+
+private:
+	typedef Delay<Tv,Si,Ts> Base;
+	using Base::operator();
 };
 
 
