@@ -26,7 +26,7 @@ struct Flanger{
 	}
 
 	float delay, modAmount;
-	Comb<float, ipl::AllPass<float> > comb;
+	Comb<float, ipl::AllPass> comb;
 	//Comb<float, ipl::Trunc> comb;
 	//Comb<float, ipl::Linear> comb;
 	//Comb<float, ipl::Cubic> comb;
