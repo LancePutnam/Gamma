@@ -4,7 +4,7 @@
 
 include ../Makefile.config
 LFLAGS += -L../$(BIN_DIR)/ -l$(LIB_NAME)
-CFLAGS += -I../
+CFLAGS += -I../ -I../external/include
 
 SRC =	effFlanger.cpp \
 	genEnvAD.cpp \

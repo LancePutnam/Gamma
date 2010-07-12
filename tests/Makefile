@@ -4,7 +4,7 @@
 
 include ../Makefile.config
 LFLAGS += -L../$(BIN_DIR)/ -l$(LIB_NAME)
-CFLAGS += -I../
+CFLAGS += -I../ -I../external/include
 
 UTSRC = ut_arr.cpp \
 	ut_fil.cpp \

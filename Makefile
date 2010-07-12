@@ -21,6 +21,7 @@ OBJS = $(SRCS:.cpp=.o)
 OBJS := $(addprefix $(OBJ_DIR)/, $(OBJS))
 
 CFLAGS		+= $(addprefix -I, $(INC_DIRS))
+LFLAGS		:= $(addprefix -L, $(LIB_DIRS)) $(LFLAGS)
 DLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(DLIB_FILE))
 SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 
