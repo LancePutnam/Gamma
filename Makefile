@@ -20,7 +20,7 @@ SRCS = 	arr.cpp\
 OBJS = $(SRCS:.cpp=.o)
 OBJS := $(addprefix $(OBJ_DIR)/, $(OBJS))
 
-CFLAGS		+= $(addprefix -I, $(INC_DIRS))
+CFLAGS		+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
 LFLAGS		:= $(addprefix -L, $(LIB_DIRS)) $(LFLAGS)
 DLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(DLIB_FILE))
 SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
@@ -60,7 +60,7 @@ tutorial/%.cpp: $(SLIB_FILE) FORCE
 # Remove active build configuration binary files
 .PHONY: clean
 clean:
-	@rm -r $(BIN_DIR)/*
+	@rm -rf $(BIN_DIR)/*
 #	@find $(BIN_DIR) -type f ! -path '*.svn*' | xargs rm -f
 #	@rm -f $(SRCDIR)/*.o *.$(SLIB_EXT) *.$(DLIB_EXT)
 #	@cd tests && make clean
