@@ -853,7 +853,7 @@ TEMTS uint32_t TTABLESINE::mFracBits = 32UL - TableSine::mTblBits;
 TEMTS uint32_t TTABLESINE::mOneIndex = 0;
 TEMTS float * TTABLESINE::mTable = 0;
 
-TEMTS TTABLESINE::TableSine(float freq, float phase) : Base(freq, phase){
+TEMTS TTABLESINE::TableSine(float freq, float phase): Base(freq, phase){
 	if(0 == mTable){
 		mOneIndex = 1<<mFracBits;
 		uint32_t size = 1<<(mTblBits-2);
@@ -887,7 +887,7 @@ TEMTS inline float TTABLESINE::nextL(){
 
 //---- LFO
 #define TLFO LFO<St,Ts>
-TEMTS TLFO::LFO(): Accum<Ts>(){ mod(0.5); }
+TEMTS TLFO::LFO(): Base(){ mod(0.5); }
 TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
 TEMTS inline void TLFO::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
