@@ -81,7 +81,7 @@ public:
 
 	float operator()(){ Base::cycle(); return Base::phase(); }
 
-private: typedef Accum<Ts> Base;
+private: typedef Accum<Stap,Ts> Base;
 };
 
 
