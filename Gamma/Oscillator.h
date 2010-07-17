@@ -112,10 +112,11 @@ protected:
 
 
 
-/// General-purpose table oscillator
+/// Tabulated function oscillator
 
 /// Tv is the table element type, Sipol is an interpolation strategy, and
 /// Stap is a table reading strategy.
+/// Mathews, M. (1969). The Technology of Computer Music. The M.I.T. Press, Boston.
 template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
 class Osc : public Accum<Ts>, public ArrayPow2<Tv>{
 public:
