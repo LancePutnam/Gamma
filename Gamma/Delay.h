@@ -55,7 +55,7 @@ public:
 
 	void freq (Tp v);	///< Set cutoff frequency
 	void freqF(Tp v);	///< Faster, but slightly less accurate than freq()	
-	void zero(){ d1=(Tv)0; }
+	void zero(){ d1=Tv(0); }
 	
 	Tv operator()(Tv input);	///< Filters sample
 	

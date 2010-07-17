@@ -15,7 +15,7 @@ namespace gam{
 
 
 /// Fixed-point phase accumulator.
-template <class Ts=Synced>
+template <class Stap=tap::Wrap, class Ts=Synced>
 class Accum : public Ts {
 public:
 	Accum();
@@ -30,6 +30,10 @@ public:
 	void phaseMax();				///< Set phase to maximum value.
 	void phaseAdd(float u);			///< Add value to phase [0, 1).		
 	void period(float v);			///< Set period length.
+	void reset(){ mTap.reset(); }	///< Reset phase accumulator
+
+	bool done(){ return mTap.done(phaseI()); }
+//	Stap& tap(){ return mTap; }
 
 	float freq() const;				///< Returns frequency.
 	float phase() const;			///< Returns current unit phase
@@ -55,20 +59,21 @@ protected:
 	float mFreq;			// Current frequency.
 	uint32_t mPhase;		// Current phase btw [0, 2^32)
 	uint32_t mPhaseInc;
+	Stap mTap;
 	
 	uint32_t phaseFI(float v) const;	// convert unit floating-point to fixed-point integer
 	float phaseIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
 };
 
 #define ACCUM_INHERIT\
-	using Accum<Ts>::phaseI;\
-	using Accum<Ts>::phaseIncI;\
-	using Accum<Ts>::incPhase;
+	using Accum<Stap,Ts>::phaseI;\
+	using Accum<Stap,Ts>::phaseIncI;\
+	using Accum<Stap,Ts>::incPhase;
 
 
 /// Linear sweep in interval [0,1)
-template <class Ts=Synced>
-class Sweep : public Accum<Ts> {
+template <class Stap=tap::Wrap, class Ts=Synced>
+class Sweep : public Accum<Stap, Ts> {
 public:
 	/// @param[in] frq		Initial frequency
 	/// @param[in] phs		Initial unit phase in [0,1)
@@ -118,7 +123,7 @@ protected:
 /// Stap is a table reading strategy.
 /// Mathews, M. (1969). The Technology of Computer Music. The M.I.T. Press, Boston.
 template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
-class Osc : public Accum<Ts>, public ArrayPow2<Tv>{
+class Osc : public Accum<Stap,Ts>, public ArrayPow2<Tv>{
 public:
 
 	/// Constructor that alocates an internal table
@@ -127,7 +132,7 @@ public:
 	/// @param[in]	phs			Initial unit phase in [0, 1)
 	/// @param[in]	size		Number of table elements (actual number is power of 2 ceiling)
 	Osc(float frq, float phs=0, uint32_t size=512)
-	:	Accum<Ts>(frq, phs), ArrayPow2<Tv>(size)
+	:	Base(frq, phs), ArrayPow2<Tv>(size)
 	{}
 
 	/// Constructor that references an external table
@@ -136,7 +141,7 @@ public:
 	/// @param[in]	phs			Initial unit phase in [0, 1)
 	/// @param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, const ArrayPow2<Tv> & src)
-	:	Accum<Ts>(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
+	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
 	{}
 	
 	virtual ~Osc(){}
@@ -149,10 +154,6 @@ public:
 	void zero(){ for(unsigned i=0; i<this->size(); ++i) (*this)[i] = 0; }
 
 	Tv val() const { return mIpol(*this, phaseI()); }
-	
-	bool done(){ return tap().done(phaseI()); }
-	
-	Stap& tap(){ return mTap; }
 	
 	/// Add sine to table
 	
@@ -170,9 +171,9 @@ public:
 
 protected:
 	Sipol<Tv> mIpol;
-	Stap mTap;
 private:
 	ACCUM_INHERIT
+	typedef Accum<Stap,Ts> Base;
 	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 };
 
@@ -396,8 +397,8 @@ private: typedef Array<SineD<Tv, Synced1> > Base;
 /// generally not as spectrally pure and additional memory needs to be allocated
 /// to store the lookup table (although it's relatively small and only allocated
 /// once).
-template <class Ts=Synced>
-class TableSine : public Accum<Ts> {
+template <class Stap=tap::Wrap, class Ts=Synced>
+class TableSine : public Accum<Stap,Ts> {
 public:
 
 	/// @param[in]	frq		Initial frequency
@@ -414,7 +415,9 @@ protected:
 	static uint32_t mTblBits;
 	static uint32_t mFracBits;	// # of bits in fractional part of phasor
 	static uint32_t mOneIndex;
-private: ACCUM_INHERIT
+private:
+	typedef Accum<Stap,Ts> Base;
+	ACCUM_INHERIT
 };
 
 
@@ -424,8 +427,8 @@ private: ACCUM_INHERIT
 
 /// This object generates various waveform types by mapping the output of a 
 /// an accumulator through mathematical functions.
-template <class Ts=Synced>
-class LFO : public Accum<Ts>{
+template <class Stap=tap::Wrap, class Ts=Synced>
+class LFO : public Accum<Stap,Ts>{
 public:
 
 	LFO();
@@ -471,7 +474,9 @@ public:
 
 	bool seq();			// Returns 'mod' as sequence of triggers
 
-private: ACCUM_INHERIT
+private:
+	ACCUM_INHERIT
+	typedef Accum<Stap,Ts> Base;
 };
 
 
@@ -670,72 +675,77 @@ protected:
 
 // Implementation_______________________________________________________________
 
-#define TEM template <class Tv, class Ts>
-#define TEMS template <class Ts>
+#define TEM template<class Tv, class Ts>
+#define TEMS template<class Ts>
+#define TEMTS template<class St, class Ts>
 
 //---- Accum
+#define TACCUM	Accum<St,Ts>
 
-TEMS Accum<Ts>::Accum(): mFreq(0){
+TEMTS TACCUM::Accum(): mFreq(0){
 	Ts::initSynced();
 	this->phase(0);
 }
 
-TEMS Accum<Ts>::Accum(float freq, float phase): mFreq(freq){
+TEMTS TACCUM::Accum(float freq, float phase): mFreq(freq){
 	Ts::initSynced();
 	(phase >= 1.f) ? phaseMax() : this->phase(phase);
 }
 
-TEMS inline uint32_t Accum<Ts>::phaseFI(float v) const {
+TEMTS inline uint32_t TACCUM::phaseFI(float v) const {
 	//return scl::unitToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
 	return castIntRound(v * 4294967296.);
 }
 
-TEMS inline float Accum<Ts>::phaseIF(uint32_t v) const {
+TEMTS inline float TACCUM::phaseIF(uint32_t v) const {
 	return uintToUnit<float>(v);
 }
 
-TEMS void Accum<Ts>::onResync(double r){ //printf("Accum: onSyncChange\n");
+TEMTS void TACCUM::onResync(double r){ //printf("Accum: onSyncChange\n");
 	freq(mFreq);
 }
 
-TEMS inline void Accum<Ts>::freq(float v){
+TEMTS inline void TACCUM::freq(float v){
 	mFreq = v;
 	mPhaseInc = phaseFI(v * Ts::ups());
 }
 
-TEMS inline void Accum<Ts>::period(float value){ freq(1.f / value); }
-TEMS inline void Accum<Ts>::phase(float v){ mPhase = phaseFI(v); }
-TEMS inline void Accum<Ts>::phaseAdd(float v){ mPhase += phaseFI(v); }
-TEMS inline void Accum<Ts>::phaseMax(){ mPhase = 0xffffffff; }
+TEMTS inline void TACCUM::period(float value){ freq(1.f / value); }
+TEMTS inline void TACCUM::phase(float v){ mPhase = phaseFI(v); }
+TEMTS inline void TACCUM::phaseAdd(float v){ mTap(mPhase, phaseFI(v)); }
+TEMTS inline void TACCUM::phaseMax(){ mPhase = 0xffffffff; }
 
-TEMS inline float Accum<Ts>::freq() const { return mFreq; }
-TEMS inline float Accum<Ts>::phase() const { return phaseIF(phaseI()); }
-TEMS inline uint32_t Accum<Ts>::phaseI() const { return mPhase; }
-TEMS inline float Accum<Ts>::phaseInc() const { return phaseIF(phaseIncI()); }
-TEMS inline uint32_t Accum<Ts>::phaseIncI() const { return mPhaseInc; }
-TEMS inline uint32_t Accum<Ts>::incPhase(){ return mPhase += phaseIncI(); }
+TEMTS inline float TACCUM::freq() const { return mFreq; }
+TEMTS inline float TACCUM::phase() const { return phaseIF(phaseI()); }
+TEMTS inline uint32_t TACCUM::phaseI() const { return mPhase; }
+TEMTS inline float TACCUM::phaseInc() const { return phaseIF(phaseIncI()); }
+TEMTS inline uint32_t TACCUM::phaseIncI() const { return mPhaseInc; }
+//TEMTS inline uint32_t TACCUM::incPhase(){ return mPhase += phaseIncI(); }
+TEMTS inline uint32_t TACCUM::incPhase(){ return mTap(mPhase, phaseIncI()); }
 
-TEMS inline uint32_t Accum<Ts>::operator()(){ return cycle(); }
+TEMTS inline uint32_t TACCUM::operator()(){ return cycle(); }
 
-TEMS inline uint32_t Accum<Ts>::cycle(){ return cycles() & 0x80000000; }
+TEMTS inline uint32_t TACCUM::cycle(){ return cycles() & 0x80000000; }
 
-//inline uint32_t Accum::cycle(uint32_t mask){
+//TEMTS inline uint32_t TACCUM::cycle(uint32_t mask){
 //	return cycles() & mask;
 //}
 
-TEMS inline uint32_t Accum<Ts>::cycles(){
+TEMTS inline uint32_t TACCUM::cycles(){
 	uint32_t prev = phaseI();
 	incPhase();	
 	return ~phaseI() & prev;
 }
 
-TEMS inline uint32_t Accum<Ts>::once(){
+TEMTS inline uint32_t TACCUM::once(){
 	uint32_t prev = phaseI();
 	uint32_t c = cycle();
 	if(c) mPhase = prev;
 	return c;
 }
+
+#undef TACCUM
 
 
 
@@ -837,12 +847,13 @@ TEM void Quadra<Tv, Ts>::onResync(double r){
 
 //---- TableSine
 
-TEMS uint32_t TableSine<Ts>::mTblBits  = 9UL;	// actual table memory is a quarter of this
-TEMS uint32_t TableSine<Ts>::mFracBits = 32UL - TableSine::mTblBits;
-TEMS uint32_t TableSine<Ts>::mOneIndex = 0;
-TEMS float * TableSine<Ts>::mTable = 0;
+#define TTABLESINE TableSine<St,Ts>
+TEMTS uint32_t TTABLESINE::mTblBits  = 9UL;	// actual table memory is a quarter of this
+TEMTS uint32_t TTABLESINE::mFracBits = 32UL - TableSine::mTblBits;
+TEMTS uint32_t TTABLESINE::mOneIndex = 0;
+TEMTS float * TTABLESINE::mTable = 0;
 
-TEMS TableSine<Ts>::TableSine(float freq, float phase) : Accum<Ts>(freq, phase){
+TEMTS TTABLESINE::TableSine(float freq, float phase) : Base(freq, phase){
 	if(0 == mTable){
 		mOneIndex = 1<<mFracBits;
 		uint32_t size = 1<<(mTblBits-2);
@@ -852,15 +863,15 @@ TEMS TableSine<Ts>::TableSine(float freq, float phase) : Accum<Ts>(freq, phase){
 	}
 }
 
-TEMS inline float TableSine<Ts>::operator()(){ return nextL(); }
+TEMTS inline float TTABLESINE::operator()(){ return nextL(); }
 
-TEMS inline float TableSine<Ts>::nextN(){
+TEMTS inline float TTABLESINE::nextN(){
 	float output = tbl::atQ(mTable, mFracBits, phaseI());
 	incPhase();
 	return output;
 }
 
-TEMS inline float TableSine<Ts>::nextL(){
+TEMTS inline float TTABLESINE::nextL(){
 	float output = ipl::linear(
 		gam::fraction(mTblBits, phaseI()),
 		tbl::atQ(mTable, mFracBits, phaseI()),
@@ -870,20 +881,22 @@ TEMS inline float TableSine<Ts>::nextL(){
 	return output;
 }
 
+#undef TTABLESINE
+
 
 
 //---- LFO
+#define TLFO LFO<St,Ts>
+TEMTS TLFO::LFO(): Accum<Ts>(){ mod(0.5); }
+TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
-TEMS LFO<Ts>::LFO(): Accum<Ts>(){ mod(0.5); }
-TEMS LFO<Ts>::LFO(float f, float p, float m): Accum<Ts>(f, p){ mod(m); }
+TEMTS inline void TLFO::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
+TEMTS inline void TLFO::mod(double n){ modi = castIntRound(n * 4294967296.); }
 
-TEMS inline void LFO<Ts>::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
-TEMS inline void LFO<Ts>::mod(double n){ modi = castIntRound(n * 4294967296.); }
-
-#define DEF(name, exp) TEMS inline float LFO<Ts>::name{ float r = exp; incPhase(); return r; }
+#define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; incPhase(); return r; }
 
 
-TEMS inline float LFO<Ts>::line2(){
+TEMTS inline float TLFO::line2(){
 	using namespace gam::scl;
 	
 //	// Starts at 1
@@ -901,7 +914,7 @@ TEMS inline float LFO<Ts>::line2(){
 	return r;
 }
 
-TEMS inline float LFO<Ts>::line2U(){
+TEMTS inline float TLFO::line2U(){
 	return line2()*0.5f+0.5f;
 }
 
@@ -933,14 +946,14 @@ DEF(sineP9(),	scl::rampUp(phaseI()); r = scl::sinP9(r))
 
 #undef DEF
 
-//TEMS inline float LFO<Ts>::imp(){ return this->cycle() ? 1.f : 0.f; }
-TEMS inline float LFO<Ts>::imp(){ 
+//TEMS inline float TLFO::imp(){ return this->cycle() ? 1.f : 0.f; }
+TEMTS inline float TLFO::imp(){ 
 	float r = phaseI() < this->phaseIncI() ? 1.f : 0.f;
 	incPhase();
 	return r; 
 }
 
-TEMS inline bool LFO<Ts>::seq(){
+TEMTS inline bool TLFO::seq(){
 	uint32_t prev = phaseI();
 	incPhase();
 	if( (phaseI() ^ prev) & 0xf8000000 ){
@@ -949,6 +962,7 @@ TEMS inline bool LFO<Ts>::seq(){
 	return false;
 }
 
+#undef TLFO
 
 
 //---- Buzz
@@ -1149,6 +1163,7 @@ protected:
 
 #undef TEM
 #undef TEMS
+#undef TEMTS
 
 } // gam::
 #endif

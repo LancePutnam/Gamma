@@ -300,7 +300,7 @@ namespace tap{
 	struct Clip{
 		void reset(){}
 	
-		void operator()(uint32_t& pos, uint32_t inc){
+		uint32_t& operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += inc;
 			if(~pos & prev & 0x80000000) pos = 0xffffffff;
@@ -308,8 +308,9 @@ namespace tap{
 			// pos2:	1110
 			// pos1:	1111
 			// pos0:	0000	msb goes from 1 to 0
+			return pos;
 		}
-		bool done(uint32_t pos){ return pos == 0xffffffff; }
+		bool done(uint32_t pos) const { return pos == 0xffffffff; }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){ return scl::clip(v+inc, max, min); }
@@ -320,13 +321,14 @@ namespace tap{
 	
 		void reset(){ dir=0; }
 	
-		void operator()(uint32_t& pos, uint32_t inc){
+		uint32_t& operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += dir ? -inc : inc;
 			if(~pos & prev & 0x80000000) dir^=1;
+			return pos;
 		}
 
-		bool done(uint32_t pos){ return false; }
+		bool done(uint32_t pos) const { return false; }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){		
@@ -346,13 +348,14 @@ namespace tap{
 		
 		void reset(){ count=0; }
 
-		void operator()(uint32_t& pos, uint32_t inc){
+		uint32_t& operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += inc;
 			if(~pos & prev & 0x80000000) ++count < N ?: pos = 0xffffffff;
+			return pos;
 		}
 		
-		bool done(uint32_t pos){ return (count >= N) && (pos == 0xffffffff); }
+		bool done(uint32_t pos) const { return (count >= N) && (pos == 0xffffffff); }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){
@@ -367,8 +370,8 @@ namespace tap{
 	struct Wrap{
 		void reset(){}
 	
-		void operator()(uint32_t& pos, uint32_t inc){ pos += inc; }
-		bool done(uint32_t pos){ return false; }
+		uint32_t& operator()(uint32_t& pos, uint32_t inc){ return pos+=inc; }
+		bool done(uint32_t pos) const { return false; }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){ return scl::wrap(v+inc, max, min); }
