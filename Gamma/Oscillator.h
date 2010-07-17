@@ -161,20 +161,20 @@ public:
 	/// @param[in] amp		amplitude
 	/// @param[in] phs		unit phase, [0, 1)
 	Osc& addSine(double cycles, double amp=1, double phs=0){
-		double f = cycles/size();
-		for(unsigned i=0; i<size(); ++i){
+		double f = cycles/this->size();
+		for(unsigned i=0; i<this->size(); ++i){
 			double p = (f*i + phs)*M_2PI;
 			(*this)[i] += sin(p) * amp;
 		}
 		return *this;
 	}
 
+//	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 protected:
 	Sipol<Tv> mIpol;
 private:
 	ACCUM_INHERIT
 	typedef Accum<Stap,Ts> Base;
-	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 };
 
 
@@ -1135,7 +1135,7 @@ TEM inline Tv DSF<Tv,Ts>::operator()(){
 #undef SIN
 #undef COS
 
-TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = pow(mA, mN); }
+TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = ::pow(mA, mN); }
 TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mPhaseInc * mFreqRatio; }
 
 TEM void DSF<Tv,Ts>::onResync(double r){
