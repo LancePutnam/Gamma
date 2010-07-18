@@ -57,8 +57,8 @@ int main(int argc, char* argv[]){
 	featureF = arr::mean(table, size);
 	printf("Mean:              %f\n", featureF);
 
-	featureF = arr::meanAbs(table, size);
-	printf("Mean Abs:          %f\n", featureF);
+	featureF = arr::meanNorm(table, size);
+	printf("Mean Norm:         %f\n", featureF);
 	
 	featureF = arr::meanWeightedIndex(table, size);
 	printf("Mean Weight Index: %f\n", featureF);

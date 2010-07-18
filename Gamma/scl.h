@@ -28,6 +28,13 @@
 
 namespace gam{
 
+/// Returns a positive length associated with argument
+TEM double norm(const T& v);
+
+/// Returns a positive number valid for comparing norms
+TEM double normCompare(const T& v);
+
+
 /// Scalar rank functions for numerical types.
 namespace scl{
 
@@ -1470,6 +1477,10 @@ TEM inline T raisedCosine(T r, T a, T b){ return a - b * cos(r); }
 TEM inline T welch(T n){ return (T)1 - n*n; }
 
 } // scl::
+
+TEM inline double norm(const T& v){ return scl::abs(v); }
+TEM inline double normCompare(const T& v){ return norm(v); }
+
 } // gam::
 
 #undef TEM

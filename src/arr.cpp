@@ -92,7 +92,7 @@ void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 //	}
 	for(uint32_t i=0; i<len; i+=chunkSize){
 		uint32_t max;
-		max = maxAbs(src, chunkSize);
+		max = maxNorm(src, chunkSize);
 
 		*dst++ = src[max];
 		src += chunkSize;

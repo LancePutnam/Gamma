@@ -192,6 +192,8 @@ struct Complex{
 #define TEM template <class T>
 TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
 TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
+TEM double norm(const Complex<T>& v){ return v.norm(); }
+TEM double normCompare(const Complex<T>& v){ return v.norm2(); }
 TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
 TEM Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
 TEM Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }

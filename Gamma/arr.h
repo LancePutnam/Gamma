@@ -101,8 +101,8 @@ void linToDB(float * arr, uint32_t len, float minDB);
 /// Returns index of maximum value.
 TEM uint32_t max(const T * src, uint32_t len, uint32_t str=1);
 
-/// Returns index of maximum absolute value (i.e. magnitude).
-TEM uint32_t maxAbs(const T * src, uint32_t len, uint32_t str=1);
+/// Returns index of maximum normed value (i.e., magnitude).
+TEM uint32_t maxNorm(const T * src, uint32_t len, uint32_t str=1);
 
 /// Locates local maxima and writes their indices into 'dst'.
 
@@ -115,9 +115,9 @@ TEM inline T mean(const T * src, uint32_t len, uint32_t str=1){
 	return sum(src, len, str) / T(len/str);
 }
 
-/// Returns the mean absolute value of array values.
-TEM inline T meanAbs(const T * src, uint32_t len, uint32_t str=1){
-	T r=T(0); LOOP(len,str){ r += scl::abs(src[i]); } return r / T(len/str);
+/// Returns the mean norm of array values.
+TEM inline T meanNorm(const T * src, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len,str){ r += gam::norm(src[i]); } return r / T(len/str);
 }
 
 /// Returns mean absolute difference of array values.
@@ -182,16 +182,16 @@ TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
 
 /// Returns the applied normalization multiplication factor.
 ///
-TEM T normalize(T * arr, uint32_t len);
+TEM double normalize(T * arr, uint32_t len);
 
 /// Returns norm of array values.
-TEM inline T norm(const T * src, uint32_t len, uint32_t str=1){
+TEM double norm(const T * src, uint32_t len, uint32_t str=1){
 	return sqrt((double)sumSquares(src, len,str));
 }
 
 /// Returns taxicab norm of array values (sum of absolute values).
-TEM T normTaxi(const T * src, uint32_t len, uint32_t str=1){
-	T r=T(0); LOOP(len,str){ r+=scl::abs(src[i]); } return r;
+TEM double normTaxi(const T * src, uint32_t len, uint32_t str=1){
+	double r=0; LOOP(len,str){ r+=gam::norm(src[i]); } return r;
 }
 
 /// Returns unnormalized Nyquist value for use with DFT.
@@ -412,10 +412,10 @@ TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 	*arr *= *src;
 }
 
-TEM T normalize(T * arr, uint32_t len){
-	T max = scl::abs(arr[maxAbs(arr, len)]);
-	T normFactor = T(1)/max;
-	if(max != T(0)){ for(uint32_t i=0; i<len; ++i){ arr[i]*=normFactor; } }
+TEM double normalize(T * arr, uint32_t len){
+	double max = gam::norm(arr[maxNorm(arr, len)]);
+	double normFactor = 1./max;
+	if(max != 0.){ for(uint32_t i=0; i<len; ++i){ arr[i]*=normFactor; } }
 	return normFactor;
 }
 
@@ -558,11 +558,11 @@ TEM uint32_t max(const T * src, uint32_t len, uint32_t str){
 	return r;
 }
 
-TEM uint32_t maxAbs(const T * src, uint32_t len, uint32_t str){
+TEM uint32_t maxNorm(const T * src, uint32_t len, uint32_t str){
 	uint32_t r = 0;
-	T max = scl::abs(src[0]);
+	double max = normCompare(src[0]);
 	for(uint32_t i=str; i<len; i+=str){
-		const T& v = scl::abs(src[i]);
+		double v = normCompare(src[i]);
 		if(v > max){ max=v; r=i; }
 	}
 	return r;
