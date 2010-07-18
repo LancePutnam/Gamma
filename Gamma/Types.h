@@ -192,8 +192,6 @@ struct Complex{
 #define TEM template <class T>
 TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
 TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
-TEM double norm(const Complex<T>& v){ return v.norm(); }
-TEM double normCompare(const Complex<T>& v){ return v.norm2(); }
 TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
 TEM Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
 TEM Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
@@ -945,6 +943,13 @@ Vec3<T> rotateZ(const Vec3<T>& v, const Complex<T>& a){
 }
 
 
+
+template<class T> inline T norm(const Complex<T>& v){ return v.norm(); }
+template<class T> inline T normCompare(const Complex<T>& v){ return v.norm2(); }
+template<class T> inline T norm(const Quat<T>& v){ return v.norm(); }
+template<class T> inline T normCompare(const Quat<T>& v){ return v.norm2(); }
+template<int N,class T> inline T norm(const Vec<N,T>& v){ return v.norm(); }
+template<int N,class T> inline T normCompare(const Vec<N,T>& v){ return v.norm2(); }
 
 
 // Trying to abstract too many things. Hard to write subclasses of templates
