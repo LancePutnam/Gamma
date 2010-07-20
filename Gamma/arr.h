@@ -182,7 +182,7 @@ TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
 
 /// Returns the applied normalization multiplication factor.
 ///
-TEM double normalize(T * arr, uint32_t len);
+TEM double normalize(T * arr, uint32_t len, double scale=1);
 
 /// Returns norm of array values.
 TEM double norm(const T * src, uint32_t len, uint32_t str=1){
@@ -412,9 +412,9 @@ TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 	*arr *= *src;
 }
 
-TEM double normalize(T * arr, uint32_t len){
+TEM double normalize(T * arr, uint32_t len, double scale){
 	double max = gam::norm(arr[maxNorm(arr, len)]);
-	double normFactor = 1./max;
+	double normFactor = scale/max;
 	if(max != 0.){ for(uint32_t i=0; i<len; ++i){ arr[i]*=normFactor; } }
 	return normFactor;
 }
