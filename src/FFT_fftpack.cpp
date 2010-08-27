@@ -69,8 +69,7 @@ int CFFT<T>::size() const{ return mImpl->n; }
 template <class T>
 struct RFFT<T>::Impl{
 
-	Impl(int sz): n(0), wsave(0)
-	{
+	Impl(int sz): n(0), wsave(0){
 		resize(sz);
 	}
 	
@@ -118,7 +117,12 @@ void RFFT<T>::forward(T * buf, bool normalize){
 }
 	
 template <class T>
-void RFFT<T>::inverse(T * buf){
+void RFFT<T>::inverse(T * buf, bool normalized){
+	if(normalized){
+		T m = 1./T(2);
+		for(int i=1; i<size()-1; ++i) buf[i] *= m;	
+	}
+
 	fftpack::rfftb(&mImpl->n, buf, mImpl->wsave, mImpl->ifac);
 }
 

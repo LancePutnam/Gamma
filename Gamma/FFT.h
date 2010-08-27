@@ -27,7 +27,7 @@ public:
 	void forward(T * buf, bool normalize=true);
 	
 	/// Perform complex-to-real inverse transform in-place
-	void inverse(T * buf);
+	void inverse(T * buf, bool normalized=true);
 
 	/// Set size of transform
 	void resize(int n);
@@ -55,15 +55,23 @@ public:
 
 	/// Get size of transform
 	int size() const;
-	
+
 	/// Perform forward transform in-place
 	void forward(T * buf, bool normalize=true);
-	
+
 	/// Perform inverse transform in-place
 	void inverse(T * buf);
 
 	/// Set size of transform
 	void resize(int n);
+
+	template <template <class> class ComplexType>
+	void forward(ComplexType<T> * buf, bool normalize=true){
+		forward((T*)buf, normalize);
+	}
+
+	template <template <class> class ComplexType>
+	void inverse(ComplexType<T> * buf){ inverse((T*)buf); }
 
 private:
 	class Impl; Impl * mImpl;
