@@ -28,6 +28,7 @@ SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 #--------------------------------------------------------------------------
 # Targets
 #--------------------------------------------------------------------------
+
 # Build object file from C++ source
 $(OBJ_DIR)/%.o: %.cpp
 	@echo CC $< $@
@@ -47,6 +48,11 @@ $(DLIB_FILE): createFolders $(OBJS)
 .PHONY: tests
 tests: $(SLIB_FILE)
 	@make --directory $(TEST_DIR)
+
+# Compile and run source files in examples/ folder
+tests/%.cpp: $(SLIB_FILE) FORCE
+	@$(CC) $(CFLAGS) -o $(BIN_DIR)/$(*F) $@ $(LFLAGS) $(SLIB_FILE)
+	@./$(BIN_DIR)/$(*F)
 
 .PHONY: tutorial
 tutorial: $(SLIB_FILE)
