@@ -499,6 +499,7 @@ public:
 	}
 	#undef SR
 
+	/// Convert input from real to complex
 	Complex<Tv> operator()(const Tv& i){
 		return Complex<Tv>(
 			cf0(cf1(cf2(cf3(cf4(cf5(i)))))),
