@@ -38,7 +38,7 @@
 
 #include <string>
 #include <string.h>		/* memset() */
-#include <portaudio.h>
+#include "portaudio.h"
 #include "Gamma/mem.h"
 
 

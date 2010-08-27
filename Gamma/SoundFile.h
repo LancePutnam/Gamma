@@ -5,7 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <string>
-#include <sndfile.h>
+#include "sndfile.h"
 #include "Gamma/mem.h"
 #include "Gamma/Types.h"
 
