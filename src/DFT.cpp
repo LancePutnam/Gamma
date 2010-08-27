@@ -101,28 +101,29 @@ DFT& DFT::precise(bool w){ mPrecise=w; return *this; }
 
 void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n");
 
-	if(window != mBuf) mem::deepCopy(mBuf+1, window, sizeWin());
-	mem::deepZero(mBuf+1 + sizeWin(), sizePad());	// zero pad
-	// TODO: zero-phase window (rotate buffer 180)
-
-	mFFT.forward(mBuf+1, true);
-	
-	// re-arrange DC and Nyquist bins
-	mBuf[0] = mBuf[1];
-	mBuf[1] = 0.f;
-	mBuf[numBins()*2-1] = 0.f;
-
-	// old code which did a mem move, rather offsetting input buffer pointer...
-//	if(window != mBuf) mem::deepCopy(mBuf, window, sizeWin());
-//	mem::deepZero(mBuf + sizeWin(), sizePad());	// zero pad
-//	//... do zero-phase window (rotate buffer 180)
+	// this attempts to avoid a memory move, but doesn't work when window == mBuf
+//	if(window != mBuf) mem::deepCopy(mBuf+1, window, sizeWin());
+//	mem::deepZero(mBuf+1 + sizeWin(), sizePad());	// zero pad
+//	// TODO: zero-phase window (rotate buffer 180)
 //
-//	mFFT.forward(mBuf, true);
+//	mFFT.forward(mBuf+1, true);
 //	
 //	// re-arrange DC and Nyquist bins
-//	mem::deepMove(mBuf+2, mBuf+1, sizeDFT()-1);
+//	mBuf[0] = mBuf[1];
 //	mBuf[1] = 0.f;
 //	mBuf[numBins()*2-1] = 0.f;
+
+	// old code which did a mem move, rather offsetting input buffer pointer...
+	if(window != mBuf) mem::deepCopy(mBuf, window, sizeWin());
+	mem::deepZero(mBuf + sizeWin(), sizePad());	// zero pad
+	//... do zero-phase window (rotate buffer 180)
+
+	mFFT.forward(mBuf, true);
+	
+	// re-arrange DC and Nyquist bins
+	mem::deepMove(mBuf+2, mBuf+1, sizeDFT()-1);
+	mBuf[1] = 0.f;
+	mBuf[numBins()*2-1] = 0.f;
 	
 	switch(mSpctFormat){
 	case Bin::Polar:
