@@ -578,7 +578,6 @@ public:
 
 protected:
 	Tp mFreq;
-	//Tp mA0, mB1;
 	Tp mA0, mB1;
 	Tv mStored;
 	Tv o1;
