@@ -2,8 +2,8 @@
 	See COPYRIGHT file for authors and license information
 	
 	Tutorial:		Generator / Envelope
-	Description:	Using a linear envelope segment to control the beating of a 
-					simple additive synth.
+	Description:	This uses a linear envelope segment to control the beating 
+					of a simple additive synth.
 */
 
 #include "tutorial.h"

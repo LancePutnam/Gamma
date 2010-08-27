@@ -258,28 +258,35 @@ namespace iplSeq{
 		T val() const { return v[0]; }
 		void val(const T& va){ v[0]=va; }
 			
-		T v[N];	// value buffer, 0 == newest, N-1 == oldest
+		T v[N];	// value buffer, 0 is newest, N-1 is oldest
 	};
 
 	template <class T>
-	struct Cubic : public Base<4, T>{
-		using Base<4, T>::v;
-		Cubic(const T& v=0): Base<4, T>(v){}
-		T operator()(float f) const { return ipl::cubic(f, v[3], v[2], v[1], v[0]); }
-		T val() const { return v[1]; }
-		void val(const T& va){ v[1]=va; }
+	struct Trunc : public Base<1,T>{
+		using Base<1,T>::v;
+		Trunc(const T& v=0): Base<1,T>(v){}
+		T operator()(float f) const { return v[0]; }
 	};
 	
 	template <class T>
-	struct Linear : public Base<2, T>{
-		using Base<2, T>::v;
+	struct Linear : public Base<2,T>{
+		using Base<2,T>::v;
 		Linear(const T& v=0): Base<2,T>(v){}
 		T operator()(float f) const { return ipl::linear(f, v[1], v[0]); }
 	};
 
 	template <class T>
-	struct Cosine : public Base<2, T>{
-		using Base<2, T>::v;
+	struct Cubic : public Base<4,T>{
+		using Base<4,T>::v;
+		Cubic(const T& v=0): Base<4,T>(v){}
+		T operator()(float f) const { return ipl::cubic(f, v[3], v[2], v[1], v[0]); }
+		T val() const { return v[1]; }
+		void val(const T& va){ v[1]=va; }
+	};
+
+	template <class T>
+	struct Cosine : public Base<2,T>{
+		using Base<2,T>::v;
 		Cosine(const T& v=0): Base<2,T>(v){}
 		T operator()(float f) const { return ipl::linear(scl::warpSinUU(f), v[1], v[0]); }
 	};

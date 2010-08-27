@@ -44,7 +44,7 @@ struct Biquad3{
 
 
 struct Burst{
-	Burst(float frq1, float frq2, float dec, float res=10) : 
+	Burst(float frq1=20000, float frq2=4000, float dec=0.1, float res=2) : 
 		freq1(frq1), freq2(frq2), fil(frq1, res, Filter::BP), env(dec)
 	{}
 	
