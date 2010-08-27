@@ -23,7 +23,6 @@ SRC = 	testAnalysis.cpp \
 	testAudioSine.cpp \
 	testContainers.cpp \
 	testConversion.cpp \
-	testDelay.cpp \
 	testDFT.cpp \
 	testEnvelope.cpp \
 	testIpol.cpp \
