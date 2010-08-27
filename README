@@ -11,7 +11,7 @@ Gamma is a cross-platform, C++ library for doing generic synthesis and filtering
 2. Compilation Instructions
 ========================================
 
-Gamma source can either be built into a library or directly compiled from source into an application. In the following, the base directory is where this README file is located.
+The source code can either be built into a library or directly compiled from source into an application. In the following, the base directory is where this README file is located.
 
 
 ----------------------------------------

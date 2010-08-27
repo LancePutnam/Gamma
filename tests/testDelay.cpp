@@ -8,56 +8,14 @@
 
 using namespace gam;
 
-int main(int argc, char* argv[]){
+int main(){
 
-	const int n = 16;
-	Sync::master().spu(n);
-	
-	#define SIZE(o) printf("%s\t%d\n", #o, sizeof(o));
-//	SIZE(AllPass1<>)
-//	typedef AllPass1<float, float, Synced1> AllPass11; SIZE(AllPass11)
-//	SIZE(Hilbert<>)
-//	SIZE(Hilbert2<>)
+	const int N = 16;
+	Sync::master().spu(N);
 
-//	Hilbert<> hilbert;
-//	printf("%f\n", hilbert.cf0.freq());
-//	printf("%f\n", hilbert.cf1.freq());
-//
-//	Hilbert2<> hilbert2;
-//	printf("%f\n", hilbert2.cf0.freq());
-//	printf("%f\n", hilbert2.cf1.freq());
-	
-/*	
-	printf("\nDelay:\n");
-	Delay<float, ipl::Linear> delay(1, 5./n);
-	gen::Sin<> genSin(M_2PI/n, M_PI_2);
-
-	for(int i=0; i<2*n; ++i){
-		float i0 = genSin();
-		float o0 = delay(i0);
-		printf("[%2d]", i);
-		printf("  % 6.3f  % 6.3f  ", i0, o0);
-		scl::printPlot(i0, 16, true); printf("  "); scl::printPlot(o0, 16);
-		printf("\n");
-	}
-	
-	
-	printf("\nAllPass1:\n");
-	LFO lfo(2);
-	AllPass1<> allPass1(3);
-
-	for(int i=0; i<2*n; ++i){
-		float i0 = lfo.up();
-		float o0 = allPass1.high(i0 * 0.5);
-		printf("[%2d]", i);
-		printf("  % 6.3f  % 6.3f  ", i0, o0);
-		scl::printPlot(i0, 32, true); printf("  "); scl::printPlot(o0, 32);
-		printf("\n");
-	}
-*/	
-
-	DFT dft(32, 0, Bin::Polar); dft.precise(true);
 	gen::Impulse<> sig;
+	
+	DFT dft(32, 0, Bin::Polar); dft.precise(true);
 
 	#define FREQ_RESP(f)\
 		printf("\n%s:\n", #f);\
@@ -69,7 +27,7 @@ int main(int argc, char* argv[]){
 			float m = dft.bins(i)[0];\
 			float p = dft.bins(i)[1] * M_1_PI;\
 			printf("% 6.3f %6.3f ", m, p);\
-			printPlot(m*n*0.5, 32);\
+			printPlot(m*N*0.5, 32);\
 			printPlot(p, 32);\
 			printf("\n");\
 		}
@@ -116,17 +74,17 @@ int main(int argc, char* argv[]){
 	reson.zero(); reson.freq(4); FREQ_RESP(reson(v))
 	reson.zero(); reson.freq(6); FREQ_RESP(reson(v))
 	
-	delay.zero(); delay.delay(1./n); FREQ_RESP(delay(v))
-	delay.zero(); delay.delay(2./n); FREQ_RESP(delay(v))
+	delay.zero(); delay.delay(1./N); FREQ_RESP(delay(v))
+	delay.zero(); delay.delay(2./N); FREQ_RESP(delay(v))
 	
-	comb.zero(); comb.set(1./n, 1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
-	comb.zero(); comb.set(4./n, 1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
-	comb.zero(); comb.set(1./n,-1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
-	comb.zero(); comb.set(4./n,-1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
-	comb.zero(); comb.set(4./n, 0, 0.5); FREQ_RESP(comb(v)*comb.normFbk())
-	comb.zero(); comb.set(4./n, 0,-0.5); FREQ_RESP(comb(v)*comb.normFbk())
-	comb.zero(); comb.set(4./n, 0.5,-0.5); FREQ_RESP(comb(v))
-	comb.zero(); comb.set(4./n,-0.5, 0.5); FREQ_RESP(comb(v))
+	comb.zero(); comb.set(1./N, 1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
+	comb.zero(); comb.set(4./N, 1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
+	comb.zero(); comb.set(1./N,-1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
+	comb.zero(); comb.set(4./N,-1, 0  ); FREQ_RESP(comb(v)*comb.normFfd())
+	comb.zero(); comb.set(4./N, 0, 0.5); FREQ_RESP(comb(v)*comb.normFbk())
+	comb.zero(); comb.set(4./N, 0,-0.5); FREQ_RESP(comb(v)*comb.normFbk())
+	comb.zero(); comb.set(4./N, 0.5,-0.5); FREQ_RESP(comb(v))
+	comb.zero(); comb.set(4./N,-0.5, 0.5); FREQ_RESP(comb(v))
 	
 	FREQ_RESP(blockDC(v))
 	FREQ_RESP(blockNyq(v))
