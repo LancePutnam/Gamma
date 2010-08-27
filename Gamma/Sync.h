@@ -30,7 +30,7 @@ public:
 	void ups(double val){}			///< Set local units/sample.
 
 protected:
-	void initSynced(){}
+	void initSynced(){ onResync(1); }
 };
 
 
