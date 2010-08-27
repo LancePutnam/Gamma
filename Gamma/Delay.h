@@ -73,8 +73,6 @@ protected:
 };
 
 
-// TODO: what filter design does this use? Butterworth?
-
 /// 2-pole/2-zero IIR filter.
 
 /// The biquadratic filter contains 2 zeroes and 2 poles in its transfer
@@ -90,21 +88,21 @@ public:
 	/// @param[in]	frq		Initial center frequency in Hz.
 	/// @param[in]	res		Initial resonance.
 	/// @param[in]	frq		Initial type of filter.
-	Biquad(Tp frq = 1000.f, Tp res = 4.f, int filterType = Filter::LP);
+	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), int filterType = Filter::LP);
 
-	void freq(Tp v);			///< Set center frequency. 
-	void res(Tp v);			///< Set resonance.
-	void set(Tp frq, Tp res);	///< Set filter center frequency and resonance.
+	void freq(Tp v);					///< Set center frequency. 
+	void res(Tp v);						///< Set resonance.
+	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance.
 	void set(Tp frq, Tp res, int type);	///< Set all filter params.
-	void type(int type);			///< Set type of filter (see Filter::type)
-	void zero();					///< Zero internal delays.
+	void type(int type);				///< Set type of filter (see Filter::type)
+	void zero();						///< Zero internal delays.
 
-	Tv operator()(Tv i0);	///< Return next filter output.
-	Tv nextBP(Tv i0);		///< Optimized for band-pass (BP, BPC) types.
+	Tv operator()(Tv i0);				///< Return next filter output.
+	Tv nextBP(Tv i0);					///< Optimized for band-pass (BP, BPC) types.
 	
 	Tp freq() const { return mFreq; }	///< Get center frequency
 	Tp res() const { return mRes; }		///< Get resonance
-	int type() const { return mType; }		///< Get filter type
+	int type() const { return mType; }	///< Get filter type
 	
 	virtual void onResync(double r);
 
@@ -486,39 +484,39 @@ protected:
 
 
 
-
 /// Hilbert transformer, converts real signal into complex
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Hilbert : public Ts{
 public:
+	#define SR 44100.
 	Hilbert()
-	:	cf0(   5.4135), cf1(  41.118 ), cf2(  167.3595),	/* for SR=44100 */
-		cf3( 671.3715), cf4(2694.363 ), cf5(11976.867 ),
-		sf0(  18.786 ), sf1(  83.5065), sf2(  335.1345), 
-		sf3(1344.4065), sf4(5471.871 ), sf5(41551.671 )
+	:	cf0(   5.4135/SR), cf1(  41.118 /SR), cf2(  167.3595/SR),	/* for SR=44100 */
+		cf3( 671.3715/SR), cf4(2694.363 /SR), cf5(11976.867 /SR),
+		sf0(  18.786 /SR), sf1(  83.5065/SR), sf2(  335.1345/SR), 
+		sf3(1344.4065/SR), sf4(5471.871 /SR), sf5(41551.671 /SR)
 	{
-		Ts::initSynced();
+		//Ts::initSynced();
 	}
+	#undef SR
 
-	Complex<Tv> operator()(Tv i){
+	Complex<Tv> operator()(const Tv& i){
 		return Complex<Tv>(
 			cf0(cf1(cf2(cf3(cf4(cf5(i)))))),
-			sf0(sf1(sf2(sf3(sf4(sf5(i))))))
+			-sf0(sf1(sf2(sf3(sf4(sf5(i))))))
 		);
 	}
-	
-	// This is a function-oriented way of synchronizing children
-	virtual void onResync(double r){
-		#define DO(o) o.freq(o.freq()/r);
-		DO(cf0) DO(cf1) DO(cf2) DO(cf3) DO(cf4) DO(cf5)
-		DO(sf0) DO(sf1) DO(sf2) DO(sf3) DO(sf4) DO(sf5)
-		#undef DO
-	}
+
+//	virtual void onResync(double r){
+//		//#define DO(o) o.freq(o.freq()*r); printf("%g\n", o.freq());
+//		#define DO(o) printf("%g\n", o.freq());
+//		DO(cf0) DO(cf1) DO(cf2) DO(cf3) DO(cf4) DO(cf5)
+//		DO(sf0) DO(sf1) DO(sf2) DO(sf3) DO(sf4) DO(sf5)
+//		#undef DO
+//	}
 
 protected:
 	AllPass1<Tv, Tp, Synced1> cf0,cf1,cf2,cf3,cf4,cf5, sf0,sf1,sf2,sf3,sf4,sf5;
 };
-
 
 
 
@@ -533,6 +531,8 @@ public:
 	Tv operator()(const Tv& i0){
 		return (mSum += i0 - Base::operator()(i0)) * mRSize;
 	}
+	
+	void zero(){ assign(Tv(0)); }
 	
 	virtual void onResize(){ mRSize = 1./Base::size(); }
 
@@ -594,7 +594,7 @@ protected:
 //---- AllPass1
 
 T_VPS AllPass1<Tv,Tp,Ts>::AllPass1(Tp frq)
-:	d1((Tv)0), mFreq(frq)
+:	d1(Tv(0)), mFreq(frq)
 {	Ts::initSynced(); }
 
 T_VPS inline void AllPass1<Tv,Tp,Ts>::freq(Tp v){
@@ -605,8 +605,8 @@ T_VPS inline void AllPass1<Tv,Tp,Ts>::freq(Tp v){
 T_VPS inline void AllPass1<Tv,Tp,Ts>::freqF(Tp v){
 	mFreq = v;
 	c = scl::freqToRad(v, Ts::ups());
-	c = (Tp)1.27323954474 * c - (Tp)1;		// 4/pi * c - 1, linear apx
-	c = c * ((Tp)0.76 + (Tp)0.24 * c * c);
+	c = Tp(1.27323954474) * c - Tp(1);		// 4/pi * c - 1, linear apx
+	c = c * (Tp(0.76) + Tp(0.24) * c * c);
 }
 
 T_VPS inline Tv AllPass1<Tv,Tp,Ts>::operator()(Tv i0){ 
@@ -616,8 +616,8 @@ T_VPS inline Tv AllPass1<Tv,Tp,Ts>::operator()(Tv i0){
 	return o0;
 }
 
-T_VPS inline Tv AllPass1<Tv,Tp,Ts>::high(Tv i0){ return (i0 - operator()(i0)) * (Tv)0.5; }
-T_VPS inline Tv AllPass1<Tv,Tp,Ts>::low (Tv i0){ return (i0 + operator()(i0)) * (Tv)0.5; }
+T_VPS inline Tv AllPass1<Tv,Tp,Ts>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
+T_VPS inline Tv AllPass1<Tv,Tp,Ts>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
 
 T_VPS inline Tp AllPass1<Tv,Tp,Ts>::freq(){ return mFreq; }
 T_VPS void AllPass1<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
