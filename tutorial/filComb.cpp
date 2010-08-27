@@ -8,10 +8,10 @@
 #include "tutorial.h"
 
 int feedType=0;				// Feed type
-double sweepFreq = 1./8;
+double sweepFreq = 1./4;
 Accum<> tmr(sweepFreq, 2);	// Switch between flanging types
-//LFO<> src(110);			// A rich source
-NoiseWhite<> src;
+Saw<> src(100);
+//NoiseWhite<> src;
 LFO<> mod(sweepFreq);
 Comb<float, ipl::Any> comb(1./100, 1,0);
 
@@ -41,11 +41,11 @@ void audioCB(AudioIOData& io){
 			(++feedType) %= 8;
 		}
 		
-		float s = src();
+		float s = src()*0.2;
 		
 		comb.ipolType(ipl::ROUND);
-		comb.delay(mod.triU() * 1./400);
-		s = comb(s)*0.1;
+		comb.delay(mod.triU() * 1./400 + 1./10000);
+		s = comb(s);
 
 		io.out(0)[i] = io.out(1)[i] = s;
 	}
