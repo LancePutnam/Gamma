@@ -83,7 +83,7 @@ public:
 
 	/// @param[in] decay	Number of units until initial value decays -60 dB
 	/// @param[in] val		Intial value
-	Decay(T decay, T val=1);
+	Decay(T decay=T(1), T val=T(1));
 
 	T operator()();			///< Generates next sample.
 	
