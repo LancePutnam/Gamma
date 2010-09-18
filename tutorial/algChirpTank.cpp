@@ -20,7 +20,7 @@ float dcyMul = 0.1f;
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		using namespace gam::rnd;
 
 		float dcy60 = lfoD.upU();

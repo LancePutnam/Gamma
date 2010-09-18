@@ -25,7 +25,7 @@ Chorus chrB3(0.13, 0.002, 0.05111, -0.7, 0.9);
 
 void audioCB(AudioIOData& io){
 	using namespace gam::rnd;
-	for(unsigned i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 
 		if(tmr()){ if(prob()) rng++; }
 

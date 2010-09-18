@@ -8,7 +8,7 @@
 
 using namespace gam;
 
-uint32_t chan=-1;
+int chan=-1;
 Accum<> tmr(2, 2);
 NoisePink<> src;
 SineD<> osc(2000, 0.1, 0.1);
@@ -17,7 +17,7 @@ void audioCB(AudioIOData & io){
 
 	io.zeroOut();
 	
-	for(uint32_t i=0; i<io.framesPerBuffer(); ++i){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 
 		if(tmr()){
 			++chan;

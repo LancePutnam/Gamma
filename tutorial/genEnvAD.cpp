@@ -15,7 +15,7 @@ double tilt = 0;			// Tilt of envelope; 0=percussive, 1=reversive
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 	
 		if(tmr()){
 			tilt += 0.1; if(tilt > 1) tilt=0;	// increment tilt amount

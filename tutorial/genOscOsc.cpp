@@ -15,7 +15,7 @@ Osc<> osc3(ff + 0.03, 0, osc1);		// Detuned oscillator sharing osc1's table
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 	
 		if(tmr()){
 			osc1.zero();			// zero wavetable

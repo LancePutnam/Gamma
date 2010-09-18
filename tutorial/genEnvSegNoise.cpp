@@ -15,7 +15,7 @@ Sine<> osc;
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 	
 		float s = seg(noise);
 		osc.freq(1000 + 400*s);

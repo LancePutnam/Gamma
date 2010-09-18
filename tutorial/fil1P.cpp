@@ -13,7 +13,7 @@ OnePole<> filt(10);
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		
 		float cutoff = scl::pow3(mod.triU()) * 10000;
 		

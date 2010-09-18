@@ -17,7 +17,7 @@ Quadra<> shifter(100);
 
 void audioCB(AudioIOData& io){
 	using namespace gam::rnd;
-	for(unsigned i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 
 		float s = osc.up()*0.1;
 

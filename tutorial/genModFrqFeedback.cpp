@@ -12,7 +12,7 @@ LFO<> mod(1./10);			// modulator of modulation index (0.1 hz)
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 
 		float s = osc();
 		io.out(0)[i] = io.out(1)[i] = s * 0.2f;

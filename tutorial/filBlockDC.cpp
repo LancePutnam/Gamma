@@ -17,7 +17,7 @@ int blockingOn = 1;
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		
 		if(tmr()){
 			blockingOn ^= 1;

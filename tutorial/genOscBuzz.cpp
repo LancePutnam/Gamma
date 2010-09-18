@@ -12,7 +12,7 @@ LFO<> mod(1./16);
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 	
 		int nh = mod.triU() * 64;
 		buzz.harmonics(nh);

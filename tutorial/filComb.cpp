@@ -17,7 +17,7 @@ Comb<float, ipl::Any> comb(1./100, 1,0);
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		
 		if(tmr()){
 			switch(feedType){

@@ -61,7 +61,7 @@ tutorial: $(SLIB_FILE)
 # Compile and run source files in examples/ folder
 tutorial/%.cpp: $(SLIB_FILE) FORCE
 	@$(CC) $(CFLAGS) -o $(BIN_DIR)/$(*F) $@ $(LFLAGS) $(SLIB_FILE)
-	@./$(BIN_DIR)/$(*F)
+	@$(BIN_DIR)/$(*F)
 
 # Remove active build configuration binary files
 .PHONY: clean

@@ -39,7 +39,7 @@ PluckedString pluck4(scl::freq("d3"));
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		
 		if(tmr()){
 			if(rnd::prob(0.1/1)) pluck1.reset();

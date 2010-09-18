@@ -16,12 +16,12 @@ struct UserData{
 // create a callback for generating a block of samples
 void audioCB(AudioIOData& io){
 
-	UserData& user = *(UserData *)io.user;
+	UserData& user = *(UserData *)io.user();
 	float ampL = user.ampL;
 	float ampR = user.ampR;
 
 	// loop through the number of samples in the block
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		
 		float s = io.in(0)[i];		// get the line-in or microphone sample
 		

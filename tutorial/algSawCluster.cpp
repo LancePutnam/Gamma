@@ -20,7 +20,7 @@ Reson<> res0(400, 2000), res1(800, 2000);
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 		using namespace gam::rnd;
 
 		if(tmr()){

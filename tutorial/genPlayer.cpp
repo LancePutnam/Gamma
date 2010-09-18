@@ -13,7 +13,7 @@ Player<float, ipl::Cubic, tap::Wrap> player("sounds/drop00.wav");
 
 void audioCB(AudioIOData& io){
 
-	for(uint32_t i=0; i<io.framesPerBuffer(); i++){
+	for(int i=0; i<io.framesPerBuffer(); ++i){
 	
 		if(tmr()){
 			float r = pow(2, rnd::uniS(1.));
