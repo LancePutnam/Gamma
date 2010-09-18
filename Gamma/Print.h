@@ -8,6 +8,7 @@
 	Visual functions for printing and colors.
 */
 
+#include <string>
 #include <stdio.h>
 #include "Gamma/Constants.h"
 #include "Gamma/Types.h"
@@ -21,7 +22,7 @@ void colorHSV(float r, float g, float b, float &h, float &s, float &v);
 /// Returns an ASCII character most closely matching an intensity value in [0,1].
 char intensityToASCII(float v);
 
-template<class T> void print(const T& v, const char * post="", const char * pre="", FILE * fp=stdout);
+template<class T> void print(const T& v, const char * post="\n", const char * pre="", FILE * fp=stdout);
 
 /// Prints 2D pixel array
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
@@ -63,12 +64,13 @@ inline char intensityToASCII(float v){
 	return map[int(N*scl::clip(v,0.9999999f))];
 }
 
-#define DEF(type, spec)\
+#define DEF(type, spec, val)\
 template<>\
 inline void print<type>(const type& v, const char * post, const char * pre, FILE * fp){\
-	fprintf(fp, "%s%"#spec"%s", pre, v, post);\
+	fprintf(fp, "%s%"#spec"%s", pre, val, post);\
 }
-DEF(float, f) DEF(double, f) DEF(uint32_t, d) DEF(int, d)
+DEF(float, g, v) DEF(double, g, v) DEF(uint32_t, d, v) DEF(int, d, v)
+DEF(std::string, s, v.c_str())
 #undef DEF
 
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
