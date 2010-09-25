@@ -43,7 +43,6 @@ protected:
 
 
 
-
 /// Attack-decay envelope
 template <class T=gam::real, class Ts=Synced>
 class AD : public Ts{
@@ -55,14 +54,15 @@ public:
 	/// @param[in] crvD		Decay curvature
 	AD(T unitsA, T unitsD, T crvA = 4, T crvD = -4);
 	
+	bool done() const;			///< Returns whether value is below threshold
+	
+	T operator()();				///< Generates next sample
+	
 	void attack(T units);		///< Set attack units
 	void curve(T valA, T valD);	///< Set attack/decay curvatures
 	void decay(T units);		///< Set decay units
 	void reset();				///< Reset envelope
 	void set(T unitsA, T unitsD);	///< Set attack/decay units
-	
-	bool done();		///< Returns whether value is below threshold
-	T operator()();		///< Generates next sample
 	
 	virtual void onResync(double r);
 
@@ -85,16 +85,16 @@ public:
 	/// @param[in] val		Intial value
 	Decay(T decay=T(1), T val=T(1));
 
+	T decay() const;		///< Returns -60 dB decay length.
+	bool done(T thresh=T(0.001)) const; ///< Returns whether value is below threshold
+	T value() const;		///< Returns current value.
+
 	T operator()();			///< Generates next sample.
 	
 	void decay(T val);		///< Set number of units for curve to decay -60 dB.
 	void reset();			///< Set current value to 1.
 	void value(T val);		///< Set current value.
-	
-	T decay() const;		///< Returns -60 dB decay length.
-	bool done(T thresh = (T)0.001) const; ///< Returns whether value is below threshold
-	T value() const;		///< Returns current value.
-	
+
 	virtual void onResync(double r);
 	
 protected:
@@ -102,6 +102,42 @@ protected:
 };
 
 
+/// Binary gate controlled by threshold comparison
+template <class T=gam::real, class Ts=Synced>
+class Gate : public Ts{
+public:
+
+	/// @param[in] closingDelay		units to wait before closing while under threshold
+	/// @param[in] threshold		threshold below which gate closes
+	Gate(double closingDelay=0, double threshold=0.001)
+	:	mDelay(closingDelay), mRemain(closingDelay), mThresh(threshold), mClosed(0)
+	{}
+
+	/// Check whether gate is closed
+	bool done() const { printf("%g\n", mRemain); return mClosed; }
+
+	/// Filter value
+	T operator()(const T& v){		
+		if(gam::norm(v) < mThresh){
+			mRemain -= Synced::ups();
+			if(mRemain <= 0) return close();
+		}
+		else{
+			mRemain = mDelay;
+		}
+		return open();
+	}
+	
+	/// Set closing delay
+	Gate& delay(double v){ mDelay=mRemain=v; return *this; }
+
+protected:
+	double mDelay, mRemain;
+	double mThresh;
+	int mClosed;
+	T close(){ mClosed=1; return T(0); }
+	T  open(){ mClosed=0; return T(1); }
+};
 
 
 /// Interpolation envelope segment
@@ -385,7 +421,7 @@ TM1 inline void AD<TM2>::reset(){
 
 TM1 void AD<TM2>::set(T unitsA, T unitsD){ attack(unitsA); decay(unitsD); }
 
-TM1 inline bool AD<TM2>::done(){ return mStage == 2; }
+TM1 inline bool AD<TM2>::done() const { return mStage == 2; }
 
 TM1 inline T AD<TM2>::operator()(){
 	switch(mStage){
