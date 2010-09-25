@@ -21,12 +21,12 @@ public:
 	Node2(bool zeroLinks);
 	virtual ~Node2();
 	
-	T * nodeL;					///< Reference to left node.
-	T * nodeR;					///< Reference to right node.
+	T * nodeL;					///< Pointer to left node
+	T * nodeR;					///< Pointer to right node
 	
-	void nodeInsertL(T & node);	///< Insert myself to left of node.
-	void nodeInsertR(T & node);	///< Insert myself to right of node.
-	void nodeRemove();			///< Remove myself from linked list.
+	void nodeInsertL(T& node);	///< Insert myself to left of node
+	void nodeInsertR(T& node);	///< Insert myself to right of node
+	void nodeRemove();			///< Remove myself from linked list
 	
 	const Node2<T>& leftmost() const {
 		Node2<T> * t = nodeL;
@@ -40,40 +40,149 @@ public:
 };
 
 
+template <class T>
+class Node3{
+public:
+
+	T * parent;		///< Parent node
+	T * child;		///< Child node
+	T * sibling;	///< Right sibling
+
+	Node3()
+	:	parent(0), child(0), sibling(0)
+	{}
+	
+//	const T * parent() const { return mParent; }
+//	const T * child() const { return mChild; }
+//	const T * sibling() const { return mSibling; }
+//
+//	T * parent(){ return mParent; }
+//	T * child(){ return mChild; }
+//	T * sibling(){ return mSibling; }
+
+	/// Add node as my first child
+	void addFirstChild(T * newChild){
+		newChild->removeFromParent();
+		newChild->parent = self();
+		newChild->sibling = child;
+		child = newChild;
+	}
+
+	/// Add node as my last child
+	void addLastChild(T * newChild){
+		newChild->removeFromParent();
+		newChild->parent = self();
+		if(!child){	// No children, so make first child
+			child = newChild;
+		}
+		else{		// Have children, so add to end of children
+			lastChild()->sibling = newChild;
+		}
+	}
+	
+	/// Remove self from parent leaving my own descendent tree intact
+	void removeFromParent(){
+
+		if(parent && parent->child){
+
+			// re-patch parent's child?
+			if(parent->child == self()){
+				// I'm my parent's first child 
+				// - remove my reference, but keep the sibling list healthy
+				parent->child = sibling;
+			}
+			
+			// re-patch the sibling chain?
+			else{
+				// I must be one of parent->child's siblings
+				T * temp = parent->child;
+				while(temp->sibling){
+					if(temp->sibling == self()) {
+						// I'm temp's sibling
+						// - remove my reference, keep the sibling list healthy
+						temp->sibling = this->sibling; 
+						break; 
+					}
+					temp = temp->sibling;
+				}
+			}
+			
+			parent=0; sibling=0; // no more parent or sibling, but child is still valid
+		}
+	}
+
+	T * lastChild(){
+		T * n = child;
+		while(n->sibling) n = n->sibling;
+		return n;
+	}
+
+	/// Returns next node using depth-first traversal.
+	
+	/// Returns 0 when the next node equals the terminal node.
+	///
+	T * next(const T * const terminal){		
+		T * n = self();
+		
+		if(n->child){
+			n = n->child;
+		}
+		else if(n->sibling){
+			n = n->sibling;
+		}
+		else{
+			while(n != terminal && n->sibling == 0){
+				n = n->parent;
+			}
+			if(n != terminal && n->sibling){
+				n = n->sibling;
+			}
+		}
+		return (n != terminal) ? n : 0;
+	}
+
+	const T * next(const T * const terminal) const {		
+		return const_cast<const T*>(next(terminal));
+	}
+
+private:
+	T * self(){ return static_cast<T*>(this); }
+	const T * self() const { return static_cast<T*>(this); }
+};
+
+
 /// A quadruply-linked node.
 template <class T>
 class Node4{
 public:
+
 	Node4();
 	virtual ~Node4();
 
-	T * parent;
-	T * child;
-	T * right;
-	T * left;
+	T * parent;		///< Parent node
+	T * child;		///< Child node
+	T * right;		///< Right sibling
+	T * left;		///< Left sibling
 
 	void add(T * node);			///< Add node to my children.
 	
-	//! Remove myself from parent. Does not delete instance.
+	/// Remove myself from parent leaving my child branch intact.
 	
-	//! This method should always be called from the instance's destructor.
-	//!
+	/// This method should always be called from the instance's destructor.
+	///
 	void remove();				
 
 	void setAsFirstChild();		///< Make myself the first child
 	void setAsLastChild();		///< Make myself the last child
 
-	//! Returns next node using preorder traversal.
+	/// Returns next node using depth-first traversal.
 	
-	//! If the next node is 'terminal', returns 0.
-	//!
-	T * nextPreorder(const T * terminal) const;
+	/// Returns 0 when the next node equals the terminal node.
+	///
+	T * next(const T * terminal) const;
 
-	//T * nextBreadth(T * terminate);		// Returns next node using breadth first traversal.
-										// If the next node is 'terminate', returns 0.
-
-	virtual void print(const char * append = "");			///< Print my value.
-	void printDescendents(const char * append = "");		///< Print indented outline of my descendents.
+	void print(const char * append="");				///< Print my value.
+	void printDescendents(const char * append="");	///< Print indented outline of my descendents.
 };
 
 
@@ -138,12 +247,9 @@ TEM void Node2<T>::printAll(const char * append, FILE * fp) const {
 
 // Node4
 
-TEM Node4<T>::Node4(){
-	parent = 0;
-	child = 0;
-	right = 0;
-	left = 0;
-}
+TEM Node4<T>::Node4()
+:	parent(0), child(0), right(0), left(0)
+{}
 
 TEM Node4<T>::~Node4(){
 }
@@ -166,12 +272,9 @@ TEM void Node4<T>::add(T * node){
 
 
 TEM void Node4<T>::remove(){
-
-	// connect neighbor siblings
-	if(left)	left->right = right;
-	else		if(parent) parent->child = right;
-	
-	if(right)	right->left = left;
+	if(left)		left->right = right;	// connect left to right, or...
+	else if(parent)	parent->child = right;	// connect parent to right
+	if(right)		right->left = left;		// connect right to left
 }
 
 
@@ -200,8 +303,8 @@ TEM void Node4<T>::setAsLastChild(){
 	if(right){	// i.e. not last child
 	
 		// connect neighbor siblings
-		if(left) left->right = right;
-		else			parent->child = right;
+		if(left)	left->right = right;
+		else		parent->child = right;
 		right->left = left;
 		
 		// insert in last child location
@@ -215,7 +318,7 @@ TEM void Node4<T>::setAsLastChild(){
 }
 
 
-TEM T * Node4<T>::nextPreorder(const T * terminal) const {
+TEM T * Node4<T>::next(const T * terminal) const {
 	
 	T * node = (T *)this;
 	
@@ -226,11 +329,11 @@ TEM T * Node4<T>::nextPreorder(const T * terminal) const {
 		node = node->right;
 	}
 	else{
-		while( node != terminal && node->right == 0 ){
+		while(node != terminal && node->right == 0){
 			node = node->parent;
 		}
 
-		if( node != terminal && node->right ){
+		if(node != terminal && node->right){
 			node = node->right;
 		}
 	}
@@ -272,7 +375,7 @@ TEM void Node4<T>::printDescendents(const char * append){
 		T * p = node->parent;
 		while(p != this->parent){ printf("  "); p = p->parent; }
 		node->print("\n");
-		node = node->nextPreorder((T *)this);
+		node = node->next((T *)this);
 	}while(node);
 	
 	printf("%s",append);
@@ -303,7 +406,7 @@ TEM void Node4<T>::printDescendents(const char * append){
 //
 //#undef TREE_OBJECT
 
-} // end namespace gam
+} // gam::
 
 #undef TEM
 #endif
