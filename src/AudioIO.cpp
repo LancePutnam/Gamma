@@ -106,27 +106,27 @@ AudioIOData::AudioIOData(void * userData)
 :	mImpl(new Impl),
 	mUser(userData),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
-	mBufI(0), mBufO(0), mBufA(0), mBufT(0), mNumI(0), mNumO(0), mNumA(0)
+	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0)
 {}
 
 AudioIOData::~AudioIOData(){
 	deleteBuf(mBufI);
 	deleteBuf(mBufO);
-	deleteBuf(mBufA);
+	deleteBuf(mBufB);
 	deleteBuf(mBufT);
 }
 
-void AudioIOData::zeroAux(){ zero(mBufA, framesPerBuffer() * mNumA); }
+void AudioIOData::zeroBus(){ zero(mBufB, framesPerBuffer()*mNumB); }
 void AudioIOData::zeroOut(){ zero(mBufO, channelsOut() * framesPerBuffer()); }
 
-float *       AudioIOData::aux(int num) const { return mBufA + num * framesPerBuffer(); }
+float *       AudioIOData::bus(int num) const { return mBufB + num * framesPerBuffer(); }
 const float * AudioIOData::in (int chn) const { return mBufI + chn * framesPerBuffer(); }
 float *       AudioIOData::out(int chn) const { return mBufO + chn * framesPerBuffer(); }
 float *       AudioIOData::temp() const { return mBufT; }
 
 int AudioIOData::channelsIn () const { return mNumI; }
 int AudioIOData::channelsOut() const { return mNumO; }
-int AudioIOData::channelsAux() const { return mNumA; }
+int AudioIOData::channelsBus() const { return mNumB; }
 int AudioIOData::channelsInDevice() const { return (int)mImpl->mInParams.channelCount; }
 int AudioIOData::channelsOutDevice() const { return (int)mImpl->mOutParams.channelCount; }
 
@@ -319,8 +319,8 @@ void AudioIO::deviceOut(const AudioDevice& v){
 }
 
 
-void AudioIO::channelsAux(int num){
-	mNumA = resize(mBufA, num * mFramesPerBuffer);
+void AudioIO::channelsBus(int num){
+	mNumB = resize(mBufB, num * mFramesPerBuffer);
 }
 
 
@@ -498,7 +498,7 @@ void AudioIO::framesPerSecond(double v){	//printf("AudioIO::fps(%f)\n", v);
 void AudioIO::framesPerBuffer(int n){
 	if(framesPerBuffer() != n){
 		mFramesPerBuffer = n;
-		channelsAux(AudioIOData::channelsAux());
+		channelsBus(AudioIOData::channelsBus());
 		reopen();
 	}
 }

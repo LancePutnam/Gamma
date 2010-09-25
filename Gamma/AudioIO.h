@@ -47,16 +47,23 @@ public:
 	/// Audio frame iterator
 	class Iterator{
 	public:
-		Iterator(const AudioIOData& aio): mFrame(-1), io(aio){}
+		Iterator(const AudioIOData& io, int frameStart=0)
+		:	mFrame(frameStart-1), mIO(io)
+		{}
 		
 		/// Get current frame number
 		int frame() const { return mFrame; }
 
+		const AudioIOData& io() const { return mIO; }
+
 		/// Get current input sample on specified channel
-		const float& in (int chan) const { return io.in (chan)[frame()]; }
+		const float& in (int chan) const { return mIO.in (chan)[frame()]; }
 		
 		/// Get current output sample on specified channel
-		float&       out(int chan) const { return io.out(chan)[frame()]; }
+		float&       out(int chan) const { return mIO.out(chan)[frame()]; }
+
+		/// Get current bus sample on specified channel
+		float&       bus(int chan) const { return mIO.bus(chan)[frame()]; }
 		
 		/// Add value to current output sample on specified channel
 		void out(float v, int chan) const { out(chan)+=v; }
@@ -65,11 +72,11 @@ public:
 		void out(float v, int ch1, int ch2) const { out(v, ch1); out(v,ch2); }
 	
 		/// Iterate frame counter, returning true while more frames
-		bool operator()(){ return (++mFrame)<io.framesPerBuffer(); }
+		bool operator()() const { return (++mFrame)<mIO.framesPerBuffer(); }
 	
 	protected:
-		int mFrame;
-		const AudioIOData& io;
+		mutable int mFrame;
+		const AudioIOData& mIO;
 	};
 
 	/// Constructor
@@ -79,14 +86,14 @@ public:
 	
 	void * user() const{ return mUser; } ///< Get pointer to user data
 	
-	float *      aux(int chan) const;	///< Get an aux channel buffer
+	float *      bus(int chan) const;	///< Get a bus channel buffer
 	const float* in (int chan) const;	///< Get an in channel buffer
 	float *      out(int chan) const;	///< Get an out channel buffer
 	float *		 temp() const;			///< Get a single channel temporary buffer
 	
 	int channelsIn () const;			///< Get effective number of input channels
 	int channelsOut() const;			///< Get effective number of output channels
-	int channelsAux() const;			///< Get number of aux channels
+	int channelsBus() const;			///< Get number of allocated bus channels
 
 	int channelsInDevice() const;		///< Get number of channels opened on input device
 	int channelsOutDevice() const;		///< Get number of channels opened on output device
@@ -95,7 +102,7 @@ public:
 	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
 	double time() const;				///< Get current stream time in seconds
 	double time(int frame) const;		///< Get current stream time in seconds of frame
-	void zeroAux();						///< Zeros all the aux buffers
+	void zeroBus();						///< Zeros all the bus buffers
 	void zeroOut();						///< Zeros all the internal output buffers
 
 protected:
@@ -103,9 +110,9 @@ protected:
 	void * mUser;					// User specified data
 	int mFramesPerBuffer;
 	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufA;	// input, output, and aux buffers
+	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
 	float * mBufT;					// temporary one channel buffer
-	int mNumI, mNumO, mNumA;		// input, output, and aux channels
+	int mNumI, mNumO, mNumB;		// input, output, and aux channels
 };
 
 
@@ -181,17 +188,16 @@ public:
 	using AudioIOData::framesPerBuffer;
 	using AudioIOData::framesPerSecond;
 
+	audioCallback callback;						///< User specified callback function.
+
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
 	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
 	double cpu() const;							///< Returns current CPU usage of audio thread
 	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
 	bool zeroNANs() const;						///< Returns whether to zero NANs in output buffer going to DAC
-
-	audioCallback callback;						///< User specified callback function.
 	
-	void operator()();							///< Calls callback manually
-	
+	void operator()();							///< Call callback manually
 	bool open();								///< Opens audio device.
 	bool close();								///< Closes audio device. Will stop active IO.
 	bool start();								///< Starts the audio IO.  Will open audio device if necessary.
@@ -206,14 +212,12 @@ public:
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
 
-	void channelsIn(int n){ channels(n,false); } ///< Set number of input channels
-	void channelsOut(int n){ channels(n,true); } ///< Set number of output channels
-	void channelsAux(int num);					///< Set number of auxiliary channels
+	void channelsIn(int n){channels(n,false);}	///< Set number of input channels
+	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
+	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
-	
 	void deviceIn(const AudioDevice& v);		///< Set input device
 	void deviceOut(const AudioDevice& v);		///< Set output device
-	
 	void framesPerSecond(double v);				///< Set number of frames per second
 	void framesPerBuffer(int n);				///< Set number of frames per processing buffer
 	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer going to DAC
