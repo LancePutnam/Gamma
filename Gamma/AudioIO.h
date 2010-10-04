@@ -47,8 +47,8 @@ public:
 	/// Audio frame iterator
 	class Iterator{
 	public:
-		Iterator(const AudioIOData& io, int frameStart=0)
-		:	mFrame(frameStart-1), mIO(io)
+		Iterator(const AudioIOData& io, int startFrame=0)
+		:	mFrame(startFrame-1), mIO(io)
 		{}
 		
 		/// Get current frame number
@@ -66,10 +66,10 @@ public:
 		float&       bus(int chan) const { return mIO.bus(chan)[frame()]; }
 		
 		/// Add value to current output sample on specified channel
-		void out(float v, int chan) const { out(chan)+=v; }
+		void sum(float v, int chan) const { out(chan)+=v; }
 		
 		/// Add value to current output sample on specified channels
-		void out(float v, int ch1, int ch2) const { out(v, ch1); out(v,ch2); }
+		void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
 	
 		/// Iterate frame counter, returning true while more frames
 		bool operator()() const { return (++mFrame)<mIO.framesPerBuffer(); }
@@ -104,6 +104,8 @@ public:
 	double time(int frame) const;		///< Get current stream time in seconds of frame
 	void zeroBus();						///< Zeros all the bus buffers
 	void zeroOut();						///< Zeros all the internal output buffers
+
+	Iterator iterator(int startFrame=0) const { return Iterator(*this, startFrame); }
 
 protected:
 	class Impl; Impl * mImpl;
@@ -156,8 +158,8 @@ private:
 
 
 /// Audio callback type
-typedef void (*audioCallback)(AudioIOData& io);
-
+typedef void (* audioCallback)(AudioIOData& io);
+//typedef void (* iteratorAudioCallback)(AudioIOData::Iterator& it);
 
 /// Audio input/output streaming.
 
