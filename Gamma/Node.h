@@ -126,8 +126,21 @@ public:
 		
 		if(n->child){
 			n = n->child;
+			return (n != terminal) ? n : 0;
 		}
-		else if(n->sibling){
+		else{
+			return nextBreadth(terminal);
+		}
+	}
+
+	const T * next(const T * const terminal) const {		
+		return const_cast<const T*>(next(terminal));
+	}
+	
+	/// Returns next breadth-wise node
+	T * nextBreadth(const T * const terminal){
+		T * n = self();
+		if(n->sibling){
 			n = n->sibling;
 		}
 		else{
@@ -139,10 +152,6 @@ public:
 			}
 		}
 		return (n != terminal) ? n : 0;
-	}
-
-	const T * next(const T * const terminal) const {		
-		return const_cast<const T*>(next(terminal));
 	}
 
 private:
