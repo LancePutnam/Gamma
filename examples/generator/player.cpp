@@ -1,12 +1,12 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Tutorial:		Generator / Player
+	Example:		Generator / Player
 	Description:	Demonstration of playing back a sound file at different
 					rates.
 */
 
-#include "tutorial.h"
+#include "../examples.h"
 
 Accum<> tmr(1);
 Player<float, ipl::Cubic, tap::Wrap> player("sounds/water3.wav");
