@@ -282,7 +282,12 @@ protected:
 /// long as |feedback| < 1.
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Tf=gam::real, class Ts=Synced>
 class Comb : public Delay<Tv,Si,Ts> {
+
+private:
+	typedef Delay<Tv,Si,Ts> Base;
+
 public:
+	using Base::operator();
 
 	Comb();
 
@@ -328,10 +333,6 @@ public:
 
 protected:
 	Tf mFFD, mFBK;
-
-private:
-	typedef Delay<Tv,Si,Ts> Base;
-	using Base::operator();
 };
 
 
