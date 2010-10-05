@@ -7,7 +7,7 @@
 #include <string>
 #include "sndfile.h"
 #include "Gamma/mem.h"
-#include "Gamma/Types.h"
+//#include "Gamma/Types.h"
 
 #define TEM template<class T>
 
@@ -31,10 +31,10 @@ public:
 	
 	/// The sound file info structure will be zero.
 	///
-	SoundFile(std::string path="");
+	SoundFile(const std::string& path="");
 	
 	/// Creates object given a path and an other object from which to get its header info.
-	SoundFile(std::string path, const SoundFile& src);
+	SoundFile(const std::string& path, const SoundFile& src);
 	
 	/// The destructor will automatically close any open files.
 	~SoundFile();
@@ -61,16 +61,16 @@ public:
 	/// the requested number of frames of data. The array must be large enough
 	/// to hold the product of frames and the number of channels.
 	//ULONG read(float * dst, ULONG numFrames);
-	TEM uint32_t read(T * dst, uint32_t numFrames);
+	TEM int read(T * dst, int numFrames);
 	
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
-	TEM uint32_t readAll(T * dst);
+	TEM int readAll(T * dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 	
 	/// If the number of channels is > 1, memory will be dynamically allocated
 	///	and freed for the deinterleaving.
-	TEM uint32_t readAllD(T * dst);
+	TEM int readAllD(T * dst);
 	
 	/// Writes interleaved frames from array to file.
 	
@@ -78,27 +78,26 @@ public:
 	/// The file write frames functions write the data in the array pointed to
 	/// by ptr to the file. The array must be large enough to hold the product
 	/// of frames and the number of channels.
-	TEM uint32_t write(const T * src, uint32_t numFrames);
+	TEM int write(const T * src, int numFrames);
 
 	// Sound file properties
 	double frameRate() const;			///< Returns frames/second
-	uint32_t frames() const;			///< Returns number of frames
-	uint32_t channels() const;			///< Returns number of channels
-	uint32_t samples() const;			///< Returns number of samples ( = frames x channels)
+	int frames() const;					///< Returns number of frames
+	int channels() const;				///< Returns number of channels
+	int samples() const;				///< Returns number of samples ( = frames x channels)
 	int format() const;					///< Returns format field
 	int formatMajor() const;
 	int formatMinor() const;
 	const char * extension();			///< Returns file extension
-	std::string path() const;			///< Returns path of sound file
+	const std::string& path() const;	///< Returns path of sound file
 	
-	void channels(uint32_t num);		///< Set number of channels
+	void channels(int num);				///< Set number of channels
 	void frameRate(double hz);			///< Set frames/second
 	void format(int newFormat);			///< Set format field
 	void formatMajor(int major);		///< Set major format field
 	void formatMinor(int minor);		///< Set minor format field
 	void info(const SoundFile& src);	///< Copy file information from an other file
-	void path(const char * path);		///< Set path of sound file
-	void path(std::string path);		///< Set path of sound file
+	void path(const std::string& path);	///< Set path of sound file
 	
 	/// Gets instrument data from file.
 	/// Returns whether or not it found the instrument data.
@@ -108,7 +107,7 @@ public:
 	
 	const char * errorString() const;
 	
-	static int formatMajor(std::string sfpath);
+	static int formatMajor(const std::string& sfpath);
 	
 private:
 	SNDFILE * fp;
@@ -120,12 +119,6 @@ private:
 
 	void formatInfoMajor();
 	void formatInfoSubtype();
-	
-//	TEM static uint32_t read(SoundFile * sf, T * dst, uint32_t numFrames);
-//	TEM static uint32_t readAll(SoundFile * sf, T * dst);
-//	TEM static uint32_t readAllD(SoundFile * sf, T * dst);
-//	
-//	TEM static uint32_t write(SoundFile * sf, const T * src, uint32_t numFrames); 
 };
 
 
@@ -134,39 +127,29 @@ private:
 // Implementation_______________________________________________________________
 
 inline double SoundFile::frameRate() const { return (double)mInfo.samplerate; }
-inline uint32_t SoundFile::frames() const { return (uint32_t)mInfo.frames; }
-inline uint32_t SoundFile::channels() const { return (uint32_t)mInfo.channels; }
-inline uint32_t SoundFile::samples() const { return frames() * channels(); }
+inline int SoundFile::frames() const { return (int)mInfo.frames; }
+inline int SoundFile::channels() const { return (int)mInfo.channels; }
+inline int SoundFile::samples() const { return frames() * channels(); }
 inline int SoundFile::format() const { return mInfo.format; }
 inline int SoundFile::formatMajor() const { return mInfo.format & SF_FORMAT_TYPEMASK; }
 inline int SoundFile::formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; }
 
 inline const char * SoundFile::errorString() const { return sf_strerror(fp); }
-inline std::string SoundFile::path() const { return mPath; }
+inline const std::string& SoundFile::path() const { return mPath; }
 
-inline void SoundFile::channels(uint32_t num){ mInfo.channels = (int)num; }
+inline void SoundFile::channels(int num){ mInfo.channels = (int)num; }
 inline void SoundFile::frameRate(double hz){ mInfo.samplerate = (int)hz; }
 inline void SoundFile::format(int newFormat){ mInfo.format = newFormat; }
-
-inline void SoundFile::formatMajor(int major){
-	mInfo.format = (mInfo.format & (~SF_FORMAT_TYPEMASK)) | (major & SF_FORMAT_TYPEMASK);
-}
-
-inline void SoundFile::formatMinor(int minor){
-	mInfo.format = (mInfo.format & (~SF_FORMAT_SUBMASK)) | (minor & SF_FORMAT_SUBMASK);
-}
-
-inline void SoundFile::path(const char * p){ mPath = p; }
-inline void SoundFile::path(std::string p){ mPath = p; }
+inline void SoundFile::path(const std::string& p){ mPath = p; }
 
 // specialized templates to hook into libsndfile functions
 #define DEFINE_SPECIAL(type) \
 	template<> \
-	inline uint32_t SoundFile::read<type>(type * dst, uint32_t numFrames){\
+	inline int SoundFile::read<type>(type * dst, int numFrames){\
 		return sf_readf_##type(fp, dst, numFrames);\
 	}\
 	template<> \
-	inline uint32_t SoundFile::write<type>(const type * src, uint32_t numFrames){\
+	inline int SoundFile::write<type>(const type * src, int numFrames){\
 		return sf_writef_##type(fp, src, numFrames);\
 	}
 	DEFINE_SPECIAL(float)
@@ -175,19 +158,19 @@ inline void SoundFile::path(std::string p){ mPath = p; }
 	DEFINE_SPECIAL(double)
 #undef DEFINE_SPECIAL
 
-TEM inline uint32_t SoundFile::readAll(T * dst){
+TEM inline int SoundFile::readAll(T * dst){
 	sf_seek(fp, 0, SEEK_SET);
 	return read(dst, frames());
 }
 
-TEM uint32_t SoundFile::readAllD(T * dst){
-	uint32_t numChannels = channels();
+TEM int SoundFile::readAllD(T * dst){
+	int numChannels = channels();
 
 	if(1 == numChannels) return readAll(dst);
 	
 	// Allocate memory for deinterleaving.  Don't know of any in-place methods.
 	T * temp = new T[samples()];
-	uint32_t framesRead = 0;
+	int framesRead = 0;
 	
 	if(temp){
 		framesRead = readAll(temp);

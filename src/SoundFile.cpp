@@ -9,13 +9,13 @@ namespace gam{
 using std::string;
 
 
-SoundFile::SoundFile(string pathA){
+SoundFile::SoundFile(const string& pathA){
 	fp = 0;
 	path(pathA);
 	memset(&inst, 0, sizeof(inst));
 }
 
-SoundFile::SoundFile(string pathA, const SoundFile & infoSrc){
+SoundFile::SoundFile(const string& pathA, const SoundFile& infoSrc){
 	fp = 0;
 	path(pathA);
 	memset(&inst, 0, sizeof(inst));
@@ -24,22 +24,6 @@ SoundFile::SoundFile(string pathA, const SoundFile & infoSrc){
 
 SoundFile::~SoundFile(){
 	close();
-}
-
-bool SoundFile::openRead(){
-	mInfo.format = 0;	// unless opening RAW
-	fp = sf_open(mPath.c_str(), SFM_READ, &mInfo);
-	return 0 != fp;
-}
-
-bool SoundFile::openWrite(){
-
-	// set major format based on path
-	formatMajor(formatMajor(mPath));
-
-	fp = sf_open(mPath.c_str(), SFM_WRITE, &mInfo);
-	if(fp) sf_command(fp, SFC_SET_CLIPPING, NULL, SF_TRUE) ;
-	return 0 != fp;
 }
 
 bool SoundFile::close(){
@@ -118,7 +102,7 @@ void SoundFile::formatInfoSubtype(){
 	sf_command(fp, SFC_GET_FORMAT_INFO, &formatInfo, sizeof(formatInfo));
 }
 
-int SoundFile::formatMajor(string sfpath){
+int SoundFile::formatMajor(const string& sfpath){
 	size_t pos = sfpath.find_last_of(".");
 	
 	if(string::npos != pos){
@@ -126,10 +110,34 @@ int SoundFile::formatMajor(string sfpath){
 		//printf("%s\n", ext.c_str());
 		
 		if(ext == "wav")  return SF_FORMAT_WAV;
-		if(ext == "aiff") return SF_FORMAT_AIFF;
+		if(ext == "aiff" || ext == "aif") return SF_FORMAT_AIFF;
 	}
 	
 	return 0;
+}
+
+void SoundFile::formatMajor(int major){
+	mInfo.format = (mInfo.format & (~SF_FORMAT_TYPEMASK)) | (major & SF_FORMAT_TYPEMASK);
+}
+
+void SoundFile::formatMinor(int minor){
+	mInfo.format = (mInfo.format & (~SF_FORMAT_SUBMASK)) | (minor & SF_FORMAT_SUBMASK);
+}
+
+bool SoundFile::openRead(){
+	mInfo.format = 0;	// unless opening RAW
+	fp = sf_open(mPath.c_str(), SFM_READ, &mInfo);
+	return 0 != fp;
+}
+
+bool SoundFile::openWrite(){
+
+	// set major format based on path
+	formatMajor(formatMajor(mPath));
+
+	fp = sf_open(mPath.c_str(), SFM_WRITE, &mInfo);
+	if(fp) sf_command(fp, SFC_SET_CLIPPING, NULL, SF_TRUE) ;
+	return 0 != fp;
 }
 
 void SoundFile::print(){
