@@ -35,8 +35,8 @@
 	#include "Gamma/Envelope.h"
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
+	#include "Gamma/Player.h"
 	#include "Gamma/RecurrenceMaps.h"
-	#include "Gamma/Sampler.h"
 	#include "Gamma/SoundFile.h"
 	#include "Gamma/Sync.h"
 
