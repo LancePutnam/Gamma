@@ -15,7 +15,7 @@ double tilt = 0;			// Tilt of envelope; 0=percussive, 1=reversive
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		if(tmr()){
 			tilt += 0.1; if(tilt > 1) tilt=0;	// increment tilt amount
@@ -25,7 +25,7 @@ void audioCB(AudioIOData& io){
 
 		float s = src() * env() * 0.2;
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

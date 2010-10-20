@@ -23,10 +23,10 @@ void audioCB(AudioIOData& io){
 	// loop through the number of samples in the block
 	for(int i=0; i<io.framesPerBuffer(); ++i){
 		
-		float s = io.in(0)[i];		// get the line-in or microphone sample
+		float s = io.in(0,i);		// get the line-in or microphone sample
 		
-		io.out(0)[i] = s * ampL;	// set left and right output channel samples
-		io.out(1)[i] = s * ampR;
+		io.out(0,i) = s * ampL;	// set left and right output channel samples
+		io.out(1,i) = s * ampR;
 	}
 }
 

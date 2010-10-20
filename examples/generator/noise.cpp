@@ -16,9 +16,7 @@ int type = 0;			// Noise type
 
 void audioCB(AudioIOData& io){
 
-	AudioIOData::Iterator i = io.iterator();
-
-	while(i()){
+	while(io()){
 		
 		if(tmr()) (++type)%=3;
 		
@@ -30,7 +28,7 @@ void audioCB(AudioIOData& io){
 			case 2: s = brown();	break;
 		}
 
-		i.sum(s*0.2, 0,1);
+		io.sum(s*0.2, 0,1);
 	}
 }
 

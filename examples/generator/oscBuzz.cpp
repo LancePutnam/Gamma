@@ -12,14 +12,14 @@ LFO<> mod(1./16);
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		int nh = mod.triU() * 64;
 		buzz.harmonics(nh);
 	
 		float s = buzz();
 
-		io.out(0)[i] = io.out(1)[i] = s*0.2;
+		io.out(0) = io.out(1) = s*0.2;
 	}
 }
 

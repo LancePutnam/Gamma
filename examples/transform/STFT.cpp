@@ -22,7 +22,7 @@ LFO<> edge(1./16, 0.5);
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); i++){
+	while(io()){
 
 		float s = src();
 
@@ -39,8 +39,8 @@ void audioCB(AudioIOData& io){
 		
 		s = stft() * 0.2;
 		
-		io.out(0)[i] = s;
-		io.out(1)[i] = s;
+		io.out(0) = s;
+		io.out(1) = s;
 	}
 }
 

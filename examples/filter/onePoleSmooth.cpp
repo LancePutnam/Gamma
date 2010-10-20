@@ -13,7 +13,7 @@ OnePole<> freq(10);
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		
 		if(tmr()){
 			freq = pow(2, rnd::uniS(1.))*440;
@@ -23,7 +23,7 @@ void audioCB(AudioIOData& io){
 		
 		float s = src();
 			
-		io.out(0)[i] = io.out(1)[i] = s * 0.2f;
+		io.out(0) = io.out(1) = s * 0.2f;
 	}
 }
 

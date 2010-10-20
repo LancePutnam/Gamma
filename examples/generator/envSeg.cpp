@@ -15,7 +15,7 @@ Seg<> env(1, fund*2, fund*2);		// beat envelope
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		if(tmr()){
 			env = fund*2 + rnd::uni(10.0);	// set new target value of envelope
@@ -24,7 +24,7 @@ void audioCB(AudioIOData& io){
 		osc2.freq(env());					// modulate frequency of 2nd harmonic
 		float s = (osc1() + osc2()) * 0.1;
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

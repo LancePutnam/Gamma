@@ -12,7 +12,7 @@ SineD<> osc(440, 0.2, 1);	// Decaying sinusoid
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		
 		// Randomize frequency and decay time every so often...
 		if(tmr())
@@ -20,7 +20,7 @@ void audioCB(AudioIOData& io){
 		
 		float s = osc();
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

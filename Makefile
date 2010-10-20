@@ -21,17 +21,19 @@ OBJS = $(SRCS:.cpp=.o)
 OBJS := $(addprefix $(OBJ_DIR), $(OBJS))
 SRCS := $(addprefix $(SRC_DIR), $(SRCS))
 
-CFLAGS		+= $(EXT_CFLAGS)
-CFLAGS		+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
-LFLAGS		+= $(EXT_LFLAGS)
-LFLAGS		+= -L$(EXT_LIB_DIR)
-DLIB_PATH 	:= $(addprefix $(BIN_DIR), $(DLIB_FILE))
-SLIB_PATH 	:= $(addprefix $(BIN_DIR), $(SLIB_FILE))
+CPPFLAGS	+= $(EXT_CPPFLAGS)
+LDFLAGS		+= $(EXT_LDFLAGS)
 
-DEPS		:= $(BUILD_DIR)depends
+CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
+LDFLAGS		:= $(addprefix -L, $(MY_LIB_DIRS)) $(LDFLAGS)
+
+LDFLAGS		+= -L$(EXT_LIB_DIR)
+
+DEPS		:= $(OBJS:.o=.d)
+CFLAGS		:= $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
 
 #--------------------------------------------------------------------------
-# Targets
+# Rules
 #--------------------------------------------------------------------------
 
 # Force these targets to always execute
@@ -39,11 +41,19 @@ DEPS		:= $(BUILD_DIR)depends
 
 # Build object file from C++ source
 $(OBJ_DIR)%.o: %.cpp
-	@echo CC $< $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+	@echo CXX $< $@
+	@$(CXX) -c $(CFLAGS) $< -o $@
+
+# Create dependency file from C++ source
+$(OBJ_DIR)%.d: %.cpp | createFolders
+	@set -e; rm -f $@; \
+	$(CXX) -MM $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(OBJ_DIR)\1.o : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+#	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@;
 
 # Build static library
-$(SLIB_PATH): createFolders external $(OBJS)
+$(SLIB_PATH): createFolders $(OBJS)
 	@echo AR $@
 	@$(AR) $@ $(OBJS)
 	@$(RANLIB) $@
@@ -51,46 +61,49 @@ $(SLIB_PATH): createFolders external $(OBJS)
 # Build dynamic (shared) library
 $(DLIB_FILE): createFolders external $(OBJS)
 	@echo SH $@
-	@$(CC) $(DLIBFLAGS) $(LFLAGS) -o $@ $(OBJS)
-
-$(DEPS): createFolders $(SRCS) FORCE
-	@$(CC) -MM $(SRCS) -I./ > $(DEPS)
+	@$(CXX) $(DLIBFLAGS) $(LDFLAGS) -o $@ $(OBJS)
 
 # Create file with settings for linking to external libraries
 external:
 	@echo '\
-EXT_CFLAGS += $(EXT_CFLAGS) \r\n\
-EXT_LFLAGS += $(EXT_LFLAGS) \
+CPPFLAGS += $(EXT_CPPFLAGS) \r\n\
+LDFLAGS  += $(EXT_LDFLAGS) \
 '> Makefile.external
 
 # Compile and run source files in examples/ and tests/ folders
 examples/%.cpp tests/%.cpp: $(SLIB_PATH) FORCE
-	@$(CC) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LFLAGS) $(SLIB_PATH)
+	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(SLIB_PATH)
+ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
+endif
 
 tests: $(SLIB_PATH)
-	@$(MAKE) --directory $(TEST_DIR)
+	@$(MAKE) -C $(TEST_DIR)
 
 # Remove active build configuration binary files
 clean:
-	@rm -df $(OBJ_DIR)* $(BIN_DIR)*
+	@$(RM) $(OBJ_DIR)* $(OBJ_DIR) $(BIN_DIR)* $(BIN_DIR)
 
 # Remove all build configuration binary files
 cleanall:
-	@$(MAKE) clean BUILD_CONFIG=Release
-	@$(MAKE) clean BUILD_CONFIG=Debug
-	@rm -df $(BUILD_DIR)* $(BUILD_DIR)
+	@$(MAKE) clean BUILD_CONFIG=release
+	@$(MAKE) clean BUILD_CONFIG=debug
+	@$(RM) $(BUILD_DIR)* $(BUILD_DIR)
 
 # Clean and rebuild library
 rebuild: clean $(SLIB_PATH)
 
+# Install library into path specified by INSTALL_DIR
+# Include files are copied into INSTALL_DIR/include/LIB_NAME and
+# library files are copied to INSTALL_DIR/lib
 install: $(SLIB_PATH)
+#	@echo 'INSTALL $(INSTALL_DIR)'
 	@$(INSTALL) -d $(INSTALL_DIR)
 	@$(INSTALL) -d $(INSTALL_DIR)lib
-	@$(INSTALL) -d $(INSTALL_DIR)include/$(INC_DIR)
+	@$(INSTALL) -d $(INSTALL_DIR)include/$(LIB_NAME)
 	@$(INSTALL) -c -m 644 $(SLIB_PATH) $(INSTALL_DIR)lib
 	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(INSTALL_DIR)lib
-	@$(INSTALL) -c -m 644 $(INC_DIR)*.h $(INSTALL_DIR)include/$(INC_DIR)
+	@$(INSTALL) -c -m 644 $(INC_DIR)*.h $(INSTALL_DIR)include/$(LIB_NAME)
 	@$(RANLIB) $(INSTALL_DIR)lib/$(SLIB_FILE)
 
 all: $(SLIB_FILE) tests tutorial

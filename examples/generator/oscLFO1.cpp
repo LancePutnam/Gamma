@@ -14,7 +14,7 @@ gen::Trigger cnt(12);		// counter for LFO type
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		if(tmr()) cnt();		// increment LFO type
 
@@ -41,7 +41,7 @@ void audioCB(AudioIOData& io){
 			case 11: s = osc.up2()/4;	break;		// Mix between two saws
 		}
 		
-		io.out(0)[i] = io.out(1)[i] = s * 0.2f;
+		io.out(0) = io.out(1) = s * 0.2f;
 	}
 }
 

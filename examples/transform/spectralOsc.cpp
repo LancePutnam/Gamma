@@ -21,7 +21,7 @@ STFT stft(hopSize * 4, hopSize, 0, WinType::Hann, Bin::Polar);
 
 void audioCB(AudioIOData & io){
 
-	for(int f=0; f<io.framesPerBuffer(); ++f){
+	while(io()){
 		float smp = src() * 0.5f;
 		
 		if( stft(smp) ){
@@ -37,7 +37,7 @@ void audioCB(AudioIOData & io){
 				//f1 = bq1(s1);
 			}	
 		}
-		io.out(0)[f] = io.out(1)[f] = stft();
+		io.out(0) = io.out(1) = stft();
 	}
 }
 

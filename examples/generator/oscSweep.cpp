@@ -13,12 +13,12 @@ Sweep<> sweep(440);			// Linearly sweeping phase
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		float s = sweep();		// upward ramp between 0 and 1
 		s = table[int(s*N)];
 
-		io.out(0)[i] = io.out(1)[i] = s*0.2;
+		io.out(0) = io.out(1) = s*0.2;
 	}
 }
 

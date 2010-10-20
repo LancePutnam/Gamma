@@ -20,7 +20,7 @@ Reson<> res0(400, 2000), res1(800, 2000);
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		using namespace gam::rnd;
 
 		if(tmr()){
@@ -51,8 +51,8 @@ void audioCB(AudioIOData& io){
 		float sl = ech0(del0(s), ap0(ech0()));
 		float sr = ech1(del1(s), ap1(ech1()));
 
-		io.out(0)[i] = sl;
-		io.out(1)[i] = sr;
+		io.out(0) = sl;
+		io.out(1) = sr;
 	}
 	
 }

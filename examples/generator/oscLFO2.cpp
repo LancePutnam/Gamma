@@ -18,7 +18,7 @@ bool modMode = false;		// True = amplitude modulation, False = Frequency Modulat
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		if(tmr()){
 			if(cnt()){
@@ -56,7 +56,7 @@ void audioCB(AudioIOData& io){
 			s = osc.cos();
 		}
 		
-		io.out(0)[i] = io.out(1)[i] = s*0.2;
+		io.out(0) = io.out(1) = s*0.2;
 	}
 }
 

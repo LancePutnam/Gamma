@@ -117,28 +117,84 @@ struct RSin : public Val<T>{ INHERIT;
 		val2 = val;
 		return val = v0;
 	}
-	
 
-	void next3(T& o2, T& o1, T& o0) const {
-		T v0 = o0 = mul * val  - val2;
-		o2 = val2 = mul * v0   - val;
-		o1 = val  = mul * val2 - v0;
-	}
+	/// Get amplitude
+	T amp() const {	return mAmp; }
 
+	/// Get unit frequency
+	T freq() const { return mFreq; }
+
+	/// Get unit phase
+	T phase() const { return mPhase; }
+
+	/// Set amplitude
+	RSin& amp(const T& v){ return set(freq(), phase(), v); }
 	
-	T freq() const { return acos(mul*0.5) * M_1_2PI; }
-	
+	/// Set unit frequency
+	RSin& freq(const T& v){	return set(v, phase(), amp()); }
+
+	/// Set unit phase
+	RSin& phase(const T& v){ return set(freq(), v, amp()); }
+
 	/// Set parameters from unit freq, phase, and amplitude.
 	RSin& set(const T& frq, const T& phs, const T& amp=T(1)){
+//		printf("%g %g %g\n", frq, phs, amp);
+		mFreq = frq;
+		mAmp = amp;
+		mPhase = phs;
+
 		T f=frq*M_2PI, p=phs*M_2PI;
-		mul  = (T)2 * (T)cos(f);
-		val2 = (T)sin(p - f * T(2))*amp;
-		val  = (T)sin(p - f       )*amp;
+		mul  = 2 * cos(f);
+		val2 = sin(p - f * T(2))*amp;
+		val  = sin(p - f       )*amp;
+//		printf("%g %g %g\n", freq(), phase(), this->amp());
 		return *this;
 	}
 
+// Note: these methods compute parameters directly from coefficients, but is buggy...
+//	/// Get amplitude
+//	T amp() const {	T a,p; ampPhase(a,p); return a; }
+//	
+//	/// Get amplitude and unit phase
+//	void ampPhase(T& a, T& p) const {
+//		p = phase();
+//
+//		const T eps = 1e-8;
+//		if(p > eps && p < (1-eps) && scl::abs(p-0.5) > eps)
+//			a = val /sin(p * M_2PI);
+//		else
+//			a = val2/sin((p - freq())*M_2PI);
+//		return;
+//	}
+//
+//	/// Get unit frequency
+//	T freq() const { return acos(mul*0.5) * M_1_2PI; }
+//
+//	/// Get unit phase
+//	T phase() const {
+//		if(val == val2) return 0;
+//		T f = freq()*M_2PI;
+//		T y = val * sin(f);
+//		T x = val * cos(f) - val2;
+//		T r = atan2(y, x) * M_1_2PI;
+//		if(r < 0) r += 1;
+//		return r;
+//	}
+//
+//	/// Set amplitude
+//	RSin& amp(const T& v){ return set(freq(), phase(), v); }
+//	
+//	/// Set unit frequency
+//	RSin& freq(const T& v){	T a,p; ampPhase(a,p); return set(v,a,p); }
+//
+//	/// Set unit phase
+//	RSin& phase(const T& v){ return set(freq(), v, amp()); }
+
 	mutable T val2;
-	T mul;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
+	T mul;			///< Multiplication factor
+
+protected:
+	T mFreq, mAmp, mPhase;
 };
 
 
@@ -162,12 +218,42 @@ struct RSin2 : public Val<T>{ INHERIT;
 		val2 = val;
 		return val = v0;
 	}
-	
-	T freq() const { return acos(mul1*0.5/decay()) * M_1_2PI; }
+
+	/// Get amplitude
+	T amp() const {	return mAmp; }
+
+	/// Get decay factor
+	//T decay() const{ return mDecay; }
 	T decay() const{ return sqrt(-mul2); }
+
+	/// Get unit frequency
+	T freq() const { return mFreq; }
+	//T freq() const { return acos(mul1*0.5/decay()) * M_1_2PI; }
+
+	/// Get unit phase
+	T phase() const { return mPhase; }
+
+
+	/// Set amplitude
+	RSin2& amp(const T& v){ return set(freq(), phase(), decay(), v); }
+
+	/// Set decay
+	RSin2& decay(const T& v){ return set(freq(), phase(), v, amp()); }
 	
+	/// Set unit frequency
+	RSin2& freq(const T& v){ return set(v, phase(), decay(), amp()); }
+
+	/// Set unit phase
+	RSin2& phase(const T& v){ return set(freq(), v, decay(), amp()); }
+
 	/// Set parameters from freq (rad/unit), phase (rad), decay, and amplitude.
 	RSin2& set(T frq, T phs, T dcy, T amp=T(1)){
+		printf("%g %g %g %g\n", frq, phs, dcy, amp);
+		mFreq = frq;
+		mAmp = amp;
+		mPhase = phs;
+		mDecay = dcy;
+
 		frq *= M_2PI; phs *= M_2PI;
 		dcy = scl::atLeast(dcy, (T)0.00000001);
 		
@@ -176,11 +262,15 @@ struct RSin2 : public Val<T>{ INHERIT;
 		T rdcy = 1./dcy;
 		val2 = (T)sin(phs - frq * (T)2) * amp * rdcy * rdcy;
 		val  = (T)sin(phs - frq       ) * amp * rdcy;
+		printf("%g %g %g %g\n", freq(), phase(), decay(), this->amp());
 		return *this;
 	}
 
 	mutable T val2;
-	T mul2, mul1;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
+	T mul2, mul1;			///< Multiplication factors
+
+protected:
+	T mFreq, mAmp, mPhase, mDecay;
 };
 
 

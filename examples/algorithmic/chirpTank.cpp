@@ -20,7 +20,7 @@ float dcyMul = 0.1f;
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		using namespace gam::rnd;
 
 		float dcy60 = lfoD.upU();
@@ -54,8 +54,8 @@ void audioCB(AudioIOData& io){
 		chr(t0, t0, t1);
 		scl::mix2(t0, t1, opMix());
 		
-		io.out(0)[i] = t0;
-		io.out(1)[i] = t1;
+		io.out(0) = t0;
+		io.out(1) = t1;
 	}
 }
 

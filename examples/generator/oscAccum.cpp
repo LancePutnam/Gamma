@@ -11,7 +11,7 @@ Accum<> tmr(10);			// timer to switch between LFO types
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		float s = 0;
 	
@@ -20,7 +20,7 @@ void audioCB(AudioIOData& io){
 			s = 0.2;
 		}
 		
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

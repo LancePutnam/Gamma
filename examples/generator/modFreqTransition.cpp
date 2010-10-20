@@ -14,7 +14,7 @@ LFO<> modFreq(1./20.);	// envelope for changing modulator frequency
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 
 		oscM.freq(modFreq.hann() * 110 + 1);	// change modulator frequency
 		oscC.freq(ff + oscM()*100);				// modulate frequency of carrier
@@ -23,7 +23,7 @@ void audioCB(AudioIOData& io){
 
 		float s = oscC() * 0.2;
 		
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

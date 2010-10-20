@@ -21,7 +21,7 @@ float curvature = 10;
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		if(tmr()){
 			// reset envelope to beginning
@@ -35,7 +35,7 @@ void audioCB(AudioIOData& io){
 
 		float s = src() * env();
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

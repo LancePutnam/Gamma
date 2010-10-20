@@ -42,7 +42,7 @@ int flangeType=0;		// Flanging type
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		
 		if(tmr()){
 			switch(flangeType){
@@ -69,7 +69,7 @@ void audioCB(AudioIOData& io){
 		float s = src.up();
 		s = flanger(s)*0.1;
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

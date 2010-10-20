@@ -13,10 +13,10 @@ SineRs<> oscs(512);
 void audioCB(AudioIOData& io){
 
 	// sample-based generation
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 
 		float s = oscs()*4;
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

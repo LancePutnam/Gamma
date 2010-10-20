@@ -17,7 +17,7 @@ Comb<float, ipl::Any> comb(1./100, 1,0);
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		
 		if(tmr()){
 			switch(feedType){
@@ -47,7 +47,7 @@ void audioCB(AudioIOData& io){
 		comb.delay(mod.triU() * 1./400 + 1./10000);
 		s = comb(s);
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

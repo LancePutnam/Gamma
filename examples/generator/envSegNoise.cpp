@@ -15,13 +15,13 @@ Sine<> osc;
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 	
 		float s = seg(noise);
 		osc.freq(1000 + 400*s);
 		s = osc()*0.1;
 
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

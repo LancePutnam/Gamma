@@ -14,7 +14,7 @@ Burst burst(2e4,2e3, 0.1);
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		
 		if(tmr()) burst.reset();
 		
@@ -39,7 +39,7 @@ void audioCB(AudioIOData& io){
 		// How about multi-tap feedback?
 		//s += delay(s + delay.read(0.197)*0.3 + delay.read(0.141)*0.4 + delay.read(0.093)*0.2)*0.5;
 	
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

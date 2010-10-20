@@ -25,6 +25,23 @@ int ut_gen(){
 	slice(A,N) = RSin<>(2./N, 0.5);
 	for(int i=0; i<N; ++i) assert(A[i] = 0.5*cos(2*M_2PI*i/N));
 
+	{
+		double f = 1./8;
+		RSin<> g(f, 1);
+		
+//		for(int i=0; i<8; ++i){
+//			double r = g();
+//			printf("% 6.3f, % 6.3f, % 6.3f\n", r, g.phase(), g.amp());
+//		}
+
+		for(int i=0; i<8; ++i){
+			g();
+			assert(scl::almostEqual(g.freq(), f));
+			assert(scl::almostEqual(g.amp(), 1));
+			//assert(scl::almostEqual(g.phase(), 0) || scl::almostEqual(g.phase(), 1));
+		}
+	}
+
 	slice(A,N) = RAdd<>(1,0);
 	ASSERT(A, 0,1,2,3,4,5,6,7)
 	slice(A,N) = RAdd<>(2,1);

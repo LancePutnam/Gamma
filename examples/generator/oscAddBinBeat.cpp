@@ -16,10 +16,10 @@ Sine<> osc2(ff + freqBeat, 0.5);	// beat oscillator starting 180 out-of-phase
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 
-		io.out(0)[i] = osc1() * 0.1;
-		io.out(1)[i] = osc2() * 0.1;
+		io.out(0) = osc1() * 0.1;
+		io.out(1) = osc2() * 0.1;
 	}
 }
 

@@ -5,27 +5,38 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <string>
-#include "sndfile.h"
+#include <stdio.h>
 #include "Gamma/mem.h"
-//#include "Gamma/Types.h"
 
 #define TEM template<class T>
 
 namespace gam{
 	
 	
-/// Class for reading and writing sound file data.
-
-/// This is a wrapper around Erik de Castro Lopo's excellent libsndfile 
-/// http://www.mega-nerd.com/libsndfile/ .
-/// Supports WAV, AIFF, AU, RAW, PAF, SVX, NIST, VOC, IRCAM, W64, MAT4
-/// MAT5, PVF, XI, HTK, SDS, AVR, WAVEX, SD2, FLAC, CAF.\n
-/// The read() and write() methods are specialized template methods and will
-/// result in a compilation error if the data type is not supported by
-/// libsndfile.  At the moment, the following types of data are supported:
-/// short, int, float, and double.
+/// Class for reading and writing sound file data
 class SoundFile{
 public:
+	enum Format{
+		WAV = 1,	/* Microsoft WAV format (little endian default). */
+		AIFF,		/* Apple/SGI AIFF format (big endian). */
+		AU,			/* Sun/NeXT AU format (big endian). */
+		RAW,		/* RAW PCM data. */
+		FLAC,		/* FLAC lossless file format */
+	};
+	
+	enum EncodingType{
+		PCM_S8 = 1,	/* Signed 8 bit data */
+		PCM_16,		/* Signed 16 bit data */
+		PCM_24,		/* Signed 24 bit data */
+		PCM_32,		/* Signed 32 bit data */
+		PCM_U8,		/* Unsigned 8 bit data (WAV and RAW only) */
+
+		FLOAT,		/* 32 bit float data */
+		DOUBLE,		/* 64 bit float data */
+
+		ULAW,		/* U-Law encoded. */
+		ALAW,		/* A-Law encoded. */
+	};
 
 	/// Creates object given a path.
 	
@@ -81,44 +92,30 @@ public:
 	TEM int write(const T * src, int numFrames);
 
 	// Sound file properties
+	EncodingType encoding() const;
+	Format format() const;
 	double frameRate() const;			///< Returns frames/second
 	int frames() const;					///< Returns number of frames
 	int channels() const;				///< Returns number of channels
 	int samples() const;				///< Returns number of samples ( = frames x channels)
-	int format() const;					///< Returns format field
-	int formatMajor() const;
-	int formatMinor() const;
 	const char * extension();			///< Returns file extension
 	const std::string& path() const;	///< Returns path of sound file
 	
+	void encoding(EncodingType v);
+	void format(Format v);
 	void channels(int num);				///< Set number of channels
 	void frameRate(double hz);			///< Set frames/second
-	void format(int newFormat);			///< Set format field
-	void formatMajor(int major);		///< Set major format field
-	void formatMinor(int minor);		///< Set minor format field
 	void info(const SoundFile& src);	///< Copy file information from an other file
 	void path(const std::string& path);	///< Set path of sound file
-	
-	/// Gets instrument data from file.
-	/// Returns whether or not it found the instrument data.
-	bool instrument();
+
+	void seek(int pos, int seekMode);
 	
 	void print();			///< Print information about file to stdout.
 	
-	const char * errorString() const;
-	
-	static int formatMajor(const std::string& sfpath);
-	
 private:
-	SNDFILE * fp;
-	SF_INFO mInfo;
-	SF_INSTRUMENT inst;
-	SF_FORMAT_INFO formatInfo;
-	
-	std::string mPath;
+	class Impl; Impl * mImpl;
 
-	void formatInfoMajor();
-	void formatInfoSubtype();
+	std::string mPath;
 };
 
 
@@ -126,40 +123,13 @@ private:
 
 // Implementation_______________________________________________________________
 
-inline double SoundFile::frameRate() const { return (double)mInfo.samplerate; }
-inline int SoundFile::frames() const { return (int)mInfo.frames; }
-inline int SoundFile::channels() const { return (int)mInfo.channels; }
+inline void SoundFile::path(const std::string& p){ mPath = p; }
 inline int SoundFile::samples() const { return frames() * channels(); }
-inline int SoundFile::format() const { return mInfo.format; }
-inline int SoundFile::formatMajor() const { return mInfo.format & SF_FORMAT_TYPEMASK; }
-inline int SoundFile::formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; }
 
-inline const char * SoundFile::errorString() const { return sf_strerror(fp); }
 inline const std::string& SoundFile::path() const { return mPath; }
 
-inline void SoundFile::channels(int num){ mInfo.channels = (int)num; }
-inline void SoundFile::frameRate(double hz){ mInfo.samplerate = (int)hz; }
-inline void SoundFile::format(int newFormat){ mInfo.format = newFormat; }
-inline void SoundFile::path(const std::string& p){ mPath = p; }
-
-// specialized templates to hook into libsndfile functions
-#define DEFINE_SPECIAL(type) \
-	template<> \
-	inline int SoundFile::read<type>(type * dst, int numFrames){\
-		return sf_readf_##type(fp, dst, numFrames);\
-	}\
-	template<> \
-	inline int SoundFile::write<type>(const type * src, int numFrames){\
-		return sf_writef_##type(fp, src, numFrames);\
-	}
-	DEFINE_SPECIAL(float)
-	DEFINE_SPECIAL(short)
-	DEFINE_SPECIAL(int)
-	DEFINE_SPECIAL(double)
-#undef DEFINE_SPECIAL
-
 TEM inline int SoundFile::readAll(T * dst){
-	sf_seek(fp, 0, SEEK_SET);
+	seek(0, SEEK_SET);
 	return read(dst, frames());
 }
 

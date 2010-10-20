@@ -17,7 +17,7 @@ int blockingOn = 1;
 
 void audioCB(AudioIOData& io){
 
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 		
 		if(tmr()){
 			blockingOn ^= 1;
@@ -33,7 +33,7 @@ void audioCB(AudioIOData& io){
 		// Simulate clipping on the DAC
 		s = scl::clipS(s) * 0.2;
 			
-		io.out(0)[i] = io.out(1)[i] = s;
+		io.out(0) = io.out(1) = s;
 	}
 }
 

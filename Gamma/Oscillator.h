@@ -247,8 +247,8 @@ public:
 /// Sine oscillator based on an efficient recursion equation.
 
 /// This oscillator is based on a recursion equation requiring only one
-/// multiply and add per sample computation.  The downsides are that frequency
-/// and phase updates are extremely expensive and 64-bit precision is required 
+/// multiply and add per sample computation. While calculation is fast, frequency
+/// and phase updates are rather expensive and 64-bit precision is required 
 /// to prevent growing or decaying in amplitude over time.  This generator is 
 /// ideal in situations where a stationary sinusoid is all that is required, 
 /// e.g. a grain or modulator.
@@ -256,30 +256,30 @@ template <class Tv=double, class Ts=Synced>
 class SineR : public gen::RSin<Tv>, Ts{
 public:
 
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	amp		Initial amplitude
-	/// @param[in]	phs		Initial unit phase in [0, 1)
-	SineR(Tv frq=440, Tv amp=1, Tv phs=0){ Ts::initSynced(); set(frq, amp, phs); }
+	/// @param[in]	frq		Frequency
+	/// @param[in]	amp		Amplitude
+	/// @param[in]	phs		Unit phase in [0, 1)
+	SineR(Tv frq=440, Tv amp=1, Tv phs=0){ set(frq, amp, phs); }
 
-	/// Returns frequency
+	/// Get frequency
 	Tv freq() const { return Base::freq() * Ts::spu(); }
 
 	/// Set amplitude and phase
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, p); }
 
+	void freq(const Tv& v){ Base::freq(v*Ts::ups()); }
+
 	/// Set all control parameters
-	void set(Tv frq, Tv amp, Tv phs=0){ gen::RSin<Tv>::set(frq*Ts::ups(), phs, amp); mAmp=amp; }
+	void set(Tv frq, Tv amp, Tv phs=0){ Base::set(frq*Ts::ups(), phs, amp); }
 	
 	/// Generate next samples adding into a buffer
 	template <class V>
 	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
 
-	// This might not be a good idea because we don't know amplitude...
-	virtual void onResync(double ratio){ set(gen::RSin<Tv>::freq()/ratio, mAmp, 0); }
+	virtual void onResync(double ratio){ Base::freq(Base::freq()/ratio); }
 
-protected:
-	Tv mAmp;
-private: typedef gen::RSin<Tv> Base;
+private:
+	typedef gen::RSin<Tv> Base;
 };
 
 
@@ -313,7 +313,8 @@ public:
 	/// Set all control parameters
 	void set(uint32_t i, Tv frq, Tv amp, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, phs); }
 
-private: typedef Array<SineR<Tv, Synced1> > Base;
+private:
+	typedef Array<SineR<Tv, Synced1> > Base;
 };
 
 
@@ -330,7 +331,7 @@ public:
 	/// @param[in]	amp		Initial amplitude
 	/// @param[in]	dcy		Initial T60 decay length
 	/// @param[in]	phs		Initial unit phase in [0, 1)
-	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ Ts::initSynced(); set(frq, amp, dcy, phs); }
+	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ set(frq, amp, dcy, phs); }
 
 	/// Returns frequency
 	Tv freq() const { return Base::freq() * Ts::spu(); }
@@ -340,14 +341,20 @@ public:
 	
 	/// Set all control parameters
 	void set(Tv frq, Tv amp, Tv dcy, Tv phs=0){
-		Base::set(frq*Ts::ups(), phs, dcy > (Tv)0 ? (Tv)scl::radius60(dcy, Ts::ups()) : (Tv)1, amp);
+		Base::set(frq*Ts::ups(), phs, dcy > Tv(0) ? (Tv)scl::radius60(dcy, Ts::ups()) : Tv(1), amp);
 	}
 	
 	/// Generate next samples adding into a buffer
 	template <class V>
 	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
 
-private: typedef gen::RSin2<Tv> Base;
+	virtual void onResync(double ratio){
+		Base::freq(Base::freq()/ratio);
+		//Base::decay( scl::radius60(dcy, Ts::ups() );
+	}
+
+private:
+	typedef gen::RSin2<Tv> Base;
 };
 
 
@@ -384,7 +391,8 @@ public:
 	/// Set all control parameters
 	void set(uint32_t i, Tv frq, Tv amp, Tv dcy, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, dcy*Ts::spu(), phs); }
 
-private: typedef Array<SineD<Tv, Synced1> > Base;
+private:
+	typedef Array<SineD<Tv, Synced1> > Base;
 };
 
 
