@@ -253,15 +253,15 @@ public:
 	/// @param[in]	value		Initial value of all elements.
 	explicit Ring(uint32_t size, const T& value=T());
 
-	/// Returns reference to backmost element
+	/// Returns reference to backmost (oldest) element
 	T& atBack(){ return (*this)[indexBack()]; }
 	const T& atBack() const { return (*this)[indexBack()]; }
 	
-	/// Returns reference to frontmost element
+	/// Returns reference to frontmost (newest) element
 	T& atFront(){ return (*this)[indexFront()]; }
 	const T& atFront() const { return (*this)[indexFront()]; }
 	
-	/// Returns reference to element 'ago' indices from front
+	/// Returns reference to element 'ago' indices behind front
 	T& atPrev(uint32_t ago){ return (*this)[indexPrev(ago)]; }
 	const T& atPrev(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
 

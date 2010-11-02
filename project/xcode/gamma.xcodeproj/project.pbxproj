@@ -38,6 +38,9 @@
 		164F33B810508E77009FAD10 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
 		165906A80D0F9F6900EA3DB0 /* testRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDFA16094F8D9E00549AC9 /* testRandom.cpp */; };
 		165906A90D0F9F6900EA3DB0 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
+		16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
+		16692FB0126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
+		16692FB1126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
 		167479521158054C00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479531158054C00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479541158054C00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
@@ -220,6 +223,8 @@
 		161264BC1140A92300E55446 /* ut_mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_mem.cpp; path = ../../tests/ut_mem.cpp; sourceTree = SOURCE_ROOT; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
+		16692FAD126FC53100C1F4E9 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
+		16692FAE126FC9A300C1F4E9 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
 		166DD72D117CD72A00A8BA12 /* fftpack++.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++.cpp"; sourceTree = "<group>"; };
 		167479501158052400A1556D /* Print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Print.h; sourceTree = "<group>"; };
 		167479511158054C00A1556D /* Print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Print.cpp; sourceTree = "<group>"; };
@@ -522,6 +527,7 @@
 				1609E5A011E5B743001A3853 /* Player.h */,
 				167479501158052400A1556D /* Print.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
+				16692FAD126FC53100C1F4E9 /* Recorder.h */,
 				169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */,
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
@@ -549,6 +555,7 @@
 				16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */,
 				16827D5810013FEE001088E7 /* File.cpp */,
 				167479511158054C00A1556D /* Print.cpp */,
+				16692FAE126FC9A300C1F4E9 /* Recorder.cpp */,
 				16E99A210A2A4B7800210497 /* SoundFile.cpp */,
 				168B78F40B75C59100645F1F /* Sync.cpp */,
 			);
@@ -1100,6 +1107,7 @@
 				167479531158054C00A1556D /* Print.cpp in Sources */,
 				16E3D2D7115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2D8115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
+				16692FB0126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1148,6 +1156,7 @@
 				16E3D2D9115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
 				16E3D308115C3D72009165E6 /* utFFT.cpp in Sources */,
+				16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1306,6 +1315,7 @@
 				167479521158054C00A1556D /* Print.cpp in Sources */,
 				16E3D2D4115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2D5115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
+				16692FB1126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
