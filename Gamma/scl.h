@@ -1348,8 +1348,8 @@ inline float rampUp(uint32_t p){
 inline float square(uint32_t p){
 //	phase = 0x3f800000 | (phase & 0x80000000);
 //	return *(float *)&phase;
-	//return p & 0x80000000 ? 1.f : -1.f;
-	return p & MaskSign<float>() ? 1.f : -1.f;
+	//return p & 0x80000000 ? -1.f : 1.f;
+	return p & MaskSign<float>() ? -1.f : 1.f;
 }
 
 // [-1, 0, 1, 0]
@@ -1431,7 +1431,7 @@ inline float rampDownU(uint32_t p){
 inline float squareU(uint32_t p){
 //	phase = (phase & 0x80000000) >> 1;
 //	return *(float *)&phase * 0.5f;
-	return p & 0x80000000 ? 1.f : 0.f;
+	return p & MaskSign<float>() ? 0.f : 1.f;
 }
 
 // [1, 0.5, 0, 0.5]
