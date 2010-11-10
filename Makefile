@@ -26,8 +26,6 @@ CPPFLAGS	+= $(EXT_CPPFLAGS)
 LDFLAGS		+= $(EXT_LDFLAGS)
 
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
-LDFLAGS		:= $(addprefix -L, $(MY_LIB_DIRS)) $(LDFLAGS)
-
 LDFLAGS		+= -L$(EXT_LIB_DIR)
 
 DEPS		:= $(OBJS:.o=.d)
