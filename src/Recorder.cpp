@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "Gamma/Recorder.h"
 
 namespace gam{
@@ -27,7 +28,9 @@ Recorder::Recorder(int channels, int frames){
 //}
 
 int Recorder::read(float *& buf){
-	int N = mRing.size();
+	if(mIR == mIW) return 0;
+
+	int N = size();
 	int iw = mIW;
 	int behind = 0;
 
@@ -45,10 +48,10 @@ int Recorder::read(float *& buf){
 		for(int i=0; i<behind; ++i){
 			mRead[i] = mRing[mIR+i];
 		}
-		//printf("w: %4d, r: %4d, d: %4d\n", mIW, mIR, behind);			
+//		printf("w: %4d, r: %4d, d: %4d\n", (int)mIW, (int)mIR, behind);			
 	}
 	else{			// case 2: two fragment copy
-		int d1 = int(mRing.size()) - mIR;
+		int d1 = N - mIR;
 		for(int i=0; i<d1; ++i){
 			mRead[i] = mRing[mIR+i];
 		}
@@ -57,7 +60,7 @@ int Recorder::read(float *& buf){
 		for(int i=d1; i<d1+d2; ++i){
 			mRead[i] = mRing[i-d1];
 		}
-		//printf("w: %4d, r: %4d, d: %4d + %4d\n", mIW, mIR, d1, d2);
+//		printf("w: %4d, r: %4d, d: %4d + %4d\n", mIW, mIR, d1, d2);
 		behind = d1+d2;
 	}
 	mIR += behind;

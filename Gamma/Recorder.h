@@ -22,7 +22,10 @@ public:
 	int channels() const { return mChans; }
 	
 	/// Get number of multi-channel recording frames
-	int frames() const { return mRing.size()/channels(); }
+	int frames() const { return size()/channels(); }
+
+	/// Get total number of samples (frames x channels) in buffer
+	int size() const { return mRing.size(); }
 
 	/// Write sample into ring buffer without advancing write tap
 	void overwrite(float v, int chan){
@@ -45,7 +48,9 @@ public:
 	
 	/// Empty buffer of most recent samples written from audio thread.
 
-	/// Returns number of frames copied to buffer.
+	/// Returns number of frames copied to buffer. If the number of 
+	/// frames returned is 0, then no samples were read and 'buf'
+	/// is unmodified.
 	/// This should be called from a lower priority thread.
 	int read(float *& buf);
 

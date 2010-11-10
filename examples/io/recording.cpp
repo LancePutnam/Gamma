@@ -40,6 +40,7 @@ int main(){
 		float * buf;
 		int n = rec.read(buf);
 		sf.write(buf, n);
+		//printf("%d\n", n);
 		sleepSec(0.01);
 	}
 
