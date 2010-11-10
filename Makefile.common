@@ -26,6 +26,8 @@ endif
 UNAMEM := $(shell uname -m)
 ifeq ($(UNAMEM), x86_64)
 	ARCH = 32_64
+else ifeq ($(UNAMEM), i686)
+	ARCH = 32_64
 else
 	ARCH = 32
 endif

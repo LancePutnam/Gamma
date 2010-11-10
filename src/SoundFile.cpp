@@ -45,10 +45,10 @@ struct SoundFile::Impl{
 	int format() const { return mInfo.format; }
 	int formatMajor() const { return mInfo.format & SF_FORMAT_TYPEMASK; }
 	int formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; }
-	void format(int newFormat){ mInfo.format = newFormat; }
+	void format(int v){ mInfo.format = v; }
 
 	bool openRead(const std::string& path){
-		mInfo.format = 0;	// unless opening RAW
+		if(formatMinor() != SF_FORMAT_RAW) mInfo.format = 0;
 		fp = sf_open(path.c_str(), SFM_READ, &mInfo);
 		return 0 != fp;
 	}
@@ -57,11 +57,15 @@ struct SoundFile::Impl{
 
 		// set major format based on path
 		formatMajor(formatMajor(path));
-		
+
+		// if no encoding type, use sensible default...
 		if(!formatMinor()) formatMinor(SF_FORMAT_PCM_16);
 
+//		printInfo();
+
 		fp = sf_open(path.c_str(), SFM_WRITE, &mInfo);
-		if(fp) sf_command(fp, SFC_SET_CLIPPING, NULL, SF_TRUE) ;
+
+		if(fp) sf_command(fp, SFC_SET_CLIPPING, NULL, SF_TRUE);
 		return 0 != fp;
 	}
 
@@ -71,32 +75,43 @@ struct SoundFile::Impl{
 		return mFormatInfo.extension;
 	}
 
+	// get file format type based on extension
 	int formatMajor(const string& sfpath){
 		size_t pos = sfpath.find_last_of(".");
 		
 		if(string::npos != pos){
 			string ext = sfpath.substr(pos+1);
 			//printf("%s\n", ext.c_str());
-			
-			if(ext == "wav")  return SF_FORMAT_WAV;
-			if(ext == "aiff" || ext == "aif") return SF_FORMAT_AIFF;
-			if(ext == "au") return SF_FORMAT_AU;
-			if(ext == "flac") return SF_FORMAT_FLAC;
+			if(ext == "wav")					return SF_FORMAT_WAV;
+			if(ext == "aiff" || ext == "aif")	return SF_FORMAT_AIFF;
+			if(ext == "au")						return SF_FORMAT_AU;
+			if(ext == "flac")					return SF_FORMAT_FLAC;
 		}
-		
 		return 0;
 	}
 
-	void formatMajor(int major){
-		mInfo.format = (mInfo.format & (~SF_FORMAT_TYPEMASK)) | (major & SF_FORMAT_TYPEMASK);
+	void formatMajor(int v){
+		mInfo.format = (mInfo.format & (~SF_FORMAT_TYPEMASK)) | (v & SF_FORMAT_TYPEMASK);
+		//printf("formatMajor(int v): %x\n", mInfo.format & SF_FORMAT_TYPEMASK);
 	}
 
-	void formatMinor(int minor){
-		mInfo.format = (mInfo.format & (~SF_FORMAT_SUBMASK)) | (minor & SF_FORMAT_SUBMASK);
+	void formatMinor(int v){
+		mInfo.format = (mInfo.format & (~SF_FORMAT_SUBMASK)) | (v & SF_FORMAT_SUBMASK);
+		//printf("formatMinor(int v): %x\n", mInfo.format & SF_FORMAT_SUBMASK);
 	}
 
 	void info(const Impl& src){
 		memcpy(&mInfo, &src.mInfo, sizeof(mInfo));
+	}
+
+	void printInfo(){
+		printf("\n");
+		printf("frames=     %d\n", (int)mInfo.frames);
+		printf("samplerate= %d\n", mInfo.samplerate);
+		printf("channels=   %d\n", mInfo.channels);
+		printf("format=     %x\n", mInfo.format);
+		printf("sections=   %d\n", mInfo.sections);
+		printf("seekable=   %d\n", mInfo.seekable);
 	}
 
 	SNDFILE * fp;
@@ -106,16 +121,16 @@ struct SoundFile::Impl{
 };
 
 
-SoundFile::SoundFile(const string& pathA)
+SoundFile::SoundFile(const string& path_)
 :	mImpl(new Impl)
 {
-	path(pathA);
+	path(path_);
 }
 
-SoundFile::SoundFile(const string& pathA, const SoundFile& infoSrc)
+SoundFile::SoundFile(const string& path_, const SoundFile& infoSrc)
 :	mImpl(new Impl)
 {
-	path(pathA);
+	path(path_);
 	info(infoSrc);
 }
 

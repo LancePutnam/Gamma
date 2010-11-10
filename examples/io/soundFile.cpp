@@ -11,7 +11,7 @@
 
 int main(){
 
-	const char * path = "./test.aiff";
+	const char * path = "test.aiff";
 	SoundFile sf(path);
 
 	
