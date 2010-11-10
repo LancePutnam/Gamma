@@ -40,7 +40,7 @@ int main(){
 		float * buf;
 		int n = rec.read(buf);
 		sf.write(buf, n);
-		wait(0.01);
+		sleepSec(0.01);
 	}
 
 	//printf("\nPress 'enter' to quit...\n"); getchar();

@@ -28,7 +28,6 @@ static void sleep(nsec_t dt);
 
 /// Suspend thread execution for a specified amount of seconds
 static void sleepSec(double sec);
-static inline void wait(double sec){ sleepSec(sec); }
 
 /// Suspend thread execution until absolute time, t. Returns ns slept.
 static nsec_t sleepUntil(nsec_t t);
