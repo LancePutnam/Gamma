@@ -19,14 +19,14 @@ int main(){
 	{
 		const float sampleRate = 44100;
 		const float lenSec = 2;
-		const unsigned numFrames = sampleRate * lenSec;
+		const int numFrames = sampleRate * lenSec;
 		
 		float freq = 440;
 		float buf[numFrames*2];		// Buffer for storing samples.
 									// The samples are stored interleaved as 
 									// sequential stereo frames.
-
-		sf.format(SF_FORMAT_AIFF | SF_FORMAT_PCM_16);
+		sf.format(SoundFile::AIFF);
+		sf.encoding(SoundFile::PCM_16);
 		sf.channels(2);
 		sf.frameRate(sampleRate);
 		
@@ -34,7 +34,7 @@ int main(){
 		if(sf.openWrite()){	printf("OK\n"); }
 		else{				printf("fail\n"); exit(-1); }
 
-		for(unsigned i=0; i<numFrames; i++){
+		for(int i=0; i<numFrames; i++){
 			
 			float s = i/float(numFrames) * lenSec;	// compute time in seconds
 			float p1 = s * freq * M_2PI;
@@ -62,7 +62,7 @@ int main(){
 	
 		//sf.print();
 		
-		unsigned numFrames = sf.frames();
+		int numFrames = sf.frames();
 		float buf[sf.samples()];
 		
 		//sf.readAll(buf);		// read all samples from sound file into buffer
