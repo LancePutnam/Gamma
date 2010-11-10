@@ -16,26 +16,29 @@ namespace gam{
 /// Class for reading and writing sound file data
 class SoundFile{
 public:
+
+	/// Sound file formats
 	enum Format{
-		WAV = 1,	/* Microsoft WAV format (little endian default). */
-		AIFF,		/* Apple/SGI AIFF format (big endian). */
-		AU,			/* Sun/NeXT AU format (big endian). */
-		RAW,		/* RAW PCM data. */
-		FLAC,		/* FLAC lossless file format */
+		WAV = 1,	/**< Microsoft WAV format (little endian default). */
+		AIFF,		/**< Apple/SGI AIFF format (big endian). */
+		AU,			/**< Sun/NeXT AU format (big endian). */
+		RAW,		/**< RAW PCM data. */
+		FLAC,		/**< FLAC lossless file format */
 	};
-	
+
+	/// Sound file sample encoding types
 	enum EncodingType{
-		PCM_S8 = 1,	/* Signed 8 bit data */
-		PCM_16,		/* Signed 16 bit data */
-		PCM_24,		/* Signed 24 bit data */
-		PCM_32,		/* Signed 32 bit data */
-		PCM_U8,		/* Unsigned 8 bit data (WAV and RAW only) */
+		PCM_S8 = 1,	/**< Signed 8 bit data */
+		PCM_16,		/**< Signed 16 bit data */
+		PCM_24,		/**< Signed 24 bit data */
+		PCM_32,		/**< Signed 32 bit data */
+		PCM_U8,		/**< Unsigned 8 bit data (WAV and RAW only) */
 
-		FLOAT,		/* 32 bit float data */
-		DOUBLE,		/* 64 bit float data */
+		FLOAT,		/**< 32 bit float data */
+		DOUBLE,		/**< 64 bit float data */
 
-		ULAW,		/* U-Law encoded. */
-		ALAW,		/* A-Law encoded. */
+		ULAW,		/**< U-Law encoded. */
+		ALAW,		/**< A-Law encoded. */
 	};
 
 	/// Creates object given a path.
@@ -92,21 +95,21 @@ public:
 	TEM int write(const T * src, int numFrames);
 
 	// Sound file properties
-	EncodingType encoding() const;
-	Format format() const;
-	double frameRate() const;			///< Returns frames/second
-	int frames() const;					///< Returns number of frames
-	int channels() const;				///< Returns number of channels
-	int samples() const;				///< Returns number of samples ( = frames x channels)
-	const char * extension();			///< Returns file extension
-	const std::string& path() const;	///< Returns path of sound file
+	EncodingType encoding() const;				///< Get encoding type
+	Format format() const;						///< Get format
+	double frameRate() const;					///< Get frames/second
+	int frames() const;							///< Get number of frames
+	int channels() const;						///< Get number of channels
+	int samples() const;						///< Get number of samples ( = frames x channels)
+	const char * extension();					///< Get file extension
+	const std::string& path() const;			///< Get path of sound file
 	
-	void encoding(EncodingType v);
-	void format(Format v);
-	void channels(int num);				///< Set number of channels
-	void frameRate(double hz);			///< Set frames/second
-	void info(const SoundFile& src);	///< Copy file information from an other file
-	void path(const std::string& path);	///< Set path of sound file
+	SoundFile& encoding(EncodingType v);		///< Set encoding type
+	SoundFile& format(Format v);				///< Set format
+	SoundFile& channels(int num);				///< Set number of channels
+	SoundFile& frameRate(double hz);			///< Set frames/second
+	SoundFile& info(const SoundFile& src);		///< Copy file information from an other file
+	SoundFile& path(const std::string& path);	///< Set path of sound file
 
 	void seek(int pos, int seekMode);
 	
@@ -123,7 +126,7 @@ private:
 
 // Implementation_______________________________________________________________
 
-inline void SoundFile::path(const std::string& p){ mPath = p; }
+inline SoundFile& SoundFile::path(const std::string& v){ mPath=v; return *this; }
 inline int SoundFile::samples() const { return frames() * channels(); }
 
 inline const std::string& SoundFile::path() const { return mPath; }

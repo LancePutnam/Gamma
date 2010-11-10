@@ -126,15 +126,15 @@ SoundFile::~SoundFile(){
 
 bool SoundFile::close(){ return mImpl->close(); }
 
-void SoundFile::info(const SoundFile& sf){ mImpl->info(*sf.mImpl); }
+SoundFile& SoundFile::info(const SoundFile& sf){ mImpl->info(*sf.mImpl); return *this; }
 
 const char * SoundFile::extension(){ return mImpl->extension(); }
 double SoundFile::frameRate() const { return mImpl->frameRate(); }
 int SoundFile::frames() const { return mImpl->frames(); }
 int SoundFile::channels() const { return mImpl->channels(); }	
 
-void SoundFile::channels(int num){ mImpl->channels(num); }
-void SoundFile::frameRate(double hz){ mImpl->frameRate(hz); }	
+SoundFile& SoundFile::channels(int num){ mImpl->channels(num); return *this; }
+SoundFile& SoundFile::frameRate(double hz){ mImpl->frameRate(hz); return *this; }
 
 SoundFile::Format SoundFile::format() const {
 	#define CS(x) case SF_FORMAT_##x: return x;
@@ -145,13 +145,14 @@ SoundFile::Format SoundFile::format() const {
 	#undef CS
 }
 
-void SoundFile::format(Format v){
-	#define CS(x) case x: mImpl->formatMajor(SF_FORMAT_##x); return;
+SoundFile& SoundFile::format(Format v){
+	#define CS(x) case x: mImpl->formatMajor(SF_FORMAT_##x); break;
 	switch(v){
 	CS(WAV) CS(AIFF) CS(AU) CS(RAW) CS(FLAC)
 	default:;
 	}
 	#undef CS
+	return *this;
 }
 
 SoundFile::EncodingType SoundFile::encoding() const {
@@ -164,14 +165,15 @@ SoundFile::EncodingType SoundFile::encoding() const {
 	#undef CS
 }
 
-void SoundFile::encoding(EncodingType v){
-	#define CS(x) case x: mImpl->formatMinor(SF_FORMAT_##x); return;
+SoundFile& SoundFile::encoding(EncodingType v){
+	#define CS(x) case x: mImpl->formatMinor(SF_FORMAT_##x); break;
 	switch(v){
 	CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
 	CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
 	default:;
 	}
 	#undef CS
+	return *this;
 }
 
 
