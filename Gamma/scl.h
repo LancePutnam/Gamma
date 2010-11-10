@@ -1381,10 +1381,6 @@ inline float triangle(uint32_t p){
 // Width precision:	32 bits
 inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
-//	uint32_t saw1 = ( p    >> 9) | Expo1<float>();
-//	uint32_t saw2 = ((p+w) >> 9) | Expo1<float>();
-//	return punUF(saw1) - punUF(saw2);
-
 	uint32_t saw1 = ((p-w) >> 9) | Expo1<float>();
 	uint32_t saw2 = ( p    >> 9) | Expo1<float>();
 	return punUF(saw1) - punUF(saw2);
