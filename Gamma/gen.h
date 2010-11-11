@@ -248,7 +248,7 @@ struct RSin2 : public Val<T>{ INHERIT;
 
 	/// Set parameters from freq (rad/unit), phase (rad), decay, and amplitude.
 	RSin2& set(T frq, T phs, T dcy, T amp=T(1)){
-		printf("%g %g %g %g\n", frq, phs, dcy, amp);
+//		printf("%g %g %g %g\n", frq, phs, dcy, amp);
 		mFreq = frq;
 		mAmp = amp;
 		mPhase = phs;
@@ -262,7 +262,7 @@ struct RSin2 : public Val<T>{ INHERIT;
 		T rdcy = 1./dcy;
 		val2 = (T)sin(phs - frq * (T)2) * amp * rdcy * rdcy;
 		val  = (T)sin(phs - frq       ) * amp * rdcy;
-		printf("%g %g %g %g\n", freq(), phase(), decay(), this->amp());
+//		printf("%g %g %g %g\n", freq(), phase(), decay(), this->amp());
 		return *this;
 	}
 
