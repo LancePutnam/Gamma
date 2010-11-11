@@ -24,17 +24,6 @@
 /* Begin PBXBuildFile section */
 		160351A50D090B9D003CC766 /* gen.h in Headers */ = {isa = PBXBuildFile; fileRef = 160351A30D090B9C003CC766 /* gen.h */; };
 		161263A41140691600E55446 /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 161263A21140691600E55446 /* Allocator.h */; };
-		161263D211409EF900E55446 /* ut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161263D111409EA800E55446 /* ut.cpp */; };
-		161263E011409FB500E55446 /* utContainers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161263D011409E0300E55446 /* utContainers.cpp */; };
-		161263F61140A0BF00E55446 /* utTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161263F51140A0BF00E55446 /* utTypes.cpp */; };
-		1612643C1140A1B500E55446 /* utConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1612643B1140A1B500E55446 /* utConversion.cpp */; };
-		161264481140A20D00E55446 /* ut_scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264471140A20D00E55446 /* ut_scl.cpp */; };
-		161264531140A33800E55446 /* ut_ipl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264521140A33800E55446 /* ut_ipl.cpp */; };
-		161264761140A39100E55446 /* utAccess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264751140A39100E55446 /* utAccess.cpp */; };
-		161264A91140A5AC00E55446 /* ut_arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264A81140A5AC00E55446 /* ut_arr.cpp */; };
-		161264B61140A78A00E55446 /* ut_fil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264B41140A78A00E55446 /* ut_fil.cpp */; };
-		161264B71140A78A00E55446 /* ut_gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264B51140A78A00E55446 /* ut_gen.cpp */; };
-		161264BD1140A92300E55446 /* ut_mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 161264BC1140A92300E55446 /* ut_mem.cpp */; };
 		164F33B810508E77009FAD10 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
 		165906A80D0F9F6900EA3DB0 /* testRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDFA16094F8D9E00549AC9 /* testRandom.cpp */; };
 		165906A90D0F9F6900EA3DB0 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
@@ -100,6 +89,7 @@
 		16827D6410014013001088E7 /* SoundFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E99A210A2A4B7800210497 /* SoundFile.cpp */; };
 		16827D6510014013001088E7 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16827D671001402E001088E7 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
+		168A0433128CB899004556F0 /* unitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168A0432128CB899004556F0 /* unitTests.cpp */; };
 		168AAD760CD0033700F36E4B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB463F30825DCE7002E1A73 /* libportaudio.a */; };
 		168AAD770CD0033700F36E4B /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464C80825E7B4002E1A73 /* libsndfile.a */; };
 		168AAD780CD0033700F36E4B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16D24FA80A9BA77100415E9E /* Carbon.framework */; };
@@ -145,7 +135,6 @@
 		16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
 		16E3D2DB115C3B1A009165E6 /* fftpack++1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */; };
 		16E3D2DC115C3B1A009165E6 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
-		16E3D308115C3D72009165E6 /* utFFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D307115C3D72009165E6 /* utFFT.cpp */; };
 		16EACA950D15BE390044B3CB /* testConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EBEB0490870F34A000EAC05 /* testConversion.cpp */; };
 		16EACA960D15BE390044B3CB /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16EACA9B0D15BE6B0044B3CB /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
@@ -209,18 +198,6 @@
 		1609E5A011E5B743001A3853 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
 		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
 		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
-		161263D011409E0300E55446 /* utContainers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utContainers.cpp; path = ../../tests/utContainers.cpp; sourceTree = SOURCE_ROOT; };
-		161263D111409EA800E55446 /* ut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut.cpp; path = ../../tests/ut.cpp; sourceTree = SOURCE_ROOT; };
-		161263EA11409FE400E55446 /* ut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ut.h; path = ../../tests/ut.h; sourceTree = SOURCE_ROOT; };
-		161263F51140A0BF00E55446 /* utTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypes.cpp; path = ../../tests/utTypes.cpp; sourceTree = SOURCE_ROOT; };
-		1612643B1140A1B500E55446 /* utConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utConversion.cpp; path = ../../tests/utConversion.cpp; sourceTree = SOURCE_ROOT; };
-		161264471140A20D00E55446 /* ut_scl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_scl.cpp; path = ../../tests/ut_scl.cpp; sourceTree = SOURCE_ROOT; };
-		161264521140A33800E55446 /* ut_ipl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_ipl.cpp; path = ../../tests/ut_ipl.cpp; sourceTree = SOURCE_ROOT; };
-		161264751140A39100E55446 /* utAccess.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utAccess.cpp; path = ../../tests/utAccess.cpp; sourceTree = SOURCE_ROOT; };
-		161264A81140A5AC00E55446 /* ut_arr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_arr.cpp; path = ../../tests/ut_arr.cpp; sourceTree = SOURCE_ROOT; };
-		161264B41140A78A00E55446 /* ut_fil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_fil.cpp; path = ../../tests/ut_fil.cpp; sourceTree = SOURCE_ROOT; };
-		161264B51140A78A00E55446 /* ut_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_gen.cpp; path = ../../tests/ut_gen.cpp; sourceTree = SOURCE_ROOT; };
-		161264BC1140A92300E55446 /* ut_mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ut_mem.cpp; path = ../../tests/ut_mem.cpp; sourceTree = SOURCE_ROOT; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		16692FAD126FC53100C1F4E9 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
@@ -233,6 +210,18 @@
 		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../Gamma/Access.h; sourceTree = SOURCE_ROOT; };
 		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../Gamma/File.h; sourceTree = SOURCE_ROOT; };
 		1686EA830F8DB1F100D0452F /* Dims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dims.h; path = ../../Gamma/Dims.h; sourceTree = SOURCE_ROOT; };
+		168A0427128CB87F004556F0 /* ut_arr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_arr.cpp; sourceTree = "<group>"; };
+		168A0428128CB87F004556F0 /* ut_fil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_fil.cpp; sourceTree = "<group>"; };
+		168A0429128CB87F004556F0 /* ut_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_gen.cpp; sourceTree = "<group>"; };
+		168A042A128CB87F004556F0 /* ut_ipl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_ipl.cpp; sourceTree = "<group>"; };
+		168A042B128CB87F004556F0 /* ut_mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_mem.cpp; sourceTree = "<group>"; };
+		168A042C128CB87F004556F0 /* ut_scl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_scl.cpp; sourceTree = "<group>"; };
+		168A042D128CB87F004556F0 /* utAccess.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utAccess.cpp; sourceTree = "<group>"; };
+		168A042E128CB87F004556F0 /* utContainers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utContainers.cpp; sourceTree = "<group>"; };
+		168A042F128CB87F004556F0 /* utConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utConversion.cpp; sourceTree = "<group>"; };
+		168A0430128CB87F004556F0 /* utFFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utFFT.cpp; sourceTree = "<group>"; };
+		168A0431128CB87F004556F0 /* utTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utTypes.cpp; sourceTree = "<group>"; };
+		168A0432128CB899004556F0 /* unitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = unitTests.cpp; path = ../../tests/unitTests.cpp; sourceTree = SOURCE_ROOT; };
 		168AAC9D0CD0025D00F36E4B /* libgamma.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libgamma.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		168B78F40B75C59100645F1F /* Sync.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Sync.cpp; path = ../../src/Sync.cpp; sourceTree = SOURCE_ROOT; };
 		168B78F50B75C59100645F1F /* Sync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Sync.h; path = ../../Gamma/Sync.h; sourceTree = SOURCE_ROOT; };
@@ -245,7 +234,6 @@
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
-		16BC61B50FFC895A00AF1B29 /* testUnits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testUnits.cpp; path = ../../tests/testUnits.cpp; sourceTree = SOURCE_ROOT; };
 		16BC61C00FFC896A00AF1B29 /* testUnits */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testUnits; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testEnvelope.cpp; path = ../../tests/testEnvelope.cpp; sourceTree = SOURCE_ROOT; };
 		16C8729A0EFA14EA00449449 /* testNode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNode; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -275,7 +263,6 @@
 		16E3D2D0115C3B1A009165E6 /* fftpack++.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "fftpack++.h"; sourceTree = "<group>"; };
 		16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++1.cpp"; sourceTree = "<group>"; };
 		16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++2.cpp"; sourceTree = "<group>"; };
-		16E3D307115C3D72009165E6 /* utFFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utFFT.cpp; path = ../../tests/utFFT.cpp; sourceTree = SOURCE_ROOT; };
 		16E99A200A2A4B7800210497 /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundFile.h; path = ../../Gamma/SoundFile.h; sourceTree = SOURCE_ROOT; };
 		16E99A210A2A4B7800210497 /* SoundFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundFile.cpp; path = ../../src/SoundFile.cpp; sourceTree = SOURCE_ROOT; };
 		16EACA910D15BE150044B3CB /* testConversion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testConversion; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -471,6 +458,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		168A0426128CB87F004556F0 /* ut */ = {
+			isa = PBXGroup;
+			children = (
+				168A0427128CB87F004556F0 /* ut_arr.cpp */,
+				168A0428128CB87F004556F0 /* ut_fil.cpp */,
+				168A0429128CB87F004556F0 /* ut_gen.cpp */,
+				168A042A128CB87F004556F0 /* ut_ipl.cpp */,
+				168A042B128CB87F004556F0 /* ut_mem.cpp */,
+				168A042C128CB87F004556F0 /* ut_scl.cpp */,
+				168A042D128CB87F004556F0 /* utAccess.cpp */,
+				168A042E128CB87F004556F0 /* utContainers.cpp */,
+				168A042F128CB87F004556F0 /* utConversion.cpp */,
+				168A0430128CB87F004556F0 /* utFFT.cpp */,
+				168A0431128CB87F004556F0 /* utTypes.cpp */,
+			);
+			name = ut;
+			path = ../../tests/ut;
+			sourceTree = SOURCE_ROOT;
+		};
 		16D24F640A9BA72E00415E9E /* Libs */ = {
 			isa = PBXGroup;
 			children = (
@@ -602,20 +608,8 @@
 				7E8339A6087E4CF3004CC4F0 /* testTable.cpp */,
 				16F5F6720CAD91C7003DD8DD /* testTimer.cpp */,
 				169387930FBC7F2E00274B2A /* testTypes.cpp */,
-				16BC61B50FFC895A00AF1B29 /* testUnits.cpp */,
-				161263EA11409FE400E55446 /* ut.h */,
-				161263D111409EA800E55446 /* ut.cpp */,
-				161264A81140A5AC00E55446 /* ut_arr.cpp */,
-				161264B41140A78A00E55446 /* ut_fil.cpp */,
-				161264B51140A78A00E55446 /* ut_gen.cpp */,
-				161264521140A33800E55446 /* ut_ipl.cpp */,
-				161264BC1140A92300E55446 /* ut_mem.cpp */,
-				161264471140A20D00E55446 /* ut_scl.cpp */,
-				161264751140A39100E55446 /* utAccess.cpp */,
-				161263D011409E0300E55446 /* utContainers.cpp */,
-				1612643B1140A1B500E55446 /* utConversion.cpp */,
-				16E3D307115C3D72009165E6 /* utFFT.cpp */,
-				161263F51140A0BF00E55446 /* utTypes.cpp */,
+				168A0432128CB899004556F0 /* unitTests.cpp */,
+				168A0426128CB87F004556F0 /* ut */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -772,9 +766,9 @@
 			productReference = 16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */;
 			productType = "com.apple.product-type.tool";
 		};
-		16BC61B60FFC896A00AF1B29 /* testUnits */ = {
+		16BC61B60FFC896A00AF1B29 /* unitTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 16BC61BC0FFC896A00AF1B29 /* Build configuration list for PBXNativeTarget "testUnits" */;
+			buildConfigurationList = 16BC61BC0FFC896A00AF1B29 /* Build configuration list for PBXNativeTarget "unitTests" */;
 			buildPhases = (
 				16BC61B70FFC896A00AF1B29 /* Sources */,
 				16BC61BB0FFC896A00AF1B29 /* Frameworks */,
@@ -783,7 +777,7 @@
 			);
 			dependencies = (
 			);
-			name = testUnits;
+			name = unitTests;
 			productName = testTable;
 			productReference = 16BC61C00FFC896A00AF1B29 /* testUnits */;
 			productType = "com.apple.product-type.tool";
@@ -1043,7 +1037,7 @@
 				16F76AD50D11E01C001C3DCA /* testTable */,
 				16EACAA80D15BE960044B3CB /* testTimer */,
 				1693877C0FBC7EF400274B2A /* testTypes */,
-				16BC61B60FFC896A00AF1B29 /* testUnits */,
+				16BC61B60FFC896A00AF1B29 /* unitTests */,
 				C0F9EF670BB059670069B343 /* libgamma.dylib */,
 				168AAC9C0CD0025D00F36E4B /* libgamma.a */,
 				168AAD840CD0042400F36E4B /* libgamma{.a, .dylib} */,
@@ -1141,22 +1135,11 @@
 				16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */,
 				16F133F90FFF4B0700DE56F6 /* FFT_fftpack.cpp in Sources */,
 				164F33B810508E77009FAD10 /* File.cpp in Sources */,
-				161263D211409EF900E55446 /* ut.cpp in Sources */,
-				161263E011409FB500E55446 /* utContainers.cpp in Sources */,
-				161263F61140A0BF00E55446 /* utTypes.cpp in Sources */,
-				1612643C1140A1B500E55446 /* utConversion.cpp in Sources */,
-				161264481140A20D00E55446 /* ut_scl.cpp in Sources */,
-				161264531140A33800E55446 /* ut_ipl.cpp in Sources */,
-				161264761140A39100E55446 /* utAccess.cpp in Sources */,
-				161264A91140A5AC00E55446 /* ut_arr.cpp in Sources */,
-				161264B61140A78A00E55446 /* ut_fil.cpp in Sources */,
-				161264B71140A78A00E55446 /* ut_gen.cpp in Sources */,
-				161264BD1140A92300E55446 /* ut_mem.cpp in Sources */,
 				167479541158054C00A1556D /* Print.cpp in Sources */,
 				16E3D2D9115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
-				16E3D308115C3D72009165E6 /* utFFT.cpp in Sources */,
 				16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
+				168A0433128CB899004556F0 /* unitTests.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2334,7 +2317,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		16BC61BC0FFC896A00AF1B29 /* Build configuration list for PBXNativeTarget "testUnits" */ = {
+		16BC61BC0FFC896A00AF1B29 /* Build configuration list for PBXNativeTarget "unitTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				16BC61BD0FFC896A00AF1B29 /* Development */,

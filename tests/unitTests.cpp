@@ -1,16 +1,21 @@
 #include <assert.h>
-#include "Gamma/Gamma.h"
-#include "Gamma/Access.h"
-#include "Gamma/Conversion.h"
-#include "Gamma/File.h"
-#include "Gamma/Strategy.h"
-#include "Gamma/Types.h"
-#include "Gamma/UnitMaps.h"
-#include <map>
+#include <stdio.h>
+#include <math.h>
+#include "../Gamma/Gamma.h"
+#include "../Gamma/FFT.h"
+#include "../Gamma/Access.h"
+#include "../Gamma/Conversion.h"
+#include "../Gamma/File.h"
+#include "../Gamma/Strategy.h"
+#include "../Gamma/Types.h"
+#include "../Gamma/UnitMaps.h"
 
 using namespace gam;
 
 int main(int argc, char* argv[]){
+
+	// Unit tests are ordered from the least to most dependent functions/objects
+	// in order to catch errors in base functionality.
 
 	// File I/O
 	{
@@ -45,6 +50,22 @@ int main(int argc, char* argv[]){
 		assert(ft(0.5/N) == 0.5);
 		assert(ft(1.5/N) == 1.5);
 	}
+
+	#include "ut/utTypes.cpp"
+	#include "ut/utConversion.cpp"
+	#include "ut/utContainers.cpp"
+	#include "ut/utAccess.cpp"
+
+	#include "ut/utFFT.cpp"
+
+	#include "ut/ut_fil.cpp"
+	#include "ut/ut_gen.cpp"
+	#include "ut/ut_mem.cpp"
+	#include "ut/ut_scl.cpp"
+	#include "ut/ut_ipl.cpp"
+	#include "ut/ut_arr.cpp"
+
+	printf("Unit testing succeeded.\n");
 
 	return 0;
 }
