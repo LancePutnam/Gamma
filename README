@@ -20,19 +20,19 @@ The source code can either be built into a library or directly compiled from sou
 ........................................
 Make (Linux, OS X)
 ........................................
-First, ensure that the PLATFORM variable is set properly either by passing it in as an option to make, e.g., 'make PLATFORM=linux', or by editing it directly in Makefile.config. See Makefile.config for other build options. Once Makefile.config has been configured properly, run
+In most cases, simply running
 
 	make
 
-to build the library.
+will build the library with automatically detected platform settings. See Makefile.config for other build options.
 
 There are several other targets within Makefile. These are:
 
-	make all		- builds library, tests, and tutorial
+	make			- builds static library
+	make install		- installs library into DESTDIR
 	make clean		- removes binaries from build folder
-	make tests		- builds the unit tests and other empirical testing code
-	make tutorial		- builds all tutorial files in /tutorial
-	make tutorial/x.cpp	- builds and runs source file 'x'
+	make examples/y/x.cpp	- builds and runs example source file y/x.cpp
+	make tests/x.cpp	- builds and runs test source file x.cpp
 
 Binaries are located in ./build/release or ./build/debug depending on the build configuration. On OS X, the Gamma library will be linked to the pre-compiled dependent libraries in external/lib_osx. On Linux, use apt-get to install the necessary dependent libraries (see 2.3 below).
 

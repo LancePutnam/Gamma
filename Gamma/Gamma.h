@@ -8,6 +8,19 @@
 	Main Gamma includes
 */
 
+/*! \mainpage Gamma - Generic synthesis library
+
+	\section intro_sec About
+
+	Gamma is a cross-platform, C++ library for doing generic synthesis and 
+	filtering of numerical data. It contains numerous mathematical functions, 
+	common algebraic types, such as vectors, complex numbers, and quaternions, 
+	an assortment of sequence generators and many objects for signal processing. 
+	It is oriented towards real-time sound and graphics rendering, but is 
+	equally useful for non-real-time tasks.
+
+*/
+
 #define GAMMA_VERSION 0.9.4
 //#define GAMMA_H_INC_ALL
 

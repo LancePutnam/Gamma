@@ -69,9 +69,6 @@ ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
 
-tests: $(SLIB_PATH)
-	@$(MAKE) -C $(TEST_DIR)
-
 # Remove active build configuration binary files
 clean:
 	@$(RM) $(OBJ_DIR)* $(OBJ_DIR) $(BIN_DIR)* $(BIN_DIR)
@@ -104,8 +101,6 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(DESTDIR)lib
 	@$(INSTALL) -c -m 644 $(INC_DIR)*.h $(DESTDIR)include/$(LIB_NAME)
 	@$(RANLIB) $(DESTDIR)lib/$(SLIB_FILE)
-
-all: $(SLIB_FILE) tests tutorial
 
 createFolders:
 	@mkdir -p $(OBJ_DIR)
