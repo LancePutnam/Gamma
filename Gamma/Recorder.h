@@ -9,12 +9,12 @@
 
 namespace gam{
 
-/// Soundfile recorder
+/// Sound recorder
 class Recorder {
 public:
 
-	/// @param[in] frames	number of (multi-)channel frames
 	/// @param[in] chans	number of channels
+	/// @param[in] frames	number of (multi-)channel frames
 	Recorder(int channels=1, int frames=8192);
 
 
