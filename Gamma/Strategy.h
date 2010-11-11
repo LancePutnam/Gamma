@@ -145,6 +145,24 @@ struct Cubic{
 	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
 	}
+
+/*
+	// TODO: is it worth trying to support strided arrays?
+	template <class AccessStrategy>
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min, index_t str) const{		
+		return ipl::cubic(
+			iFrac,
+			a[s.map(iInt-str, max, min)],
+			a[iInt],
+			a[s.map(iInt+str, max, min)],
+			a[s.map(iInt+(str<<1), max, min)]
+		);
+	}
+
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min, index_t str) const{
+		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min,str);
+	}
+*/
 };
 
 

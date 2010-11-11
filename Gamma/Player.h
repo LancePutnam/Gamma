@@ -38,42 +38,52 @@ public:
 	/// @param[in] src			Another sampler to read data from
 	/// @param[in] rate			Playback rate scalar	
 	Player(const Player<T>& src, double rate=1)
-	:	Array<T>(src), mSampleRate(src.sampleRate()), 
+	:	Array<T>(src), mSampleRate(src.sampleRate()), mChans(src.channels()),
 		mPos(0), mInc(1), mRate(rate), mMin(0), mMax(src.size())
 	{ initSynced(); }
 	
 	Player(const Array<T>& src, double smpRate, double rate)
-	:	Array<T>(src), mSampleRate(smpRate), 
+	:	Array<T>(src), mSampleRate(smpRate), mChans(1),
 		mPos(0), mInc(1), mRate(rate), mMin(0), mMax(src.size())
 	{
 		initSynced();
 		sampleRate(smpRate);
 	}
 
-	/// Generate next sample
-	T operator()(){
-		double p = mPos;
-		mPos = mTap(mPos, mInc, max(), min());
-		uint32_t i = (uint32_t)p;
-		return mIpol(*this, i, p-i, size()-1);
+	/// Increment read tap
+	void advance(){
+		mPos = mTap(pos(), mInc, max(), min()); // update read tap, in frames
+	}
+
+	/// Returns sample at current position on specified channel and increments phase
+	T operator()(int channel=0){ T r = read(channel); advance(); return r; }
+
+	/// Returns sample at current position on specified channel (without incrementing phase)
+	T read(int channel) const {
+		uint32_t posi = (uint32_t)pos();
+		int Nframes= frames();
+		int offset = channel*Nframes;
+		return mIpol(*this, posi+offset, pos()-posi, offset+Nframes-1, offset);
 	}
 
 	void free();							///< Free sample buffer (if owner)
-	void max(double v);						///< Set max range point (sample)
-	void min(double v);						///< Set min range point (sample)
-	void pos(double v);						///< Set current read position (sample)
+	void max(double v);						///< Set interval max, in frames
+	void min(double v);						///< Set interval min, in frames
+	void pos(double v);						///< Set current read position, in frames
 	void phase(double v);					///< Set current read position [0, 1)
 	void rate(double v);					///< Set playback rate scalar
-	void range(double phs, double period);	///< Set range start phase and period
+	void range(double phs, double period);	///< Set interval start phase and period
 	void reset();							///< Reset playback head
-	
-	double max() const;						///< Get max range point
-	double min() const;						///< Get min range point
-	double period() const;					///< Get total period of sample
-	double pos() const;						///< Get current read position (samples)
-	double posInRange(double frac) const;	///< Get position from a fraction inside set range
-	double rate() const;					///< Get playback rate
-	double sampleRate() const;				///< Get sample rate of sample buffer
+
+	double max() const { return mMax; }		///< Get interval max
+	double min() const { return mMin; }		///< Get interval min
+	double period() const;					///< Get total period of sample data
+	double pos() const { return mPos; }		///< Get current read position, in frames
+	double posInInterval(double frac) const;///< Get position from fraction within interval
+	double rate() const { return mRate; }	///< Get playback rate
+	double sampleRate() const { return mSampleRate; } ///< Get sample rate of sample buffer
+
+	int channels() const { return mChans; }	///< Get number of channels
 
 	virtual void onResync(double r){ sampleRate(mSampleRate); }
 
@@ -84,8 +94,9 @@ protected:
 	Tipol<T> mIpol;
 	Ttap mTap;
 
-	double mPos, mInc;
-	double mSampleRate;
+	double mPos, mInc;			// real index position and increment
+	double mSampleRate;			// sample rate of array data
+	int mChans;					// number of channels
 	double mRate, mMin, mMax;
 	
 	void sampleRate(double v){
@@ -93,6 +104,7 @@ protected:
 		rate(mRate);
 	}
 
+	int frames() const { return size()/channels(); }
 };
 
 #define PRE template <class T, template<class> class Ti, class Tt>
@@ -102,16 +114,16 @@ PRE T CLS::sDummyElement = (T)0;
 PRE Array<T> CLS::sDummyArray(&sDummyElement, 1);
 
 PRE CLS::Player(const char * path, double rate)
-:	Array<T>(), mPos(0), mInc(1), mRate(rate), mMin(0), mMax(1)
+:	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {
-	
 	SoundFile sf(path);
 	
 	if(sf.openRead()){
 		Array<T>::resize(sf.samples());
 		sf.readAllD(elems());
 		sampleRate(sf.frameRate());
-		mMax = size();
+		mChans = sf.channels();
+		mMax = frames();
 		sf.close();
 	}
 	else{
@@ -120,12 +132,10 @@ PRE CLS::Player(const char * path, double rate)
 	}
 }
 
-#define FSIZE (double)size()
-PRE inline void CLS::pos(double value){	mPos = value; }
-PRE inline void CLS::phase(double value){ pos(value * FSIZE); }
-PRE inline void CLS::min(double value){	mMin = scl::clip(value, FSIZE); }	
-PRE inline void CLS::max(double value){ mMax = scl::clip(value, FSIZE); }
-#undef FSIZE
+PRE inline void CLS::pos(double v){	mPos = v; }
+PRE inline void CLS::phase(double v){ pos(v * frames()); }
+PRE inline void CLS::min(double v){	mMin = scl::clip<double>(v, frames()); }	
+PRE inline void CLS::max(double v){ mMax = scl::clip<double>(v, frames()); }
 
 PRE void CLS::free(){ this->freeElements(); }
 PRE inline void CLS::rate(double v){ mRate = v; mInc = v * scaleSPU(); }
@@ -140,13 +150,8 @@ PRE inline void CLS::reset(){
 	mTap.reset();
 }
 
-PRE inline double CLS::max() const { return mMax; }
-PRE inline double CLS::min() const { return mMin; }
-PRE inline double CLS::period() const { return size() * ups(); }
-PRE inline double CLS::pos() const { return mPos; }
-PRE inline double CLS::posInRange(double frac) const { return min() + (max() - min()) * frac; }
-PRE inline double CLS::rate() const { return mRate; }
-PRE double CLS::sampleRate() const { return mSampleRate; }
+PRE inline double CLS::period() const { return frames() * ups(); }
+PRE inline double CLS::posInInterval(double frac) const { return min() + (max() - min()) * frac; }
 
 #undef PRE
 #undef CLS
