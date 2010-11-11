@@ -14,10 +14,8 @@ NoisePink<> src;
 SineD<> osc(2000, 0.1, 0.1);
 
 void audioCB(AudioIOData & io){
-
-	io.zeroOut();
 	
-	for(int i=0; i<io.framesPerBuffer(); ++i){
+	while(io()){
 
 		if(tmr()){
 			++chan;
@@ -26,7 +24,7 @@ void audioCB(AudioIOData & io){
 			printf("chan: %d\n", chan);
 		}
 
-		io.out(chan)[i] = osc();
+		io.out(chan) = osc();
 	}
 }
 

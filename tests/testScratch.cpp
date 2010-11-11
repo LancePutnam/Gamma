@@ -1,5 +1,5 @@
 #include "Gamma/Gamma.h"
-#include "../doc/scratch.h"
+//#include "../doc/scratch.h"
 #include "Gamma/Effects.h"
 
 #define ONES	mem::set(buf, gen::Val<>(1), Loop(size));
@@ -7,7 +7,7 @@
 #define PRINT	for(uint32_t i=0; i<size; i++) printf("% 5.2f ", buf[i]); printf("\n");
 
 int main(int argc, char** argv){
-
+/*
 	using namespace gam;
 
 	const uint32_t size = 8;
@@ -97,6 +97,7 @@ int main(int argc, char** argv){
 	}
 	
 	#undef DO
+*/
 /*
 	{	using namespace scratch;
 	

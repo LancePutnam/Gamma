@@ -82,7 +82,7 @@ int main(int argc, char ** argv){
 	
 	do{
 		node->v = v++;
-		node = node->nextPreorder(n1a);
+		node = node->next(n1a);
 	}while(node);
 	
 	n1a->printDescendents("\n");	

@@ -5,13 +5,11 @@ using namespace gam;
 
 double error(double m, double g){ return (m - g) / g * 100.; }
 
-int main(int argc, char* argv[]){
+int main(){
 
 	Timer timer;
 
-	printf("Current time: %lld nsec\n", timer.currentTime());
-	
-	timer.sleepSec(1);		// wait for program loading tasks to chill
+	printf("Current time: %lld nsec\n", timeNow());
 
 	printf("\nSleep function test:\n");
 	double wait = 0.0015;	// sleep interval (sec)
@@ -24,9 +22,9 @@ int main(int argc, char* argv[]){
 		double min = wait * 2.;
 		double avg = 0.;
 		for(int i=0; i<trials; ++i){
-			timer.sleepSec(0.01);
+			sleepSec(0.01);
 			timer.start();
-			timer.sleepSec(wait);
+			sleepSec(wait);
 			timer.stop();
 			double dur = timer.elapsedSec();
 			if(dur < min && dur > 0.) min = dur;
@@ -48,7 +46,7 @@ int main(int argc, char* argv[]){
 	printf("\nTimer period: %f sec\n", wait);
 	printf("Total duration: %5.3f sec\n", dur);
 	
-	nsec_t target = timer.currentTime() + nwait;
+	nsec_t target = timeNow() + nwait;
 	timer.start();
 	for(int i=0; i<trials; ++i){
 
@@ -57,7 +55,7 @@ int main(int argc, char* argv[]){
 			printf("%d ", 10 - (i * 10) / trials); fflush(stdout);
 		}
 
-		timer.sleepUntil(target);
+		sleepUntil(target);
 		target += nwait;
 	}
 	timer.stop();
