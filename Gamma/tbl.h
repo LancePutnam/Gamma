@@ -407,9 +407,9 @@ TEM void rectangle(T * dst, uint32_t len){
 }
 
 TEM void nyquist(T * dst, uint32_t len, uint32_t str){
-	LOOP(len>>1, str){
-		dst[i    ] = (T) 1;
-		dst[i+str] = (T)-1;
+	LOOP(len, str*2){
+		dst[(i+0)*str] = T( 1);
+		dst[(i+1)*str] = T(-1);
 	}
 }
 
