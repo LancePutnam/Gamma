@@ -271,10 +271,7 @@ public:
 
 	/// Set all control parameters
 	void set(Tv frq, Tv amp, Tv phs=0){ Base::set(frq*Ts::ups(), phs, amp); }
-	
-	/// Generate next samples adding into a buffer
-	template <class V>
-	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
+
 
 	virtual void onResync(double ratio){ Base::freq(Base::freq()/ratio); }
 
@@ -343,14 +340,14 @@ public:
 	void set(Tv frq, Tv amp, Tv dcy, Tv phs=0){
 		Base::set(frq*Ts::ups(), phs, dcy > Tv(0) ? (Tv)scl::radius60(dcy, Ts::ups()) : Tv(1), amp);
 	}
-	
-	/// Generate next samples adding into a buffer
-	template <class V>
-	void add(V * dst, uint32_t n){ for(uint32_t i=0; i<n; ++i) dst[i] += (*this)(); }
 
 	virtual void onResync(double ratio){
 		Base::freq(Base::freq()/ratio);
-		//Base::decay( scl::radius60(dcy, Ts::ups() );
+		//printf("%g\n", Base::decay());
+		//printf("%g %g %g\n", Base::decay(), ratio, ::pow(Base::decay(), 1./ratio));
+		// double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); }
+		//		same as (0.001)^(ups/dcy)
+		Base::decay(::pow(Base::decay(), 1./ratio));
 	}
 
 private:
