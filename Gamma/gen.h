@@ -136,6 +136,9 @@ struct RSin : public Val<T>{ INHERIT;
 	/// Set unit phase
 	RSin& phase(const T& v){ return set(freq(), v, amp()); }
 
+	/// Reset state from stored parameters
+	RSin& reset(){ set(freq(), phase(), amp()); return *this; }
+
 	/// Set parameters from unit freq, phase, and amplitude.
 	RSin& set(const T& frq, const T& phs, const T& amp=T(1)){
 //		printf("%g %g %g\n", frq, phs, amp);
@@ -246,6 +249,9 @@ struct RSin2 : public Val<T>{ INHERIT;
 	/// Set unit phase
 	RSin2& phase(const T& v){ return set(freq(), v, decay(), amp()); }
 
+	/// Reset state from stored parameters
+	RSin2& reset(){ set(freq(), phase(), decay(), amp()); return *this; }
+
 	/// Set parameters from freq (rad/unit), phase (rad), decay, and amplitude.
 	RSin2& set(T frq, T phs, T dcy, T amp=T(1)){
 //		printf("%g %g %g %g\n", frq, phs, dcy, amp);
@@ -255,7 +261,7 @@ struct RSin2 : public Val<T>{ INHERIT;
 		mDecay = dcy;
 
 		frq *= M_2PI; phs *= M_2PI;
-		dcy = scl::atLeast(dcy, (T)0.00000001);
+		//dcy = scl::atLeast(dcy, (T)0.00000001);
 		
 		mul1 = (T)2 * dcy * cos(frq);
 		mul2 = -dcy*dcy;
