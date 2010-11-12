@@ -20,7 +20,7 @@ void audioCB(AudioIOData & io){
 		if(tmr()){
 			++chan;
 			if(chan >= io.channelsOut()) chan=0;
-			osc.ampPhase(0.1);
+			osc.reset();
 			printf("chan: %d\n", chan);
 		}
 
@@ -29,7 +29,12 @@ void audioCB(AudioIOData & io){
 }
 
 int main(int argc, char* argv[]){
-	AudioIO io(256, 44100., audioCB, NULL, 8);
+	
+	int maxOChans = AudioDevice::defaultOutput().channelsOutMax();
+	int maxIChans = AudioDevice::defaultOutput().channelsOutMax();
+	//printf("%d %d\n", maxIChans, maxOChans);
+
+	AudioIO io(256, 44100., audioCB, NULL, maxOChans, maxIChans);
 	Sync::master().spu(io.framesPerSecond());
 	io.start(); io.print();
 	
