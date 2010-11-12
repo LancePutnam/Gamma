@@ -90,8 +90,8 @@ double AudioDevice::defaultSampleRate() const { return ((const PaDeviceInfo*)mIm
 bool AudioDevice::hasInput() const { return channelsInMax()>0; }
 bool AudioDevice::hasOutput() const { return channelsOutMax()>0; }
 void AudioDevice::setImpl(int deviceNum){ initDevices(); mImpl = Pa_GetDeviceInfo(deviceNum); mID=deviceNum; }
-AudioDevice AudioDevice::defaultInput(){ return AudioDevice(Pa_GetDefaultInputDevice()); }
-AudioDevice AudioDevice::defaultOutput(){ return AudioDevice(Pa_GetDefaultOutputDevice()); }
+AudioDevice AudioDevice::defaultInput(){ initDevices(); return AudioDevice(Pa_GetDefaultInputDevice()); }
+AudioDevice AudioDevice::defaultOutput(){ initDevices(); return AudioDevice(Pa_GetDefaultOutputDevice()); }
 
 struct InitSingleton{
 	InitSingleton(): mCleanUp(paNoError == Pa_Initialize()){}
