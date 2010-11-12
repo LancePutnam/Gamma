@@ -11,7 +11,6 @@
 
 #define TEST_WINDOWS
 #define TEST_TABLEOSC
-//#define TEST_CURVES
 //#define TEST_ACCESS
 
 #define PRINT_TABLE \
@@ -88,26 +87,19 @@ int main(int argc, char* argv[]){
 	WIN(bartlett) WIN(welch)
 	
 	#endif
-	
-	
-	#ifdef TEST_CURVES
-	printf("\n\nDecay...\n");
-		tbl::decay(arr, len, -4.f);
-		PRINT_TABLE
-		
-	#endif
+
 	
 	#ifdef TEST_ACCESS
 
 	#define Q_NUM_BITS 3
-	float qSine[1<<Q_NUM_BITS + 1];
+	float qSine[(1<<Q_NUM_BITS) + 1];
 	unsigned long qLength = 1<<Q_NUM_BITS;
 
 	tbl::sinusoid(qSine, qLength, 0.f, 0.25f);
 	qSine[qLength] = 1.f;	// set the end sample
 	printf("\n\nQuarter sine table values...\n");
-	ArrOp::printHex(qSine, qLength+1);
-	
+	printHexArray(qSine, qLength+1, 4);
+
 	unsigned long bits = 30 - Q_NUM_BITS;
 	unsigned long phaseInc = 1 << bits;
 	
@@ -123,7 +115,7 @@ int main(int argc, char* argv[]){
 
 	tbl::sinusoid(hSine, hLength, 0.f, 0.5f);
 	printf("\n\nHalf sine table values...\n");
-	ArrOp::printHex(hSine, hLength);
+	printHexArray(hSine, hLength, 4);
 	
 	bits = 31 - H_NUM_BITS;
 	phaseInc = 1 << bits;
@@ -150,10 +142,10 @@ int main(int argc, char* argv[]){
 	// 0 -> 0x00000000	0000 -> 0000
 
 	printf("\n\nqSine as C hex array:\n");
-	tbl::printHexArray(qSine, qLength+1, 4);
+	printHexArray(qSine, qLength+1, 4);
 
 	printf("\n\nhSine as C hex array:\n");
-	tbl::printHexArray(hSine, hLength, 4);
+	printHexArray(hSine, hLength, 4);
 
 	#endif
 
