@@ -90,6 +90,9 @@ public:
 	/// @param[in]	frq		Initial type of filter.
 	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), int filterType = Filter::LP);
 
+	/// Set input (a's) and output (b's) coefficients directly
+	void coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2);
+
 	void freq(Tp v);					///< Set center frequency. 
 	void res(Tp v);						///< Set resonance.
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance.
@@ -554,10 +557,6 @@ class OnePole : public Ts{
 public:
 	OnePole();
 
-	/// @param[in]	smooth	Initial smoothing amount.
-	/// @param[in]	stored	Initial stored value.
-	//OnePole(T smooth, T stored=0.f);
-
 	/// @param[in]	freq	Smoothing frequency
 	/// @param[in]	stored	Initial stored value
 	OnePole(Tp freq, const Tv& stored=0);
@@ -646,6 +645,10 @@ T_VPS void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, int typeA){
 }
 
 T_VPS void Biquad<Tv,Tp,Ts>::zero(){ d1=d2=(Tv)0; }
+
+T_VPS void Biquad<Tv,Tp,Ts>::coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2){
+	mA0=a0; mA1=a1; mA2=a2; mB0=b0; mB1=b1; mB2=b2;
+}
 
 T_VPS inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
 //	float w = freqA * mFrqToRad;	// radial frequency [0, pi)
