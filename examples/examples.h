@@ -12,6 +12,7 @@
 #include "Gamma/DFT.h"
 #include "Gamma/Effects.h"
 #include "Gamma/Envelope.h"
+#include "Gamma/FormantData.h"
 #include "Gamma/Noise.h"
 #include "Gamma/Oscillator.h"
 #include "Gamma/Player.h"
