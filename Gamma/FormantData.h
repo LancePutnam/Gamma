@@ -8,6 +8,8 @@
 	Frequency/amplitude data of formants.
 */
 
+#include <math.h>
+
 namespace gam{
 
 /// Formant data of vowel sounds
@@ -31,7 +33,7 @@ public:
 
 	/// Get amplitude of filter
 	static float amp(Voice v, Phoneme p, int i){
-		return pow(10, dB(v,p,i)/20.);
+		return ::pow(10., dB(v,p,i)/20.);
 	}
 
 	/// Get amplitude, in decibels, of filter
@@ -106,4 +108,3 @@ public:
 } // gam::
 
 #endif
-
