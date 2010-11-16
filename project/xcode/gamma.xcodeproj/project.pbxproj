@@ -195,6 +195,7 @@
 /* Begin PBXFileReference section */
 		160351A30D090B9C003CC766 /* gen.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = gen.h; path = ../../Gamma/gen.h; sourceTree = SOURCE_ROOT; };
 		16064BD30DFF02680043BC29 /* Strategy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Strategy.h; path = ../../Gamma/Strategy.h; sourceTree = SOURCE_ROOT; };
+		1609A9E51292018400A2484F /* FormantData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FormantData.h; sourceTree = "<group>"; };
 		1609E5A011E5B743001A3853 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
 		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
 		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
@@ -234,7 +235,7 @@
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
-		16BC61C00FFC896A00AF1B29 /* testUnits */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testUnits; sourceTree = BUILT_PRODUCTS_DIR; };
+		16BC61C00FFC896A00AF1B29 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testEnvelope.cpp; path = ../../tests/testEnvelope.cpp; sourceTree = SOURCE_ROOT; };
 		16C8729A0EFA14EA00449449 /* testNode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNode; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C872A70EFA151600449449 /* testNoise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNoise; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -541,6 +542,7 @@
 				160E7B3E0B36792200CE82F3 /* Timer.h */,
 				164622960E0EEDD80011911A /* Types.h */,
 				16F133850FFF426400DE56F6 /* UnitMaps.h */,
+				1609A9E51292018400A2484F /* FormantData.h */,
 			);
 			name = Gamma;
 			path = ../../Gamma;
@@ -635,7 +637,7 @@
 				16C8729A0EFA14EA00449449 /* testNode */,
 				16C872A70EFA151600449449 /* testNoise */,
 				169387860FBC7EF400274B2A /* testTypes */,
-				16BC61C00FFC896A00AF1B29 /* testUnits */,
+				16BC61C00FFC896A00AF1B29 /* unitTests */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -779,7 +781,7 @@
 			);
 			name = unitTests;
 			productName = testTable;
-			productReference = 16BC61C00FFC896A00AF1B29 /* testUnits */;
+			productReference = 16BC61C00FFC896A00AF1B29 /* unitTests */;
 			productType = "com.apple.product-type.tool";
 		};
 		16C872990EFA14EA00449449 /* testNode */ = {
