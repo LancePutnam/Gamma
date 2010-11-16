@@ -188,6 +188,14 @@ TEM T cosT8(T radians);
 template <class T, template <class> class V>
 T curvature(const V<T>& a, const V<T>& b, const V<T>& c);
 
+/// Convert decibels to amplitude
+template <class T>
+inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
+
+/// Convert amplitude to decibels
+template <class T>
+inline T ampTodB(const T& amp){ return 20*::log(amp); }
+
 /// Returns two element dot product x1 * y1 + x2 * y2.
 TEM T dot2(T x1, T x2, T y1, T y2);
 
