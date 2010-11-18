@@ -90,8 +90,6 @@
 		16827D6510014013001088E7 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16827D671001402E001088E7 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
 		168A0433128CB899004556F0 /* unitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168A0432128CB899004556F0 /* unitTests.cpp */; };
-		168AAD760CD0033700F36E4B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB463F30825DCE7002E1A73 /* libportaudio.a */; };
-		168AAD770CD0033700F36E4B /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464C80825E7B4002E1A73 /* libsndfile.a */; };
 		168AAD780CD0033700F36E4B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16D24FA80A9BA77100415E9E /* Carbon.framework */; };
 		168AAD790CD0033700F36E4B /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16D24F930A9BA74800415E9E /* AudioUnit.framework */; };
 		168AAD7A0CD0033700F36E4B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464320825DDF5002E1A73 /* AudioToolbox.framework */; };
@@ -101,6 +99,14 @@
 		169387940FBC7F2E00274B2A /* testTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 169387930FBC7F2E00274B2A /* testTypes.cpp */; };
 		16938AC10FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
+		1695E7451295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
+		1695E7461295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
+		1695E7471295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
+		1695E7481295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
+		1695E7491295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
+		1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
+		1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
+		1695E74C1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		169F711410C1CFEE00FB2BA0 /* RecurrenceMaps.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */; };
 		16AEEFC20D3C41C400AFD3A4 /* testOscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */; };
 		16AEEFC30D3C41C900AFD3A4 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
@@ -117,7 +123,6 @@
 		16D428720DC8033300BF3144 /* testAudioSine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DDFCE00B5801220076E3F7 /* testAudioSine.cpp */; };
 		16D428740DC8033300BF3144 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16D428750DC8033300BF3144 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
-		16D4292F0DC8034500BF3144 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB463F30825DCE7002E1A73 /* libportaudio.a */; };
 		16D429300DC8034500BF3144 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464320825DDF5002E1A73 /* AudioToolbox.framework */; };
 		16D429310DC8034500BF3144 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464330825DDF5002E1A73 /* CoreAudio.framework */; };
 		16D429320DC8034500BF3144 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16D24F930A9BA74800415E9E /* AudioUnit.framework */; };
@@ -167,8 +172,6 @@
 		C0F9EF840BB059A50069B343 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		C0F9EF860BB059AE0069B343 /* SoundFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E99A210A2A4B7800210497 /* SoundFile.cpp */; };
 		C0F9EF880BB059AF0069B343 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
-		C0F9EF900BB059C80069B343 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB463F30825DCE7002E1A73 /* libportaudio.a */; };
-		C0F9EF920BB059D20069B343 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464C80825E7B4002E1A73 /* libsndfile.a */; };
 		C0F9EF940BB059DD0069B343 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464320825DDF5002E1A73 /* AudioToolbox.framework */; };
 		C0F9EF950BB059DD0069B343 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16D24F930A9BA74800415E9E /* AudioUnit.framework */; };
 		C0F9EF960BB059E10069B343 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464330825DDF5002E1A73 /* CoreAudio.framework */; };
@@ -231,6 +234,8 @@
 		169389570FBCCE4200274B2A /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pstdint.h; path = ../../Gamma/pstdint.h; sourceTree = SOURCE_ROOT; };
 		16938ABF0FBD0C4400274B2A /* Conversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Conversion.h; path = ../../Gamma/Conversion.h; sourceTree = SOURCE_ROOT; };
 		16938AC00FBD0C6700274B2A /* Conversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conversion.cpp; path = ../../src/Conversion.cpp; sourceTree = SOURCE_ROOT; };
+		1695E7431295AE1400F6F3C0 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = ../../external/lib_osx/libportaudio.a; sourceTree = SOURCE_ROOT; };
+		1695E7441295AE1400F6F3C0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../external/lib_osx/libsndfile.a; sourceTree = SOURCE_ROOT; };
 		1699F3860B9D1D2600ECB243 /* testNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testNode.cpp; path = ../../tests/testNode.cpp; sourceTree = SOURCE_ROOT; };
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
 		169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
@@ -251,8 +256,6 @@
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		16D4286C0DC8030500BF3144 /* testAudioSine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAudioSine; sourceTree = BUILT_PRODUCTS_DIR; };
-		16D5B0FB0B9F3B28009284F6 /* sndfile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sndfile.h; path = /usr/local/include/sndfile.h; sourceTree = "<absolute>"; };
-		16D5B1080B9F3B4C009284F6 /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = portaudio.h; path = /usr/local/include/portaudio.h; sourceTree = "<absolute>"; };
 		16D733960BBE17D300D7769F /* testRecurrenceMap.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testRecurrenceMap.cpp; path = ../../tests/testRecurrenceMap.cpp; sourceTree = SOURCE_ROOT; };
 		16D8143B0B9D08BA00A4B638 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = notes.txt; path = ../../doc/notes.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		16D9B4BA0DDBEA100043A25B /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../../Gamma/Filter.h; sourceTree = SOURCE_ROOT; };
@@ -297,10 +300,8 @@
 		16FC1BBD0DED18E000B9AD13 /* testDFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testDFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E09511E0DECCE18000AF828 /* FFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FFT.h; path = ../../Gamma/FFT.h; sourceTree = SOURCE_ROOT; };
 		7E8339A6087E4CF3004CC4F0 /* testTable.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTable.cpp; path = ../../tests/testTable.cpp; sourceTree = "<group>"; };
-		7EB463F30825DCE7002E1A73 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
 		7EB464320825DDF5002E1A73 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		7EB464330825DDF5002E1A73 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
-		7EB464C80825E7B4002E1A73 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = /usr/local/lib/libsndfile.a; sourceTree = "<absolute>"; };
 		7EBEB0490870F34A000EAC05 /* testConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testConversion.cpp; path = ../../tests/testConversion.cpp; sourceTree = "<group>"; };
 		C0F9EF680BB059670069B343 /* libgamma.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgamma.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -317,12 +318,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				168AAD760CD0033700F36E4B /* libportaudio.a in Frameworks */,
-				168AAD770CD0033700F36E4B /* libsndfile.a in Frameworks */,
 				168AAD780CD0033700F36E4B /* Carbon.framework in Frameworks */,
 				168AAD790CD0033700F36E4B /* AudioUnit.framework in Frameworks */,
 				168AAD7A0CD0033700F36E4B /* AudioToolbox.framework in Frameworks */,
 				168AAD7B0CD0033700F36E4B /* CoreAudio.framework in Frameworks */,
+				1695E7491295AE1400F6F3C0 /* libportaudio.a in Frameworks */,
+				1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,11 +366,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16D4292F0DC8034500BF3144 /* libportaudio.a in Frameworks */,
 				16D429300DC8034500BF3144 /* AudioToolbox.framework in Frameworks */,
 				16D429310DC8034500BF3144 /* CoreAudio.framework in Frameworks */,
 				16D429320DC8034500BF3144 /* AudioUnit.framework in Frameworks */,
 				16D429330DC8034500BF3144 /* Carbon.framework in Frameworks */,
+				1695E7471295AE1400F6F3C0 /* libportaudio.a in Frameworks */,
+				1695E7481295AE1400F6F3C0 /* libsndfile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +407,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1695E7451295AE1400F6F3C0 /* libportaudio.a in Frameworks */,
+				1695E7461295AE1400F6F3C0 /* libsndfile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,12 +451,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0F9EF900BB059C80069B343 /* libportaudio.a in Frameworks */,
-				C0F9EF920BB059D20069B343 /* libsndfile.a in Frameworks */,
 				C0F9EF940BB059DD0069B343 /* AudioToolbox.framework in Frameworks */,
 				C0F9EF950BB059DD0069B343 /* AudioUnit.framework in Frameworks */,
 				C0F9EF960BB059E10069B343 /* CoreAudio.framework in Frameworks */,
 				C0F9EF980BB059F40069B343 /* Carbon.framework in Frameworks */,
+				1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */,
+				1695E74C1295AE1400F6F3C0 /* libsndfile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,10 +485,8 @@
 		16D24F640A9BA72E00415E9E /* Libs */ = {
 			isa = PBXGroup;
 			children = (
-				16D5B1080B9F3B4C009284F6 /* portaudio.h */,
-				16D5B0FB0B9F3B28009284F6 /* sndfile.h */,
-				7EB463F30825DCE7002E1A73 /* libportaudio.a */,
-				7EB464C80825E7B4002E1A73 /* libsndfile.a */,
+				1695E7431295AE1400F6F3C0 /* libportaudio.a */,
+				1695E7441295AE1400F6F3C0 /* libsndfile.a */,
 				16D24FA80A9BA77100415E9E /* Carbon.framework */,
 				16D24F930A9BA74800415E9E /* AudioUnit.framework */,
 				7EB464320825DDF5002E1A73 /* AudioToolbox.framework */,
@@ -529,6 +531,7 @@
 				7E09511E0DECCE18000AF828 /* FFT.h */,
 				1686EA820F8DB1F100D0452F /* File.h */,
 				16D9B4BA0DDBEA100043A25B /* Filter.h */,
+				1609A9E51292018400A2484F /* FormantData.h */,
 				16EDF9D0094F8C2600549AC9 /* Noise.h */,
 				16EDF9D2094F8C2600549AC9 /* Oscillator.h */,
 				1609E5A011E5B743001A3853 /* Player.h */,
@@ -542,7 +545,6 @@
 				160E7B3E0B36792200CE82F3 /* Timer.h */,
 				164622960E0EEDD80011911A /* Types.h */,
 				16F133850FFF426400DE56F6 /* UnitMaps.h */,
-				1609A9E51292018400A2484F /* FormantData.h */,
 			);
 			name = Gamma;
 			path = ../../Gamma;
@@ -1376,6 +1378,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
@@ -1396,6 +1403,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				OTHER_CFLAGS = $inherited;
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
@@ -1414,6 +1426,11 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
@@ -1670,6 +1687,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				ZERO_LINK = YES;
@@ -1684,6 +1706,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				ZERO_LINK = NO;
@@ -1696,6 +1723,11 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				ZERO_LINK = YES;
@@ -1880,6 +1912,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				ZERO_LINK = YES;
@@ -1894,6 +1931,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				ZERO_LINK = NO;
@@ -1906,6 +1948,11 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				ZERO_LINK = YES;
@@ -2220,6 +2267,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
 				ZERO_LINK = YES;
@@ -2241,6 +2293,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
 				ZERO_LINK = NO;
@@ -2260,6 +2317,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = gamma;
 				ZERO_LINK = YES;
