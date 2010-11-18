@@ -21,13 +21,24 @@ public:
 
 	/// Voice types
 	enum Voice{
-		MAN=0, WOMAN=1, CHILD=2,
+		MAN=0,		/**< */
+		WOMAN=1,	/**< */
+		CHILD=2,	/**< */
 		NUM_VOICES
 	};
 
 	/// Phonemes
 	enum Phoneme{
-		HEED=0, HID=1, HEAD=2, HAD=3, HOD=4, HAWED=5, HOOD=6, WHOD=7, HUD=8, HEARD=9,
+		HEED=0,		/**< */
+		HID=1,		/**< */
+		HEAD=2,		/**< */
+		HAD=3,		/**< */
+		HOD=4,		/**< */
+		HAWED=5,	/**< */
+		HOOD=6,		/**< */
+		WHOD=7,		/**< */
+		HUD=8,		/**< */
+		HEARD=9,	/**< */
 		NUM_PHONEMES
 	};
 
