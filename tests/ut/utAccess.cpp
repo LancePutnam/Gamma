@@ -23,57 +23,57 @@
 	#define SET(A, a,b,c,d,e,f,g,h) A[0]=a; A[1]=b; A[2]=c; A[3]=d; A[4]=e; A[5]=f; A[6]=g; A[7]=h
 	#define PRINT(A) for(uint32_t i=0;i<N;++i) printf("%g ", A[i]); printf("\n")
 
-	{
-		Indexer ind(8);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
-	}
-
-	{
-		IndexerInt ind(8);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
-
-		ind.stride(2);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,2,4,6,8,10,12,14);
-
-		ind.stride(-1);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,-1,-2,-3,-4,-5,-6,-7);
-
-		ind.stride(-2);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,-2,-4,-6,-8,-10,-12,-14);
-	}
-
-	{
-		IndexerReal ind(8);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
-
-		ind.stride(2);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,2,4,6,0,2,4,6);
-
-		ind.stride(-1);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,7,6,5,4,3,2,1);
-
-		//ind.stride(4. + 1/2.);
-		ind.strides(4, 2);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,4,1,5,2,6,3,7);
-
-		//ind.stride(2. + 1/4.);
-		ind.strides(2, 4);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,2,4,6,1,3,5,7);
-
-		ind.stride(0.5);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,0,1,1,2,2,3,3);
-
-		// overstrided
-		ind.stride(1. + 32.);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
-
-		ind.stride(-1. + 32.);
-		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,7,6,5,4,3,2,1);
-			
-		//for(int32_t i=1; i<32678*; ++i){ /*printf("%d ", i);*/ assert(1 == int32_t(i * (1./i) + 1e-8)); }
-		//ind.strides(2, 2, 2); 
-		//ind.stride(2 + 2./7); for(int i=0; i<8; ++i){ printf("%d ", ind(i,8)); } printf("\n");		
-	}
+//	{
+//		Indexer ind(8);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
+//	}
+//
+//	{
+//		IndexerInt ind(8);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
+//
+//		ind.stride(2);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,2,4,6,8,10,12,14);
+//
+//		ind.stride(-1);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,-1,-2,-3,-4,-5,-6,-7);
+//
+//		ind.stride(-2);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,-2,-4,-6,-8,-10,-12,-14);
+//	}
+//
+//	{
+//		IndexerReal ind(8);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
+//
+//		ind.stride(2);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,2,4,6,0,2,4,6);
+//
+//		ind.stride(-1);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,7,6,5,4,3,2,1);
+//
+//		//ind.stride(4. + 1/2.);
+//		ind.strides(4, 2);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,4,1,5,2,6,3,7);
+//
+//		//ind.stride(2. + 1/4.);
+//		ind.strides(2, 4);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,2,4,6,1,3,5,7);
+//
+//		ind.stride(0.5);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,0,1,1,2,2,3,3);
+//
+//		// overstrided
+//		ind.stride(1. + 32.);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,1,2,3,4,5,6,7);
+//
+//		ind.stride(-1. + 32.);
+//		for(int i=0; i<8; ++i){ A[i]=ind(i,8); }	ASSERT(A, 0,7,6,5,4,3,2,1);
+//			
+//		//for(int32_t i=1; i<32678*; ++i){ /*printf("%d ", i);*/ assert(1 == int32_t(i * (1./i) + 1e-8)); }
+//		//ind.strides(2, 2, 2); 
+//		//ind.stride(2 + 2./7); for(int i=0; i<8; ++i){ printf("%d ", ind(i,8)); } printf("\n");		
+//	}
 
 
 	// Basic slice functionality
