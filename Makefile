@@ -99,7 +99,7 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -c -m 644 $(SLIB_PATH) $(DESTDIR)lib
 	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)/* $(DESTDIR)/lib
 	@$(INSTALL) -c -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
-	@$(RANLIB) $(DESTDIR)lib/$(SLIB_FILE)
+	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
 createFolders:
 	@mkdir -p $(OBJ_DIR)
