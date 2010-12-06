@@ -30,6 +30,9 @@ public:
 	/// @param[in] curve	Curvature value
 	Curve(T length, T curve);
 
+	/// Returns whether envelope value is below threshold
+	bool done(T thresh=T(0.001)) const { return mValue < thresh; }
+
 	void reset();					///< Reset envelope
 	void set(T length, T curve);	///< Set length and curvature
 	
@@ -114,7 +117,7 @@ public:
 	{}
 
 	/// Check whether gate is closed
-	bool done() const { printf("%g\n", mRemain); return mClosed; }
+	bool done() const { return mClosed; }
 
 	/// Filter value
 	T operator()(const T& v){		
@@ -155,24 +158,27 @@ public:
 		Ts::initSynced();
 	}
 	
+	/// Returns whether envelope is done
+	bool done() const { return mAcc.val >= Tp(1); }
+	
 	/// Generate next value
 	Tv operator()(){
 		Tp f = mAcc.val;
-		if(f >= (Tp)1) return mIpl.val();
+		if(done()) return mIpl.val();
 		mAcc();
-		return mIpl(scl::min(f, (Tp)1));
+		return mIpl(scl::min(f, Tp(1)));
 	}
 	
 	/// Set new end value.  Start value is set to current value.
 	void operator= (Tv v){
-		mIpl.val(mIpl(scl::min(mAcc.val, (Tp)1)));
+		mIpl.val(mIpl(scl::min(mAcc.val, Tp(1))));
 		mIpl.push(v);
 		reset();
 	}
 
 	/// Generates a new end point from a generator when the segment end is reached
 	
-	/// This is useful for creating pitched noise
+	/// This is useful for creating pitched noise from a random number generator.
 	///
 	template <class G>
 	Tv operator()(G& g){
@@ -226,15 +232,18 @@ public:
 		Ts::initSynced();
 	}
 	
+	/// Returns whether envelope is done
+	bool done() const { return mFnc.value() >= T(1); }
+	
 	/// Generate next value
 	T operator()(){
-		if(mFnc.value() >= (T)1) return mVal0;
-		return ipl::linear(scl::min(mFnc(), (T)1), mVal1, mVal0);
+		if(done()) return mVal0;
+		return ipl::linear(scl::min(mFnc(), T(1)), mVal1, mVal0);
 	}
 	
 	/// Set new end value.  Start value is set to current value.
 	void operator= (T v){
-		mVal1 = ipl::linear(scl::min(mFnc.value(), (T)1), mVal1, mVal0);
+		mVal1 = ipl::linear(scl::min(mFnc.value(), T(1)), mVal1, mVal0);
 		mVal0 = v;
 		mFnc.reset();
 	}
