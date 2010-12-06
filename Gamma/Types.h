@@ -823,7 +823,7 @@ struct ShiftBuffer : public Multi<N,T>{
 
 
 
-///< Fixed size vector.
+/// Fixed size vector.
 template <uint32_t N, class T>
 struct Vec : public Multi<N,T> {
 
@@ -870,7 +870,7 @@ struct Vec : public Multi<N,T> {
 
 
 
-///< Two element vector
+// Two element vector
 template <class T>
 struct Vec2 : public Vec<2, T> {
 	using Vec<2,T>::operator=;
@@ -881,7 +881,7 @@ struct Vec2 : public Vec<2, T> {
 };
 
 
-///< Three element vector
+// Three element vector
 template <class T>
 struct Vec3 : public Vec<3, T> {
 	using Vec<3,T>::operator=;
@@ -926,7 +926,7 @@ struct Vec3 : public Vec<3, T> {
 };
 
 
-///< Four element vector
+// Four element vector
 template <class T>
 struct Vec4 : public Vec<4, T> {
 	using Vec<4,T>::operator=;
@@ -946,8 +946,8 @@ struct Vec4 : public Vec<4, T> {
 
 
 /// Rotate vector towards perpendicular vector by angle using right-hand rule.
-template <class T>
-Vec3<T> rotate(const Vec3<T>& v, const Vec3<T>& p, const Complex<T>& a){
+template <int N, class T>
+Vec<N,T> rotate(const Vec<N,T>& v, const Vec<N,T>& p, const Complex<T>& a){
 	return v*a.r + p*a.i;
 }
 
