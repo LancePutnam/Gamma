@@ -333,6 +333,7 @@ TEM void mix2(T& io1, T& io2, T mix);
 /// Perform complex multiplication, c1 = c1 c2.
 TEM void mulComplex(T& r1, T& i1, const T& r2, const T& i2);
 
+/// Returns nearest "note" within a pitch class set
 TEM T nearest(T v, const char * interval="2212221", long div=12);
 
 /// Returns nearest integer division of one value to another
