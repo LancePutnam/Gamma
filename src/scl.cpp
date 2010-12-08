@@ -33,8 +33,8 @@ bool almostEqual(double a, double b, int maxUlps){
 	int64_t bi = punFI(b);
 
 	// Make aInt and bInt lexicographically ordered as a twos-complement int
-	if(ai < 0) ai = INT64_C(0x8000000000000000) - ai;
-	if(bi < 0) bi = INT64_C(0x8000000000000000) - bi;
+	if(ai < 0) ai = 0x8000000000000000ULL - ai;
+	if(bi < 0) bi = 0x8000000000000000ULL - bi;
 
 	return abs(ai - bi) <= maxUlps;
 }
