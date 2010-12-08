@@ -83,13 +83,10 @@ extern "C" {
 #endif
 
 /*
-
       The 'ifac' parameter needs to be as long as the number of
 	  bits in a signed integer, minus one. Therefore if you are
 	  on a 64-bit machine, the longest fft you can compute is
-	  2^63-1, and 'ifac' should have length 63.
-
-	  
+	  2^63-1, and 'ifac' should have length 63.	  
 */
 
 /* Single-precision */

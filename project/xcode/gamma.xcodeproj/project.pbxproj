@@ -206,7 +206,6 @@
 		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		16692FAD126FC53100C1F4E9 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
 		16692FAE126FC9A300C1F4E9 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
-		166DD72D117CD72A00A8BA12 /* fftpack++.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++.cpp"; sourceTree = "<group>"; };
 		167479501158052400A1556D /* Print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Print.h; sourceTree = "<group>"; };
 		167479511158054C00A1556D /* Print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Print.cpp; sourceTree = "<group>"; };
 		16827D5810013FEE001088E7 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
@@ -241,6 +240,7 @@
 		169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BC61C00FFC896A00AF1B29 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
+		16BEA8BE12AF724900654E30 /* fftpack++.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "fftpack++.inc"; sourceTree = "<group>"; };
 		16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testEnvelope.cpp; path = ../../tests/testEnvelope.cpp; sourceTree = SOURCE_ROOT; };
 		16C8729A0EFA14EA00449449 /* testNode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNode; sourceTree = BUILT_PRODUCTS_DIR; };
 		16C872A70EFA151600449449 /* testNoise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testNoise; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -560,9 +560,9 @@
 				16D15CA309F0219B001AE497 /* DFT.cpp */,
 				16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */,
 				16E3D2D0115C3B1A009165E6 /* fftpack++.h */,
-				166DD72D117CD72A00A8BA12 /* fftpack++.cpp */,
 				16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */,
 				16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */,
+				16BEA8BE12AF724900654E30 /* fftpack++.inc */,
 				16827D5810013FEE001088E7 /* File.cpp */,
 				167479511158054C00A1556D /* Print.cpp */,
 				16692FAE126FC9A300C1F4E9 /* Recorder.cpp */,
@@ -2173,7 +2173,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = __STDC_CONSTANT_MACROS;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
@@ -2191,7 +2191,7 @@
 				);
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
-				PRODUCT_NAME = testArrayOps;
+				PRODUCT_NAME = "";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -2203,7 +2203,7 @@
 			buildSettings = {
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PREPROCESSOR_DEFINITIONS = __STDC_CONSTANT_MACROS;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2230,7 +2230,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = __STDC_CONSTANT_MACROS;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
