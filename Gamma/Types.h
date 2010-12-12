@@ -90,16 +90,23 @@ private:
 
 
 
-/// Polar number
+/// Polar number with argument in radians
 template <class T>
 struct Polar{
-	Polar(const T& p): m(1.), p(p){}
+
+	union{
+		struct{ T m, p; };	///< Magnitude and phase values
+		T elems[2];			///< Component 2-vector
+	};
+
+	Polar(const T& p=0): m(1.), p(p){}
 	Polar(const T& m, const T& p): m(m), p(p){}
 	Polar(const Complex<T>& v){ *this = v; }
 
-	Polar& operator = (const Complex<T>& v){ m=v.norm(); p=v.arg(); return *this; }
+	T& operator[](uint32_t i){ return elems[i];}
+	const T& operator[](uint32_t i) const { return elems[i]; }
 
-	T m, p;
+	Polar& operator = (const Complex<T>& v){ m=v.norm(); p=v.arg(); return *this; }
 };
 
 
@@ -110,8 +117,8 @@ struct Complex{
 	typedef Complex<T> C;
 
 	union{
-		struct{ T r, i; };
-		T elems[2];
+		struct{ T r, i; };	///< Real and imaginary values
+		T elems[2];			///< Component 2-vector
 	};
 	
 	Complex(const Complex& v): r(v.r), i(v.i){}
