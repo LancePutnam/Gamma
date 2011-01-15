@@ -41,6 +41,10 @@
 // Optional includes
 #ifdef GAMMA_H_INC_ALL
 
+	// System/Utility
+	#include "Gamma/Print.h"
+	#include "Gamma/Timer.h"
+
 	// State Functions
 	#include "Gamma/AudioIO.h"
 	#include "Gamma/Delay.h"
