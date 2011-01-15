@@ -196,14 +196,14 @@ public:
 	}
 
 	/// Advance one iteration and return value
-	C operator()(){ return (*this)*=mFactor; }
+	const C& operator()(){ return (*this)*=mFactor; }
 
 	/// Filter input
-	C operator()(const C& v){ return (*this) = (*this)*mFactor + v; }
-	C operator()(const T& v){ return (*this) = (*this)*mFactor + v; }
+	const C& operator()(const C& v){ return (*this) = (*this)*mFactor + v; }
+	const C& operator()(const T& v){ return (*this) = (*this)*mFactor + v; }
 	
 	/// Recede one iteration and return value
-	C recede(){ return (*this)/=mFactor; }
+	const C& recede(){ return (*this)/=mFactor; }
 
 	/// Set amplitude
 	void amp(const T& v){ (*this).fromPolar(v, this->arg()); }
