@@ -97,7 +97,9 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -c -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)/* $(DESTDIR)/lib
+ifneq ($(EXT_LIB_COPY_DIR), )
+	@$(INSTALL) -c -m 644 $(EXT_LIB_COPY_DIR)/* $(DESTDIR)/lib
+endif
 	@$(INSTALL) -c -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
