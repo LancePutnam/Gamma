@@ -302,7 +302,7 @@ void STFT::forward(float * input){ //printf("STFT::forward(float *)\n");
 		
 		// compute relative frequencies
 		//arr::phaseToFreq(phs, mPhases, numBins(), unitsHop());
-		float factor = 1.f / (M_2PI * unitsHop());
+		float factor = 1.f / (M_2PI * unitsHop()); // converts phase difference from radians to Hz
 		for(uint32_t i=1; i<numBins()-1; ++i){
 			float dp = scl::wrapPhase(bins()[i][1] - mPhases[i]);	// wrap phase into [-pi, pi)
 			mPhases[i] = bins()[i][1];							// prev phase = curr phase
