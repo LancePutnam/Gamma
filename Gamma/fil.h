@@ -157,19 +157,41 @@ public:
 		set(smooth, gain);
 	}
 
-	OnePole& set(const Tp& smooth, const Tp& gain=Tp(1)){
-		ma[0] = gain;
-		mb[0] = smooth;
+	/// @param[in] b	previous output coefficient (e.g., smoothing amount)
+	/// @param[in] a	current input coefficient (gain)
+	OnePole& set(const Tp& b, const Tp& a=Tp(1)){
+		ma[0] = a;
+		mb[0] = b;
+		return *this;
+	}
+	
+	/// @param[in] coef		low-pass bandwidth, [0, 1)
+	OnePole& setLowPass(const Tp& coef){
+		return set(Tp(1) - coef, coef);
+	}
+
+	/// @param[in] coef		high-pass bandwidth, [0, 1)
+	OnePole& setHighPass(const Tp& coef){
+//		i - (o * (1-c) + i * c)
+//		i - o * (1-c) - i * c
+//		-o * (1-c) + i - i * c
+//		-o * (1-c) + i * (1-c)
+		ma[0] = Tp(1) - coef;
+		mb[0] = -ma[0];
 		return *this;
 	}
 
-	Tv operator()(const Tv& v) const {
+	/// Returns next filtered sample
+	const Tv& operator()(const Tv& v) const {
 		return mo[0] = mo[0]*mb[0] + v*ma[0];
 	}
 
+	/// Returns previous output
+	const Tv& prevOut() const { return mo[0]; }
+
 protected:
-	mutable Tv mo[1];
-	Tp ma[1], mb[1];
+	mutable Tv mo[1];	// previous output
+	Tp ma[1], mb[1];	// feedforward, feedback coefs
 };
 
 
