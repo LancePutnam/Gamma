@@ -40,6 +40,10 @@ int main(){
 	int inputChannels = 1;			// how many input channels to open
 	UserData user = {-0.5, 0.5};	// external data to be passed into callback
 
+	printf("Audio devices found:\n");
+	AudioDevice::printAll();
+	printf("\n");
+
 	// create an audio i/o object using default input and output devices
 	AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
 	
@@ -50,6 +54,7 @@ int main(){
 	io.start();
 	
 	// print some information about the i/o streams
+	printf("Audio stream info:\n");
 	io.print();
 	
 	printf("\nPress 'enter' to quit...\n"); getchar();
