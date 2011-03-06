@@ -868,7 +868,7 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
 }
 
 TEM T gcd(const T& x, const T& y){
-	if(y==T(0)) return x;
+	if(y==T(0)) return scl::abs(x);
 	return gcd(y, remainder(x,y));
 }
 
