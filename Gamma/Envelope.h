@@ -15,9 +15,9 @@
 
 namespace gam{
 
-/// Variable curve functor.
+/// Exponential curve with variable curvature
 
-/// This curve will return samples in the interval [0, 1] starting from 0 and
+/// This curve will return values in the interval [0, 1] starting from 0 and
 /// ending on 1 over its length in samples.  The last point is exclusive, so
 /// it takes length + 1 samples to reach 1 inclusively.  For iterations 
 /// exceeding the specified length, the values returned will be unbounded.
@@ -26,18 +26,24 @@ class Curve{
 public:
 	Curve();
 	
-	/// @param[in] length	Length of curve in samples
-	/// @param[in] curve	Curvature value
+	/// @param[in] length	length of curve in samples
+	/// @param[in] curve	curvature value
 	Curve(T length, T curve);
 
 	/// Returns whether envelope value is below threshold
-	bool done(T thresh=T(0.001)) const { return mValue < thresh; }
+	bool done(T thresh=T(0.001)) const { return value() < thresh; }
 
+	/// Get current value
+	T value() const { return mValue; }
+
+	T operator()();					///< Generates next value
 	void reset();					///< Reset envelope
-	void set(T length, T curve);	///< Set length and curvature
+
+	/// Set length and curvature
 	
-	T operator()();	///< Generates next value
-	T value();		///< Returns current value
+	/// @param[in] length	length of curve in samples
+	/// @param[in] curve	curvature; positive curves down, negative curves up, and 0 is line 
+	void set(T length, T curve);
 
 protected:
 	T mValue;
@@ -55,9 +61,10 @@ public:
 	/// @param[in] unitsD	Decay length
 	/// @param[in] crvA		Attack curvature
 	/// @param[in] crvD		Decay curvature
-	AD(T unitsA, T unitsD, T crvA = 4, T crvD = -4);
+	AD(T unitsA = 0.01, T unitsD = 2, T crvA =-4, T crvD = 4);
 	
 	bool done() const;			///< Returns whether value is below threshold
+	T value() const;			///< Get current value
 	
 	T operator()();				///< Generates next sample
 	
@@ -345,28 +352,28 @@ TEM Curve<T>::Curve(): mValue(0), mMul(0), a1(0), b1(0){}
 
 TEM Curve<T>::Curve(T length, T curve){
 	set(length, curve);
-	mValue = (T)0;
+	mValue = T(0);
 }
 
-TEM inline void Curve<T>::reset(){ mValue = (T)0; b1 = a1; }
+TEM inline void Curve<T>::reset(){ mValue = T(0); b1 = a1; }
 
-#define EPS (T)0.00001
 TEM void Curve<T>::set(T length, T curve){
+	static const T EPS = T(0.00001);
 
 	// Avoid discontinuity when curve = 0 (a line)
 	if(curve < EPS && curve > -EPS){
-		curve = curve < (T)0 ? -EPS : EPS;
+		curve = curve < T(0) ? -EPS : EPS;
 	}
 	
 	T curve_length = curve / length;
 	
 	if(curve_length < EPS && curve_length > -EPS){
-		curve_length = curve_length < (T)0 ? -EPS : EPS;
+		curve_length = curve_length < T(0) ? -EPS : EPS;
 		curve = curve_length * length;
 	}
 
 	mMul = ::exp(curve_length);
-	a1 = (T)1 / ((T)1 - ::exp(curve));
+	a1 = T(1) / (T(1) - ::exp(curve));
 	b1 = a1;
 
 //	level = start;
@@ -378,15 +385,11 @@ TEM void Curve<T>::set(T length, T curve){
 //	b1 = a1;
 }
 
-#undef EPS
-
 TEM inline T Curve<T>::operator()(){
 	mValue = a1 - b1;
 	b1 *= mMul;
 	return mValue;
 }
-
-TEM inline T Curve<T>::value(){ return mValue; }
 
 #undef TEM
 
@@ -401,6 +404,32 @@ TM1 AD<TM2>::AD(T unitsA, T unitsD, T crvA, T crvD) :
 	mUnitsA(unitsA), mUnitsD(unitsD), mCrvA(crvA), mCrvD(crvD), mStage(0), mCntA(0)
 {
 	Ts::initSynced();
+}
+
+
+TM1 inline bool AD<TM2>::done() const { return 2 == mStage; }
+
+TM1 inline T AD<TM2>::value() const {
+	switch(mStage){
+		case 0:	return scl::min(mFncA.value(), T(1));
+		case 1: return scl::max(mFncD.value(), T(0));
+		default: return T(0);
+	}
+}
+
+TM1 inline T AD<TM2>::operator()(){
+	switch(mStage){
+	case 0:		
+		if(mCntA++ < mSmpsA)	return scl::min(mFncA(), T(1));
+		else					mStage = 1;
+		
+	case 1:{
+		T v = T(1) - mFncD();
+		if(v > T(0))			return v;
+		else					mStage = 2;
+	}
+	default: return T(0);
+	}
 }
 
 TM1 void AD<TM2>::attack(T units){
@@ -429,23 +458,6 @@ TM1 inline void AD<TM2>::reset(){
 }
 
 TM1 void AD<TM2>::set(T unitsA, T unitsD){ attack(unitsA); decay(unitsD); }
-
-TM1 inline bool AD<TM2>::done() const { return mStage == 2; }
-
-TM1 inline T AD<TM2>::operator()(){
-	switch(mStage){
-	case 0:		
-		if(mCntA++ < mSmpsA)	return scl::min(mFncA(), (T)1);
-		else					mStage = 1;
-		
-	case 1:{
-		T v = (T)1 - mFncD();
-		if(v > (T)0)			return v;
-		else					mStage = 2;
-	}
-	default: return (T)0;
-	}
-}
 
 TM1 void AD<TM2>::onResync(double r){
 	//printf("AD: onSyncChange()\n");
