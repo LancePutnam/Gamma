@@ -43,7 +43,7 @@ public:
 
 	uint32_t operator()();			///< Alias of cycle().
 
-	/// Returns 0x80000000 on phase wrap, 0 otherwise.
+	/// Returns 0x80000000 on phase wrap, 0 otherwise
 	
 	/// The return value can be used as a bool.  It's an integer because it
 	/// saves a conditional check converting to a bool.
@@ -51,7 +51,8 @@ public:
 
 	uint32_t cycles();		///< Returns 1 to 0 transitions of all accumulator bits
 	uint32_t once();
-	uint32_t incPhase();	///< Increment phase and return post-incremented phase.
+	uint32_t incPhase();	///< Increment phase and return post-incremented phase
+	uint32_t incPhasePre();	///< Increment phase and return pre-incremented phase
 
 	virtual void onResync(double r);
 
@@ -68,7 +69,8 @@ protected:
 #define ACCUM_INHERIT\
 	using Accum<Stap,Ts>::phaseI;\
 	using Accum<Stap,Ts>::phaseIncI;\
-	using Accum<Stap,Ts>::incPhase;
+	using Accum<Stap,Ts>::incPhase;\
+	using Accum<Stap,Ts>::incPhasePre;
 
 
 /// Linear sweep in interval [0,1)
@@ -479,8 +481,8 @@ public:
 
 	bool seq();			// Returns 'mod' as sequence of triggers
 
-private:
 	ACCUM_INHERIT
+private:
 	typedef Accum<Stap,Ts> Base;
 };
 
@@ -728,6 +730,7 @@ TEMTS inline float TACCUM::phaseInc() const { return phaseIF(phaseIncI()); }
 TEMTS inline uint32_t TACCUM::phaseIncI() const { return mPhaseInc; }
 //TEMTS inline uint32_t TACCUM::incPhase(){ return mPhase += phaseIncI(); }
 TEMTS inline uint32_t TACCUM::incPhase(){ return mTap(mPhase, phaseIncI()); }
+TEMTS inline uint32_t TACCUM::incPhasePre(){ uint32_t r=phaseI(); mTap(mPhase, phaseIncI()); return r; }
 
 TEMTS inline uint32_t TACCUM::operator()(){ return cycle(); }
 
@@ -898,7 +901,7 @@ TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 TEMTS inline void TLFO::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
 TEMTS inline void TLFO::mod(double n){ modi = castIntRound(n * 4294967296.); }
 
-#define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; incPhase(); return r; }
+#define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; return r; }
 
 
 TEMTS inline float TLFO::line2(){
@@ -919,48 +922,43 @@ TEMTS inline float TLFO::line2(){
 	return r;
 }
 
-TEMTS inline float TLFO::line2U(){
-	return line2()*0.5f+0.5f;
-}
+TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
-DEF(down(),		scl::rampDown(phaseI()))
-DEF(even3(),	scl::rampUp(phaseI()); static float c=-1.50*sqrt(3.); r *= (1-r*r)*c;)
-DEF(even5(),	scl::rampUp(phaseI()); static float c=-1.25*::pow(5.,0.25); r *= (1-scl::pow4(r))*c;)
-DEF(pulse(),	scl::pulse(phaseI(), modi))
-DEF(cos(),		scl::triangle(phaseI()); r *= 0.5f * r*r - 1.5f)
-DEF(stair(),	scl::stair(phaseI(), modi))
-DEF(sqr(),		scl::square(phaseI()))
-DEF(tri(),		scl::triangle(phaseI()))
-DEF(up(),		scl::rampUp(phaseI()))
-DEF(up2(),		scl::rampUp2(phaseI(), modi))
-DEF(cosU(),		scl::triangle(phaseI()); r = r * (0.25f * r*r - 0.75f) + 0.5f)
-DEF(downU(),	scl::rampDownU(phaseI()))
-DEF(hann(),		scl::triangle(phaseI()); r = scl::warpSinSU(r))
-DEF(pulseU(),	scl::pulseU(phaseI(), modi))
-DEF(sqrU(),		scl::squareU(phaseI()))
-DEF(stairU(),	scl::stairU(phaseI(), modi))
-DEF(triU(),		scl::triangleU(phaseI()))
-DEF(upU(),		scl::rampUpU(phaseI()))
-DEF(up2U(),		scl::rampUp2U(phaseI(), modi))
-DEF(patU(),		scl::rampUpU(phaseI() & modi))
+DEF(down(),		scl::rampDown(incPhasePre()))
+DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
+DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
+DEF(pulse(),	scl::pulse(incPhasePre(), modi))
+//DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
+DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
+DEF(stair(),	scl::stair(incPhasePre(), modi))
+DEF(sqr(),		scl::square(incPhasePre()))
+DEF(tri(),		scl::triangle(incPhasePre()))
+DEF(up(),		scl::rampUp(incPhasePre()))
+DEF(up2(),		scl::rampUp2(incPhasePre(), modi))
+DEF(cosU(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
+DEF(downU(),	scl::rampDownU(incPhasePre()))
+DEF(hann(),		tri(); r = scl::warpSinSU(r))
+DEF(pulseU(),	scl::pulseU(incPhasePre(), modi))
+DEF(sqrU(),		scl::squareU(incPhasePre()))
+DEF(stairU(),	scl::stairU(incPhasePre(), modi))
+DEF(triU(),		scl::triangleU(incPhasePre()))
+DEF(upU(),		scl::rampUpU(incPhasePre()))
+DEF(up2U(),		scl::rampUp2U(incPhasePre(), modi))
+DEF(patU(),		scl::rampUpU(incPhasePre() & modi))
 
-DEF(patU(uint32_t mul), scl::rampUpU((phaseI() & modi) * mul))
+DEF(patU(uint32_t mul), scl::rampUpU((incPhasePre() & modi) * mul))
 
-DEF(sineT9(),	scl::rampUp(phaseI()); r = scl::sinT9(r * M_PI))
-DEF(sineP9(),	scl::rampUp(phaseI()); r = scl::sinP9(r))
+DEF(sineT9(),	up(); r = scl::sinT9(r * M_PI))
+DEF(sineP9(),	up(); r = scl::sinP9(r))
 
 #undef DEF
 
-//TEMS inline float TLFO::imp(){ return this->cycle() ? 1.f : 0.f; }
-TEMTS inline float TLFO::imp(){ 
-	float r = phaseI() < this->phaseIncI() ? 1.f : 0.f;
-	incPhase();
-	return r; 
+TEMTS inline float TLFO::imp(){	
+	return incPhasePre() < this->phaseIncI() ? 1.f : 0.f;
 }
 
 TEMTS inline bool TLFO::seq(){
-	uint32_t prev = phaseI();
-	incPhase();
+	uint32_t prev = incPhasePre();
 	if( (phaseI() ^ prev) & 0xf8000000 ){
 		if( (modi >> (phaseI()>>27)) & 0x1 ) return true;
 	}
