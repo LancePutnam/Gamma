@@ -21,7 +21,11 @@ namespace gam{
 	CONST(MaskExpo, 0x7F800000, 0x7FF0000000000000)	// IEEE-754 floating-point exponent bit mask
 	CONST(MaskFrac, 0x007FFFFF, 0x000FFFFFFFFFFFFF) // IEEE-754 floating-point fraction bit mask
 	CONST(MaskSign, 0x80000000, 0x8000000000000000) // IEEE-754 floating-point sign bit mask
-	CONST(Expo1   , 0x3F800000, 0x3FF0000000000000) // IEEE-754 floating-point [1-2) exponent interval
+	CONST(Expo1_2 , 0x3F000000, 0x3FE0000000000000) // IEEE-754 floating-point [0.5, 1) exponent interval
+	CONST(Expo1   , 0x3F800000, 0x3FF0000000000000) // IEEE-754 floating-point [ 1, 2) exponent interval
+	CONST(Expo2   , 0x40000000, 0x4000000000000000)	// IEEE-754 floating-point [ 2, 4) exponent interval
+	CONST(Expo4   , 0x40800000, 0x4010000000000000) // IEEE-754 floating-point [ 4, 8) exponent interval
+	CONST(ExpoNeg1, 0xBF800000, 0xBFF0000000000000) // IEEE-754 floating-point [-1,-2) exponent interval
 #undef CONST
 
 const float justUnder1f = 0.99999997f; //0x3f7fffff;

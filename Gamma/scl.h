@@ -1339,7 +1339,7 @@ TEM inline void sphericalToCart(T& r, T& p, T& t){
 // Freq precision:	32 bits
 // Amp precision:	24 bits
 inline float rampDown(uint32_t p){
-	p = (p >> 9) | 0x40000000;
+	p = (p >> 9) | Expo2<float>();
 	return 3.f - punUF(p);
 }
 
@@ -1347,42 +1347,46 @@ inline float rampDown(uint32_t p){
 // Freq precision:	32 bits
 // Amp precision:	24 bits
 inline float rampUp(uint32_t p){
-	p = (p >> 9) | 0x40000000;
+	p = (p >> 9) | Expo2<float>();
 	return punUF(p) - 3.f;
 }
 
-// [1, 1, -1, -1] 
+// [1, 1,-1,-1] 
 // Freq precision:	31 bits
 // Amp precision:	NA
 inline float square(uint32_t p){
-//	phase = 0x3f800000 | (phase & 0x80000000);
-//	return *(float *)&phase;
-	//return p & 0x80000000 ? -1.f : 1.f;
+//	p = Expo1<float>() | (p & MaskSign<float>());
+//	return punUF(p);
 	return p & MaskSign<float>() ? -1.f : 1.f;
 }
 
-// [-1, 0, 1, 0]
+// [ 1, 0,-1, 0]
 // Freq precision:	31 bits
 // Amp precision:	25 bits
 inline float triangle(uint32_t p){
 	uint32_t dir = p >> 31;
 	p = ((p^(-dir)) + dir);
-	p = (p >> 8) | 0x40000000;
-	return punUF(p) - 3.f;
+	p = (p >> 8) | Expo2<float>();
+	return 3.f - punUF(p);
 }
 
+//inline float triangle(uint32_t p){
+//	p = (p >> 9) | Expo4<float>(); // [4, 8]
+//	return abs(gam::punUF(p) - 6.f) - 1.f;
+//}
+
 // Just another triangle wave algorithm
-//inline float triangle(uint32_t phase){	
-//	uint32_t dir = phase & 0x80000000;
+//inline float triangle(uint32_t p){	
+//	uint32_t dir = p & MaskSign<float>();
 //	dir |= 0x40000000;
-//	phase = (phase << 1 >> 9) | dir;
+//	p = (p << 1 >> 9) | dir;
 //	dir |= 0x400000;	// make it +/-3
-//	return *(float *)&phase - *(float *)&dir;
+//	return punUF(dir) - punUF(p);
 //}
 
 // and another...
-//inline float triangle(uint32_t phase){
-//	return rampUp(phase<<1) * square(phase);
+//inline float triangle(uint32_t p){
+//	return rampDown(p<<1) * square(p);
 //}
 
 // Freq precision:	32 bits
@@ -1396,8 +1400,8 @@ inline float pulse(uint32_t p, uint32_t w){
 }
 
 inline float stair(uint32_t p, uint32_t w){
-	uint32_t sqr1 = 0x3f000000 | ( p    & MaskSign<float>());
-	uint32_t sqr2 = 0x3f000000 | ((p+w) & MaskSign<float>());
+	uint32_t sqr1 = Expo1_2<float>() | ( p    & MaskSign<float>());
+	uint32_t sqr2 = Expo1_2<float>() | ((p+w) & MaskSign<float>());
 	return punUF(sqr1) + punUF(sqr2);
 }
 
@@ -1424,8 +1428,8 @@ inline float rampUpU(uint32_t p){
 }
 	
 inline float rampUp2U(uint32_t p, uint32_t w){
-	uint32_t saw1 = ( p    >> 9) | 0x3F000000;
-	uint32_t saw2 = ((p+w) >> 9) | 0x3F000000;
+	uint32_t saw1 = ( p    >> 9) | Expo1_2<float>();
+	uint32_t saw2 = ((p+w) >> 9) | Expo1_2<float>();
 	return punUF(saw1) + punUF(saw2) - 1.f;
 }
 
@@ -1433,7 +1437,7 @@ inline float rampUp2U(uint32_t p, uint32_t w){
 // Freq precision:	32 bits
 // Amp precision:	24 bits
 inline float rampDownU(uint32_t p){
-	p = (p >> 9) | 0xbf800000;
+	p = (p >> 9) | ExpoNeg1<float>();
 	return punUF(p) + 2.f;
 }
 
@@ -1448,7 +1452,7 @@ inline float squareU(uint32_t p){
 // Amp precision:	24 bits
 inline float triangleU(uint32_t p){
 	union{ float f; uint32_t i; } u;
-	u.i = (p >> 9) | 0x40000000;
+	u.i = (p >> 9) | Expo2<float>();
 	u.f -= 3.f;
 	u.i &= 0x7fffffff;
 	return u.f;
