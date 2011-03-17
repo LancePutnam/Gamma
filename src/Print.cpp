@@ -81,12 +81,12 @@ void printBinary(float value, const char * zero, const char * one, int msb){
 	)
 }
 
-void printBinary(void * value32, const char * zero, const char * one, int msb){
+void printBinary(const void * value32, const char * zero, const char * one, int msb){
 	printBinary(*(uint32_t *)value32, zero, one, msb);
 }
 #undef LOOP_BITS
 
-void printHexArray(float * a, uint32_t len, uint32_t valuesPerLine){
+void printHexArray(const float * a, uint32_t len, uint32_t valuesPerLine){
 	printf("{");
 	for(uint32_t i=0; i<len; ++i){
 		if((i % valuesPerLine) == 0) printf("\n\t");

@@ -31,10 +31,10 @@ template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
 void printBinary(uint32_t value, const char * zero="0", const char * one="1", int msb=32);
 void printBinary(uint64_t value, const char * zero="0", const char * one="1", int msb=64);
 void printBinary(float value, const char * zero="0", const char * one="1", int msb=32);
-void printBinary(void * value32, const char * zero="0", const char * one="1", int msb=32);
+void printBinary(const void * value32, const char * zero="0", const char * one="1", int msb=32);
 
 /// Prints array as hexidecimal values.
-void printHexArray(float * table, uint32_t len, uint32_t valuesPerLine);
+void printHexArray(const float * table, uint32_t len, uint32_t valuesPerLine);
 
 /// Print signed unit value on a horizontal plot.
 
