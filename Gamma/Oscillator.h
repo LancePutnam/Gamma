@@ -454,6 +454,7 @@ public:
 	float down();		///< Downward ramp (1 to -1)
 	float even3();		///< Even harmonic sine-like wave (3rd order)
 	float even5();		///< Even harmonic sine-like wave (5th order)
+	float para();		///< Sine-like wave constructed from parabolas (odd harmonics)
 	float imp();		///< Impulse (occurs at beginning of cycle)
 	float line2();		///< 2-segment line. mod changes wave from down to tri to up
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
@@ -927,6 +928,7 @@ TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 DEF(down(),		scl::rampDown(incPhasePre()))
 DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
+DEF(para(),		scl::sinePara(incPhasePre()))
 DEF(pulse(),	scl::pulse(incPhasePre(), modi))
 //DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
 DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )

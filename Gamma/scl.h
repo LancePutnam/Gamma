@@ -1370,6 +1370,12 @@ inline float triangle(uint32_t p){
 	return 3.f - punUF(p);
 }
 
+inline float sinePara(uint32_t p){
+	uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
+	uint32_t tri = ((p+MaskSign<float>()) >> 9) | Expo4<float>();
+	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));
+}
+
 //inline float triangle(uint32_t p){
 //	p = (p >> 9) | Expo4<float>(); // [4, 8]
 //	return abs(gam::punUF(p) - 6.f) - 1.f;
@@ -1442,8 +1448,8 @@ inline float rampDownU(uint32_t p){
 }
 
 inline float squareU(uint32_t p){
-//	phase = (phase & 0x80000000) >> 1;
-//	return *(float *)&phase * 0.5f;
+//	p = (p & 0x80000000) >> 1;
+//	return punUF(p) * 0.5f;
 	return p & MaskSign<float>() ? 0.f : 1.f;
 }
 
