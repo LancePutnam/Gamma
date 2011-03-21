@@ -193,10 +193,12 @@ struct Complex{
 
 	T abs() const { return norm(); }						///< Returns norm (radius), |z|
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
+	T magSqr() const { return norm2(); }					///< Returns magnitude squared, |z|^2
 	T phase() const { return arg(); }						///< Returns argument (angle)
 };
 
 #define TEM template <class T>
+TEM Complex<T> abs(const Complex<T>& c){ return c.abs(); }
 TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
 TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
 TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
