@@ -280,12 +280,34 @@ protected:
 };
 
 
-/// Recursive add generator
+/// Recursive add generator that generates lines
 template <class T=gam::real>
 struct RAdd: public Val<T>{ INHERIT;
+
+	/// @param[in] add	addition amount
+	/// @param[in] val	current value
 	RAdd(const T& add=T(1), const T& val=T(0))
-	: Val<T>(val-add), add(add){}						///< Constructor
-	T operator()() const { return val += add; }			///< Generate next value
+	: Val<T>(val-add), add(add){}
+	
+	/// Generate next value
+	T operator()() const { return val += add; }
+
+	/// Go back one step
+	T recede() const { return val -= add; }
+
+	/// Set to generate line between points (0, begin) and (length, end)
+	void line(T begin, T end, T length){
+		val = begin;
+		add = (end - begin)/length;
+		recede();
+	}
+
+	/// Set to generate line between points (0, val) and (length, end)
+	void line(T end, T length){ line(val, end, length); }
+
+	/// Set to generate constant value
+	void constant(T v){ val=v; add=T(0); }
+
 	T add;												///< Addition amount
 };
 
