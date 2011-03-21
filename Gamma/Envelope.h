@@ -17,9 +17,9 @@ namespace gam{
 
 /// Exponential curve with variable curvature
 
-/// This curve will return values in the interval [0, 1] starting from 0 and
-/// ending on 1 over its length in samples.  The last point is exclusive, so
-/// it takes length + 1 samples to reach 1 inclusively.  For iterations 
+/// This curve will return values in the interval [0, end] starting from 0 and
+/// ending on 'end' over its length in samples.  The last point is exclusive, so
+/// it takes length + 1 samples to reach 'end' inclusively.  For iterations 
 /// exceeding the specified length, the values returned will be unbounded.
 template <class T=gam::real>
 class Curve{
@@ -27,14 +27,18 @@ public:
 	Curve();
 	
 	/// @param[in] length	length of curve in samples
-	/// @param[in] curve	curvature value
-	Curve(T length, T curve);
+	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
+	/// @param[in] end		end value
+	Curve(T length, T curve, T end = T(1));
 
-	/// Returns whether envelope value is below threshold
-	bool done(T thresh=T(0.001)) const { return value() < thresh; }
+	/// Returns whether curve has gone past end value
+	bool done() const;
+
+	/// Get end value
+	T end() const { return mEnd; }
 
 	/// Get current value
-	T value() const { return mValue; }
+	T value() const;
 
 	T operator()();					///< Generates next value
 	void reset();					///< Reset envelope
@@ -42,12 +46,109 @@ public:
 	/// Set length and curvature
 	
 	/// @param[in] length	length of curve in samples
-	/// @param[in] curve	curvature; positive curves down, negative curves up, and 0 is line 
-	void set(T length, T curve);
+	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
+	/// @param[in] end		end value
+	void set(T length, T curve, T end = T(1));
 
 protected:
-	T mValue;
-	T mMul, a1, b1;
+	T mEnd;
+	T mMul, mA, mB;
+	
+	T eps() const;
+};
+
+
+
+template <int N, class T=gam::real>
+class CurveEnv{
+public:
+
+	CurveEnv(): mRelease(N)
+	{ reset(); }
+
+	int size() const { return N; }
+	int position() const { return mPos; }
+	int releasePoint() const { return mRelease; }
+	int stage() const { return mStage; }
+	
+	T value() const {
+		return mValues[mStage] + mCurve.value();
+	}
+
+	bool done() const { return mStage == size(); }
+	bool released() const { return mRelease < 0; }
+	bool sustained() const { return (mStage == mRelease) && !released(); }
+
+	T operator()(){
+		begin:
+		if(sustained()){
+			return mValues[mStage];
+		}
+		else if(mPos < mLen){
+			++mPos;
+			return mValues[mStage] + mCurve();
+		}
+		else if(mStage < size()-1){
+			++mStage;
+
+			if(!done()){
+				mPos = 0;
+				mLen = mLengths[mStage];
+				mCurve.set(mLen, mCurves[mStage], mValues[mStage+1]-mValues[mStage]);
+				goto begin;
+			}
+		}
+		return mValues[mStage+1];
+	}
+	
+	void release(){ mRelease=-scl::abs(mRelease); }
+	void releasePoint(int v){ mRelease = v; }
+
+	void reset(){
+		mPos = 0xFFFFFFFF;
+		mLen = 0;
+		mStage = -1;
+		mRelease = scl::abs(mRelease);
+	}
+
+	void segment(int i, T length, T curve){
+		mLengths[i]=length;
+		mCurves[i]=curve;
+	}
+	
+	void segments(const T* lengths, const T* curves, int len){
+		int n = len < size() ? len : size();
+		for(int i=0; i<n; ++i){
+			mLengths[i] = lengths[i];
+			mCurves[i] = curves[i];
+		}
+	}
+	
+	void segments(T la, T ca, T lb, T cb){ T l[]={la,lb}; T c[]={ca,cb}; segments(l,c,2); }
+	void segments(T la, T ca, T lb, T cb, T lc, T cc){ T l[]={la,lb,lc}; T c[]={ca,cb,cc}; segments(l,c,3); }
+	void segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){ T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; segments(l,c,4); }
+
+	void point(int i, T value){ mValues[i] = value; }
+
+	void points(const T * vals, int len){
+		int n = len <= size() ? len : size()+1;
+		for(int i=0; i<n; ++i) mValues[i] = vals[i];
+	}
+	
+	void points(T a, T b){ T v[]={a,b}; points(v,2); }
+	void points(T a, T b, T c){ T v[]={a,b,c}; points(v,3); }
+	void points(T a, T b, T c, T d){ T v[]={a,b,c,d}; points(v,4); }
+	void points(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; points(v,5); }
+
+protected:
+	Curve<T> mCurve;
+	T mLengths[N];			// segment lengths
+	T mCurves[N];			// segment curvatures
+	T mValues[N+1];			// break point values
+	
+	uint32_t mPos, mLen;	// position in and length of current segment, in samples
+	int mStage;				// the current curve segment
+	int mRelease;			// index of point before release portion
 };
 
 
@@ -57,29 +158,34 @@ template <class T=gam::real, class Ts=Synced>
 class AD : public Ts{
 public:
 
-	/// @param[in] unitsA	Attack length
-	/// @param[in] unitsD	Decay length
-	/// @param[in] crvA		Attack curvature
-	/// @param[in] crvD		Decay curvature
-	AD(T unitsA = 0.01, T unitsD = 2, T crvA =-4, T crvD = 4);
+	/// @param[in] lengthA		Attack length
+	/// @param[in] lengthD		Decay length
+	/// @param[in] curveA		Attack curvature
+	/// @param[in] curveD		Decay curvature
+	/// @param[in] amp			Amplitude
+	AD(T lengthA = 0.01, T lengthD = 2, T curveA =-4, T curveD = 4, T amp = 1);
 	
 	bool done() const;			///< Returns whether value is below threshold
+	T amp() const;				///< Get amplitude (maximum value)
 	T value() const;			///< Get current value
 	
 	T operator()();				///< Generates next sample
 	
+	void amp(T v);				///< Set maximum amplitude
 	void attack(T units);		///< Set attack units
 	void curve(T valA, T valD);	///< Set attack/decay curvatures
 	void decay(T units);		///< Set decay units
+	void length(T unitsA, T unitsD);	///< Set attack/decay units
+	void set(T lengthA, T lengthD, T curveA, T curveD, T amp); ///< Set all envelope parameters
 	void reset();				///< Reset envelope
-	void set(T unitsA, T unitsD);	///< Set attack/decay units
 	
 	virtual void onResync(double r);
 
 protected:
 	Curve<T> mFncA, mFncD;
-	T mUnitsA, mUnitsD;
+	T mLenA, mLenD;
 	T mCrvA, mCrvD;
+	T mAmp;
 	uint32_t mStage, mSmpsA, mCntA;
 };
 
@@ -278,69 +384,6 @@ protected:
 
 
 
-// Exponentially attacking and decaying curve.
-//TEM class AttDec : public Synced{
-//public:
-//	/// @param[in] dec60	Number of units until value decays -60db
-//	/// @param[in] dec60	Number of units until value decays -60db
-//	AttDec(double att60, double dec60);
-//	
-//	T next();				///< Returns next curve sample.
-//	T operator () ();		///< Returns next curve sample.
-//	
-//	void decay(T value);	///< Set decay multiplication factor.
-//	void value();
-//	
-//	/// Set number of units for curve to decay -60 dB.
-//	void decay60(double value);
-//	
-//	T attack() const;
-//	T decay() const;		///< Returns decay multiplication factor.
-//	T value() const;		///< Returns current value.
-//	
-//	virtual void onSyncChange();
-//	
-//protected:
-//	T mValA, mValD, mAtt, mAtt60, mDcy, mDcy60;
-//};
-//
-//TEM inline void Decay<T>::attack60(double value){
-//	mAtt60 = value;
-//	mAtt = (T)scl::t60(value * spu());
-//}
-//
-//TEM inline void Decay<T>::decay60(double value){
-//	mDcy60 = value;
-//	mDcy = (T)scl::t60(value * spu());
-//}
-//
-//TEM inline void Decay<T>::next(){
-//	if(mValA > (T)0.001){
-//		T o = (T)1 - mValA;
-//		mValA *= mAtt;
-//		return o;
-//	}
-//	else{
-//		T o = mValD;
-//		mValD *= mDcy;
-//		return o;
-//	}
-//}
-//
-//TEM inline void Decay<T>::next(){
-//	if(mValA > (T)0.001){
-//		T o = (T)1 - mValA;
-//		mValA *= mAtt;
-//		return o;
-//	}
-//	else{
-//		T o = mValD;
-//		mValD *= mDcy;
-//		return o;
-//	}
-//}
-//o1 = scl::dot2(o1, mStored, co1, ci0);
-
 
 
 // Implementation_______________________________________________________________
@@ -348,33 +391,41 @@ protected:
 #define TEM template <class T>
 
 //---- Curve
-TEM Curve<T>::Curve(): mValue(0), mMul(0), a1(0), b1(0){}
+TEM Curve<T>::Curve(): mEnd(1), mMul(1), mA(0), mB(0){}
 
-TEM Curve<T>::Curve(T length, T curve){
-	set(length, curve);
-	mValue = T(0);
+TEM Curve<T>::Curve(T length, T curve, T amp){
+	set(length, curve, amp);
 }
 
-TEM inline void Curve<T>::reset(){ mValue = T(0); b1 = a1; }
+TEM inline bool Curve<T>::done() const { return scl::abs(mA - mB*mMul) >= scl::abs(end()); }
 
-TEM void Curve<T>::set(T length, T curve){
-	static const T EPS = T(0.00001);
+TEM inline T Curve<T>::value() const { return mA - mB; }
+
+// dividing by mMul goes back one step
+TEM inline void Curve<T>::reset(){ mB = mA / mMul; }
+
+TEM inline T Curve<T>					::eps() const { return T(0.00001  ); }
+template<> inline double Curve<double>	::eps() const { return   0.00000001; }
+
+TEM void Curve<T>::set(T len, T crv, T end){
+	static const T EPS = eps();
 
 	// Avoid discontinuity when curve = 0 (a line)
-	if(curve < EPS && curve > -EPS){
-		curve = curve < T(0) ? -EPS : EPS;
+	if(crv < EPS && crv > -EPS){
+		crv = crv < T(0) ? -EPS : EPS;
 	}
 	
-	T curve_length = curve / length;
+	T crvOverLen = crv / len;
 	
-	if(curve_length < EPS && curve_length > -EPS){
-		curve_length = curve_length < T(0) ? -EPS : EPS;
-		curve = curve_length * length;
+	if(crvOverLen < EPS && crvOverLen > -EPS){
+		crvOverLen = crvOverLen < T(0) ? -EPS : EPS;
+		crv = crvOverLen * len;
 	}
 
-	mMul = ::exp(curve_length);
-	a1 = T(1) / (T(1) - ::exp(curve));
-	b1 = a1;
+	mEnd = end;
+	mMul = ::exp(crvOverLen);
+	mA = mEnd / (T(1) - ::exp(crv));
+	reset();
 
 //	level = start;
 //
@@ -386,11 +437,9 @@ TEM void Curve<T>::set(T length, T curve){
 }
 
 TEM inline T Curve<T>::operator()(){
-	mValue = a1 - b1;
-	b1 *= mMul;
-	return mValue;
+	mB *= mMul;
+	return value();
 }
-
 #undef TEM
 
 
@@ -400,8 +449,9 @@ TEM inline T Curve<T>::operator()(){
 
 //---- AD
 
-TM1 AD<TM2>::AD(T unitsA, T unitsD, T crvA, T crvD) :
-	mUnitsA(unitsA), mUnitsD(unitsD), mCrvA(crvA), mCrvD(crvD), mStage(0), mCntA(0)
+TM1 AD<TM2>::AD(T lenA, T lenD, T crvA, T crvD, T amp) :
+	mLenA(lenA), mLenD(lenD), mCrvA(crvA), mCrvD(crvD), mAmp(amp),
+	mStage(0), mCntA(0)
 {
 	Ts::initSynced();
 }
@@ -409,9 +459,11 @@ TM1 AD<TM2>::AD(T unitsA, T unitsD, T crvA, T crvD) :
 
 TM1 inline bool AD<TM2>::done() const { return 2 == mStage; }
 
+TM1 inline T AD<TM2>::amp() const { return mAmp; }
+
 TM1 inline T AD<TM2>::value() const {
 	switch(mStage){
-		case 0:	return scl::min(mFncA.value(), T(1));
+		case 0:	return scl::min(mFncA.value(), amp());
 		case 1: return scl::max(mFncD.value(), T(0));
 		default: return T(0);
 	}
@@ -420,11 +472,11 @@ TM1 inline T AD<TM2>::value() const {
 TM1 inline T AD<TM2>::operator()(){
 	switch(mStage){
 	case 0:		
-		if(mCntA++ < mSmpsA)	return scl::min(mFncA(), T(1));
+		if(mCntA++ < mSmpsA)	return scl::min(mFncA(), amp());
 		else					mStage = 1;
 		
 	case 1:{
-		T v = T(1) - mFncD();
+		T v = amp() - mFncD();
 		if(v > T(0))			return v;
 		else					mStage = 2;
 	}
@@ -432,22 +484,37 @@ TM1 inline T AD<TM2>::operator()(){
 	}
 }
 
-TM1 void AD<TM2>::attack(T units){
-	mUnitsA = units;
-	T smps = units * Ts::spu();
-	mSmpsA = (uint32_t)smps;
-	mFncA.set(smps, mCrvA);
+TM1 void AD<TM2>::amp(T v){
+	mAmp = v;
+	attack(mLenA);
+	decay(mLenD);	
 }
 
 TM1 void AD<TM2>::curve(T valA, T valD){
 	mCrvA = valA; mCrvD = -valD;
-	attack(mUnitsA);
-	decay(mUnitsD);
+	attack(mLenA);
+	decay(mLenD);
 }
 
-TM1 void AD<TM2>::decay(T units){
-	mUnitsD = units;
-	mFncD.set(units * Ts::spu(), mCrvD);
+TM1 void AD<TM2>::attack(T v){
+	mLenA = v;
+	T smps = v * Ts::spu();
+	mSmpsA = (uint32_t)smps;
+	mFncA.set(smps, mCrvA, amp());
+}
+
+TM1 void AD<TM2>::decay(T v){
+	mLenD = v;
+	mFncD.set(v * Ts::spu(), mCrvD, amp());
+}
+
+TM1 void AD<TM2>::length(T a, T d){ attack(a); decay(d); }
+
+TM1 void AD<TM2>::set(T lenA, T lenD, T curveA, T curveD, T amp){
+	mAmp = amp;
+	mCrvA = curveA; mCrvD = -curveD;
+	attack(lenA);
+	decay(lenD);	
 }
 
 TM1 inline void AD<TM2>::reset(){
@@ -456,8 +523,6 @@ TM1 inline void AD<TM2>::reset(){
 	mFncA.reset();
 	mFncD.reset();
 }
-
-TM1 void AD<TM2>::set(T unitsA, T unitsD){ attack(unitsA); decay(unitsD); }
 
 TM1 void AD<TM2>::onResync(double r){
 	//printf("AD: onSyncChange()\n");
