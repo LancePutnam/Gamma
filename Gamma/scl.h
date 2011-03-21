@@ -61,9 +61,8 @@ template<int N, class T> struct InvSqrtNewton
 };
 
 template<class T> const Twiddle<T> invSqrtMagic();
-template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >((float)0x5f3759df); }
-template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>((double)0x5fe6ec85e7de30daULL); }
-
+template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(0x5f3759df); }
+template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(0x5fe6ec85e7de30daULL); }
 
 /// Approximate square root using a quick log base-2 method.
 inline float sqrtLog2(float v){
@@ -630,6 +629,9 @@ TEM void sphericalToCart(T & rho, T & phi, T & theta);
 
 
 //---- Waveform generators
+
+/// Returns value quantized to multiples of 2^q
+uint32_t quantizePow2(uint32_t value, uint32_t q);
 
 //---- Bipolar waveforms [-1, 1)
 float rampDown	(uint32_t phase);	///< Returns value of bipolar downward ramp function.
@@ -1333,6 +1335,11 @@ TEM inline void sphericalToCart(T& r, T& p, T& t){
 	p = rsinp * sin(tt);
 }
 
+
+
+inline uint32_t quantizePow2(uint32_t v, uint32_t q){
+	return v & (0xFFFFFFFF << q);
+}
 
 
 // [1, 0.5, 0, -0.5]
