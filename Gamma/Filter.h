@@ -156,6 +156,12 @@ public:
 		if(odd()) o0 = (*mIIR1)(o0);
 		return o0;
 	}
+	
+	/// Zero internal delays
+	void zero(){
+		for(uint32_t i=0; i<numIIR2(); ++i) mIIR2[i].zero();
+		if(odd()) mIIR1->zero();
+	}
 
 protected:
 	typedef Complex<double> complex;
@@ -199,7 +205,7 @@ protected:
 
 	// Convert a z-plane pole to IIR2 low-pass coefs
 	static void convertLP(IIR2<Tv,Tp>& f, const Complex<Tp>& p){	
-		Tp co2 = Tp(1)/p.dot();						// recip of mag squared
+		Tp co2 = Tp(1)/p.magSqr();						// recip of mag squared
 		Tp co1 = Tp(-2)*p.r*co2;
 		Tp ci  = (Tp(1) + co1 + co2) * Tp(0.25);	// input gain compensation
 		f.coefs(ci, ci*Tp(2), ci, -co1, -co2);
@@ -229,7 +235,7 @@ template <class Tv=gam::real, class Tp=gam::real>
 class IIRButter: public IIRSeries<Tv,Tp>{
 public:
 
-	IIRButter(Tp frq, uint32_t order=2): super(order){
+	IIRButter(Tp frq=1./4, uint32_t order=2): super(order){
 		freq(frq);
 	}
 
