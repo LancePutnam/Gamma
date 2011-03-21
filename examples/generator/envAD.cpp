@@ -19,7 +19,7 @@ void audioCB(AudioIOData& io){
 	
 		if(tmr()){
 			tilt += 0.1; if(tilt > 1) tilt=0;	// increment tilt amount
-			env.set(tilt, 1-tilt);				// set new attack/decay times
+			env.length(tilt, 1-tilt);			// set new attack/decay times
 			env.reset();						// reset amplitude of envelope
 		}
 
