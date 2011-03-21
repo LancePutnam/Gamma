@@ -561,26 +561,25 @@ public:
 	/// @param[in]	stored	Initial stored value
 	OnePole(Tp freq, const Tv& stored=0);
 
-	void operator  = (const Tv& val);	///< Stores input value for operator().
-	void operator *= (const Tv& val);	///< Multiplies stored value by value.
-	void freq(Tp val);					///< Set -3 dB bandwidth of pole.
-	void smooth(Tp val);				///< Set smoothing coefficient directly.
+	void operator  = (const Tv& val);	///< Stores input value for operator()
+	void operator *= (const Tv& val);	///< Multiplies stored value by value
+	void freq(Tp val);					///< Set -3 dB bandwidth of pole
+	void smooth(Tp val);				///< Set smoothing coefficient directly
 	void zero(){ o1=0; }				///< Zero internal delay
+	void reset(const Tv& v){ o1=v; mStored=v; }
 
-	const Tv& operator()();				///< Returns filtered output using stored value (see store()).
-	const Tv& operator()(const Tv& input);		///< Returns filtered output from input value.
-	const Tv& last() const;				///< Returns last output.
-	const Tv& stored() const;			///< Returns stored value.
-	Tv& stored();						///< Returns stored value.
-	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros.
+	const Tv& operator()();				///< Returns filtered output using stored value
+	const Tv& operator()(const Tv& input);		///< Returns filtered output from input value
+	const Tv& last() const;				///< Returns last output
+	const Tv& stored() const;			///< Returns stored value
+	Tv& stored();						///< Returns stored value
+	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros
 	
 	virtual void onResync(double r);
 
 protected:
-	Tp mFreq;
-	Tp mA0, mB1;
-	Tv mStored;
-	Tv o1;
+	Tp mFreq, mA0, mB1;
+	Tv mStored, o1;
 };
 
 
