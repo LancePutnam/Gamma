@@ -639,6 +639,27 @@ protected:
           Imaginary part antisymmetrical around t=0.
 */
 
+/*
+Butterworth filters are characterized by a magnitude response that is maximally 
+flat in the passband and monotonic overall. Butterworth filters sacrifice 
+rolloff steepness for monotonicity in the pass- and stopbands. Unless the 
+smoothness of the Butterworth filter is needed, an elliptic or Chebyshev 
+filter can generally provide steeper rolloff characteristics with a lower 
+filter order.
+
+Chebyshev Type I filters are equiripple in the passband and monotonic in the 
+stopband. Type I filters roll off faster than type II filters, but at the 
+expense of greater deviation from unity in the passband.
+
+Chebyshev Type II filters are monotonic in the passband and equiripple in the 
+stopband. Type II filters do not roll off as fast as type I filters, but are 
+free of passband ripple.
+
+Elliptic filters offer steeper rolloff characteristics than Butterworth or 
+Chebyshev filters, but are equiripple in both the pass- and stopbands. In 
+general, elliptic filters meet given performance specifications with the 
+lowest order of any filter type.
+*/
 
 
 

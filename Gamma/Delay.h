@@ -81,6 +81,9 @@ protected:
 /// dB/octave cutoff slope and are normally cascaded (run in series) to obtain
 /// a sharper response. This particular implementation utilizes the Butterworth
 /// design.
+///
+/// These filters are adapted from:
+/// http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Biquad : public Ts{
 public:
