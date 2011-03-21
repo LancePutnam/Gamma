@@ -34,15 +34,20 @@ int main(int argc, char* argv[]){
 	Square<> square(1);
 	TableSine<> tableSine(1);
 	
-//	DO(accum.phase(); accum())
-//	DO(accumPhase.nextPhase()/M_PI)
-//	DO(impulse())
-//	DO(impulse.odd())
-//	DO(lfo.cos())
-//	DO(lfo.down())
-//	DO(lfo.even3())
-//	DO(lfo.even5())
-//	DO(lfo.imp())
+	DO(accum.phase(); accum())
+	DO(accumPhase.nextPhase()/M_PI)
+	DO(impulse())
+	DO(impulse.odd())
+	DO(lfo.cos())
+	DO(lfo.down())
+	DO(lfo.even3())
+	DO(lfo.even5())
+	DO(lfo.imp())
+	DO(lfo.sqr())
+	DO(lfo.tri())
+	DO(lfo.up())
+	DO(lfo.para())
+
 //	DO(lfo.line2(); lfo.mod(0.00))
 //	DO(lfo.line2(); lfo.mod(0.25))
 //	DO(lfo.line2(); lfo.mod(0.50))
@@ -54,14 +59,14 @@ int main(int argc, char* argv[]){
 //	DO(lfo.pulse(); lfo.mod(0.50))
 //	DO(lfo.pulse(); lfo.mod(0.75))
 //	DO(lfo.pulse(); lfo.mod(0.99999))
-	
+//
 //	DO(lfo.up();)
 //	DO(lfo.stair(); lfo.mod(0.00))
 //	DO(lfo.stair(); lfo.mod(0.25))
 //	DO(lfo.stair(); lfo.mod(0.50))
 //	DO(lfo.stair(); lfo.mod(0.75))
 //	DO(lfo.stair(); lfo.mod(0.99999))
-
+//
 //	DO(lfo.line2U(); lfo.mod(0.00))
 //	DO(lfo.line2U(); lfo.mod(0.25))
 //	DO(lfo.line2U(); lfo.mod(0.50))
@@ -79,18 +84,15 @@ int main(int argc, char* argv[]){
 //	DO(lfo.stairU(); lfo.mod(0.50))
 //	DO(lfo.stairU(); lfo.mod(0.75))
 //	DO(lfo.stairU(); lfo.mod(0.99999))
-	
-//	DO(lfo.sqr())
-//	DO(lfo.tri())
-//	DO(lfo.up())
+
 //	DO(osc())
 //	DO(quadra()[1])
 //	DO(saw())
 //	DO(sine())
-	DO(sineD())
-	DO(sineDs())
-	DO(sineR())
-	DO(sineRs())
+//	DO(sineD())
+//	DO(sineDs())
+//	DO(sineR())
+//	DO(sineRs())
 //	DO(square())
 //	DO(tableSine())
 	

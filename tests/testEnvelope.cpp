@@ -11,8 +11,14 @@ int main(int argc, char* argv[]){
 	const int n = 32;
 	Sync::master().spu(n);
 
-	AD<> ad(0.2, 0.8, -3, 3);
 	Curve<> curve(n, -3);
+	CurveEnv<4> curveEnv;
+//	curveEnv.releasePoint(2);
+//	curveEnv.release();
+	curveEnv.segments(8,-4, 8,-4, 8,0, 8,0);
+	curveEnv.points(0, 1, 0.5, 0.5, 0);
+
+	AD<> ad(0.2, 0.8, -3, 3);
 	Seg<> segLin(1, 1, -1);
 	Seg<float, iplSeq::Cosine> segCos(0.25, 0, 0, 1);
 	Seg<float, iplSeq::Cubic> segCub(0.25, 0, 0, 1);
@@ -20,7 +26,7 @@ int main(int argc, char* argv[]){
 	
 	NoiseWhite<> noiseWhite;
 	gen::Nyquist<> nyq;
-	
+
 	#define DO(fnc)\
 		printf("\n%s:\n", #fnc);\
 		for(int i=0; i<n+4; ++i){\
@@ -29,21 +35,24 @@ int main(int argc, char* argv[]){
 			printPlot(v, 32); printf("\n");\
 		}\
 	
-	DO(ad())
-	curve.set(n,-3); DO(curve()) curve.reset();
-	curve.set(n, 3); DO(curve()) curve.reset();
-	DO(segExp()) segExp = 1;
-	DO(segExp())
-	DO(segLin()) segLin = 1;
-	DO(segLin())
-	
-	segLin.period(0.25);
-	DO(segLin(nyq))
-	DO(segLin(noiseWhite))
-	DO(segCos(nyq))
-	DO(segCos(noiseWhite))
-	DO(segCub(nyq))
-	DO(segCub(noiseWhite))
+	curve.set(n,-3, 1./1); DO(curve()) curve.reset();
+	curve.set(n, 3, 1./1); DO(curve()) curve.reset();
+
+	DO(curveEnv())
+
+//	DO(ad())
+//	DO(segExp()) segExp = 1;
+//	DO(segExp())
+//	DO(segLin()) segLin = 1;
+//	DO(segLin())
+//	
+//	segLin.period(0.25);
+//	DO(segLin(nyq))
+//	DO(segLin(noiseWhite))
+//	DO(segCos(nyq))
+//	DO(segCos(noiseWhite))
+//	DO(segCub(nyq))
+//	DO(segCub(noiseWhite))
 	
 
 

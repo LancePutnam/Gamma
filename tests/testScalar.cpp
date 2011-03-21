@@ -7,6 +7,10 @@ using namespace gam;
 
 int main(int argc, char* argv[]){
 
+//	{	float x = 4.f;
+//		printHexArray(&x, 1, 1);
+//	}
+
 	const int len = 12;
 	float array[len];
 

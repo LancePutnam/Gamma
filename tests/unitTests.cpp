@@ -10,6 +10,8 @@
 #include "../Gamma/Types.h"
 #include "../Gamma/UnitMaps.h"
 
+#include "../Gamma/Envelope.h"
+
 using namespace gam;
 
 int main(int argc, char* argv[]){
@@ -64,8 +66,10 @@ int main(int argc, char* argv[]){
 	#include "ut/ut_scl.cpp"
 	#include "ut/ut_ipl.cpp"
 	#include "ut/ut_arr.cpp"
+	
+	#include "ut/utEnvelope.cpp"
 
-	printf("Unit testing succeeded.\n");
+//	printf("Unit testing succeeded.\n");
 
 	return 0;
 }
