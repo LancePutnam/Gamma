@@ -925,13 +925,14 @@ TEMTS inline float TLFO::line2(){
 
 TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
+//DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
+DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
 DEF(down(),		scl::rampDown(incPhasePre()))
 DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
+DEF(imp(),		scl::pulseU(incPhasePre(), this->phaseIncI()) )
 DEF(para(),		scl::sinePara(incPhasePre()))
 DEF(pulse(),	scl::pulse(incPhasePre(), modi))
-//DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
-DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
 DEF(stair(),	scl::stair(incPhasePre(), modi))
 DEF(sqr(),		scl::square(incPhasePre()))
 DEF(tri(),		scl::triangle(incPhasePre()))
@@ -954,10 +955,6 @@ DEF(sineT9(),	up(); r = scl::sinT9(r * M_PI))
 DEF(sineP9(),	up(); r = scl::sinP9(r))
 
 #undef DEF
-
-TEMTS inline float TLFO::imp(){	
-	return incPhasePre() < this->phaseIncI() ? 1.f : 0.f;
-}
 
 TEMTS inline bool TLFO::seq(){
 	uint32_t prev = incPhasePre();
