@@ -438,7 +438,8 @@ DEF(sharm22){ static const T c= 0.25*::sqrt(15.*M_1_2PI); return Complex<T>(cp,s
 /// Continuous sign map.
 
 /// The return value is close to 1 if v > 0 and close to -1 if v < 0.
-/// 'bw' controls the width of the transition region.
+/// 'bw' controls the width of the transition region. If 'bw' is 0, then this
+/// turns into a signum function.
 TEM T sign(T v, T bw);
 
 //
