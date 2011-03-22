@@ -251,28 +251,35 @@ DELAY_DEF(A, ipl::AllPass)
 
 
 
-
-/// Variable delay-line with multiple read taps.
+/// Variable delay-line with multiple read taps
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
 class Delays : public Delay<Tv,Si,Ts> {
 public:
 
 	/// @param[in]	delay		Initial delay length. The size of the delay line will be the smallest possible power of two.
-	/// @param[in]	numTaps		Number of reader taps.
-	Delays(float delay, uint32_t numTaps);
-	virtual ~Delays();
+	/// @param[in]	numTaps		Number of reader taps
+	Delays(float delay, uint32_t numTaps)
+	:	Delay<Tv,Si,Ts>(delay)
+	{	taps(numTaps); }
 
-	void delay(float length, uint32_t tap);		///< Set delay length.
-	//void delayNorm(float norm, uint32_t tap);		///< Set normalized delay as (0, 1) of buffer size.
+	/// Get number of read taps
+	uint32_t taps() const { return mDelays.size(); }	
 
-	Tv read(uint32_t tap) const;		///< Read sample from tap.
+	/// Read sample from tap
+	Tv read(uint32_t tap) const {
+		return mIpol(*this, this->mPhase - mDelays[tap]);
+	}
 
-	void taps(uint32_t numTaps);		///< Set number of read taps.
-	uint32_t taps() const;				///< Get number of read taps.		
-	
+	/// Set delay length
+	void delay(float length, uint32_t tap){
+		mDelays[tap] = this->delayFToI(length);
+	}
+
+	/// Set number of read taps
+	void taps(uint32_t numTaps){ mDelays.resize(numTaps); }
+
 protected:
-	uint32_t mTaps;		// number of delay read taps
-	uint32_t * mDelays;	// read taps as delays from write tap
+	std::vector<uint32_t> mDelays;
 };
 
 
@@ -863,31 +870,6 @@ TM1 void Delay<TM2>::print(){
 	printf("Max Delay: %f\n",  mMaxDelay);
 	printf("DlyFactor: %f\n",  mDelayFactor);
 }
-
-
-
-//---- Delays
-TM1 Delays<TM2>::Delays(float delay, uint32_t numTaps)
-:	Delay<TM2>(delay), mTaps(0), mDelays(0)
-{	taps(numTaps); }
-
-TM1 Delays<TM2>::~Delays(){
-	mem::free(mDelays);
-}
-
-TM1 void Delays<TM2>::taps(uint32_t numTaps){
-	if(mem::resize(mDelays, mTaps, numTaps)) mTaps = numTaps;
-}
-
-TM1 inline void Delays<TM2>::delay(float v, uint32_t tap){
-	mDelays[tap] = this->delayFToI(v);
-}
-
-TM1 inline Tv Delays<TM2>::read(uint32_t tap) const {
-	return mIpol(*this, this->mPhase - mDelays[tap]);
-}
-
-TM1 inline uint32_t Delays<TM2>::taps() const { return mTaps; }
 
 #undef TM1
 #undef TM2
