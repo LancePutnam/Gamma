@@ -24,10 +24,28 @@ public:
 	int size() const;
 	
 	/// Perform real-to-complex forward transform in-place
-	void forward(T * buf, bool normalize=true);
+	
+	/// @param[in,out]	buf			input is real sequence, output is complex sequence
+	/// @param[in]		normalize	whether to normalize output complex magnitudes
+	/// @param[in]		complexBuf	If true, then 
+	///									input is  [ *, x0, x1, x2, ..., x(n),   *] and
+	///									output is [r0,  0, r1, i1, ..., r(n/2), 0].
+	///								If false, then 
+	///									input is  [x0, x1, x2, ..., x(n)  ] and
+	///									output is [r0, r1, i1, ..., r(n/2)].
+	void forward(T * buf, bool normalize=true, bool complexBuf=false);
 	
 	/// Perform complex-to-real inverse transform in-place
-	void inverse(T * buf, bool normalized=true);
+
+	/// @param[in,out]	buf			input is complex sequence, output is real sequence
+	/// @param[in]		normalize	whether input complex magnitudes are normalized
+	/// @param[in]		complexBuf	If true, then 
+	///									input is  [r0,  0, r1, i1, ..., r(n/2), 0] and
+	///									output is [ *, x0, x1, x2, ..., x(n),   *].
+	///								If false, then 
+	///									input is  [r0, r1, i1, ..., r(n/2)]  and 
+	///									output is [x0, x1, x2, ..., x(n)  ].
+	void inverse(T * buf, bool normalized=true, bool complexBuf=false);
 
 	/// Set size of transform
 	void resize(int n);

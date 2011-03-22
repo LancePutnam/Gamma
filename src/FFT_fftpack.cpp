@@ -104,7 +104,10 @@ RFFT<T>::~RFFT(){
 }
 
 template <class T>
-void RFFT<T>::forward(T * buf, bool normalize){
+void RFFT<T>::forward(T * iobuf, bool normalize, bool complexBuf){
+
+	T * buf = complexBuf ? iobuf+1 : iobuf;
+
 	fftpack::rfftf(&mImpl->n, buf, mImpl->wsave, mImpl->ifac);
 	
 	if(normalize){
@@ -114,10 +117,24 @@ void RFFT<T>::forward(T * buf, bool normalize){
 		buf[0] *= m;
 		buf[size()-1] *= m;
 	}
+	
+	if(complexBuf){
+		iobuf[       0] = buf[0];
+		iobuf[       1] = T(0);
+		iobuf[size()+1] = T(0);
+	}
 }
 	
 template <class T>
-void RFFT<T>::inverse(T * buf, bool normalized){
+void RFFT<T>::inverse(T * iobuf, bool normalized, bool complexBuf){
+
+	T * buf = iobuf;
+
+	if(complexBuf){
+		buf++;
+		buf[0] = iobuf[0];
+	}
+
 	if(normalized){
 		T m = 1./T(2);
 		for(int i=1; i<size()-1; ++i) buf[i] *= m;	
