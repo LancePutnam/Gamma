@@ -79,6 +79,13 @@
 		16747A1A115806FF00A1556D /* Strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 16064BD30DFF02680043BC29 /* Strategy.h */; };
 		16747A1C115806FF00A1556D /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 164622960E0EEDD80011911A /* Types.h */; };
 		16747A1D115806FF00A1556D /* UnitMaps.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F133850FFF426400DE56F6 /* UnitMaps.h */; };
+		1681B94E13392AF200056E42 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
+		1681B94F13392AF200056E42 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
+		1681B95013392AF200056E42 /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
+		1681B96913392B1C00056E42 /* testFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1681B96813392B1C00056E42 /* testFilter.cpp */; };
+		1681B96E13392B4B00056E42 /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
+		1681B96F13392B4B00056E42 /* fftpack++1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */; };
+		1681B97013392B4B00056E42 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
 		16827D5C10014013001088E7 /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
 		16827D5D10014013001088E7 /* AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F836E00A1E888200F05DF5 /* AudioIO.cpp */; };
 		16827D5E10014013001088E7 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
@@ -209,6 +216,8 @@
 		16692FAE126FC9A300C1F4E9 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
 		167479501158052400A1556D /* Print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Print.h; sourceTree = "<group>"; };
 		167479511158054C00A1556D /* Print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Print.cpp; sourceTree = "<group>"; };
+		1681B95613392AF200056E42 /* testFilter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testFilter; sourceTree = BUILT_PRODUCTS_DIR; };
+		1681B96813392B1C00056E42 /* testFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testFilter.cpp; path = ../../tests/testFilter.cpp; sourceTree = SOURCE_ROOT; };
 		16827D5810013FEE001088E7 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		1683FC410E283786001FAF43 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = design.txt; path = ../../doc/design.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../Gamma/Access.h; sourceTree = SOURCE_ROOT; };
@@ -309,6 +318,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		165906A20D0F9F3E00EA3DB0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1681B95113392AF200056E42 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -604,6 +620,7 @@
 				7EBEB0490870F34A000EAC05 /* testConversion.cpp */,
 				16D15D4D09F068E4001AE497 /* testDFT.cpp */,
 				16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */,
+				1681B96813392B1C00056E42 /* testFilter.cpp */,
 				16E2B27E0D3AD1BD003E39D1 /* testIpol.cpp */,
 				1699F3860B9D1D2600ECB243 /* testNode.cpp */,
 				169C11980B65CC78000D2A44 /* testNoise.cpp */,
@@ -642,6 +659,7 @@
 				16C872A70EFA151600449449 /* testNoise */,
 				169387860FBC7EF400274B2A /* testTypes */,
 				16BC61C00FFC896A00AF1B29 /* unitTests */,
+				1681B95613392AF200056E42 /* testFilter */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -720,6 +738,22 @@
 			name = testRandom;
 			productName = testRandom;
 			productReference = 165906A40D0F9F3E00EA3DB0 /* testRandom */;
+			productType = "com.apple.product-type.tool";
+		};
+		1681B94B13392AF200056E42 /* testFilter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1681B95213392AF200056E42 /* Build configuration list for PBXNativeTarget "testFilter" */;
+			buildPhases = (
+				1681B94C13392AF200056E42 /* Sources */,
+				1681B95113392AF200056E42 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = testFilter;
+			productName = testEnvelope;
+			productReference = 1681B95613392AF200056E42 /* testFilter */;
 			productType = "com.apple.product-type.tool";
 		};
 		168AAC9C0CD0025D00F36E4B /* libgamma.a */ = {
@@ -1033,6 +1067,7 @@
 				16EACA900D15BE150044B3CB /* testConversion */,
 				16FC1BBC0DED18E000B9AD13 /* testDFT */,
 				16F76C730D12058C001C3DCA /* testEnvelope */,
+				1681B94B13392AF200056E42 /* testFilter */,
 				16E2B28B0D3AD1F8003E39D1 /* testIpol */,
 				16C872990EFA14EA00449449 /* testNode */,
 				16C872A60EFA151600449449 /* testNoise */,
@@ -1088,6 +1123,20 @@
 				165906A80D0F9F6900EA3DB0 /* testRandom.cpp in Sources */,
 				165906A90D0F9F6900EA3DB0 /* scl.cpp in Sources */,
 				1674797D115805C100A1556D /* Print.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1681B94C13392AF200056E42 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1681B94E13392AF200056E42 /* scl.cpp in Sources */,
+				1681B94F13392AF200056E42 /* Sync.cpp in Sources */,
+				1681B95013392AF200056E42 /* Print.cpp in Sources */,
+				1681B96E13392B4B00056E42 /* FFT_fftpack.cpp in Sources */,
+				1681B96F13392B4B00056E42 /* fftpack++1.cpp in Sources */,
+				1681B97013392B4B00056E42 /* fftpack++2.cpp in Sources */,
+				1681B96913392B1C00056E42 /* testFilter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1355,6 +1404,48 @@
 			name = Deployment;
 		};
 		165906BD0D0F9FB700EA3DB0 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				ZERO_LINK = YES;
+			};
+			name = Default;
+		};
+		1681B95313392AF200056E42 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		1681B95413392AF200056E42 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		1681B95513392AF200056E42 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2339,6 +2430,16 @@
 				165906BB0D0F9FB700EA3DB0 /* Development */,
 				165906BC0D0F9FB700EA3DB0 /* Deployment */,
 				165906BD0D0F9FB700EA3DB0 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		1681B95213392AF200056E42 /* Build configuration list for PBXNativeTarget "testFilter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1681B95313392AF200056E42 /* Development */,
+				1681B95413392AF200056E42 /* Deployment */,
+				1681B95513392AF200056E42 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
