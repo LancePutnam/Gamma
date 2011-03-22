@@ -12,20 +12,16 @@
 
 int main(){
 
-	const int N = 16;		// Number of samples per unit of position
-	Sync::master().spu(N);
-
-	gen::Impulse<> sig;
-	
-	DFT dft(32, 0, Bin::Polar); dft.precise(true);
+	const int N = 32;		// Number of samples per unit of position
+	Sync::master().spu(N);	
+	DFT dft(N, 0, Bin::Polar); dft.precise(true);
 
 	#define FREQ_RESP(f, description)\
 		printf("\n%s:\n", description);\
-		sig = 1;\
-		for(uint32_t i=0; i<dft.sizeWin(); ++i){ float v=sig(); v=f; dft(v); }\
+			for(uint32_t i=0; i<dft.sizeWin(); ++i){ float v=i?0:1; v=f; dft(v); }\
 		dft.bins(0)[0] *= 2; dft.bins(dft.numBins()-1)[0] *= 2;\
 		for(uint32_t i=0; i<dft.numBins(); ++i){\
-			float m = dft.bins(i)[0] * N;\
+			float m = dft.bins(i)[0] * N * 0.5;\
 			float p = dft.bins(i)[1] * M_1_PI;\
 			printf("% 6.3f %6.3f ", m, p);\
 			printPlot(m*0.7, 32);\
