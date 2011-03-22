@@ -14,7 +14,7 @@ namespace gam{
 
 /// y[n] = ci0*x[n] + ci1*x[n-1] + co1*y[n-1]
 ///
-template <class Tv, class Tp>
+template <class Tv=gam::real, class Tp=gam::real>
 class IIR1{
 public:
 
@@ -77,6 +77,7 @@ protected:
 
 
 
+/// Nth order IIR filter
 template <int N, class Tv=gam::real, class Tp=gam::real>
 class IIRN{
 public:
@@ -101,8 +102,8 @@ public:
 	
 	/// Zero internal delays
 	void zero(){ for(int i=0; i<N; ++i) d[i]=Tv(0); }
-	
 };
+
 
 /// General-purpose multi-staged IIR filter
 
@@ -124,33 +125,41 @@ public:
 
 	/// @param[in]	ord		order of filter
 	IIRSeries(uint32_t ord)
-	:	mOrder(ord), mPoles(0), mIIR1(0), mIIR2(0)
-	{
-		mPoles = new complex[numPoles()];
-		if(odd()) mIIR1 = new IIR1<Tv, Tp>;
-		mIIR2 = new IIR2<Tv, Tp>[numIIR2()];
+	:	mOrder(0), mPoles(0), mIIR1(0), mIIR2(0)
+	{	order(ord); }
 
-//		mPoleAngle.fromPhase(M_PI/order());
-//		mPoleStart.fromPhase(-M_PI_2 + M_PI_2/order());
+	virtual ~IIRSeries(){ clearMem(); }
 
-		// precompute s-plane pole angles in (-,+) quarter
-		complex p0, p1;							// position, angle
-		p0.fromPhase(-M_PI_2 + M_PI_2/order());	// start near (0, 1)
-		p1.fromPhase(M_PI/order());				// go clockwise towards (-1, 0)
+	uint32_t odd() const { return order()&1; }		///< Returns whether filter is odd order
+	uint32_t order() const { return mOrder; }		///< Get filter order
 
-		for(uint32_t i=0; i<numPoles(); ++i){
-			mPoles[i] = p0; p0 *= p1;
+	/// Set order
+	void order(uint32_t v){
+		if(order() != v){
+			mOrder = v;
+
+			clearMem();
+			if(odd()) mIIR1 = new IIR1<Tv, Tp>;
+			mIIR2 = new IIR2<Tv, Tp>[numIIR2()];
+			mPoles = new complex[numPoles()];
+
+//			mPoleAngle.fromPhase(M_PI/order());
+//			mPoleStart.fromPhase(-M_PI_2 + M_PI_2/order());
+
+			// precompute s-plane pole angles in (-,+) quarter
+			complex p0, p1;							// position, angle
+			p0.fromPhase(-M_PI_2 + M_PI_2/order());	// start near (0, 1)
+			p1.fromPhase(M_PI/order());				// go clockwise towards (-1, 0)
+
+			for(uint32_t i=0; i<numPoles(); ++i){
+				mPoles[i] = p0; p0 *= p1;
+			}
 		}
 	}
 
-	virtual ~IIRSeries(){
-		delete [] mPoles; mPoles=0;
-		if(mIIR1) delete mIIR1;
-		delete [] mIIR2; mIIR2=0;
-	}
 	
 	/// Filter input sample
-	Tv operator()(const Tv& i0) {
+	Tv operator()(const Tv& i0){
 		Tv o0 = i0;
 		for(uint32_t i=0; i<numIIR2(); ++i) o0 = mIIR2[i](o0);
 		if(odd()) o0 = (*mIIR1)(o0);
@@ -171,11 +180,15 @@ protected:
 
 	IIR1<Tv, Tp> * mIIR1;	// pointer to first order stage for odd order filters
 	IIR2<Tv, Tp> * mIIR2;	// array of second order stages
-	
+
+	void clearMem(){
+		if(mIIR1){  delete mIIR1; mIIR1=0; }
+		if(mIIR2){  delete[] mIIR2; mIIR2=0; }
+		if(mPoles){ delete[] mPoles; mPoles=0; }
+	}
+
 	uint32_t numPoles() const { return (order()+1)>>1; }	// # non-conjugated poles
 	uint32_t numIIR2() const { return order()>>1; }			// # 2nd-order IIRs
-	uint32_t odd() const { return order()&1; }				// is filter odd order?
-	uint32_t order() const { return mOrder; }				// filter order
 	complex& pole1(){ return mPoles[(order()-1)>>1]; }
 
 	// Convert z-plane pole to first-order IIR coefs
@@ -212,19 +225,20 @@ protected:
 	}
 };
 
+#define INHERIT_IIRSERIES_PUBLIC\
+	typedef IIRSeries<Tv,Tp> Base;\
+	using Base::order;\
+	using Base::odd;
 
-#define INHERIT_IIRSERIES\
-	typedef IIRSeries<Tv,Tp> super;\
+#define INHERIT_IIRSERIES_PROTECTED\
 	typedef Complex<double> complex;\
-	using super::mIIR1;\
-	using super::mIIR2;\
-	using super::mPoles;\
-	using super::bilinear;\
-	using super::numIIR2;\
-	using super::numPoles;\
-	using super::order;\
-	using super::odd;\
-	using super::convertLP;
+	using Base::mIIR1;\
+	using Base::mIIR2;\
+	using Base::mPoles;\
+	using Base::bilinear;\
+	using Base::numIIR2;\
+	using Base::numPoles;\
+	using Base::convertLP;
 
 
 /// Butterworth filter
@@ -235,7 +249,7 @@ template <class Tv=gam::real, class Tp=gam::real>
 class IIRButter: public IIRSeries<Tv,Tp>{
 public:
 
-	IIRButter(Tp frq=1./4, uint32_t order=2): super(order){
+	IIRButter(Tp frq=1./4, uint32_t order=2): Base(order){
 		freq(frq);
 	}
 
@@ -259,8 +273,9 @@ public:
 		if(odd()) convertLP(*mIIR1, Tp(mPoles[j].r) * v);
 	}
 
+	INHERIT_IIRSERIES_PUBLIC;
 protected:
-	INHERIT_IIRSERIES;
+	INHERIT_IIRSERIES_PROTECTED;
 };
 
 
@@ -277,12 +292,12 @@ template <class Tv=gam::real, class Tp=gam::real>
 class IIRCheby: public IIRSeries<Tv,Tp>{
 public:
 
-	IIRCheby(Tp frq, Tp rip, uint32_t order=2)
-	:	super(order), mWarpR(1.), mWarpI(1.){
+	IIRCheby(Tp frq=1./4, Tp rip=0, uint32_t order=2)
+	:	Base(order), mWarpR(1.), mWarpI(1.){
 		set(frq, rip);
 	}
 
-	/// Set cutoff frequency (0, 0.5)
+	/// Set cutoff frequency [0, 0.5)
 	void freq(Tp v){
 
 		v = tan(M_PI*v);		// pre-warp frequency
@@ -305,24 +320,31 @@ public:
 		if(odd()) convertLP(*mIIR1, Tp(mPoles[j].r) * mr);
 	}
 
-	/// Set cutoff frequency (0, 0.5) and passband ripple (dB)
+
+	/// Set center frequency and passband ripple
+
+	/// @param[in] frq		center frequency [0, 0.5)
+	/// @param[in] rip		passband ripple, in dB (> 0)
 	void set(Tp frq, Tp rip){
 		ripple(rip); freq(frq);
 	}
 
+	INHERIT_IIRSERIES_PUBLIC;
 protected:
-	INHERIT_IIRSERIES;
+	INHERIT_IIRSERIES_PROTECTED;
 	
-	Tp mWarpR, mWarpI;	// multiplicands to warp circle to ellipse
+	Tp mWarpR, mWarpI;	// factors to warp circle to ellipse
 
+	// Set pass-band ripple, in dB
 	void ripple(Tp v){
-		v = pow(10., v/10.) - 1.;
-		v = 1./pow(v, 1./order());
-		Tp asinh = log(v + sqrt(1. + v*v));
+		v = ::pow(10., v/10.) - 1.;
+		//v = 1./::pow(v, 1./order());
+		v = ::pow(v, -1./order());
+		Tp asinh = ::log(v + ::sqrt(1. + v*v));
 		Tp v0 = asinh/(double)order();
 	
-		mWarpR = sinh(v0);
-		mWarpI = cosh(v0);
+		mWarpR = ::sinh(v0);
+		mWarpI = ::cosh(v0);
 	}
 };
 
@@ -640,6 +662,8 @@ protected:
 */
 
 /*
+From mathworks.com:
+
 Butterworth filters are characterized by a magnitude response that is maximally 
 flat in the passband and monotonic overall. Butterworth filters sacrifice 
 rolloff steepness for monotonicity in the pass- and stopbands. Unless the 
