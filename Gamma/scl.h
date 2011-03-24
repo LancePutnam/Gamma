@@ -61,8 +61,8 @@ template<int N, class T> struct InvSqrtNewton
 };
 
 template<class T> const Twiddle<T> invSqrtMagic();
-template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(0x5f3759df); }
-template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>((const uint64_t)0x5fe6ec85e7de30daULL); }
+template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(uint32_t(0x5f3759df)); }
+template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(uint64_t(0x5fe6ec85e7de30daULL)); }
 
 /// Approximate square root using a quick log base-2 method.
 inline float sqrtLog2(float v){
