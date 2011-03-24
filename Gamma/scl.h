@@ -62,7 +62,7 @@ template<int N, class T> struct InvSqrtNewton
 
 template<class T> const Twiddle<T> invSqrtMagic();
 template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(0x5f3759df); }
-template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(0x5fe6ec85e7de30daULL); }
+template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>((const uint64_t)0x5fe6ec85e7de30daULL); }
 
 /// Approximate square root using a quick log base-2 method.
 inline float sqrtLog2(float v){
@@ -206,12 +206,12 @@ TEM void fadeLin(T& weight1, T& weight2, T fade);
 
 /// Returns weights for triangular window fade.
 
-/// The weights returned are from two overlapping normalized unipolar 
+/// The weights returned are from two overlapping normalized unipolar
 /// triangular windows in the fade interval [0, 2/3] and [1/3, 1].\n
 /// fade	weight1		weight2 \n
 /// 0.25	1			0       \n
 /// 0.5		0.5			0.5		\n
-/// 0.75	0			1		
+/// 0.75	0			1
 TEM void fadeTri(T& weight1, T& weight2, T fade);
 
 uint32_t factorial12(uint32_t value);				///< Returns factorial of value in [0, 12].
@@ -246,7 +246,7 @@ TEM T foldOnce(T value, T hi=T(1), T lo=T(0));
 
 /// Returns frequency in Hz from a 12-TET note string.
 
-/// Notes are specified by a letter in [a, g], followed optionally by one of 
+/// Notes are specified by a letter in [a, g], followed optionally by one of
 /// '+', '-', ' ', to specify a sharp, flat or natural, and finally an integer
 /// in [0,9] representing the octave number.  For example, middle C is specified
 /// as "c5" or "c 5" and the A sharp below that as "a+4".
@@ -557,11 +557,11 @@ TEM T peak1(T v, T bw){ return bw/(scl::abs(v)+bw); }
 
 //
 // Analysis
-//	
+//
 
 /// Returns number of bits set to 1.
 
-/// From "Bit Twiddling Hacks", 
+/// From "Bit Twiddling Hacks",
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 uint32_t bitsSet(uint32_t v);
 
@@ -600,7 +600,7 @@ TEM T slope(T x1, T y1, T x2, T y2);
 
 /// Returns number of trailing zeros in 32-bit int
 
-/// This implements an algorithm from the paper 
+/// This implements an algorithm from the paper
 /// "Using de Bruijn Sequences to Index 1 in a Computer Word"
 /// by Charles E. Leiserson, Harald Prokof, and Keith H. Randall.
 uint32_t trailingZeroes(uint32_t v);
@@ -680,20 +680,20 @@ TEM T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
 namespace{
 
 //	const float mFactorial12f[13] = {
-//		1.f, 1.f, 2.f, 6.f, 24.f, 120.f, 720.f, 5040.f, 40320.f, 
+//		1.f, 1.f, 2.f, 6.f, 24.f, 120.f, 720.f, 5040.f, 40320.f,
 //		362880.f, 3628800.f, 39916800.f, 479001600.f
 //	};
 
 	const uint32_t mFactorial12u[13] = {
-		1, 1, 2, 6, 24, 120, 720, 5040, 40320, 
+		1, 1, 2, 6, 24, 120, 720, 5040, 40320,
 		362880, 3628800, 39916800, 479001600
 	};
 
 	const uint32_t deBruijnBitPosition[32] = {
-		 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8, 
+		 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8,
 		31, 27, 13, 23, 21, 19, 16,  7, 26, 12, 18,  6, 11,  5, 10,  9
 	};
-	
+
 	inline uint32_t deBruijn(uint32_t v){
 		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
@@ -707,7 +707,7 @@ namespace{
 		179, 181, 191, 193, 197, 199, 211, 223, 227, 229, // 4
 		233, 239, 241, 251								  // 5
 	};
-	
+
 	TEM T taylorFactor3(T vv, T c1, T c2, T c3);
 	TEM T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
 	TEM T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
@@ -723,10 +723,10 @@ TEM inline T abs(T v){ return v < T(0) ? -v : v; }
 
 
 TEM T atan2Fast(T y, T x){
-	
+
 	T r, angle;
 	T ay = scl::abs(y) + (T)1e-10;      // kludge to prevent 0/0 condition
-	
+
 	if(x < (T)0){
 		r = (x + ay) / (ay - x);
 		angle = (T)M_3PI_4;
@@ -735,7 +735,7 @@ TEM T atan2Fast(T y, T x){
 		r = (x - ay) / (x + ay);
 		angle = (T)M_PI_4;
 	}
-	
+
 	angle += ((T)0.1963*r*r - (T)0.9817)*r;
 	return y < (T)0 ? -angle : angle;
 }
@@ -781,11 +781,11 @@ T curvature(const V<T>& a, const V<T>& b, const V<T>& c){
 	V<T> d1b = b-a;				// first backward difference
 	V<T> d1f = c-b;				// first forward difference
 	V<T> d1  = (d1f+d1b) * 0.5;	// first mid difference
-	
+
 	V<T> d2  = d1f - d1b;		// second difference
-	
+
 	T d1n = d1.norm();
-	
+
 	return (d1.cross(d2)).norm() / (d1n*d1n*d1n);
 }
 
@@ -854,7 +854,7 @@ void frenet(const V2& d1, V2& t, V2& n){
 }
 
 template <class V3>
-void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
+void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){
 	b = cross(d2, d1);
 	n = cross(d1, b);
 	t = d1 * invSqrt<2>(d1.magSqr());
@@ -911,7 +911,7 @@ TEM inline void mix2(T& io1, T& io2, T mix){
 	T t2 = io1 - t1;
 	io1 = t1 + io2;
 	io2 = t2;
-	//io1 = io1 * mix + io2 * ((T)1 - mix); 
+	//io1 = io1 * mix + io2 * ((T)1 - mix);
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
 }
 
@@ -931,7 +931,7 @@ TEM T nearest(T val, const char * interval, long div){
 		if(vm <= sum){ vm = sum; break; }
 		sum += (long)(*interval++ - 48);
 	}
-	
+
 	return (T)(vm + numWraps * div);
 }
 
@@ -979,7 +979,7 @@ TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //inline float round(float val, float step){
 //	union { float f; unsigned long i; } u;
 //	u.f = val;
-//	u.i = u.i & 0x80000000 | 0x3F000000;		
+//	u.i = u.i & 0x80000000 | 0x3F000000;
 //	//val = fastFloor(val * step + u.f) * stepRec;
 //	return float(long(val/step + u.f)) * step;
 //}
@@ -987,7 +987,7 @@ TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //inline float round(float val, float step, float stepRec){
 //	union { float f; unsigned long i; } u;
 //	u.f = val;
-//	u.i = u.i & 0x80000000 | 0x3F000000;		
+//	u.i = u.i & 0x80000000 | 0x3F000000;
 //	//val = fastFloor(val * step + u.f) * stepRec;
 //	return float(long(val * stepRec + u.f)) * step;
 //}
@@ -996,7 +996,7 @@ TEM Complex<T> sharm(int l, int m, T theta, T phi){
 	T c = T(factorial12(l-m)) / T(factorial12(l+m));
 	c = ::sqrt((2*l + 1) / M_4PI * c);
 	c *= legendre(l, m, theta);
-	
+
 	phi *= m;
 	return Complex<T>(c*cos(phi), c*sin(phi));
 }
@@ -1028,7 +1028,7 @@ TEM inline T cosP3(T n){
 #define t71 1.9841269841e-04
 
 TEM inline T cosT8(T r){
-	
+
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		float rr = r*r;
 		return (T)1 - rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
@@ -1058,7 +1058,7 @@ TEM inline T sinP7(T n){
 	return n * ((T)3.138982 + nn * ((T)-5.133625 + nn * ((T)2.428288 - nn * (T)0.433645)));
 }
 
-TEM inline T sinP9(T n){	
+TEM inline T sinP9(T n){
 	T nn = n*n;
 	return n * ((T)3.1415191 + nn * ((T)-5.1662729 + nn * ((T)2.5422065 + nn * ((T)-0.5811243 + nn * (T)0.0636716))));
 }
@@ -1076,7 +1076,7 @@ TEM inline T sinT7(T r){
 //		r += (T)M_PI_2;
 //		return (T)-1 + taylorFactor4<T>(r*r, t81, t82, t83, t84);
 //	}
-	
+
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		T rr = r*r;
 		return r * ((T)1 - (T)t71 * rr * ((T)t72 - rr * ((T)t73 - rr)));
@@ -1138,7 +1138,7 @@ TEM inline T sinT9(T r){
 
 TEM T sinc(T r, T eps){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
 
-TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } } 
+TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } }
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
@@ -1162,7 +1162,7 @@ TEM inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
 
 //inline float wrap1(float value){
 //	uint32_t valueU = *(uint32_t *)&value;
-//	
+//
 //	if((valueU & 0x7fffffff) > 0x3f7fffff){
 //		uint32_t shift = floatExponent(value) - 127;
 //		valueU = (valueU << shift) & 0x007fffff | 0x3f800000;
@@ -1171,8 +1171,8 @@ TEM inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
 //	else{
 //		return value;
 //	}
-//	
-//	
+//
+//
 //}
 
 TEM inline T warpSinSS(T v){ return v*((T)1.50 - v*v*(T)0.50); }
@@ -1182,7 +1182,7 @@ TEM inline T warpSinUU(T v){ return v*v*(v*(T)-2 + (T)3); }
 
 TEM inline T wrap(T v, T hi, T lo){
 	if(lo == hi) return lo;
-	
+
 	//if(v >= hi){
 	if(!(v < hi)){
 		T diff = hi - lo;
@@ -1200,10 +1200,10 @@ TEM inline T wrap(T v, T hi, T lo){
 
 TEM inline T wrap(T v, long& numWraps, T hi, T lo){
 	if(lo == hi){ numWraps = 0xFFFFFFFF; return lo; }
-	
+
 	T diff = hi - lo;
 	numWraps = 0;
-	
+
 	if(v >= hi){
 		v -= diff;
 		if(v >= hi){
@@ -1245,7 +1245,7 @@ TEM inline T wrapPhase(T r){
 		if(r >= (T)-M_PI) return r;
 	}
 	else return r;
-	
+
 	return r - (T)M_2PI * scl::floor<T>((r + (T)M_PI) * (T)M_1_2PI);
 }
 
@@ -1278,7 +1278,7 @@ TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
 TEM inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
 
 TEM inline T nextMultiple(T v, T m){
-	uint32_t div = (uint32_t)(v / m);	
+	uint32_t div = (uint32_t)(v / m);
 	return (T)(div + 1) * m;
 }
 
@@ -1359,7 +1359,7 @@ inline float rampUp(uint32_t p){
 	return punUF(p) - 3.f;
 }
 
-// [1, 1,-1,-1] 
+// [1, 1,-1,-1]
 // Freq precision:	31 bits
 // Amp precision:	NA
 inline float square(uint32_t p){
@@ -1390,7 +1390,7 @@ inline float sinePara(uint32_t p){
 //}
 
 // Just another triangle wave algorithm
-//inline float triangle(uint32_t p){	
+//inline float triangle(uint32_t p){
 //	uint32_t dir = p & MaskSign<float>();
 //	dir |= 0x40000000;
 //	p = (p << 1 >> 9) | dir;
@@ -1422,7 +1422,7 @@ inline float stair(uint32_t p, uint32_t w){
 inline float stairU(uint32_t p, uint32_t w){
 	return ((p & MaskSign<float>()) ? 0.5f : 0.f) + (((p+w) & MaskSign<float>()) ? 0.5f : 0.f);
 }
-	
+
 inline float pulseU(uint32_t p, uint32_t w){
 	return p > w ? 0.f : 1.f;
 }
@@ -1440,7 +1440,7 @@ inline float rampUpU(uint32_t p){
 	p = (p >> 9) | Expo1<float>();
 	return punUF(p) - 1.f;
 }
-	
+
 inline float rampUp2U(uint32_t p, uint32_t w){
 	uint32_t saw1 = ( p    >> 9) | Expo1_2<float>();
 	uint32_t saw2 = ((p+w) >> 9) | Expo1_2<float>();
@@ -1482,7 +1482,7 @@ inline float dirichlet(float p, float n){
 inline float dirichlet2(float p, float n){
 	float den = sin(p);
 	if( scl::abs(den) < EPS ){
-		p = scl::wrapPhase(p);		
+		p = scl::wrapPhase(p);
 		return (p > -M_PI_2 && p < M_PI_2) ? n : -n;
 	}
 	return sin(p * n) / den;
