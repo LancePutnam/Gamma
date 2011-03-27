@@ -454,10 +454,11 @@ public:
 	float down();		///< Downward ramp (1 to -1)
 	float even3();		///< Even harmonic sine-like wave (3rd order)
 	float even5();		///< Even harmonic sine-like wave (5th order)
-	float para();		///< Sine-like wave constructed from parabolas (odd harmonics)
 	float imp();		///< Impulse (occurs at beginning of cycle)
 	float line2();		///< 2-segment line. mod changes wave from down to tri to up
+	float para();		///< Parabolic wave (triangle wave with all harmonics)
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
+	float sinPara();	///< Sine-like wave constructed from parabolas (odd harmonics)
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
 	float sqr();		///< Square (-1 to 1)
 	float tri();		///< Triangle (starts at 1 going down to -1 then up to 1)
@@ -931,8 +932,9 @@ DEF(down(),		scl::rampDown(incPhasePre()))
 DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
 DEF(imp(),		scl::pulseU(incPhasePre(), this->phaseIncI()) )
-DEF(para(),		scl::sinePara(incPhasePre()))
+DEF(para(),		down(); r = 1.5f * r*r - 0.5f;)
 DEF(pulse(),	scl::pulse(incPhasePre(), modi))
+DEF(sinPara(),	scl::sinPara(incPhasePre()))
 DEF(stair(),	scl::stair(incPhasePre(), modi))
 DEF(sqr(),		scl::square(incPhasePre()))
 DEF(tri(),		scl::triangle(incPhasePre()))
