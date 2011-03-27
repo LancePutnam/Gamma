@@ -64,6 +64,7 @@ template<class T> const Twiddle<T> invSqrtMagic();
 template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(uint32_t(0x5f3759df)); }
 template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(uint64_t(0x5fe6ec85e7de30daULL)); }
 
+
 /// Approximate square root using a quick log base-2 method.
 inline float sqrtLog2(float v){
 	Twiddle<float> u(v);
@@ -1378,7 +1379,7 @@ inline float triangle(uint32_t p){
 	return 3.f - punUF(p);
 }
 
-inline float sinePara(uint32_t p){
+inline float sinPara(uint32_t p){
 	uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
 	uint32_t tri = ((p+MaskSign<float>()) >> 9) | Expo4<float>();
 	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));
