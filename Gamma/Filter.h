@@ -22,7 +22,7 @@ public:
 
 	/// Filter input sample
 	Tv operator()(const Tv& i0){
-		Tv d0 = i0 + d1*co1;
+		Tv d0 = i0 - d1*co1;
 		Tv o0 = d0*ci0 + d1*ci1;
 		d1=d0;
 		return o0;
@@ -53,7 +53,7 @@ public:
 
 	/// Filter input sample
 	Tv operator()(const Tv& i0){	// direct form II
-		Tv d0 = i0 + d1*co1 + d2*co2;
+		Tv d0 = i0 - d1*co1 - d2*co2;
 		Tv o0 = d0*ci0 + d1*ci1 + d2*ci2;
 		d2=d1; d1=d0;
 		return o0;
@@ -68,7 +68,7 @@ public:
 	}
 	
 	/// Zero internal delays
-	void zero(){ d1=0; d2=0; }
+	void zero(){ d1=d2=0; }
 
 protected:
 	Tv d1, d2;
@@ -76,6 +76,25 @@ protected:
 };
 
 
+/*
+Direct transpose canonic realization:
+
+x[n] --> a[0] --> + --------------> y[n]
+	 |            ^            |
+     |	         d[1]          |
+     |            ^            |
+	 --> a[1] --> + <-- b[1] <--
+	 |            ^            |
+     |	         d[2]          |
+     |            ^            |
+	 --> a[2] --> + <-- b[2] <--
+	 
+     ...         ...          ...
+
+     |           d[N]          |
+	 |            ^            |
+	 --> a[N] --> + <-- b[N] <--
+*/
 
 /// Nth order IIR filter
 template <int N, class Tv=gam::real, class Tp=gam::real>
@@ -116,8 +135,8 @@ public:
 // s-plane characteristics
 //	+ im	+ frequencies
 //	- im	- frequencies
-//	- re	growing amplitudes
-//	+ re	decaying amplitudes
+//	+ re	growing amplitudes
+//	- re	decaying amplitudes
 
 template <class Tv=gam::real, class Tp=gam::real>
 class IIRSeries{
@@ -143,17 +162,19 @@ public:
 			mIIR2 = new IIR2<Tv, Tp>[numIIR2()];
 			mPoles = new complex[numPoles()];
 
-//			mPoleAngle.fromPhase(M_PI/order());
-//			mPoleStart.fromPhase(-M_PI_2 + M_PI_2/order());
-
-			// precompute s-plane pole angles in (-,+) quarter
+			// Precompute prototype analog filter poles on s plane.
+			// We only need poles in (-,+) quarter due to symmetry.
 			complex p0, p1;							// position, angle
-			p0.fromPhase(-M_PI_2 + M_PI_2/order());	// start near (0, 1)
-			p1.fromPhase(M_PI/order());				// go clockwise towards (-1, 0)
 
+			p0.fromPhase(M_PI_2 + M_PI_2/order());	// start position (1 tick counter-clockwise from (0,1))
+			p1.fromPhase(M_PI/order());				// angular increment (counter-clockwise towards (-1,0))
+
+//			printf("\norder=%d, poles=%d:\n", order(), numPoles());
 			for(uint32_t i=0; i<numPoles(); ++i){
+//				printf("%3u: %f %f\n", i, p0.r, p0.i);
 				mPoles[i] = p0; p0 *= p1;
 			}
+			onSetOrder(v);
 		}
 	}
 
@@ -176,10 +197,13 @@ protected:
 	typedef Complex<double> complex;
 
 	uint32_t mOrder;		// order of the filter (# pole/zero pairs)
-	complex * mPoles;		// array of non-conjugated poles (others mirrored around imaginary axis)
+	complex * mPoles;		// array of poles in (-,+) quadrant of s plane (others reflected around real axis)
 
 	IIR1<Tv, Tp> * mIIR1;	// pointer to first order stage for odd order filters
 	IIR2<Tv, Tp> * mIIR2;	// array of second order stages
+
+	// Called after the filter order has changed
+	virtual void onSetOrder(uint32_t v){}
 
 	void clearMem(){
 		if(mIIR1){  delete mIIR1; mIIR1=0; }
@@ -189,21 +213,18 @@ protected:
 
 	uint32_t numPoles() const { return (order()+1)>>1; }	// # non-conjugated poles
 	uint32_t numIIR2() const { return order()>>1; }			// # 2nd-order IIRs
-	complex& pole1(){ return mPoles[(order()-1)>>1]; }
+	complex& pole1(){ return mPoles[(order()-1)>>1]; }		// get the single (real) pole for odd orders
 
-	// Convert z-plane pole to first-order IIR coefs
-	void poleToCoef1(){
-		if(odd()){
-			double t = pole1().r;
-			t = (t - 1.)/(t + 1.);
-			mIIR1->coefs(1, 1, -t);
-		}
-	}
 	
 	// Conformal map from s-plane to z-plane.
-	// The transform is p = (1+p)/(1-p), a special type of Mobius transform.
+	// The transform is z = (1+s)/(1-s), a special type of Mobius transform.
+	// The jw axis and left half of the s plane map to a unit circle and its 
+	// interior on the z plane.
 	template <class T>
 	static void bilinear(Complex<T>& p){
+		p.r = -p.r; // flip around imag axis
+
+//		p = (1.f+p)/(1.f-p);
 		Complex<T> den(T(1) - p.r, -p.i);
 		p.r += Tp(1);
 		p /= den;
@@ -211,18 +232,25 @@ protected:
 
 	// Convert a z-plane pole real component to IIR1 low-pass coefs
 	static void convertLP(IIR1<Tv,Tp>& f, Tp pr){
+		pr = -pr; // flip around imag axis
 		pr = (pr - Tp(1))/(pr + Tp(1));			
 		Tp ci = (Tp(1) + pr) * Tp(0.5);
-		f.coefs(ci, ci, -pr);
+		f.coefs(ci, ci, pr);
 	}
 
 	// Convert a z-plane pole to IIR2 low-pass coefs
 	static void convertLP(IIR2<Tv,Tp>& f, const Complex<Tp>& p){	
-		Tp co2 = Tp(1)/p.magSqr();						// recip of mag squared
-		Tp co1 = Tp(-2)*p.r*co2;
+		Tp co2 = Tp( 1) / p.magSqr();					// recip of mag squared
+		Tp co1 = Tp(-2) * p.r * co2;
 		Tp ci  = (Tp(1) + co1 + co2) * Tp(0.25);	// input gain compensation
-		f.coefs(ci, ci*Tp(2), ci, -co1, -co2);
+		f.coefs(ci, ci*Tp(2), ci, co1, co2);
 	}
+	
+	/*
+		Transforming analog prototype:
+		frequency scaling:			s -> s/omega
+		conversion to high-pass:	s -> 1/s
+	*/
 };
 
 #define INHERIT_IIRSERIES_PUBLIC\
@@ -253,24 +281,27 @@ public:
 		freq(frq);
 	}
 
-	/// Set cutoff frequency (0, 0.5)
+	/// Set cutoff frequency [0, 0.5)
+	
+	/// The cutoff frequency is the point where the magnitude spectrum is
+	/// attenuated by 3 dB.
 	void freq(Tp v){
 
 		v = tan(M_PI*v);	// pre-warp frequency
 
-		// convert IIR2s
-		uint32_t j=0;
-		for(; j<numIIR2(); ++j){
+		// compute IIR2 coefs
+		uint32_t k=0;
+		for(; k<numIIR2(); ++k){
 
-			// get s-plane pole
-			Complex<Tp> p(Tp(mPoles[j].r) * v, Tp(mPoles[j].i) * v);
+			// get s plane pole
+			Complex<Tp> p(Tp(mPoles[k].r) * v, Tp(mPoles[k].i) * v);
 
-			bilinear(p);				// bilinear xform
-			convertLP(mIIR2[j], p);		// z-plane pole to coefs
+			bilinear(p);				// s plane to z plane
+			convertLP(mIIR2[k], p);		// z plane pole to coefs
 		}
 		
-		// convert IIR1
-		if(odd()) convertLP(*mIIR1, Tp(mPoles[j].r) * v);
+		// compute IIR1 coefs
+		if(odd()) convertLP(*mIIR1, Tp(mPoles[k].r) * v);
 	}
 
 	INHERIT_IIRSERIES_PUBLIC;
@@ -280,22 +311,22 @@ protected:
 
 
 
-
 /// Chebyshev filter
 
 /// A Chebyshev filter is a special case of a Butterworth filter with a narrower
 /// transition band but ripple in the passband.
 
-// TODO: odd orders are unity gain, but even orders are not...
-//
+// TODO: even orders misbehaving, gain > 1; might have to do with wrong norm 
+// factors between IIR1 and IIR2
 template <class Tv=gam::real, class Tp=gam::real>
 class IIRCheby: public IIRSeries<Tv,Tp>{
 public:
 
-	IIRCheby(Tp frq=1./4, Tp rip=0, uint32_t order=2)
-	:	Base(order), mWarpR(1.), mWarpI(1.){
+	IIRCheby(Tp frq=1./4, Tp rip=1, uint32_t order=2)
+	:	Base(order), mRipple(rip), mWarpR(1.), mWarpI(1.){
 		set(frq, rip);
 	}
+
 
 	/// Set cutoff frequency [0, 0.5)
 	void freq(Tp v){
@@ -305,25 +336,25 @@ public:
 		Tp mr = mWarpR * v;		// bring poles closer to jw axis
 		Tp mi = mWarpI * v;	
 
-		// convert IIR2s
-		uint32_t j=0;
-		for(; j<numIIR2(); ++j){
+		// compute IIR2 coefs
+		uint32_t k=0;
+		for(; k<numIIR2(); ++k){
 
-			// get s-plane pole
-			Complex<Tp> p(Tp(mPoles[j].r) * mr, Tp(mPoles[j].i) * mi);
+			// get s plane pole
+			Complex<Tp> p(Tp(mPoles[k].r) * mr, Tp(mPoles[k].i) * mi);
 
 			bilinear(p);				// bilinear xform
-			convertLP(mIIR2[j], p);		// z-plane pole to coefs
+			convertLP(mIIR2[k], p);		// z plane pole to coefs
 		}
 		
-		// convert IIR1
-		if(odd()) convertLP(*mIIR1, Tp(mPoles[j].r) * mr);
+		// compute IIR1 coefs
+		if(odd()) convertLP(*mIIR1, Tp(mPoles[k].r) * mr);
 	}
 
 
-	/// Set center frequency and passband ripple
+	/// Set cutoff frequency and passband ripple
 
-	/// @param[in] frq		center frequency [0, 0.5)
+	/// @param[in] frq		cutoff frequency [0, 0.5)
 	/// @param[in] rip		passband ripple, in dB (> 0)
 	void set(Tp frq, Tp rip){
 		ripple(rip); freq(frq);
@@ -333,18 +364,36 @@ public:
 protected:
 	INHERIT_IIRSERIES_PROTECTED;
 	
+	Tp mRipple;
 	Tp mWarpR, mWarpI;	// factors to warp circle to ellipse
+	
+	virtual void onSetOrder(uint32_t v){
+		ripple(mRipple);
+	}
 
 	// Set pass-band ripple, in dB
 	void ripple(Tp v){
-		v = ::pow(10., v/10.) - 1.;
-		//v = 1./::pow(v, 1./order());
-		v = ::pow(v, -1./order());
-		Tp asinh = ::log(v + ::sqrt(1. + v*v));
-		Tp v0 = asinh/(double)order();
-	
+		mRipple = v;
+//		Tp eps = ::pow(10., v*0.1) - 1.;
+//		eps = ::pow(eps, -1./order());
+//		Tp asinh = ::log(eps + ::sqrt(1. + eps*eps));
+//		Tp v0 = asinh/(double)order();
+
+		Tp eps = sqrt(::pow(10., v*0.1) - 1.);
+		Tp v0  = ::asinh(1./eps)/order();
 		mWarpR = ::sinh(v0);
 		mWarpI = ::cosh(v0);
+		
+		if(!odd()){
+			Tp A0 = ::pow(10., -0.05*v);
+			mWarpR *= A0;
+			mWarpI *= A0;
+		}
+
+//		Tp eps = sqrt(::pow(10., v*0.1) - 1.);
+//		Tp a = 1./eps + ::sqrt(1 + 1./(eps*eps));
+//		mWarpR = 0.5 * (::pow(a, 1./order()) - ::pow(a,-1./order()));
+//		mWarpI = 0.5 * (::pow(a, 1./order()) + ::pow(a,-1./order()));
 	}
 };
 
