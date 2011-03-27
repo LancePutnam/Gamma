@@ -13,7 +13,7 @@
 int main(){
 
 	const int N = 32;		// Number of samples per unit of position
-	Sync::master().spu(N);	
+	Sync::master().spu(1);
 	DFT dft(N, 0, Bin::Polar); dft.precise(true);
 
 	#define FREQ_RESP(f, description)\
@@ -32,58 +32,59 @@ int main(){
 	AllPass1<> allPass1;
 	AllPass2<> allPass2(4, 4);
 	Biquad<> biquad(4);
-	BlockDC<> blockDC(0.5);
-	BlockNyq<> blockNyq(0.5);
-	Delay<> delay(1);
-	Comb<> comb(1, 1, 0);
+	BlockDC<> blockDC(0.5/N);
+	BlockNyq<> blockNyq(0.5/N);
+	Delay<> delay(N);
+	Comb<> comb(N, 1, 0);
 	Hilbert<> hilbert;
 	OnePole<> onePole;
 	MovingAvg<> movingAvg(4);
-	Notch<> notch(2, 0.5);
-	Reson<> reson(2, 0.5);
+	Notch<> notch(2, 0.5/N);
+	Reson<> reson(2, 0.5/N);
 	
-	allPass1.zero(); allPass1.freq(2); FREQ_RESP(allPass1(v), "1st-order all-pass at 1/4 band")
-	allPass1.zero(); allPass1.freq(4); FREQ_RESP(allPass1(v), "1st-order all-pass at 1/2 band")
-	allPass1.zero(); allPass1.freq(6); FREQ_RESP(allPass1(v), "1st-order all-pass at 3/4 band")
-	allPass1.zero(); allPass1.freq(2); FREQ_RESP(allPass1.low(v), "1st-order low-pass at 1/4 band")
-	allPass1.zero(); allPass1.freq(2); FREQ_RESP(allPass1.high(v), "1st-order high-pass at 1/4 band")
+	allPass1.zero(); allPass1.freq(1./4*0.5); FREQ_RESP(allPass1(v), "1st-order all-pass at 1/4 band")
+	allPass1.zero(); allPass1.freq(2./4*0.5); FREQ_RESP(allPass1(v), "1st-order all-pass at 1/2 band")
+	allPass1.zero(); allPass1.freq(3./4*0.5); FREQ_RESP(allPass1(v), "1st-order all-pass at 3/4 band")
+	allPass1.zero(); allPass1.freq(1./4*0.5); FREQ_RESP(allPass1.low(v), "1st-order low-pass at 1/4 band")
+	allPass1.zero(); allPass1.freq(1./4*0.5); FREQ_RESP(allPass1.high(v), "1st-order high-pass at 1/4 band")
 
-	allPass2.zero(); allPass2.freq(2); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/4 band")
-	allPass2.zero(); allPass2.freq(4); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/2 band")
-	allPass2.zero(); allPass2.freq(6); FREQ_RESP(allPass2(v), "2nd-order all-pass at 3/4 band")
+	allPass2.zero(); allPass2.freq(1./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/4 band")
+	allPass2.zero(); allPass2.freq(2./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/2 band")
+	allPass2.zero(); allPass2.freq(3./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 3/4 band")
 
 	// Note: res=1 will give us the same phase response as a 1st-order all-pass
 	biquad.res(1);
-	biquad.zero(); biquad.freq(2); FREQ_RESP(biquad(v), "Biquad low-pass at 1/4 band")
-	biquad.zero(); biquad.freq(4); FREQ_RESP(biquad(v), "Biquad low-pass at 1/2 band")
-	biquad.zero(); biquad.freq(6); FREQ_RESP(biquad(v), "Biquad low-pass at 3/4 band")
+	biquad.zero(); biquad.freq(1./4*0.5); FREQ_RESP(biquad(v), "Biquad low-pass at 1/4 band")
+	biquad.zero(); biquad.freq(2./4*0.5); FREQ_RESP(biquad(v), "Biquad low-pass at 1/2 band")
+	biquad.zero(); biquad.freq(3./4*0.5); FREQ_RESP(biquad(v), "Biquad low-pass at 3/4 band")
 
 	
 	FREQ_RESP(hilbert(v).i, "Hilbert filter (90 degree phase shift)")
 
-	onePole.zero(); onePole.freq(1); FREQ_RESP(onePole(v), "One-pole at 1/8 band")
-	onePole.zero(); onePole.freq(2); FREQ_RESP(onePole(v), "One-pole at 1/4 band")
-	onePole.zero(); onePole.freq(3); FREQ_RESP(onePole(v), "One-pole at 3/8 band")
+	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole at 1/8 band")
+	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole at 1/4 band")
+	onePole.zero(); onePole.freq(3./8*0.5); FREQ_RESP(onePole(v), "One-pole at 3/8 band")
 
-	notch.zero(); notch.freq(2); FREQ_RESP(notch(v), "Two-zero notch at 1/4 band")
-	notch.zero(); notch.freq(4); FREQ_RESP(notch(v), "Two-zero notch at 1/2 band")
-	notch.zero(); notch.freq(6); FREQ_RESP(notch(v), "Two-zero notch at 3/4 band")
+	notch.zero(); notch.freq(1./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 1/4 band")
+	notch.zero(); notch.freq(2./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 1/2 band")
+	notch.zero(); notch.freq(3./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 3/4 band")
 
-	reson.zero(); reson.freq(2); FREQ_RESP(reson(v), "Two-pole reson at 1/4 band")
-	reson.zero(); reson.freq(4); FREQ_RESP(reson(v), "Two-pole reson at 1/2 band")
-	reson.zero(); reson.freq(6); FREQ_RESP(reson(v), "Two-pole reson at 3/4 band")
+	reson.zero(); reson.freq(1./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 1/4 band")
+	reson.zero(); reson.freq(2./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 1/2 band")
+	reson.zero(); reson.freq(3./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 3/4 band")
 	
-	delay.zero(); delay.delay(1./N); FREQ_RESP(delay(v), "Delay of 1 sample")
-	delay.zero(); delay.delay(2./N); FREQ_RESP(delay(v), "Delay of 2 samples")
+	printf("%d\n", delay.size());
+	delay.zero(); delay.delay(1); FREQ_RESP(delay(v), "Delay of 1 sample")
+	delay.zero(); delay.delay(2); FREQ_RESP(delay(v), "Delay of 2 samples")
 	
-	comb.zero(); comb.set(1./N, 1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "Low-pass FFD comb at full band")
-	comb.zero(); comb.set(4./N, 1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "Low-pass FFD comb at 1/4 band")
-	comb.zero(); comb.set(1./N,-1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "High-pass FFD comb at full band")
-	comb.zero(); comb.set(4./N,-1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "High-pass FFD comb at 1/4 band")
-	comb.zero(); comb.set(4./N, 0  , 0.5); FREQ_RESP(comb(v)*comb.normFbk(), "Low-pass FBK comb at 1/4 band")
-	comb.zero(); comb.set(4./N, 0  ,-0.5); FREQ_RESP(comb(v)*comb.normFbk(), "High-pass FBK comb at 1/4 band")
-	comb.zero(); comb.set(4./N, 0.5,-0.5); FREQ_RESP(comb(v), "All-pass comb at 1/4 band")
-	comb.zero(); comb.set(4./N,-0.5, 0.5); FREQ_RESP(comb(v), "All-pass comb at 1/4 band")
+	comb.zero(); comb.set(1, 1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "Low-pass FFD comb at full band")
+	comb.zero(); comb.set(2, 1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "Low-pass FFD comb at 1/2 band")
+	comb.zero(); comb.set(1,-1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "High-pass FFD comb at full band")
+	comb.zero(); comb.set(2,-1  , 0  ); FREQ_RESP(comb(v)*comb.normFfd(), "High-pass FFD comb at 1/2 band")
+	comb.zero(); comb.set(2, 0  , 0.5); FREQ_RESP(comb(v)*comb.normFbk(), "Low-pass FBK comb at 1/2 band")
+	comb.zero(); comb.set(2, 0  ,-0.5); FREQ_RESP(comb(v)*comb.normFbk(), "High-pass FBK comb at 1/2 band")
+	comb.zero(); comb.set(2, 0.5,-0.5); FREQ_RESP(comb(v), "All-pass comb at 1/2 band")
+	comb.zero(); comb.set(2,-0.5, 0.5); FREQ_RESP(comb(v), "All-pass comb at 1/2 band")
 	
 	FREQ_RESP(blockDC(v), "DC blocker")
 	FREQ_RESP(blockNyq(v), "Nyquist blocker")
