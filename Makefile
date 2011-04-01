@@ -38,18 +38,14 @@ CFLAGS		:= $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
 # Force these targets to always execute
 .PHONY: clean cleanall external tests
 
+
 # Build object file from C++ source
 $(OBJ_DIR)%.o: %.cpp
 	@echo CXX $< $@
-	@$(CXX) -c $(CFLAGS) $< -o $@
+	@$(CXX) -c $(CFLAGS) $< -o $@ -MMD -MF $(basename $@).dep
 
-# Create dependency file from C++ source
-$(OBJ_DIR)%.d: %.cpp | createFolders
-	@set -e; rm -f $@; \
-	$(CXX) -MM $(CPPFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,$(OBJ_DIR)\1.o : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-#	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@;
+include $(wildcard $(OBJ_DIR)*.dep)
+
 
 # Build static library
 $(SLIB_PATH): createFolders $(OBJS)
@@ -57,10 +53,12 @@ $(SLIB_PATH): createFolders $(OBJS)
 	@$(AR) $@ $(OBJS)
 	@$(RANLIB) $@
 
+
 # Build dynamic (shared) library
 $(DLIB_FILE): createFolders external $(OBJS)
 	@echo SH $@
 	@$(CXX) $(DLIBFLAGS) $(LDFLAGS) -o $@ $(OBJS)
+
 
 # Compile and run source files in examples/ and tests/ folders
 EXEC_TARGETS = examples/%.cpp tests/%.cpp
@@ -71,15 +69,18 @@ ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
 
+
 # Remove active build configuration binary files
 clean:
 	@$(RM) $(OBJ_DIR)* $(OBJ_DIR) $(BIN_DIR)* $(BIN_DIR)
+
 
 # Remove all build configuration binary files
 cleanall:
 	@$(MAKE) clean BUILD_CONFIG=release
 	@$(MAKE) clean BUILD_CONFIG=debug
 	@$(RM) $(BUILD_DIR)* $(BUILD_DIR)
+
 
 # Create file with settings for linking to external libraries
 external:
@@ -88,8 +89,10 @@ CPPFLAGS += $(EXT_CPPFLAGS) \r\n\
 LDFLAGS  += $(EXT_LDFLAGS) \
 '> Makefile.external
 
+
 # Clean and rebuild library
 rebuild: clean $(SLIB_PATH)
+
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/LIB_NAME and
@@ -105,10 +108,11 @@ endif
 	@$(INSTALL) -c -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
+
 createFolders:
 	@mkdir -p $(OBJ_DIR)
 
-#-include $(DEPS)
 
 # Dummy target to force rebuilds
 FORCE:
+
