@@ -63,7 +63,9 @@ $(DLIB_FILE): createFolders external $(OBJS)
 	@$(CXX) $(DLIBFLAGS) $(LDFLAGS) -o $@ $(OBJS)
 
 # Compile and run source files in examples/ and tests/ folders
-examples/%.cpp tests/%.cpp: $(SLIB_PATH) FORCE
+EXEC_TARGETS = examples/%.cpp tests/%.cpp
+.PRECIOUS: $(EXEC_TARGETS)
+$(EXEC_TARGETS): $(SLIB_PATH) FORCE
 	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(SLIB_PATH)
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
