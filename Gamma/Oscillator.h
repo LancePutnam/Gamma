@@ -112,7 +112,7 @@ public:
 	void print(const char * append = "\n", FILE * fp = stdout);
 	
 protected:
-	Tv mFreq, mPhase, mPhaseInc;
+	Tv mFreq, mPhase;//, mPhaseInc;
 	Tv m2PiUPS;
 	void recache();
 };
@@ -521,7 +521,7 @@ protected:
 	Tv mNFrac;		
 	Tv mSPU_2;			// cached locals
 	Tv mPrev;			// previous output for integration
-	void recache();
+//	void recache();
 	void setAmp();
 private: typedef AccumPhase<Tv,Ts> Base;
 };
@@ -537,7 +537,8 @@ public:
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v); Base::harmonicsMax(); }
 
-	virtual void onResync(double r){ Base::recache(); freq(AccumPhase<Tv, Ts>::freq()); }
+//	virtual void onResync(double r){ Base::recache(); freq(AccumPhase<Tv, Ts>::freq()); }
+	virtual void onResync(double r){ Base::onResync(r); freq(AccumPhase<Tv, Ts>::freq()); }
 
 private: typedef Buzz<Tv,Ts> Base; using Base::freq;
 };
@@ -708,6 +709,7 @@ TEMTS inline uint32_t TACCUM::phaseFI(float v) const {
 }
 
 TEMTS inline float TACCUM::phaseIF(uint32_t v) const {
+	//return v/4294967296.;
 	return uintToUnit<float>(v);
 }
 
@@ -762,36 +764,43 @@ TEMTS inline uint32_t TACCUM::once(){
 //---- AccumPhase
 
 TEM AccumPhase<Tv, Ts>::AccumPhase(Tv frq, Tv phase)
-:	mFreq(frq)
+:	mFreq(frq), m2PiUPS(1)
 {
 	Ts::initSynced();
 	this->phase(phase);
 }
 
 TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(){
+//	Tv r = mPhase;
+//	mPhase = scl::wrapPhase(mPhase + mPhaseInc);
+//	return r;
+	mPhase = scl::wrapPhase(mPhase); // guarantees that result is in [-pi, pi)
 	Tv r = mPhase;
-	mPhase = scl::wrapPhase(mPhase + mPhaseInc);
+//	mPhase += mPhaseInc;
+	mPhase += mFreq;
 	return r;
 }
 
 TEM inline void AccumPhase<Tv, Ts>::freq(Tv v){
-	mFreq = v;
-	mPhaseInc = v * m2PiUPS;
+//	mFreq = v;
+//	mPhaseInc = v * m2PiUPS;
+	mFreq = v*m2PiUPS;
 }
 
 TEM inline void AccumPhase<Tv, Ts>::period(Tv v){ freq(Tv(1)/v); }
 TEM inline void AccumPhase<Tv, Ts>::phase(Tv u){ mPhase = u * Tv(M_2PI); }
 TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv u){ mPhase += u * Tv(M_2PI); }
 
-TEM inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq; }
-TEM inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / mFreq; }
+TEM inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq/m2PiUPS; } //mFreq; }
+TEM inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / freq(); }
 TEM inline Tv AccumPhase<Tv, Ts>::phase(){ return mPhase * Tv(M_1_2PI); }
 
-TEM void AccumPhase<Tv, Ts>::onResync(double r){ recache(); freq(mFreq); }
+TEM void AccumPhase<Tv, Ts>::onResync(double r){ Tv f=freq(); recache(); freq(f); }
 TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
 
 TEM void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
-	fprintf(fp, "%f %f %f%s", freq(), phase(), mPhaseInc, append);
+//	fprintf(fp, "%f %f %f%s", freq(), phase(), mPhaseInc, append);
+	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreq, append);
 }
 
 
@@ -972,7 +981,7 @@ TEMTS inline bool TLFO::seq(){
 //---- Buzz
 
 TEM Buzz<Tv,Ts>::Buzz(Tv frq, Tv phase, Tv harmonics)
-:	Base(frq, phase), mAmp(0), mPrev((Tv)0)
+:	Base(frq, phase), mAmp(0), mPrev(Tv(0))
 {
 	onResync(1);
 	this->harmonics(harmonics);
@@ -992,17 +1001,21 @@ TEM inline void Buzz<Tv,Ts>::antialias(){
 	setAmp();
 }
 
-TEM inline Tv Buzz<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->mFreq; }
+TEM inline Tv Buzz<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->freq(); }
 
-TEM inline void Buzz<Tv,Ts>::setAmp(){ mAmp = (mN != Tv(0)) ? (Tv(0.5) / mN) : 0; }
+TEM inline void Buzz<Tv,Ts>::setAmp(){ mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN+mNFrac)) : 0; }
 
 #define EPS 0.000001
 TEM inline Tv Buzz<Tv, Ts>::operator()(){
 	Tv theta = this->nextPhase();
 
+	/*        1   / sin((N+0.5)x)    \
+	   f(x) = -- | -------------- - 1 |
+	          2N  \   sin(0.5x)      /
+	*/
 	Tv result;
-	Tv denom = scl::sinT9(theta * (Tv)0.5);
-	if( scl::abs(denom) < (Tv)EPS ){ result = Tv(1); /*printf("Impulse::(): oops\n");*/ }
+	Tv denom = scl::sinT9(theta * Tv(0.5));
+	if( scl::abs(denom) < Tv(EPS) ){ result = Tv(1); /*printf("Impulse::(): oops\n");*/ }
 	else{
 		Tv nphase = scl::wrapPhase(theta * (mN + Tv(0.5)));
 		//result = (scl::sinT7(nphase) / denom - Tv(1)) * Tv(0.5);
@@ -1015,8 +1028,7 @@ TEM inline Tv Buzz<Tv, Ts>::operator()(){
 //		(n-d)/d*0.5/N
 	}
 	
-	//result -= 2.f * cos(theta * mN) * (1.f - mNFrac);	// removes clicks!
-	
+	//result -= 2.f * mAmp * cos(theta * mN) * (1.f - mNFrac);	// removes clicks
 	return result;
 }
 
@@ -1043,15 +1055,21 @@ TEM inline Tv Buzz<Tv,Ts>::odd(){
 TEM inline Tv Buzz<Tv,Ts>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
 TEM inline Tv Buzz<Tv,Ts>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
 
-TEM void Buzz<Tv,Ts>::onResync(double r){
-	Base::recache();
-	Base::freq(Base::freq());
-}
+//TEM void AccumPhase<Tv, Ts>::onResync(double r){ Tv f=freq(); recache(); freq(f); }
+//TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
 
-TEM void Buzz<Tv,Ts>::recache(){
-	Base::recache();
+TEM void Buzz<Tv,Ts>::onResync(double r){
+//	Base::recache();
+//	Base::freq(Base::freq());
+
+	Base::onResync(r);
 	mSPU_2 = (Tv)(Synced::spu() * 0.5);
 }
+
+//TEM void Buzz<Tv,Ts>::recache(){
+//	Base::recache();
+//	mSPU_2 = (Tv)(Synced::spu() * 0.5);
+//}
 
 
 
@@ -1107,7 +1125,7 @@ TEM inline Tv DSF<Tv,Ts>::freqRatio(){ return mFreqRatio; }
 TEM inline Tv DSF<Tv,Ts>::harmonics(){ return mN; }
 
 TEM inline Tv DSF<Tv,Ts>::maxHarmonics(){
-	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->mFreq - Tv(1))/mFreqRatio + Tv(1));
+	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->freq() - Tv(1))/freqRatio() + Tv(1));
 }
 
 // Generalized DSF formula:
@@ -1140,11 +1158,11 @@ TEM inline Tv DSF<Tv,Ts>::operator()(){
 #undef COS
 
 TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = ::pow(mA, mN); }
-TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mPhaseInc * mFreqRatio; }
+TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio; }
 
 TEM void DSF<Tv,Ts>::onResync(double r){
 	Base::onResync(r);
-	freq(Base::mFreq);
+	freq(Base::freq());
 	harmonics(mNDesired);
 }
 
