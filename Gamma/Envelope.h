@@ -49,6 +49,8 @@ public:
 	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
 	/// @param[in] end		end value
 	void set(T length, T curve, T end = T(1));
+	
+	void value(const T& v);
 
 protected:
 	T mEnd;
@@ -101,9 +103,22 @@ public:
 		return mValues[mStage+1];
 	}
 	
-	void release(){ mRelease=-scl::abs(mRelease); }
+	void release(){
+		mRelease=-scl::abs(mRelease);
+
+		// begin release portion immediately starting at current level
+//		T curVal = value();
+//		mStage = -mRelease;
+//		mPos = 0;
+//		mLen = mLengths[mStage];
+//		mCurve.set(mLen, mCurves[mStage], 2*mValues[mStage+1]-mValues[mStage]-curVal);
+//		mCurve.value(curVal-mValues[mStage]);
+	}
+
+	/// Sets the point at which the envelope holds its value until released
 	void releasePoint(int v){ mRelease = v; }
 
+	/// Reset envelope to starting point
 	void reset(){
 		mPos = 0xFFFFFFFF;
 		mLen = 0;
@@ -111,16 +126,19 @@ public:
 		mRelease = scl::abs(mRelease);
 	}
 
+	/// Set length and curvature of a segment
 	void segment(int i, T length, T curve){
 		mLengths[i]=length;
 		mCurves[i]=curve;
 	}
-	
-	void segments(const T* lengths, const T* curves, int len){
-		int n = len < size() ? len : size();
+
+	/// Set length and curvature of many segments
+	void segments(const T* lengths, const T* curves, int len, int begin=0){
+		int max = size() - begin;
+		int n = len < max ? len : max;
 		for(int i=0; i<n; ++i){
-			mLengths[i] = lengths[i];
-			mCurves[i] = curves[i];
+			mLengths[i+begin] = lengths[i];
+			mCurves[i+begin] = curves[i];
 		}
 	}
 	
@@ -435,6 +453,8 @@ TEM void Curve<T>::set(T len, T crv, T end){
 //	a2 = start + a1;
 //	b1 = a1;
 }
+
+TEM inline void Curve<T>::value(const T& v){ mB = mA-v; }
 
 TEM inline T Curve<T>::operator()(){
 	mB *= mMul;
