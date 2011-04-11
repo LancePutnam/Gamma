@@ -127,36 +127,40 @@ public:
 	}
 
 	/// Set length and curvature of a segment
-	void segment(int i, T length, T curve){
+	CurveEnv& segment(int i, T length, T curve){
 		mLengths[i]=length;
-		mCurves[i]=curve;
+		mCurves [i]=curve;
+		return *this;
 	}
 
 	/// Set length and curvature of many segments
-	void segments(const T* lengths, const T* curves, int len, int begin=0){
+	template <class V>
+	CurveEnv& segments(const V* lengths, const V* curves, int len, int begin=0){
 		int max = size() - begin;
 		int n = len < max ? len : max;
 		for(int i=0; i<n; ++i){
-			mLengths[i+begin] = lengths[i];
-			mCurves[i+begin] = curves[i];
+			segment(i+begin, lengths[i], curves[i]);
 		}
+		return *this;
 	}
 	
-	void segments(T la, T ca, T lb, T cb){ T l[]={la,lb}; T c[]={ca,cb}; segments(l,c,2); }
-	void segments(T la, T ca, T lb, T cb, T lc, T cc){ T l[]={la,lb,lc}; T c[]={ca,cb,cc}; segments(l,c,3); }
-	void segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){ T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; segments(l,c,4); }
+	CurveEnv& segments(T la, T ca, T lb, T cb){ T l[]={la,lb}; T c[]={ca,cb}; return segments(l,c,2); }
+	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc){ T l[]={la,lb,lc}; T c[]={ca,cb,cc}; return segments(l,c,3); }
+	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){ T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; return segments(l,c,4); }
 
-	void point(int i, T value){ mValues[i] = value; }
+	CurveEnv& point(int i, T val){ mValues[i]=val; return *this; }
 
-	void points(const T * vals, int len){
+	template <class V>
+	CurveEnv& points(const V* vals, int len){
 		int n = len <= size() ? len : size()+1;
-		for(int i=0; i<n; ++i) mValues[i] = vals[i];
+		for(int i=0; i<n; ++i) point(i, vals[i]);
+		return *this;
 	}
 	
-	void points(T a, T b){ T v[]={a,b}; points(v,2); }
-	void points(T a, T b, T c){ T v[]={a,b,c}; points(v,3); }
-	void points(T a, T b, T c, T d){ T v[]={a,b,c,d}; points(v,4); }
-	void points(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; points(v,5); }
+	CurveEnv& points(T a, T b){ T v[]={a,b}; return points(v,2); }
+	CurveEnv& points(T a, T b, T c){ T v[]={a,b,c}; return points(v,3); }
+	CurveEnv& points(T a, T b, T c, T d){ T v[]={a,b,c,d}; return points(v,4); }
+	CurveEnv& points(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return points(v,5); }
 
 protected:
 	Curve<T> mCurve;
@@ -425,8 +429,23 @@ TEM inline void Curve<T>::reset(){ mB = mA / mMul; }
 TEM inline T Curve<T>					::eps() const { return T(0.00001  ); }
 template<> inline double Curve<double>	::eps() const { return   0.00000001; }
 
+
+// hack to get proper max floating point value
+namespace{
+	template<class T> static inline T maxReal(){ return DBL_MAX; }
+	template<> static inline float maxReal<float>(){ return FLT_MAX; }
+}
+
 TEM void Curve<T>::set(T len, T crv, T end){
 	static const T EPS = eps();
+
+	if(len == T(0)){ // if length is 0, return end value immediately
+		mEnd = end;
+		mMul = maxReal<T>();
+		mA = end;
+		mB = 0;
+		return;
+	}
 
 	// Avoid discontinuity when curve = 0 (a line)
 	if(crv < EPS && crv > -EPS){
