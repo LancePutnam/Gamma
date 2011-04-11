@@ -334,7 +334,13 @@ TEM void mix2(T& io1, T& io2, T mix);
 TEM void mulComplex(T& r1, T& i1, const T& r2, const T& i2);
 
 /// Returns nearest "note" within a pitch class set
-TEM T nearest(T v, const char * interval="2212221", long div=12);
+
+/// @param[in] v			the value to match
+/// @param[in] intervals	sequence of base-36 intervals 
+/// @param[in] mod			modulo amount
+///
+/// The sum of the values in the interval array should be equal to 'mod'.
+TEM T nearest(T v, const char * intervals="2212221", long mod=12);
 
 /// Returns nearest integer division of one value to another
 TEM T nearestDiv(T of, T to);
@@ -922,18 +928,24 @@ TEM inline void mulComplex(T & r1, T & i1, const T & r2, const T & i2){
 	i1 = i1 * r2 + rt * i2;
 }
 
-TEM T nearest(T val, const char * interval, long div){
+TEM T nearest(T val, const char * intervals, long div){
 	long vr = castIntRound(val);
 	long numWraps = 0;
 	long vm = wrap(vr, numWraps, div, 0L);
-	long sum = 0;
+	long min = 0;
 
-	while(*interval){
-		if(vm <= sum){ vm = sum; break; }
-		sum += (long)(*interval++ - 48);
+	while(*intervals){
+		long dia = base36To10(*intervals++);
+		long max = min + dia;
+		if(vm < max){	// are we within current interval?
+			if(vm < (min + dia*0.5))	vm = min;
+			else						vm = max;
+			break;
+		}
+		min = max;
 	}
 
-	return (T)(vm + numWraps * div);
+	return T(vm + numWraps * div);
 }
 
 TEM inline T nearestDiv(T of, T to){ return to / round(to/of); }
