@@ -66,7 +66,7 @@ EXEC_TARGETS = examples/%.cpp tests/%.cpp
 $(EXEC_TARGETS): $(SLIB_PATH) FORCE
 	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(SLIB_PATH)
 ifneq ($(AUTORUN), 0)
-	@$(BIN_DIR)$(*F)
+	@cd $(BIN_DIR) && ./$(*F)
 endif
 
 
