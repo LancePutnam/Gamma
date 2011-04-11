@@ -210,6 +210,7 @@ public:
 	void amp(Tv val);		///< Set amplitude
 	void decay(Tv val);		///< Set number of units to decay -60 dB. Negative = no decay.
 	void freq(Tv val);		///< Set frequency
+	void freq(const complex& val){ mInc=val; }
 	void phase(Tv radians);	///< Set phase
 	void reset();			///< Resets amplitude and sets phase to 0
 	void set(Tv frq, Tv phs, Tv amp, Tv dcy);
@@ -814,34 +815,34 @@ TEM Quadra<Tv, Ts>::Quadra(Tv frq, Tv amp, Tv dcy60, Tv phase)
 }
 
 TEM void Quadra<Tv, Ts>::amp(Tv v){
-	if(scl::abs(mAmp) > (Tv)0.000001){
+	if(scl::abs(mAmp) > Tv(0.000001)){
 		Tv factor = v / mAmp;
 		val *= factor;
 	} else {
-		val(v, (Tv)0);
+		val(v, Tv(0));
 	}
 	mAmp = v;
 }
 
 TEM void Quadra<Tv, Ts>::decay(Tv v){
 	mDcy60 = v;
-	mDcy = v > (Tv)0 ? (Tv)scl::t60(v * Ts::spu()) : (Tv)1;
+	mDcy = v > Tv(0) ? Tv(scl::t60(v * Ts::spu())) : Tv(1);
 	freq(mFreq);
 }
 
 TEM void Quadra<Tv, Ts>::freq(Tv v){
 	mFreq = v;
-	Tv phaseInc = v * Ts::ups() * (Tv)M_2PI;
+	Tv phaseInc = v * Ts::ups() * Tv(M_2PI);
 	mInc.fromPolar(mDcy, phaseInc);
 	//printf("%f %f %f %f\n", phaseInc, mDcy, c1, s1);
 }
 
 TEM void Quadra<Tv, Ts>::phase(Tv v){
 	// set phase without changing current magnitude
-	val.fromPolar(val.norm(), v*(Tv)M_2PI);
+	val.fromPolar(val.norm(), v*Tv(M_2PI));
 }
 
-TEM void Quadra<Tv, Ts>::reset(){ val(mAmp, (Tv)0); }
+TEM void Quadra<Tv, Ts>::reset(){ val(mAmp, Tv(0)); }
 
 TEM void Quadra<Tv, Ts>::set(Tv frq, Tv phase, Tv amp, Tv dcy60){
 	mFreq = frq;
