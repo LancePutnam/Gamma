@@ -620,7 +620,7 @@ T_VPS inline void AllPass1<Tv,Tp,Ts>::freqF(Tp v){
 
 T_VPS inline Tv AllPass1<Tv,Tp,Ts>::operator()(Tv i0){ 
 	i0 -= d1 * c;			// o0 = c * (i0 - c * d1) + d1
-	Tv o0 = i0 * c + d1;
+	Tv o0 = i0 * c + d1;	//    = c * i0 + (1 - c*c) * d1
 	d1 = i0;
 	return o0;
 }

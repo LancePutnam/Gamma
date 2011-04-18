@@ -12,11 +12,16 @@ int main(int argc, char* argv[]){
 	Sync::master().spu(n);
 
 	Curve<> curve(n, -3);
-	CurveEnv<4> curveEnv;
+//	CurveEnv<4> curveEnv;
 //	curveEnv.releasePoint(2);
-//	curveEnv.release();
-	curveEnv.segments(8,-4, 8,-4, 8,0, 8,0);
-	curveEnv.points(0, 1, 0.5, 0.5, 0);
+////	curveEnv.release();
+//	curveEnv.segments(8,-4, 8,-4, 8,-4, 8,-4);
+//	curveEnv.points(0, 1, 0.5, 0.5, 0);
+
+	CurveEnv<2> curveEnv;
+
+	curveEnv.segments(0,0, 8,-4);
+	curveEnv.points(0, 1, 0);
 
 	AD<> ad(0.2, 0.8, -3, 3);
 	Seg<> segLin(1, 1, -1);
@@ -39,6 +44,15 @@ int main(int argc, char* argv[]){
 	curve.set(n, 3, 1./1); DO(curve()) curve.reset();
 
 	DO(curveEnv())
+
+//	curveEnv.reset();
+//		printf("\n");
+//		for(int i=0; i<n+4; ++i){
+//			if(i == 4) curveEnv.release();
+//			double v = curveEnv();
+//			printf("[%2d] % 6.4f ", i, v);
+//			printPlot(v, 32); printf("\n");
+//		}
 
 //	DO(ad())
 //	DO(segExp()) segExp = 1;
