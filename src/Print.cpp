@@ -95,32 +95,53 @@ void printHexArray(const float * a, uint32_t len, uint32_t valuesPerLine){
 	}
 }
 
-void printPlot(float value, uint32_t width, bool spaces, const char * point){
+void printPlot(float value, uint32_t width, bool spaces, bool sign, const char * point){
+
+	float min, max;
+	if(sign)	{ min=-1; max=1; }
+	else		{ min= 0; max=1; }
+	float dia = max-min;
+
 	int clipFlag;
-	value = scl::clip(value, clipFlag, 1.f, -1.f);
+	value = scl::clip(value, clipFlag, max, min);
 	
 	const char * pt = clipFlag != 0 ? "+" : point;
-	
-	uint32_t pos = castIntRound((value + 1.f) * 0.5f * (float)(width));
-	uint32_t mid = width >> 1;
-	uint32_t i=0;
 
-	if(pos < mid){	// [-1, 0)
-		for(; i<pos; ++i) printf(" ");
-		printf("%s", pt); ++i;
-		for(; i<mid; ++i) printf("-");
-		printf("|");
-	}
-	else{			// (0, 1]
-		for(; i<mid; ++i) printf(" ");
-		if(pos == mid){ printf("%s", pt); goto end; }
-		printf("|"); ++i;
-		for(; i<pos; ++i) printf("-");
-		printf("%s", pt);
+	int imin = min/dia * width;	// normalize by diameter, then multiply by width
+	int imax = imin + width;
+	int pos = castIntRound(value / dia * width);
+
+	if(!spaces) imax = pos<=0 ? 1 : pos;
+
+	if(pos >= imax) pos = imax-1;
+	
+	for(int i=imin; i<imax; ++i){
+		if(i == pos)	printf("%s", pt);
+		else if(i==0)	printf("|");
+		else if((i>pos && i<0) || (i<pos && i>0))	printf("-");
+		else			printf(" ");
 	}
 	
-	end: 
-	if(spaces) for(; i<width; ++i) printf(" ");
+//	uint32_t pos = castIntRound((value + 1.f) * 0.5f * (float)(width));
+//	uint32_t mid = width >> 1;
+//	uint32_t i=0;
+//
+//	if(pos < mid){	// [-1, 0)
+//		for(; i<pos; ++i) printf(" ");
+//		printf("%s", pt); ++i;
+//		for(; i<mid; ++i) printf("-");
+//		printf("|");
+//	}
+//	else{			// (0, 1]
+//		for(; i<mid; ++i) printf(" ");
+//		if(pos == mid){ printf("%s", pt); goto end; }
+//		printf("|"); ++i;
+//		for(; i<pos; ++i) printf("-");
+//		printf("%s", pt);
+//	}
+//	
+//	end: 
+//	if(spaces) for(; i<width; ++i) printf(" ");
 }
 
 

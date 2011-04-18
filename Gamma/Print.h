@@ -41,8 +41,9 @@ void printHexArray(const float * table, uint32_t len, uint32_t valuesPerLine);
 /// @param[in]	value	Normalized value to plot
 /// @param[in]	width	Character width of plot excluding center point
 /// @param[in]	spaces	Print extra filling spaces to the right
+/// @param[in]	sign	Whether plot is signed
 /// @param[in]	point	The print character for points
-void printPlot(float value, uint32_t width=50, bool spaces=true, const char * point="o");
+void printPlot(float value, uint32_t width=50, bool spaces=true, bool sign=true, const char * point="o");
 
 /// Prints error messge to stderr and optionally calls exit()
 void err(const char * msg, const char * src="", bool exits=true);
