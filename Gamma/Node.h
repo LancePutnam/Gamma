@@ -4,10 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <iostream>
 #include <stdio.h>
-
-using std::cout;
 
 #define TEM template <class T>
 
@@ -372,7 +369,7 @@ TEM T * Node4<T>::next(const T * terminal) const {
 
 
 TEM void Node4<T>::print(const char * append){
-	cout << this << append;
+	printf("%p%s", this, append);
 }
 
 
