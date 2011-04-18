@@ -10,7 +10,7 @@
 namespace gam{
 
 
-/// First-order IIR section (1 pole/ 1 zero)
+/// First-order IIR section (1 pole, 1 zero)
 
 /// y[n] = ci0*x[n] + ci1*x[n-1] + co1*y[n-1]
 ///
@@ -73,54 +73,6 @@ public:
 protected:
 	Tv d1, d2;
 	union{ struct{ Tp ci0, ci1, ci2, co1, co2; }; Tp c[5]; };
-};
-
-
-/*
-Direct transpose canonic realization:
-
-x[n] --> a[0] --> + --------------> y[n]
-	 |            ^            |
-     |	         d[1]          |
-     |            ^            |
-	 --> a[1] --> + <-- b[1] <--
-	 |            ^            |
-     |	         d[2]          |
-     |            ^            |
-	 --> a[2] --> + <-- b[2] <--
-	 
-     ...         ...          ...
-
-     |           d[N]          |
-	 |            ^            |
-	 --> a[N] --> + <-- b[N] <--
-*/
-
-/// Nth order IIR filter
-template <int N, class Tv=gam::real, class Tp=gam::real>
-class IIRN{
-public:
-
-	Tv d[N];	///< delay buffer
-	Tp a[N];	///< feedforward coefficients
-	Tp b[N];	///< feedback coefficients
-
-	/// Filter input sample
-	Tv operator()(const Tv& i0){	// direct form II
-		d[0] = i0;
-		Tv o0 = 0;
-		for(int i=N-1; i>=1; --i){
-			d[0] += d[i]*b[i];	// sum feedback
-			o0   += d[i]*a[i];	// sum feedforward
-			d[i] = d[i-1];		// shift delay
-		}
-		o0 += d[0]*a[0];
-
-		return o0*b[0];
-	}
-	
-	/// Zero internal delays
-	void zero(){ for(int i=0; i<N; ++i) d[i]=Tv(0); }
 };
 
 
