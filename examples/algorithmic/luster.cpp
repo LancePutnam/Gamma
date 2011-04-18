@@ -16,12 +16,12 @@ LFO<> oscA(62), oscB(62.003);
 LFO<> mix(1./60);
 FreqShift<> fshift1, fshift2;
 LFO<> modfs1(1./101), modfs2(1./102);
-Chorus chrA1(0.31, 0.002, 0.20111, -0.7, 0.9);
-Chorus chrA2(0.22, 0.002, 0.10151, -0.7, 0.9);
-Chorus chrA3(0.13, 0.002, 0.05131, -0.7, 0.9);
-Chorus chrB1(0.31, 0.002, 0.20141, -0.7, 0.9);
-Chorus chrB2(0.22, 0.002, 0.10171, -0.7, 0.9);
-Chorus chrB3(0.13, 0.002, 0.05111, -0.7, 0.9);
+Chorus<> chrA1(0.31, 0.002, 0.20111, -0.7, 0.9);
+Chorus<> chrA2(0.22, 0.002, 0.10151, -0.7, 0.9);
+Chorus<> chrA3(0.13, 0.002, 0.05131, -0.7, 0.9);
+Chorus<> chrB1(0.31, 0.002, 0.20141, -0.7, 0.9);
+Chorus<> chrB2(0.22, 0.002, 0.10171, -0.7, 0.9);
+Chorus<> chrB3(0.13, 0.002, 0.05111, -0.7, 0.9);
 
 void audioCB(AudioIOData& io){
 	using namespace gam::rnd;

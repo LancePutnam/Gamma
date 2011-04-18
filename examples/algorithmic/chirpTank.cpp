@@ -11,7 +11,7 @@
 Accum<> tmr(16, 2);
 LFO<> lfoD(2.51);
 Chirp<> src(100., 1, 0.1);
-Chorus chr(0.5, 0.3, 0.01, 1, 0.7);
+Chorus<> chr(0.5, 0.3, 0.01, 1, 0.7);
 #define FD 0.9
 Comb<> cmb1(1, -FD, FD), cmb2(1, -FD, FD), cmb3(1, -FD, FD);
 Combs4<> cmbs4(0.11, 0.17, 0.23, 0.31, -FD,FD);

@@ -132,39 +132,40 @@ struct Cheby8{
 };
 
 
-/// Dual delay-line chorus driven by quadrature sinusoid.
+
+/// Dual delay-line chorus driven by quadrature sinusoid
+template <class T=gam::real>
 struct Chorus{
 	/// @param[in] delay	Delay interval
 	/// @param[in] depth	Depth of delay-line modulation
 	/// @param[in] freq		Frequency of modulation
 	/// @param[in] ffd		Feedforward amount
 	/// @param[in] fbk		Feedback amount
-	Chorus(float delay, float depth=0.002, float freq=1, float ffd=0.9, float fbk=0.1):
+	Chorus(float delay=0.0021, float depth=0.002, float freq=1, float ffd=0.9, float fbk=0.1):
 		comb1(delay + depth, delay, ffd, fbk),
 		comb2(delay + depth, delay, ffd, fbk),
-		mod((double)freq, (double)depth),
+		mod(double(freq), double(depth)),
 		delay(delay)
 	{}
 	
 	/// Filter sample (mono-mono)
-	float operator()(float in){
-		m(); return (comb1(in) + comb2(in)) * 0.5f;
+	T operator()(const T& v){
+		m(); return (comb1(v) + comb2(v)) * 0.5f;
 	}
 	
 	/// Filter sample (mono-stereo)
-	void operator()(float in, float& o1, float& o2){
+	void operator()(const T& in, T& o1, T& o2){
 		m(); o1=comb1(in); o2=comb2(in);
 	}
 	
 	/// Filter samples (stereo-stereo)
-	void operator()(float i1, float i2, float& o1, float& o2){
+	void operator()(const T& i1, const T& i2, T& o1, T& o2){
 		m(); o1=comb1(i1); o2=comb2(i2);		
 	}
 
-	Comb<float, ipl::AllPass> comb1, comb2;		///< Comb filters
-	//Comb<float, ipl::Linear> comb1, comb2;	///< Comb filters
-	Quadra<double> mod;	///< Modulator
-	float delay;		///< Delay interval
+	Comb<T, ipl::AllPass> comb1, comb2;		///< Comb filters
+	Quadra<double> mod;						///< Modulator
+	float delay;							///< Delay interval
 	
 private: 
 	void m(){ comb1.delay(delay + mod.val.r); comb2.delay(delay + mod.val.i); mod(); } // modulate
@@ -172,9 +173,8 @@ private:
 
 
 
-/// Group of 4 comb filters.
-
-template <template<class> class Tipol=ipl::Linear>
+/// Group of 4 comb filters
+template <class T = gam::real, template<class> class Tipol=ipl::Linear>
 struct Combs4{
 
 	/// @param[in] d1		Delay length of filter 1
@@ -186,27 +186,29 @@ struct Combs4{
 	Combs4(float d1, float d2, float d3, float d4, float ffd, float fbk)
 	: c1(d1, ffd, fbk), c2(d2, ffd, fbk), c3(d3, ffd, fbk), c4(d4, ffd, fbk){}
 	
-	/// Set decay length for filters.
+	/// Set decay length for filters
 	void decay(float v, float end = 0.001f){
 		c1.decay(v, end); c2.decay(v, end); c3.decay(v, end); c4.decay(v, end);
 	}
 	
-	/// Set delay length for filters.
+	/// Set delay length for filters
 	void delay(float d1, float d2, float d3, float d4){
 		c1.delay(d1); c2.delay(d2); c3.delay(d3); c4.delay(d4);
 	}
 
-	float nextP(float i0){ return c1(i0) + c2(i0) + c3(i0) + c4(i0); }
+	/// Returns next sample processed through combs in parallel
+	T nextP(const T& v){ return c1(v) + c2(v) + c3(v) + c4(v); }
 	
-	float nextS(float i0){ return c4(c3(c2(c1(i0)))); }
+	/// Returns next sample processed through combs in series
+	T nextS(const T& v){ return c4(c3(c2(c1(v)))); }
 	
-	Comb<float, Tipol> c1, c2, c3, c4;
+	Comb<T, Tipol> c1, c2, c3, c4;
 };
 
 
 
-
-/// Diffuser using 4 parallel combs and 4 series comb allpass. 
+/// Diffuser using 4 parallel combs and 4 series comb allpass
+template <class T=gam::real>
 struct Diffuser{
 
 	/// param[in] decay		Decay length of parallel combs
@@ -221,17 +223,17 @@ struct Diffuser{
 		this->decay(decay);
 	}
 	
-	/// Returns next processed sample.
-	float operator()(float input){
-		input = comb4P.nextP(input);	// needs precision to avoid beating
-		return comb4S.nextS(input);
+	/// Returns next processed sample
+	T operator()(T v){
+		v = comb4P.nextP(v);	// needs precision to avoid beating
+		return comb4S.nextS(v);
 	}
 	
-	/// Set 60 dB decay length of parallel combs.
+	/// Set 60 dB decay length of parallel combs
 	void decay(float value){ comb4P.decay(value); }
 
-	Combs4<ipl::AllPass> comb4P;	///< Parallel feedback comb filters
-	Combs4<ipl::Trunc> comb4S;		///< Series allpass comb filters	
+	Combs4<T, ipl::AllPass> comb4P;	///< Parallel feedback comb filters
+	Combs4<T, ipl::Trunc> comb4S;	///< Series allpass comb filters	
 };
 
 
@@ -379,7 +381,7 @@ public:
 
 	T operator()(T input);		///< Return next filtered sample
 	
-	virtual void onSyncChange();
+	virtual void onResync(double r);
 
 private:
 	T mHeld;
@@ -388,34 +390,35 @@ private:
 	bool mDoStep;
 };
 
-TEM Quantizer<T>::Quantizer(double freq, T step){
-	this->freq(freq);
+TEM Quantizer<T>::Quantizer(double freq, T step)
+:	mPeriod(1./freq)
+{
 	this->step(step);
 }
 
-TEM inline void Quantizer<T>::freq(double value){ period(1./value); }
+TEM inline void Quantizer<T>::freq(double v){ period(1./v); }
 
-TEM inline void Quantizer<T>::period(double value){
-	mPeriod = value;
-	mSamples = value * spu();
+TEM inline void Quantizer<T>::period(double v){
+	mPeriod = v;
+	mSamples = v * spu();
 	if(mSamples < 1.) mSamples = 1.;
 }
 
-TEM inline void Quantizer<T>::step(T value){
-	mStep = value;
+TEM inline void Quantizer<T>::step(T v){
+	mStep = v;
 	mDoStep = mStep > 0.;
 	if(mDoStep) mStepRec = 1./mStep;
 }
 
-TEM inline T Quantizer<T>::operator()(T input){
+TEM inline T Quantizer<T>::operator()(T vi){
 	if(++mCount >= mSamples){
 		mCount -= mSamples;
-		mHeld = mDoStep ? scl::round(input, mStep, mStepRec) : input;
+		mHeld = mDoStep ? scl::round(vi, mStep, mStepRec) : vi;
 	}
 	return mHeld;
 }
 
-TEM void Quantizer<T>::onSyncChange(){
+TEM void Quantizer<T>::onResync(double r){
 	period(mPeriod);
 }
 
