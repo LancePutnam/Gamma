@@ -40,6 +40,9 @@ public:
 		ULAW,		/**< U-Law encoded. */
 		ALAW,		/**< A-Law encoded. */
 	};
+	
+	static const char * toString(Format v);
+	static const char * toString(EncodingType v);
 
 	/// Creates object given a path.
 	

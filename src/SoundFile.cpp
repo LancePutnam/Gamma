@@ -191,6 +191,24 @@ SoundFile& SoundFile::encoding(EncodingType v){
 	return *this;
 }
 
+const char * SoundFile::toString(Format v){
+	#define CS(x) case x: return #x;
+	switch(v){
+	CS(WAV) CS(AIFF) CS(AU) CS(RAW) CS(FLAC)
+	default: return "";
+	}
+	#undef CS
+}
+const char * SoundFile::toString(EncodingType v){
+	#define CS(x) case x: return #x;
+	switch(v){
+	CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
+	CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
+	default: return "";
+	}
+	#undef CS
+}
+
 
 /*
 typedef struct
@@ -249,18 +267,8 @@ bool SoundFile::openWrite(){ return mImpl->openWrite(path()); }
 
 void SoundFile::print(){
 //	printf("Path:       %s\n", mPath.c_str());
-//
-//	formatInfoMajor();
-//	printf("Format:     %s, %s, ", formatInfo.name, formatInfo.extension) ;
-//	
-//	formatInfoSubtype();
-//	printf("%s\n", formatInfo.name) ;
-//	
-//	printf("Frame rate: %f\n", frameRate());
-//	printf("Frames:     %d\n", frames());
-//	printf("Channels:   %d\n", channels());
-//	printf("Samples:    %d\n", samples());
-//	printf("Length:     %f\n", frames()/frameRate());
+	printf("%s (%s): %g frames/sec, %d chan, %d frames, %f sec\n",
+		toString(format()), toString(encoding()), frameRate(), channels(), frames(), frames()/frameRate());
 }
 
 // specialized templates to hook into libsndfile functions
