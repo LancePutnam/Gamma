@@ -32,8 +32,13 @@ else
 	ARCH = 32
 endif
 
-# Mac OS X version: '10_4' or '10_5'
-OSX_VERSION	= 10_5
+# Mac OS X version: '10_6' or '10_5'
+UNAME := $(shell uname -r)
+ifeq ($(UNAME), $(findstring $(UNAME), 10.6.0 10.7.0))
+    OSX_VERSION = 10_6
+else
+    OSX_VERSION = 10_5
+endif
 
 #
 USING_PUREDYNE	= 0
@@ -104,11 +109,15 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -arch i386 -arch x86_64
 	endif
 
-	ifeq ($(OSX_VERSION), 10_5)
-		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+	CFLAGS += -isysroot
+
+	ifeq ($(OSX_VERSION), 10_6)
+		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+	else ifeq ($(OSX_VERSION), 10_5)
+		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
 #		LDFLAGS += -syslibroot /Developer/SDKs/MacOSX10.5.sdk
 	else ifeq ($(OSX_VERSION), 10_4)
-		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+		CFLAGS += /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 #		LDFLAGS += -syslibroot /Developer/SDKs/MacOSX10.4u.sdk
 	endif
 
