@@ -517,7 +517,7 @@ TEM void nyquist(T * dst, uint32_t len, uint32_t str){
 ///*
 inline float atQ(const float * src, uint32_t fbits, uint32_t phase){
 	uint32_t sign = phase & MaskSign<float>();
-	uint32_t dir  = (phase & 0x40000000) >> 30;	// 0 = fwd or 1 = bwd
+	uint32_t dir = (phase >> 30) & 1; // 0 = fwd or 1 = bwd
 	Twiddle<float> v(src[(((phase^-dir) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
 	v.i |= sign;	// sign bit
 	return v.f;
