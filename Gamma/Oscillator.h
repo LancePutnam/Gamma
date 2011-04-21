@@ -413,10 +413,20 @@ public:
 	/// @param[in]	phase	Initial unit phase in [0, 1)
 	TableSine(float frq=440, float phase=0);
 
-	float operator()();
+	float operator()();			///< Return next linearly-interpolated sample
 	float nextN();				///< Return next non-interpolated sample
 	float nextL();				///< Return next linearly-interpolated sample
+
+	/// Resize global sine table
 	
+	/// @param[in] bits		set effective table size to be 2^bits
+	///
+	/// This sets the effective table size with only one quarter the amount of
+	/// memory actually being allocated. For example, if bits=10, the effective 
+	/// table size is 2^10 = 1024, but the amount of allocated memory is only
+	/// 1024/4 = 256. This call is not thread safe.
+	static void resize(uint32_t bits);
+
 protected:
 //	static ArrayPow2<float> mTable; // can't use because need 2**N+1 table
 	static float * mTable;		// Reference to my sample table. Must be 1<<bits.
@@ -864,22 +874,30 @@ TEM void Quadra<Tv, Ts>::onResync(double r){
 }
 
 
-
 //---- TableSine
 
 #define TTABLESINE TableSine<St,Ts>
-TEMTS uint32_t TTABLESINE::mTblBits  = 9UL;	// actual table memory is a quarter of this
-TEMTS uint32_t TTABLESINE::mFracBits = 32UL - TableSine::mTblBits;
+TEMTS uint32_t TTABLESINE::mTblBits  = 0;	
+TEMTS uint32_t TTABLESINE::mFracBits = 0;
 TEMTS uint32_t TTABLESINE::mOneIndex = 0;
 TEMTS float * TTABLESINE::mTable = 0;
 
 TEMTS TTABLESINE::TableSine(float freq, float phase): Base(freq, phase){
-	if(0 == mTable){
+	// initialize global table ONCE
+	if(0 == mTable){ resize(11); }
+}
+
+TEMTS void TTABLESINE::resize(uint32_t bits){
+	if(bits != mTblBits){
+		if(mTable) delete[] mTable;
+
+		mTblBits = bits;
+		mFracBits = 32UL - mTblBits;
 		mOneIndex = 1<<mFracBits;
 		uint32_t size = 1<<(mTblBits-2);
-		mTable = new float[size + 1];	// does this need to be deleted?
+		mTable = new float[size + 1];
 		tbl::sinusoid(mTable, size, 0, 0.25);
-		mTable[size] = 1;
+		mTable[size] = 1;		
 	}
 }
 
