@@ -22,12 +22,15 @@ else
 	PLATFORM = windows
 endif
 
-# Architecture: '32', '64', or '32_64' (macosx only)
+# Architecture: '32' or '64'
 UNAMEM := $(shell uname -m)
-ifeq ($(UNAMEM), x86_64)
-	ARCH = 32_64
-else ifeq ($(UNAMEM), i686)
-	ARCH = 32_64
+ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
+	ifeq ($(PLATFORM), macosx)
+#		ARCH = 32_64
+		ARCH = 64
+	else
+		ARCH = 64
+	endif
 else
 	ARCH = 32
 endif
