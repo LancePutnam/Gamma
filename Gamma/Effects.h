@@ -106,28 +106,50 @@ struct Chirp{
 
 
 
-/// 8th order Chebyshev transfer function
+/// Nth order Chebyshev transfer function
 
-/// This filter applies a Chebyshev polynomial to generate the 2nd through 8th 
-/// harmonics of the input signal which is presumed to be a unity gain cosine.
-template <class T=gam::real> 
-struct Cheby8{
-	T c[7];									///< 2nd-8th harmonics coefficients
+/// This filter applies a Chebyshev polynomial to generate the 2nd through Nth 
+/// cosine harmonics of the input signal which is presumed to be a unity gain 
+/// sinusoid.
+template <unsigned N, class T=gam::real> 
+struct ChebyN{
+	T c[N];			///< Harmonic coefficients
 	
-	Cheby8(T h2=0, T h3=0, T h4=0, T h5=0, T h6=0, T h7=0, T h8=0){
-		c[0]=h2; c[1]=h3; c[2]=h4; c[3]=h5; c[4]=h6; c[5]=h7; c[6]=h8;
-	}
+	ChebyN(const T& fundAmp = T(1)){ zero(); c[0]=fundAmp; }
 	
 	/// Returns filtered sample
-	T operator()(T i0){ return i0 + wet(i0); }
+	T operator()(T i0) const { return i0*c[0] + wet(i0); }
 	
-	/// Returns 2nd-8th harmonics of cosine input
-	T wet(T i0){
-		gen::RSin<T> rsin((T)1, i0, (T)2 * i0); T o0 = (T)0;
-		#define DO(h) o0 += rsin() * c[h];
-			DO(0) DO(1) DO(2) DO(3) DO(4) DO(5) DO(6)
-		#undef DO
+	/// Returns cosinusoidal overtones of sinusoidal input
+	T wet(T i0) const {
+//		T d1 = i0 * T(2);	// Chebyshev polynomial of 2nd kind
+		T d1 = i0;			// Chebyshev polynomial of 1st kind
+		T d2 = T(1);
+		T b1 = T(2) * i0;
+		
+		T o0 = T(0);
+		for(unsigned i=1; i<N; ++i){
+			T d0 = b1 * d1 - d2;
+			d2 = d1;
+			d1 = d0;
+			o0 += d0 * c[i];
+		}
 		return o0;
+	}
+	
+	unsigned size() const { return N; }
+
+	/// Set harmonic amplitudes
+	template <class V>
+	ChebyN& set(const V* weights){
+		for(unsigned i=0; i<N; ++i) c[i] = weights[i];
+		return *this;
+	}
+
+	/// Zero all harmonic amplitudes
+	ChebyN& zero(){
+		for(unsigned i=0; i<N; ++i) c[i] = T(0);
+		return *this;
 	}
 };
 
@@ -150,25 +172,27 @@ struct Chorus{
 	
 	/// Filter sample (mono-mono)
 	T operator()(const T& v){
-		m(); return (comb1(v) + comb2(v)) * 0.5f;
+		modulate(); return (comb1(v) + comb2(v)) * 0.5f;
 	}
 	
 	/// Filter sample (mono-stereo)
 	void operator()(const T& in, T& o1, T& o2){
-		m(); o1=comb1(in); o2=comb2(in);
+		modulate(); o1=comb1(in); o2=comb2(in);
 	}
 	
 	/// Filter samples (stereo-stereo)
 	void operator()(const T& i1, const T& i2, T& o1, T& o2){
-		m(); o1=comb1(i1); o2=comb2(i2);		
+		modulate(); o1=comb1(i1); o2=comb2(i2);		
+	}
+	
+	/// Perform delay modulation step (must manually step comb filters after use!)
+	void modulate(){
+		comb1.delay(delay + mod.val.r); comb2.delay(delay + mod.val.i); mod();
 	}
 
-	Comb<T, ipl::AllPass> comb1, comb2;		///< Comb filters
+	Comb<T, ipl::Cubic> comb1, comb2;		///< Comb filters
 	Quadra<double> mod;						///< Modulator
 	float delay;							///< Delay interval
-	
-private: 
-	void m(){ comb1.delay(delay + mod.val.r); comb2.delay(delay + mod.val.i); mod(); } // modulate
 };
 
 
@@ -307,12 +331,14 @@ public:
 	Pan(T pos=0){ this->pos(pos); }
 	
 	/// Filter sample (mono-to-stereo)
-	void operator()(T in, T& out1, T& out2){
+	template <class V>
+	void operator()(T in, V& out1, V& out2){
 		out1 = in * w1; out2 = in * w2;
 	}
 
 	/// Filter sample (stereo-to-stereo)
-	void operator()(T in1, T in2, T& out1, T& out2){
+	template <class V>
+	void operator()(T in1, T in2, V& out1, V& out2){
 		out1 = in1 * w1 + in2 * w2;
 		out2 = in1 * w2 + in2 * w1;
 	}
@@ -320,7 +346,7 @@ public:
 	/// Set position
 //	void pos(T v){
 //		v = scl::clip(v, (T)1, (T)-1);
-//		v = (v+T(1))*M_PI_4;	// put in [0, ¹/2]
+//		v = (v+T(1))*M_PI_4;	// put in [0, Ï€/2]
 //		w1 = cos(v);
 //		w2 = sin(v); 
 //	}
