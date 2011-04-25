@@ -20,7 +20,7 @@ namespace gam{
 
 /// Some filter types.
 namespace Filter{
-	enum { LP, HP, BP, BPC, BR, AP };
+	enum { LP=0, HP, BP, BPC, BR, AP };
 	
 //	/// Returns filter type as human readable string.
 //	const char * string(int type){
@@ -341,8 +341,8 @@ public:
 	float norm() const;				///< Returns unity gain scale factor.
 	float normFbk() const;			///< Returns unity gain scale factor due to feedback.
 	float normFfd() const;			///< Returns unity gain scale factor due to feedforward.
-	Tf ffd() const;				///< Returns feedforward amount.
-	Tf fbk() const;				///< Returns feedback amount.
+	Tf ffd() const;					///< Returns feedforward amount.
+	Tf fbk() const;					///< Returns feedback amount.
 
 protected:
 	Tf mFFD, mFBK;
@@ -366,7 +366,7 @@ public:
 	}
 
 	/// Zero delay elements
-	void zero(){ d2=d1=(Tv)0; }
+	void zero(){ d2=d1=Tv(0); }
 	
 	virtual void onResync(double r){ freq(mFreq); width(mWidth); }
 
