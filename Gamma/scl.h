@@ -396,8 +396,12 @@ TEM Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
 
-/// Returns equal temperament ratio- octave^(pc/divisions)
-TEM T ratioET(T pc, T divisions=12, T octave=2);
+/// Returns equal temperament ratio- octave^(pitch/divs)
+
+/// @param[in] pitch	pitch class
+/// @param[in] divs		number of equally tempered divisions in octave
+/// @param[in] octave	base multiplier of (pseudo) octave
+TEM T ratioET(T pitch, T divs=12, T octave=2);
 
 /// Returns the value r such that r = x - n*y.
 TEM T remainder(const T& x, const T& y);
@@ -972,8 +976,8 @@ TEM inline T pow64(T v){ return pow8(pow8(v)); }
 inline unsigned char prime(uint32_t n){ return mPrimes54[n]; }
 TEM inline T prime(uint32_t n, T mul){ return (T)prime(n) * mul; }
 
-TEM inline T ratioET(T pc, T divisions, T interval){
-	return (T)::pow((double)interval, (double)pc / (double)divisions);
+TEM inline T ratioET(T pc, T divs, T ival){
+	return T(::pow(double(ival), double(pc) / double(divs)));
 }
 
 
