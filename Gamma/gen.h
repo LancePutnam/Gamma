@@ -103,6 +103,8 @@ struct RCos : public Val<T>{ INHERIT;
 };
 
 
+// TODO: zero-overhead version of this with only delays and coef
+
 /// Sinusoidal generator based on recursive formula x0 = c x1 - x2
 template <class T=double>
 struct RSin : public Val<T>{ INHERIT;
