@@ -14,41 +14,46 @@
 namespace gam{
 
 
-/// Sample player
+/// Sample buffer player
 
 ///	The number of frames in the sample should not exceed 2^32.  This equates
 ///	to 27 hours at 44.1 kHz.
-
-/*
-			Max sample duration
-phasor		44.1					96						192
-32-bit		1623.19 m / 27.05 h		745.65 m / 12.43 h		372.83 m / 6.21 h
-64-bit		6.97e12 m / 1.16e11 h	3.2e12 m / 5.33e10 h	1.6e12 m / 2.67e10 h
-*/
-
 template <class T=gam::real, template<class> class Tipol=ipl::Trunc, class Ttap=tap::Clip>
 class Player: public Synced, public Array<T>{
 public:
 	using Array<T>::size; using Array<T>::elems;
 
-	/// @param[in] path			Path to sound file
-	/// @param[in] rate			Playback rate scalar
-	Player(const char * path, double rate=1);
+	Player()
+	:	Array<T>(defaultArray()), mSampleRate(1), mChans(1),
+		mPos(0), mInc(0), mRate(0), mMin(0), mMax(1)
+	{}
 
-	/// @param[in] src			Another sampler to read data from
-	/// @param[in] rate			Playback rate scalar	
-	Player(const Player<T>& src, double rate=1)
+
+	/// @param[in] src		Another Player to read data from
+	/// @param[in] rate		Playback rate
+	explicit Player(const Player<T>& src, double rate=1)
 	:	Array<T>(src), mSampleRate(src.sampleRate()), mChans(src.channels()),
 		mPos(0), mInc(1), mRate(rate), mMin(0), mMax(src.size())
 	{ initSynced(); }
-	
-	Player(const Array<T>& src, double smpRate, double rate)
+
+
+	/// @param[in] src		Sample array to reference
+	/// @param[in] smpRate	Sample rate of samples
+	/// @param[in] rate		Playback rate
+	Player(const Array<T>& src, double smpRate, double rate=1)
 	:	Array<T>(src), mSampleRate(smpRate), mChans(1),
 		mPos(0), mInc(1), mRate(rate), mMin(0), mMax(src.size())
 	{
 		initSynced();
 		sampleRate(smpRate);
 	}
+
+
+	/// @param[in] path		Path to sound file
+	/// @param[in] rate		Playback rate
+	template<class Char>
+	explicit Player(const Char * path, double rate=1);
+
 
 	/// Increment read tap
 	void advance(){
@@ -60,11 +65,18 @@ public:
 
 	/// Returns sample at current position on specified channel (without incrementing phase)
 	T read(int channel) const {
-		uint32_t posi = (uint32_t)pos();
+		uint32_t posi = uint32_t(pos());
 		int Nframes= frames();
 		int offset = channel*Nframes;
 		return mIpol(*this, posi+offset, pos()-posi, offset+Nframes-1, offset);
 	}
+
+	/// Set sample buffer
+	
+	/// @param[in] src		Sample buffer (if multichannel, must be deinterleaved)
+	/// @param[in] smpRate	Sample rate of samples
+	/// @param[in] channels	Number of channels in sample buffer
+	void buffer(const Array<T>& src, double smpRate, int channels);
 
 	void free();							///< Free sample buffer (if owner)
 	void max(double v);						///< Set interval max, in frames
@@ -88,8 +100,11 @@ public:
 	virtual void onResync(double r){ sampleRate(mSampleRate); }
 
 protected:
-	static T sDummyElement;
-	static Array<T> sDummyArray;
+	static Array<T>& defaultArray(){
+		static T v = T(0);
+		static Array<T> a(&v, 1);
+		return a;
+	}
 
 	Tipol<T> mIpol;
 	Ttap mTap;
@@ -110,10 +125,9 @@ protected:
 #define PRE template <class T, template<class> class Ti, class Tt>
 #define CLS Player<T,Ti,Tt>
 
-PRE T CLS::sDummyElement = (T)0;
-PRE Array<T> CLS::sDummyArray(&sDummyElement, 1);
-
-PRE CLS::Player(const char * path, double rate)
+PRE
+template<class Char>
+CLS::Player(const Char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {
 	SoundFile sf(path);
@@ -127,9 +141,17 @@ PRE CLS::Player(const char * path, double rate)
 		sf.close();
 	}
 	else{
-		sDummyArray.source(&sDummyElement, 1);	// make sure this gets set
-		source(sDummyArray);
+		source(defaultArray());
 	}
+}
+
+PRE void CLS::buffer(const Array<T>& src, double smpRate, int channels){
+	source(src);
+	sampleRate(smpRate);	// sets mSampleRate, mRate, and mInc
+	mChans = channels;
+	mMin = 0;
+	mMax = frames();
+	mPos = 0;
 }
 
 PRE inline void CLS::pos(double v){	mPos = v; }
@@ -155,7 +177,6 @@ PRE inline double CLS::posInInterval(double frac) const { return min() + (max() 
 
 #undef PRE
 #undef CLS
-
 
 } // gam::
 
