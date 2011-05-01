@@ -321,7 +321,7 @@ protected:
 
 
 --------------------------------------------------------------------------------
-Random Quibblings:
+Random peanuts:
 
 /*
 			Max sample duration
