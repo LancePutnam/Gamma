@@ -1,7 +1,6 @@
 {
 	typedef Complex<double> Complexd;
 	typedef Polar<double> Polard;
-	typedef Quat<double> Quatd;
 	typedef Vec3<double> Vec3d;
 
 	// Constants
@@ -44,13 +43,6 @@
 		c.fromPolar(4,0.2);
 		T(c.sqrt().norm(), 2)
 		T(c.sqrt().arg(), 0.1)
-		#undef T
-	}
-
-	{	Quatd q(0,0,0,0);
-		#define T(x, y) assert(x == y);
-		T(q, Quatd(0,0,0,0))
-		T(q.conj(), Quatd(q.r, -q.i, -q.j, -q.k))
 		#undef T
 	}
 
