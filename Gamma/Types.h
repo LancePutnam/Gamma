@@ -21,8 +21,6 @@ typedef float			real;	// default real number type
 
 
 template<class T> class Complex;
-template<class T> class Quat;
-template<class T> class Mat3;
 template<class T> class Vec2;
 template<class T> class Vec3;
 template<class T> class Vec4;
@@ -32,16 +30,12 @@ template<class T> class Vec4;
 //typedef Polar<double> Polard;
 //typedef Complex<float > Complexf;
 //typedef Complex<double> Complexd;
-//typedef Mat3<float> Mat3f;
-//typedef Mat3<double> Mat3d;
 //typedef Vec2<float> Vec2f;
 //typedef Vec2<double> Vec2d;
 //typedef Vec3<float> Vec3f;
 //typedef Vec3<double> Vec3d;
 //typedef Vec4<float> Vec4f;
 //typedef Vec4<double> Vec4d;
-//typedef Quat<float> Quatf;
-//typedef Quat<double> Quatd;
 
 
 /// Integer-based bit field
