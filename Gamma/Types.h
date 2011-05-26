@@ -204,27 +204,6 @@ TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm
 
 
 
-/// Returns product of matrix multiplied by column vector
-template <class T1, class T2>
-Vec3<T2> operator * (const Mat3<T1>& m, const Vec3<T2>& v){
-	return Vec3<T2>(
-		m(0,0)*v[0] + m(0,1)*v[1] + m(0,2)*v[2],
-		m(1,0)*v[0] + m(1,1)*v[1] + m(1,2)*v[2],
-		m(2,0)*v[0] + m(2,1)*v[1] + m(2,2)*v[2]
-	);
-}
-
-/// Returns product of row vector multiplied by matrix
-template <class T1, class T2>
-Vec3<T1> operator * (const Vec3<T1>& v, const Mat3<T2>& m){
-	return Vec3<T1>(
-		v[0]*m(0,0) + v[1]*m(1,0) + v[2]*m(2,0),
-		v[0]*m(0,1) + v[1]*m(1,1) + v[2]*m(2,1),
-		v[0]*m(0,2) + v[1]*m(1,2) + v[2]*m(2,2)
-	);
-}
-
-
 /// Multi-element container
 
 /// This is a fixed size array to enable better loop unrolling optimizations
@@ -560,17 +539,6 @@ struct Vec3 : public Vec<3, T> {
 	Vec3(const T& v1, const T& v2, const T& v3=T(0)){ (*this)(v1,v2,v3); }
 
 	Vec3& operator()(const T& v1, const T& v2, const T& v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; return *this; }
-	
-	Vec3& operator*= (const Mat3<T>& m){
-		Vec3& t = *this;
-		return t(
-			t[0]*m[0] + t[1]*m[1] + t[2]*m[2],
-			t[0]*m[3] + t[1]*m[4] + t[2]*m[5],
-			t[0]*m[6] + t[1]*m[7] + t[2]*m[8]			
-		);
-	}
-	
-	Vec3 operator * (const Mat3<T>& m) const { return Vec3(*this) *= m; }
 
 	Vec3 cross(const Vec3& v) const {
 		Vec3 r; const Vec3& t = *this;
@@ -651,8 +619,6 @@ Vec3<T> rotateZ(const Vec3<T>& v, const Complex<T>& a){
 
 template<class T> inline T norm(const Complex<T>& v){ return v.norm(); }
 template<class T> inline T normCompare(const Complex<T>& v){ return v.norm2(); }
-template<class T> inline T norm(const Quat<T>& v){ return v.norm(); }
-template<class T> inline T normCompare(const Quat<T>& v){ return v.norm2(); }
 template<int N,class T> inline T norm(const Vec<N,T>& v){ return v.norm(); }
 template<int N,class T> inline T normCompare(const Vec<N,T>& v){ return v.norm2(); }
 
