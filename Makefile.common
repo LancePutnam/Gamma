@@ -56,7 +56,8 @@ DLIB_EXT	= so
 DLIB_OPT	= shared
 
 # Whether Make should determine the dependencies of each C or C++ file as
-# it compiles it. This will be automatically disabled for universal builds # on Mac OSX.
+# it compiles it. This will be automatically disabled for universal builds
+# on Mac OSX.
 DEP_TRACK = 1
 ifeq ($(ARCH), 32_64)
 	DEP_TRACK = 0
