@@ -146,20 +146,6 @@ int main(int argc, char* argv[]){
 //		printf("%f\n", sub.doSomething().noop(4));
 //	}
 	
-//
-//
-//	{
-//		printf("\nQuat\n");
-//		Quat<double> q(1,2/3.,1/3.,0), qr(13,1,1,1);
-//		q.normalize();
-//		qr.normalize();
-//		
-//		for(int i=0; i<64; ++i){
-//			for(int i=0; i<4; ++i) scl::printPlot(q[i], 16); printf("\n");
-//			q *= qr;
-//		}
-//	}
-	
 	return 0;
 }
 
