@@ -71,14 +71,7 @@ int main(int argc, char* argv[]){
 		printf("]\n");
 	}
 
-	
-	printf("\nMulti:\n");
-	{	Multi<5,char> multi = {{'m','u','l','t','i'}};
-		for(uint32_t i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}	
-	{	Multi<5,char> multi = {{'z'}};
-		for(uint32_t i=0; i<multi.size(); ++i) cout<<multi[i]; cout<<endl;}
-	
-	
+
 	{ printf("\nRing:\n");
 		const int N=4;
 		Ring<int> ring(N);
@@ -96,34 +89,7 @@ int main(int argc, char* argv[]){
 			printf("\n");
 		}
 	}
-	
-	{ printf("\nVec:\n");
-		const int N=4;
-		Vec<N, int> v1;
-		Vec<N, int> v2;
-		
-		#define DO(op)\
-			printf("\n%s\n", #op);\
-			printf("\ti: v1:"); for(int i=0; i<N; ++i) printf("%2d", v1[i]);\
-			printf("  v2:"); for(int i=0; i<N; ++i) printf("%2d", v2[i]); printf("\n");\
-			op;\
-			printf("\to: v1:"); for(int i=0; i<N; ++i) printf("%2d", v1[i]);\
-			printf("  v2:"); for(int i=0; i<N; ++i) printf("%2d", v2[i]); printf("\n");
-		
-		DO(v1 = 3; v2 = 2)
-		DO(v1 += v2)
-		DO(v1 -= v2)
-		DO(v1 *= v2)
-		DO(v1 /= v2)
-		DO(v1 += 1)
-		DO(v1 -= 1)
-		DO(v1 *= 2)
-		DO(v1 /= 2)
-		DO(v1 = v1 * 2 + v2)
-		DO(v1 = -v2)
-				
-		#undef DO
-	}
+
 //	#define PRINT(obj, fnc) for(int i=0; i<obj.size(); ++i) cout << fnc; cout << endl;
 //	
 //	printf("\nSeq:\n");
@@ -139,30 +105,6 @@ int main(int argc, char* argv[]){
 //		seq.tap() = -0.5; seq.tap().add = 0.5;
 //		PRINT(seq, seq()) }
 //
-//	
-//	{
-//		printf("\nComplex\n");
-//		Complex<double> c(Complex<double>::Polar(1, M_PI));
-//		
-//		for(int i=0; i<32; ++i){
-//			for(int i=0; i<2; ++i) scl::printPlot(c[i], 16); printf("\n");
-//			c *= c.normalize();
-//		}
-//	}
-//
-//
-//	{
-//		printf("\nQuat\n");
-//		Quat<double> q(1,2/3.,1/3.,0), qr(13,1,1,1);
-//		q.normalize();
-//		qr.normalize();
-//		
-//		for(int i=0; i<64; ++i){
-//			for(int i=0; i<4; ++i) scl::printPlot(q[i], 16); printf("\n");
-//			q *= qr;
-//		}
-//	}
-	
 	return 0;
 }
 
