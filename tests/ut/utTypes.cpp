@@ -58,14 +58,15 @@
 		v(2);		assert(v[0]==2); assert(v[1]==1);
 	}
 	
-	{	Vec3d v(0,0,0);
+	{	typedef Vec<3,double> Vec3;
+		Vec3 v(0,0,0);
 		assert(v == 0);
-		v  = 1;		assert(v == 1); assert(v == Vec3d(1,1,1));
-		v += 1;		assert(v == 2);
-		v -= 1;		assert(v == 1);
-		v *= 2;		assert(v == 2);
-		v /= 2;		assert(v == 1);
-		v(1,2,3).normalize(); assert(scl::almostEqual(v.norm(),1));
-		v(1,2,3);	assert(v.sgn() == v.normalize());
+		v  = 1;						assert(v == 1); assert(v == Vec3(1,1,1));
+		v += 1;						assert(v == 2);
+		v -= 1;						assert(v == 1);
+		v *= 2;						assert(v == 2);
+		v /= 2;						assert(v == 1);
+		v.set(1,2,3).normalize();	assert(scl::almostEqual(v.norm(),1));
+		v.set(1,2,3);				assert(v.sgn() == v.normalize());
 	}
 }

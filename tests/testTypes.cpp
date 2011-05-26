@@ -44,7 +44,7 @@ struct TVec3 : public TVec<3, T, TVec3<T> >{
 int main(int argc, char* argv[]){
 
 	{
-		Vec3<float> v(1,0,0), u(0,1,0);
+		Vec<3,float> v(1,0,0), u(0,1,0);
 
 		//v = ipl::linear(0.5, v, u*0.5);
 	}

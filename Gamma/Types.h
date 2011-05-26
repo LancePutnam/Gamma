@@ -224,16 +224,16 @@ struct Multi{
 	/// Get element at index with no bounds checking
 	const T& operator[](uint32_t i) const { return elems[i]; }
 
-	#define DO for(uint32_t i=0; i<N; ++i)
+	#define IT for(uint32_t i=0; i<N; ++i)
 
-	bool operator !=(const M& v){ DO{ if((*this)[i] == v[i]) return false; } return true; }
-	bool operator !=(const T& v){ DO{ if((*this)[i] == v   ) return false; } return true; }
-	M& operator   = (const M& v){ DO{ (*this)[i] = v[i]; } return *this; }
-	M& operator   = (const T& v){ DO{ (*this)[i] = v;    } return *this; }
-	bool operator ==(const M& v){ DO{ if((*this)[i] != v[i]) return false; } return true; }
-	bool operator ==(const T& v){ DO{ if((*this)[i] != v   ) return false; } return true; }
+	bool operator !=(const M& v){ IT{ if((*this)[i] == v[i]) return false; } return true; }
+	bool operator !=(const T& v){ IT{ if((*this)[i] == v   ) return false; } return true; }
+	M& operator   = (const M& v){ IT{ (*this)[i] = v[i]; } return *this; }
+	M& operator   = (const T& v){ IT{ (*this)[i] = v;    } return *this; }
+	bool operator ==(const M& v){ IT{ if((*this)[i] != v[i]) return false; } return true; }
+	bool operator ==(const T& v){ IT{ if((*this)[i] != v   ) return false; } return true; }
 
-	#undef DO
+	#undef IT
 
 	/// Returns size of array
 	static uint32_t size(){ return N; }
@@ -475,110 +475,107 @@ struct Vec : public Multi<N,T> {
 
 	typedef Vec<N,T> V;
 
-	Vec(const T& v=T(0)){ (*this) = v; }
-	Vec(const V& v){ (*this) = v; }
+	Vec(const T& v=T()){ set(v); }
+	Vec(const T& v1, const T& v2){ set(v1,v2); }
+	Vec(const T& v1, const T& v2, const T& v3){ set(v1,v2,v3); }
+	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1,v2,v3,v4); }
 
-	#define DO for(uint32_t i=0; i<N; ++i)
+	template <uint32_t N2, class T2>
+	Vec(const Vec<N2, T2>& v){ set(v); }
 
-	bool operator !=(const V& v){ DO{ if((*this)[i] == v[i]) return false; } return true; }
-	bool operator !=(const T& v){ DO{ if((*this)[i] == v   ) return false; } return true; }
-	V& operator = (const V& v){ DO (*this)[i] = v[i]; return *this; }
-	V& operator = (const T& v){ DO (*this)[i] = v;    return *this; }
-	bool operator ==(const V& v){ DO{ if((*this)[i] != v[i]) return false; } return true; }
-	bool operator ==(const T& v){ DO{ if((*this)[i] != v   ) return false; } return true; }
-	V  operator * (const V& v) const { V r; DO r[i] = (*this)[i] * v[i]; return r; }
-	V  operator * (const T& v) const { V r; DO r[i] = (*this)[i] * v;    return r; }
-	V& operator *=(const V& v){ DO (*this)[i] *= v[i]; return *this; }
-	V& operator *=(const T& v){ DO (*this)[i] *= v;    return *this; }
-	V  operator / (const V& v) const { V r; DO r[i] = (*this)[i] / v[i]; return r; }
-	V  operator / (const T& v) const { V r; DO r[i] = (*this)[i] / v;    return r; }
-	V& operator /=(const V& v){ DO (*this)[i] /= v[i]; return *this; }
-	V& operator /=(const T& v){ DO (*this)[i] /= v;    return *this; }
-	V  operator - (          ) const { V r; DO r[i] = -(*this)[i]; return r; }
-	V  operator - (const V& v) const { V r; DO r[i] = (*this)[i] - v[i]; return r; }
-	V  operator - (const T& v) const { V r; DO r[i] = (*this)[i] - v;    return r; }
-	V& operator -=(const V& v){ DO (*this)[i] -= v[i]; return *this; }
-	V& operator -=(const T& v){ DO (*this)[i] -= v;    return *this; }
-	V  operator + (const V& v) const { V r; DO r[i] = (*this)[i] + v[i]; return r; }
-	V  operator + (const T& v) const { V r; DO r[i] = (*this)[i] + v;    return r; }
-	V& operator +=(const V& v){ DO (*this)[i] += v[i]; return *this; }
-	V& operator +=(const T& v){ DO (*this)[i] += v;    return *this; }
+	/// Get a vector comprised of indexed elements
+	Vec<2,T> get(int i0, int i1) const {
+		return Vec<2,T>((*this)[i0], (*this)[i1]); }
 
-	T dot(const V& v) const { T r=(T)0; DO r+=(*this)[i]*v[i]; return r; }
+	/// Get a vector comprised of indexed elements
+	Vec<3,T> get(int i0, int i1, int i2) const {
+		return Vec<3,T>((*this)[i0], (*this)[i1], (*this)[i2]); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
+		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
+
+	#define IT(n) for(uint32_t i=0; i<n; ++i)
+
+	bool operator !=(const V& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
+	bool operator !=(const T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
+	V& operator = (const V& v){ IT(N) (*this)[i] = v[i]; return *this; }
+	V& operator = (const T& v){ IT(N) (*this)[i] = v;    return *this; }
+	bool operator ==(const V& v){ IT(N){ if((*this)[i] != v[i]) return false; } return true; }
+	bool operator ==(const T& v){ IT(N){ if((*this)[i] != v   ) return false; } return true; }
+	V  operator * (const V& v) const { V r; IT(N) r[i] = (*this)[i] * v[i]; return r; }
+	V  operator * (const T& v) const { V r; IT(N) r[i] = (*this)[i] * v;    return r; }
+	V& operator *=(const V& v){ IT(N) (*this)[i] *= v[i]; return *this; }
+	V& operator *=(const T& v){ IT(N) (*this)[i] *= v;    return *this; }
+	V  operator / (const V& v) const { V r; IT(N) r[i] = (*this)[i] / v[i]; return r; }
+	V  operator / (const T& v) const { V r; IT(N) r[i] = (*this)[i] / v;    return r; }
+	V& operator /=(const V& v){ IT(N) (*this)[i] /= v[i]; return *this; }
+	V& operator /=(const T& v){ IT(N) (*this)[i] /= v;    return *this; }
+	V  operator - (          ) const { V r; IT(N) r[i] = -(*this)[i]; return r; }
+	V  operator - (const V& v) const { V r; IT(N) r[i] = (*this)[i] - v[i]; return r; }
+	V  operator - (const T& v) const { V r; IT(N) r[i] = (*this)[i] - v;    return r; }
+	V& operator -=(const V& v){ IT(N) (*this)[i] -= v[i]; return *this; }
+	V& operator -=(const T& v){ IT(N) (*this)[i] -= v;    return *this; }
+	V  operator + (const V& v) const { V r; IT(N) r[i] = (*this)[i] + v[i]; return r; }
+	V  operator + (const T& v) const { V r; IT(N) r[i] = (*this)[i] + v;    return r; }
+	V& operator +=(const V& v){ IT(N) (*this)[i] += v[i]; return *this; }
+	V& operator +=(const T& v){ IT(N) (*this)[i] += v;    return *this; }
+
+	T dot(const V& v) const { T r=(T)0; IT(N) r+=(*this)[i]*v[i]; return r; }
 	T norm() const { return sqrt(norm2()); }
 	T norm2() const { return dot(*this); }
-	V& normalize(){ return *this /= norm(); }
+	Vec& normalize(){ return *this /= norm(); }
 
-	V sgn() const { return V(*this).normalize(); }
+	Vec sgn() const { return V(*this).normalize(); }
 
-	#undef DO
-};
+	template <int N2, class T2>
+	Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
 
+	/// Set all elements to the same value
+	Vec& set(const T& v){ return (*this = v); }
 
+	/// Set first 2 elements
+	Vec& set(const T& v1, const T& v2){
+		return set(v1,v2,v1,v1,v1,v1); }
 
-// Two element vector
-template <class T>
-struct Vec2 : public Vec<2, T> {
-	using Vec<2,T>::operator=;
-	Vec2(const Vec<2, T>& v){ (*this)=v; }
-	Vec2(const T& v=T(0)){ (*this)(v,v); }
-	Vec2(const T& v1, const T& v2){ (*this)(v1,v2); }
-	Vec2& operator()(const T& v1, const T& v2){ (*this)[0]=v1; (*this)[1]=v2; return *this; }
-};
+	/// Set first 3 elements
+	Vec& set(const T& v1, const T& v2, const T& v3){
+		return set(v1,v2,v3,v1,v1,v1); }
 
+	/// Set first 4 elements
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
+		return set(v1,v2,v3,v4,v1,v1); }
 
-// Three element vector
-template <class T>
-struct Vec3 : public Vec<3, T> {
-	using Vec<3,T>::operator=;
-	using Vec<3,T>::operator*;
-	using Vec<3,T>::operator*=;
+	/// Set first 5 elements
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
+		return set(v1,v2,v3,v4,v5,v1); }
 
-	Vec3(const Vec<3, T>& v){ (*this)=v; }
-	Vec3(const T& v=T(0)){ (*this)(v,v,v); }
-	Vec3(const T& v1, const T& v2, const T& v3=T(0)){ (*this)(v1,v2,v3); }
-
-	Vec3& operator()(const T& v1, const T& v2, const T& v3){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; return *this; }
-
-	Vec3 cross(const Vec3& v) const {
-		Vec3 r; const Vec3& t = *this;
-		r[0] = t[1]*v[2] - t[2]*v[1];
-		r[1] = t[2]*v[0] - t[0]*v[2];
-		r[2] = t[0]*v[1] - t[1]*v[0];
-		return r;
+	/// Set first 6 elements
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
+		switch(N){
+		default:(*this)[5] = v6;
+		case 5: (*this)[4] = v5;
+		case 4: (*this)[3] = v4;
+		case 3: (*this)[2] = v3;
+		case 2: (*this)[1] = v2;
+		case 1: (*this)[0] = v1;
+		}
+		return *this;
 	}
 
-	T dot() const { return dot(*this); }
-	T dot(const Vec3& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2]; }
-	
-	Vec3& rotateX(const Complex<T>& v){ Complex<T> t(y(),z()); t*=v; return (*this)(x(),t.r,t.i); }
-	Vec3& rotateY(const Complex<T>& v){ Complex<T> t(z(),x()); t*=v; return (*this)(t.i,y(),t.r); }
-	Vec3& rotateZ(const Complex<T>& v){ Complex<T> t(x(),y()); t*=v; return (*this)(t.r,t.i,z()); }
-	
-	const T& x() const { return (*this)[0]; }
-	const T& y() const { return (*this)[1]; }
-	const T& z() const { return (*this)[2]; }
+	#undef IT
 };
 
 
-// Four element vector
+/// Returns cross product, a x b
 template <class T>
-struct Vec4 : public Vec<4, T> {
-	using Vec<4,T>::operator=;
-
-	Vec4(const Vec<4, T>& v){ (*this)=v; }
-	Vec4(const T& v=T(0)){ (*this)(v,v,v,v); }
-	Vec4(const T& v1, const T& v2, const T& v3, const T& v4){ (*this)(v1,v2,v3,v4); }
-
-	Vec4& operator()(const T& v1, const T& v2, const T& v3, const T& v4){
-		(*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; (*this)[3]=v4; return *this; }
-	
-	T dot() const { return dot(*this); }
-	T dot(const Vec4& v) const { return v[0]*(*this)[0] + v[1]*(*this)[1] + v[2]*(*this)[2] + v[3]*(*this)[3]; }
-	
-	Vec3<T> xyz() const { return Vec3<T>((*this)[0], (*this)[1], (*this)[2]); }
-};
-
+inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
+	return Vec<3,T>(
+		a[1]*b[2] - a[2]*b[1],
+		a[2]*b[0] - a[0]*b[2],
+		a[0]*b[1] - a[1]*b[0]
+	);
+}
 
 /// Rotate vector towards perpendicular vector by angle using right-hand rule.
 template <int N, class T>
