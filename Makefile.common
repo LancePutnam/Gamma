@@ -25,12 +25,7 @@ endif
 # Architecture: '32' or '64'
 UNAMEM := $(shell uname -m)
 ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
-	ifeq ($(PLATFORM), macosx)
-#		ARCH = 32_64
-		ARCH = 64
-	else
-		ARCH = 64
-	endif
+	ARCH = 64
 else
 	ARCH = 32
 endif
@@ -59,6 +54,13 @@ AUTORUN		= 1
 SLIB_EXT	= a
 DLIB_EXT	= so
 DLIB_OPT	= shared
+
+# Whether Make should determine the dependencies of each C or C++ file as
+# it compiles it. This will be automatically disabled for universal builds # on Mac OSX.
+DEP_TRACK = 1
+ifeq ($(ARCH), 32_64)
+	DEP_TRACK = 0
+endif
 
 # Flags required for including and linking against library
 EXT_CPPFLAGS	?=
