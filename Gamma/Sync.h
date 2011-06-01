@@ -109,15 +109,12 @@ public:
 		// the heap when the program exits.		
 		// Since we can't predict when a class variable is initialized, we
 		// will assume that uninitialized variables are set to 0.
-		// TODO: there may be a compiler flag to ensure this is the case
-		if(!mMaster){
-			mMaster = new Sync; //printf("new master %p\n", mMaster);
-		}
-		return *mMaster;
+		// TODO: there may be a compiler flag to ensure this is the case		
+		static Sync * s = new Sync;
+		return *s;
 	}
 
 protected:
-	static Sync * mMaster;
 	double mSPU, mUPS;
 	Synced mHeadSynced;		// Head of Synced doubly-linked list.
 	bool mHasBeenSet;

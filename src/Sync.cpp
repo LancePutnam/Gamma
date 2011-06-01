@@ -7,9 +7,6 @@ namespace gam{
 
 // Sync
 
-Sync * Sync::mMaster=0;
-
-
 // Note:	We can't zero the head node's links because it might be constructed
 //			after nodes have been appended to it!
 //
