@@ -107,9 +107,6 @@ public:
 		// Note: This uses a Construct On First Use Idiom to avoid unpredictable
 		// static initialization order.  The memory allocated will get freed from 
 		// the heap when the program exits.		
-		// Since we can't predict when a class variable is initialized, we
-		// will assume that uninitialized variables are set to 0.
-		// TODO: there may be a compiler flag to ensure this is the case		
 		static Sync * s = new Sync;
 		return *s;
 	}
