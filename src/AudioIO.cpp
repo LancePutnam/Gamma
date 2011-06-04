@@ -289,6 +289,7 @@ void AudioIO::init(){
 void AudioIO::deviceIn(const AudioDevice& v){
 
 	if(v.valid() && v.hasInput()){
+		mInDevice = v;
 		mImpl->inDevice(v.id());
 		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mImpl->mInParams.device);	
 		if(dInfo) mImpl->mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
@@ -303,6 +304,7 @@ void AudioIO::deviceIn(const AudioDevice& v){
 
 void AudioIO::deviceOut(const AudioDevice& v){
 	if(v.valid() && v.hasOutput()){
+		mOutDevice = v;
 		mImpl->outDevice(v.id());
 		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mImpl->mOutParams.device);
 		if(dInfo) mImpl->mOutParams.suggestedLatency = dInfo->defaultLowOutputLatency; // for RT
