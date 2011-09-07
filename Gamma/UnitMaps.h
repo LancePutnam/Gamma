@@ -93,6 +93,117 @@ protected:
 
 
 
+// Fixed-size power of 2 table supporting fixed point lookup
+
+// This table minimizes memory usage and table look-up speed at the expense
+// of having a fixed size that is a power of two.
+template <uint32_t B, class T>
+class TablePow2{
+public:
+
+	enum{ N = 1<<B };
+
+	const T& operator[](unsigned i) const { return mElems[i]; }
+	T& operator[](unsigned i){ return mElems[i]; }
+
+	/// Read value using truncating interpolation
+	
+	/// @param[in] phase	phase value in [0,1)
+	///
+	const T& read(double phase) const {
+		return read(phaseR2I(phase));
+	}
+
+	/// Read value using truncating interpolation
+	const T& read(uint32_t phase) const {
+		return (*this)[phase >> shift()];
+	}
+
+	/// Read value using linear interpolation
+	T readL(uint32_t phase) const {
+		const T& lo = read(phase);
+		const T& hi = read(phase + oneIndex());
+		float fr = gam::fraction(bits(), phase);
+		return lo + (hi - lo)*fr;
+	}
+
+	static uint32_t mask(){ return N-1; }
+	static uint32_t size(){ return N; }
+	static uint32_t bits(){ return B; }
+	static uint32_t shift(){ return 32U-B; }
+	static uint32_t oneIndex(){ return 1<<shift(); }
+
+protected:
+	T mElems[N];
+	static uint32_t phaseR2I(double v){ return static_cast<uint32_t>(v * 4294967296.); }
+};
+
+
+
+// Complex sinusoid table
+// B is the log2 size of each table
+// D is the number of tables
+// The effective table size is (2^B)^D
+template <unsigned B=10, unsigned D=2, class T=double>
+class CSinTable{
+public:
+	typedef TablePow2<B, Complex<T> > Arc;
+
+	CSinTable(){ init(); }
+	
+	/// Get sinusoidal value at unit phase. No bounds checking is performed.
+	Complex<T> operator()(double phase){
+		return (*this)(uint32_t(phase * 4294967296.));
+	}
+	
+	/// Get value from fixed-point phase in interval [0, 2^(B*D))
+	Complex<T> operator()(uint32_t p){
+
+		p >>= shift();
+
+		// start with finest sample
+		Complex<T> r = arc(D-1)[p & Arc::mask()];
+
+		// iterate remaining arcs (fine to coursest)
+		for(unsigned i=2; i<D+1; ++i){
+			p >>= B;
+			r *= arc(D-i)[p & Arc::mask()];
+		}
+		return r;
+	}
+	
+	static uint32_t shift(){ return 32U - (B*D); }
+
+private:
+	enum{ M = Arc::N };
+
+	// Get pointer to complex arc tables
+	static Arc * arcs(){
+		static Arc tables[D]; // higher index = finer resolution
+		return tables;
+	}
+	
+	static Arc& arc(unsigned res){ return arcs()[res]; }
+	
+	static void init(){
+		static bool tabulate=true;
+		if(tabulate){
+			tabulate=false;
+			unsigned long long N = M;
+			
+			for(unsigned j=0; j<D; ++j){		// iterate resolution (course to fine)
+				for(unsigned i=0; i<M; ++i){	// iterate arc of unit circle
+					double p = (i*M_PI)/(N>>1);
+					arc(j)[i] = Polar<T>(1, p);
+				}
+				N *= M;
+			}
+			
+		}
+	}
+};
+
+
 
 // Maps a normalized value to a warped, ranged value.
 template <class T>
