@@ -18,6 +18,19 @@ ifeq ($(UNAME), Linux)
 	PLATFORM = linux
 else ifeq ($(UNAME), Darwin)
 	PLATFORM = macosx
+
+	# Mac OS X version
+	UNAMER := $(shell uname -r)
+	UNAMER := $(firstword $(subst ., , $(UNAMER)))
+	ifeq ($(UNAMER), 11)
+		OSX_VERSION = 10_7
+	else ifeq ($(UNAMER), 10)
+		OSX_VERSION = 10_6
+	else ifeq ($(UNAMER), 9)
+		OSX_VERSION = 10_5
+	else ifeq ($(UNAMER), 8)
+		OSX_VERSION = 10_4
+	endif
 else
 	PLATFORM = windows
 endif
@@ -28,14 +41,6 @@ ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
 	ARCH = 64
 else
 	ARCH = 32
-endif
-
-# Mac OS X version: '10_6' or '10_5'
-UNAME := $(shell uname -r)
-ifeq ($(UNAME), $(findstring $(UNAME), 10.6.0 10.7.0))
-    OSX_VERSION = 10_6
-else
-    OSX_VERSION = 10_5
 endif
 
 #
@@ -117,14 +122,14 @@ else ifeq ($(PLATFORM), macosx)
 
 	CFLAGS += -isysroot
 
-	ifeq ($(OSX_VERSION), 10_6)
+	ifeq ($(OSX_VERSION), 10_7)
+		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+	else ifeq ($(OSX_VERSION), 10_6)
 		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
 	else ifeq ($(OSX_VERSION), 10_5)
 		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
-#		LDFLAGS += -syslibroot /Developer/SDKs/MacOSX10.5.sdk
 	else ifeq ($(OSX_VERSION), 10_4)
 		CFLAGS += /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-#		LDFLAGS += -syslibroot /Developer/SDKs/MacOSX10.4u.sdk
 	endif
 
 	DLIB_EXT = dylib
