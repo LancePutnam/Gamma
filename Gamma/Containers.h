@@ -53,14 +53,14 @@ public:
 	explicit ArrayBase(uint32_t size);
 	ArrayBase(uint32_t size, const T& init);
 	ArrayBase(T * src, uint32_t size);
-	explicit ArrayBase(const ArrayBase<T,S,A>& src);
+	explicit ArrayBase(ArrayBase<T,S,A>& src);
 
 	virtual ~ArrayBase();
 
-	/// Set element
+	/// Get write reference to element
 	T& operator[](uint32_t i);
 	
-	/// Get element
+	/// Get read-only reference to element
 	const T& operator[](uint32_t i) const;
 	
 	/// Sets all elements to value
@@ -73,9 +73,10 @@ public:
 	/// @param[in] stride	index stride amount
 	/// @param[in] start	start index (inclusive)
 	ArrayBase& assign(const T& v, uint32_t end, uint32_t stride=1, uint32_t start=0);
-	
-	T * elems() const;				///< Returns pointer to first array element.
-	uint32_t size() const;			///< Returns number of elements in array.
+
+	T * elems();					///< Get writable pointer to elements	
+	const T * elems() const;		///< Get read-only pointer to elements
+	uint32_t size() const;			///< Returns number of elements in array
 
 	/// Destroys all elements and frees memory
 	void clear();
@@ -92,7 +93,7 @@ public:
 	/// If the new size is greater than the old size, then the argument value
 	/// is copied into the additional elements.
 	void resize(uint32_t newSize, const T& c=T());
-	void source(const ArrayBase<T,S,A>& src);	///< Sets source of array elements to another array
+	void source(ArrayBase<T,S,A>& src);		///< Sets source of array elements to another array
 	void source(T * src, uint32_t size);	///< Sets source of array elements to another array
 
 	virtual void onResize(){}
@@ -129,7 +130,7 @@ public:
 	explicit Array(uint32_t size): Base(size){}
 	Array(uint32_t size, const T& init): Base(size, init){}
 	Array(T * src, uint32_t size): Base(src, size){}
-	Array(const Array& src): Base(src){}
+	Array(Array& src): Base(src){}
 
 	virtual ~Array(){}
 
@@ -411,7 +412,7 @@ TEM3 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t sz)
 :	ARRAYBASE_INIT
 {	source(src, sz); }
 
-TEM3 ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
+TEM3 ArrayBase<T,S,A>::ArrayBase(ArrayBase<T,S,A>& src)
 :	ARRAYBASE_INIT
 {	source(src); }
 
@@ -433,7 +434,8 @@ TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
 TEM3 inline T& ArrayBase<T,S,A>::operator[](uint32_t i){ return elems()[i]; }
 TEM3 inline const T& ArrayBase<T,S,A>::operator[](uint32_t i) const { return elems()[i]; }
 
-TEM3 inline T * ArrayBase<T,S,A>::elems() const { return mElems; }
+TEM3 inline T * ArrayBase<T,S,A>::elems(){ return mElems; }
+TEM3 inline const T * ArrayBase<T,S,A>::elems() const { return mElems; }
 
 TEM3 void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n", mElems);
 	
@@ -506,7 +508,7 @@ TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 
 TEM3 inline uint32_t ArrayBase<T,S,A>::size() const { return mSize(); }
 
-TEM3 void ArrayBase<T,S,A>::source(const ArrayBase<T,S,A>& src){
+TEM3 void ArrayBase<T,S,A>::source(ArrayBase<T,S,A>& src){
 	source(src.elems(), src.size());
 }
 
