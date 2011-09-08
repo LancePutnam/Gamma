@@ -175,7 +175,7 @@ class Buffer : public Array<T,A> {
 public:
 
 	/// @param[in]	size		Number of elements in buffer.
-	explicit Buffer(uint32_t size);
+	explicit Buffer(uint32_t size=0);
 	virtual ~Buffer(){}
 	
 	/// Writes 'src' to buffer and locks buffer.
@@ -213,7 +213,7 @@ class DoubleBuffer : public Array<T,A>{
 public:
 	
 	/// @param[in]	singleBufSize	Number of elements in single buffer (allocated size will be twice this).
-	explicit DoubleBuffer(uint32_t singleBufSize);
+	explicit DoubleBuffer(uint32_t singleBufSize=0);
 
 	/// Set front buffer element
 	T& operator[](uint32_t i){ return front()[i]; }
@@ -252,7 +252,7 @@ public:
 
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	explicit Ring(uint32_t size, const T& value=T());
+	explicit Ring(uint32_t size=0, const T& value=T());
 
 	/// Returns reference to backmost (oldest) element
 	T& readBack(){ return (*this)[indexBack()]; }
@@ -297,7 +297,7 @@ public:
 	
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	explicit RingFill(uint32_t size, const T& value=T())
+	explicit RingFill(uint32_t size=0, const T& value=T())
 	:	Base(size, value), mFill(0)
 	{}
 
@@ -333,7 +333,7 @@ class DoubleRing : public Ring<T,A>{
 public:
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	explicit DoubleRing(uint32_t size, const T& value=T())
+	explicit DoubleRing(uint32_t size=0, const T& value=T())
 	:	Ring<T>(size, value), mRead(size)
 	{}
 
