@@ -77,14 +77,18 @@ endif
 
 # Remove active build configuration binary files
 clean:
-	@$(RM) $(OBJ_DIR)* $(OBJ_DIR) $(BIN_DIR)* $(BIN_DIR)
+	@$(RM) $(OBJ_DIR)* 
+	@rmdir $(OBJ_DIR)
+	@$(RM) $(BIN_DIR)*
+	@rmdir $(BIN_DIR)
 
 
 # Remove all build configuration binary files
 cleanall:
 	@$(MAKE) clean BUILD_CONFIG=release
 	@$(MAKE) clean BUILD_CONFIG=debug
-	@$(RM) $(BUILD_DIR)* $(BUILD_DIR)
+	@$(RM) $(BUILD_DIR)*
+	@rmdir $(BUILD_DIR)
 
 
 # Create file with settings for linking to external libraries
@@ -113,6 +117,17 @@ endif
 	@$(INSTALL) -c -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
+
+# Archive repository
+archive:
+	$(eval $@_TMP := $(shell mktemp -d tmp.XXXXXXXXXX))
+	@echo Creating archive, this may take some time...
+	@echo Creating temporary export...
+	@svn export --force . $($@_TMP)
+	@echo Compressing...
+	@cd $($@_TMP) && tar -czf ../$(LIB_NAME).tar.gz .
+	@echo Compression complete.
+	@$(RM) -R $($@_TMP)
 
 createFolders:
 	@mkdir -p $(OBJ_DIR)

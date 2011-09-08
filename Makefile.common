@@ -88,7 +88,7 @@ DESTDIR		= $(PREFIX)
 AR		= ar cr
 INSTALL		= install
 RANLIB		= ranlib
-RM		= rm -df
+RM		= rm -f
 
 # Linux:
 ifeq ($(PLATFORM), linux)
