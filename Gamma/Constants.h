@@ -18,6 +18,11 @@ namespace gam{
 	template<> struct N< float>{ operator uint32_t() const { return vf##UL; } };\
 	template<> struct N<double>{ operator uint64_t() const { return vd##ULL; } };
 
+	/*		sign +	expo +	frac =	total
+	float	1		 8		23		32
+	double	1		11		52		64
+	*/
+
 	CONST(MaskExpo, 0x7F800000, 0x7FF0000000000000)	// IEEE-754 floating-point exponent bit mask
 	CONST(MaskFrac, 0x007FFFFF, 0x000FFFFFFFFFFFFF) // IEEE-754 floating-point fraction bit mask
 	CONST(MaskSign, 0x80000000, 0x8000000000000000) // IEEE-754 floating-point sign bit mask
