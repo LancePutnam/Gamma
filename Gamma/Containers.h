@@ -335,7 +335,10 @@ public:
 	explicit DoubleRing(uint32_t size, const T& value=T())
 	:	Ring<T>(size, value), mRead(size)
 	{}
-	
+
+	/// Returns reference to the reading buffer
+	const Array<T,A>& readBuf() const { return mRead; }
+
 	/// Copy elements into read buffer unwrapping from ring
 	
 	/// \returns a pointer to the read buffer
@@ -351,9 +354,9 @@ public:
 		//for(uint32_t i=0; i<read.size(); ++i) construct(read.elems()+i, (*this)[i]);
 		return mRead.elems();
 	}
-	
-	// Returns reference to the reading buffer
-	const Array<T,A>& readBuf() const { return mRead; }
+
+	/// Resize buffers
+	void resize(int n){ Ring<T,A>::resize(n); mRead.resize(n); }
 
 protected:	
 	Array<T,A> mRead;
