@@ -254,16 +254,16 @@ public:
 	explicit Ring(uint32_t size, const T& value=T());
 
 	/// Returns reference to backmost (oldest) element
-	T& atBack(){ return (*this)[indexBack()]; }
-	const T& atBack() const { return (*this)[indexBack()]; }
+	T& readBack(){ return (*this)[indexBack()]; }
+	const T& readBack() const { return (*this)[indexBack()]; }
 	
 	/// Returns reference to frontmost (newest) element
-	T& atFront(){ return (*this)[indexFront()]; }
-	const T& atFront() const { return (*this)[indexFront()]; }
+	T& readFront(){ return (*this)[indexFront()]; }
+	const T& readFront() const { return (*this)[indexFront()]; }
 	
 	/// Returns reference to element 'ago' indices behind front
-	T& atPrev(uint32_t ago){ return (*this)[indexPrev(ago)]; }
-	const T& atPrev(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
+	T& read(uint32_t ago){ return (*this)[indexPrev(ago)]; }
+	const T& read(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
 
 	/// Copies len elements starting from element pos() - delay into dst.
 	void copy(T * dst, uint32_t len, uint32_t delay) const;
@@ -272,6 +272,7 @@ public:
 	void copyUnwrap(T * dst, uint32_t len) const;
 	
 	uint32_t pos() const;			///< Return absolute index of frontmost (newest) element
+	bool reachedEnd() const;		///< Returns whether the last element written was at the end of the array
 	uint32_t indexBack() const;		///< Returns absolute index of backmost (oldest) element
 	uint32_t indexFront() const;	///< Returns absolute index of frontmost (newest) element
 	uint32_t indexPrev(uint32_t ago) const;	///< Returns absolute index of a previously written element
@@ -295,7 +296,9 @@ public:
 	
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	explicit RingFill(uint32_t size, const T& value=T()): Base(size, value), mFill(0){}
+	explicit RingFill(uint32_t size, const T& value=T())
+	:	Base(size, value), mFill(0)
+	{}
 
 	/// Write new element
 	void operator()(const T& v){
@@ -321,22 +324,27 @@ protected:
 
 
 /// Double buffered ring-buffer
+
+/// This is a two-part buffer consisting of a ring buffer for writing and
+/// a standard (absolute indexed) array for reading.
 template <class T, class A=gam::Allocator<T> >
 class DoubleRing : public Ring<T,A>{
 public:
 	/// @param[in]	size		Number of elements in ring.
 	/// @param[in]	value		Initial value of all elements.
-	explicit DoubleRing(uint32_t size, const T& value=T()): Ring<T>(size, value), mRead(size){}
+	explicit DoubleRing(uint32_t size, const T& value=T())
+	:	Ring<T>(size, value), mRead(size)
+	{}
 	
 	/// Copy elements into read buffer unwrapping from ring
 	
-	/// Returns a pointer to the read buffer
+	/// \returns a pointer to the read buffer
 	///
 	T * copyUnwrap(){ Ring<T,A>::copyUnwrap(mRead.elems(), mRead.size()); return mRead.elems(); }
 	
 	/// Copy elements into read buffer "as is" from ring
 	
-	/// Returns a pointer to the read buffer
+	/// \returns a pointer to the read buffer
 	///
 	T * copy(){
 		mem::deepCopy(mRead.elems(), Ring<T,A>::elems(), mRead.size());
@@ -344,8 +352,8 @@ public:
 		return mRead.elems();
 	}
 	
-	// Returns reference to the read buffer
-	const Array<T,A>& read() const { return mRead; }
+	// Returns reference to the reading buffer
+	const Array<T,A>& readBuf() const { return mRead; }
 
 protected:	
 	Array<T,A> mRead;
@@ -591,6 +599,7 @@ TEM inline uint32_t Ring<T,A>::indexPrev(uint32_t v) const {
 }
 
 TEM inline uint32_t Ring<T,A>::pos() const { return mPos; }
+TEM inline bool Ring<T,A>::reachedEnd() const { return pos() == (size()-1); }
 
 TEM inline void Ring<T,A>::incPos(){ if(++mPos >= size()) mPos = 0; }
 TEM void Ring<T,A>::pos(uint32_t index){ mPos = index; }

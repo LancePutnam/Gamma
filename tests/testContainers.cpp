@@ -85,7 +85,7 @@ int main(int argc, char* argv[]){
 		for(int i=0; i<N*2; ++i){
 			ring(i+1);
 			printf("\t"); for(int j=0; j<N; ++j) printf("%d ", ring[j]);
-			printf("  "); for(int j=0; j<N; ++j) printf("%d ", ring.atPrev(j));
+			printf("  "); for(int j=0; j<N; ++j) printf("%d ", ring.read(j));
 			printf("\n");
 		}
 	}
