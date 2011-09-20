@@ -40,6 +40,12 @@ struct Val{
 	T operator()() const { return val; }					///< Generate next value
 	T& operator[](uint32_t i)      { return val; }			///< Array set; sets current value 
 	T  operator[](uint32_t i) const{ return (*this)(); }	///< Array get; generates next element
+
+	template<class U> bool operator> (const U& v) const { return val> v; }
+	template<class U> bool operator>=(const U& v) const { return val>=v; }
+	template<class U> bool operator< (const U& v) const { return val< v; }
+	template<class U> bool operator<=(const U& v) const { return val<=v; }
+	
 	mutable T val;											///< Value
 	// Since this is a generator, we will allow its value to be modified if 
 	// it's a const.
@@ -292,10 +298,10 @@ struct RAdd: public Val<T>{ INHERIT;
 	: Val<T>(val-add), add(add){}
 	
 	/// Generate next value
-	T operator()() const { return val += add; }
+	const T& operator()() const { return val += add; }
 
 	/// Go back one step
-	T recede() const { return val -= add; }
+	const T& recede() const { return val -= add; }
 
 	/// Set to generate line between points (0, begin) and (length, end)
 	void line(T begin, T end, T length){
