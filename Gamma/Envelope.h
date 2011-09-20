@@ -82,7 +82,7 @@ public:
 	bool sustained() const { return (mStage == mRelease) && !released(); }
 
 	T operator()(){
-		begin:
+		//begin:
 		if(sustained()){
 			return mValues[mStage];
 		}
@@ -90,17 +90,20 @@ public:
 			++mPos;
 			return mValues[mStage] + mCurve();
 		}
-		else if(mStage < size()-1){
+//		else if(mStage < size()-1){
+		else if(mStage < size()){
 			++mStage;
 
 			if(!done()){
 				mPos = 0;
 				mLen = mLengths[mStage];
 				mCurve.set(mLen, mCurves[mStage], mValues[mStage+1]-mValues[mStage]);
-				goto begin;
+				//goto begin;
+				(*this)();
 			}
 		}
-		return mValues[mStage+1];
+//		return mValues[mStage+1];
+		return mValues[mStage];
 	}
 	
 	void release(){
