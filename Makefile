@@ -77,18 +77,14 @@ endif
 
 # Remove active build configuration binary files
 clean:
-	@$(RM) $(OBJ_DIR)* 
-	@rmdir $(OBJ_DIR)
-	@$(RM) $(BIN_DIR)*
-	@rmdir $(BIN_DIR)
-
+	$(call RemoveDir, $(OBJ_DIR))
+	$(call RemoveDir, $(BIN_DIR))
 
 # Remove all build configuration binary files
 cleanall:
 	@$(MAKE) clean BUILD_CONFIG=Release
 	@$(MAKE) clean BUILD_CONFIG=Debug
-	@$(RM) $(BUILD_DIR)*
-	@rmdir $(BUILD_DIR)
+	$(call RemoveDir, $(BUILD_DIR))
 
 
 # Create file with settings for linking to external libraries
