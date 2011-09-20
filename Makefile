@@ -85,8 +85,8 @@ clean:
 
 # Remove all build configuration binary files
 cleanall:
-	@$(MAKE) clean BUILD_CONFIG=release
-	@$(MAKE) clean BUILD_CONFIG=debug
+	@$(MAKE) clean BUILD_CONFIG=Release
+	@$(MAKE) clean BUILD_CONFIG=Debug
 	@$(RM) $(BUILD_DIR)*
 	@rmdir $(BUILD_DIR)
 
