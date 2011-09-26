@@ -38,7 +38,6 @@
 		1674797D115805C100A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		16747986115805D200A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		16747989115805D700A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
-		1674799D115805F600A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A61158060300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A91158060900A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479EA115806A300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
@@ -121,8 +120,6 @@
 		16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16D0F0500DCAF24E00EDF5CD /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16DEEFEB0E4ABD62001292EF /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
-		16E2B2900D3AD21C003E39D1 /* testIpol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E2B27E0D3AD1BD003E39D1 /* testIpol.cpp */; };
-		16E2B29D0D3AD2D1003E39D1 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16E3D2D3115C3B1A009165E6 /* fftpack++.h in Headers */ = {isa = PBXBuildFile; fileRef = 16E3D2D0115C3B1A009165E6 /* fftpack++.h */; };
 		16E3D2D4115C3B1A009165E6 /* fftpack++1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */; };
 		16E3D2D5115C3B1A009165E6 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
@@ -252,8 +249,6 @@
 		16D9B4BA0DDBEA100043A25B /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../../Gamma/Filter.h; sourceTree = SOURCE_ROOT; };
 		16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testOscillator.cpp; path = ../../tests/testOscillator.cpp; sourceTree = "<group>"; };
 		16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FFT_fftpack.cpp; path = ../../src/FFT_fftpack.cpp; sourceTree = SOURCE_ROOT; };
-		16E2B27E0D3AD1BD003E39D1 /* testIpol.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testIpol.cpp; path = ../../tests/testIpol.cpp; sourceTree = SOURCE_ROOT; };
-		16E2B28C0D3AD1F8003E39D1 /* testIpol */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testIpol; sourceTree = BUILT_PRODUCTS_DIR; };
 		16E3D2D0115C3B1A009165E6 /* fftpack++.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "fftpack++.h"; sourceTree = "<group>"; };
 		16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++1.cpp"; sourceTree = "<group>"; };
 		16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++2.cpp"; sourceTree = "<group>"; };
@@ -352,13 +347,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		16C872A50EFA151600449449 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16E2B28A0D3AD1F8003E39D1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -578,7 +566,6 @@
 				16D15D4D09F068E4001AE497 /* testDFT.cpp */,
 				16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */,
 				1681B96813392B1C00056E42 /* testFilter.cpp */,
-				16E2B27E0D3AD1BD003E39D1 /* testIpol.cpp */,
 				1699F3860B9D1D2600ECB243 /* testNode.cpp */,
 				169C11980B65CC78000D2A44 /* testNoise.cpp */,
 				16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */,
@@ -606,7 +593,6 @@
 				16F76C740D12058C001C3DCA /* testEnvelope */,
 				16EACA910D15BE150044B3CB /* testConversion */,
 				16EACAA90D15BE960044B3CB /* testTimer */,
-				16E2B28C0D3AD1F8003E39D1 /* testIpol */,
 				16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */,
 				16FC1BBD0DED18E000B9AD13 /* testDFT */,
 				16C8729A0EFA14EA00449449 /* testNode */,
@@ -806,22 +792,6 @@
 			productReference = 16C872A70EFA151600449449 /* testNoise */;
 			productType = "com.apple.product-type.tool";
 		};
-		16E2B28B0D3AD1F8003E39D1 /* testIpol */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16E2B2910D3AD244003E39D1 /* Build configuration list for PBXNativeTarget "testIpol" */;
-			buildPhases = (
-				16E2B2890D3AD1F8003E39D1 /* Sources */,
-				16E2B28A0D3AD1F8003E39D1 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = testIpol;
-			productName = testIpol;
-			productReference = 16E2B28C0D3AD1F8003E39D1 /* testIpol */;
-			productType = "com.apple.product-type.tool";
-		};
 		16EACA900D15BE150044B3CB /* testConversion */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16EACAA20D15BE8E0044B3CB /* Build configuration list for PBXNativeTarget "testConversion" */;
@@ -987,7 +957,6 @@
 				16FC1BBC0DED18E000B9AD13 /* testDFT */,
 				16F76C730D12058C001C3DCA /* testEnvelope */,
 				1681B94B13392AF200056E42 /* testFilter */,
-				16E2B28B0D3AD1F8003E39D1 /* testIpol */,
 				16C872990EFA14EA00449449 /* testNode */,
 				16C872A60EFA151600449449 /* testNoise */,
 				16AEEFBD0D3C41AA00AFD3A4 /* testOscillator */,
@@ -1132,16 +1101,6 @@
 				16C872AD0EFA152400449449 /* scl.cpp in Sources */,
 				16C872AE0EFA152400449449 /* Sync.cpp in Sources */,
 				16747989115805D700A1556D /* Print.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16E2B2890D3AD1F8003E39D1 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				16E2B2900D3AD21C003E39D1 /* testIpol.cpp in Sources */,
-				16E2B29D0D3AD2D1003E39D1 /* scl.cpp in Sources */,
-				1674799D115805F600A1556D /* Print.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1663,48 +1622,6 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = testNoise;
-			};
-			name = Default;
-		};
-		16E2B2920D3AD244003E39D1 /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		16E2B2930D3AD244003E39D1 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		16E2B2940D3AD244003E39D1 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
 			};
 			name = Default;
 		};
@@ -2307,16 +2224,6 @@
 				16C872A90EFA151600449449 /* Development */,
 				16C872AA0EFA151600449449 /* Deployment */,
 				16C872AB0EFA151600449449 /* Default */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
-		};
-		16E2B2910D3AD244003E39D1 /* Build configuration list for PBXNativeTarget "testIpol" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16E2B2920D3AD244003E39D1 /* Development */,
-				16E2B2930D3AD244003E39D1 /* Deployment */,
-				16E2B2940D3AD244003E39D1 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
