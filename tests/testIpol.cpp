@@ -1,12 +1,10 @@
 #include <stdio.h>
-#include "Gamma/gen.h"
-#include "Gamma/ipl.h"
-#include "Gamma/scl.h"
+#include "Gamma/Gamma.h"
 #include "Gamma/Print.h"
 
 using namespace gam;
 
-int main(int argc, char* argv[]){
+int main(){
 
 	const int len = 16;
 	gen::RAdd<> frac(1./len);
