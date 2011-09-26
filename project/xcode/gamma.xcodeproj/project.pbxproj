@@ -25,8 +25,6 @@
 		160351A50D090B9D003CC766 /* gen.h in Headers */ = {isa = PBXBuildFile; fileRef = 160351A30D090B9C003CC766 /* gen.h */; };
 		161263A41140691600E55446 /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 161263A21140691600E55446 /* Allocator.h */; };
 		164F33B810508E77009FAD10 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
-		165906A80D0F9F6900EA3DB0 /* testRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDFA16094F8D9E00549AC9 /* testRandom.cpp */; };
-		165906A90D0F9F6900EA3DB0 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
 		16692FB0126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
 		16692FB1126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
@@ -35,7 +33,6 @@
 		167479541158054C00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		1674796D1158059E00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		16747975115805AF00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
-		1674797D115805C100A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		16747986115805D200A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		16747989115805D700A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A61158060300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
@@ -191,7 +188,6 @@
 		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
 		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
-		165906A40D0F9F3E00EA3DB0 /* testRandom */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRandom; sourceTree = BUILT_PRODUCTS_DIR; };
 		165DFF651337016600C61126 /* utEnvelope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utEnvelope.cpp; sourceTree = "<group>"; };
 		16692FAD126FC53100C1F4E9 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
 		16692FAE126FC9A300C1F4E9 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
@@ -268,7 +264,6 @@
 		16EDF9D2094F8C2600549AC9 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../../Gamma/Oscillator.h; sourceTree = SOURCE_ROOT; };
 		16EDF9E9094F8C2600549AC9 /* rnd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rnd.h; path = ../../Gamma/rnd.h; sourceTree = SOURCE_ROOT; };
 		16EDF9EB094F8C2600549AC9 /* tbl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tbl.h; path = ../../Gamma/tbl.h; sourceTree = SOURCE_ROOT; };
-		16EDFA16094F8D9E00549AC9 /* testRandom.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testRandom.cpp; path = ../../tests/testRandom.cpp; sourceTree = SOURCE_ROOT; };
 		16F1305A0FFEE85900DE56F6 /* fil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fil.h; path = ../../Gamma/fil.h; sourceTree = SOURCE_ROOT; };
 		16F133850FFF426400DE56F6 /* UnitMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnitMaps.h; sourceTree = "<group>"; };
 		16F5F6720CAD91C7003DD8DD /* testTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTimer.cpp; path = ../../tests/testTimer.cpp; sourceTree = SOURCE_ROOT; };
@@ -291,13 +286,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		165906A20D0F9F3E00EA3DB0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1681B95113392AF200056E42 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -569,7 +557,6 @@
 				1699F3860B9D1D2600ECB243 /* testNode.cpp */,
 				169C11980B65CC78000D2A44 /* testNoise.cpp */,
 				16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */,
-				16EDFA16094F8D9E00549AC9 /* testRandom.cpp */,
 				16CB4CCC0A6C5DC400F94EC1 /* testScalar.cpp */,
 				7E8339A6087E4CF3004CC4F0 /* testTable.cpp */,
 				16F5F6720CAD91C7003DD8DD /* testTimer.cpp */,
@@ -587,7 +574,6 @@
 				168AAC9D0CD0025D00F36E4B /* libgamma.a */,
 				16F9A1850D0DB63E00721CC7 /* testScalar */,
 				16F9A1B50D0DB74000721CC7 /* testContainers */,
-				165906A40D0F9F3E00EA3DB0 /* testRandom */,
 				16F76AD60D11E01C001C3DCA /* testTable */,
 				16F76AFE0D11E23D001C3DCA /* testAnalysis */,
 				16F76C740D12058C001C3DCA /* testEnvelope */,
@@ -662,22 +648,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		165906A30D0F9F3E00EA3DB0 /* testRandom */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 165906BA0D0F9FB700EA3DB0 /* Build configuration list for PBXNativeTarget "testRandom" */;
-			buildPhases = (
-				165906A10D0F9F3E00EA3DB0 /* Sources */,
-				165906A20D0F9F3E00EA3DB0 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = testRandom;
-			productName = testRandom;
-			productReference = 165906A40D0F9F3E00EA3DB0 /* testRandom */;
-			productType = "com.apple.product-type.tool";
-		};
 		1681B94B13392AF200056E42 /* testFilter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1681B95213392AF200056E42 /* Build configuration list for PBXNativeTarget "testFilter" */;
@@ -960,7 +930,6 @@
 				16C872990EFA14EA00449449 /* testNode */,
 				16C872A60EFA151600449449 /* testNoise */,
 				16AEEFBD0D3C41AA00AFD3A4 /* testOscillator */,
-				165906A30D0F9F3E00EA3DB0 /* testRandom */,
 				16F9A1840D0DB63E00721CC7 /* testScalar */,
 				16F76AD50D11E01C001C3DCA /* testTable */,
 				16EACAA80D15BE960044B3CB /* testTimer */,
@@ -1003,16 +972,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		165906A10D0F9F3E00EA3DB0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				165906A80D0F9F6900EA3DB0 /* testRandom.cpp in Sources */,
-				165906A90D0F9F6900EA3DB0 /* scl.cpp in Sources */,
-				1674797D115805C100A1556D /* Print.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1681B94C13392AF200056E42 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1228,48 +1187,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		165906BB0D0F9FB700EA3DB0 /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		165906BC0D0F9FB700EA3DB0 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		165906BD0D0F9FB700EA3DB0 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Default;
-		};
 		1681B95313392AF200056E42 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2138,16 +2055,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		165906BA0D0F9FB700EA3DB0 /* Build configuration list for PBXNativeTarget "testRandom" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				165906BB0D0F9FB700EA3DB0 /* Development */,
-				165906BC0D0F9FB700EA3DB0 /* Deployment */,
-				165906BD0D0F9FB700EA3DB0 /* Default */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
-		};
 		1681B95213392AF200056E42 /* Build configuration list for PBXNativeTarget "testFilter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
