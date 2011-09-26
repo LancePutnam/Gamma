@@ -21,7 +21,7 @@
 
 */
 
-#define GAMMA_VERSION 0.9.4
+#define GAMMA_VERSION 0.9.4x
 //#define GAMMA_H_INC_ALL
 
 // Core Functions
@@ -37,25 +37,32 @@
 
 #include "Gamma/Containers.h"
 #include "Gamma/Strategy.h"
+#include "Gamma/Types.h"
 
 // Optional includes
 #ifdef GAMMA_H_INC_ALL
 
 	// System/Utility
+	#include "Gamma/AudioIO.h"
+	#include "Gamma/Conversion.h"
+	#include "Gamma/File.h"
 	#include "Gamma/Print.h"
 	#include "Gamma/Timer.h"
 
-	// State Functions
-	#include "Gamma/AudioIO.h"
+	// Generators/Filters
+	#include "Gamma/Access.h"
 	#include "Gamma/Delay.h"
 	#include "Gamma/DFT.h"
 	#include "Gamma/Envelope.h"
+	#include "Gamma/FFT.h"
+	#include "Gamma/FormantData.h"
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
 	#include "Gamma/Player.h"
-	#include "Gamma/RecurrenceMaps.h"
+	#include "Gamma/Recorder.h"
 	#include "Gamma/SoundFile.h"
 	#include "Gamma/Sync.h"
+	#include "Gamma/UnitMaps.h"
 
 	// Composite Objects
 	#include "Gamma/Effects.h"
