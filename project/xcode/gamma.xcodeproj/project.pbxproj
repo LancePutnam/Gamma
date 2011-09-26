@@ -36,7 +36,6 @@
 		16747986115805D200A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A61158060300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A91158060900A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
-		167479EA115806A300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479F5115806C800A1556D /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 161263A21140691600E55446 /* Allocator.h */; };
 		167479F6115806C800A1556D /* arr.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9B6094F8C2600549AC9 /* arr.h */; };
 		167479F7115806C800A1556D /* AudioIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F836E10A1E888200F05DF5 /* AudioIO.h */; };
@@ -95,8 +94,6 @@
 		168AAD7B0CD0033700F36E4B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464330825DDF5002E1A73 /* CoreAudio.framework */; };
 		16938AC10FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
-		1695E7451295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
-		1695E7461295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		1695E7491295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
 		1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
@@ -129,9 +126,6 @@
 		16F76ADE0D11E041001C3DCA /* testTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E8339A6087E4CF3004CC4F0 /* testTable.cpp */; };
 		16F76ADF0D11E04D001C3DCA /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
 		16F76AE00D11E04D001C3DCA /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
-		16F76B020D11E26B001C3DCA /* testAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F74C970A4E114600A34E6F /* testAnalysis.cpp */; };
-		16F76B030D11E26B001C3DCA /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
-		16F76B040D11E26B001C3DCA /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16F76C780D1205B4001C3DCA /* testEnvelope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */; };
 		16F76C790D1205B4001C3DCA /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16F76C870D1205FB001C3DCA /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
@@ -253,9 +247,7 @@
 		16F1305A0FFEE85900DE56F6 /* fil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fil.h; path = ../../Gamma/fil.h; sourceTree = SOURCE_ROOT; };
 		16F133850FFF426400DE56F6 /* UnitMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnitMaps.h; sourceTree = "<group>"; };
 		16F5F6720CAD91C7003DD8DD /* testTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTimer.cpp; path = ../../tests/testTimer.cpp; sourceTree = SOURCE_ROOT; };
-		16F74C970A4E114600A34E6F /* testAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAnalysis.cpp; path = ../../tests/testAnalysis.cpp; sourceTree = SOURCE_ROOT; };
 		16F76AD60D11E01C001C3DCA /* testTable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTable; sourceTree = BUILT_PRODUCTS_DIR; };
-		16F76AFE0D11E23D001C3DCA /* testAnalysis */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAnalysis; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76C740D12058C001C3DCA /* testEnvelope */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testEnvelope; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F7D07C0B5414A1008A2E29 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../Gamma/Node.h; sourceTree = SOURCE_ROOT; };
 		16F836E00A1E888200F05DF5 /* AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AudioIO.cpp; path = ../../src/AudioIO.cpp; sourceTree = SOURCE_ROOT; };
@@ -324,15 +316,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16F76AFC0D11E23D001C3DCA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1695E7451295AE1400F6F3C0 /* libportaudio.a in Frameworks */,
-				1695E7461295AE1400F6F3C0 /* libsndfile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,7 +496,6 @@
 		7EB463E80825DC92002E1A73 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				16F74C970A4E114600A34E6F /* testAnalysis.cpp */,
 				16CE92EC0AAFB97900CEC0CF /* testContainers.cpp */,
 				7EBEB0490870F34A000EAC05 /* testConversion.cpp */,
 				16D15D4D09F068E4001AE497 /* testDFT.cpp */,
@@ -537,7 +519,6 @@
 				16F9A1850D0DB63E00721CC7 /* testScalar */,
 				16F9A1B50D0DB74000721CC7 /* testContainers */,
 				16F76AD60D11E01C001C3DCA /* testTable */,
-				16F76AFE0D11E23D001C3DCA /* testAnalysis */,
 				16F76C740D12058C001C3DCA /* testEnvelope */,
 				16EACA910D15BE150044B3CB /* testConversion */,
 				16EACAA90D15BE960044B3CB /* testTimer */,
@@ -721,22 +702,6 @@
 			productReference = 16F76AD60D11E01C001C3DCA /* testTable */;
 			productType = "com.apple.product-type.tool";
 		};
-		16F76AFD0D11E23D001C3DCA /* testAnalysis */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16F76B060D11E29F001C3DCA /* Build configuration list for PBXNativeTarget "testAnalysis" */;
-			buildPhases = (
-				16F76AFB0D11E23D001C3DCA /* Sources */,
-				16F76AFC0D11E23D001C3DCA /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = testAnalysis;
-			productName = testAnalysis;
-			productReference = 16F76AFE0D11E23D001C3DCA /* testAnalysis */;
-			productType = "com.apple.product-type.tool";
-		};
 		16F76C730D12058C001C3DCA /* testEnvelope */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16F76C7B0D1205D9001C3DCA /* Build configuration list for PBXNativeTarget "testEnvelope" */;
@@ -832,7 +797,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				16F76AFD0D11E23D001C3DCA /* testAnalysis */,
 				16F9A1B40D0DB74000721CC7 /* testContainers */,
 				16EACA900D15BE150044B3CB /* testConversion */,
 				16FC1BBC0DED18E000B9AD13 /* testDFT */,
@@ -969,17 +933,6 @@
 				16F76ADF0D11E04D001C3DCA /* arr.cpp in Sources */,
 				16F76AE00D11E04D001C3DCA /* scl.cpp in Sources */,
 				1674796D1158059E00A1556D /* Print.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16F76AFB0D11E23D001C3DCA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				16F76B020D11E26B001C3DCA /* testAnalysis.cpp in Sources */,
-				16F76B030D11E26B001C3DCA /* arr.cpp in Sources */,
-				16F76B040D11E26B001C3DCA /* scl.cpp in Sources */,
-				167479EA115806A300A1556D /* Print.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1421,63 +1374,6 @@
 			};
 			name = Default;
 		};
-		16F76B070D11E29F001C3DCA /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		16F76B080D11E29F001C3DCA /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		16F76B090D11E29F001C3DCA /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../external/lib_osx\"";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Default;
-		};
 		16F76C7C0D1205D9001C3DCA /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1884,16 +1780,6 @@
 				16F76ADB0D11E039001C3DCA /* Development */,
 				16F76ADC0D11E039001C3DCA /* Deployment */,
 				16F76ADD0D11E039001C3DCA /* Default */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
-		};
-		16F76B060D11E29F001C3DCA /* Build configuration list for PBXNativeTarget "testAnalysis" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16F76B070D11E29F001C3DCA /* Development */,
-				16F76B080D11E29F001C3DCA /* Deployment */,
-				16F76B090D11E29F001C3DCA /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
