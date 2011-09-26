@@ -1,3 +1,10 @@
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+	
+	Example:		Function / Interpolation
+	Description:	Demonstration of various interpolation functions.
+*/
+
 #include <stdio.h>
 #include "Gamma/Gamma.h"
 #include "Gamma/Print.h"
