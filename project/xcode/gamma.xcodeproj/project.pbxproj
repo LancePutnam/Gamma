@@ -41,13 +41,11 @@
 		1674799D115805F600A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A61158060300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479A91158060900A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
-		167479BE1158062D00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479CC1158063D00A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479EA115806A300A1556D /* Print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 167479511158054C00A1556D /* Print.cpp */; };
 		167479F5115806C800A1556D /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 161263A21140691600E55446 /* Allocator.h */; };
 		167479F6115806C800A1556D /* arr.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9B6094F8C2600549AC9 /* arr.h */; };
 		167479F7115806C800A1556D /* AudioIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F836E10A1E888200F05DF5 /* AudioIO.h */; };
-		167479F8115806C800A1556D /* RecurrenceMaps.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */; };
 		167479F9115806C800A1556D /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9B9094F8C2600549AC9 /* Constants.h */; };
 		167479FA115806C800A1556D /* Containers.h in Headers */ = {isa = PBXBuildFile; fileRef = 16CCF9C00A9EC1650013D2BF /* Containers.h */; };
 		167479FB115806C800A1556D /* Delay.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9BD094F8C2600549AC9 /* Delay.h */; };
@@ -114,7 +112,6 @@
 		1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
 		1695E74C1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
-		169F711410C1CFEE00FB2BA0 /* RecurrenceMaps.h in Headers */ = {isa = PBXBuildFile; fileRef = 169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */; };
 		16AEEFC20D3C41C400AFD3A4 /* testOscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */; };
 		16AEEFC30D3C41C900AFD3A4 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16AEEFC50D3C41CF00AFD3A4 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
@@ -160,8 +157,6 @@
 		16F76B020D11E26B001C3DCA /* testAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F74C970A4E114600A34E6F /* testAnalysis.cpp */; };
 		16F76B030D11E26B001C3DCA /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
 		16F76B040D11E26B001C3DCA /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
-		16F76B180D11E370001C3DCA /* testRecurrenceMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D733960BBE17D300D7769F /* testRecurrenceMap.cpp */; };
-		16F76B190D11E370001C3DCA /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16F76C780D1205B4001C3DCA /* testEnvelope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */; };
 		16F76C790D1205B4001C3DCA /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16F76C870D1205FB001C3DCA /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
@@ -247,7 +242,6 @@
 		1695E7441295AE1400F6F3C0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../external/lib_osx/libsndfile.a; sourceTree = SOURCE_ROOT; };
 		1699F3860B9D1D2600ECB243 /* testNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testNode.cpp; path = ../../tests/testNode.cpp; sourceTree = SOURCE_ROOT; };
 		169C11980B65CC78000D2A44 /* testNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testNoise.cpp; path = ../../tests/testNoise.cpp; sourceTree = SOURCE_ROOT; };
-		169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
 		16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testOscillator; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BC61C00FFC896A00AF1B29 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BEA8BE12AF724900654E30 /* fftpack++.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "fftpack++.inc"; sourceTree = "<group>"; };
@@ -266,7 +260,6 @@
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		16D4286C0DC8030500BF3144 /* testAudioSine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAudioSine; sourceTree = BUILT_PRODUCTS_DIR; };
-		16D733960BBE17D300D7769F /* testRecurrenceMap.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testRecurrenceMap.cpp; path = ../../tests/testRecurrenceMap.cpp; sourceTree = SOURCE_ROOT; };
 		16D8143B0B9D08BA00A4B638 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = notes.txt; path = ../../doc/notes.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		16D9B4BA0DDBEA100043A25B /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../../Gamma/Filter.h; sourceTree = SOURCE_ROOT; };
 		16DDFCE00B5801220076E3F7 /* testAudioSine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAudioSine.cpp; path = ../../tests/testAudioSine.cpp; sourceTree = SOURCE_ROOT; };
@@ -300,7 +293,6 @@
 		16F74C970A4E114600A34E6F /* testAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testAnalysis.cpp; path = ../../tests/testAnalysis.cpp; sourceTree = SOURCE_ROOT; };
 		16F76AD60D11E01C001C3DCA /* testTable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTable; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76AFE0D11E23D001C3DCA /* testAnalysis */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAnalysis; sourceTree = BUILT_PRODUCTS_DIR; };
-		16F76B140D11E34A001C3DCA /* testRecurrenceMap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testRecurrenceMap; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F76C740D12058C001C3DCA /* testEnvelope */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testEnvelope; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F7D07C0B5414A1008A2E29 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../Gamma/Node.h; sourceTree = SOURCE_ROOT; };
 		16F836E00A1E888200F05DF5 /* AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AudioIO.cpp; path = ../../src/AudioIO.cpp; sourceTree = SOURCE_ROOT; };
@@ -429,13 +421,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		16F76B120D11E34A001C3DCA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		16F76C720D12058C001C3DCA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -556,7 +541,6 @@
 				167479501158052400A1556D /* Print.h */,
 				169389570FBCCE4200274B2A /* pstdint.h */,
 				16692FAD126FC53100C1F4E9 /* Recorder.h */,
-				169F711210C1CFEE00FB2BA0 /* RecurrenceMaps.h */,
 				16E99A200A2A4B7800210497 /* SoundFile.h */,
 				16064BD30DFF02680043BC29 /* Strategy.h */,
 				168B78F50B75C59100645F1F /* Sync.h */,
@@ -626,7 +610,6 @@
 				169C11980B65CC78000D2A44 /* testNoise.cpp */,
 				16DE36A709E4D6FB009D67A9 /* testOscillator.cpp */,
 				16EDFA16094F8D9E00549AC9 /* testRandom.cpp */,
-				16D733960BBE17D300D7769F /* testRecurrenceMap.cpp */,
 				16CB4CCC0A6C5DC400F94EC1 /* testScalar.cpp */,
 				7E8339A6087E4CF3004CC4F0 /* testTable.cpp */,
 				16F5F6720CAD91C7003DD8DD /* testTimer.cpp */,
@@ -647,7 +630,6 @@
 				165906A40D0F9F3E00EA3DB0 /* testRandom */,
 				16F76AD60D11E01C001C3DCA /* testTable */,
 				16F76AFE0D11E23D001C3DCA /* testAnalysis */,
-				16F76B140D11E34A001C3DCA /* testRecurrenceMap */,
 				16F76C740D12058C001C3DCA /* testEnvelope */,
 				16EACA910D15BE150044B3CB /* testConversion */,
 				16EACAA90D15BE960044B3CB /* testTimer */,
@@ -672,7 +654,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				160351A50D090B9D003CC766 /* gen.h in Headers */,
-				169F711410C1CFEE00FB2BA0 /* RecurrenceMaps.h in Headers */,
 				161263A41140691600E55446 /* Allocator.h in Headers */,
 				16E3D2D6115C3B1A009165E6 /* fftpack++.h in Headers */,
 			);
@@ -692,7 +673,6 @@
 				16747A0C115806C800A1556D /* tbl.h in Headers */,
 				16747A10115806FF00A1556D /* Access.h in Headers */,
 				167479F5115806C800A1556D /* Allocator.h in Headers */,
-				167479F8115806C800A1556D /* RecurrenceMaps.h in Headers */,
 				167479F9115806C800A1556D /* Constants.h in Headers */,
 				167479FA115806C800A1556D /* Containers.h in Headers */,
 				16747A11115806FF00A1556D /* Conversion.h in Headers */,
@@ -950,22 +930,6 @@
 			productReference = 16F76AFE0D11E23D001C3DCA /* testAnalysis */;
 			productType = "com.apple.product-type.tool";
 		};
-		16F76B130D11E34A001C3DCA /* testRecurrenceMap */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16F76B1F0D11E3D1001C3DCA /* Build configuration list for PBXNativeTarget "testRecurrenceMap" */;
-			buildPhases = (
-				16F76B110D11E34A001C3DCA /* Sources */,
-				16F76B120D11E34A001C3DCA /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = testRecurrenceMap;
-			productName = testChaos;
-			productReference = 16F76B140D11E34A001C3DCA /* testRecurrenceMap */;
-			productType = "com.apple.product-type.tool";
-		};
 		16F76C730D12058C001C3DCA /* testEnvelope */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16F76C7B0D1205D9001C3DCA /* Build configuration list for PBXNativeTarget "testEnvelope" */;
@@ -1073,7 +1037,6 @@
 				16C872A60EFA151600449449 /* testNoise */,
 				16AEEFBD0D3C41AA00AFD3A4 /* testOscillator */,
 				165906A30D0F9F3E00EA3DB0 /* testRandom */,
-				16F76B130D11E34A001C3DCA /* testRecurrenceMap */,
 				16F9A1840D0DB63E00721CC7 /* testScalar */,
 				16F76AD50D11E01C001C3DCA /* testTable */,
 				16EACAA80D15BE960044B3CB /* testTimer */,
@@ -1277,16 +1240,6 @@
 				16F76B030D11E26B001C3DCA /* arr.cpp in Sources */,
 				16F76B040D11E26B001C3DCA /* scl.cpp in Sources */,
 				167479EA115806A300A1556D /* Print.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16F76B110D11E34A001C3DCA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				16F76B180D11E370001C3DCA /* testRecurrenceMap.cpp in Sources */,
-				16F76B190D11E370001C3DCA /* scl.cpp in Sources */,
-				167479BE1158062D00A1556D /* Print.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2052,48 +2005,6 @@
 			};
 			name = Default;
 		};
-		16F76B200D11E3D1001C3DCA /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		16F76B210D11E3D1001C3DCA /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		16F76B220D11E3D1001C3DCA /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Default;
-		};
 		16F76C7C0D1205D9001C3DCA /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2570,16 +2481,6 @@
 				16F76B070D11E29F001C3DCA /* Development */,
 				16F76B080D11E29F001C3DCA /* Deployment */,
 				16F76B090D11E29F001C3DCA /* Default */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
-		};
-		16F76B1F0D11E3D1001C3DCA /* Build configuration list for PBXNativeTarget "testRecurrenceMap" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16F76B200D11E3D1001C3DCA /* Development */,
-				16F76B210D11E3D1001C3DCA /* Deployment */,
-				16F76B220D11E3D1001C3DCA /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
