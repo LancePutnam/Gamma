@@ -1,26 +1,29 @@
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+	
+	Example:		Function / Analysis
+	Description:	Demonstration of various analysis functions.
+*/
+
 #include <stdio.h>
 #include <string.h>
-
-#include "Gamma/arr.h"
-#include "Gamma/gen.h"
-#include "Gamma/tbl.h"
+#include "Gamma/Gamma.h"
 #include "Gamma/Access.h"
 #include "Gamma/Print.h"
 
 using namespace gam;
 using namespace gam::gen;
 
-int main(int argc, char* argv[]){
+int main(){
 
 	const uint32_t size = 32;
 	float table[size];
 	//uint32_t indices[size];
 
-	tbl::sinusoid(table, size, 0.f, 2.f);
-	slice(table, size) += val(1);
-	//arr::lineSlope1(table, size); arr::add(table, size, -8.f);
-	//arr::mul(table, size, 0.9999f);
-	slice(table, size) = rAdd(1./size, 0.);
+	for(uint32_t i=0; i<size; ++i){
+		float phs = float(i)/size;
+		table[i] = scl::abs(cos(2 * 2*M_PI*phs) * exp(-phs));
+	}
 	
 	// print out function
 	for(uint32_t i=0; i<size; i++){
