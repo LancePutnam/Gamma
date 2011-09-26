@@ -1,17 +1,12 @@
-/*
- *  testRandom.cpp
- *  dsp
- *
- *  Created by Lance Putnam on 10/15/05.
- *  Copyright 2005 __MyCompanyName__. All rights reserved.
- *
- */
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+	
+	Example:		Function / Random
+	Description:	Demonstration of various random number functions.
+*/
 
 #include <stdio.h>
-#include "Gamma/arr.h"
-#include "Gamma/gen.h"
-#include "Gamma/rnd.h"
-#include "Gamma/scl.h"
+#include "Gamma/Gamma.h"
 #include "Gamma/Access.h"
 #include "Gamma/Print.h"
 
