@@ -1,42 +1,61 @@
 #include <stdio.h>
 #include "Gamma/Gamma.h"
 #include "Gamma/AudioIO.h"
-#include "Gamma/Delay.h"
-#include "Gamma/Noise.h"
-#include "Gamma/Oscillator.h"
-#include "Gamma/Sync.h"
 
 using namespace gam;
 
+struct TestSound{
+	double env;
+
+	TestSound(): env(1){}
+
+	float operator()(){
+		float r = rnd::uniS(1.);
+		r *= env;
+		env *= 0.9997;
+		return r;
+	}
+	
+	void reset(){ env = 1; }
+	bool done(){ return env < 0.001; }
+};
+
+TestSound src;
 int chan=-1;
-Accum<> tmr(2, 2);
-NoisePink<> src;
-SineD<> osc(2000, 0.1, 0.1);
+
 
 void audioCB(AudioIOData & io){
 	
 	while(io()){
 
-		if(tmr()){
+		if(src.done()){
 			++chan;
 			if(chan >= io.channelsOut()) chan=0;
-			osc.reset();
+			src.reset();
 			printf("chan: %d\n", chan);
 		}
 
-		io.out(chan) = osc();
+		io.out(chan) = src();
 	}
 }
 
-int main(int argc, char* argv[]){
+
+int main(){
 	
 	int maxOChans = AudioDevice::defaultOutput().channelsOutMax();
 	int maxIChans = AudioDevice::defaultOutput().channelsOutMax();
-	//printf("%d %d\n", maxIChans, maxOChans);
+	printf("Max input channels:  %d\n", maxIChans);
+	printf("Max output channels: %d\n", maxOChans);
 
-	AudioIO io(256, 44100., audioCB, NULL, maxOChans, maxIChans);
-	Sync::master().spu(io.framesPerSecond());
-	io.start(); io.print();
+	// To open the maximum number of channels, we can hand in the queried values...
+	//AudioIO io(256, 44100., audioCB, NULL, maxOChans, maxIChans);
+	
+	// ... or just use -1
+	AudioIO io(256, 44100., audioCB, NULL, -1, -1);
+
+	//Sync::master().spu(io.framesPerSecond());
+	io.start();
+	//io.print();
 	
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;
