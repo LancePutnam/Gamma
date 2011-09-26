@@ -11,7 +11,7 @@
 namespace gam{
 
 
-/// Stores dimensions of a lattice (up to 4 dimensions) and provides conversion \
+/// Stores dimensions of an array (up to 4 dimensions) and provides conversion \
 functions between real positions and indices.
 
 /// The positions must lie within [-1,1) relative to the smallest dimension
