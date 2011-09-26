@@ -283,6 +283,11 @@ inline uint32_t unitToUInt2(float v){
 	return punFU(v) << 9;
 }
 
+//inline uint32_t unitToUInt2(double v){
+//	++v;	// go into [1,2] range, FP fraction is now result
+//	return punFU(v) << 12;
+//}
+
 inline uint8_t unitToUInt8(float u){
 	++u;
 	return (punFU(u) >> 15) & MaskFrac<float>();
