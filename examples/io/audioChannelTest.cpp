@@ -1,3 +1,10 @@
+/*	Gamma - Generic processing library
+	See COPYRIGHT file for authors and license information
+	
+	Example:		IO / Audio Channel Test
+	Description:	Plays a noise burst through each output channel.
+*/
+
 #include <stdio.h>
 #include "Gamma/Gamma.h"
 #include "Gamma/AudioIO.h"
