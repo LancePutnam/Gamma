@@ -46,9 +46,8 @@ class Synced : public Node2<Synced> {
 public:
 	/// Constructor
 	Synced();
-	
-	/// Constructor
-	Synced(bool zeroLinks, Sync& src);
+	Synced(const Synced& rhs);
+
 	virtual ~Synced(){}
 
 	double scaleSPU() const;	///< Returns ratio of my SPU to my Sync's SPU
@@ -68,10 +67,16 @@ public:
 	void sync(Sync& src);		///< Set absolute Sync source.
 	void ups(double v);			///< Set local units/sample.
 
+
+	Synced& operator= (const Synced& rhs);
+
 protected:
 	void initSynced();
 
 private:
+	friend class Sync;
+	Synced(bool zeroLinks, Sync& src);
+
 	Sync * mSync;	// Reference to my Sync.
 	double mSPU;	// Local samples/unit.
 	double mUPS;	// Local units/sample.
@@ -137,14 +142,25 @@ inline double Sync::ups() const { return mUPS; }
 #define SYNCED_INIT mSync(0), mSPU(1), mUPS(1)
 
 inline Synced::Synced()
-:	Node2<Synced>(), SYNCED_INIT{
+:	Node2<Synced>(), SYNCED_INIT
+{
+	//printf("Synced::Synced() - %p\n", this);
 	sync(Sync::master());
 }
 
 // This ctor is used to create the head Synced in a Sync
 inline Synced::Synced(bool zeroLinks, Sync& src)
-:	Node2<Synced>(zeroLinks), SYNCED_INIT{
+:	Node2<Synced>(zeroLinks), SYNCED_INIT
+{
 	sync(src);
+}
+
+inline Synced::Synced(const Synced& rhs)
+:	Node2<Synced>(), SYNCED_INIT
+{
+	//printf("Synced::Synced(const Synced&) - %p\n", this);
+	Sync& s = rhs.mSync ? *rhs.mSync : Sync::master();
+	sync(s);
 }
 
 inline void Synced::initSynced(){ if(sync()) spu(sync()->spu()); }

@@ -64,6 +64,15 @@ void Sync::ups(double val){ spu(1./val); }
 
 // Synced
 
+Synced& Synced::operator= (const Synced& rhs){
+	if(this != &rhs){
+		if(rhs.mSync){
+			sync(*rhs.mSync);
+		}
+	}
+	return *this;
+}
+
 void Synced::scaleSPU(double v){
 	mSPU *= v;
 	mUPS = 1. / mSPU;
