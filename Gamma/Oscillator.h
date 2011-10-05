@@ -931,7 +931,6 @@ TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 TEMTS inline void TLFO::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
 TEMTS inline void TLFO::mod(double n){ modi = castIntRound(n * 4294967296.); }
 
-#define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; return r; }
 
 
 TEMTS inline float TLFO::line2(){
@@ -954,6 +953,7 @@ TEMTS inline float TLFO::line2(){
 
 TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
+#define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; return r; }
 //DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
 DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
 DEF(down(),		scl::rampDown(incPhasePre()))
