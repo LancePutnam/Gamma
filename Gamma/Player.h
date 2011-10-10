@@ -24,7 +24,7 @@ public:
 	using Array<T>::size; using Array<T>::elems;
 
 	Player()
-	:	Array<T>(defaultArray()), mSampleRate(1), mChans(1),
+	:	Array<T>(defaultBuffer(), 1), mSampleRate(1), mChans(1),
 		mPos(0), mInc(0), mRate(0), mMin(0), mMax(1)
 	{}
 
@@ -49,10 +49,15 @@ public:
 	}
 
 
-	/// @param[in] path		Path to sound file
-	/// @param[in] rate		Playback rate
+	/// @param[in] pathToSoundFile		Path to sound file
+	/// @param[in] rate					Playback rate
 	template<class Char>
-	explicit Player(const Char * path, double rate=1);
+	explicit Player(const Char * pathToSoundFile, double rate=1);
+
+
+	/// Load a sound file into internal buffer
+	template<class Char>
+	bool load(const Char * pathToSoundFile);
 
 
 	/// Increment read tap
@@ -99,11 +104,10 @@ public:
 
 	virtual void onResync(double r){ sampleRate(mSampleRate); }
 
-protected:
-	static Array<T>& defaultArray(){
-		static T v = T(0);
-		static Array<T> a(&v, 1);
-		return a;
+protected:	
+	static T * defaultBuffer(){
+		static T v(0);
+		return &v;
 	}
 
 	Tipol<T> mIpol;
@@ -129,20 +133,30 @@ PRE
 template<class Char>
 CLS::Player(const Char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
-{
-	SoundFile sf(path);
+{	
+	if(!load(path)){
+		source(defaultBuffer(), 1);
+	}
+}
+
+PRE
+template<class Char>
+bool CLS::load(const Char * pathToSoundFile){
+	SoundFile sf(pathToSoundFile);
 	
 	if(sf.openRead()){
 		Array<T>::resize(sf.samples());
 		sf.readAllD(elems());
 		sampleRate(sf.frameRate());
 		mChans = sf.channels();
+		mMin = 0;
 		mMax = frames();
+		mPos = 0;
 		sf.close();
+		return true;
 	}
-	else{
-		source(defaultArray());
-	}
+	
+	return false;
 }
 
 PRE void CLS::buffer(const Array<T>& src, double smpRate, int channels){

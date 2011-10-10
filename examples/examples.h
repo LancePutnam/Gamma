@@ -18,7 +18,6 @@
 #include "Gamma/Player.h"
 #include "Gamma/Print.h"
 #include "Gamma/Recorder.h"
-#include "Gamma/RecurrenceMaps.h"
 #include "Gamma/SoundFile.h"
 #include "Gamma/Timer.h"
 #include "Gamma/Types.h"
