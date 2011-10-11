@@ -81,7 +81,7 @@ public:
 	/// @param[in] src		Sample buffer (if multichannel, must be deinterleaved)
 	/// @param[in] smpRate	Sample rate of samples
 	/// @param[in] channels	Number of channels in sample buffer
-	void buffer(const Array<T>& src, double smpRate, int channels);
+	void buffer(Array<T>& src, double smpRate, int channels);
 
 	void free();							///< Free sample buffer (if owner)
 	void max(double v);						///< Set interval max, in frames
@@ -159,7 +159,7 @@ bool CLS::load(const Char * pathToSoundFile){
 	return false;
 }
 
-PRE void CLS::buffer(const Array<T>& src, double smpRate, int channels){
+PRE void CLS::buffer(Array<T>& src, double smpRate, int channels){
 	source(src);
 	sampleRate(smpRate);	// sets mSampleRate, mRate, and mInc
 	mChans = channels;
