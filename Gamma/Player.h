@@ -25,7 +25,7 @@ public:
 
 	Player()
 	:	Array<T>(defaultBuffer(), 1), mSampleRate(1), mChans(1),
-		mPos(0), mInc(0), mRate(0), mMin(0), mMax(1)
+		mPos(0), mInc(0), mRate(1), mMin(0), mMax(1)
 	{}
 
 
