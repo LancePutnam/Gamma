@@ -87,14 +87,6 @@ int main(int argc, char* argv[]){
 	printf("\nMin:\n");
 		f1 = 0.f; f2 = INFINITY;
 		printf("%f, %f = %f\n", f1, f2, scl::min(f1, f2));
-
-	printf("\nMul Complex:\n");
-		f1 = 1.f; f2 = 0.f;
-		for(int i=0; i<17; i++){
-			printf("% 9.6f % 9.6f\n", f1, f2);
-			float ang = M_2PI/(float)16;
-			scl::mulComplex(f1, f2, cosf(ang), sinf(ang));
-		}
 		
 	printf("\nNearest:\n");
 		for(float i=0.f; i<12.f; i+=0.77f){

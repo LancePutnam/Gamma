@@ -139,9 +139,6 @@ TEM T atan2Fast(T y, T x);
 /// Returns value clipped ouside of range [-eps, eps]
 TEM T atLeast(T v, T eps);
 
-/// Returns bump function, psi(x)
-TEM T bump(T x);
-
 /// Returns floating point value rounded to next highest integer.
 TEM T ceil(T val);
 TEM T ceil(T val, T step);
@@ -185,8 +182,8 @@ TEM T cosP3(T u);
 TEM T cosT8(T radians);
 
 /// Compute curvature around point b of three successive points a, b, and c.
-template <class T, template <class> class V>
-T curvature(const V<T>& a, const V<T>& b, const V<T>& c);
+template <class T, template <class> class NVec>
+T curvature(const NVec<T>& a, const NVec<T>& b, const NVec<T>& c);
 
 /// Convert decibels to amplitude
 template <class T>
@@ -278,25 +275,8 @@ TEM T gcd(const T& x, const T& y);
 
 TEM T hypot(T x, T y);
 
-/// Generalized Laguerre polynomial L{n,k}
-///
-/// http://en.wikipedia.org/wiki/Laguerre_polynomials
-double laguerre(int n, int k, double x);
-
 /// Returns least common multiple
 TEM inline T lcm(const T& x, const T& y){ return (x*y)/gcd(x,y); }
-
-/// Associated Legendre polynomial
-///
-/// P_l^m(cos(t)) = (-1)^{l+m} / (2^l l!) sin^m(t) (d/d cos(t))^{l+m} sin^{2l}(t)
-///
-/// @param[in]	l	degree s.t. l>=0
-/// @param[in]	m	order s.t. -l<=m <=l
-/// @param[in]	t	variable
-///
-/// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
-double legendre(int l, int m, double t);
-double legendre(int l, int m, double ct, double st);
 
 /// Convert linear value to log2 in range [0, 1]
 TEM T linLog2(T v, T recMin);
@@ -329,9 +309,6 @@ double mapPower(double v, double bound1, double bound0, double power=1.);
 
 /// Mixes two values together (1 = thru, 0.5 = mono, 0 = swap).
 TEM void mix2(T& io1, T& io2, T mix);
-
-/// Perform complex multiplication, c1 = c1 c2.
-TEM void mulComplex(T& r1, T& i1, const T& r2, const T& i2);
 
 /// Returns nearest "note" within a pitch class set
 
@@ -728,8 +705,6 @@ TEM T atan2Fast(T y, T x){
 
 TEM inline T atLeast(T v, T e){	return v > (T)0 ? max(v, e) : min(v, -e); }
 
-TEM inline T bump(T x){ return abs(x)<T(1) ? ::exp(T(-1)/(T(1) - x*x)) : T(0); }
-
 TEM inline T ceil(T v){ return round(v + roundEps<T>()); }
 TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
 TEM inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
@@ -899,12 +874,6 @@ TEM inline void mix2(T& io1, T& io2, T mix){
 	io2 = t2;
 	//io1 = io1 * mix + io2 * ((T)1 - mix);
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
-}
-
-TEM inline void mulComplex(T & r1, T & i1, const T & r2, const T & i2){
-	T rt = r1;
-	r1 = r1 * r2 - i1 * i2;
-	i1 = i1 * r2 + rt * i2;
 }
 
 TEM T nearest(T val, const char * intervals, long div){
