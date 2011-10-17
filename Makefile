@@ -113,6 +113,8 @@ endif
 	@$(INSTALL) -c -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
+test:
+	@$(MAKE) tests/unitTests.cpp
 
 # Archive repository
 archive:
