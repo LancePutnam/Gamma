@@ -577,6 +577,16 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	);
 }
 
+/// Returns spherical Euler product (ZXZ convention)
+template <class T>
+Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c){
+	return Vec3<T>(
+		a.r*b.i - a.i*b.r*c.i,
+		a.i*b.i + a.r*b.r*c.i,
+		b.r*c.r
+	);
+}
+
 /// Rotate vector towards perpendicular vector by angle using right-hand rule.
 template <int N, class T>
 Vec<N,T> rotate(const Vec<N,T>& v, const Vec<N,T>& p, const Complex<T>& a){

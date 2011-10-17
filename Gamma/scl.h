@@ -5,13 +5,13 @@
 	See COPYRIGHT file for authors and license information
 
 	File Description:
-	Mathematical scalar operations.
+	Scalar-oriented functions.
 */
 
 #include <math.h>
 #include <stdlib.h>				/* labs(long) */
 #include "Gamma/Conversion.h"
-#include "Gamma/Types.h"
+
 
 #define TEM template<class T>
 
@@ -390,9 +390,6 @@ TEM T pow64(T v);			///< Returns value to the 64th power.
 unsigned char prime(uint32_t n);	///< Returns (n+1)th prime number up to n=53.
 TEM T prime(uint32_t n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
 
-/// Returns spherical Euler product (ZXZ convention)
-TEM Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c);
-
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
 
@@ -427,25 +424,6 @@ inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 /// Signum function for real numbers.
 TEM inline T sgn(const T& v, const T& norm=T(1)){ return v<T(0) ? -norm : norm; }
 
-/// Returns value of spherical harmonic Y{l,m}(theta, phi).
-TEM Complex<T> sharm(int l, int m, T theta, T phi);
-
-#define DEF(name) TEM inline Complex<T> name(T ct, T st, T cp, T sp)
-
-// Spherical harmonics of l and m. For m!=0, the +m harmonic is returned.
-// The input angles are in terms of cosine and sine of theta and phi.
-// The phi arguments should be of an angle m times the base phi angle.
-// For odd, negative m, the result should by multiplied by -1.
-
-DEF(sharm00){ static const T c= 0.50*::sqrt(    M_1_PI ); return Complex<T>(c, 0); }
-DEF(sharm10){ static const T c= 0.50*::sqrt( 3.*M_1_PI ); return Complex<T>(c*ct, 0); }
-DEF(sharm11){ static const T c=-0.50*::sqrt( 3.*M_1_2PI); return Complex<T>(cp,sp)*c*st; }
-DEF(sharm20){ static const T c= 0.25*::sqrt( 5.*M_1_PI ); return Complex<T>(c*(3.*ct*ct - 1.), 0); }
-DEF(sharm21){ static const T c=-0.50*::sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*ct*st; }
-DEF(sharm22){ static const T c= 0.25*::sqrt(15.*M_1_2PI); return Complex<T>(cp,sp)*c*st*st; }
-
-#undef DEF
-
 /// Continuous sign map.
 
 /// The return value is close to 1 if v > 0 and close to -1 if v < 0.
@@ -479,9 +457,6 @@ TEM T sinc(T radians, T eps=T(0.0001));
 
 /// Sort values so that value1 <= value2.
 TEM void sort(T& value1, T& value2);
-
-/// Returns spherical product of two complex numbers
-TEM Vec3<T> spherical(const Complex<T>& a, const Complex<T>& b){ return Vec3<T>(a.r*b.r, a.i*b.r, b.i); }
 
 /// Sum of integers squared from 1 to n.
 TEM T sumOfSquares(T n){
@@ -1009,15 +984,6 @@ TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //	return float(long(val * stepRec + u.f)) * step;
 //}
 
-TEM Complex<T> sharm(int l, int m, T theta, T phi){
-	T c = T(factorial12(l-m)) / T(factorial12(l+m));
-	c = ::sqrt((2*l + 1) / M_4PI * c);
-	c *= legendre(l, m, theta);
-
-	phi *= m;
-	return Complex<T>(c*cos(phi), c*sin(phi));
-}
-
 TEM inline T sign(T v, T bw){ return v/(scl::abs(v) + bw); }
 
 TEM inline T taylorFactor3(T vv, T c1, T c2, T c3){
@@ -1327,14 +1293,6 @@ TEM inline void polarToRect(T m, T p, T& r, T& i){
 	r = m * cos(p);
 	i = m * sin(p);
 	//printf("%f %f %f %f\n", m, p, r, i);
-}
-
-TEM Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c){
-	return Vec3<T>(
-		a.r*b.i - a.i*b.r*c.i,
-		a.i*b.i + a.r*b.r*c.i,
-		b.r*c.r
-	);
 }
 
 TEM inline void rectToPolar(T& r, T& i){
