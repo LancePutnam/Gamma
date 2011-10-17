@@ -561,7 +561,7 @@ protected:
 
 
 
-/// One-pole smoothing filter.
+/// One-pole smoothing filter
 template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class OnePole : public Ts{ 
 public:
@@ -571,9 +571,11 @@ public:
 	/// @param[in]	stored	Initial stored value
 	OnePole(Tp freq, const Tv& stored=0);
 
+	const Tp& freq() const { return mFreq; }	///< Get cutoff frequency
+
 	void operator  = (const Tv& val);	///< Stores input value for operator()
 	void operator *= (const Tv& val);	///< Multiplies stored value by value
-	void freq(Tp val);					///< Set -3 dB bandwidth of pole
+	void freq(Tp val);					///< Set cutoff frequency (-3 dB bandwidth of pole)
 	void smooth(Tp val);				///< Set smoothing coefficient directly
 	void zero(){ o1=0; }				///< Zero internal delay
 	void reset(const Tv& v){ o1=v; mStored=v; }
@@ -950,7 +952,7 @@ T_VPS inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
 	
 	// freq is half the bandwidth of a pole at 0
 	smooth( scl::poleRadius(Tp(2) * v, Ts::ups()) );
-	//printf("%f, %f, %f\n", spu(), mB1, v);
+	//printf("%f, %f, %f\n", Ts::spu(), mB1, v);
 }
 
 T_VPS inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
