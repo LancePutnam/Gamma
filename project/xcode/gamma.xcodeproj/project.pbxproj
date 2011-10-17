@@ -93,7 +93,6 @@
 		168AAD7A0CD0033700F36E4B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464320825DDF5002E1A73 /* AudioToolbox.framework */; };
 		168AAD7B0CD0033700F36E4B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB464330825DDF5002E1A73 /* CoreAudio.framework */; };
 		16938AC10FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
-		16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		1695E7491295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
 		1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
@@ -116,9 +115,6 @@
 		16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
 		16E3D2DB115C3B1A009165E6 /* fftpack++1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */; };
 		16E3D2DC115C3B1A009165E6 /* fftpack++2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */; };
-		16EACA950D15BE390044B3CB /* testConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EBEB0490870F34A000EAC05 /* testConversion.cpp */; };
-		16EACA960D15BE390044B3CB /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
-		16EACA9B0D15BE6B0044B3CB /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
 		16EACAAD0D15BEBB0044B3CB /* testTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F5F6720CAD91C7003DD8DD /* testTimer.cpp */; };
 		16F133EF0FFF4A8600DE56F6 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
 		16F133F00FFF4A8600DE56F6 /* FFT_fftpack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */; };
@@ -230,7 +226,6 @@
 		16E3D2D2115C3B1A009165E6 /* fftpack++2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++2.cpp"; sourceTree = "<group>"; };
 		16E99A200A2A4B7800210497 /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundFile.h; path = ../../Gamma/SoundFile.h; sourceTree = SOURCE_ROOT; };
 		16E99A210A2A4B7800210497 /* SoundFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundFile.cpp; path = ../../src/SoundFile.cpp; sourceTree = SOURCE_ROOT; };
-		16EACA910D15BE150044B3CB /* testConversion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testConversion; sourceTree = BUILT_PRODUCTS_DIR; };
 		16EACAA90D15BE960044B3CB /* testTimer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testTimer; sourceTree = BUILT_PRODUCTS_DIR; };
 		16EDF9B5094F8C2600549AC9 /* arr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = arr.cpp; path = ../../src/arr.cpp; sourceTree = SOURCE_ROOT; };
 		16EDF9B6094F8C2600549AC9 /* arr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = arr.h; path = ../../Gamma/arr.h; sourceTree = SOURCE_ROOT; };
@@ -259,7 +254,6 @@
 		7E8339A6087E4CF3004CC4F0 /* testTable.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testTable.cpp; path = ../../tests/testTable.cpp; sourceTree = "<group>"; };
 		7EB464320825DDF5002E1A73 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		7EB464330825DDF5002E1A73 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
-		7EBEB0490870F34A000EAC05 /* testConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testConversion.cpp; path = ../../tests/testConversion.cpp; sourceTree = "<group>"; };
 		C0F9EF680BB059670069B343 /* libgamma.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgamma.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -292,13 +286,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		16BC61BB0FFC896A00AF1B29 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16EACA8F0D15BE150044B3CB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -497,7 +484,6 @@
 			isa = PBXGroup;
 			children = (
 				16CE92EC0AAFB97900CEC0CF /* testContainers.cpp */,
-				7EBEB0490870F34A000EAC05 /* testConversion.cpp */,
 				16D15D4D09F068E4001AE497 /* testDFT.cpp */,
 				16C6B1150A6AC7E2000543EB /* testEnvelope.cpp */,
 				1681B96813392B1C00056E42 /* testFilter.cpp */,
@@ -520,7 +506,6 @@
 				16F9A1B50D0DB74000721CC7 /* testContainers */,
 				16F76AD60D11E01C001C3DCA /* testTable */,
 				16F76C740D12058C001C3DCA /* testEnvelope */,
-				16EACA910D15BE150044B3CB /* testConversion */,
 				16EACAA90D15BE960044B3CB /* testTimer */,
 				16AEEFBE0D3C41AA00AFD3A4 /* testOscillator */,
 				16FC1BBD0DED18E000B9AD13 /* testDFT */,
@@ -654,22 +639,6 @@
 			productReference = 16BC61C00FFC896A00AF1B29 /* unitTests */;
 			productType = "com.apple.product-type.tool";
 		};
-		16EACA900D15BE150044B3CB /* testConversion */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16EACAA20D15BE8E0044B3CB /* Build configuration list for PBXNativeTarget "testConversion" */;
-			buildPhases = (
-				16EACA8E0D15BE150044B3CB /* Sources */,
-				16EACA8F0D15BE150044B3CB /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = testConversion;
-			productName = testConversion;
-			productReference = 16EACA910D15BE150044B3CB /* testConversion */;
-			productType = "com.apple.product-type.tool";
-		};
 		16EACAA80D15BE960044B3CB /* testTimer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16EACAB10D15BEE30044B3CB /* Build configuration list for PBXNativeTarget "testTimer" */;
@@ -798,7 +767,6 @@
 			projectRoot = "";
 			targets = (
 				16F9A1B40D0DB74000721CC7 /* testContainers */,
-				16EACA900D15BE150044B3CB /* testConversion */,
 				16FC1BBC0DED18E000B9AD13 /* testDFT */,
 				16F76C730D12058C001C3DCA /* testEnvelope */,
 				1681B94B13392AF200056E42 /* testFilter */,
@@ -903,17 +871,6 @@
 				16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
 				16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
 				168A0433128CB899004556F0 /* unitTests.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16EACA8E0D15BE150044B3CB /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				16EACA950D15BE390044B3CB /* testConversion.cpp in Sources */,
-				16EACA9B0D15BE6B0044B3CB /* arr.cpp in Sources */,
-				16EACA960D15BE390044B3CB /* scl.cpp in Sources */,
-				16938AC20FBD0C6700274B2A /* Conversion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1237,48 +1194,6 @@
 			name = Deployment;
 		};
 		16BC61BF0FFC896A00AF1B29 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Default;
-		};
-		16EACAA30D15BE8E0044B3CB /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		16EACAA40D15BE8E0044B3CB /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		16EACAA50D15BE8E0044B3CB /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1750,16 +1665,6 @@
 				16BC61BD0FFC896A00AF1B29 /* Development */,
 				16BC61BE0FFC896A00AF1B29 /* Deployment */,
 				16BC61BF0FFC896A00AF1B29 /* Default */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
-		};
-		16EACAA20D15BE8E0044B3CB /* Build configuration list for PBXNativeTarget "testConversion" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16EACAA30D15BE8E0044B3CB /* Development */,
-				16EACAA40D15BE8E0044B3CB /* Deployment */,
-				16EACAA50D15BE8E0044B3CB /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
