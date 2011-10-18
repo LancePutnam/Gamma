@@ -435,8 +435,8 @@ template<> inline double Curve<double>	::eps() const { return   0.00000001; }
 
 // hack to get proper max floating point value
 namespace{
-	template<class T> static inline T maxReal(){ return DBL_MAX; }
-	template<> static inline float maxReal<float>(){ return FLT_MAX; }
+	template<class T> inline T maxReal(){ return DBL_MAX; }
+	template<> inline float maxReal<float>(){ return FLT_MAX; }
 }
 
 TEM void Curve<T>::set(T len, T crv, T end){
