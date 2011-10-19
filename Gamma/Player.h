@@ -10,6 +10,7 @@
 #include "Gamma/SoundFile.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Sync.h"
+#include "Gamma/Types.h"
 
 namespace gam{
 
