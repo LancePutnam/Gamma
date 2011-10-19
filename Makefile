@@ -69,7 +69,7 @@ $(DLIB_FILE): createFolders external $(OBJS)
 EXEC_TARGETS = examples/%.cpp tests/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): $(SLIB_PATH) FORCE
-	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(SLIB_PATH)
+	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
