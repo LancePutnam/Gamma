@@ -26,6 +26,10 @@
 
 // Core Functions
 // Everything else depends on these so always include them.
+#include "Gamma/Containers.h"
+#include "Gamma/Strategy.h"
+#include "Gamma/Types.h"
+
 #include "Gamma/arr.h"
 #include "Gamma/gen.h"
 #include "Gamma/fil.h"
@@ -34,10 +38,6 @@
 #include "Gamma/scl.h"
 #include "Gamma/tbl.h"
 #include "Gamma/rnd.h"
-
-#include "Gamma/Containers.h"
-#include "Gamma/Strategy.h"
-#include "Gamma/Types.h"
 
 // Optional includes
 #ifdef GAMMA_H_INC_ALL
