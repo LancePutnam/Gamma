@@ -624,10 +624,10 @@ Vec3<T> rotateZ(const Vec3<T>& v, const Complex<T>& a){
 
 
 
-template<class T> inline T norm(const Complex<T>& v){ return v.norm(); }
-template<class T> inline T normCompare(const Complex<T>& v){ return v.norm2(); }
-template<int N,class T> inline T norm(const Vec<N,T>& v){ return v.norm(); }
-template<int N,class T> inline T normCompare(const Vec<N,T>& v){ return v.norm2(); }
+template<class T> inline double norm(const Complex<T>& v){ return v.norm(); }
+template<class T> inline double normCompare(const Complex<T>& v){ return v.norm2(); }
+template<int N,class T> inline double norm(const Vec<N,T>& v){ return v.norm(); }
+template<int N,class T> inline double normCompare(const Vec<N,T>& v){ return v.norm2(); }
 
 } // gam::
 
