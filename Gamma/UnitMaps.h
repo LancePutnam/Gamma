@@ -144,25 +144,25 @@ protected:
 // B is the log2 size of each table
 // D is the number of tables
 // The effective table size is (2^B)^D
-template <unsigned B=10, unsigned D=2, class T=double>
+template <unsigned B=10, unsigned D=2, class TComplex=Complex<double> >
 class CSinTable{
 public:
-	typedef TablePow2<B, Complex<T> > Arc;
+	typedef TablePow2<B, TComplex> Arc;
 
 	CSinTable(){ init(); }
 	
 	/// Get sinusoidal value at unit phase. No bounds checking is performed.
-	Complex<T> operator()(double phase){
+	TComplex operator()(double phase){
 		return (*this)(uint32_t(phase * 4294967296.));
 	}
 	
 	/// Get value from fixed-point phase in interval [0, 2^(B*D))
-	Complex<T> operator()(uint32_t p){
+	TComplex operator()(uint32_t p){
 
 		p >>= shift();
 
 		// start with finest sample
-		Complex<T> r = arc(D-1)[p & Arc::mask()];
+		TComplex r(arc(D-1)[p & Arc::mask()]);
 
 		// iterate remaining arcs (fine to coursest)
 		for(unsigned i=2; i<D+1; ++i){
@@ -194,7 +194,8 @@ private:
 			for(unsigned j=0; j<D; ++j){		// iterate resolution (course to fine)
 				for(unsigned i=0; i<M; ++i){	// iterate arc of unit circle
 					double p = (i*M_PI)/(N>>1);
-					arc(j)[i] = Polar<T>(1, p);
+					arc(j)[i].real() = cos(p);
+					arc(j)[i].imag() = sin(p);
 				}
 				N *= M;
 			}
