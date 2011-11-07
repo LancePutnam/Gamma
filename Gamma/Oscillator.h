@@ -142,7 +142,7 @@ public:
 	/// @param[in]	frq			Initial frequency
 	/// @param[in]	phs			Initial unit phase in [0, 1)
 	/// @param[in]	src			A table to use as a reference
-	Osc(float frq, float phs, const ArrayPow2<Tv> & src)
+	Osc(float frq, float phs, ArrayPow2<Tv>& src)
 	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
 	{}
 	
