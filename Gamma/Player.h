@@ -25,25 +25,31 @@ public:
 	using Array<T>::size; using Array<T>::elems;
 
 	Player()
-	:	Array<T>(defaultBuffer(), 1), mSampleRate(1), mChans(1),
-		mPos(0), mInc(0), mRate(1), mMin(0), mMax(1)
+	:	Array<T>(defaultBuffer(), 1),
+		mPos(0), mInc(0),
+		mSampleRate(1), mChans(1),
+		mRate(1), mMin(0), mMax(1)
 	{}
 
 
 	/// @param[in] src		Another Player to read data from
 	/// @param[in] rate		Playback rate
-	explicit Player(const Player<T>& src, double rate=1)
-	:	Array<T>(src), mSampleRate(src.sampleRate()), mChans(src.channels()),
-		mPos(0), mInc(1), mRate(rate), mMin(0), mMax(src.size())
+	explicit Player(Player<T>& src, double rate=1)
+	:	Array<T>(src), 
+		mPos(0), mInc(1), 
+		mSampleRate(src.sampleRate()), mChans(src.channels()), 
+		mRate(rate), mMin(0), mMax(src.size())
 	{ initSynced(); }
 
 
 	/// @param[in] src		Sample array to reference
 	/// @param[in] smpRate	Sample rate of samples
 	/// @param[in] rate		Playback rate
-	Player(const Array<T>& src, double smpRate, double rate=1)
-	:	Array<T>(src), mSampleRate(smpRate), mChans(1),
-		mPos(0), mInc(1), mRate(rate), mMin(0), mMax(src.size())
+	Player(Array<T>& src, double smpRate, double rate=1)
+	:	Array<T>(src),
+		mPos(0), mInc(1),
+		mSampleRate(smpRate), mChans(1),
+		mRate(rate), mMin(0), mMax(src.size())
 	{
 		initSynced();
 		sampleRate(smpRate);
