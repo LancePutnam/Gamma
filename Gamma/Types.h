@@ -120,6 +120,13 @@ struct Complex{
 	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar<T>(m,p); }
 
+
+	// Accessors compatible with std::complex
+	T& real(){return r;}
+	const T& real() const {return r;}
+	T& imag(){return i;}
+	const T& imag() const {return i;}
+
 	
 	C& arg(const T& v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
 	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
