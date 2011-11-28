@@ -11,6 +11,7 @@
 #include "../Gamma/UnitMaps.h"
 
 #include "../Gamma/Envelope.h"
+#include "../Gamma/Player.h"
 
 using namespace gam;
 
@@ -68,6 +69,7 @@ int main(int argc, char* argv[]){
 	#include "ut/ut_arr.cpp"
 	
 	#include "ut/utEnvelope.cpp"
+	#include "ut/utGenerators.cpp"
 
 //	printf("Unit testing succeeded.\n");
 

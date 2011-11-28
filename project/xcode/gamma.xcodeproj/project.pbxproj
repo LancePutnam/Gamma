@@ -84,6 +84,7 @@
 		1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
 		1695E74C1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
+		16A09FE2148424E3000E1512 /* Sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B78F40B75C59100645F1F /* Sync.cpp */; };
 		16BC61B80FFC896A00AF1B29 /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
 		16BC61B90FFC896A00AF1B29 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
@@ -165,6 +166,7 @@
 		16938AC00FBD0C6700274B2A /* Conversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conversion.cpp; path = ../../src/Conversion.cpp; sourceTree = SOURCE_ROOT; };
 		1695E7431295AE1400F6F3C0 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = ../../external/lib_osx/libportaudio.a; sourceTree = SOURCE_ROOT; };
 		1695E7441295AE1400F6F3C0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../external/lib_osx/libsndfile.a; sourceTree = SOURCE_ROOT; };
+		16A0A007148426E7000E1512 /* utGenerators.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utGenerators.cpp; sourceTree = "<group>"; };
 		16BC61C00FFC896A00AF1B29 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BEA8BE12AF724900654E30 /* fftpack++.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "fftpack++.inc"; sourceTree = "<group>"; };
 		16CCF9C00A9EC1650013D2BF /* Containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Containers.h; path = ../../Gamma/Containers.h; sourceTree = SOURCE_ROOT; };
@@ -257,6 +259,7 @@
 				168A042F128CB87F004556F0 /* utConversion.cpp */,
 				165DFF651337016600C61126 /* utEnvelope.cpp */,
 				168A0430128CB87F004556F0 /* utFFT.cpp */,
+				16A0A007148426E7000E1512 /* utGenerators.cpp */,
 				168A0431128CB87F004556F0 /* utTypes.cpp */,
 			);
 			name = ut;
@@ -586,6 +589,7 @@
 				16E3D2D9115C3B1A009165E6 /* fftpack++1.cpp in Sources */,
 				16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
 				16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
+				16A09FE2148424E3000E1512 /* Sync.cpp in Sources */,
 				168A0433128CB899004556F0 /* unitTests.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
