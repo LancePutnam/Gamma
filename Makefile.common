@@ -153,6 +153,7 @@ RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
 ifeq ($(BUILD_CONFIG), Release)
 	CFLAGS += -O3 -fpeel-loops
 else
+	CFLAGS += -g -O0 -fno-inline
 endif
 
 ifneq ($(STRICT_WARNINGS), 0)
