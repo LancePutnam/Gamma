@@ -253,20 +253,6 @@ double freq(const char * note);
 /// Convert domain frequency to radians clipped to interval [0, pi).
 TEM inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_PI; }
 
-/// Compute Frenet frame (tangent, normal) from 1st difference
-template <class V2>
-void frenet(const V2& d1, V2& t, V2& n);
-
-
-/// Compute Frenet frame (tangent, normal, binormal) from 1st and 2nd differences
-template <class V3>
-void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b);
-
-/// Compute Frenet frame (tangent, normal, binormal) from 3 consecutive points
-template <class V3>
-void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
-
-
 /// Returns e^(-v*v)
 TEM T gaussian(T v){ return ::exp(-v*v); }
 
@@ -805,30 +791,6 @@ TEM inline T foldOnce(T v, T hi, T lo){
 	if(v > hi) return hi + (hi - v);
 	if(v < lo) return lo + (lo - v);
 	return v;
-}
-
-template <class V2>
-void frenet(const V2& d1, V2& t, V2& n){
-	t = d1;
-	t *= invSqrt<2>(t.dot());
-	n(-t[1], t[0]);	// normal according to right-hand rule
-}
-
-template <class V3>
-void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){
-	b = cross(d2, d1);
-	n = cross(d1, b);
-	t = d1 * invSqrt<2>(d1.magSqr());
-	b *= invSqrt<2>(b.magSqr());
-	n *= invSqrt<2>(n.magSqr());
-}
-
-template <class V3>
-void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
-	//const V3 d1 = p0 - p1, d2 = d1 - (p1 - p2);
-	const V3 d1 = (p0 - p2)*0.5;
-	const V3 d2 = (d1 - p1)*2.0; // p0 - 2*p1 + p2 = p0 - p2 - 2*p1 = 2*d1 - 2*p1
-	frenet(d1,d2, t,n,b);
 }
 
 TEM T gcd(const T& x, const T& y){
