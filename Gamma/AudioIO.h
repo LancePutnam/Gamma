@@ -121,7 +121,7 @@ public:
 	float& bus(int chan, int frame) const;
 
 	/// Get non-interleaved bus buffer on specified channel
-	float * busBuffer(int chan=0) const { return &bus(0,0); }
+	float * busBuffer(int chan=0) const { return &bus(chan,0); }
 
 	/// Get input sample at current frame iteration on specified channel
 	const float& in(int chan) const { return in (chan, frame()); }
@@ -130,7 +130,7 @@ public:
 	const float& in (int chan, int frame) const;
 
 	/// Get non-interleaved input buffer on specified channel
-	const float * inBuffer(int chan=0) const { return &in(0,0); }
+	const float * inBuffer(int chan=0) const { return &in(chan,0); }
 
 	/// Get output sample at current frame iteration on specified channel
 	float& out(int chan) const { return out(chan, frame()); }
@@ -139,7 +139,7 @@ public:
 	float& out(int chan, int frame) const;
 
 	/// Get non-interleaved output buffer on specified channel
-	float * outBuffer(int chan=0) const { return &out(0,0); }
+	float * outBuffer(int chan=0) const { return &out(chan,0); }
 	
 	/// Add value to current output sample on specified channel
 	void sum(float v, int chan) const { out(chan)+=v; }
@@ -151,7 +151,7 @@ public:
 	float& temp(int frame) const;
 
 	/// Get non-interleaved temporary buffer on specified channel
-	float * tempBuffer(int chan=0) const { return &temp(0); }
+	float * tempBuffer() const { return &temp(0); }
 
 	void * user() const{ return mUser; } ///< Get pointer to user data
 
