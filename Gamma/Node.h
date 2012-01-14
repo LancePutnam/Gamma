@@ -10,7 +10,7 @@
 
 namespace gam{
 
-/// A doubly-linked node.
+/// Doubly-linked node
 template <class T>
 class Node2{
 public:
@@ -37,6 +37,7 @@ public:
 };
 
 
+/// Triply-linked node
 template <class T>
 class Node3{
 public:
@@ -157,7 +158,7 @@ private:
 };
 
 
-/// A quadruply-linked node.
+/// Quadruply-linked node
 template <class T>
 class Node4{
 public:
