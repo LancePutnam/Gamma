@@ -21,6 +21,8 @@ namespace gam{
 /// ending on 'end' over its length in samples.  The last point is exclusive, so
 /// it takes length + 1 samples to reach 'end' inclusively.  For iterations 
 /// exceeding the specified length, the values returned will be unbounded.
+///
+/// \tparam T	sample type
 template <class T=gam::real>
 class Curve{
 public:
@@ -55,12 +57,20 @@ public:
 protected:
 	T mEnd;
 	T mMul, mA, mB;
-	
 	T eps() const;
 };
 
 
 
+/// Envelope with a fixed number of exponential segments and a sustain point
+
+/// This class can be used to construct many typical envelopes such as AD 
+/// (Attack Decay), ADSR (Attack Decay Sustain Release), and ADSHR (Attack
+/// Decay Sustain Hold Release). The number of envelope segments is fixed to
+/// ensure better memory locality.
+///
+/// \tparam N	number of segments
+/// \tparam T	sample type
 template <int N, class T=gam::real>
 class CurveEnv{
 public:
@@ -68,19 +78,33 @@ public:
 	CurveEnv(): mRelease(N)
 	{ reset(); }
 
+	/// Get the number of segments
 	int size() const { return N; }
+	
+	/// Get the position, in samples, within the current segment
 	int position() const { return mPos; }
+	
+	/// Get the release point
 	int releasePoint() const { return mRelease; }
+	
+	/// Get the envelope's current segment
 	int stage() const { return mStage; }
 	
+	/// Get the current envelope value
 	T value() const {
 		return mValues[mStage] + mCurve.value();
 	}
 
+	/// Returns whether the envelope is done
 	bool done() const { return mStage == size(); }
+	
+	/// Returns whether the envelope is released
 	bool released() const { return mRelease < 0; }
+	
+	/// Returns whether the envelope is currently sustained
 	bool sustained() const { return (mStage == mRelease) && !released(); }
 
+	/// Generate next value
 	T operator()(){
 		//begin:
 		if(sustained()){
@@ -106,6 +130,7 @@ public:
 		return mValues[mStage];
 	}
 	
+	/// Release the envelope
 	void release(){
 		mRelease=-scl::abs(mRelease);
 
@@ -147,12 +172,22 @@ public:
 		return *this;
 	}
 	
-	CurveEnv& segments(T la, T ca, T lb, T cb){ T l[]={la,lb}; T c[]={ca,cb}; return segments(l,c,2); }
-	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc){ T l[]={la,lb,lc}; T c[]={ca,cb,cc}; return segments(l,c,3); }
-	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){ T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; return segments(l,c,4); }
+	/// Set length and curvature of first two segments
+	CurveEnv& segments(T la, T ca, T lb, T cb){
+		T l[]={la,lb}; T c[]={ca,cb}; return segments(l,c,2); }
 
+	/// Set length and curvature of first three segments
+	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc){
+		T l[]={la,lb,lc}; T c[]={ca,cb,cc}; return segments(l,c,3); }
+	
+	/// Set length and curvature of first four segments
+	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){
+		T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; return segments(l,c,4); }
+
+	/// Set a break-point value
 	CurveEnv& point(int i, T val){ mValues[i]=val; return *this; }
 
+	/// Set break-point values
 	template <class V>
 	CurveEnv& points(const V* vals, int len){
 		int n = len <= size() ? len : size()+1;
@@ -160,9 +195,16 @@ public:
 		return *this;
 	}
 	
+	/// Set first two break-point values
 	CurveEnv& points(T a, T b){ T v[]={a,b}; return points(v,2); }
+
+	/// Set first three break-point values
 	CurveEnv& points(T a, T b, T c){ T v[]={a,b,c}; return points(v,3); }
+
+	/// Set first four break-point values
 	CurveEnv& points(T a, T b, T c, T d){ T v[]={a,b,c,d}; return points(v,4); }
+
+	/// Set first five break-point values
 	CurveEnv& points(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return points(v,5); }
 
 protected:
@@ -217,7 +259,7 @@ protected:
 
 
 
-/// Exponentially decaying  curve.
+/// Exponentially decaying curve
 template <class T=gam::real, class Ts=Synced>
 class Decay : public Ts{
 public:
