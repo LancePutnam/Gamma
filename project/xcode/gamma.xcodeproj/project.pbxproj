@@ -57,7 +57,6 @@
 		16747A0F115806FF00A1556D /* fil.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F1305A0FFEE85900DE56F6 /* fil.h */; };
 		16747A10115806FF00A1556D /* Access.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA810F8DB1F100D0452F /* Access.h */; };
 		16747A11115806FF00A1556D /* Conversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 16938ABF0FBD0C4400274B2A /* Conversion.h */; };
-		16747A12115806FF00A1556D /* Dims.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA830F8DB1F100D0452F /* Dims.h */; };
 		16747A14115806FF00A1556D /* FFT.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E09511E0DECCE18000AF828 /* FFT.h */; };
 		16747A15115806FF00A1556D /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA820F8DB1F100D0452F /* File.h */; };
 		16747A16115806FF00A1556D /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D9B4BA0DDBEA100043A25B /* Filter.h */; };
@@ -145,7 +144,6 @@
 		1683FC410E283786001FAF43 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = design.txt; path = ../../doc/design.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		1686EA810F8DB1F100D0452F /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Access.h; path = ../../Gamma/Access.h; sourceTree = SOURCE_ROOT; };
 		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../Gamma/File.h; sourceTree = SOURCE_ROOT; };
-		1686EA830F8DB1F100D0452F /* Dims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dims.h; path = ../../Gamma/Dims.h; sourceTree = SOURCE_ROOT; };
 		168A0427128CB87F004556F0 /* ut_arr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_arr.cpp; sourceTree = "<group>"; };
 		168A0428128CB87F004556F0 /* ut_fil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_fil.cpp; sourceTree = "<group>"; };
 		168A0429128CB87F004556F0 /* ut_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ut_gen.cpp; sourceTree = "<group>"; };
@@ -304,7 +302,6 @@
 				16EDF9B9094F8C2600549AC9 /* Constants.h */,
 				16CCF9C00A9EC1650013D2BF /* Containers.h */,
 				16938ABF0FBD0C4400274B2A /* Conversion.h */,
-				1686EA830F8DB1F100D0452F /* Dims.h */,
 				16CEF9120BBCDA0A0049666F /* Gamma.h */,
 				16F7D07C0B5414A1008A2E29 /* Node.h */,
 				16F836E10A1E888200F05DF5 /* AudioIO.h */,
@@ -425,7 +422,6 @@
 				167479F9115806C800A1556D /* Constants.h in Headers */,
 				167479FA115806C800A1556D /* Containers.h in Headers */,
 				16747A11115806FF00A1556D /* Conversion.h in Headers */,
-				16747A12115806FF00A1556D /* Dims.h in Headers */,
 				167479FF115806C800A1556D /* Gamma.h in Headers */,
 				16747A03115806C800A1556D /* Node.h in Headers */,
 				167479F7115806C800A1556D /* AudioIO.h in Headers */,
