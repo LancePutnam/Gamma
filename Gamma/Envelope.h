@@ -29,18 +29,13 @@ public:
 	Curve();
 	
 	/// @param[in] length	length of curve in samples
-	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
+	/// @param[in] curve	curvature; >0 approaches slowly, <0 approaches rapidly, 0 approaches linearly
 	/// @param[in] end		end value
 	Curve(T length, T curve, T end = T(1));
 
-	/// Returns whether curve has gone past end value
-	bool done() const;
-
-	/// Get end value
-	T end() const { return mEnd; }
-
-	/// Get current value
-	T value() const;
+	bool done() const;				///< Returns whether curve has gone past end value
+	T end() const { return mEnd; }	///< Get end value
+	T value() const;				///< Get current value
 
 	T operator()();					///< Generates next value
 	void reset();					///< Reset envelope
@@ -64,8 +59,11 @@ protected:
 
 /// Envelope with a fixed number of exponential segments and a sustain point
 
-/// This class can be used to construct many typical envelopes such as AD 
-/// (Attack Decay), ADSR (Attack Decay Sustain Release), and ADSHR (Attack
+/// The envelope consists of N exponential curve 'segments' and N+1 break-point
+/// levels. The curvature and length of each segment and the break-point levels
+/// can be controlled independently.
+/// This class can be used to construct many specialized envelopes such as an AD 
+/// (Attack Decay), an ADSR (Attack Decay Sustain Release), and an ADSHR (Attack
 /// Decay Sustain Hold Release). The number of envelope segments is fixed to
 /// ensure better memory locality.
 ///
@@ -75,7 +73,7 @@ template <int N, class T=gam::real>
 class CurveEnv{
 public:
 
-	CurveEnv(): mRelease(N)
+	CurveEnv(): mSustain(N)
 	{ reset(); }
 
 	/// Get the number of segments
@@ -84,74 +82,87 @@ public:
 	/// Get the position, in samples, within the current segment
 	int position() const { return mPos; }
 	
-	/// Get the release point
-	int releasePoint() const { return mRelease; }
+	/// Get the sustain break-point
+	int sustainPoint() const { return mSustain; }
 	
 	/// Get the envelope's current segment
 	int stage() const { return mStage; }
 	
 	/// Get the current envelope value
 	T value() const {
-		return mValues[mStage] + mCurve.value();
+		return mLevels[mStage] + mCurve.value();
 	}
 
 	/// Returns whether the envelope is done
 	bool done() const { return mStage == size(); }
 	
 	/// Returns whether the envelope is released
-	bool released() const { return mRelease < 0; }
+	bool released() const { return mSustain < 0; }
 	
 	/// Returns whether the envelope is currently sustained
-	bool sustained() const { return (mStage == mRelease) && !released(); }
+	bool sustained() const { return (mStage == mSustain); }
+	//bool sustained() const { return (mStage == mSustain) && !released(); }
 
 	/// Generate next value
 	T operator()(){
-		//begin:
 		if(sustained()){
-			return mValues[mStage];
+			return mLevels[mStage];
 		}
 		else if(mPos < mLen){
 			++mPos;
-			return mValues[mStage] + mCurve();
+			return mLevels[mStage] + mCurve();
 		}
-//		else if(mStage < size()-1){
 		else if(mStage < size()){
 			++mStage;
 
 			if(!done()){
 				mPos = 0;
 				mLen = mLengths[mStage];
-				mCurve.set(mLen, mCurves[mStage], mValues[mStage+1]-mValues[mStage]);
-				//goto begin;
-				(*this)();
+				mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1]-mLevels[mStage]);
+				return (*this)(); // return level of new stage
 			}
 		}
-//		return mValues[mStage+1];
-		return mValues[mStage];
-	}
-	
+		return mLevels[mStage];
+	}	
+
 	/// Release the envelope
 	void release(){
-		mRelease=-scl::abs(mRelease);
+		mSustain = -scl::abs(mSustain);
 
 		// begin release portion immediately starting at current level
 //		T curVal = value();
-//		mStage = -mRelease;
+//		mStage = -mSustain;
 //		mPos = 0;
 //		mLen = mLengths[mStage];
-//		mCurve.set(mLen, mCurves[mStage], 2*mValues[mStage+1]-mValues[mStage]-curVal);
-//		mCurve.value(curVal-mValues[mStage]);
+//		mCurve.set(mLen, mCurves[mStage], 2*mLevels[mStage+1]-mLevels[mStage]-curVal);
+//		mCurve.value(curVal-mLevels[mStage]);
 	}
 
 	/// Sets the point at which the envelope holds its value until released
-	void releasePoint(int v){ mRelease = v; }
+	CurveEnv& sustainPoint(int v){ mSustain=v; return *this; }
+
+	/// Disable sustain
+	CurveEnv& sustainDisable(){ return sustainPoint(N); }
 
 	/// Reset envelope to starting point
 	void reset(){
+		// this forces a stage increment upon first iteration
 		mPos = 0xFFFFFFFF;
 		mLen = 0;
 		mStage = -1;
-		mRelease = scl::abs(mRelease);
+		mSustain = scl::abs(mSustain);
+	}
+	
+	/// Get segment lengths array
+	T * lengths(){ return mLengths; }
+	
+	/// Get segment curvature array
+	T * curves(){ return mCurves; }
+	
+	/// Set curvature of all segments
+	CurveEnv& curve(T v){
+		for(int i=0; i<N; ++i) curves()[i]=v;
+		return *this;
 	}
 
 	/// Set length and curvature of a segment
@@ -184,43 +195,104 @@ public:
 	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){
 		T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; return segments(l,c,4); }
 
-	/// Set a break-point value
-	CurveEnv& point(int i, T val){ mValues[i]=val; return *this; }
+
+	/// Get break-point levels array
+	T * levels(){ return mLevels; }
 
 	/// Set break-point values
 	template <class V>
-	CurveEnv& points(const V* vals, int len){
+	CurveEnv& levels(const V* vals, int len){
 		int n = len <= size() ? len : size()+1;
-		for(int i=0; i<n; ++i) point(i, vals[i]);
+		for(int i=0; i<n; ++i) levels()[i] = vals[i];
 		return *this;
 	}
 	
-	/// Set first two break-point values
-	CurveEnv& points(T a, T b){ T v[]={a,b}; return points(v,2); }
+	/// Set first two break-point levels
+	CurveEnv& levels(T a, T b){ T v[]={a,b}; return levels(v,2); }
 
-	/// Set first three break-point values
-	CurveEnv& points(T a, T b, T c){ T v[]={a,b,c}; return points(v,3); }
+	/// Set first three break-point levels
+	CurveEnv& levels(T a, T b, T c){ T v[]={a,b,c}; return levels(v,3); }
 
-	/// Set first four break-point values
-	CurveEnv& points(T a, T b, T c, T d){ T v[]={a,b,c,d}; return points(v,4); }
+	/// Set first four break-point levels
+	CurveEnv& levels(T a, T b, T c, T d){ T v[]={a,b,c,d}; return levels(v,4); }
 
-	/// Set first five break-point values
-	CurveEnv& points(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return points(v,5); }
+	/// Set first five break-point levels
+	CurveEnv& levels(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return levels(v,5); }
 
 protected:
 	Curve<T> mCurve;
-	T mLengths[N];			// segment lengths
+	T mLengths[N];			// segment lengths, in samples
 	T mCurves[N];			// segment curvatures
-	T mValues[N+1];			// break point values
+	T mLevels[N+1];			// break-point levels
 	
 	uint32_t mPos, mLen;	// position in and length of current segment, in samples
 	int mStage;				// the current curve segment
-	int mRelease;			// index of point before release portion
+	int mSustain;			// index of sustain point
 };
 
 
 
-/// Attack-decay envelope
+/// ADSR (Attack Decay Sustain Release) envelope
+
+/// This is a three segment envelope that rises to one and then falls back
+/// to zero. The attack is the rise length, the decay is the length until
+/// hitting the sustain level, and the release is the length until hitting
+/// zero again.
+/// This envelope is most useful when the duration of the envelope is not known 
+/// in advance. However, it can be easily converted into a fixed length ADR by
+/// calling the sustainDisable() mehod. The decay segment then acts as a pseudo
+/// steady state portion.
+/// \tparam T	sample type
+/// \tparam Ts	sync type
+template <class T=gam::real, class Ts=Synced>
+class ADSR : public CurveEnv<3,T>, public Ts{
+public:
+	using CurveEnv<3,T>::release;
+
+	/// @param[in] att	Attack length
+	/// @param[in] dec	Decay length
+	/// @param[in] sus	Sustain level
+	/// @param[in] rel	Release length
+	/// @param[in] crv	Curvature of segments
+	ADSR(T att =T(0.01), T dec =T(0.1), T sus =T(0.7), T rel =T(1.), T crv =T(-4))
+	{
+		this->sustainPoint(2);
+		levels(0,1,sus,0);
+		attack(att).decay(dec).release(rel);
+		curve(crv);
+	}
+
+	/// Set attack length
+	ADSR& attack(T len){ return setLen(0,len); }
+
+	/// Set decay length
+	ADSR& decay(T len){ return setLen(1,len); }
+
+	/// Set sustain level
+	ADSR& sustain(T val){
+		point(this->sustainPoint(), val);
+		return *this;
+	}
+
+	/// Set release length
+	ADSR& release(T len){ return setLen(2,len); }
+	
+protected:
+	virtual void onResync(double r){
+		for(int i=0; i<this->size(); ++i) this->mLengths[i] *= r;
+	}
+
+	ADSR& setLen(int i, T v){
+		this->lengths()[i] = v*Ts::spu(); return *this;
+	}
+};
+
+
+
+/// AD (Attack Decay) envelope
+
+/// This is a fixed-length envelope
+///
 template <class T=gam::real, class Ts=Synced>
 class AD : public Ts{
 public:
@@ -245,8 +317,6 @@ public:
 	void length(T unitsA, T unitsD);	///< Set attack/decay units
 	void set(T lengthA, T lengthD, T curveA, T curveD, T amp); ///< Set all envelope parameters
 	void reset();				///< Reset envelope
-	
-	virtual void onResync(double r);
 
 protected:
 	Curve<T> mFncA, mFncD;
@@ -254,12 +324,19 @@ protected:
 	T mCrvA, mCrvD;
 	T mAmp;
 	uint32_t mStage, mSmpsA, mCntA;
+
+	virtual void onResync(double r);
 };
 
 
 
-
 /// Exponentially decaying curve
+
+/// This envelope exponentially decays towards zero starting from an initial
+/// value. Because zero is never reached, the decay length determines when the
+/// envelope is -60 dB down from its initial value. This envelope is one of the 
+/// most computationally efficient envelopes requiring only a single multiply
+/// per iteration.
 template <class T=gam::real, class Ts=Synced>
 class Decay : public Ts{
 public:
@@ -268,21 +345,22 @@ public:
 	/// @param[in] val		Intial value
 	Decay(T decay=T(1), T val=T(1));
 
-	T decay() const;		///< Returns -60 dB decay length.
+	T decay() const;		///< Returns -60 dB decay length
 	bool done(T thresh=T(0.001)) const; ///< Returns whether value is below threshold
-	T value() const;		///< Returns current value.
+	T value() const;		///< Returns current value
 
-	T operator()();			///< Generates next sample.
+	T operator()();			///< Generate next sample
 	
-	void decay(T val);		///< Set number of units for curve to decay -60 dB.
-	void reset();			///< Set current value to 1.
-	void value(T val);		///< Set current value.
-
-	virtual void onResync(double r);
+	void decay(T val);		///< Set number of units for curve to decay -60 dB
+	void reset();			///< Set current value to 1
+	void value(T val);		///< Set current value
 	
 protected:
 	T mVal, mMul, mDcy;
+
+	virtual void onResync(double r);
 };
+
 
 
 /// Binary gate controlled by threshold comparison
@@ -386,12 +464,12 @@ public:
 	
 	Si<Tv>& ipol(){ return mIpl; }
 	
-	virtual void onResync(double r){ freq(mFreq); }
-	
 protected:
 	Tp mFreq;
 	gen::RAdd<Tp> mAcc;
 	Si<Tv> mIpl;
+	
+	virtual void onResync(double r){ freq(mFreq); }
 };
 
 
