@@ -14,7 +14,10 @@
 namespace gam{
 
 
-/// Fixed-point phase accumulator.
+/// Fixed-point phase accumulator
+
+/// \tparam Stap	Read tap strategy (tap::Clip, tap::Fold, tap::Rep, or tap::Wrap)
+/// \tparam Ts		Synced type
 template <class Stap=tap::Wrap, class Ts=Synced>
 class Accum : public Ts {
 public:
