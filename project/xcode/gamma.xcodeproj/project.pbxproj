@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		164BDCAF14CCA7750061E1EF /* Makefile test */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 164BDCB614CCA7E50061E1EF /* Build configuration list for PBXAggregateTarget "Makefile test" */;
+			buildPhases = (
+				164BDCAE14CCA7750061E1EF /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Makefile test";
+			productName = "Make all test";
+		};
 		168AAD840CD0042400F36E4B /* libgamma{.a, .dylib} */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 168AAD8B0CD0046700F36E4B /* Build configuration list for PBXAggregateTarget "libgamma{.a, .dylib}" */;
@@ -135,6 +146,7 @@
 		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
 		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
+		164BDD0B14CCAE3F0061E1EF /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; name = examples; path = ../../examples; sourceTree = SOURCE_ROOT; };
 		165DFF651337016600C61126 /* utEnvelope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utEnvelope.cpp; sourceTree = "<group>"; };
 		16692FAD126FC53100C1F4E9 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
 		16692FAE126FC9A300C1F4E9 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
@@ -356,30 +368,31 @@
 		7EB463CC0825DC05002E1A73 = {
 			isa = PBXGroup;
 			children = (
-				7EB463E80825DC92002E1A73 /* Main */,
-				7EB463D70825DC5D002E1A73 /* gamma */,
+				7EB463D70825DC5D002E1A73 /* source */,
+				7EB463E80825DC92002E1A73 /* tests */,
+				164BDD0B14CCAE3F0061E1EF /* examples */,
 				16D8143A0B9D089E00A4B638 /* doc */,
 				16D24F640A9BA72E00415E9E /* Libs */,
 				7EB463FF0825DD10002E1A73 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		7EB463D70825DC5D002E1A73 /* gamma */ = {
+		7EB463D70825DC5D002E1A73 /* source */ = {
 			isa = PBXGroup;
 			children = (
 				16F7DB390B812023001CABCE /* Gamma */,
 				16F7DB3C0B812041001CABCE /* src */,
 			);
-			name = gamma;
+			name = source;
 			sourceTree = "<group>";
 		};
-		7EB463E80825DC92002E1A73 /* Main */ = {
+		7EB463E80825DC92002E1A73 /* tests */ = {
 			isa = PBXGroup;
 			children = (
 				168A0432128CB899004556F0 /* unitTests.cpp */,
 				168A0426128CB87F004556F0 /* ut */,
 			);
-			name = Main;
+			name = tests;
 			sourceTree = "<group>";
 		};
 		7EB463FF0825DD10002E1A73 /* Products */ = {
@@ -518,11 +531,25 @@
 				C0F9EF670BB059670069B343 /* libgamma.dylib */,
 				168AAC9C0CD0025D00F36E4B /* libgamma.a */,
 				168AAD840CD0042400F36E4B /* libgamma{.a, .dylib} */,
+				164BDCAF14CCA7750061E1EF /* Makefile test */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		164BDCAE14CCA7750061E1EF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This runs all the Makefile rules\ncd ../..\nfor v in algorithmic curves effects filter function generator io transform; do\n\tmake examples/$v/*.cpp -j4 AUTORUN=0\ndone\nmake test -j4";
+		};
 		168AAD890CD0044800F36E4B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 8;
@@ -626,6 +653,34 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		164BDCB014CCA7760061E1EF /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Make all test";
+			};
+			name = Development;
+		};
+		164BDCB114CCA7760061E1EF /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Make all test";
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		164BDCB214CCA7760061E1EF /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Make all test";
+			};
+			name = Default;
+		};
 		168AACA10CD0027E00F36E4B /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -933,6 +988,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		164BDCB614CCA7E50061E1EF /* Build configuration list for PBXAggregateTarget "Makefile test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				164BDCB014CCA7760061E1EF /* Development */,
+				164BDCB114CCA7760061E1EF /* Deployment */,
+				164BDCB214CCA7760061E1EF /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
 		168AACA00CD0027E00F36E4B /* Build configuration list for PBXNativeTarget "libgamma.a" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
