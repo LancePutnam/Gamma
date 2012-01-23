@@ -23,7 +23,6 @@ public:
 		AIFF,		/**< Apple/SGI AIFF format (big endian). */
 		AU,			/**< Sun/NeXT AU format (big endian). */
 		RAW,		/**< RAW PCM data. */
-		FLAC,		/**< FLAC lossless file format */
 	};
 
 	/// Sound file sample encoding types

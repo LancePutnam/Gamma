@@ -1,6 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <ctype.h>
 #include <string>
 #include <stdio.h>
 #include "sndfile.h"
@@ -47,9 +48,19 @@ struct SoundFile::Impl{
 	int formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; }
 	void format(int v){ mInfo.format = v; }
 
+/*
+When opening a file for read, the format field should be set to zero before 
+calling sf_open(). The only exception to this is the case of RAW files where 
+the caller has to set the samplerate, channels and format fields to valid 
+values. All other fields of the structure are filled in by the library.
+*/
+
 	bool openRead(const std::string& path){
 		if(formatMinor() != SF_FORMAT_RAW) mInfo.format = 0;
 		fp = sf_open(path.c_str(), SFM_READ, &mInfo);
+
+		//printf("%s\n", path.c_str());
+		//printInfo();
 		return 0 != fp;
 	}
 
@@ -81,11 +92,13 @@ struct SoundFile::Impl{
 		
 		if(string::npos != pos){
 			string ext = sfpath.substr(pos+1);
+			for(unsigned i=0; i<ext.size(); ++i) ext[i] = tolower(ext[i]);
+			
 			//printf("%s\n", ext.c_str());
 			if(ext == "wav")					return SF_FORMAT_WAV;
 			if(ext == "aiff" || ext == "aif")	return SF_FORMAT_AIFF;
 			if(ext == "au")						return SF_FORMAT_AU;
-			if(ext == "flac")					return SF_FORMAT_FLAC;
+			//if(ext == "flac")					return SF_FORMAT_FLAC;
 		}
 		return 0;
 	}
@@ -121,6 +134,9 @@ struct SoundFile::Impl{
 };
 
 
+
+
+
 SoundFile::SoundFile(const string& path_)
 :	mImpl(new Impl)
 {
@@ -154,7 +170,8 @@ SoundFile& SoundFile::frameRate(double hz){ mImpl->frameRate(hz); return *this; 
 SoundFile::Format SoundFile::format() const {
 	#define CS(x) case SF_FORMAT_##x: return x;
 	switch(mImpl->formatMajor()){
-	CS(WAV) CS(AIFF) CS(AU) CS(RAW) CS(FLAC)
+	CS(WAV) CS(AIFF) CS(AU) CS(RAW)
+	//CS(FLAC)
 	default: return Format(0);
 	}
 	#undef CS
@@ -163,7 +180,8 @@ SoundFile::Format SoundFile::format() const {
 SoundFile& SoundFile::format(Format v){
 	#define CS(x) case x: mImpl->formatMajor(SF_FORMAT_##x); break;
 	switch(v){
-	CS(WAV) CS(AIFF) CS(AU) CS(RAW) CS(FLAC)
+	CS(WAV) CS(AIFF) CS(AU) CS(RAW)
+	//CS(FLAC)
 	default:;
 	}
 	#undef CS
@@ -194,7 +212,8 @@ SoundFile& SoundFile::encoding(EncodingType v){
 const char * SoundFile::toString(Format v){
 	#define CS(x) case x: return #x;
 	switch(v){
-	CS(WAV) CS(AIFF) CS(AU) CS(RAW) CS(FLAC)
+	CS(WAV) CS(AIFF) CS(AU) CS(RAW)
+	//CS(FLAC)
 	default: return "";
 	}
 	#undef CS
