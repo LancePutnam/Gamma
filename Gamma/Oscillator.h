@@ -124,19 +124,26 @@ protected:
 
 /// Tabulated function oscillator
 
-/// Tv is the table element type, Sipol is an interpolation strategy, and
-/// Stap is a table reading strategy.
-/// Mathews, M. (1969). The Technology of Computer Music. The M.I.T. Press, Boston.
+/// This generator produces a periodic signal by reading values from a table.
+/// Its advantage over other types of waveform generators is that it can
+/// produce arbitrary periodic waveforms with a fixed computational cost. Its
+/// main weakness is lack of parametric control over the waveform timbre.
+/// This generator is named after the generator of the same name in the MUSIC
+/// series of compilers. [Mathews, M. (1969). The Technology of Computer Music. 
+/// The M.I.T. Press, Boston.]
+/// \tparam Tv		table element type
+/// \tparam Sipol	interpolation strategy
+/// \tparam Stap	table reading strategy
 template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
 class Osc : public Accum<Stap,Ts>, public ArrayPow2<Tv>{
 public:
 
-	/// Constructor that alocates an internal table
+	/// Constructor that allocates an internal table
 
 	/// @param[in]	frq			Initial frequency
 	/// @param[in]	phs			Initial unit phase in [0, 1)
 	/// @param[in]	size		Number of table elements (actual number is power of 2 ceiling)
-	Osc(float frq, float phs=0, uint32_t size=512)
+	Osc(float frq=440, float phs=0, uint32_t size=512)
 	:	Base(frq, phs), ArrayPow2<Tv>(size)
 	{}
 
@@ -149,15 +156,14 @@ public:
 	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
 	{}
 	
-	virtual ~Osc(){}
+	//virtual ~Osc(){}
 
 	/// Generate next sample
 	Tv operator()(){
 		Tv o0 = val(); mTap(this->mPhase, phaseIncI()); return o0;
 	}
-	
-	void zero(){ for(unsigned i=0; i<this->size(); ++i) (*this)[i] = 0; }
 
+	/// Get current value
 	Tv val() const { return mIpol(*this, phaseI()); }
 	
 	/// Add sine to table
@@ -173,6 +179,9 @@ public:
 		}
 		return *this;
 	}
+
+	/// Zero table elements
+	void zero(){ for(unsigned i=0; i<this->size(); ++i) (*this)[i] = Tv(0); }
 
 //	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 protected:
@@ -400,11 +409,11 @@ private:
 
 
 
-/// Lookup table sine oscillator.
+/// Lookup table sine oscillator
 
 /// This oscillator looks up values in a table containing the sine function
-/// in [0, pi/2].  Doing a non-interpolating table lookup is very fast and
-/// stable compared to other methods.  The downsides are that the waveform is
+/// in [0, pi/2]. Doing a non-interpolating table lookup is very fast and
+/// stable compared to other methods. The downsides are that the waveform is
 /// generally not as spectrally pure and additional memory needs to be allocated
 /// to store the lookup table (although it's relatively small and only allocated
 /// once).
