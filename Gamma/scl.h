@@ -22,9 +22,6 @@
 #ifdef min
 #undef min
 #endif
-#ifdef sinc
-#undef sinc
-#endif
 
 namespace gam{
 
@@ -136,9 +133,6 @@ bool almostEqual(double a, double b, int maxUlps=10);
 // |error| < 0.01 rad
 TEM T atan2Fast(T y, T x);
 
-/// Returns value clipped ouside of range [-eps, eps]
-TEM T atLeast(T v, T eps);
-
 /// Returns floating point value rounded to next highest integer.
 TEM T ceil(T val);
 TEM T ceil(T val, T step);
@@ -149,9 +143,6 @@ TEM T ceil(T val, T step, T recStep);
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
 uint32_t ceilPow2(uint32_t value);
-
-/// Returns even number ceiling.
-uint32_t ceilEven(uint32_t value);
 
 /// Returns value clipped to [lo, hi].
 TEM T clip(T value, T hi=T(1), T lo=T(0));
@@ -167,7 +158,7 @@ TEM T clipS(T value, T hi=T(1));
 TEM T clip(T value, int & clipFlag, T hi, T lo);
 
 /// Returns value whose magnitude is clipped to [min, max].
-float clipMag(float value, float min, float max);
+float clipMag(float value, float max=1.f, float min=0.f);
 
 /// Third order polynomial approximation to first half of cosine.
 
@@ -181,10 +172,6 @@ TEM T cosP3(T u);
 ///
 TEM T cosT8(T radians);
 
-/// Compute curvature around point b of three successive points a, b, and c.
-template <class T, template <class> class NVec>
-T curvature(const NVec<T>& a, const NVec<T>& b, const NVec<T>& c);
-
 /// Convert decibels to amplitude
 template <class T>
 inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
@@ -192,12 +179,6 @@ inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 /// Convert amplitude to decibels
 template <class T>
 inline T ampTodB(const T& amp){ return 20*::log(amp); }
-
-/// Returns two element dot product x1 * y1 + x2 * y2.
-TEM T dot2(T x1, T x2, T y1, T y2);
-
-/// Returns relative error between a true and measured value.
-TEM inline double error(const T& truth, const T& measured){ return (measured-truth)/double(truth);}
 
 /// Returns weights for linear fade.
 TEM void fadeLin(T& weight1, T& weight2, T fade);
@@ -212,8 +193,6 @@ TEM void fadeLin(T& weight1, T& weight2, T fade);
 /// 0.75	0			1
 TEM void fadeTri(T& weight1, T& weight2, T fade);
 
-uint32_t factorial12(uint32_t value);				///< Returns factorial of value in [0, 12].
-
 /// Return Fejer weighting factor for kth harmonic in a Fourier series of length n.
 
 /// The function is a line from (0,1) to (n,0). This is used for reducing the
@@ -224,12 +203,6 @@ TEM T fejer(T k, T n){ return (n-k)/n; }
 TEM T floor(T val);
 TEM T floor(T val, T step);
 TEM T floor(T val, T step, T recStep);
-
-/// Returns power of two floor of value.
-
-/// This uses an algorithm devised by Sean Anderson, Sep. 2001.
-/// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-uint32_t floorPow2(uint32_t value);
 
 /// Returns value folded into [lo, hi].
 
@@ -252,17 +225,6 @@ double freq(const char * note);
 
 /// Convert domain frequency to radians clipped to interval [0, pi).
 TEM inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_PI; }
-
-/// Returns e^(-v*v)
-TEM T gaussian(T v){ return ::exp(-v*v); }
-
-/// Return greatest common divisor of two arguments
-TEM T gcd(const T& x, const T& y);
-
-TEM T hypot(T x, T y);
-
-/// Returns least common multiple
-TEM inline T lcm(const T& x, const T& y){ return (x*y)/gcd(x,y); }
 
 /// Convert linear value to log2 in range [0, 1]
 TEM T linLog2(T v, T recMin);
@@ -305,9 +267,6 @@ TEM void mix2(T& io1, T& io2, T mix);
 /// The sum of the values in the interval array should be equal to 'mod'.
 TEM T nearest(T v, const char * intervals="2212221", long mod=12);
 
-/// Returns nearest integer division of one value to another
-TEM T nearestDiv(T of, T to);
-
 /// Smooth negative map.
 
 /// The return value is close to 1 if v < 0 and close to 0 if v > 0.
@@ -320,18 +279,9 @@ TEM T negative(T v, T bw, T amt);
 /// Returns the next representable floating-point or integer value following x in the direction of y
 TEM T nextAfter(T x, T y);
 
-/// Returns the number of digits in the integer portion
-TEM T numInt(const T& v){ return scl::floor(::log10(v)) + 1; }
-
 /// Returns pole radius given a bandwidth and sampling interval
 TEM	inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
-
-/// Evaluates polynomial a0 + a1 x + a2 x^2
-TEM T poly(T x, T a0, T a1, T a2);
-
-/// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3
-TEM T poly(T x, T a0, T a1, T a2, T a3);
 
 /// Smooth positive map
 
@@ -339,19 +289,9 @@ TEM T poly(T x, T a0, T a1, T a2, T a3);
 /// The smoothness is controlled with the bw argument.
 TEM T positive(T v, T bw);
 
-TEM T pow2(T v);			///< Returns value to the 2nd power.
-TEM T pow2S(T v);			///< Returns value to the 2nd power preserving sign.
-TEM T pow3(T v);			///< Returns value to the 3rd power.
-TEM T pow3Abs(T v);			///< Returns absolute value to the 3rd power.
-TEM T pow4(T v);			///< Returns value to the 4th power.
-TEM T pow5(T v);			///< Returns value to the 5th power.
-TEM T pow6(T v);			///< Returns value to the 6th power.
-TEM T pow8(T v);			///< Returns value to the 8th power.
-TEM T pow16(T v);			///< Returns value to the 16th power.
-TEM T pow64(T v);			///< Returns value to the 64th power.
-
-unsigned char prime(uint32_t n);	///< Returns (n+1)th prime number up to n=53.
-TEM T prime(uint32_t n, T mul);	///< Returns scaled (n+1)th prime number up to n=53.
+TEM T pow2(T v);			///< Returns value to the 2nd power
+TEM T pow3(T v);			///< Returns value to the 3rd power
+TEM T pow4(T v);			///< Returns value to the 4th power
 
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
@@ -362,9 +302,6 @@ inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups);
 /// @param[in] divs		number of equally tempered divisions in octave
 /// @param[in] octave	base multiplier of (pseudo) octave
 TEM T ratioET(T pitch, T divs=12, T octave=2);
-
-/// Returns the value r such that r = x - n*y.
-TEM T remainder(const T& x, const T& y);
 
 /// Returns floating point value rounded to nearest integer.
 TEM T round(T v);
@@ -383,9 +320,6 @@ TEM T roundAway(T v, T step);
 
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
-
-/// Signum function for real numbers.
-TEM inline T sgn(const T& v, const T& norm=T(1)){ return v<T(0) ? -norm : norm; }
 
 /// Continuous sign map.
 
@@ -414,20 +348,6 @@ TEM T sinT7(T radians);
 /// 'radians' must be in [-pi, pi].
 ///
 TEM T sinT9(T radians);
-
-/// Unnormalized sinc function
-TEM T sinc(T radians, T eps=T(0.0001));
-
-/// Sort values so that value1 <= value2.
-TEM void sort(T& value1, T& value2);
-
-/// Sum of integers squared from 1 to n.
-TEM T sumOfSquares(T n){
-	static const T c1_6 = 1/T(6);
-	static const T c2_6 = c1_6*T(2);
-	return n*(n+1)*(c2_6*n+c1_6);
-}
-
 
 /// Truncates floating point value at decimal.
 TEM T trunc(T value);
@@ -508,17 +428,8 @@ TEM T peak1(T v, T bw){ return bw/(scl::abs(v)+bw); }
 // Analysis
 //
 
-/// Returns number of bits set to 1.
-
-/// From "Bit Twiddling Hacks",
-/// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-uint32_t bitsSet(uint32_t v);
-
 /// Returns whether or not an integer value is even.
 TEM bool even(T v);
-
-/// Returns whether the absolute value is less than an epsilon.
-TEM bool lessAbs(T v, T eps=(T)0.000001);
 
 /// Returns maximum of two values.
 TEM T max(T v1, T v2);
@@ -526,23 +437,14 @@ TEM T max(T v1, T v2);
 /// Returns maximum of three values.
 TEM T max(T v1, T v2, T v3);
 
-/// Returns mean of two values.
-TEM T mean(T v1, T v2);
-
 /// Returns minimum of two values.
 TEM T min(T v1, T v2);
 
 /// Returns minimum of three values.
 TEM T min(T v1, T v2, T v3);
 
-/// Returns next largest value of 'val' that is a multiple of 'multiple'.
-TEM T nextMultiple(T val, T multiple);
-
 /// Returns whether or not an integer value is odd.
 TEM bool odd(T v);
-
-/// Returns whether the value is a power of two.
-bool powerOf2(int v);
 
 /// Returns slope of line passing through two points.
 TEM T slope(T x1, T y1, T x2, T y2);
@@ -556,25 +458,9 @@ uint32_t trailingZeroes(uint32_t v);
 
 /// Returns whether value is within [lo, hi].
 TEM bool within(T v, T lo, T hi);
-TEM bool within3(T v1, T v2, T v3, T lo, T hi);
-
-/// Returns whether value is within [lo, hi).
-TEM bool withinIE(T v, T lo, T hi);
 
 /// Returns whether a positive zero crossing occured.
 bool zeroCrossP(float prev, float now);
-
-
-
-/// Convert polar to rectangular coordinates
-TEM void polarToRect(T mag, T phs, T& real, T& imag);
-
-/// Convert rectangular coordinates to polar.
-TEM void rectToPolar(T& r, T& i);
-
-/// In-place spherical to cartesian conversion for floating point types.
-TEM void sphericalToCart(T & rho, T & phi, T & theta);
-
 
 
 
@@ -607,15 +493,6 @@ float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
 float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
 float triangleU	(uint32_t phase);	///< Returns value of unipolar triangle function.
 
-/// Dirichlet kernel, an impulse with n harmonics.
-
-/// This is a closed form solution to the summation:\n
-/// Dn(x)	= 1 + 2 * sum(1,n){ cos( kx ) } \n
-///	Dn(x)	= sin( nx + x/2 ) / sin( x/2 )
-float dirichlet(float phase, float n);
-
-float dirichlet2(float phase, float n);
-
 TEM T bartlett(T nphase);				///< Bartlett window. nphase => [-1, 1)
 TEM T blackman(T phase);				///< Blackman window function.
 TEM T blackmanHarris(T phase);			///< Blackman-Harris window function.
@@ -628,16 +505,6 @@ TEM T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
 // internal
 namespace{
 
-//	const float mFactorial12f[13] = {
-//		1.f, 1.f, 2.f, 6.f, 24.f, 120.f, 720.f, 5040.f, 40320.f,
-//		362880.f, 3628800.f, 39916800.f, 479001600.f
-//	};
-
-	const uint32_t mFactorial12u[13] = {
-		1, 1, 2, 6, 24, 120, 720, 5040, 40320,
-		362880, 3628800, 39916800, 479001600
-	};
-
 	const uint32_t deBruijnBitPosition[32] = {
 		 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8,
 		31, 27, 13, 23, 21, 19, 16,  7, 26, 12, 18,  6, 11,  5, 10,  9
@@ -646,16 +513,6 @@ namespace{
 	inline uint32_t deBruijn(uint32_t v){
 		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
-
-	const unsigned char mPrimes54[54] = {
-	/*	  0    1    2    3    4    5    6    7    8    9   */
-		  2,   3,   5,   7,  11,  13,  17,  19,  23,  29, // 0
-		 31,  37,  41,  43,  47,  53,  59,  61,	 67,  71, // 1
-		 73,  79,  83,  89,  97, 101, 103, 107, 109, 113, // 2
-		127, 131, 137, 139, 149, 151, 157, 163, 167, 173, // 3
-		179, 181, 191, 193, 197, 199, 211, 223, 227, 229, // 4
-		233, 239, 241, 251								  // 5
-	};
 
 	TEM T taylorFactor3(T vv, T c1, T c2, T c3);
 	TEM T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
@@ -689,13 +546,9 @@ TEM T atan2Fast(T y, T x){
 	return y < (T)0 ? -angle : angle;
 }
 
-TEM inline T atLeast(T v, T e){	return v > (T)0 ? max(v, e) : min(v, -e); }
-
 TEM inline T ceil(T v){ return round(v + roundEps<T>()); }
 TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
 TEM inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
-
-inline uint32_t ceilEven(uint32_t v){ return v += v & 1UL; }
 
 inline uint32_t ceilPow2(uint32_t v){
 	v--;
@@ -722,22 +575,6 @@ TEM inline T clip(T v, int & clipFlag, T hi, T lo){
 
 TEM inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
 
-template <class T, template <class> class V>
-T curvature(const V<T>& a, const V<T>& b, const V<T>& c){
-
-	V<T> d1b = b-a;				// first backward difference
-	V<T> d1f = c-b;				// first forward difference
-	V<T> d1  = (d1f+d1b) * 0.5;	// first mid difference
-
-	V<T> d2  = d1f - d1b;		// second difference
-
-	T d1n = d1.norm();
-
-	return (d1.cross(d2)).norm() / (d1n*d1n*d1n);
-}
-
-TEM inline T dot2(T x1, T x2, T y1, T y2){ return x1 * y1 + x2 * y2; }
-
 TEM inline T equals(T v1, T v2, T bw){ return equals(v1, v2, bw, pow2<T>); }
 
 template <class T, class F>
@@ -759,20 +596,9 @@ TEM inline void fadeTri(T & w1, T & w2, T f){
 	}
 }
 
-//inline float factorial12(float v){ return mFactorial12f[(uint32_t)v]; }
-inline uint32_t factorial12(uint32_t v){ return mFactorial12u[v]; }
 TEM inline T floor(T v){ return round(v - roundEps<T>()); }
 TEM inline T floor(T v, T s){ return floor(v/s)*s; }
 TEM inline T floor(T v, T s, T r){ return floor(v*r)*s; }
-
-inline uint32_t floorPow2(uint32_t v){
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	return (v >> 1) + 1;
-}
 
 TEM inline T fold(T v, T hi, T lo){
 	long t;
@@ -792,13 +618,6 @@ TEM inline T foldOnce(T v, T hi, T lo){
 	if(v < lo) return lo + (lo - v);
 	return v;
 }
-
-TEM T gcd(const T& x, const T& y){
-	if(y==T(0)) return scl::abs(x);
-	return gcd(y, remainder(x,y));
-}
-
-TEM inline T hypot(T x, T y){ return ::sqrt(x*x + y*y); }
 
 TEM inline T linLog2(T v, T recMin){
 	v = log2Fast(scl::abs(v) + (T)0.000001);	// offset to avoid -inf
@@ -858,39 +677,20 @@ TEM T nearest(T val, const char * intervals, long div){
 	return T(vm + numWraps * div);
 }
 
-TEM inline T nearestDiv(T of, T to){ return to / round(to/of); }
 TEM inline T negative(T v, T bw){ return T(0.5) - sign(v, bw)*T(0.5); }
 TEM inline T negative(T v, T bw, T a){ return a - (T(1)-a)*sign(v, bw); }
 TEM inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<> inline float nextAfter(float x, float y){ return nextafterf(x,y); }
 template<> inline double nextAfter(double x, double y){ return nextafter(x,y); }
 template<> inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
-TEM inline T poly(T v, T a0, T a1, T a2){ return a0 + v*(a1 + v*a2); }
-TEM inline T poly(T v, T a0, T a1, T a2, T a3){ return a0 + v*(a1 + v*(a2 + v*a3)); }
 TEM inline T positive(T v, T bw){ return T(0.5) + sign(v, bw)*T(0.5); }
 TEM inline T pow2 (T v){ return v*v; }
-TEM inline T pow2S(T v){ return v*scl::abs(v); }
 TEM inline T pow3 (T v){ return v*v*v; }
-TEM inline T pow3Abs(T v){ return scl::abs(pow3(v)); }
 TEM inline T pow4 (T v){ return pow2(pow2(v)); }
-TEM inline T pow5 (T v){ return v * pow4(v); }
-TEM inline T pow6 (T v){ return pow3(pow2(v)); }
-TEM inline T pow8 (T v){ return pow4(pow2(v)); }
-TEM inline T pow16(T v){ return pow4(pow4(v)); }
-TEM inline T pow64(T v){ return pow8(pow8(v)); }
-
-inline unsigned char prime(uint32_t n){ return mPrimes54[n]; }
-TEM inline T prime(uint32_t n, T mul){ return (T)prime(n) * mul; }
 
 TEM inline T ratioET(T pc, T divs, T ival){
 	return T(::pow(double(ival), double(pc) / double(divs)));
 }
-
-
-template<> inline float remainder<float>(const float& x, const float& y){ return ::remainderf(x,y); }
-template<> inline double remainder<double>(const double& x, const double& y){ return ::remainder(x,y); }
-template<> inline long double remainder<long double>(const long double& x, const long double& y){ return ::remainderl(x,y); }
-TEM inline T remainder(const T& x, const T& y){ return x-(x/y)*y; }
 
 //TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
 TEM inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
@@ -1050,10 +850,6 @@ TEM inline T sinT9(T r){
 #undef t92
 #undef t91
 
-TEM T sinc(T r, T eps){ return (scl::abs(r) > eps) ? sin(r)/r : cos(r); }
-
-TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } }
-
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
 TEM inline T trunc(T v){ return round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
@@ -1175,26 +971,12 @@ template <class T, class F>
 inline T zero(T v, T bw, F f){ return bw/(f(v) + bw); }
 
 
-
-inline uint32_t bitsSet(uint32_t v){
-	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
-	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
-}
-
 TEM inline bool even(T v){ return 0 == odd(v); }
 
-TEM inline bool lessAbs(T v, T eps){ return scl::abs(v) < eps; }
 TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
 TEM inline T max(T v1, T v2, T v3){ return max(max(v1,v2),v3); }
-TEM inline T mean(T v1, T v2){ return (v1 + v2) * (T)0.5; }
 TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
 TEM inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
-
-TEM inline T nextMultiple(T v, T m){
-	uint32_t div = (uint32_t)(v / m);
-	return (T)(div + 1) * m;
-}
 
 TEM inline bool odd(T v){ return v & T(1); }
 
@@ -1202,12 +984,7 @@ TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
 inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
 
-TEM inline bool within  (T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
-TEM inline bool withinIE(T v, T lo, T hi){ return (!(v < lo)) && (v < hi); }
-
-TEM inline bool within3(T v1, T v2, T v3, T lo, T hi){
-	return within(v1,lo,hi) && within(v2,lo,hi) && within(v3,lo,hi);
-}
+TEM inline bool within(T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 
 inline bool zeroCrossP(float prev, float now){
 	union{ float f; int32_t i; } u1, u0;
@@ -1218,30 +995,6 @@ inline bool zeroCrossP(float prev, float now){
 //	nowI += 0x00800000;
 //	(now & ~prev)>>31
 }
-
-
-TEM inline void polarToRect(T m, T p, T& r, T& i){
-	r = m * cos(p);
-	i = m * sin(p);
-	//printf("%f %f %f %f\n", m, p, r, i);
-}
-
-TEM inline void rectToPolar(T& r, T& i){
-//	i = atan2(i, r);
-//	r /= cos(i);
-	T m = scl::hypot(i, r);
-	i = atan2(i, r);
-	r = m;
-}
-
-TEM inline void sphericalToCart(T& r, T& p, T& t){
-	T rsinp = r * sin(p);
-	T tt = t;
-	t = r * cos(p);
-	r = rsinp * cos(tt);
-	p = rsinp * sin(tt);
-}
-
 
 
 inline uint32_t quantizePow2(uint32_t v, uint32_t q){
@@ -1377,24 +1130,6 @@ inline float triangleU(uint32_t p){
 	u.i &= 0x7fffffff;
 	return u.f;
 }
-
-#define EPS 0.0000001
-inline float dirichlet(float p, float n){
-	float den = sin(p * 0.5f);
-	if( scl::abs(den) < EPS )	return n;
-	return sin(p * (n + 0.5f)) / den;
-}
-
-inline float dirichlet2(float p, float n){
-	float den = sin(p);
-	if( scl::abs(den) < EPS ){
-		p = scl::wrapPhase(p);
-		return (p > -M_PI_2 && p < M_PI_2) ? n : -n;
-	}
-	return sin(p * n) / den;
-}
-#undef EPS
-
 
 TEM inline T bartlett(T n){	return (T)1 - scl::abs(n); }
 

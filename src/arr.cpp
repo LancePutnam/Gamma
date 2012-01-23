@@ -306,7 +306,13 @@ void polarToRectFast(float * magA, float * phsA, uint32_t len){
 
 
 void rectToPolar(float * re, float * im, uint32_t len, uint32_t str){
-	LOOP(len,str){ scl::rectToPolar(re[i], im[i]); }
+	LOOP(len,str){
+		float& r_ = re[i];
+		float& i_ = im[i];
+		float m = ::hypot(i_, r_);
+		i_ = atan2(i_, r_);
+		r_ = m;
+	}
 }
 
 

@@ -497,7 +497,8 @@ inline void fitLine(const T * src, uint32_t len, T2& slope, T3& inter){
 	T lenT  = T(len);
 	T meanX = (lenT - T(1)) * T(0.5);	// mean of independent variables (the indices)
 	T meanY = sum(src, len) / lenT;		// mean of dependent variables
-	T varX  = T(2)*scl::sumOfSquares(meanX); // variance of x
+	T sumSqrs = meanX*(meanX+T(1))*(meanX*T(2./6) + T(1./6));
+	T varX  = T(2)*sumSqrs; // variance of x
 
 	T cov  = T(0);	// covariance
 	T dx   =-meanX;	// current distance from point to center along x

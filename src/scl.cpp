@@ -40,7 +40,7 @@ bool almostEqual(double a, double b, int maxUlps){
 }
 
 
-float clipMag(float value, float min, float max){
+float clipMag(float value, float max, float min){
 	Twiddle<float> v(value);
 	uint32_t sign = v.u & MaskSign<float>();
 	v.u |= MaskSign<float>();
