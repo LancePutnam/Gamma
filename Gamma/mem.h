@@ -86,7 +86,7 @@ TEM void deinterleave2(T * dst, const T * src, uint32_t numFrames);
 /// Ex.: 1234 -> 1..2..3..4.. (amount = 3)
 TEM void expand(T * dst, const T * src, uint32_t lenSrc, uint32_t amount);
 
-/// Like standard free, but checks if pointer is valid (!=0) and sets it to zero aftyer freeing it.
+/// Like standard free, but checks if pointer is valid (!=0) and sets it to zero after freeing it.
 
 /// This uses C-style memory management. No destructors will be called on
 /// class-type objects.
