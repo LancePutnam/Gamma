@@ -32,9 +32,9 @@ There are several other rules within Makefile. These are:
 	make install		- installs library into DESTDIR
 	make clean		- removes binaries from build folder
 	make examples/y/x.cpp	- builds and runs example source file y/x.cpp
-	make tests/x.cpp	- builds and runs test source file x.cpp
+	make test		- performs unit tests
 
-The rules that build examples and tests will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples and tests rules follow standard Unix conventions so that, for instance, all the tests can be built and run by typing the command 'make tests/test*.cpp'.
+The rule that builds examples will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples rule follows standard Unix conventions so that, for instance, all the examples can be built and run by typing the command 'make examples/*/*.cpp'.
 Binaries are located in ./build/release or ./build/debug depending on the build configuration. On OS X, the Gamma library will be linked to the pre-compiled dependent libraries in external/lib_osx. On Linux, use apt-get to install the necessary dependent libraries (see 2.3 below).
 
 ........................................
