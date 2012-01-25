@@ -376,7 +376,9 @@ namespace tap{
 		uint32_t& operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += inc;
-			if(~pos & prev & 0x80000000) ++count < N ?: pos = 0xffffffff;
+			if(~pos & prev & 0x80000000){
+				if(++count >= (N-1)) pos = 0xffffffff;
+			}
 			return pos;
 		}
 		
