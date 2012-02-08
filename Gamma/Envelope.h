@@ -31,21 +31,23 @@ public:
 	/// @param[in] length	length of curve in samples
 	/// @param[in] curve	curvature; >0 approaches slowly, <0 approaches rapidly, 0 approaches linearly
 	/// @param[in] end		end value
-	Curve(T length, T curve, T end = T(1));
+	/// @param[in] start	start value
+	Curve(T length, T curve, T end=T(1), T start=T(0));
 
 	bool done() const;				///< Returns whether curve has gone past end value
 	T end() const { return mEnd; }	///< Get end value
 	T value() const;				///< Get current value
 
 	T operator()();					///< Generates next value
-	void reset();					///< Reset envelope
+	void reset(T start=T(0));		///< Reset envelope
 
 	/// Set length and curvature
 	
 	/// @param[in] length	length of curve in samples
 	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
 	/// @param[in] end		end value
-	void set(T length, T curve, T end = T(1));
+	/// @param[in] start	start value
+	void set(T length, T curve, T end=T(1), T start=T(0));
 	
 	void value(const T& v);
 
@@ -90,7 +92,7 @@ public:
 	
 	/// Get the current envelope value
 	T value() const {
-		return mLevels[mStage] + mCurve.value();
+		return mCurve.value();
 	}
 
 	/// Returns whether the envelope is done
@@ -101,7 +103,6 @@ public:
 	
 	/// Returns whether the envelope is currently sustained
 	bool sustained() const { return (mStage == mSustain); }
-	//bool sustained() const { return (mStage == mSustain) && !released(); }
 
 	/// Generate next value
 	T operator()(){
@@ -110,15 +111,14 @@ public:
 		}
 		else if(mPos < mLen){
 			++mPos;
-			return mLevels[mStage] + mCurve();
+			return mCurve();
 		}
 		else if(mStage < size()){
 			++mStage;
-
 			if(!done()){
 				mPos = 0;
 				mLen = mLengths[mStage];
-				mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1]-mLevels[mStage]);
+				mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], mLevels[mStage]);
 				return (*this)(); // return level of new stage
 			}
 		}
@@ -130,12 +130,13 @@ public:
 		mSustain = -scl::abs(mSustain);
 
 		// begin release portion immediately starting at current level
-//		T curVal = value();
-//		mStage = -mSustain;
-//		mPos = 0;
-//		mLen = mLengths[mStage];
-//		mCurve.set(mLen, mCurves[mStage], 2*mLevels[mStage+1]-mLevels[mStage]-curVal);
-//		mCurve.value(curVal-mLevels[mStage]);
+		T curVal = value();
+		mStage = -mSustain;
+		if(!done()){
+			mPos = 0;
+			mLen = mLengths[mStage];
+			mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], curVal);
+		}
 	}
 
 	/// Sets the point at which the envelope holds its value until released
@@ -401,6 +402,7 @@ protected:
 };
 
 
+
 /// Interpolation envelope segment
 template <class Tv=gam::real, template <class> class Si=iplSeq::Linear, class Tp=gam::real, class Ts=Synced>
 class Seg : public Ts{
@@ -538,8 +540,8 @@ protected:
 //---- Curve
 TEM Curve<T>::Curve(): mEnd(1), mMul(1), mA(0), mB(0){}
 
-TEM Curve<T>::Curve(T length, T curve, T amp){
-	set(length, curve, amp);
+TEM Curve<T>::Curve(T length, T curve, T end, T start){
+	set(length, curve, end, start);
 }
 
 TEM inline bool Curve<T>::done() const { return scl::abs(mA - mB*mMul) >= scl::abs(end()); }
@@ -547,7 +549,7 @@ TEM inline bool Curve<T>::done() const { return scl::abs(mA - mB*mMul) >= scl::a
 TEM inline T Curve<T>::value() const { return mA - mB; }
 
 // dividing by mMul goes back one step
-TEM inline void Curve<T>::reset(){ mB = mA / mMul; }
+TEM inline void Curve<T>::reset(T start){ mB = (mA-start) / mMul; }
 
 TEM inline T Curve<T>					::eps() const { return T(0.00001  ); }
 template<> inline double Curve<double>	::eps() const { return   0.00000001; }
@@ -559,7 +561,7 @@ namespace{
 	template<> inline float maxReal<float>(){ return FLT_MAX; }
 }
 
-TEM void Curve<T>::set(T len, T crv, T end){
+TEM void Curve<T>::set(T len, T crv, T end, T start){
 	static const T EPS = eps();
 
 	if(len == T(0)){ // if length is 0, return end value immediately
@@ -582,18 +584,24 @@ TEM void Curve<T>::set(T len, T crv, T end){
 		crv = crvOverLen * len;
 	}
 
+	/*
+	This algorithm uses an exponential curve in [0,1] to linearly interpolate
+	between the start and end values.
+	
+	    1 - e^(cx)
+	y = ---------- * (end-start) + start
+	     1 - e^c
+
+	     delta             delta
+	  = ------- + start - ------- e^(cx) 
+	    1 - e^c           1 - e^c
+	*/
+
 	mEnd = end;
 	mMul = ::exp(crvOverLen);
-	mA = mEnd / (T(1) - ::exp(crv));
-	reset();
-
-//	level = start;
-//
-//	grow = exp(curve / dur);
-//	
-//	a1 = (end - start) / (1 - exp(curve));
-//	a2 = start + a1;
-//	b1 = a1;
+	mA = (end-start) / (T(1) - ::exp(crv));
+	mB = mA / mMul;
+	mA+= start;
 }
 
 TEM inline void Curve<T>::value(const T& v){ mB = mA-v; }
