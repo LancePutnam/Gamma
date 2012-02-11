@@ -48,6 +48,23 @@ public:
 /// Table functions
 namespace tbl{
 
+
+/// Add sine wave to array
+
+/// @param[in] dst		destination array
+/// @param[in] len		length of array
+/// @param[in] cycles	number of cycles of sine wave
+/// @param[in] amp		amplitude of sine wave
+/// @param[in] phs		phase of sine wave, in [0,1]
+template <class T>
+void addSine(T * dst, uint32_t len, double cycles=1, double amp=1, double phs=0);
+
+template <class T, template<class> class ArrayType>
+void addSine(ArrayType<T>& dst, double cycles=1, double amp=1, double phs=0){
+	addSine(&dst[0], dst.size(), cycles, amp, phs);
+}
+
+
 /// Fills array with one period of a cosine wave.
 TEM void cosine(T * dst, uint32_t len);
 
@@ -156,6 +173,15 @@ float phaseIncFactor(double framesPerSec);
 
 
 // Implementation_______________________________________________________________
+
+template <class T>
+void addSine(T * dst, uint32_t len, double cycles, double amp, double phs){
+	double f = cycles/len;
+	for(uint32_t i=0; i<len; ++i){
+		double p = (f*i + phs)*M_2PI;
+		dst[i] += sin(p) * amp;
+	}
+}
 
 TEM void cosine(T * dst, uint32_t len){
 	double inc = M_2PI / (double)len;
