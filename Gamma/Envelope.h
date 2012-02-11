@@ -71,12 +71,20 @@ protected:
 ///
 /// \tparam N	number of segments
 /// \tparam T	sample type
-template <int N, class T=gam::real>
-class CurveEnv{
+template <int N, class T=gam::real, class Ts=Synced>
+class CurveEnv : public Ts{
 public:
 
-	CurveEnv(): mSustain(N)
-	{ reset(); }
+	CurveEnv()
+	:	mSustain(N)
+	{
+		for(int i=0; i<N; ++i){
+			mLengths[i]=0;
+			mCurves[i]=-4;
+			mLevels[i]=0;
+		}	mLevels[N]=0;
+		reset();
+	}
 
 	/// Get the number of segments
 	int size() const { return N; }
@@ -117,7 +125,7 @@ public:
 			++mStage;
 			if(!done()){
 				mPos = 0;
-				mLen = mLengths[mStage];
+				setLen(mStage);
 				mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], mLevels[mStage]);
 				return (*this)(); // return level of new stage
 			}
@@ -134,7 +142,7 @@ public:
 		mStage = -mSustain;
 		if(!done()){
 			mPos = 0;
-			mLen = mLengths[mStage];
+			setLen(mStage);
 			mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], curVal);
 		}
 	}
@@ -153,10 +161,32 @@ public:
 		mStage = -1;
 		mSustain = scl::abs(mSustain);
 	}
+
 	
 	/// Get segment lengths array
 	T * lengths(){ return mLengths; }
+
+	/// Set break-point values
+	template <class V>
+	CurveEnv& lengths(const V* vals, int len){
+		int n = len <= size() ? len : size();
+		for(int i=0; i<n; ++i) lengths()[i] = vals[i];
+		return *this;
+	}
 	
+	/// Set first two segment lengths
+	CurveEnv& lengths(T a, T b){ T v[]={a,b}; return lengths(v,2); }
+
+	/// Set first three segment lengths
+	CurveEnv& lengths(T a, T b, T c){ T v[]={a,b,c}; return lengths(v,3); }
+
+	/// Set first four segment lengths
+	CurveEnv& lengths(T a, T b, T c, T d){ T v[]={a,b,c,d}; return lengths(v,4); }
+
+	/// Set first five segment lengths
+	CurveEnv& lengths(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return lengths(v,5); }
+
+
 	/// Get segment curvature array
 	T * curves(){ return mCurves; }
 	
@@ -165,6 +195,7 @@ public:
 		for(int i=0; i<N; ++i) curves()[i]=v;
 		return *this;
 	}
+
 
 	/// Set length and curvature of a segment
 	CurveEnv& segment(int i, T length, T curve){
@@ -229,6 +260,8 @@ protected:
 	uint32_t mPos, mLen;	// position in and length of current segment, in samples
 	int mStage;				// the current curve segment
 	int mSustain;			// index of sustain point
+	
+	void setLen(int i){ mLen=mLengths[i]*Ts::spu(); }
 };
 
 
@@ -246,9 +279,9 @@ protected:
 /// \tparam T	sample type
 /// \tparam Ts	sync type
 template <class T=gam::real, class Ts=Synced>
-class ADSR : public CurveEnv<3,T>, public Ts{
+class ADSR : public CurveEnv<3,T,Ts>{
 public:
-	using CurveEnv<3,T>::release;
+	using CurveEnv<3,T,Ts>::release;
 
 	/// @param[in] att	Attack length
 	/// @param[in] dec	Decay length
@@ -259,6 +292,7 @@ public:
 	{
 		this->sustainPoint(2);
 		levels(0,1,sus,0);
+		sustain(sus);
 		attack(att).decay(dec).release(rel);
 		curve(crv);
 	}
@@ -271,7 +305,7 @@ public:
 
 	/// Set sustain level
 	ADSR& sustain(T val){
-		point(this->sustainPoint(), val);
+		this->levels()[this->sustainPoint()] = val;
 		return *this;
 	}
 
@@ -279,12 +313,8 @@ public:
 	ADSR& release(T len){ return setLen(2,len); }
 	
 protected:
-	virtual void onResync(double r){
-		for(int i=0; i<this->size(); ++i) this->mLengths[i] *= r;
-	}
-
 	ADSR& setLen(int i, T v){
-		this->lengths()[i] = v*Ts::spu(); return *this;
+		this->lengths()[i] = v; return *this;
 	}
 };
 

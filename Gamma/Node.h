@@ -115,7 +115,7 @@ public:
 		return n;
 	}
 
-	/// Returns next node using depth-first traversal.
+	/// Returns next node using depth-first traversal
 	
 	/// Returns 0 when the next node equals the terminal node.
 	///
@@ -135,7 +135,7 @@ public:
 		return const_cast<const T*>(next(terminal));
 	}
 	
-	/// Returns next breadth-wise node
+	/// Returns next node using breadth-first traversal
 	T * nextBreadth(const T * const terminal){
 		T * n = self();
 		if(n->sibling){
