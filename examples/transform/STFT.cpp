@@ -26,6 +26,8 @@ void audioCB(AudioIOData& io){
 
 		float s = src();
 
+		// Input next sample for analysis
+		// When this returns true, then we have a new spectral frame
 		if(stft(s)){
 		
 			float frac = scl::pow3( edge.triU() );
@@ -37,6 +39,7 @@ void audioCB(AudioIOData& io){
 			}
 		}
 		
+		// Get next resynthesized sample
 		s = stft() * 0.2;
 		
 		io.out(0) = s;
