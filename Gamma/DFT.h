@@ -271,6 +271,7 @@ public:
 
 	float unitsHop();
 	
+	/// Returns array of phases if the sample data type is Bin::MagFreq
 	float * phases();
 	
 	virtual void print(FILE * fp=stdout, const char * append="\n");
