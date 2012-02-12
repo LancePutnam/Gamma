@@ -70,7 +70,6 @@
 		16747A11115806FF00A1556D /* Conversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 16938ABF0FBD0C4400274B2A /* Conversion.h */; };
 		16747A14115806FF00A1556D /* FFT.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E09511E0DECCE18000AF828 /* FFT.h */; };
 		16747A15115806FF00A1556D /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA820F8DB1F100D0452F /* File.h */; };
-		16747A16115806FF00A1556D /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D9B4BA0DDBEA100043A25B /* Filter.h */; };
 		16747A17115806FF00A1556D /* pstdint.h in Headers */ = {isa = PBXBuildFile; fileRef = 169389570FBCCE4200274B2A /* pstdint.h */; };
 		16747A1A115806FF00A1556D /* Strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 16064BD30DFF02680043BC29 /* Strategy.h */; };
 		16747A1C115806FF00A1556D /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 164622960E0EEDD80011911A /* Types.h */; };
@@ -188,7 +187,6 @@
 		16D24F930A9BA74800415E9E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16D24FA80A9BA77100415E9E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		16D8143B0B9D08BA00A4B638 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = notes.txt; path = ../../doc/notes.txt; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
-		16D9B4BA0DDBEA100043A25B /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../../Gamma/Filter.h; sourceTree = SOURCE_ROOT; };
 		16DEEFB60E4ABA57001292EF /* FFT_fftpack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FFT_fftpack.cpp; path = ../../src/FFT_fftpack.cpp; sourceTree = SOURCE_ROOT; };
 		16E3D2D0115C3B1A009165E6 /* fftpack++.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "fftpack++.h"; sourceTree = "<group>"; };
 		16E3D2D1115C3B1A009165E6 /* fftpack++1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "fftpack++1.cpp"; sourceTree = "<group>"; };
@@ -323,7 +321,6 @@
 				16EDF9C1094F8C2600549AC9 /* Envelope.h */,
 				7E09511E0DECCE18000AF828 /* FFT.h */,
 				1686EA820F8DB1F100D0452F /* File.h */,
-				16D9B4BA0DDBEA100043A25B /* Filter.h */,
 				1609A9E51292018400A2484F /* FormantData.h */,
 				16EDF9D0094F8C2600549AC9 /* Noise.h */,
 				16EDF9D2094F8C2600549AC9 /* Oscillator.h */,
@@ -444,7 +441,6 @@
 				167479FE115806C800A1556D /* Envelope.h in Headers */,
 				16747A14115806FF00A1556D /* FFT.h in Headers */,
 				16747A15115806FF00A1556D /* File.h in Headers */,
-				16747A16115806FF00A1556D /* Filter.h in Headers */,
 				16747A04115806C800A1556D /* Noise.h in Headers */,
 				16747A05115806C800A1556D /* Oscillator.h in Headers */,
 				16747A0E115806D500A1556D /* Print.h in Headers */,
