@@ -13,11 +13,11 @@ using namespace gam;
 NoisePink<> src;
 //Sine<float> src(440);
 LFO<> lfoA1(1./1000., 0, 0.2), lfoA2(1./800., 0, 0.2), lfoF1(1./1.3), lfoF2(1./1.61);
-Biquad<> bq0(1./400., 10, Filter::BP);
-Biquad<> bq1(1./400., 10, Filter::BP);
+Biquad<> bq0(1./400., 10, BAND_PASS);
+Biquad<> bq1(1./400., 10, BAND_PASS);
 
 uint32_t hopSize = 512;
-STFT stft(hopSize * 4, hopSize, 0, WinType::Hann, Bin::Polar);
+STFT stft(hopSize * 4, hopSize, 0, HANN, MAG_PHASE);
 
 void audioCB(AudioIOData & io){
 

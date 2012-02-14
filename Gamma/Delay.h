@@ -18,20 +18,14 @@
 namespace gam{
 
 
-/// Some filter types.
-namespace Filter{
-	enum { LP=0, HP, BP, BPC, BR, AP };
-	
-//	/// Returns filter type as human readable string.
-//	const char * string(int type){
-//		switch(type){
-//		#define CS(type, string) case Filter::type: return #string;
-//		CS(LP, Low Pass) CS(HP, High Pass) CS(BP, Band Pass) CS(BPC, Band Pass)
-//		CS(BR, Band Reject) CS(AP, All Pass)
-//		default: return "Unknown";
-//		#undef CS
-//		}
-//	}
+/// Filter types
+enum FilterType{
+	LOW_PASS,			/**< Low-pass */
+	HIGH_PASS,			/**< High-pass */
+	BAND_PASS,			/**< Band-pass */
+	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
+	BAND_REJECT,		/**< Band-reject */
+	ALL_PASS			/**< All-pass */
 };
 
 
@@ -50,7 +44,7 @@ template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass1 : public Ts {
 public:
 	///
-	/// @param[in]	frq		Initial cutoff frequency.
+	/// @param[in]	frq		Center frequency
 	AllPass1(Tp frq=1000);
 
 	void freq (Tp v);	///< Set cutoff frequency
@@ -73,7 +67,7 @@ protected:
 };
 
 
-/// 2-pole/2-zero IIR filter.
+/// 2-pole/2-zero IIR filter
 
 /// The biquadratic filter contains 2 zeroes and 2 poles in its transfer
 /// function. The zeroes provide a better response near the DC and Nyquist
@@ -88,27 +82,27 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Biquad : public Ts{
 public:
 
-	/// @param[in]	frq		Initial center frequency in Hz.
-	/// @param[in]	res		Initial resonance.
-	/// @param[in]	frq		Initial type of filter.
-	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), int filterType = Filter::LP);
+	/// @param[in]	frq		Center frequency
+	/// @param[in]	res		Resonance amount
+	/// @param[in]	type	Type of filter
+	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
 
 	/// Set input (a's) and output (b's) coefficients directly
 	void coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2);
 
-	void freq(Tp v);					///< Set center frequency. 
-	void res(Tp v);						///< Set resonance.
-	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance.
-	void set(Tp frq, Tp res, int type);	///< Set all filter params.
-	void type(int type);				///< Set type of filter (see Filter::type)
-	void zero();						///< Zero internal delays.
+	void freq(Tp v);					///< Set center frequency
+	void res(Tp v);						///< Set resonance
+	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
+	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
+	void type(FilterType type);			///< Set type of filter
+	void zero();						///< Zero internal delays
 
-	Tv operator()(Tv i0);				///< Return next filter output.
-	Tv nextBP(Tv i0);					///< Optimized for band-pass (BP, BPC) types.
+	Tv operator()(Tv i0);				///< Return next filter output
+	Tv nextBP(Tv i0);					///< Optimized for band-pass types
 	
 	Tp freq() const { return mFreq; }	///< Get center frequency
 	Tp res() const { return mRes; }		///< Get resonance
-	int type() const { return mType; }	///< Get filter type
+	FilterType type() const { return mType; }	///< Get filter type
 	
 	virtual void onResync(double r);
 
@@ -116,7 +110,7 @@ protected:
 	Tp mA0, mA1, mA2, mB0, mB1, mB2;	// ffd and fbk coefficients
 	Tv d1, d2;		// inner sample delays
 	Tp mFreq, mRes;	// center frequency, resonance
-	int mType;
+	FilterType mType;
 	Tp mReal, mImag;	// real, imag components of center frequency
 	Tp mAlpha;
 	Tp mFrqToRad;
@@ -637,7 +631,7 @@ T_VPS void AllPass1<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
 
 
 //---- Biquad
-T_VPS Biquad<Tv,Tp,Ts>::Biquad(Tp frq, Tp res, int type)
+T_VPS Biquad<Tv,Tp,Ts>::Biquad(Tp frq, Tp res, FilterType type)
 :	d1(0), d2(0)
 {
 	Ts::initSynced();
@@ -649,7 +643,7 @@ T_VPS void Biquad<Tv,Tp,Ts>::onResync(double r){
 	freq(mFreq);
 }
 
-T_VPS void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, int typeA){
+T_VPS void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, FilterType typeA){
 	mRes = resA;
 	mType = typeA;
 	freq(freqA);
@@ -697,36 +691,36 @@ void setAllpass(float fr, float R){
 }
 */
 
-T_VPS inline void Biquad<Tv,Tp,Ts>::type(int typeA){
+T_VPS inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 	mType = typeA;
 	
 	switch(mType){
-	case Filter::LP:
+	case LOW_PASS:
 		mA1 = (Tp(1) - mReal) * mB0;
 		mA0 = mA1 * Tp(0.5);
 		mA2 = mA0;
 		break;
-	case Filter::HP:
+	case HIGH_PASS:
 		mA1 = -(Tp(1) + mReal) * mB0;
 		mA0 = -mA1 * Tp(0.5);
 		mA2 = mA0;
 		break;
-	case Filter::BP:
+	case BAND_PASS:
 		mA0 = mImag * Tp(0.5) * mB0;
 		mA1 = Tp(0);
 		mA2 = -mA0;
 		break;
-	case Filter::BPC:
+	case BAND_PASS_UNIT:
         mA0 = mAlpha * mB0;
         mA1 = Tp(0);
         mA2 = -mA0;
 		break;
-	case Filter::BR:
+	case BAND_REJECT:
         mA0 = mB0;	// 1.f * a0
         mA1 = mB1;
         mA2 = mB0;	// 1.f * a0
 		break;
-	case Filter::AP:
+	case ALL_PASS:
 		mA0 = mB2;
 		mA1 = mB1;
 		mA2 = mB0;

@@ -11,7 +11,7 @@
 #include "Gamma/Sync.h"
 
 
-#define RECT_POLAR\
+#define RECT_TO_POLAR\
 	if(mPrecise){\
 		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
@@ -27,7 +27,7 @@
 		}\
 	}
 
-#define POLAR_RECT\
+#define POLAR_TO_RECT\
 	if(mPrecise){\
 		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
@@ -45,14 +45,14 @@
 
 namespace gam{
 
-DFT::DFT(uint32_t winSize, uint32_t padSize, Bin::t binT, uint32_t numAuxA) :
-	mSizeWin(0), mSizeHop(0),
+DFT::DFT(uint32_t winSize, uint32_t padSize, SpectralType specT, uint32_t numAuxA)
+:	mSizeWin(0), mSizeHop(0),
 	mFFT(0),
 	mPadOA(0), mTapW(0), mTapR(0), mPrecise(false)
 {
 	//printf("DFT::DFT\n");
 	resize(winSize, padSize);
-	binType(binT);	
+	spectrumType(specT);	
 	numAux(numAuxA);
 	
 	arr::conversionInit();
@@ -96,7 +96,7 @@ void DFT::onResync(double r){
 	//printf("[%p] hop: %d, ups: %f\n", this, sizeHop(), spu());
 }
 
-void DFT::binType(Bin::t type){ mSpctFormat = type; }
+DFT& DFT::spectrumType(SpectralType v){ mSpctFormat=v; return *this; }
 DFT& DFT::precise(bool w){ mPrecise=w; return *this; }
 
 void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n");
@@ -126,9 +126,9 @@ void DFT::forward(const float * window){ //printf("DFT::forward(const float *)\n
 	mBuf[numBins()*2-1] = 0.f;
 	
 	switch(mSpctFormat){
-	case Bin::Polar:
-	case Bin::MagFreq:
-		RECT_POLAR
+	case MAG_PHASE:
+	case MAG_FREQ:
+		RECT_TO_POLAR
 		//arr::mul(bins0(), gen::val(normForward()), nbins);
 		break;
 	
@@ -141,10 +141,10 @@ void DFT::inverse(float * output){
 	//printf("DFT::inverse(float *)\n");
 	
 	switch(mSpctFormat){
-	case Bin::Polar:
-	case Bin::MagFreq:
+	case MAG_PHASE:
+	case MAG_FREQ:
 		//arr::mul(bins0(), gen::val(normInverse()), nbins);
-		POLAR_RECT
+		POLAR_TO_RECT
 		break;
 	
 	default:;
@@ -177,18 +177,28 @@ void DFT::inverse(float * output){
 
 void DFT::spctToRect(){
 	switch(mSpctFormat){
-	case Bin::Polar: POLAR_RECT break;
+	case MAG_PHASE: POLAR_TO_RECT break;
 	default:;
 	}
-	mSpctFormat = Bin::Rect;
+	mSpctFormat = COMPLEX;
 }
 
 void DFT::spctToPolar(){	
 	switch(mSpctFormat){
-	case Bin::Rect:	RECT_POLAR break;
+	case COMPLEX:	RECT_TO_POLAR break;
 	default:;
 	}
-	mSpctFormat = Bin::Polar;
+	mSpctFormat = MAG_PHASE;
+}
+
+
+static const char * toString(SpectralType v){
+	switch(v){
+	case COMPLEX:	return "Complex";
+	case MAG_PHASE:	return "Magnitude/Phase";
+	case MAG_FREQ:	return "Magnitude/Frequency";
+	default:		return "Unknown\n";
+	}	
 }
 
 void DFT::print(FILE * f, const char * a){
@@ -196,7 +206,7 @@ void DFT::print(FILE * f, const char * a){
 	fprintf(f, "# bins:        %d\n", (int)numBins());
 	fprintf(f, "Freq res:      %f units/sample\n", freqRes());
 	fprintf(f, "Bin freq:      %f units\n", binFreq());
-	fprintf(f, "Data format:   %s\n", Bin::string(mSpctFormat));
+	fprintf(f, "Data format:   %s\n", toString(mSpctFormat));
 	fprintf(f, "Precise:       %s\n", mPrecise ? "true" : "false");	
 	fprintf(f, "Aux buffers:   %d\n", (int)mNumAux);
 	//printf("buf, pad, inv, aux: %p %p %p %p", mBuf, mPadOA, mBufInv, mAux);
@@ -206,10 +216,10 @@ void DFT::print(FILE * f, const char * a){
 
 //---- STFT
 
-STFT::STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize, WinType::type windowType, Bin::t binT, uint32_t numAuxA) :
-	DFT(0, 0, binT, numAuxA),
+STFT::STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize, WindowType winType, SpectralType specType, uint32_t numAuxA)
+:	DFT(0, 0, specType, numAuxA),
 	mSlide(winSize, hopSize), mFwdWin(0), mPhases(0),
-	mWinType(windowType),
+	mWinType(winType),
 	mWindowInverse(true), mRotateForward(false)
 {
 	mBufInv = 0;
@@ -242,15 +252,15 @@ void STFT::computeInvWinMul(){
 }
 
 
-void STFT::winType(WinType::type type){
-	tbl::window(mFwdWin, sizeWin(), type);
+void STFT::windowType(WindowType v){
+	tbl::window(mFwdWin, sizeWin(), v);
 	mFwdWinMul = 1.f / arr::mean(mFwdWin, sizeWin());	// compute mul factor for normalization
 	
 	// scale forward window?
 	//slice(mFwdWin, sizeWin()) *= mFwdWinMul;
 	
 	computeInvWinMul();
-	mWinType = type;
+	mWinType = v;
 }
 
 
@@ -274,7 +284,7 @@ void STFT::resize(uint32_t winSize, uint32_t padSize){
 	mem::deepZero(mBufInv, winSize);
 	
 	// re-compute fwd window
-	winType(mWinType);
+	windowType(mWinType);
 }
 
 
@@ -294,7 +304,7 @@ void STFT::forward(float * input){ //printf("STFT::forward(float *)\n");
 	DFT::forward(input);					// do forward transform
 	
 	// compute frequency estimates?
-	if(Bin::MagFreq == mSpctFormat){
+	if(MAG_FREQ == mSpctFormat){
 		
 		// This will effectively subtract the expected phase difference from the computed.
 		// This extra step seems to give more precise frequency estimates.
@@ -317,7 +327,7 @@ void STFT::forward(float * input){ //printf("STFT::forward(float *)\n");
 
 void STFT::inverse(float * dst){
 	//printf("STFT::inverse(float *)\n");
-	if(Bin::MagFreq == mSpctFormat){
+	if(MAG_FREQ == mSpctFormat){
 		//mem::copy(bins1(), mPhases, numBins()); // not correct, need to unwrap frequencies
 		for(uint32_t i=1; i<numBins()-1; ++i) bins()[i] = mPhases[i];
 	}	
@@ -353,13 +363,13 @@ void STFT::inverse(float * dst){
 
 void STFT::print(FILE * f, const char * a){
 	DFT::print(f, "");
-	fprintf(f, "Window type:   %s\n", WinType::string(mWinType));
+	fprintf(f, "Window type:   %s\n", toString(mWinType));
 	fprintf(f, "Inv. window:   %s\n", mWindowInverse ? "true" : "false");
 	fprintf(f, "%s", a);
 }
 
 } // gam::
 
-#undef RECT_POLAR
-#undef POLAR_RECT
+#undef RECT_TO_POLAR
+#undef POLAR_TO_RECT
 

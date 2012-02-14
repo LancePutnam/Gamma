@@ -20,10 +20,10 @@ void audioCB(AudioIOData& io){
 		
 		if(tmr()){
 			switch(cnt){
-				case 0: filt.type(Filter::LP); printf("Low-pass\n"); break;
-				case 1: filt.type(Filter::HP); printf("High-pass\n"); break;
-				case 2: filt.type(Filter::BP); printf("Band-pass\n"); break;
-				case 3: filt.type(Filter::BR); printf("Band-reject\n"); break;
+				case 0: filt.type(LOW_PASS); printf("Low-pass\n"); break;
+				case 1: filt.type(HIGH_PASS); printf("High-pass\n"); break;
+				case 2: filt.type(BAND_PASS); printf("Band-pass\n"); break;
+				case 3: filt.type(BAND_REJECT); printf("Band-reject\n"); break;
 			}
 			++cnt %= 4;
 		}

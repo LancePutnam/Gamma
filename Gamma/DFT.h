@@ -17,25 +17,12 @@
 
 namespace gam{
 
-namespace Bin{
 
-	/// Bin format types.
-	enum t{
-		Rect=0,		/**< Rectangular (Cartesian)*/
-		Polar,		/**< Polar */
-		MagFreq		/**< Magnitude/Frequency */
-	};
-
-	/// Returns bin type as human readable string.
-	inline const char * string(int type){
-		switch(type){
-		case Bin::Rect:		return "Rectangular";
-		case Bin::Polar:	return "Polar";
-		case Bin::MagFreq:	return "Magnitude/Frequency";
-		default:			return "Unknown\n";
-		}	
-	}
-
+/// Spectral data types
+enum SpectralType{
+	COMPLEX,	/**< Complex number */
+	MAG_PHASE,	/**< Magnitude and phase */
+	MAG_FREQ	/**< Magnitude and frequency */
 };
 
 
@@ -102,7 +89,6 @@ TEM inline bool OverlapAdd<T>::operator()(T * input){
 TEM void OverlapAdd<T>::overlapAdd(T * input){
 	ArrOp::overlapAdd(mBuf, input, sizeWin(), sizeHop());
 }
-
 */
 
 template <class T=gam::real>
@@ -139,26 +125,26 @@ protected:
 };
 
 
-/// Discrete Fourier transform.
+/// Discrete Fourier transform
 
 ///
 ///
 class DFT : public DFTBase<float>{
 public:
-	/// Constructor.
+	/// Constructor
 
-	/// @param[in]	winSize		Number of samples in window.
-	/// @param[in]	padSize		Number of zeros to append to window.
-	/// @param[in]	complexType	Form of complex spectral data.
+	/// @param[in]	winSize		Number of samples in window
+	/// @param[in]	padSize		Number of zeros to append to window
+	/// @param[in]	specType	Format of spectrum data
 	/// @param[in]	numAux		Number of auxilliary buffers of size numBins() to create
-	DFT(uint32_t winSize, uint32_t padSize=0, Bin::t t = Bin::Rect, uint32_t numAux=0);
+	DFT(uint32_t winSize, uint32_t padSize=0, SpectralType specType=COMPLEX, uint32_t numAux=0);
 	virtual ~DFT();
 
-	void binType(Bin::t t);				///< Sets format of complex spectrum data.
+	DFT& spectrumType(SpectralType v);	///< Set format of spectrum data
 	DFT& precise(bool whether);			///< Whether to use precise (but slower) math. Default is off.
-	void resize(uint32_t windowSize, uint32_t padSize);	///< Sets size parameters of transform.
+	void resize(uint32_t windowSize, uint32_t padSize);	///< Sets size parameters of transform
 
-	float freqRes() const;				///< Returns frequency resolution of analysis.
+	float freqRes() const;				///< Returns frequency resolution of analysis
 	float overlap() const;				///< Returns degree of transform overlap
 	bool overlapping() const;			///< Whether the xform is overlapping
 	uint32_t sizeHop() const;			///< Returns size of hop
@@ -167,28 +153,28 @@ public:
 
 	Sync& syncHop();					///< Hop rate synchronizer
 
-	/// Reads next sample in for a forward transform.
+	/// Reads next sample in for a forward transform
 	
 	/// Returns true when sizeDFT() samples are read in and, subsequently,
 	/// the forward DFT is performed.  Returns false otherwise.
 	bool operator()(float input);
 
 
-	/// Returns next sample from inverse transform.
+	/// Returns next sample from inverse transform
 	
 	/// The inverse transform is performed every sizeWin() samples.
 	///
 	float operator()();
 
 
-	/// Performs forward transform on a window of samples.
+	/// Performs forward transform on a window of samples
 	
 	/// 'src' must have at least sizeWin() number of elements.
 	///
 	void forward(const float * src);	
 
 	
-	/// Performs inverse transform on internal spectrum.
+	/// Performs inverse transform on internal spectrum
 	
 	///	The resynthesized samples are copied into 'dst'.  The destination
 	/// array must have room for at least sizeDFT() number of elements. If 'dst'
@@ -213,7 +199,7 @@ public:
 protected:
 	uint32_t mSizeWin;				// samples in analysis window
 	uint32_t mSizeHop;				// samples between forward transforms (= winSize() for DFT)
-	Bin::t mSpctFormat;				// complex format of spectrum
+	SpectralType mSpctFormat;		// format of spectrum
 	//FFTInfo mInfoFFT, mInfoIFFT;	// info for FFT
 	RFFT<float> mFFT;
 	Sync mSyncHop;
@@ -238,40 +224,51 @@ protected:
 class STFT : public DFT {
 public:
 
-	/// Constructor.
+	/// Constructor
 	
 	/// The default complex data type is rectangular and the default window
 	/// is none.
-	/// @param[in]	winSize		Number of samples to window.
-	/// @param[in]	hopSize		Number of samples between successive windows.
-	/// @param[in]	padSize		Number of zeros to append to window.
-	/// @param[in]	winType		Type of forward transform window.
-	/// @param[in]	complexType	Complex form of spectral data.
-	/// @param[in]	createAux	Whether to create an auxillary spectral buffer (see createAux()).
+	/// @param[in]	winSize		Number of samples to window
+	/// @param[in]	hopSize		Number of samples between successive windows
+	/// @param[in]	padSize		Number of zeros to append to window
+	/// @param[in]	winType		Type of forward transform window
+	/// @param[in]	specType	Format of spectrum data
+	/// @param[in]	createAux	Whether to create an auxillary spectral buffer (see createAux())
 	STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize=0,
-		WinType::type winType = WinType::Rectangle,
-		Bin::t t = Bin::Rect,
+		WindowType winType = RECTANGLE,
+		SpectralType specType = COMPLEX,
 		uint32_t numAux=0);
 	
 	virtual ~STFT();
-	
+
+
 	using DFT::operator();
 
-	bool  operator()(float input);
-	//float operator()();
-	
+	/// Input next time-domain sample and return whether a new spectral frame is available
+	bool operator()(float input);
+
+	/// Perform forward transform on an array of samples
 	void forward(float * input);
-	virtual void inverse(float * dst);
 	
-	void resize(uint32_t winSize, uint32_t padSize);					///< Sets size parameters of transform.
+	/// Get inverse transform using current spectral frame
+	virtual void inverse(float * dst);
+
+
+	/// Set size parameters of transform
+	void resize(uint32_t winSize, uint32_t padSize);
+	
+	/// Set hop size, in samples
 	void sizeHop(uint32_t size);
-	void winType(WinType::type type);
+	
+	/// Set window type
+	void windowType(WindowType type);
+
 	void rotateForward(bool v){ mRotateForward = v; }
 	//void resetPhaseAccum(){  }
 
 	float unitsHop();
 	
-	/// Returns array of phases if the sample data type is Bin::MagFreq
+	/// Returns array of phases if the sample data type is MAG_FREQ
 	float * phases();
 	
 	virtual void print(FILE * fp=stdout, const char * append="\n");
@@ -284,7 +281,7 @@ protected:
 	SlidingWindow<float> mSlide;
 	float * mFwdWin;			// forward transform window
 	float * mPhases;			// copy of current phases (mag-freq mode)
-	WinType::type mWinType;		// type of analysis window used
+	WindowType mWinType;		// type of analysis window used
 	float mFwdWinMul, mInvWinMul;
 	bool mWindowInverse;		// whether to window inverse samples
 	bool mRotateForward;

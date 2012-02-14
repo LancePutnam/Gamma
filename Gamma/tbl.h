@@ -16,34 +16,30 @@
 namespace gam{
 
 
-/// Various window types.
-class WinType{
-public:
-
-	/// Window types.
-	enum type{ 	
-		Bartlett,			/**< Bartlett (Triangle)*/
-		Blackman,			/**< Blackman */
-		BlackmanHarris,		/**< Blackman-Harris */
-		Hamming,			/**< Hamming */
-		Hann,				/**< von Hann */
-		Welch,				/**< Welch */
-		Nyquist,			/**< Nyquist */
-		Rectangle			/**< Rectangle (1s) */
-	};
-	
-	/// Returns human readable string of window type.
-	inline static const char * string(WinType::type type){
-		#define CS(name) case WinType::name: return #name;
-		switch(type){
-			CS(Bartlett) CS(Blackman) CS(BlackmanHarris) CS(Hamming) CS(Hann)
-			CS(Welch) CS(Nyquist) CS(Rectangle)
-			default: return "Unknown";
-		}
-		#undef CS
-	}
-	
+/// Window types
+enum WindowType{ 	
+	BARTLETT,			/**< Bartlett (Triangle) */
+	BLACKMAN,			/**< Blackman */
+	BLACKMAN_HARRIS,	/**< Blackman-Harris */
+	HAMMING,			/**< Hamming */
+	HANN,				/**< von Hann */
+	WELCH,				/**< Welch */
+	NYQUIST,			/**< Nyquist */
+	RECTANGLE			/**< Rectangle (no window) */
 };
+
+/// Returns human readable string of window type
+inline static const char * toString(WindowType v){
+	#define CS(name) case name: return #name;
+	switch(v){
+		CS(BARTLETT) CS(BLACKMAN) CS(BLACKMAN_HARRIS) CS(HAMMING) CS(HANN)
+		CS(WELCH) CS(NYQUIST) CS(RECTANGLE)
+		default: return "Unknown";
+	}
+	#undef CS
+}
+
+
 
 /// Table functions
 namespace tbl{
@@ -118,16 +114,16 @@ TEM void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uin
 /// Returns maximum number of harmonics that will fit in array.
 inline uint32_t maxHarmonics(uint32_t len){ return len>>1; }
 
-/// Fills array with specified window type.
-TEM void window			(T * dst, uint32_t len, WinType::type type);
-TEM void bartlett		(T * dst, uint32_t len); ///< Fills array with Bartlett window.
-TEM void blackman		(T * dst, uint32_t len); ///< Fills array with Blackman window.
-TEM void blackmanHarris	(T * dst, uint32_t len); ///< Fills array with Blackman-Harris window.
-TEM void hamming		(T * dst, uint32_t len); ///< Fills array with Hamming window.
-TEM void hann			(T * dst, uint32_t len); ///< Fills array with von Hann window.
-TEM void welch			(T * dst, uint32_t len); ///< Fills array with Welch window.
-TEM void rectangle		(T * dst, uint32_t len); ///< Fills array with Rectangle window.
-TEM void nyquist		(T * dst, uint32_t len, uint32_t str=1); ///< Fills array with Nyquist window.
+/// Fills array with specified window type
+TEM void window			(T * dst, uint32_t len, WindowType type);
+TEM void bartlett		(T * dst, uint32_t len); ///< Fills array with Bartlett window
+TEM void blackman		(T * dst, uint32_t len); ///< Fills array with Blackman window
+TEM void blackmanHarris	(T * dst, uint32_t len); ///< Fills array with Blackman-Harris window
+TEM void hamming		(T * dst, uint32_t len); ///< Fills array with Hamming window
+TEM void hann			(T * dst, uint32_t len); ///< Fills array with von Hann window
+TEM void welch			(T * dst, uint32_t len); ///< Fills array with Welch window
+TEM void rectangle		(T * dst, uint32_t len); ///< Fills array with Rectangle window
+TEM void nyquist		(T * dst, uint32_t len, uint32_t str=1); ///< Fills array with Nyquist window
 
 
 //
@@ -394,16 +390,16 @@ TEM void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uin
 	}
 }
 
-TEM void window(T * dst, uint32_t len, WinType::type type){
+TEM void window(T * dst, uint32_t len, WindowType type){
 	switch(type){
-		case WinType::Bartlett:			bartlett(dst, len);			break;
-		case WinType::Blackman:			blackman(dst, len);			break;
-		case WinType::BlackmanHarris:	blackmanHarris(dst, len);	break;
-		case WinType::Hamming:			hamming(dst, len);			break;
-		case WinType::Hann:				hann(dst, len);				break;
-		case WinType::Welch:			welch(dst, len);			break;
-		case WinType::Nyquist:			nyquist(dst, len);			break;
-		default:						rectangle(dst, len);
+		case BARTLETT:			bartlett(dst, len);			break;
+		case BLACKMAN:			blackman(dst, len);			break;
+		case BLACKMAN_HARRIS:	blackmanHarris(dst, len);	break;
+		case HAMMING:			hamming(dst, len);			break;
+		case HANN:				hann(dst, len);				break;
+		case WELCH:				welch(dst, len);			break;
+		case NYQUIST:			nyquist(dst, len);			break;
+		default:				rectangle(dst, len);
 	};
 }
 

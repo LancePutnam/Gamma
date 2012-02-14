@@ -9,7 +9,7 @@
 
 int rng = 1;
 const int dftSize = 2048*2;
-STFT stft(dftSize, dftSize/4, 0, WinType::Hann, Bin::Rect, 1);
+STFT stft(dftSize, dftSize/4, 0, HANN, COMPLEX, 1);
 Accum<> tmr(1./10);
 LFO<> osc1(40), osc2(40.003);
 LFO<> oscA(62), oscB(62.003);

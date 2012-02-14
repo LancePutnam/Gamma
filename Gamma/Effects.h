@@ -29,7 +29,7 @@ struct AmpEnv{
 /// 3 biquad filters in parallel
 struct Biquad3{
 	/// Constructor
-	Biquad3(float f0, float f1, float f2, float q=8, int type=Filter::BP):
+	Biquad3(float f0, float f1, float f2, float q=8, FilterType type=BAND_PASS):
 		bq0(f0,q,type), bq1(f1,q,type), bq2(f2,q,type){}
 
 	/// Set center frequencies
@@ -45,7 +45,7 @@ struct Biquad3{
 
 struct Burst{
 	Burst(float frq1=20000, float frq2=4000, float dec=0.1, float res=2) : 
-		freq1(frq1), freq2(frq2), fil(frq1, res, Filter::BP), env(dec)
+		freq1(frq1), freq2(frq2), fil(frq1, res, BAND_PASS), env(dec)
 	{}
 	
 	float operator()(){
@@ -265,7 +265,7 @@ struct Diffuser{
 template <class T=gam::real>
 struct Modulet{
 	Modulet(T cfreq=1000, T q=10, T mfreq=1, T mphs=0, T depth=1)
-	:	fil(cfreq, q, Filter::BPC), osc(mfreq, mphs), depth(depth){}
+	:	fil(cfreq, q, BAND_PASS_UNIT), osc(mfreq, mphs), depth(depth){}
 	
 	T operator()(T in){ return fil(in) * scl::mapDepth(osc.cos(), depth); }
 
@@ -378,7 +378,7 @@ protected:
 
 /// Plucked string source/filter
 struct Pluck{
-	Pluck() : env(0.1), fil(3000, 0.2, Filter::LP), comb(1./27.5, 1./440., 1, 0.99){}
+	Pluck() : env(0.1), fil(3000, 0.2, LOW_PASS), comb(1./27.5, 1./440., 1, 0.99){}
 	
 	float operator()(){ return comb(fil(noise() * env())); }
 	float operator()(float in){ return comb(fil(in * env())); }

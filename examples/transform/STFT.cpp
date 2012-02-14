@@ -9,11 +9,11 @@
 
 STFT stft(
 	2048,			// Window size
-	2048/4,			// Hop size
-	0,				// Pad size
-	WinType::Hann,	// Window type: Bartlett, Blackman, BlackmanHarris, 
-					// Hamming, Hann, Welch, Rectangle
-	Bin::Rect		// Format of frequency samples
+	2048/4,			// Hop size; interval between transforms
+	0,				// Pad size; zero padding amount on window
+	HANN,			// Window type: BARTLETT, BLACKMAN, BLACKMAN_HARRIS,
+					// HAMMING, HANN, WELCH, NYQUIST, or RECTANGLE
+	COMPLEX			// Format of frequency samples
 );
 
 NoisePink<> src;
