@@ -367,7 +367,7 @@ TEM inline bool SlidingWindow<T>::operator()(T input){
 	
 	if(++mTapW >= sizeHop()){
 		mTapW = 0;
-		mem::rotateLeft(mBuf, sizeWin(), sizeHop());
+		mem::rotateLeft(sizeHop(), mBuf, sizeWin());
 		return true;
 	}
 	return false;
