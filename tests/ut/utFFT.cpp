@@ -1,21 +1,75 @@
 {
+	typedef Complex<double> complex;
+
+	struct F{
+		static bool aeq(double a, double b, double eps=1e-8){
+			return scl::abs(a-b) <= eps;
+		}
+		static bool aeq(const complex& a, const complex& b, double eps=1e-8){
+			return aeq(a.r, b.r, eps) && aeq(a.i, b.i, eps);
+		}
+	};
+
 	const int N=16;
-
-	Complex<double> ac[N];
-	double ar[N];
-
+	complex in[N];
+	complex ac[N];
+	double ar2[N+2];
+	double * ar = ar2+1;
 	CFFT<double> cfft(N);
 	RFFT<double> rfft(N);
 
-	fil::Reson<double> r1(1./N), r2(2./N);
-	for(int i=0; i<N; ++i){ ac[i] = r1()+r2()+1; ar[i] = ac[i].r; }
+	for(int i=0; i<N; ++i){
+		double phs = double(i)/N * M_2PI;
+		in[i] = 1. + complex().fromPhase(phs) + complex().fromPhase(2*phs);
+		in[i] += (i&1?-1:1); // Nyquist
+		ac[i] = in[i];
+		ar[i] = ac[i].r;
+	}
+	
+	// test forward transform
+	cfft.forward(ac);
+	rfft.forward(ar);
 
 //	for(int i=0; i<N; ++i){
 //		printf("[%3d] % f % f\n", i, ac[i].r, ac[i].i);
 //	}
+//	for(int i=0; i<N; ++i){
+//		printf("[%3d] % f\n", i, ar[i]);
+//	}
+
+	assert(F::aeq(ac[0], complex(1,0)));
+	assert(F::aeq(ac[1], complex(1,0)));
+	assert(F::aeq(ac[2], complex(1,0)));
+	assert(F::aeq(ac[N/2], complex(1,0)));
+	assert(F::aeq(ar[0], 1));
+	assert(F::aeq(ar[1], 1));
+	assert(F::aeq(ar[3], 1));
+	assert(F::aeq(ar[N-1], 1));
+
+	// test inverse transform
+	cfft.inverse(ac);
+	rfft.inverse(ar);
+
+	for(int i=0; i<N; ++i){
+		assert(F::aeq(ac[i], in[i]));
+		assert(F::aeq(ar[i], in[i].r));
+	}
 	
-	cfft.forward((double*)ac);
-	rfft.forward(ar);
+	
+	// test complex output buffer real-to-complex
+	rfft.forward(ar2, true, true);
+
+	assert(F::aeq(ar2[0], 1));
+	assert(F::aeq(ar2[1], 0));
+	assert(F::aeq(ar2[2], 1));
+	assert(F::aeq(ar2[4], 1));
+	assert(F::aeq(ar2[N], 1));
+	assert(F::aeq(ar2[N+1], 0));
+
+	rfft.inverse(ar2, true);
+	for(int i=0; i<N; ++i){
+		assert(F::aeq(ar2[i+1], in[i].r));
+	}
 
 //	for(int i=0; i<N; ++i) printf("[%3d] % f % f\n", i, ac[i].r, ac[i].i);
 //	
