@@ -48,7 +48,7 @@ void audioCB(AudioIOData& io){
 }
 
 
-int main(int argc, char* argv[]){
+int main(){
 
 	stft.syncHop() << edge;
 
@@ -56,5 +56,4 @@ int main(int argc, char* argv[]){
 	Sync::master().spu(io.framesPerSecond());
 	io.start();
 	printf("Press 'enter' to quit...\n"); getchar();
-	return 0;
 }

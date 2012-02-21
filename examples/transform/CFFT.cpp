@@ -56,6 +56,4 @@ int main(){
 		printPlot(br/3, 16); printPlot(bi/3, 16);
 		printf("\n");
 	}
-
-	return 0;
 }

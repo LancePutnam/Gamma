@@ -56,6 +56,4 @@ int main(){
 		printPlot(buf[i]/5, 32);
 		printf("\n");
 	}
-
-	return 0;
 }

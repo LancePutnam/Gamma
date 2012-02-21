@@ -41,7 +41,7 @@ void audioCB(AudioIOData & io){
 	}
 }
 
-int main(int argc, char* argv[]){
+int main(){
 
 	stft.syncHop()  << lfoF1 << lfoF2;
 	stft.syncFreq() << lfoA1 << lfoA2 << bq0 << bq1;
@@ -50,5 +50,4 @@ int main(int argc, char* argv[]){
 	Sync::master().spu(io.framesPerSecond());		
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
 }
