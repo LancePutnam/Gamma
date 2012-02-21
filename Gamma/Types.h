@@ -127,11 +127,13 @@ struct Complex{
 	T& imag(){return i;}
 	const T& imag() const {return i;}
 
-	
+
 	C& arg(const T& v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
 	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
+	C& mag(const T& v){ return norm(v); }
 	C& norm(const T& v){ return fromPolar(v, arg()); }					///< Set magnitude leaving phase the same
+	
 
 	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
 	C& operator()(const Polar<T>& p){ return *this = p; }
