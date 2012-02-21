@@ -169,7 +169,12 @@ struct Chorus{
 		mod(double(freq), double(depth)),
 		delay(delay)
 	{}
-	
+
+	Chorus& fbk(float v){ comb1.fbk(v); comb2.fbk(v); return *this; }
+	Chorus& ffd(float v){ comb1.ffd(v); comb2.ffd(v); return *this; }
+	Chorus& freq(float v){ mod.freq(v); return *this; }
+	Chorus& depth(float v){ mod.amp(v); return *this; }
+
 	/// Filter sample (mono-mono)
 	T operator()(const T& v){
 		modulate(); return (comb1(v) + comb2(v)) * 0.5f;
