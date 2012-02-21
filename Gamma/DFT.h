@@ -73,23 +73,6 @@ private:
 };
 
 
-/*
-if(oa()){
-	oa(buf);
-}
-
-
-TEM inline bool OverlapAdd<T>::operator()(T * input){	
-	if(++mHopCnt == sizeHop()){
-		overlapAdd(input);
-		mHopCnt = 0;
-	}
-}
-
-TEM void OverlapAdd<T>::overlapAdd(T * input){
-	ArrOp::overlapAdd(mBuf, input, sizeWin(), sizeHop());
-}
-*/
 
 template <class T=gam::real>
 class DFTBase : public Synced{
@@ -121,7 +104,11 @@ protected:
 	
 	T * mAux;		// aux buffers
 	Sync mSyncFreq;
+
 	T normForward() const;	// Returns norm factor for forward transform values
+
+	T * bufPos(){ return mBuf+1; }
+	T * bufFrq(){ return mBuf; }
 };
 
 
@@ -137,7 +124,7 @@ public:
 	/// @param[in]	padSize		Number of zeros to append to window
 	/// @param[in]	specType	Format of spectrum data
 	/// @param[in]	numAux		Number of auxilliary buffers of size numBins() to create
-	DFT(uint32_t winSize, uint32_t padSize=0, SpectralType specType=COMPLEX, uint32_t numAux=0);
+	DFT(uint32_t winSize=1024, uint32_t padSize=0, SpectralType specType=COMPLEX, uint32_t numAux=0);
 	virtual ~DFT();
 
 	DFT& spectrumType(SpectralType v);	///< Set format of spectrum data
@@ -145,8 +132,8 @@ public:
 	void resize(uint32_t windowSize, uint32_t padSize);	///< Sets size parameters of transform
 
 	float freqRes() const;				///< Returns frequency resolution of analysis
-	float overlap() const;				///< Returns degree of transform overlap
-	bool overlapping() const;			///< Whether the xform is overlapping
+	float overlap() const;				///< Returns amount of transform overlap in [0,1]
+	bool overlapping() const;			///< Whether the transform is overlapping
 	uint32_t sizeHop() const;			///< Returns size of hop
 	uint32_t sizePad() const;			///< Returns size of zero-padding
 	uint32_t sizeWin() const;			///< Returns size of window
@@ -200,41 +187,35 @@ protected:
 	uint32_t mSizeWin;				// samples in analysis window
 	uint32_t mSizeHop;				// samples between forward transforms (= winSize() for DFT)
 	SpectralType mSpctFormat;		// format of spectrum
-	//FFTInfo mInfoFFT, mInfoIFFT;	// info for FFT
 	RFFT<float> mFFT;
 	Sync mSyncHop;
 	
 	// Buffers
 	float * mPadOA;			// Overlap-add buffer (alloc'ed only if zero-padded)
 	float * mBufInv;		// Pointer to inverse sample buffer
-	uint32_t mTapW, mTapR;		// DFT i/o read/write taps
+	uint32_t mTapW, mTapR;	// DFT i/o read/write taps
 	bool mPrecise;
-
-	// Magnitude normalization for inverse transform
-	float normInverse() const;
 };
 
 
 
 
-/// Short-time Fourier transform.
+/// Short-time Fourier transform
 
-///
-///
+/// The short-time Fourier transform uses a sliding window during analysis
+/// to obtain better time resolution between successive spectral frames. The 
+/// resolution within each individual spectral frame is still determined by the
+/// window size.
 class STFT : public DFT {
 public:
 
-	/// Constructor
-	
-	/// The default complex data type is rectangular and the default window
-	/// is none.
 	/// @param[in]	winSize		Number of samples to window
 	/// @param[in]	hopSize		Number of samples between successive windows
 	/// @param[in]	padSize		Number of zeros to append to window
 	/// @param[in]	winType		Type of forward transform window
 	/// @param[in]	specType	Format of spectrum data
 	/// @param[in]	createAux	Whether to create an auxillary spectral buffer (see createAux())
-	STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize=0,
+	STFT(uint32_t winSize=1024, uint32_t hopSize=256, uint32_t padSize=0,
 		WindowType winType = RECTANGLE,
 		SpectralType specType = COMPLEX,
 		uint32_t numAux=0);
@@ -244,27 +225,35 @@ public:
 
 	using DFT::operator();
 
-	/// Input next time-domain sample and return whether a new spectral frame is available
+	/// Input next time-domain sample
+	
+	/// \returns whether a new spectral frame is available
+	///
 	bool operator()(float input);
 
-	/// Perform forward transform on an array of samples
-	void forward(float * input);
+	/// Perform forward transform of an array of samples
+	void forward(const float * src);
 	
 	/// Get inverse transform using current spectral frame
 	virtual void inverse(float * dst);
 
 
-	/// Set size parameters of transform
+	/// Set window and zero-padding size, in samples
 	void resize(uint32_t winSize, uint32_t padSize);
-	
+
+	/// Whether to apply a triangular window to inverse transform samples
+	STFT& inverseWindowing(bool v){
+		mWindowInverse=v; computeInvWinMul(); return *this; }
+
+	/// Whether to rotate input samples by half
+	STFT& rotateForward(bool v){ mRotateForward=v; return *this; }
+
 	/// Set hop size, in samples
-	void sizeHop(uint32_t size);
+	STFT& sizeHop(uint32_t size);
 	
 	/// Set window type
-	void windowType(WindowType type);
+	STFT& windowType(WindowType type);
 
-	void rotateForward(bool v){ mRotateForward = v; }
-	//void resetPhaseAccum(){  }
 
 	float unitsHop();
 	
@@ -290,18 +279,27 @@ protected:
 
 
 
-/// Sliding discrete Fourier transform
+/// Sliding discrete Fourier transform (SDFT)
 
-/// This transform computes the DFT with a fixed hop size of 1 sample.
-/// Its computational complexity is O(N), where N is the number of bins
-/// to compute.
+/// This transform computes the DFT with a fixed hop size of 1 sample and
+/// within a specified frequency interval. The computational complexity per
+/// sample is O(M), where M is the size, in samples, of the frequency interval.
 template <class T>
 class SDFT : public DFTBase<T> {
 public:
+
+	/// @param[in] sizeDFT	transform size, in samples
+	/// @param[in] binLo	lower closed endpoint of frequency interval
+	/// @param[in] binHi	upper open endpoint of frequency interval
 	SDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
 	
+	/// Input next sample and perform forward transform
 	void forward(T input);
-	void range(uint32_t binLo, uint32_t binHi);
+	
+	/// Set endpoints of frequency interval
+	SDFT& interval(uint32_t binLo, uint32_t binHi);
+
+	/// Resize transform
 	void resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
 		
 protected:
@@ -421,21 +419,22 @@ TEM void DFTBase<T>::onResync(double r){
 
 //---- DFT
 
-inline float DFT::freqRes() const { return spu() / (float)sizeWin(); }
-inline float DFT::overlap() const { return (float)sizeWin() / (float)sizeHop(); }
+inline DFT& DFT::spectrumType(SpectralType v){ mSpctFormat=v; return *this; }
+inline DFT& DFT::precise(bool w){ mPrecise=w; return *this; }
+
+inline float DFT::freqRes() const { return spu() / sizeWin(); }
+inline float DFT::overlap() const { return float(sizeWin()) / sizeHop(); }
 inline bool DFT::overlapping() const { return sizeHop() < sizeWin(); }
 inline uint32_t DFT::sizeHop() const { return mSizeHop; }
 inline uint32_t DFT::sizePad() const { return mSizeDFT - mSizeWin; }
 inline uint32_t DFT::sizeWin() const { return mSizeWin; }
 inline Sync& DFT::syncHop(){ return mSyncHop; }
-//inline float DFT::normInverse() const { return 0.5f * (float)sizeHop() / (float)sizeWin(); } /* o-a factor depends on window */
-inline float DFT::normInverse() const { return 0.5f; }
 
 inline bool DFT::operator()(float input){
-	mBuf[mTapW] = input;
+	bufPos()[mTapW] = input;
 
 	if(++mTapW >= sizeHop()){
-		forward(mBuf);
+		forward(bufPos());
 		mTapW = 0;
 		return true;
 	}
@@ -463,8 +462,8 @@ inline void DFT::zeroEnds(){
 //---- STFT
 
 inline bool STFT::operator()(float input){
-	if(mSlide(mBuf, input)){
-		forward(mBuf);
+	if(mSlide(bufPos(), input)){
+		forward(bufPos());
 		return true;
 	}
 	return false;
@@ -487,33 +486,35 @@ TEM void SDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	// may be able to keep these smaller?
 	mem::resize(this->mBuf, this->mSizeDFT + 2, sizeDFT + 2);
 	mem::deepZero(this->mBuf, sizeDFT + 2);
-	
+
 	mDelay.resize(sizeDFT);
 	mDelay.assign(T(0));
-	
+
 	this->mSizeDFT = sizeDFT;
-	
-	range(binLo, binHi);
-	
+
+	interval(binLo, binHi);
+
 	//this->onSyncChange();
 }
 
-TEM void SDFT<T>::range(uint32_t binLo, uint32_t binHi){
+TEM SDFT<T>& SDFT<T>::interval(uint32_t binLo, uint32_t binHi){
 	mBinLo = binLo;
 	mBinHi = binHi;
 	
-	double theta = M_2PI / (double)this->sizeDFT();
+	double theta = M_2PI / this->sizeDFT();
 
 	mF1.fromPhase(theta);
 	mFL.fromPhase(theta*mBinLo);
-	mNorm = (T)2 / (T)this->sizeDFT();
+	mNorm = T(2) / T(this->sizeDFT());
+	return *this;
 }
 
+//
 TEM inline void SDFT<T>::forward(T input){
 	T dif = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
 												// difference between temporal 'frames'
 	Complex<T> c = mFL;							// phasor at low bin
-	
+
 	// apply complex resonators:
 	// multiply freq samples by 1st harmonic (shift time signal)
 	// add time sample to all bins (set time sample at n=0)
@@ -525,7 +526,7 @@ TEM inline void SDFT<T>::forward(T input){
 	}
 }
 
-//TEM inline T inverse(){}
+//TEM inline T SDFT<T>::inverse(){}
 
 
 
