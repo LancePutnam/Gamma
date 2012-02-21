@@ -11,14 +11,14 @@ namespace gam{
 class Sync;
 
 
-// Unit
+/// Normalized unit synchronization observer
 class Synced1{
 public:
 
 	virtual ~Synced1(){}
 
-	double spu() const { return 1.; }		///< Returns local samples/unit.
-	double ups() const { return 1.; }		///< Returns local units/sample.
+	double spu() const { return 1.; }		///< Returns local samples/unit
+	double ups() const { return 1.; }		///< Returns local units/sample
 
 	///	Notification that subject's samples/unit has changed.
 
@@ -26,8 +26,8 @@ public:
 	/// updated here. The ratio of the new to the old samples/unit is passed in.
 	virtual void onResync(double ratioSPU){}
 	
-	void spu(double val){}			///< Set local samples/unit.	
-	void ups(double val){}			///< Set local units/sample.
+	void spu(double val){}			///< Set local samples/unit	
+	void ups(double val){}			///< Set local units/sample
 
 protected:
 	void initSynced(){ onResync(1); }
@@ -35,7 +35,7 @@ protected:
 
 
 
-/// Synchronized unit sampler.
+/// Unit synchronization observer
 
 /// A Synced will attempt to copy its local variables from the master Sync
 /// upon construction. If the master Sync has not been constructed, it will
@@ -44,29 +44,33 @@ protected:
 /// By default, the reference Sync is Sync::master.
 class Synced : public Node2<Synced> {
 public:
-	/// Constructor
+
 	Synced();
+	
+	/// Copy constructor
+	
+	/// If the argument has a subject, then attach this as an observer to the
+	/// same subject. Otherwise, attach as observer of Sync::master().
 	Synced(const Synced& rhs);
 
 	virtual ~Synced(){}
 
 	double scaleSPU() const;	///< Returns ratio of my SPU to my Sync's SPU
-	double spu() const;			///< Returns local samples/unit.
-	double ups() const;			///< Returns local units/sample.
-	const Sync * sync() const;	///< Returns reference to my Sync.
+	double spu() const;			///< Returns local samples/unit
+	double ups() const;			///< Returns local units/sample
+	const Sync * sync() const;	///< Returns reference to my Sync
 
-	/// Called by my Sync reference after it changes its value.
+	/// Called by my Sync reference after it changes its value
 	
-	///	Any instance state that depends on the sampling length should be updated here.
-	/// TODO: Maybe this should be pure virtual?
+	///	Any instance state that depends on the sampling length should be 
+	/// updated here.
 	virtual void onResync(double ratioSPU){}
 
-	void scaleSPU(double v);	///< Scales samples/unit by factor.
-	void scaleUPS(double v);	///< Scales units/sample by factor.
-	void spu(double v);			///< Set local samples/unit.
-	void sync(Sync& src);		///< Set absolute Sync source.
-	void ups(double v);			///< Set local units/sample.
-
+	void scaleSPU(double v);	///< Scales samples/unit by factor
+	void scaleUPS(double v);	///< Scales units/sample by factor
+	void spu(double v);			///< Set local samples/unit
+	void sync(Sync& src);		///< Set absolute Sync source
+	void ups(double v);			///< Set local units/sample
 
 	Synced& operator= (const Synced& rhs);
 
@@ -77,41 +81,37 @@ private:
 	friend class Sync;
 	Synced(bool zeroLinks, Sync& src);
 
-	Sync * mSync;	// Reference to my Sync.
-	double mSPU;	// Local samples/unit.
-	double mUPS;	// Local units/sample.
+	Sync * mSync;	// Reference to my Sync
+	double mSPU;	// Local samples/unit
+	double mUPS;	// Local units/sample
 };
 
 
 
 
 
-/// Synchronizing unit sampler.
+/// Unit synchronization subject
 class Sync{
 public:
 
 	Sync();
 
-	/// @param[in]	spu		Initial samples/unit.
+	/// @param[in]	spu		samples/unit
 	Sync(double spu);
 
 	~Sync();
 
-	Sync& operator<< (Synced& synced);	///< Move a Synced into list.
-	void notifySynceds(double r);		///< Calls onSyncChange() for all my Synceds.
-	void spu(double v);					///< Set samples/unit.  If changed, will notify Synceds.
-	void ups(double v);					///< Set units/sample.  If changed, will notify Synceds.
+	Sync& operator<< (Synced& synced);	///< Attach observer
+	void notifySynceds(double r);		///< Notify observers (\see Synced::onResync)
+	void spu(double v);					///< Set samples/unit and notify observers
+	void ups(double v);					///< Set units/sample and notify observers
 
-	bool hasBeenSet() const;			///< Returns true if spu has been set at least once.
-	double spu() const;					///< Returns samples/unit, i.e. sample rate.
-	double ups() const;					///< Returns units/sample, i.e. sample interval.	
+	bool hasBeenSet() const;			///< Returns true if spu has been set at least once
+	double spu() const;					///< Returns samples/unit, i.e. sample rate
+	double ups() const;					///< Returns units/sample, i.e. sample interval
 
 	/// Master sync. By default, Synceds will be synced to this.
 	static Sync& master(){
-	
-		// Note: This uses a Construct On First Use Idiom to avoid unpredictable
-		// static initialization order.  The memory allocated will get freed from 
-		// the heap when the program exits.		
 		static Sync * s = new Sync;
 		return *s;
 	}
