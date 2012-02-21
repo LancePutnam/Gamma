@@ -1,11 +1,11 @@
-#ifndef GAMMA_VISUAL_H_INC
-#define GAMMA_VISUAL_H_INC
+#ifndef GAMMA_PRINT_H_INC
+#define GAMMA_PRINT_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 
 	File Description: 
-	Visual functions for printing and colors.
+	Printing functions
 */
 
 #include <string>
@@ -15,9 +15,6 @@
 #include "Gamma/scl.h"
 
 namespace gam{
-
-void colorRGB(float h, float s, float v, float &r, float &g, float &b);
-void colorHSV(float r, float g, float b, float &h, float &s, float &v);
 
 /// Returns an ASCII character most closely matching an intensity value in [0,1].
 char intensityToASCII(float v);
