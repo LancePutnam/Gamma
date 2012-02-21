@@ -22,11 +22,14 @@ public:
 	int size() const;
 
 	/// Perform forward transform in-place
+	
+	/// @param[in,out] buf		input/output buffer
+	/// @param[in] normalize	whether to scale magnitudes by 1/N
 	void forward(T * buf, bool normalize=true);
 
 	template <template <class> class ComplexType>
-	void forward(ComplexType<T> * buf, bool normalize=true){
-		forward((T*)buf, normalize);
+	void forward(ComplexType<T> * buf, bool unitize=true){
+		forward((T*)buf, unitize);
 	}
 
 	/// Perform inverse transform in-place
@@ -63,26 +66,27 @@ public:
 	/// Perform real-to-complex forward transform in-place
 	
 	/// @param[in,out]	buf			input is real sequence, output is complex sequence
-	/// @param[in]		normalize	whether to normalize output complex magnitudes
+	/// @param[in]		normalize	whether to scale magnitudes by 1/N
 	/// @param[in]		complexBuf	If true, then 
 	///									input is  [ *, x0, x1, x2, ..., x(n),   *] and
 	///									output is [r0,  0, r1, i1, ..., r(n/2), 0].
 	///								If false, then 
 	///									input is  [x0, x1, x2, ..., x(n)  ] and
 	///									output is [r0, r1, i1, ..., r(n/2)].
-	void forward(T * buf, bool normalize=true, bool complexBuf=false);
+	/// @param[in]		halfSpec	whether the output spectrum is the positive frequency half only
+	void forward(T * buf, bool normalize=true, bool complexBuf=false, bool halfSpec=false);
 	
 	/// Perform complex-to-real inverse transform in-place
 
 	/// @param[in,out]	buf			input is complex sequence, output is real sequence
-	/// @param[in]		normalize	whether input complex magnitudes are normalized
 	/// @param[in]		complexBuf	If true, then 
 	///									input is  [r0,  0, r1, i1, ..., r(n/2), 0] and
 	///									output is [ *, x0, x1, x2, ..., x(n),   *].
 	///								If false, then 
 	///									input is  [r0, r1, i1, ..., r(n/2)]  and 
 	///									output is [x0, x1, x2, ..., x(n)  ].
-	void inverse(T * buf, bool normalized=true, bool complexBuf=false);
+	/// @param[in]		halfSpec	whether the input spectrum is the positive frequency half only
+	void inverse(T * buf, bool complexBuf=false, bool halfSpec=false);
 
 	/// Set size of transform
 	void resize(int n);
