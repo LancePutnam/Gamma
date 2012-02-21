@@ -183,7 +183,7 @@ PRE inline void CLS::max(double v){ mMax = scl::clip<double>(v, frames()); }
 PRE void CLS::free(){ this->freeElements(); }
 PRE inline void CLS::rate(double v){
 	mRate = v;
-	mInc = v * mSampleRate / spu();
+	mInc = v * mSampleRate * ups();
 }
 PRE inline void CLS::range(double posn, double period){
 	phase(posn);
