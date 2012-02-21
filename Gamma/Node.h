@@ -16,7 +16,8 @@ class Node2{
 public:
 	Node2();
 	Node2(bool zeroLinks);
-	virtual ~Node2();
+	//virtual ~Node2();
+	~Node2();
 	
 	T * nodeL;					///< Pointer to left node
 	T * nodeR;					///< Pointer to right node
@@ -164,7 +165,8 @@ class Node4{
 public:
 
 	Node4();
-	virtual ~Node4();
+	//virtual ~Node4();
+	~Node4();
 
 	T * parent;		///< Parent node
 	T * child;		///< Child node
@@ -210,6 +212,7 @@ TEM Node2<T>::Node2(bool zeroLinks){
 }
 
 TEM Node2<T>::~Node2(){
+	//printf("~Node2\n");
 	nodeRemove();
 }
 
