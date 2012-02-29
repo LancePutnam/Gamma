@@ -620,8 +620,8 @@ TEM inline T foldOnce(T v, T hi, T lo){
 }
 
 TEM inline T linLog2(T v, T recMin){
-	v = log2Fast(scl::abs(v) + (T)0.000001);	// offset to avoid -inf
-	return scl::max(v * recMin, (T)-1) + (T)1;
+	v = log2Fast(scl::abs(v) + T(0.000001));	// offset to avoid -inf
+	return scl::max(v * recMin, T(-1)) + T(1);
 }
 
 inline uint32_t log2(uint32_t v){ return deBruijn(ceilPow2(v)); }
