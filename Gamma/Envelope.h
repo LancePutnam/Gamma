@@ -72,10 +72,10 @@ protected:
 /// \tparam N	number of segments
 /// \tparam T	sample type
 template <int N, class T=gam::real, class Ts=Synced>
-class CurveEnv : public Ts{
+class Env : public Ts{
 public:
 
-	CurveEnv()
+	Env()
 	:	mSustain(N)
 	{
 		for(int i=0; i<N; ++i){
@@ -148,10 +148,10 @@ public:
 	}
 
 	/// Sets the point at which the envelope holds its value until released
-	CurveEnv& sustainPoint(int v){ mSustain=v; return *this; }
+	Env& sustainPoint(int v){ mSustain=v; return *this; }
 
 	/// Disable sustain
-	CurveEnv& sustainDisable(){ return sustainPoint(N); }
+	Env& sustainDisable(){ return sustainPoint(N); }
 
 	/// Reset envelope to starting point
 	void reset(){
@@ -168,37 +168,37 @@ public:
 
 	/// Set break-point values
 	template <class V>
-	CurveEnv& lengths(const V* vals, int len){
+	Env& lengths(const V* vals, int len){
 		int n = len <= size() ? len : size();
 		for(int i=0; i<n; ++i) lengths()[i] = vals[i];
 		return *this;
 	}
 	
 	/// Set first two segment lengths
-	CurveEnv& lengths(T a, T b){ T v[]={a,b}; return lengths(v,2); }
+	Env& lengths(T a, T b){ T v[]={a,b}; return lengths(v,2); }
 
 	/// Set first three segment lengths
-	CurveEnv& lengths(T a, T b, T c){ T v[]={a,b,c}; return lengths(v,3); }
+	Env& lengths(T a, T b, T c){ T v[]={a,b,c}; return lengths(v,3); }
 
 	/// Set first four segment lengths
-	CurveEnv& lengths(T a, T b, T c, T d){ T v[]={a,b,c,d}; return lengths(v,4); }
+	Env& lengths(T a, T b, T c, T d){ T v[]={a,b,c,d}; return lengths(v,4); }
 
 	/// Set first five segment lengths
-	CurveEnv& lengths(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return lengths(v,5); }
+	Env& lengths(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return lengths(v,5); }
 
 
 	/// Get segment curvature array
 	T * curves(){ return mCurves; }
 	
 	/// Set curvature of all segments
-	CurveEnv& curve(T v){
+	Env& curve(T v){
 		for(int i=0; i<N; ++i) curves()[i]=v;
 		return *this;
 	}
 
 
 	/// Set length and curvature of a segment
-	CurveEnv& segment(int i, T length, T curve){
+	Env& segment(int i, T length, T curve){
 		mLengths[i]=length;
 		mCurves [i]=curve;
 		return *this;
@@ -206,7 +206,7 @@ public:
 
 	/// Set length and curvature of many segments
 	template <class V>
-	CurveEnv& segments(const V* lengths, const V* curves, int len, int begin=0){
+	Env& segments(const V* lengths, const V* curves, int len, int begin=0){
 		int max = size() - begin;
 		int n = len < max ? len : max;
 		for(int i=0; i<n; ++i){
@@ -216,15 +216,15 @@ public:
 	}
 	
 	/// Set length and curvature of first two segments
-	CurveEnv& segments(T la, T ca, T lb, T cb){
+	Env& segments(T la, T ca, T lb, T cb){
 		T l[]={la,lb}; T c[]={ca,cb}; return segments(l,c,2); }
 
 	/// Set length and curvature of first three segments
-	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc){
+	Env& segments(T la, T ca, T lb, T cb, T lc, T cc){
 		T l[]={la,lb,lc}; T c[]={ca,cb,cc}; return segments(l,c,3); }
 	
 	/// Set length and curvature of first four segments
-	CurveEnv& segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){
+	Env& segments(T la, T ca, T lb, T cb, T lc, T cc, T ld, T cd){
 		T l[]={la,lb,lc,ld}; T c[]={ca,cb,cc,cd}; return segments(l,c,4); }
 
 
@@ -233,23 +233,23 @@ public:
 
 	/// Set break-point values
 	template <class V>
-	CurveEnv& levels(const V* vals, int len){
+	Env& levels(const V* vals, int len){
 		int n = len <= size() ? len : size()+1;
 		for(int i=0; i<n; ++i) levels()[i] = vals[i];
 		return *this;
 	}
 	
 	/// Set first two break-point levels
-	CurveEnv& levels(T a, T b){ T v[]={a,b}; return levels(v,2); }
+	Env& levels(T a, T b){ T v[]={a,b}; return levels(v,2); }
 
 	/// Set first three break-point levels
-	CurveEnv& levels(T a, T b, T c){ T v[]={a,b,c}; return levels(v,3); }
+	Env& levels(T a, T b, T c){ T v[]={a,b,c}; return levels(v,3); }
 
 	/// Set first four break-point levels
-	CurveEnv& levels(T a, T b, T c, T d){ T v[]={a,b,c,d}; return levels(v,4); }
+	Env& levels(T a, T b, T c, T d){ T v[]={a,b,c,d}; return levels(v,4); }
 
 	/// Set first five break-point levels
-	CurveEnv& levels(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return levels(v,5); }
+	Env& levels(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return levels(v,5); }
 
 protected:
 	Curve<T> mCurve;
@@ -279,9 +279,9 @@ protected:
 /// \tparam T	sample type
 /// \tparam Ts	sync type
 template <class T=gam::real, class Ts=Synced>
-class ADSR : public CurveEnv<3,T,Ts>{
+class ADSR : public Env<3,T,Ts>{
 public:
-	using CurveEnv<3,T,Ts>::release;
+	using Env<3,T,Ts>::release;
 
 	/// @param[in] att	Attack length
 	/// @param[in] dec	Decay length
