@@ -1,0 +1,73 @@
+#=========================================================================
+# Common rules for all Makefiles
+#=========================================================================
+
+CPPFLAGS	+= $(EXT_CPPFLAGS)
+LDFLAGS		+= $(EXT_LDFLAGS)
+
+CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
+CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
+
+DEPFLAGS	=
+ifneq ($(DEP_TRACK), 0)
+	DEPFLAGS = -MMD -MF $(basename $@).dep
+endif
+
+ALL_BUILD_DIRS = $(BIN_DIR) $(OBJ_DIR) $(BUILD_DIR)include $(BUILD_DIR)lib
+
+#--------------------------------------------------------------------------
+# Rules
+#--------------------------------------------------------------------------
+
+all: $(LIB_PATH)
+
+
+# Build object file from C++ source
+$(OBJ_DIR)%.o:: %.cpp
+	@echo CXX $< $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
+
+# Build object file from C source
+$(OBJ_DIR)%.o:: %.c
+	@echo CC $< $@
+	$(CC) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
+	
+# Build object file from Obj-C++ source
+$(OBJ_DIR)%.o:: %.mm
+	@echo CC $< $@
+	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
+
+-include $(wildcard $(OBJ_DIR)*.dep)
+
+
+# Build static library
+$(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+	@echo AR $@
+	@$(RM) $@
+	$(AR) $@ $(filter %.o, $^) $(SLIB_FLAGS)
+#	@$(RANLIB) $@
+#	libtool --mode=link --tag=CXX $(filter %.o, $^) $(SLIB_FLAGS) -o $@
+#	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
+
+
+# Build dynamic library
+$(DLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+	@echo DY $@
+	$(CXX) $(DLIB_FLAGS) $(CXXFLAGS) -o $@ $(filter %.o, $^) $(LDFLAGS)
+
+
+# Dummy target to force rebuilds
+FORCE:
+
+
+# This creates a particular build folder
+$(ALL_BUILD_DIRS):
+	@mkdir -p $@
+
+# This rule creates all the build directories ONCE when the first object is built
+$(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
+
+
+# Create file with settings for linking to external libraries
+external:
+	@printf "%b\n" "CPPFLAGS +=$(EXT_CPPFLAGS)\r\nLDFLAGS +=$(EXT_LDFLAGS)"> Makefile.external

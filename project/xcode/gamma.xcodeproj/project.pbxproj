@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		164BDCAF14CCA7750061E1EF /* Makefile test */ = {
+		164BDCAF14CCA7750061E1EF /* Build Test */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 164BDCB614CCA7E50061E1EF /* Build configuration list for PBXAggregateTarget "Makefile test" */;
+			buildConfigurationList = 164BDCB614CCA7E50061E1EF /* Build configuration list for PBXAggregateTarget "Build Test" */;
 			buildPhases = (
 				164BDCAE14CCA7750061E1EF /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = "Makefile test";
+			name = "Build Test";
 			productName = "Make all test";
 		};
 		168AAD840CD0042400F36E4B /* libgamma{.a, .dylib} */ = {
@@ -527,7 +527,7 @@
 				C0F9EF670BB059670069B343 /* libgamma.dylib */,
 				168AAC9C0CD0025D00F36E4B /* libgamma.a */,
 				168AAD840CD0042400F36E4B /* libgamma{.a, .dylib} */,
-				164BDCAF14CCA7750061E1EF /* Makefile test */,
+				164BDCAF14CCA7750061E1EF /* Build Test */,
 			);
 		};
 /* End PBXProject section */
@@ -544,7 +544,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This runs all the Makefile rules\ncd ../..\nfor v in algorithmic curves effects filter function generator io transform; do\n\tmake examples/$v/*.cpp -j4 AUTORUN=0\ndone\nmake test -j4";
+			shellScript = "# This runs all the Makefile rules\ncd ../..\nmake buildtest -j4";
 		};
 		168AAD890CD0044800F36E4B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -984,7 +984,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		164BDCB614CCA7E50061E1EF /* Build configuration list for PBXAggregateTarget "Makefile test" */ = {
+		164BDCB614CCA7E50061E1EF /* Build configuration list for PBXAggregateTarget "Build Test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				164BDCB014CCA7760061E1EF /* Development */,

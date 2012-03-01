@@ -22,7 +22,9 @@ else ifeq ($(UNAME), Darwin)
 	# Mac OS X version
 	UNAMER := $(shell uname -r)
 	UNAMER := $(firstword $(subst ., , $(UNAMER)))
-	ifeq ($(UNAMER), 11)
+	ifeq ($(UNAMER), 12)
+		OSX_VERSION = 10_8
+	else ifeq ($(UNAMER), 11)
 		OSX_VERSION = 10_7
 	else ifeq ($(UNAMER), 10)
 		OSX_VERSION = 10_6
@@ -35,6 +37,7 @@ else
 	PLATFORM = windows
 endif
 
+
 # Architecture: '32' or '64'
 UNAMEM := $(shell uname -m)
 ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
@@ -43,34 +46,51 @@ else
 	ARCH = 32
 endif
 
+
 #
 USING_PUREDYNE	= 0
 
 #--------------------------------------------------------------------------
 # Build settings
 #--------------------------------------------------------------------------
+# Name of the library
+# This should be defined prior to including this file
 LIB_NAME	?=
+
+# Dynamic library major/minor version numbers
+DLIB_MAJ	= 1
+DLIB_MIN	= 0
 
 # Build configuration: 'Release' or 'Debug'
 BUILD_CONFIG	= Release
 
-STRICT_WARNINGS = 1
-AUTORUN		= 1
-SLIB_EXT	= a
-DLIB_EXT	= so
-DLIB_OPT	= shared
+# Whether to build a dynamic library versus a static library
+DYNAMIC		= 0
+
+# Whether to show verbose output
+VERBOSE		= 0
 
 # Whether Make should determine the dependencies of each C or C++ file as
 # it compiles it. This will be automatically disabled for universal builds
 # on Mac OSX.
-DEP_TRACK = 1
-ifeq ($(ARCH), 32_64)
-	DEP_TRACK = 0
-endif
+DEP_TRACK	= 1
+
+# Whether to enable strict warnings
+STRICT_WARNINGS = 1
+
+# Whether to automatically run executables after building
+AUTORUN		= 1
+
+SLIB_EXT	= a
+DLIB_EXT	= so
+DLIB_OPT	= shared
 
 # Flags required for including and linking against library
 EXT_CPPFLAGS	?=
 EXT_LDFLAGS	?=
+
+SLIB_FLAGS 	?=
+DLIB_FLAGS 	?=
 
 #--------------------------------------------------------------------------
 # Default paths
@@ -81,37 +101,66 @@ MANPREFIX	= $(PREFIX)/share/man/
 
 # Locations of built objects
 BUILD_DIR	= build/
-BIN_DIR		= $(BUILD_DIR)$(BUILD_CONFIG)/
-OBJ_DIR		= $(BIN_DIR)obj/
+BIN_DIR		= $(BUILD_DIR)bin/
+OBJ_DIR		= $(BUILD_DIR)obj/
 
 # Location of library installation
 DESTDIR		= $(PREFIX)
 
+# Platform-dependent directory
+PLATFORM_DIR ?=
+
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
-AR		= ar cr
+
+# NOTE: ar -s is completely equivalent to running ranlib
+AR 		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -f
 
+
+# Let user override variables
+-include Makefile.user
+
+#--------------------------------------------------------------------------
+# Finalize variables
+#--------------------------------------------------------------------------
+ifeq ($(ARCH), 32_64)
+	DEP_TRACK = 0
+endif
+
 # Linux:
 ifeq ($(PLATFORM), linux)
+
+	PLATFORM_DIR = linux/
+
 	ifneq ($(USING_PUREDYNE), 0)
 		CXX = gcc
 	endif
+	
+	#CXX = clang++
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -m32
 	else ifeq ($(ARCH), 64)
 		CFLAGS += -m64
+	else ifeq ($(ARCH), 32_64)
+		CFLAGS += -m32 -m64
 	endif
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
 	LDFLAGS	+= -lm -lstdc++
+	
+	DLIB_FLAGS += -shared
+	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
 
 # Mac OSX:
 else ifeq ($(PLATFORM), macosx)
+
+	PLATFORM_DIR = osx/
+
 	ifeq ($(ARCH), 32)
 		CFLAGS += -arch i386
 	else ifeq ($(ARCH), 64)
@@ -120,51 +169,76 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -arch i386 -arch x86_64
 	endif
 
-	CFLAGS += -isysroot
+	# This triggers an ocean of loader warnings...
+	#CFLAGS += -fvisibility=hidden -fvisibility-inlines-hidden
 
+	# Set system root directory
 	ifeq ($(OSX_VERSION), 10_7)
-		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
 	else ifeq ($(OSX_VERSION), 10_6)
-		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
 	else ifeq ($(OSX_VERSION), 10_5)
-		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
 	else ifeq ($(OSX_VERSION), 10_4)
-		CFLAGS += /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 	endif
 
+	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
 
+	DLIB_FLAGS += -dynamiclib
+	DLIB_FLAGS += -current_version $(DLIB_MAJ).$(DLIB_MIN) -compatibility_version $(DLIB_MAJ).$(DLIB_MIN)
+	
 # Windows:
 else ifeq ($(PLATFORM), windows)
+
+	PLATFORM_DIR = windows/
+
 	SLIB_EXT = lib
 	DLIB_EXT = dll
 endif
 
-#--------------------------------------------------------------------------
-# Utility functions
-#--------------------------------------------------------------------------
-RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
-
-
-#--------------------------------------------------------------------------
-# Finalize variables
-#--------------------------------------------------------------------------
 ifeq ($(BUILD_CONFIG), Release)
 	CFLAGS += -O3 -fpeel-loops
 else
 	CFLAGS += -g -O0 -fno-inline
 endif
 
+ifeq ($(VERBOSE), 0)
+	AR  := @$(AR)
+	CC  := @$(CC)
+	CXX := @$(CXX)
+endif
+
 ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
-		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas
+		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas 
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 
-SLIB_FILE = lib$(LIB_NAME).$(SLIB_EXT)
-DLIB_FILE = lib$(LIB_NAME).$(DLIB_EXT)
-DLIB_PATH = $(addprefix $(BIN_DIR), $(DLIB_FILE))
-SLIB_PATH = $(addprefix $(BIN_DIR), $(SLIB_FILE))
+SLIB_FILE	= lib$(LIB_NAME).$(SLIB_EXT)
+DLIB_FILE	= lib$(LIB_NAME).$(DLIB_EXT)
+DLIB_MAJ_FILE	= lib$(LIB_NAME).$(DLIB_MAJ).$(DLIB_EXT)
+DLIB_MIN_FILE	= lib$(LIB_NAME).$(DLIB_MAJ).$(DLIB_MIN).$(DLIB_EXT)
+DLIB_PATH	= $(addprefix $(BUILD_DIR)lib/, $(DLIB_MIN_FILE))
+SLIB_PATH	= $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
+
+# Set file directory/name of specified library type
+ifneq ($(DYNAMIC), 0)
+	CFLAGS += -fPIC
+	LIB_FILE = $(DLIB_MIN_FILE)
+	LIB_PATH = $(DLIB_PATH)
+else
+	LIB_FILE = $(SLIB_FILE)
+	LIB_PATH = $(SLIB_PATH)
+endif
+
+
+
+#--------------------------------------------------------------------------
+# Utility functions
+#--------------------------------------------------------------------------
+RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
