@@ -111,9 +111,7 @@ TEM uint32_t maxNorm(const T * src, uint32_t len, uint32_t str=1);
 TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns the mean (average) value of array values
-TEM inline T mean(const T * src, uint32_t len, uint32_t str=1){
-	return sum(src, len, str) / T(len/str);
-}
+TEM T mean(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns the mean norm of array values.
 TEM inline T meanNorm(const T * src, uint32_t len, uint32_t str=1){
@@ -231,9 +229,7 @@ TEM void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices);
 TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end);
 
 /// Returns sum of values
-TEM inline T sum(const T * src, uint32_t len, uint32_t str=1){
-	T r=T(0); LOOP(len, str){ r += src[i]; } return r;
-}
+TEM T sum(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns sum of values squared
 TEM inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
@@ -596,6 +592,10 @@ TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str){
 }
 
 
+TEM inline T mean(const T * src, uint32_t len, uint32_t str){
+	return arr::sum(src, len, str) / T(len/str);
+}
+
 
 TEM T meanAbsDiff(const T * src, uint32_t len){
 	T sum = (T)0;
@@ -808,6 +808,10 @@ TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end){
 		sortQuick(src, indices, beg, l);
 		sortQuick(src, indices, r, end);
 	}
+}
+
+TEM inline T sum(const T * src, uint32_t len, uint32_t str){
+	T r=T(0); LOOP(len, str){ r += src[i]; } return r;
 }
 
 TEM inline T variance(const T * src, uint32_t len, uint32_t str){
