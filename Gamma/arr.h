@@ -182,6 +182,11 @@ TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
 ///
 TEM double normalize(T * arr, uint32_t len, double scale=1);
 
+template<class T, template<class> class ArrayType>
+double inline normalize(ArrayType<T>& arr, double scale=1){
+	return normalize(&arr[0], arr.size(), scale);
+}
+
 /// Returns norm of array values.
 TEM double norm(const T * src, uint32_t len, uint32_t str=1){
 	return sqrt((double)sumSquares(src, len,str));
