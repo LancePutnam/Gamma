@@ -15,6 +15,7 @@ SRCS = 	arr.cpp\
 	Print.cpp\
 	scl.cpp\
 	Recorder.cpp\
+	Scheduler.cpp\
 	SoundFile.cpp\
 	Sync.cpp
 
