@@ -186,6 +186,23 @@ public:
 	/// Set first five segment lengths
 	Env& lengths(T a, T b, T c, T d, T e){ T v[]={a,b,c,d,e}; return lengths(v,5); }
 
+	/// Get total length of all envelope segments
+	T totalLength() const {
+		T sum=T(0);
+		for(int i=0;i<size();++i) sum += mLengths[i];
+		return sum;
+	}
+	
+	/// Set total length of envelope
+	
+	/// @param[in] length		desired length
+	/// @param[in] modSegment	segment whose length is modified to match desired length
+	Env& totalLength(T length, int modSegment){
+		mLengths[modSegment] = T(0);
+		mLengths[modSegment] = length - totalLength();
+		return *this;
+	}
+
 
 	/// Get segment curvature array
 	T * curves(){ return mCurves; }
