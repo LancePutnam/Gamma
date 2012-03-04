@@ -9,7 +9,7 @@
 	slice(A,N) = Val<>(1);
 	ASSERT(A, 1,1,1,1,1,1,1,1)
 	
-	slice(A,N) = Impulse<>();
+	slice(A,N) = gen::Impulse<>();
 	ASSERT(A, 1,0,0,0,0,0,0,0)
 
 	slice(A,N) = RCos<>(1./N, 1);

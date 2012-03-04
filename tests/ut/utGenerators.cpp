@@ -1,4 +1,62 @@
 {
+	const int N = 32;
+	RFFT<float> fft(N);
+	float buf[N+2];
+	std::complex<float> * fdbuf = (std::complex<float> *)buf;
+	float * tdbuf = buf+1;
+	Sync::master().spu(1);
+
+	struct F{
+		static bool near(double a, double b, double eps=1e-6){
+			return scl::abs(a-b) < eps;
+		}
+	};
+
+	{
+		Sine<> g;
+		g.freq(1./N);
+		for(int i=0;i<N;++i) tdbuf[i]=g();
+		//for(int i=0;i<N;++i) printf("% f\n", tdbuf[i]);
+		fft.forward(buf, true, true);
+		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, norm(fdbuf[i]), arg(fdbuf[i]));
+		assert(F::near(abs(fdbuf[1]), 1.f));
+		assert(F::near(arg(fdbuf[1]),-M_PI/2));
+		
+		g.phase(0.25);
+		for(int i=0;i<N;++i) tdbuf[i]=g();
+		fft.forward(buf, true, true);
+		assert(F::near(abs(fdbuf[1]), 1.f));
+		assert(F::near(arg(fdbuf[1]), 0.f));		
+	}
+
+	{
+		double eps=1e-3;
+		DSF<> g;
+		g.freq(1./N);
+		g.harmonics(3);
+		g.ampRatio(0.5);
+		//g.freqRatio(2);
+		for(int i=0;i<N;++i) tdbuf[i]=g();
+		fft.forward(buf, true, true);
+		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, abs(fdbuf[i]), arg(fdbuf[i]));
+		assert(F::near(abs(fdbuf[1]), 1, eps));
+		assert(F::near(abs(fdbuf[2]), 0.5, eps));
+		assert(F::near(abs(fdbuf[3]), 0.5*0.5, eps));
+		assert(F::near(abs(fdbuf[4]), 0, eps));
+		
+		g.freqRatio(2);
+		for(int i=0;i<N;++i) tdbuf[i]=g();
+		fft.forward(buf, true, true);
+		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, abs(fdbuf[i]), arg(fdbuf[i]));
+		assert(F::near(abs(fdbuf[1]), 1, eps));
+		assert(F::near(abs(fdbuf[3]), 0.5, eps));
+		assert(F::near(abs(fdbuf[5]), 0.5*0.5, eps));
+		assert(F::near(abs(fdbuf[2]), 0, eps));
+		assert(F::near(abs(fdbuf[4]), 0, eps));
+		assert(F::near(abs(fdbuf[6]), 0, eps));
+		assert(F::near(abs(fdbuf[7]), 0, eps));
+	}
+
 	{
 		{ Player<> p; }
 		{ Player<> p; Player<> q(p); }
@@ -6,7 +64,6 @@
 		//{ Player<> p("path/to/soundfile.wav"); }
 		
 		{
-			const int N = 128;
 			const double SR = 44100;
 
 			Array<float> a(N);

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
+#include <complex>
 #include "../Gamma/Gamma.h"
 #include "../Gamma/FFT.h"
 #include "../Gamma/Access.h"
@@ -11,6 +12,7 @@
 #include "../Gamma/UnitMaps.h"
 
 #include "../Gamma/Envelope.h"
+#include "../Gamma/Oscillator.h"
 #include "../Gamma/Player.h"
 
 using namespace gam;
