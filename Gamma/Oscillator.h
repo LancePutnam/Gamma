@@ -38,11 +38,11 @@ public:
 	bool done(){ return mTap.done(phaseI()); }
 //	Stap& tap(){ return mTap; }
 
-	float freq() const;				///< Returns frequency.
-	float phase() const;			///< Returns current unit phase
-	uint32_t phaseI() const;		///< Returns current fixed-point phase value
-	float phaseInc() const;			///< Returns unit phase increment in [0, 1).
-	uint32_t phaseIncI() const;		///< Returns current fixed-point phase increment value
+	float freq() const;				///< Get frequency
+	float phase() const;			///< Get current unit phase
+	uint32_t phaseI() const;		///< Get current fixed-point phase value
+	float phaseInc() const;			///< Get unit phase increment in [0, 1)
+	uint32_t phaseIncI() const;		///< Get current fixed-point phase increment value
 
 	uint32_t operator()();			///< Alias of cycle().
 
@@ -52,7 +52,7 @@ public:
 	/// saves a conditional check converting to a bool.
 	uint32_t cycle();
 
-	uint32_t cycles();		///< Returns 1 to 0 transitions of all accumulator bits
+	uint32_t cycles();		///< Get 1 to 0 transitions of all accumulator bits
 	uint32_t once();
 	uint32_t incPhase();	///< Increment phase and return post-incremented phase
 	uint32_t incPhasePre();	///< Increment phase and return pre-incremented phase
@@ -319,7 +319,7 @@ public:
 		}
 	}
 
-	/// Returns ith oscillator's last value
+	/// Get ith oscillator's last value
 	Tv last(uint32_t i){ return (*this)[i].val; }
 
 	/// Set all control parameters
@@ -345,7 +345,7 @@ public:
 	/// @param[in]	phs		Initial unit phase in [0, 1)
 	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ set(frq, amp, dcy, phs); }
 
-	/// Returns frequency
+	/// Get frequency
 	Tv freq() const { return Base::freq() * Ts::spu(); }
 
 	/// Set amplitude and phase
@@ -397,7 +397,7 @@ public:
 		}
 	}
 
-	/// Returns ith oscillator's last value
+	/// Get ith oscillator's last value
 	Tv last(uint32_t i){ return (*this)[i].val; }
 
 	/// Set all control parameters
@@ -513,14 +513,14 @@ private:
 
 
 
-/// Variable harmonic impulse wave
+/// Band-limited impulse wave
 template<class Tv=gam::real, class Ts=Synced>
 class Buzz : public AccumPhase<Tv,Ts> {
 public:
 
-	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phase		Initial unit phase in [0, 1)
-	/// @param[in]	harmonics	Initial number of harmonics
+	/// @param[in]	frq			frequency
+	/// @param[in]	phase		phase in [0, 1)
+	/// @param[in]	harmonics	number of harmonics
 	Buzz(Tv frq=440, Tv phase=0, Tv harmonics=8);
 	virtual ~Buzz(){}
 
@@ -533,7 +533,7 @@ public:
 	Tv saw(Tv intg=0.993);		///< Returns next sample of saw waveform
 	Tv square(Tv intg=0.993);	///< Returns next sample of square waveform
 	
-	Tv maxHarmonics();			///< Returns number of harmonics below Nyquist based on current settings
+	Tv maxHarmonics();			///< Get number of harmonics below Nyquist based on current settings
 
 	virtual void onResync(double r);
 
@@ -615,14 +615,17 @@ struct Square : public Impulse<Tv,Ts> {
 
 
 /// Discrete summation formula (DSF) oscillator
+
+/// This produces a finite set of harmonics whose amplitudes follow a geometric
+/// series.
 template<class Tv=gam::real, class Ts=Synced>
 class DSF : public AccumPhase<Tv,Ts> {
 public:
 
-	/// @param[in]	frq		Initial frequency in Hz
-	/// @param[in]	freqRatio	Initial frequency ratio of partials
-	/// @param[in]	ampRatio	Initial amplitude ratio of partials
-	/// @param[in]	harmonics	Initial number of harmonics
+	/// @param[in]	frq			frequency in Hz
+	/// @param[in]	freqRatio	frequency ratio of partials
+	/// @param[in]	ampRatio	amplitude ratio of partials
+	/// @param[in]	harmonics	number of harmonics
 	DSF(Tv frq=440, Tv freqRatio=1, Tv ampRatio=0.5, Tv harmonics=8);
 	virtual ~DSF(){}
 	
@@ -635,10 +638,10 @@ public:
 	void harmonics(Tv val);		///< Set number of harmonics
 	void harmonicsMax();		///< Set number of harmonics to fill Nyquist range
 
-	Tv ampRatio();				///< Returns amplitude ratio
-	Tv freqRatio();				///< Returns frequency ratio
-	Tv harmonics();				///< Returns current number of harmonics
-	Tv maxHarmonics();			///< Returns maximum number of harmonics for current settings
+	Tv ampRatio();				///< Get amplitude ratio
+	Tv freqRatio();				///< Get frequency ratio
+	Tv harmonics();				///< Get current number of harmonics
+	Tv maxHarmonics();			///< Get maximum number of harmonics for current settings
 	
 	virtual void onResync(double r);
 
@@ -646,9 +649,9 @@ protected:
 	typedef AccumPhase<Tv,Ts> Base;
 
 	Tv mN, mNDesired;		// actual and desired # harmonics
-	Tv mFreqRatio;			// Frequency ratio
+	Tv mFreqRatio;			// frequency ratio
 	Tv mA;					// Partial amplitude ratio
-	Tv mBeta, mBetaInc;		// "detune" phasor
+	Tv mBeta, mBetaInc;		// "detune" accumulator
 	Tv mAPow, mASqP1;		// cached vars
 	
 	void updateAPow();
@@ -1117,27 +1120,27 @@ TEM DSF<Tv,Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
 	mBeta = 0.f;
 }
 
-TEM inline void DSF<Tv,Ts>::freq(Tv value){
-	Base::freq(value);
+TEM inline void DSF<Tv,Ts>::freq(Tv v){
+	Base::freq(v);
 	updateBetaInc();	
 }
 
-TEM inline void DSF<Tv,Ts>::freqRatio(Tv value){
-	mFreqRatio = value;
+TEM inline void DSF<Tv,Ts>::freqRatio(Tv v){
+	mFreqRatio = v;
 	updateBetaInc();
 }
 
-TEM inline void DSF<Tv,Ts>::ampRatio(Tv value){
-	if(value != mA){
-		mA = value;
+TEM inline void DSF<Tv,Ts>::ampRatio(Tv v){
+	if(v != mA){
+		mA = v;
 		mASqP1 = mA * mA + 1.f;
 		updateAPow();
 	}
 }
 
-TEM inline void DSF<Tv,Ts>::harmonics(Tv value){
-	if(value != mN){
-		mN = mNDesired = value;
+TEM inline void DSF<Tv,Ts>::harmonics(Tv v){
+	if(v != mN){
+		mN = mNDesired = v;
 		updateAPow();
 	}
 }
@@ -1159,12 +1162,13 @@ TEM inline Tv DSF<Tv,Ts>::maxHarmonics(){
 	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->freq() - Tv(1))/freqRatio() + Tv(1));
 }
 
+TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = ::pow(mA, mN); }
+TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio; }
+
 // Generalized DSF formula:
-// sum{k=0, N}( a^k sin(theta + k beta) )
-//		=  sin(theta) - a sin(theta - beta) - a^(N+1) (sin(theta + (N+1) beta) - a sin(theta + N beta)))
-//			/ 1 + a^2 - 2a cos(beta)
-//
-// The denominator is the frequency response of a resonator w/ resonance a.
+// sum{k=0, N}( a^k sin(T + k B) )
+//		=  sin(T) - a sin(T - B) - a^(N+1) [sin(T + (N+1) B) - a sin(T + N B))]
+//			/ 1 + a^2 - 2a cos(B)
 
 #define SIN scl::sinT7
 #define COS scl::cosT8
@@ -1177,19 +1181,16 @@ TEM inline Tv DSF<Tv,Ts>::operator()(){
 	Tv phs2 = scl::wrapPhaseOnce(theta - mBeta);
 	Tv phs3 = scl::wrapPhase(theta + mN * mBeta);
 	Tv phs4 = scl::wrapPhaseOnce(phs3 - mBeta);
-	
-	Tv result = SIN(theta) - mA * SIN(phs2) - mAPow * (SIN(phs3) - mA * SIN(phs4));
-	result /= mASqP1 - (Tv)2 * mA * COS(mBeta);
+
+	Tv result = SIN(theta) - mA * SIN(phs2) - mAPow * (SIN(phs3) - mA * SIN(phs4));	
+	result /= mASqP1 - Tv(2) * mA * COS(mBeta);
+	//result /= mA * (mA - Tv(2) * COS(mBeta)) + Tv(1);
 
 	mBeta += mBetaInc;
-	
 	return result;
 }
 #undef SIN
 #undef COS
-
-TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = ::pow(mA, mN); }
-TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio; }
 
 TEM void DSF<Tv,Ts>::onResync(double r){
 	Base::onResync(r);
