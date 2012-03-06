@@ -193,13 +193,22 @@ public:
 		return sum;
 	}
 	
-	/// Set total length of envelope
+	/// Set total length of envelope by adjusting one segment length
 	
 	/// @param[in] length		desired length
 	/// @param[in] modSegment	segment whose length is modified to match desired length
 	Env& totalLength(T length, int modSegment){
 		mLengths[modSegment] = T(0);
 		mLengths[modSegment] = length - totalLength();
+		return *this;
+	}
+
+	/// Set total length of envelope by scaling all segment lengths
+	Env& totalLength(T length){
+		T mul = length / totalLength();
+		for(int i=0; i<size(); ++i){
+			lengths()[i] *= mul;
+		}
 		return *this;
 	}
 
