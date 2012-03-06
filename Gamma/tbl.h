@@ -17,7 +17,7 @@ namespace gam{
 
 
 /// Window types
-enum WindowType{ 	
+enum WindowType{
 	BARTLETT,			/**< Bartlett (Triangle) */
 	BLACKMAN,			/**< Blackman */
 	BLACKMAN_HARRIS,	/**< Blackman-Harris */
@@ -51,8 +51,8 @@ inline static const char * toString(WindowType v){
 template <class T>
 void addSine(T * dst, uint32_t len, double cycles=1, double amp=1, double phs=0);
 
-template <class T, template<class> class ArrayType>
-void inline addSine(ArrayType<T>& dst, double cycles=1, double amp=1, double phs=0){
+template <class T, class Alloc, template<class,class> class ArrayType>
+void inline addSine(ArrayType<T,Alloc>& dst, double cycles=1, double amp=1, double phs=0){
 	addSine(&dst[0], dst.size(), cycles, amp, phs);
 }
 
@@ -74,8 +74,8 @@ void inline addSines(
 		if(A(0) != amps[i]) addSine(dst,len,i*hMul+hShf,amps[i],phs);
 	}
 }
-template <class T, template<class> class ArrayType, class A>
-void inline addSines(ArrayType<T>& dst, const A * amps, int hNum, int hMul=1, int hShf=1, double phs=0){
+template <class T, class Alloc, template<class,class> class ArrayType, class A>
+void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, int hNum, int hMul=1, int hShf=1, double phs=0){
 	addSines(&dst[0],dst.size(), amps, hNum,hMul,hShf,phs);
 }
 
@@ -94,8 +94,8 @@ void addSines(
 ){
 	for(int i=0; i<hNum; ++i) addSine(dst,len,cycs[i],amps[i],phs);
 }
-template <class T, template<class> class ArrayType, class A, class C>
-void inline addSines(ArrayType<T>& dst, const A * amps, const C * cycs, int hNum, double phs=0){
+template <class T, class Alloc, template<class,class> class ArrayType, class A, class C>
+void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, const C * cycs, int hNum, double phs=0){
 	addSines(&dst[0],dst.size(), amps,cycs,hNum,phs);
 }
 
@@ -113,8 +113,8 @@ void inline addSines(ArrayType<T>& dst, const A * amps, const C * cycs, int hNum
 template <int InvPower, class T>
 void addSinesPow(T * dst, uint32_t len, int hNum, int hMul=1, int hShf=1, double amp=1, double phs=0);
 
-template <int InvPower, class T, template<class> class ArrayType>
-inline void addSinesPow(ArrayType<T>& dst, int hNum, int hMul=1, int hShf=1, double amp=1, double phs=0){
+template <int InvPower, class Alloc, class T, template<class,class> class ArrayType>
+inline void addSinesPow(ArrayType<T,Alloc>& dst, int hNum, int hMul=1, int hShf=1, double amp=1, double phs=0){
 	addSinesPow<InvPower>(&dst[0], dst.size(), hNum,hMul,hShf,amp,phs);
 }
 
