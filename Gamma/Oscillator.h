@@ -617,7 +617,10 @@ struct Square : public Impulse<Tv,Ts> {
 /// Discrete summation formula (DSF) oscillator
 
 /// This produces a finite set of harmonics whose amplitudes follow a geometric
-/// series.
+/// series. The amplitude of harmonic i is ar^i where 'ar' is called the 
+/// amplitude ratio. The frequency of harmonic i is (i * fr + 1) where 'fr' is
+/// called the frequency ratio. Harmonics run from i=0 (the fundamental) to
+/// the maximum specified harmonic.
 template<class Tv=gam::real, class Ts=Synced>
 class DSF : public AccumPhase<Tv,Ts> {
 public:
@@ -631,11 +634,11 @@ public:
 	
 	Tv operator()();			///< Returns next sample
 	
-	void ampRatio(Tv val);		///< Set amplitude ratio of partials
+	void ampRatio(Tv v);		///< Set amplitude ratio of partials
 	void antialias();			///< Adjust harmonics so partials do not alias
-	void freq(Tv val);			///< Set frequency of fundamental
-	void freqRatio(Tv val);		///< Set frequency ratio of partials
-	void harmonics(Tv val);		///< Set number of harmonics
+	void freq(Tv v);			///< Set frequency of fundamental
+	void freqRatio(Tv v);		///< Set frequency ratio of partials
+	void harmonics(Tv v);		///< Set number of harmonics
 	void harmonicsMax();		///< Set number of harmonics to fill Nyquist range
 
 	Tv ampRatio();				///< Get amplitude ratio
@@ -1132,6 +1135,11 @@ TEM inline void DSF<Tv,Ts>::freqRatio(Tv v){
 
 TEM inline void DSF<Tv,Ts>::ampRatio(Tv v){
 	if(v != mA){
+		// if near 1, nudge away
+		static const Tv epslt = 0.9997;
+		static const Tv epsgt = 1/epslt;
+				if(v >= 1 && v < epsgt) v = epsgt;
+		else	if(v <= 1 && v > epslt) v = epslt;
 		mA = v;
 		mASqP1 = mA * mA + 1.f;
 		updateAPow();
