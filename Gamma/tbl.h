@@ -28,6 +28,19 @@ enum WindowType{
 	RECTANGLE			/**< Rectangle (no window) */
 };
 
+
+/// Waveform types
+enum WaveformType{
+	SINE,				/**< Sine wave */
+	COSINE,				/**< Cosine wave */
+	TRIANGLE,			/**< Triangle wave */
+	PARABOLIC,			/**< Parabolic wave */
+	SQUARE,				/**< Square wave */
+	SAW,				/**< Saw wave */
+	IMPULSE				/**< Impulse wave */
+};
+
+
 /// Returns human readable string of window type
 inline static const char * toString(WindowType v){
 	#define CS(name) case name: return #name;
@@ -45,14 +58,17 @@ inline static const char * toString(WindowType v){
 
 /// @param[in] dst		destination array
 /// @param[in] len		length of array
-/// @param[in] cycles	number of cycles of sine wave
+/// @param[in] cycles	number of cycles of sine wave, must be integer for periodic waves
 /// @param[in] amp		amplitude of sine wave
 /// @param[in] phs		phase of sine wave, in [0,1]
 template <class T>
 void addSine(T * dst, uint32_t len, double cycles=1, double amp=1, double phs=0);
 
 template <class T, class Alloc, template<class,class> class ArrayType>
-void inline addSine(ArrayType<T,Alloc>& dst, double cycles=1, double amp=1, double phs=0){
+void inline addSine(
+	ArrayType<T,Alloc>& dst,
+	double cycles=1, double amp=1, double phs=0
+){
 	addSine(&dst[0], dst.size(), cycles, amp, phs);
 }
 
@@ -61,22 +77,26 @@ void inline addSine(ArrayType<T,Alloc>& dst, double cycles=1, double amp=1, doub
 
 /// @param[in] dst		destination array
 /// @param[in] len		length of destination array
-/// @param[in] amps		amplitudes of harmonic series, size must be hNum
-/// @param[in] hNum		total number of harmonics
-/// @param[in] hMul		harmonic number multiplication factor
-/// @param[in] hShf		harmonic number shift amount
-/// @param[in] phs		phase of sine wave, in [0,1]
+/// @param[in] amps		amplitudes of harmonic series, size must be numh
+/// @param[in] numh		total number of harmonics
+/// @param[in] hmul		harmonic number multiplication factor
+/// @param[in] hshf		harmonic number shift amount
+/// @param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class A>
 void inline addSines(
-	T * dst, uint32_t len, const A * amps, int hNum, int hMul=1, int hShf=1, double phs=0
+	T * dst, uint32_t len, const A * amps, int numh,
+	double hmul=1, double hshf=1, double hphs=0
 ){
-	for(int i=0; i<hNum; ++i){
-		if(A(0) != amps[i]) addSine(dst,len,i*hMul+hShf,amps[i],phs);
+	for(int i=0; i<numh; ++i){
+		if(A(0) != amps[i]) addSine(dst,len, i*hmul+hshf, amps[i], hphs);
 	}
 }
 template <class T, class Alloc, template<class,class> class ArrayType, class A>
-void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, int hNum, int hMul=1, int hShf=1, double phs=0){
-	addSines(&dst[0],dst.size(), amps, hNum,hMul,hShf,phs);
+void inline addSines(
+	ArrayType<T,Alloc>& dst, const A * amps, int numh,
+	double hmul=1, double hshf=1, double hphs=0
+){
+	addSines(&dst[0],dst.size(),amps,numh,hmul,hshf,hphs);
 }
 
 
@@ -84,39 +104,76 @@ void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, int hNum, int hMul
 
 /// @param[in] dst		destination array
 /// @param[in] len		length of destination array
-/// @param[in] amps		harmonic amplitudes of series, size must be hNum
-/// @param[in] cycs		harmonic numbers of series, size must be hNum
-/// @param[in] hNum		total number of harmonics
-/// @param[in] phs		phase of sine wave, in [0,1]
+/// @param[in] amps		harmonic amplitudes of series, size must be numh
+/// @param[in] cycs		harmonic numbers of series, size must be numh
+/// @param[in] numh		total number of harmonics
+/// @param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class A, class C>
 void addSines(
-	T * dst, uint32_t len, const A * amps, const C * cycs, int hNum, double phs=0
+	T * dst, uint32_t len, const A * amps, const C * cycs, int numh, double hphs=0
 ){
-	for(int i=0; i<hNum; ++i) addSine(dst,len,cycs[i],amps[i],phs);
+	for(int i=0; i<numh; ++i) addSine(dst,len,cycs[i],amps[i],hphs);
 }
 template <class T, class Alloc, template<class,class> class ArrayType, class A, class C>
-void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, const C * cycs, int hNum, double phs=0){
-	addSines(&dst[0],dst.size(), amps,cycs,hNum,phs);
+void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, const C * cycs, int numh, double hphs=0){
+	addSines(&dst[0],dst.size(), amps,cycs,numh,hphs);
 }
 
 
 /// Add multiple sine waves to array
 
-/// \tparam InvPower
+/// \tparam InvPower	amplitudes will be set to 1 / h^InvPower
 /// @param[in] dst		destination array
 /// @param[in] len		length of destination array
-/// @param[in] amps		amplitudes of harmonic series, size must be hNum
-/// @param[in] hNum		total number of harmonics
-/// @param[in] hMul		harmonic number multiplication factor
-/// @param[in] hShf		harmonic number shift amount
-/// @param[in] phs		phase of sine wave, in [0,1]
+/// @param[in] numh		total number of harmonics
+/// @param[in] hmul		harmonic number multiplication factor
+/// @param[in] hshf		harmonic number shift amount
+/// @param[in] hphs		phase of (sine) harmonics, in [0,1]
+/// @param[in] wphs		phase of composite waveform, in [0,1]
 template <int InvPower, class T>
-void addSinesPow(T * dst, uint32_t len, int hNum, int hMul=1, int hShf=1, double amp=1, double phs=0);
+void addSinesPow(
+	T * dst, uint32_t len, double numh,
+	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
+);
 
 template <int InvPower, class Alloc, class T, template<class,class> class ArrayType>
-inline void addSinesPow(ArrayType<T,Alloc>& dst, int hNum, int hMul=1, int hShf=1, double amp=1, double phs=0){
-	addSinesPow<InvPower>(&dst[0], dst.size(), hNum,hMul,hShf,amp,phs);
+inline void addSinesPow(
+	ArrayType<T,Alloc>& dst, int numh,
+	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
+){
+	addSinesPow<InvPower>(&dst[0], dst.size(), numh,hmul,hshf,amp,hphs,wphs);
 }
+
+
+/// Add predefined waveform to array
+
+/// The produced waveforms are not normalized; the fundamental always has a 
+/// unit amplitude.
+/// @param[in] dst		destination array
+/// @param[in] len		length of destination array
+/// @param[in] type		waveform type
+/// @param[in] numh		total number of harmonics
+/// @param[in] amp		amplitude of waveform
+/// @param[in] phs		phase of waveform, in [0,1]
+/// @param[in] hshf		harmonic number shift amount
+template <class T>
+void addWave(
+	T * dst, uint32_t len, WaveformType type,
+	int numh=32, double amp=1, double phs=0, double hshf=1
+);
+
+template <class T, class Alloc, template<class,class> class ArrayType>
+void inline addWave(
+	ArrayType<T,Alloc>& dst, WaveformType type,
+	int numh=32, double amp=1, double phs=0, double hshf=1
+){
+	addWave(&dst[0],dst.size(), type,numh,amp,phs,hshf);
+}
+
+
+/// Get Fourier series normalization constant for a waveform
+template<WaveformType W> double normConstant();
+
 
 
 /// Table functions
@@ -484,6 +541,12 @@ inline float phaseIncFactor(double framesPerSec){
 } // tbl::
 
 
+template<WaveformType W> inline double normConstant(){ return 1.; }
+template<> inline double normConstant<TRIANGLE	>(){ return 8/(M_PI*M_PI); }
+template<> inline double normConstant<PARABOLIC	>(){ return 2/ M_PI; }
+template<> inline double normConstant<SQUARE	>(){ return 4/ M_PI; }
+template<> inline double normConstant<SAW		>(){ return 2/ M_PI; }
+
 template <class T>
 void addSine(T * dst, uint32_t len, double cycles, double amp, double phs){
 	double f = cycles/len;
@@ -494,11 +557,14 @@ void addSine(T * dst, uint32_t len, double cycles, double amp, double phs){
 }
 
 template <int InvPower, class T>
-void addSinesPow(T * dst, uint32_t len, int hNum, int hMul, int hShf, double amp, double phs){
+void addSinesPow(
+	T * dst, uint32_t len,
+	int numh, double hmul, double hshf, double amp, double hphs, double wphs
+){
 	const double inc1 = M_2PI / len;
 
-	for(int j=0; j<hNum; ++j){
-		const int h = j*hMul + hShf;
+	for(int j=0; j<numh; ++j){
+		const double h = j*hmul + hshf;
 		if(InvPower && 0==h) continue;
 		const double inch = inc1 * h;
 		double A = amp;
@@ -511,11 +577,39 @@ void addSinesPow(T * dst, uint32_t len, int hNum, int hMul, int hShf, double amp
 		default:A *= ::pow(h, -InvPower);
 		}
 		
+		double P = hphs + h*wphs;
+		
 		for(uint32_t i=0; i<len; ++i){
-			dst[i] += A*sin(inch*i + phs);
+			dst[i] += A*sin(inch*i + P);
 		}
 	}
 }
+
+
+template <class T>
+void addWave(
+	T * dst, uint32_t len, WaveformType type,
+	int numh, double amp, double phs, double hshf
+){
+//	static const double ctri = normConstant<TRIANGLE>();
+//	static const double csaw = normConstant<SAW>();
+//	static const double csqr = normConstant<SQUARE>();
+	static const double ctri = 1;
+	static const double csaw = 1;
+	static const double csqr = 1;
+	
+	switch(type){
+	case SINE:		addSine(dst,len, hshf,amp,phs); break;
+	case COSINE:	addSine(dst,len, hshf,amp,phs+0.25); break;
+	case TRIANGLE:	addSinesPow<2>(dst,len, numh,2,hshf,amp*ctri,0.25,phs-0.25); break;
+	case PARABOLIC:	addSinesPow<2>(dst,len, numh,1,hshf,amp*csaw,0.25,phs); break;
+	case SQUARE:	addSinesPow<1>(dst,len, numh,2,hshf,amp*csqr,0.00,phs); break;
+	case SAW:		addSinesPow<1>(dst,len, numh,1,hshf,amp*csaw,0.00,phs); break;
+	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp      ,0.25,phs); break;
+	default:;
+	}
+}
+
 
 } // gam::
 
