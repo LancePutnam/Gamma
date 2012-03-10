@@ -16,23 +16,27 @@ namespace gam{
 
 /// Fixed-point phase accumulator
 
+/// This is a linear phase accumulator that uses integer (fixed-point) 
+/// arithmetic. The advantage of using fixed-point versus floating-point is that
+/// the phase is wrapped automatically when the integer overflows. As long as
+/// we used unsigned integers, this wrapping behavior is well-defined- all 
+/// results of addition are taken modulo the maximum size of the integer.
 /// \tparam Stap	Read tap strategy (tap::Clip, tap::Fold, tap::Rep, or tap::Wrap)
 /// \tparam Ts		Synced type
 template <class Stap=tap::Wrap, class Ts=Synced>
 class Accum : public Ts {
 public:
-	Accum();
 
-	/// @param[in] frq		Initial frequency.
-	/// @param[in] phs		Initial phase [0, 1).
-	Accum(float frq, float phs=0);
-	virtual ~Accum(){}
+	/// @param[in] frq		Frequency
+	/// @param[in] phs		Phase in [0, 1)
+	Accum(float frq=0, float phs=0);
 
-	void freq(float v);				///< Set frequency.
-	void phase(float u);			///< Set phase from [0, 1) of one period.
-	void phaseMax();				///< Set phase to maximum value.
-	void phaseAdd(float u);			///< Add value to phase [0, 1).		
-	void period(float v);			///< Set period length.
+
+	void freq(float v);				///< Set frequency
+	void phase(float v);			///< Set phase from [0, 1) of one period
+	void phaseMax();				///< Set phase to maximum value
+	void phaseAdd(float v);			///< Add value to phase [0, 1)
+	void period(float v);			///< Set period length
 	void reset(){ mTap.reset(); }	///< Reset phase accumulator
 
 	bool done(){ return mTap.done(phaseI()); }
@@ -44,13 +48,12 @@ public:
 	float phaseInc() const;			///< Get unit phase increment in [0, 1)
 	uint32_t phaseIncI() const;		///< Get current fixed-point phase increment value
 
-	uint32_t operator()();			///< Alias of cycle().
-
 	/// Returns 0x80000000 on phase wrap, 0 otherwise
 	
 	/// The return value can be used as a bool.  It's an integer because it
 	/// saves a conditional check converting to a bool.
 	uint32_t cycle();
+	uint32_t operator()();			///< Alias of cycle()
 
 	uint32_t cycles();		///< Get 1 to 0 transitions of all accumulator bits
 	uint32_t once();
@@ -60,8 +63,8 @@ public:
 	virtual void onResync(double r);
 
 protected:
-	float mFreq;			// Current frequency.
-	uint32_t mPhase;		// Current phase btw [0, 2^32)
+	float mFreq;			// Current frequency
+	uint32_t mPhase;		// Current phase in [0, 2^32)
 	uint32_t mPhaseInc;
 	Stap mTap;
 	
@@ -76,12 +79,13 @@ protected:
 	using Accum<Stap,Ts>::incPhasePre;
 
 
+
 /// Linear sweep in interval [0,1)
 template <class Stap=tap::Wrap, class Ts=Synced>
 class Sweep : public Accum<Stap, Ts> {
 public:
-	/// @param[in] frq		Initial frequency
-	/// @param[in] phs		Initial unit phase in [0,1)
+	/// @param[in] frq		Frequency
+	/// @param[in] phs		Phase in [0,1)
 	Sweep(float frq=440, float phs=0): Base(frq, phs){}
 
 	float operator()(){ Base::cycle(); return Base::phase(); }
@@ -90,34 +94,41 @@ private: typedef Accum<Stap,Ts> Base;
 };
 
 
-/// Floating point phase accumulator in [-pi, pi).
+
+/// Floating-point phase accumulator with output in [-pi, pi).
 template <class Tv=gam::real, class Ts=Synced>
 class AccumPhase : public Ts{
 public:
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phs		Initial unit phase in [0, 1)
+	/// @param[in]	frq		Frequency
+	/// @param[in]	phs		Phase in [0, 1)
 	AccumPhase(Tv frq=440, Tv phs=0);
-	virtual ~AccumPhase(){}
-	
-	Tv nextPhase();			///< Return next phase. Stored phase is post-incremented.
 
-	void freq(Tv v);		///< Set frequency.
-	void period(Tv v);		///< Set period length.
-	void phase(Tv v);		///< Set phase from [0, 1) of one period.
-	void phaseAdd(Tv v);	///< Add value to unit phase.
 	
-	Tv freq();				///< Return frequency.
-	Tv period();			///< Return period.
-	Tv phase();				///< Return phase [0, 1).
+	/// Generate next sample. Stored phase is post-incremented.
+	Tv nextPhase();
+	
+	/// Generate next sample with a frequency offset
+	Tv nextPhase(Tv frqOffset);
+
+	void freq(Tv v);		///< Set frequency
+	void period(Tv v);		///< Set period length
+	void phase(Tv v);		///< Set phase from [0, 1) of one period
+	void phaseAdd(Tv v);	///< Add value to unit phase
+	
+	Tv freq();				///< Get frequency
+	Tv period();			///< Get period
+	Tv phase();				///< Get normalized phase in [0, 1)
 	
 	virtual void onResync(double r);
-	
 	void print(const char * append = "\n", FILE * fp = stdout);
 	
 protected:
-	Tv mFreq, mPhase;//, mPhaseInc;
+	Tv mFreq, mPhase;
 	Tv m2PiUPS;
 	void recache();
+	Tv mapFreq(Tv v) const;
+	Tv mapPhase(Tv v) const;
+	Tv nextPhaseUsing(Tv frq);
 };
 
 
@@ -155,8 +166,7 @@ public:
 	Osc(float frq, float phs, ArrayPow2<Tv>& src)
 	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
 	{}
-	
-	//virtual ~Osc(){}
+
 
 	/// Generate next sample
 	Tv operator()(){
@@ -215,7 +225,7 @@ public:
 	/// @param[in] dcy		Initial decay time. Negative means no decay.
 	/// @param[in] phs		Initial unit phase in [0, 1)
 	Quadra(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
-	//virtual ~Quadra(){}
+
 
 	complex val;			///< Current complex output
 	
@@ -253,8 +263,13 @@ public:
 	/// @param[in]	phs		Initial unit phase in [0, 1)
 	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv, Ts>(frq, phs){}
 
-	/// Return next sample.
-	Tv operator()(){ return scl::sinP9(AccumPhase<Tv, Ts>::nextPhase() * M_1_PI); }
+	/// Generate next sample
+	Tv operator()(){ return (*this)(Tv(0)); }
+	
+	/// Generate next sample with a frequency offset
+	Tv operator()(Tv frqOffset){
+		return scl::sinP9(this->nextPhase(frqOffset) * M_1_PI);
+	}
 };
 
 
@@ -443,7 +458,7 @@ protected:
 //	static ArrayPow2<float> mTable; // can't use because need 2**N+1 table
 	static float * mTable;		// Reference to my sample table. Must be 1<<bits.
 	static uint32_t mTblBits;
-	static uint32_t mFracBits;	// # of bits in fractional part of phasor
+	static uint32_t mFracBits;	// # of bits in fractional part of accumulator
 	static uint32_t mOneIndex;
 private:
 	typedef Accum<Stap,Ts> Base;
@@ -463,15 +478,18 @@ public:
 
 	LFO();
 	
-	/// @param[in] frq		Initial frequency
-	/// @param[in] phase	Initial phase in [0, 1)
-	/// @param[in] mod		Initial modifier amount in [0, 1)
+	/// @param[in] frq		Frequency
+	/// @param[in] phase	Phase in [0, 1)
+	/// @param[in] mod		Modifier amount in [0, 1)
 	LFO(float frq, float phase=0, float mod=0.5);
 
 	uint32_t modi;			///< Modifier parameter
 
-	void operator()(float f, float p, float m);
-	void mod(double n);	///< Sets modifier parameter of waveform from unit value
+	/// Set frequency, phase and modifier amount
+	LFO& set(float f, float p, float m);
+
+	LFO& mod(double n);	///< Sets modifier parameter of waveform from unit value
+
 
 	float cos();		///< Cosine based on 3rd order polynomial
 	float down();		///< Downward ramp (1 to -1)
@@ -484,7 +502,7 @@ public:
 	float sinPara();	///< Sine-like wave constructed from parabolas (odd harmonics)
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
 	float sqr();		///< Square (-1 to 1)
-	float tri();		///< Triangle (starts at 1 going down to -1 then up to 1)
+	float tri();		///< Triangle (starts at 1 goes down to -1 then up to 1)
 	float up();			///< Upward ramp
 	float up2();		///< Dual upward ramp (up + up). 'mod' controls pulse width.
 
@@ -544,7 +562,6 @@ protected:
 	Tv mNFrac;		
 	Tv mSPU_2;			// cached locals
 	Tv mPrev;			// previous output for integration
-//	void recache();
 	void setAmp();
 private: typedef AccumPhase<Tv,Ts> Base;
 };
@@ -560,7 +577,6 @@ public:
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v); Base::harmonicsMax(); }
 
-//	virtual void onResync(double r){ Base::recache(); freq(AccumPhase<Tv, Ts>::freq()); }
 	virtual void onResync(double r){ Base::onResync(r); freq(AccumPhase<Tv, Ts>::freq()); }
 
 private: typedef Buzz<Tv,Ts> Base; using Base::freq;
@@ -571,7 +587,15 @@ private: typedef Buzz<Tv,Ts> Base; using Base::freq;
 /// Band-limited saw wave
 template <class Tv=gam::real, class Ts=Synced>
 struct Saw : public Impulse<Tv,Ts> {
-	Saw(Tv frq=440, Tv phase=0): Impulse<Tv, Ts>(frq, phase){}
+
+	/// @param[in] frq		Frequency
+	/// @param[in] phs		Phase, in [0, 1)
+	Saw(Tv frq=440, Tv phs=0): Impulse<Tv, Ts>(frq, phs){}
+
+	/// Generate next sample
+	
+	/// @param[in] itg		Integration amount
+	///
 	Tv operator()(Tv intg=0.993){ return Impulse<Tv,Ts>::saw(intg); }
 };
 
@@ -580,37 +604,17 @@ struct Saw : public Impulse<Tv,Ts> {
 /// Band-limited square wave
 template <class Tv=gam::real, class Ts=Synced>
 struct Square : public Impulse<Tv,Ts> {
-	Square(Tv frq=440, Tv phase=0) : Impulse<Tv,Ts>(frq, phase){}
+
+	/// @param[in] frq		Frequency
+	/// @param[in] phs		Phase, in [0, 1)
+	Square(Tv frq=440, Tv phs=0) : Impulse<Tv,Ts>(frq, phs){}
+
+	/// Generate next sample
+	
+	/// @param[in] itg		Integration amount
+	///
 	Tv operator()(Tv intg=0.993){ return Impulse<Tv,Ts>::square(intg); }
 };
-
-// Variable harmonic saw wave.
-
-// This generator integrates a band-limited impulse using a leaky integrater
-// to suppress DC build-up.  The integration amount can be adjusted to go
-// between a pure impulse to a saw.
-//class Saw : public Impulse{
-//public:
-//	/// @param[in]	frq		Initial frequency in Hz.
-//	/// @param[in]	harmonics	Initial number of harmonics.
-//	Saw(float frq=440.f, float harmonics=8.f, float integration=0.993);
-//	virtual ~Saw(){}
-//
-//	float next();					///< Returns next sample.
-//	
-//	/// Set integration amount
-//	
-//	/// This amount, in [0, 1), determines how much integration of the impulse
-//	/// wave occurs and how long it takes for DC to decay.
-//	/// Higher values approach a more ideal saw wave, but result
-//	/// in more DC offset.	Lower values suppress the DC but pass more of the 
-//	/// impulse through resulting in a brighter sound.  A reasonable comprise
-//	/// is ~0.993 at a 44.1k sampling rate.
-//	void integration(float normal);
-//	
-//protected:
-//	float mInt;
-//};
 
 
 
@@ -630,7 +634,6 @@ public:
 	/// @param[in]	ampRatio	amplitude ratio of partials
 	/// @param[in]	harmonics	number of harmonics
 	DSF(Tv frq=440, Tv freqRatio=1, Tv ampRatio=0.5, Tv harmonics=8);
-	virtual ~DSF(){}
 	
 	Tv operator()();			///< Returns next sample
 	
@@ -663,7 +666,7 @@ protected:
 
 
 
-// Simple band-limited impulse generator.
+// Simple band-limited impulse generator
 
 // This uses a fast, simplified formula for generating a band-limited impulse,
 // but only operates at integer divisions of the Nyquist frequency.
@@ -720,11 +723,6 @@ protected:
 
 //---- Accum
 #define TACCUM	Accum<St,Ts>
-
-TEMTS TACCUM::Accum(): mFreq(0){
-	Ts::initSynced();
-	this->phase(0);
-}
 
 TEMTS TACCUM::Accum(float freq, float phase): mFreq(freq){
 	Ts::initSynced();
@@ -799,26 +797,29 @@ TEM AccumPhase<Tv, Ts>::AccumPhase(Tv frq, Tv phase)
 	this->phase(phase);
 }
 
-TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(){
-//	Tv r = mPhase;
-//	mPhase = scl::wrapPhase(mPhase + mPhaseInc);
-//	return r;
+TEM inline Tv AccumPhase<Tv, Ts>::mapFreq(Tv v) const { return v*m2PiUPS; }
+TEM inline Tv AccumPhase<Tv, Ts>::mapPhase(Tv v) const { return v*Tv(M_2PI); }
+
+TEM inline Tv AccumPhase<Tv, Ts>::nextPhaseUsing(Tv frq){
 	mPhase = scl::wrapPhase(mPhase); // guarantees that result is in [-pi, pi)
 	Tv r = mPhase;
-//	mPhase += mPhaseInc;
-	mPhase += mFreq;
+	mPhase += frq;
 	return r;
+
 }
 
-TEM inline void AccumPhase<Tv, Ts>::freq(Tv v){
-//	mFreq = v;
-//	mPhaseInc = v * m2PiUPS;
-	mFreq = v*m2PiUPS;
+TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(){
+	return nextPhaseUsing(mFreq);
 }
 
+TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(Tv frqMod){
+	return nextPhaseUsing(mFreq + mapFreq(frqMod));
+}
+
+TEM inline void AccumPhase<Tv, Ts>::freq(Tv v){ mFreq = mapFreq(v); }
 TEM inline void AccumPhase<Tv, Ts>::period(Tv v){ freq(Tv(1)/v); }
-TEM inline void AccumPhase<Tv, Ts>::phase(Tv u){ mPhase = u * Tv(M_2PI); }
-TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv u){ mPhase += u * Tv(M_2PI); }
+TEM inline void AccumPhase<Tv, Ts>::phase(Tv u){ mPhase = mapPhase(u); }
+TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv u){ mPhase += mapPhase(u); }
 
 TEM inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq/m2PiUPS; } //mFreq; }
 TEM inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / freq(); }
@@ -946,10 +947,8 @@ TEMTS inline float TTABLESINE::nextL(){
 TEMTS TLFO::LFO(): Base(){ mod(0.5); }
 TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
-TEMTS inline void TLFO::operator()(float f, float p, float m){ this->freq(f); this->phase(p); mod(m); }
-TEMTS inline void TLFO::mod(double n){ modi = castIntRound(n * 4294967296.); }
-
-
+TEMTS inline TLFO& TLFO::set(float f, float p, float m){ this->freq(f); this->phase(p); return mod(m); }
+TEMTS inline TLFO& TLFO::mod(double v){ modi = castIntRound(v*4294967296.); return *this; }
 
 TEMTS inline float TLFO::line2(){
 	using namespace gam::scl;
@@ -986,9 +985,9 @@ DEF(sqr(),		scl::square(incPhasePre()))
 DEF(tri(),		scl::triangle(incPhasePre()))
 DEF(up(),		scl::rampUp(incPhasePre()))
 DEF(up2(),		scl::rampUp2(incPhasePre(), modi))
-DEF(cosU(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
+DEF(cosU(),		tri(); r = scl::warpSinSU(r))
 DEF(downU(),	scl::rampDownU(incPhasePre()))
-DEF(hann(),		tri(); r = scl::warpSinSU(r))
+DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
 DEF(pulseU(),	scl::pulseU(incPhasePre(), modi))
 DEF(sqrU(),		scl::squareU(incPhasePre()))
 DEF(stairU(),	scl::stairU(incPhasePre(), modi))
@@ -1092,21 +1091,10 @@ TEM inline Tv Buzz<Tv,Ts>::odd(){
 TEM inline Tv Buzz<Tv,Ts>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
 TEM inline Tv Buzz<Tv,Ts>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
 
-//TEM void AccumPhase<Tv, Ts>::onResync(double r){ Tv f=freq(); recache(); freq(f); }
-//TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
-
 TEM void Buzz<Tv,Ts>::onResync(double r){
-//	Base::recache();
-//	Base::freq(Base::freq());
-
 	Base::onResync(r);
-	mSPU_2 = (Tv)(Synced::spu() * 0.5);
+	mSPU_2 = Tv(Synced::spu() * 0.5);
 }
-
-//TEM void Buzz<Tv,Ts>::recache(){
-//	Base::recache();
-//	mSPU_2 = (Tv)(Synced::spu() * 0.5);
-//}
 
 
 
