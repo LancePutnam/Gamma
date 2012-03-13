@@ -17,6 +17,15 @@
 
 using namespace gam;
 
+inline bool near(double a, double b, double eps=1e-6){
+	return scl::abs(a-b) < eps;
+}
+
+//template<class A, class B>
+//inline bool near(A a, B b, double eps=1e-6){
+//	return scl::abs(a-b) < eps;
+//}
+
 int main(int argc, char* argv[]){
 
 	// Unit tests are ordered from the least to most dependent functions/objects

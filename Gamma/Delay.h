@@ -26,6 +26,10 @@ enum FilterType{
 	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
 	BAND_REJECT,		/**< Band-reject */
 	ALL_PASS			/**< All-pass */
+//	COMB_FBK_EVEN,
+//	COMB_FBK_ODD,
+//	COMB_FFD_EVEN,
+//	COMB_FFD_ODD
 };
 
 

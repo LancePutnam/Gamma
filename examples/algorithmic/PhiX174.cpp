@@ -17,7 +17,7 @@ const int len = strlen(seq);
 Accum<> tmr(100, 2);
 LFO<> osc(200,0,0.25);
 OnePole<> frq(200);
-AD<> env(0.001, 0.02, -4, -4);
+AD<> env(0.001, 0.02);
 gen::Trigger cnt(len), cnt3(3);
 float tonic = scl::freq("a5");
 int ind[4] = {0,1,2,3};

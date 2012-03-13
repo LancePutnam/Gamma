@@ -1,7 +1,7 @@
 {
 	typedef Complex<double> Complexd;
 	typedef Polar<double> Polard;
-	typedef Vec3<double> Vec3d;
+	typedef Vec<3,double> Vec3d;
 
 	// Constants
 	
@@ -66,7 +66,7 @@
 		v -= 1;						assert(v == 1);
 		v *= 2;						assert(v == 2);
 		v /= 2;						assert(v == 1);
-		v.set(1,2,3).normalize();	assert(scl::almostEqual(v.norm(),1));
+		v.set(1,2,3).normalize();	assert(scl::almostEqual(v.mag(),1));
 		v.set(1,2,3);				assert(v.sgn() == v.normalize());
 	}
 }

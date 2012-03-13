@@ -10,7 +10,7 @@
 
 Accum<> tmr(1/1.2);			// Timer for resetting envelope
 NoiseWhite<> src;			// Noise source
-AD<> env(0, 1);				// Attack/decay envelope
+AD<> env(0, 1, 1);			// Envelope (attack, decay, amplitude)
 double tilt = 0;			// Tilt of envelope; 0=percussive, 1=reversive
 
 void audioCB(AudioIOData& io){
@@ -19,7 +19,7 @@ void audioCB(AudioIOData& io){
 	
 		if(tmr()){
 			tilt += 0.1; if(tilt > 1) tilt=0;	// increment tilt amount
-			env.length(tilt, 1-tilt);			// set new attack/decay times
+			env.lengths(tilt, 1-tilt);			// set new attack/decay times
 			env.reset();						// reset amplitude of envelope
 		}
 
