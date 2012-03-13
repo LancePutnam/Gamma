@@ -371,9 +371,11 @@ template <class T, class A=gam::Allocator<T> >
 struct DelayN: public Ring<T,A>{
 	using Ring<T,A>::incPos; using Ring<T,A>::pos;
 
-	/// @param[in]	size		Number of elements to delay.
-	/// @param[in]	value		Initial value of all elements.
-	explicit DelayN(uint32_t size, const T& value=T()): Ring<T,A>(size, value){}
+	/// @param[in]	size		Delay size, greater than 0
+	/// @param[in]	value		Initial value of all elements
+	explicit DelayN(uint32_t size, const T& value=T())
+	:	Ring<T,A>(size, value)
+	{}
 
 	/// Write new element and return oldest
 	T operator()(const T& input){
