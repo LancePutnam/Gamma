@@ -115,9 +115,28 @@ inline T invSqrt(T v){
 }
 
 
+// Define overloaded versions of certain basic functions for primitive types.
+// Custom types, such as vectors, can define their own specialized versions in
+// a different header file.
+#define DEF(T, f)\
+inline T abs(T v){ return f(v); }
+DEF(int, ::abs) DEF(long, labs) DEF(long long, llabs) DEF(float, fabsf) DEF(double, fabs)
+#undef DEF
 
-/// Returns absolute value.
-TEM T abs(T value);
+
+#define DEF(T)\
+inline T max(T v1, T v2){ return v1<v2?v2:v1; }\
+inline T min(T v1, T v2){ return v1<v2?v1:v2; }
+DEF(float) DEF(double)
+DEF(long long) DEF(unsigned long long)
+DEF(int) DEF(unsigned) 
+DEF(short) DEF(unsigned short)
+DEF(char) DEF(unsigned char)
+#undef DEF
+
+
+// Returns absolute value.
+//TEM T abs(T value);
 
 /// Tests whether two values are close in value
 
@@ -431,14 +450,14 @@ TEM T peak1(T v, T bw){ return bw/(scl::abs(v)+bw); }
 /// Returns whether or not an integer value is even.
 TEM bool even(T v);
 
-/// Returns maximum of two values.
-TEM T max(T v1, T v2);
+// Returns maximum of two values.
+//TEM T max(T v1, T v2);
 
 /// Returns maximum of three values.
 TEM T max(T v1, T v2, T v3);
 
-/// Returns minimum of two values.
-TEM T min(T v1, T v2);
+// Returns minimum of two values.
+//TEM T min(T v1, T v2);
 
 /// Returns minimum of three values.
 TEM T min(T v1, T v2, T v3);
@@ -522,10 +541,10 @@ namespace{
 
 // Implementation_______________________________________________________________
 
-#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
-GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
-TEM inline T abs(T v){ return v < T(0) ? -v : v; }
-#undef GEN
+//#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
+//GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
+////TEM inline T abs(T v){ return v < T(0) ? -v : v; } // only allow specializations
+//#undef GEN
 
 
 TEM T atan2Fast(T y, T x){
@@ -973,9 +992,9 @@ inline T zero(T v, T bw, F f){ return bw/(f(v) + bw); }
 
 TEM inline bool even(T v){ return 0 == odd(v); }
 
-TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
+//TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
 TEM inline T max(T v1, T v2, T v3){ return max(max(v1,v2),v3); }
-TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
+//TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
 TEM inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
 
 TEM inline bool odd(T v){ return v & T(1); }
