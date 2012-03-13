@@ -182,12 +182,19 @@ struct Chorus{
 	
 	/// Filter sample (mono-stereo)
 	void operator()(const T& in, T& o1, T& o2){
-		modulate(); o1=comb1(in); o2=comb2(in);
+		(*this)(in,in, o1,o2);
+	}
+
+	/// Filter samples (stereo-stereo)
+	template <class V>
+	Vec<2,V> operator()(const Vec<2,V>& v){
+		modulate();
+		return Vec<2,V>(comb1(v[0]), comb2(v[1]));
 	}
 	
 	/// Filter samples (stereo-stereo)
 	void operator()(const T& i1, const T& i2, T& o1, T& o2){
-		modulate(); o1=comb1(i1); o2=comb2(i2);		
+		modulate(); o1=comb1(i1); o2=comb2(i2);
 	}
 	
 	/// Perform delay modulation step (must manually step comb filters after use!)
@@ -334,24 +341,29 @@ public:
 
 	/// @param[in] pos	Signed unit position in [-1, 1]
 	Pan(T pos=0){ this->pos(pos); }
-	
+
+	/// Filter sample (mono-to-stereo)
+	Vec<2,T> operator()(T in){
+		return Vec<2,T>(in*w1, in*w2);
+	}	
+
 	/// Filter sample (mono-to-stereo)
 	template <class V>
 	void operator()(T in, V& out1, V& out2){
-		out1 = in * w1; out2 = in * w2;
+		out1 = in*w1; out2 = in*w2;
 	}
 
 	/// Filter sample (stereo-to-stereo)
 	template <class V>
 	void operator()(T in1, T in2, V& out1, V& out2){
-		out1 = in1 * w1 + in2 * w2;
-		out2 = in1 * w2 + in2 * w1;
+		out1 = in1*w1 + in2*w2;
+		out2 = in1*w2 + in2*w1;
 	}
 
 	/// Set position
 //	void pos(T v){
 //		v = scl::clip(v, (T)1, (T)-1);
-//		v = (v+T(1))*M_PI_4;	// put in [0, π/2]
+//		v = (v+T(1))*M_PI_4;	// put in [0, pi/2]
 //		w1 = cos(v);
 //		w2 = sin(v); 
 //	}
