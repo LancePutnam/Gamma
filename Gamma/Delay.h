@@ -30,9 +30,10 @@ enum FilterType{
 
 
 
-/// First-order all-pass filter.
+/// First-order all-pass filter
 
-/// This filter is essentially a "phase" filter in that its only effect is to 
+/// This filter has the transfer function H(z) = (a + z^-1) / (1 + a z^-1).
+/// It is essentially a "phase" filter in that its only effect is to 
 /// shift frequencies from 0 to Nyquist from 0 to -180 degress, respectively.
 /// The cutoff frequency is the frequency where the phase is shifted by -90 
 /// degrees.  A lowpass or highpass filter can be constructed by adding or 
@@ -47,11 +48,11 @@ public:
 	/// @param[in]	frq		Center frequency
 	AllPass1(Tp frq=1000);
 
-	void freq (Tp v);	///< Set cutoff frequency
-	void freqF(Tp v);	///< Faster, but slightly less accurate than freq()	
+	void freq (Tp v);		///< Set cutoff frequency
+	void freqF(Tp v);		///< Faster, but slightly less accurate than freq()	
 	void zero(){ d1=Tv(0); }
 	
-	Tv operator()(Tv input);	///< Filters sample
+	Tv operator()(Tv input);///< Filters sample
 	
 	Tv high(Tv input);		///< High-pass filters sample
 	Tv low (Tv input);		///< Low-pass filters sample
@@ -83,7 +84,7 @@ class Biquad : public Ts{
 public:
 
 	/// @param[in]	frq		Center frequency
-	/// @param[in]	res		Resonance amount
+	/// @param[in]	res		Resonance amount in [1, inf)
 	/// @param[in]	type	Type of filter
 	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
 
@@ -97,7 +98,7 @@ public:
 	void type(FilterType type);			///< Set type of filter
 	void zero();						///< Zero internal delays
 
-	Tv operator()(Tv i0);				///< Return next filter output
+	Tv operator()(Tv i0);				///< Filter next sample
 	Tv nextBP(Tv i0);					///< Optimized for band-pass types
 	
 	Tp freq() const { return mFreq; }	///< Get center frequency
@@ -173,14 +174,15 @@ template <class Tv=gam::real, template<class> class Si=ipl::Linear, class Ts=Syn
 class Delay : public ArrayPow2<Tv>, Ts{
 public:
 
+	/// Default constructor. Does not allocate memory.
 	Delay();
 
-	/// @param[in]	delay		Initial delay length
+	/// @param[in]	delay		Delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float delay);
 
 	/// @param[in]	maxDelay	Maximum delay length
-	/// @param[in]	delay		Initial delay length
+	/// @param[in]	delay		Delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float maxDelay, float delay);
 	
@@ -199,11 +201,12 @@ public:
 	void write(const Tv& v);					///< Writes element into buffer. Tap is post-incremented.
 	void writePre(const Tv& v);					///< Writes element into buffer. Tap is pre-incremented.
 	
-	float delay() const;						///< Returns current delay length
-	uint32_t delayIndex(uint32_t delay) const;	///< Returns index of delayed element
-	float delayUnit() const;					///< Returns unit delay (to max delay)
-	uint32_t indexBack() const;					///< Returns index of backmost element
-	float maxDelay() const;						///< Returns maximum delay length units
+	float delay() const;						///< Get current delay length
+	uint32_t delayIndex(uint32_t delay) const;	///< Get index of delayed element
+	float delayUnit() const;					///< Get unit delay (to max delay)
+	float freq() const { return 1.f/delay(); }	///< Get frequency of delay line
+	uint32_t indexBack() const;					///< Get index of backmost element
+	float maxDelay() const;						///< Get maximum delay length units
 
 	virtual void onResize();
 	virtual void onResync(double r);
@@ -250,7 +253,7 @@ template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Sy
 class Delays : public Delay<Tv,Si,Ts> {
 public:
 
-	/// @param[in]	delay		Initial delay length. The size of the delay line will be the smallest possible power of two.
+	/// @param[in]	delay		Delay length. The size of the delay line will be the smallest possible power of two.
 	/// @param[in]	numTaps		Number of reader taps
 	Delays(float delay, uint32_t numTaps)
 	:	Delay<Tv,Si,Ts>(delay)
@@ -296,17 +299,18 @@ private:
 public:
 	using Base::operator();
 
+	/// Default constructor. Does not allocate memory.
 	Comb();
 
-	/// @param[in]	delay		Initial delay length. The size of the delay line will be the smallest possible power of two.
-	/// @param[in]	ffd			Initial feedforward amount.
-	/// @param[in]	fbk			Initial feedback amount.
+	/// @param[in]	delay		Delay length. The size of the delay line will be the smallest possible power of two.
+	/// @param[in]	ffd			Feedforward amount
+	/// @param[in]	fbk			Feedback amount
 	Comb(float delay, const Tf& ffd, const Tf& fbk);
 	
 	/// @param[in]	maxDelay	Maximum delay length. The size of the delay line will be the smallest possible power of two.
-	/// @param[in]	delay		Initial delay length.
-	/// @param[in]	ffd			Initial feedforward amount.
-	/// @param[in]	fbk			Initial feedback amount.
+	/// @param[in]	delay		Delay length
+	/// @param[in]	ffd			Feedforward amount
+	/// @param[in]	fbk			Feedback amount
 	Comb(float maxDelay, float delay, const Tf& ffd, const Tf& fbk);
 	
 	virtual ~Comb(){}
@@ -325,18 +329,18 @@ public:
 
 	void set(float delay, const Tf& ffd, const Tf& fbk); ///< Set several parameters.
 
-	Tv operator()(const Tv& i0);					///< Returns filtered value.
+	Tv operator()(const Tv& i0);					///< Returns next filtered value
 	Tv operator()(const Tv& i0, const Tv& oN);		///< Circulate filter with ffd & fbk
 	Tv circulateFbk(const Tv& i0, const Tv& oN);	///< Circulate filter with fbk only	
 
 	/// Filters sample (feedback only).
 	Tv nextFbk(const Tv& i0);
 	
-	float norm() const;				///< Returns unity gain scale factor.
-	float normFbk() const;			///< Returns unity gain scale factor due to feedback.
-	float normFfd() const;			///< Returns unity gain scale factor due to feedforward.
-	Tf ffd() const;					///< Returns feedforward amount.
-	Tf fbk() const;					///< Returns feedback amount.
+	float norm() const;				///< Get unity gain scale factor
+	float normFbk() const;			///< Get unity gain scale factor due to feedback
+	float normFfd() const;			///< Get unity gain scale factor due to feedforward
+	Tf ffd() const;					///< Get feedforward amount
+	Tf fbk() const;					///< Get feedback amount
 
 protected:
 	Tf mFFD, mFBK;
@@ -394,7 +398,7 @@ public:
 
 	/// @param[in] frq	Center frequency
 	/// @param[in] wid	Bandwidth
-	AllPass2(Tp frq, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
+	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){
@@ -529,27 +533,41 @@ protected:
 
 
 
+/// Moving average filter
+
+/// The moving average filter is a special case of an FIR filter whose kernel
+/// is a rectangular window with a magnitude equal to the inverse of the kernel
+/// size. Due to the symmetry of the window, the moving average filter can be
+/// implemented efficiently using a single delay line with O(1) processing time
+/// complexity.
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
 
-	MovingAvg(uint32_t size): Base(size), mSum(0), mRSize(0){ onResize(); }
-	
+	/// @param[in] size		Kernel size, greater than 1
+	explicit MovingAvg(uint32_t size)
+	:	Base(size), mSum(0), mRSize(0)
+	{	onResize(); }
+
 	MovingAvg& operator=(const Tv& v){ DelayN<Tv>::operator=(v); return *this; }
 	
 	Tv operator()(const Tv& i0){
-		return (mSum += i0 - Base::operator()(i0)) * mRSize;
+		mSum += i0 - Base::operator()(i0);
+		return mSum * mRSize;
 	}
 	
 	void zero(){ assign(Tv(0)); }
-	
-	virtual void onResize(){ mRSize = 1./Base::size(); }
+
+	virtual void onResize(){
+		mRSize = 1./Base::size();
+		//printf("mRSize = %g\n", mRSize);
+	}
 
 protected:
 	typedef DelayN<Tv> Base;
 	
-	Tv mSum;
-	double mRSize;
+	Tv mSum;		// the moving sum
+	double mRSize;	// reciprocal of the size
 };
 
 
@@ -750,7 +768,7 @@ T_VPS inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
 #define TM1 template <class Tv, template <class> class Ti, class Ts>
 #define TM2 Tv,Ti,Ts
 
-#define DELAY_INIT mPhase(0)
+#define DELAY_INIT mMaxDelay(0), mDelayFactor(0), mDelayLength(0), mPhase(0), mPhaseInc(0), mDelay(0)
 
 TM1 Delay<TM2>::Delay()
 :	ArrayPow2<Tv>(), DELAY_INIT
