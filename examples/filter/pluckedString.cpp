@@ -9,7 +9,8 @@
 #include "../examples.h"
 
 struct PluckedString{
-	PluckedString(float frq=440) : env(0.1), fil(2), delay(1./27.5, 1./frq){}
+	PluckedString(float frq=440)
+	:	env(0.1), fil(2), delay(1./27.5, 1./frq){}
 
 	float operator()(){
 		return (*this)(noise()*env());
