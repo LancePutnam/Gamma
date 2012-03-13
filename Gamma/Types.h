@@ -21,10 +21,10 @@ typedef float			real;	// default real number type
 
 
 template<class T> class Complex;
-template<class T> class Vec2;
-template<class T> class Vec3;
-template<class T> class Vec4;
+template<uint32_t N, class T> class Vec;
 
+typedef Vec<2,float > float2;
+typedef Vec<2,double> double2;
 
 //typedef Polar<float > Polarf;
 //typedef Polar<double> Polard;
@@ -217,13 +217,11 @@ TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm
 
 /// This is a fixed size array to enable better loop unrolling optimizations
 /// by the compiler and to avoid an extra 'size' data member for small-sized
-/// arrays. It also lacks a constructor to allow C-style struct initializations.
+/// arrays. It intentionally lacks a constructor to allow C-style struct 
+/// initializations.
 template <uint32_t N, class T>
 struct Multi{
 	typedef Multi M;
-//	Multi(){}
-//	Multi(const T& e ){ mem::set(elems, N, e); }
-//	Multi(const T* es){ mem::copy(elems, es, N); }
 
 	T elems[N];
 	
@@ -530,12 +528,21 @@ struct Vec : public Multi<N,T> {
 	V& operator +=(const V& v){ IT(N) (*this)[i] += v[i]; return *this; }
 	V& operator +=(const T& v){ IT(N) (*this)[i] += v;    return *this; }
 
-	T dot(const V& v) const { T r=(T)0; IT(N) r+=(*this)[i]*v[i]; return r; }
-	T norm() const { return sqrt(norm2()); }
-	T norm2() const { return dot(*this); }
-	Vec& normalize(){ return *this /= norm(); }
 
+	T dot(const V& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
+	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
+	T mag() const { return sqrt(magSqr()); }
+	T magSqr() const { return dot(*this); }
+	
+	//T norm() const { return sqrt(norm2()); }
+	//T norm2() const { return dot(*this); }
 	Vec sgn() const { return V(*this).normalize(); }
+
+	Vec& normalize(){
+		T msqr = magSqr();
+		if(msqr > 0) return (*this) /= sqrt(msqr);
+		return Vec().setIdentity();
+	}
 
 	template <int N2, class T2>
 	Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
@@ -571,9 +578,40 @@ struct Vec : public Multi<N,T> {
 		}
 		return *this;
 	}
+	
+	Vec& setIdentity(){
+		(*this)[0] = T(1);
+		for(uint32_t i=1; i<N; ++i) (*this)[i] = T(0);
+		return *this;
+	}
 
 	#undef IT
 };
+
+namespace scl{
+
+template<uint32_t N, class T>
+inline Vec<N,T> abs(Vec<N,T> a){
+	Vec<N,T> r;
+	for(uint32_t i=0; i<N; ++i) r[i] = abs(a[i]);
+	return r;
+}
+
+template<uint32_t N, class T, class U>
+inline Vec<N,T> max(Vec<N,T> a, Vec<N,U> b){
+	Vec<N,T> r;
+	for(uint32_t i=0; i<N; ++i) r[i] = max(a[i], b[i]);
+	return r;
+}
+
+template<uint32_t N, class T, class U>
+inline Vec<N,T> min(Vec<N,T> a, Vec<N,U> b){
+	Vec<N,T> r;
+	for(uint32_t i=0; i<N; ++i) r[i] = min(a[i], b[i]);
+	return r;
+}
+
+}
 
 
 /// Returns cross product, a x b
@@ -588,8 +626,8 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 
 /// Returns spherical Euler product (ZXZ convention)
 template <class T>
-Vec3<T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c){
-	return Vec3<T>(
+Vec<3,T> productZXZ(const Complex<T>& a, const Complex<T>& b, const Complex<T>& c){
+	return Vec<3,T>(
 		a.r*b.i - a.i*b.r*c.i,
 		a.i*b.i + a.r*b.r*c.i,
 		b.r*c.r
@@ -617,18 +655,18 @@ void rotatePlane(VecN& v1, VecN& v2, const Complex<T>& a){
 
 
 template <class T>
-Vec3<T> rotateX(const Vec3<T>& v, const Complex<T>& a){
-	Complex<T> t(v[1], v[2]); t*=a; return Vec3<T>(v[0], t[0], t[1]);
+Vec<3,T> rotateX(const Vec<3,T>& v, const Complex<T>& a){
+	Complex<T> t(v[1], v[2]); t*=a; return Vec<3,T>(v[0], t[0], t[1]);
 }
 
 template <class T>
-Vec3<T> rotateY(const Vec3<T>& v, const Complex<T>& a){
-	Complex<T> t(v[2], v[0]); t*=a; return Vec3<T>(t[1], v[1], t[0]);
+Vec<3,T> rotateY(const Vec<3,T>& v, const Complex<T>& a){
+	Complex<T> t(v[2], v[0]); t*=a; return Vec<3,T>(t[1], v[1], t[0]);
 }
 
 template <class T>
-Vec3<T> rotateZ(const Vec3<T>& v, const Complex<T>& a){
-	Complex<T> t(v[0], v[1]); t*=a; return Vec3<T>(t[0], t[1], v[2]);
+Vec<3,T> rotateZ(const Vec<3,T>& v, const Complex<T>& a){
+	Complex<T> t(v[0], v[1]); t*=a; return Vec<3,T>(t[0], t[1], v[2]);
 }
 
 
