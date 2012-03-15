@@ -531,7 +531,13 @@ private:
 
 
 
-/// Band-limited impulse wave
+/// Base class for producing band-limited waveforms
+
+/// This produces a finite sum of equi-amplitude cosine waves that approach the
+/// shape of a periodic impulse train. 
+/// Due to numerical issues, this generator should not be used for producing 
+/// very low frequency modulation signals. For that purpose, it is better to use
+/// the LFO class.
 template<class Tv=gam::real, class Ts=Synced>
 class Buzz : public AccumPhase<Tv,Ts> {
 public:
@@ -548,8 +554,8 @@ public:
 
 	Tv operator()();			///< Returns next sample of all harmonic impulse
 	Tv odd();					///< Returns next sample of odd harmonic impulse
-	Tv saw(Tv intg=0.993);		///< Returns next sample of saw waveform
-	Tv square(Tv intg=0.993);	///< Returns next sample of square waveform
+	Tv saw(Tv intg=0.997);		///< Returns next sample of saw waveform
+	Tv square(Tv intg=0.997);	///< Returns next sample of square waveform
 	
 	Tv maxHarmonics();			///< Get number of harmonics below Nyquist based on current settings
 
@@ -568,7 +574,13 @@ private: typedef AccumPhase<Tv,Ts> Base;
 
 
 
-/// Band-limited impulse wave
+/// Band-limited impulse train
+
+/// This produces a Fourier representation of an impulse train where the number of
+/// harmonics is adjusted automatically to prevent aliasing.
+/// Due to numerical issues, this generator should not be used for producing 
+/// very low frequency modulation signals. For that purpose, it is better to use
+/// the LFO class.
 template <class Tv=gam::real, class Ts=Synced>
 struct Impulse : public Buzz<Tv,Ts>{
 public:
@@ -585,6 +597,12 @@ private: typedef Buzz<Tv,Ts> Base; using Base::freq;
 
 
 /// Band-limited saw wave
+
+/// This produces a Fourier representation of a saw wave where the number of
+/// harmonics is adjusted automatically to prevent aliasing.
+/// Due to numerical issues, this generator should not be used for producing 
+/// very low frequency modulation signals. For that purpose, it is better to use
+/// the LFO class.
 template <class Tv=gam::real, class Ts=Synced>
 struct Saw : public Impulse<Tv,Ts> {
 
@@ -596,12 +614,18 @@ struct Saw : public Impulse<Tv,Ts> {
 	
 	/// @param[in] itg		Integration amount
 	///
-	Tv operator()(Tv intg=0.993){ return Impulse<Tv,Ts>::saw(intg); }
+	Tv operator()(Tv intg=0.997){ return Impulse<Tv,Ts>::saw(intg); }
 };
 
 
 
 /// Band-limited square wave
+
+/// This produces a Fourier representation of a square wave where the number of
+/// harmonics is adjusted automatically to prevent aliasing.
+/// Due to numerical issues, this generator should not be used for producing 
+/// very low frequency modulation signals. For that purpose, it is better to use
+/// the LFO class.
 template <class Tv=gam::real, class Ts=Synced>
 struct Square : public Impulse<Tv,Ts> {
 
@@ -613,7 +637,7 @@ struct Square : public Impulse<Tv,Ts> {
 	
 	/// @param[in] itg		Integration amount
 	///
-	Tv operator()(Tv intg=0.993){ return Impulse<Tv,Ts>::square(intg); }
+	Tv operator()(Tv intg=0.997){ return Impulse<Tv,Ts>::square(intg); }
 };
 
 
@@ -1039,50 +1063,65 @@ TEM inline void Buzz<Tv,Ts>::antialias(){
 
 TEM inline Tv Buzz<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->freq(); }
 
-TEM inline void Buzz<Tv,Ts>::setAmp(){ mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN+mNFrac)) : 0; }
+TEM inline void Buzz<Tv,Ts>::setAmp(){
+	// Normally, the amplitude is 1/(2N), but we will linearly interpolate
+	// based on fractional harmonics to avoid sudden changes in amplitude to
+	// the lower harmonics which is very noticeable.
+	mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN+mNFrac)) : 0;
+	//mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN)) : 0;
+}
 
 #define EPS 0.000001
 TEM inline Tv Buzz<Tv, Ts>::operator()(){
-	Tv theta = this->nextPhase();
-
 	/*        1   / sin((N+0.5)x)    \
-	   f(x) = -- | -------------- - 1 |
+	   f(x) = -- |  ------------- - 1 |
 	          2N  \   sin(0.5x)      /
 	*/
+	Tv theta = this->nextPhase();
 	Tv result;
 	Tv denom = scl::sinT9(theta * Tv(0.5));
-	if( scl::abs(denom) < Tv(EPS) ){ result = Tv(1); /*printf("Impulse::(): oops\n");*/ }
+
+	// denominator goes to zero when theta is an integer multiple of 2 pi
+	if(scl::abs(denom) < Tv(EPS)){
+		result = Tv(2) * mN * mAmp;
+		//printf("Impulse::(): oops\n");
+	}
 	else{
 		Tv nphase = scl::wrapPhase(theta * (mN + Tv(0.5)));
-		//result = (scl::sinT7(nphase) / denom - Tv(1)) * Tv(0.5);
-		
-		//result = ((scl::sinT7(nphase) - denom) / (denom*mN)) * Tv(0.5);
+		//result = (scl::sinT7(nphase) / denom - Tv(1)) * mAmp;
 		result = ((scl::sinT7(nphase) - denom) / denom) * mAmp;
-		
-//		(n/d - 1)*0.5/N
-//		n/d - d/d
-//		(n-d)/d*0.5/N
 	}
-	
-	//result -= 2.f * mAmp * cos(theta * mN) * (1.f - mNFrac);	// removes clicks
+
+	//Tv fund = ((denom*denom)-0.5)*-4*mAmp;
+	//result -= fund; // drop first harmonic
+
+	// Mitigate pops when number of harmonics is changed by a small amount
+	//result -= 2.f * mAmp * cos(theta * mN) * (1.f - scl::pow2(mNFrac));
+
 	return result;
 }
 
 TEM inline Tv Buzz<Tv,Ts>::odd(){
+	/*        1   / sin(2N x) \
+	   f(x) = -- |  ---------  |
+	          2N  \   sin(x)  /
+	*/
 	Tv theta = this->nextPhase();
-	
 	Tv result;
-	Tv n = scl::ceil(mN, Tv(2), Tv(0.5));	// get next highest even for formula
-										// wave has odd harmonics 1,3, ..., n-1 with peak amp n
 
-	Tv denom = scl::cosT8(scl::wrapPhaseOnce(theta - M_PI_2));	// this is more precise near zero-crossings
+	Tv n2 = scl::roundAway(mN*0.5) * 2;	
+	Tv n2frac = ((mN + mNFrac) - (n2-1)); // fraction, in [0,2), btw odd harmonics
+
+	// cos is more precise near zero-crossings
+	Tv denom = scl::cosT8(scl::wrapPhaseOnce(theta - M_PI_2));
 	//Tv denom = scl::sinT9(theta);
 	if( scl::abs(denom) < Tv(EPS) ){
 		if( theta > M_PI ) theta -= M_2PI;
-		result = (theta > -M_PI_2 && theta < M_PI_2) ? 1 : -1;
+		Tv A = n2 / (n2 + n2frac);
+		result = (theta > -M_PI_2 && theta < M_PI_2) ? A : -A;
 		//printf("Impulse::odd(): oops\n");
 	}
-	else result = scl::sinT7(scl::wrapPhase(n * theta)) / (denom * n);
+	else result = scl::sinT7(scl::wrapPhase(n2 * theta)) / (denom * (n2 + n2frac));
 	
 	return result;
 }
