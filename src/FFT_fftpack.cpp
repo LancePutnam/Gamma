@@ -103,25 +103,15 @@ RFFT<T>::~RFFT(){
 }
 
 template <class T>
-void RFFT<T>::forward(T * iobuf, bool normalize, bool complexBuf, bool halfSpec){
+void RFFT<T>::forward(T * iobuf, bool complexBuf, bool normalize){
 
 	T * buf = complexBuf ? iobuf+1 : iobuf;
 
 	fftpack::rfftf(&mImpl->n, buf, mImpl->wsave, mImpl->ifac);
 
-	// Magnitudes work a bit differently for complex-to-real transform.
-	// DC and Nyquist map [-1,1] -> [-N,N], but other components map
-	// [-1,1] -> [-N/2,N/2]. FFTpack only returns the positive frequency 
-	// components even though there really exist negative frequency
-	// components that are complex conjugates.
 	if(normalize){
-		T m = (halfSpec ? T(1) : T(2))/size();
+		const T m = T(1)/size();
 		for(int i=0; i<size(); ++i) buf[i] *= m;
-	}
-
-	if(!halfSpec){
-		buf[       0] *= T(0.5);
-		buf[size()-1] *= T(0.5);		
 	}
 
 	if(complexBuf){
@@ -132,19 +122,13 @@ void RFFT<T>::forward(T * iobuf, bool normalize, bool complexBuf, bool halfSpec)
 }
 	
 template <class T>
-void RFFT<T>::inverse(T * iobuf, bool complexBuf, bool halfSpec){
+void RFFT<T>::inverse(T * iobuf, bool complexBuf){
 
 	T * buf = iobuf;
 
 	if(complexBuf){
 		buf++;
 		buf[0] = iobuf[0];
-	}
-
-	// FFTpack wants a half spectrum for complex-to-rel transform
-	if(!halfSpec){
-		T m = 1./T(2);
-		for(int i=1; i<size()-1; ++i) buf[i] *= m;	
 	}
 
 	fftpack::rfftb(&mImpl->n, buf, mImpl->wsave, mImpl->ifac);

@@ -13,7 +13,8 @@ template <class T>
 class CFFT{
 public:
 
-	/// @param[in] size		size of complex input sequence; most efficient when a product of small primes
+	/// @param[in] size		size of complex input sequence; 
+	///						most efficient when a product of small primes
 	CFFT(int size=0);
 	
 	~CFFT();
@@ -28,8 +29,8 @@ public:
 	void forward(T * buf, bool normalize=true);
 
 	template <template <class> class ComplexType>
-	void forward(ComplexType<T> * buf, bool unitize=true){
-		forward((T*)buf, unitize);
+	void forward(ComplexType<T> * buf, bool normalize=true){
+		forward((T*)buf, normalize);
 	}
 
 	/// Perform inverse transform in-place
@@ -55,7 +56,8 @@ template <class T>
 class RFFT{
 public:
 
-	/// @param[in] size		size of real input sequence; most efficient when a product of small primes
+	/// @param[in] size		size of real input sequence; 
+	///						most efficient when a product of small primes
 	RFFT(int size=0);
 	
 	~RFFT();
@@ -66,15 +68,14 @@ public:
 	/// Perform real-to-complex forward transform in-place
 	
 	/// @param[in,out]	buf			input is real sequence, output is complex sequence
-	/// @param[in]		normalize	whether to scale magnitudes by 1/N
 	/// @param[in]		complexBuf	If true, then 
 	///									input is  [ *, x0, x1, x2, ..., x(n),   *] and
 	///									output is [r0,  0, r1, i1, ..., r(n/2), 0].
 	///								If false, then 
 	///									input is  [x0, x1, x2, ..., x(n)  ] and
 	///									output is [r0, r1, i1, ..., r(n/2)].
-	/// @param[in]		halfSpec	whether the output spectrum is the positive frequency half only
-	void forward(T * buf, bool normalize=true, bool complexBuf=false, bool halfSpec=false);
+	/// @param[in]		normalize	whether to scale magnitudes by 1/N
+	void forward(T * buf, bool complexBuf=false, bool normalize=true);
 	
 	/// Perform complex-to-real inverse transform in-place
 
@@ -85,8 +86,7 @@ public:
 	///								If false, then 
 	///									input is  [r0, r1, i1, ..., r(n/2)]  and 
 	///									output is [x0, x1, x2, ..., x(n)  ].
-	/// @param[in]		halfSpec	whether the input spectrum is the positive frequency half only
-	void inverse(T * buf, bool complexBuf=false, bool halfSpec=false);
+	void inverse(T * buf, bool complexBuf=false);
 
 	/// Set size of transform
 	void resize(int n);

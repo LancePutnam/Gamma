@@ -6,19 +6,25 @@
 	float * tdbuf = buf+1;
 	Sync::master().spu(1);
 
+	/*
+	NOTE: Amplitudes of oscillators are multiplied by 2 before being fed to
+	FFT so that magnitudes fall in a more intuitive range. The real-to-complex
+	FFT actually reports magnitudes that are half of what you would expect.
+	*/
+
 	{
 		Sine<> g;
 		g.freq(1./N);
-		for(int i=0;i<N;++i) tdbuf[i]=g();
+		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
 		//for(int i=0;i<N;++i) printf("% f\n", tdbuf[i]);
-		fft.forward(buf, true, true);
+		fft.forward(buf, true);
 		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, norm(fdbuf[i]), arg(fdbuf[i]));
 		assert(near(abs(fdbuf[1]), 1.f));
 		assert(near(arg(fdbuf[1]),-M_PI/2));
 		
 		g.phase(0.25);
-		for(int i=0;i<N;++i) tdbuf[i]=g();
-		fft.forward(buf, true, true);
+		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
+		fft.forward(buf, true);
 		assert(near(abs(fdbuf[1]), 1.f));
 		assert(near(arg(fdbuf[1]), 0.f));		
 	}
@@ -30,8 +36,8 @@
 		g.harmonics(3);
 		g.ampRatio(0.5);
 		//g.freqRatio(2);
-		for(int i=0;i<N;++i) tdbuf[i]=g();
-		fft.forward(buf, true, true);
+		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
+		fft.forward(buf, true);
 		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, abs(fdbuf[i]), arg(fdbuf[i]));
 		assert(near(abs(fdbuf[1]), 1, eps));
 		assert(near(abs(fdbuf[2]), 0.5, eps));
@@ -39,8 +45,8 @@
 		assert(near(abs(fdbuf[4]), 0, eps));
 		
 		g.freqRatio(2);
-		for(int i=0;i<N;++i) tdbuf[i]=g();
-		fft.forward(buf, true, true);
+		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
+		fft.forward(buf, true);
 		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, abs(fdbuf[i]), arg(fdbuf[i]));
 		assert(near(abs(fdbuf[1]), 1, eps));
 		assert(near(abs(fdbuf[3]), 0.5, eps));
