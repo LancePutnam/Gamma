@@ -15,13 +15,19 @@ namespace gam{
 
 
 /// Amplitude envelope extractor
-template <class Tv=gam::real, class Tp=gam::real>
+template <class Tv=real, class Tp=real, class Ts=Synced>
 struct AmpEnv{
+
 	/// @param[in] freq		Cutoff frequency of smoothing filter
 	AmpEnv(Tp freq=10):lpf(freq){}
-	Tv operator()(Tv i0){ return lpf(scl::abs(i0)); }	///< Returns next sample
-	Tv last(){ return lpf.last(); }
-	OnePole<Tv, Tp> lpf;									///< Low-pass filter
+
+	/// Filter next sample
+	Tv operator()(Tv i0){ return lpf(scl::abs(i0)); }
+
+	/// Returns current amplitude estimate
+	Tv value() const { return lpf.last(); }
+
+	OnePole<Tv,Tp,Ts> lpf;	///< Low-pass filter
 };
 
 
