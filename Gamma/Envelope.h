@@ -241,7 +241,7 @@ public:
 		int max = size() - begin;
 		int n = len < max ? len : max;
 		for(int i=0; i<n; ++i){
-			segment(i+begin, lengths[i], curves[i]);
+			segment(i+begin, lens[i], crvs[i]);
 		}
 		return *this;
 	}
@@ -620,7 +620,8 @@ protected:
 #define TEM template <class Tv,class Tp>
 
 //---- Curve
-TEM Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mMul(Tp(1)), mA(Tv(0)), mB(Tv(0)){}
+TEM Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
+{}
 
 TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv end, Tv start){
 	set(length, curve, end, start);
