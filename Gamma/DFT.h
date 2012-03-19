@@ -74,22 +74,29 @@ private:
 
 
 
+/// Base class for DFTs
 template <class T=gam::real>
 class DFTBase : public Synced{
 public:
 	DFTBase();
 	virtual ~DFTBase();
 
-	T * aux(uint32_t num);		///< Returns pointer to an auxiliary buffer
+	/// Get pointer to an auxiliary buffer
+	T * aux(uint32_t num);
 	
+	/// Get pointer to bin data
 	Complex<T> * bins() const { return mBins; }
-	Complex<T>& bins(uint32_t i){ return mBins[i]; }
-	const Complex<T>& bins(uint32_t i) const { return mBins[i]; }
 	
-	double binFreq() const;		///< Returns width of frequency bins
-	uint32_t numBins() const;	///< Returns number of frequency bins
-	uint32_t sizeDFT() const;	///< Returns size of forward transform
-	Sync& syncFreq();			///< Returns frequency domain synchronizer
+	/// Get reference to bin value
+	Complex<T>& bin(uint32_t k){ return mBins[k]; }
+	
+	/// Get read-only reference to bin value
+	const Complex<T>& bin(uint32_t k) const { return mBins[k]; }
+	
+	double binFreq() const;		///< Get width of frequency bins
+	uint32_t numBins() const;	///< Get number of frequency bins
+	uint32_t sizeDFT() const;	///< Get size of forward transform
+	Sync& syncFreq();			///< Get frequency domain synchronizer
 	
 	void numAux(uint32_t num);	///< Sets number of auxilliary buffers, each of size numBins()
 
@@ -101,21 +108,17 @@ protected:
 		T * mBuf;		// FFT buffer
 		Complex<T> * mBins;
 	};
-	
 	T * mAux;		// aux buffers
 	Sync mSyncFreq;
 
-	T normForward() const;	// Returns norm factor for forward transform values
-
+	T normForward() const;	// get norm factor for forward transform values
 	T * bufPos(){ return mBuf+1; }
 	T * bufFrq(){ return mBuf; }
 };
 
 
-/// Discrete Fourier transform
 
-///
-///
+/// Discrete Fourier transform
 class DFT : public DFTBase<float>{
 public:
 	/// Constructor
@@ -124,19 +127,30 @@ public:
 	/// @param[in]	padSize		Number of zeros to append to window
 	/// @param[in]	specType	Format of spectrum data
 	/// @param[in]	numAux		Number of auxilliary buffers of size numBins() to create
-	DFT(uint32_t winSize=1024, uint32_t padSize=0, SpectralType specType=COMPLEX, uint32_t numAux=0);
+	DFT(
+		uint32_t winSize=1024, uint32_t padSize=0,
+		SpectralType specType=COMPLEX,
+		uint32_t numAux=0
+	);
+
 	virtual ~DFT();
 
-	DFT& spectrumType(SpectralType v);	///< Set format of spectrum data
-	DFT& precise(bool whether);			///< Whether to use precise (but slower) math. Default is off.
-	void resize(uint32_t windowSize, uint32_t padSize);	///< Sets size parameters of transform
 
-	float freqRes() const;				///< Returns frequency resolution of analysis
-	float overlap() const;				///< Returns amount of transform overlap in [0,1]
+	/// Set format of spectrum data
+	DFT& spectrumType(SpectralType v);
+
+	/// Set whether to use precise (but slower) for converting to polar
+	DFT& precise(bool whether);
+
+	/// Set size parameters of transform
+	void resize(uint32_t windowSize, uint32_t padSize);
+
+	float freqRes() const;				///< Get frequency resolution of analysis
+	float overlap() const;				///< Get transform overlap factor
 	bool overlapping() const;			///< Whether the transform is overlapping
-	uint32_t sizeHop() const;			///< Returns size of hop
-	uint32_t sizePad() const;			///< Returns size of zero-padding
-	uint32_t sizeWin() const;			///< Returns size of window
+	uint32_t sizeHop() const;			///< Get size of hop
+	uint32_t sizePad() const;			///< Get size of zero-padding
+	uint32_t sizeWin() const;			///< Get size of window
 
 	Sync& syncHop();					///< Hop rate synchronizer
 
@@ -146,13 +160,11 @@ public:
 	/// the forward DFT is performed.  Returns false otherwise.
 	bool operator()(float input);
 
-
 	/// Returns next sample from inverse transform
 	
 	/// The inverse transform is performed every sizeWin() samples.
 	///
 	float operator()();
-
 
 	/// Performs forward transform on a window of samples
 	
@@ -160,7 +172,6 @@ public:
 	///
 	void forward(const float * src);	
 
-	
 	/// Performs inverse transform on internal spectrum
 	
 	///	The resynthesized samples are copied into 'dst'.  The destination
@@ -218,7 +229,8 @@ public:
 	STFT(uint32_t winSize=1024, uint32_t hopSize=256, uint32_t padSize=0,
 		WindowType winType = RECTANGLE,
 		SpectralType specType = COMPLEX,
-		uint32_t numAux=0);
+		uint32_t numAux=0
+	);
 	
 	virtual ~STFT();
 
@@ -260,7 +272,7 @@ public:
 	/// Returns array of phases if the sample data type is MAG_FREQ
 	float * phases();
 	
-	virtual void print(FILE * fp=stdout, const char * append="\n");
+	virtual void print(FILE * fp=stdout, const char * append="\n");	
 
 protected:
 	using DFT::sizeHop;

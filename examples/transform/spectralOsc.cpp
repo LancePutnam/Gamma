@@ -31,7 +31,7 @@ void audioCB(AudioIOData & io){
 			
 			for(unsigned i=0; i<stft.numBins(); ++i){
 			
-				stft.bins(i)[0] *= lfoA1.triU() - lfoA2.triU();
+				stft.bin(i)[0] *= lfoA1.triU() - lfoA2.triU();
 				//f0 *= lfoA1.impulse();
 				//f0 = bq0(s0);
 				//f1 = bq1(s1);

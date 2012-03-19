@@ -35,7 +35,7 @@ void audioCB(AudioIOData& io){
 			
 			for(int k=0; k<N; ++k){
 				int indKnee = frac * N;
-				stft.bins(k) *= k < indKnee ? 1:0;
+				stft.bin(k) *= k < indKnee ? 1:0;
 			}
 		}
 		

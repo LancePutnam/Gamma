@@ -43,7 +43,7 @@ void audioCB(AudioIOData& io){
 			for(unsigned k=0; k<stft.numBins(); ++k){
 				//float frac = double(k)/stft.numBins();
 				float m = pick(pick(2,1, 0.1),0, prb);
-				stft.bins(k) *= m;
+				stft.bin(k) *= m;
 			}
 			rnd::pop();
 			stft.zeroEnds();
