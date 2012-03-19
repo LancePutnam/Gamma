@@ -49,6 +49,7 @@ struct SizeArray{
 template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
+
 	ArrayBase();
 	explicit ArrayBase(uint32_t size);
 	ArrayBase(uint32_t size, const T& init);
@@ -81,11 +82,16 @@ public:
 	/// Destroys all elements and frees memory
 	void clear();
 
-	/// Ensures ownership of elements.
+	/// Ensures ownership of elements
 	
-	/// If the array is not the owner, new memory is allocated and the previously
-	/// referenced array elements are copied.
+	/// If the array is not already the sole owner, new memory is allocated and 
+	/// the previously referenced array elements are copied.
 	void own();
+	
+	/// Returns true if we are the sole owner of data internally allocated
+	bool isSoleOwner() const;
+	
+	bool usingExternalSource() const;
 	
 	/// Resizes number of elements in array
 	
@@ -99,7 +105,10 @@ public:
 	virtual void onResize(){}
 
 	/// Returns number of pointers to memory address being managed
-	static int references(T * const m){ return managing(m) ? refCount()[m] : 0; }
+	static int references(T* m){
+		typename RefCount::const_iterator it = refCount().find(m);
+		return it != refCount().end() ? it->second : 0;
+	}
 
 protected:
 	T * mElems;
@@ -113,7 +122,7 @@ protected:
 	}
 	
 	// is memory being managed automatically?
-	static bool managing(T* const m){ return refCount().count(m) != 0; }
+	static bool managing(T* m){ return references(m) != 0; }
 
 private: ArrayBase& operator=(const ArrayBase& v);
 };
@@ -441,11 +450,8 @@ TEM3 inline const T * ArrayBase<T,S,A>::elems() const { return mElems; }
 
 TEM3 void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n", mElems);
 	
-	// Is this memory being ref counted?
-	// NOTE: this check is only necessary because mElems can be assigned from
-	// a raw external pointer. Maybe having this functionality is not a good
-	// idea in the first place???
-	// The culprit method is source(T * src, uint32_t size).
+	// We will only attempt to deallocate the data if it exists and is being 
+	// managed (reference counted) by ArrayBase.
 	if(mElems && managing(mElems)){
 		int& c = refCount()[mElems];
 		--c;
@@ -461,13 +467,21 @@ TEM3 void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n",
 TEM3 void ArrayBase<T,S,A>::own(){	
 	T * oldElems = elems();
 	
-	// Check to see if we are already the owner
-	if(references(oldElems) != 1){
+	// If we are not the sole owner, do nothing...
+	if(!isSoleOwner()){
 		uint32_t oldSize = size();
 		clear();
 		resize(oldSize);
 		for(uint32_t i=0; i<size(); ++i) A::construct(mElems+i, oldElems[i]);
 	}
+}
+
+TEM3 bool ArrayBase<T,S,A>::isSoleOwner() const {
+	return references((T*)elems()) == 1;
+}
+
+TEM3 bool ArrayBase<T,S,A>::usingExternalSource() const {
+	return elems() && !managing((T*)elems());
 }
 
 TEM3 void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
@@ -521,6 +535,7 @@ TEM3 void ArrayBase<T,S,A>::source(T * src, uint32_t size){
 	}
 	mElems = src;
 	mSize(size);
+	onResize();
 }
 
 #undef TEM3

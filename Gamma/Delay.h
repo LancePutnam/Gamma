@@ -189,8 +189,7 @@ public:
 	/// @param[in]	delay		Delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float maxDelay, float delay);
-	
-	virtual ~Delay(){}
+
 
 	void delay(float v);						///< Set delay length
 	void delayUnit(float u);					///< Set delay as (0, 1) of buffer size
@@ -294,7 +293,7 @@ protected:
 /// odd harmonics. If the feedback and feedforward amounts are inverses of each
 /// other, an Nth order all-pass filter results. Comb filters are stable as
 /// long as |feedback| < 1.
-template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Tf=gam::real, class Ts=Synced>
+template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Tp=gam::real, class Ts=Synced>
 class Comb : public Delay<Tv,Si,Ts> {
 
 private:
@@ -309,15 +308,14 @@ public:
 	/// @param[in]	delay		Delay length. The size of the delay line will be the smallest possible power of two.
 	/// @param[in]	ffd			Feedforward amount
 	/// @param[in]	fbk			Feedback amount
-	Comb(float delay, const Tf& ffd, const Tf& fbk);
+	Comb(float delay, const Tp& ffd = Tp(0), const Tp& fbk = Tp(0));
 	
 	/// @param[in]	maxDelay	Maximum delay length. The size of the delay line will be the smallest possible power of two.
 	/// @param[in]	delay		Delay length
 	/// @param[in]	ffd			Feedforward amount
 	/// @param[in]	fbk			Feedback amount
-	Comb(float maxDelay, float delay, const Tf& ffd, const Tf& fbk);
-	
-	virtual ~Comb(){}
+	Comb(float maxDelay, float delay, const Tp& ffd, const Tp& fbk);
+
 	
 	/// Set number of units for response to decay to end value.
 	
@@ -326,12 +324,12 @@ public:
 	/// the filter.  Setting the decay amount effects only the feedback value.
 	/// The decay must be updated whenever the delay length of the filter changes.
 	void decay(float units, float end = 0.001f);
-	void fbk(const Tf& v);					///< Set feedback amount (-1, 1).
-	void fbkAllPass(const Tf& v);			///< Set feedback amount (-1, 1) with feedforward set to opposite.
-	void ffd(const Tf& v);					///< Set feedforward amount [-1, 1].
-	void feeds(const Tf& fwd, const Tf& bwd){ ffd(fwd); fbk(bwd); }
+	void fbk(const Tp& v);					///< Set feedback amount (-1, 1).
+	void fbkAllPass(const Tp& v);			///< Set feedback amount (-1, 1) with feedforward set to opposite.
+	void ffd(const Tp& v);					///< Set feedforward amount [-1, 1].
+	void feeds(const Tp& fwd, const Tp& bwd){ ffd(fwd); fbk(bwd); }
 
-	void set(float delay, const Tf& ffd, const Tf& fbk); ///< Set several parameters.
+	void set(float delay, const Tp& ffd, const Tp& fbk); ///< Set several parameters.
 
 	Tv operator()(const Tv& i0);					///< Returns next filtered value
 	Tv operator()(const Tv& i0, const Tv& oN);		///< Circulate filter with ffd & fbk
@@ -343,23 +341,24 @@ public:
 	float norm() const;				///< Get unity gain scale factor
 	float normFbk() const;			///< Get unity gain scale factor due to feedback
 	float normFfd() const;			///< Get unity gain scale factor due to feedforward
-	Tf ffd() const;					///< Get feedforward amount
-	Tf fbk() const;					///< Get feedback amount
+	Tp ffd() const;					///< Get feedforward amount
+	Tp fbk() const;					///< Get feedback amount
 
 protected:
-	Tf mFFD, mFBK;
+	Tp mFFD, mFBK;
 };
 
 
 
-// Base class for 2-pole or 2-zero filter
+/// Abstract base class for 2-pole or 2-zero filter
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Filter2 : public Ts{
 public:
-	Filter2(): d2(0), d1(0){}
 
+	/// Set frequency
 	void freq(Tp v){ freqRef(v); }
 
+	/// Set bandwidth
 	void width(Tp v){
 		mWidth = v;
 		mRad = scl::poleRadius(mWidth, Ts::ups());
@@ -374,7 +373,9 @@ public:
 
 protected:
 
-	Filter2(Tp frq, Tp wid): mFreq(frq), mWidth(wid){ zero(); }
+	Filter2(Tp frq, Tp wid)
+	:	mFreq(frq), mWidth(wid)
+	{	zero(); }
 
 	void freqRef(Tp& v){
 		mFreq = v;		
@@ -388,14 +389,25 @@ protected:
 	void delay(Tv v){ d2 = d1; d1 = v; }
 	
 	Tp mFreq, mWidth;
-	Tp mB0, cd1, cd2;
+	Tp mB0, cd1, cd2;	// coefficients
 	Tp mCos, mRad;
-	Tv d2, d1;
+	Tv d2, d1;			// 2- and 1-sample delays
 };
 
 
+#define INHERIT_FILTER2 \
+typedef Filter2<Tv,Tp,Ts> Base;\
+using Base::mFreq;\
+using Base::mWidth;\
+using Base::d2;\
+using Base::d1;\
+using Base::mB0;\
+using Base::cd1;\
+using Base::cd2;\
+using Base::mRad
 
-/// Second-order all-pass filter.
+
+/// Second-order all-pass filter
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass2 : public Filter2<Tv,Tp,Ts>{
 public:
@@ -412,9 +424,7 @@ public:
 	}
 
 protected:
-	#define USE(var) using Base::var;
-	typedef Filter2<Tv,Tp,Ts> Base; USE(d2) USE(d1) USE(mB0) USE(cd1) USE(cd2)
-	#undef USE
+	INHERIT_FILTER2;
 };
 
 
@@ -444,11 +454,7 @@ public:
 	virtual void onResync(double r){ freq(mFreq); width(mWidth); }
 
 protected:
-
-	#define USE(var) using Base::var;
-	typedef Filter2<Tv,Tp> Base;
-	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(mB0) USE(cd1) USE(cd2) USE(mRad)
-	#undef USE
+	INHERIT_FILTER2;
 
 	// compute constant gain factor
 	void computeGain(){ mB0 = Tp(1) / (Tp(1) + scl::abs(cd1) - cd2); }
@@ -487,13 +493,9 @@ public:
 	void onResync(double r){ freq(mFreq); width(mWidth); }
 
 protected:
-	#define USE(var) using Base::var;
-	typedef Filter2<Tv,Tp,Ts> Base;
-	USE(mFreq) USE(mWidth) USE(d2) USE(d1) USE(mB0) USE(cd1) USE(cd2) USE(mRad)
-	#undef USE
-
+	INHERIT_FILTER2;
 	Tp mSin;
-	
+
 	// compute constant gain factor
 	void computeGain(){ mB0 = (Tp(1) - mRad*mRad) * mSin; }
 };
@@ -510,9 +512,7 @@ public:
 		cf3( 671.3715/SR), cf4(2694.363 /SR), cf5(11976.867 /SR),
 		sf0(  18.786 /SR), sf1(  83.5065/SR), sf2(  335.1345/SR), 
 		sf3(1344.4065/SR), sf4(5471.871 /SR), sf5(41551.671 /SR)
-	{
-		//Ts::initSynced();
-	}
+	{}
 	#undef SR
 
 	/// Convert input from real to complex
@@ -522,14 +522,6 @@ public:
 			-sf0(sf1(sf2(sf3(sf4(sf5(i))))))
 		);
 	}
-
-//	virtual void onResync(double r){
-//		//#define DO(o) o.freq(o.freq()*r); printf("%g\n", o.freq());
-//		#define DO(o) printf("%g\n", o.freq());
-//		DO(cf0) DO(cf1) DO(cf2) DO(cf3) DO(cf4) DO(cf5)
-//		DO(sf0) DO(sf1) DO(sf2) DO(sf3) DO(sf4) DO(sf5)
-//		#undef DO
-//	}
 
 protected:
 	AllPass1<Tv, Tp, Synced1> cf0,cf1,cf2,cf3,cf4,cf5, sf0,sf1,sf2,sf3,sf4,sf5;
@@ -800,14 +792,14 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 	mMaxDelay = length;
 	if(Ts::sync() && Ts::sync()->hasBeenSet()){
 		//printf("Delay::maxDelay(): resize to %d\n", (uint32_t)(mMaxDelay * spu()));
-		this->resize((uint32_t)(mMaxDelay * Ts::spu())); // calls onResize() -> onResync(double r)
+		
+		// This will only trigger onResize() -> onResync(double r) calls if
+		// the size changes, thereby preventing infinite recursion.
+		this->resize((uint32_t)(mMaxDelay * Ts::spu()));
 	}
 }
 
-TM1 void Delay<TM2>::zero(){ 
-	for(uint32_t i=0; i<ArrayPow2<Tv>::size(); ++i) ArrayPow2<Tv>::elems()[i] = 0;
-}
-
+TM1 void Delay<TM2>::zero(){ this->assign(Tv(0)); }
 
 TM1 inline Tv Delay<TM2>::operator()() const{ return mIpol(*this, mPhase - mDelay); }
 
@@ -828,12 +820,18 @@ TM1 inline void Delay<TM2>::incPhase(){ mPhase += mPhaseInc; }
 
 TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this->size());
 	mPhaseInc = this->oneIndex();
-	for(uint32_t i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
+	//for(uint32_t i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
+	if(this->isSoleOwner()) zero();
 	onResync(1);
 }
 
 TM1 void Delay<TM2>::onResync(double r){ //printf("Delay::onSyncChange\n");
-	maxDelay(mMaxDelay);
+	if(this->usingExternalSource()){
+		mMaxDelay = this->size() * Ts::ups();
+	}
+	else{
+		maxDelay(mMaxDelay);
+	}
 	refreshDelayFactor();
 	delay(mDelayLength);
 }
@@ -894,15 +892,15 @@ TM1 void Delay<TM2>::print(){
 
 
 //---- Comb
-#define TM1 template<class Tv, template<class> class Si, class Tf, class Ts>
-#define TM2 Tv,Si,Tf,Ts
+#define TM1 template<class Tv, template<class> class Si, class Tp, class Ts>
+#define TM2 Tv,Si,Tp,Ts
 TM1 Comb<TM2>::Comb(): Delay<Tv,Si,Ts>(), mFFD(0), mFBK(0){}
 
-TM1 Comb<TM2>::Comb(float delay, const Tf& ffd, const Tf& fbk)
+TM1 Comb<TM2>::Comb(float delay, const Tp& ffd, const Tp& fbk)
 :	Delay<Tv,Si,Ts>(delay), mFFD(ffd), mFBK(fbk)
 {}
 
-TM1 Comb<TM2>::Comb(float delayMax, float delay, const Tf& ffd, const Tf& fbk)
+TM1 Comb<TM2>::Comb(float delayMax, float delay, const Tp& ffd, const Tp& fbk)
 :	Delay<Tv,Si,Ts>(delayMax, delay), mFFD(ffd), mFBK(fbk)
 {}
 
@@ -926,13 +924,13 @@ TM1 inline void Comb<TM2>::decay(float units, float end){
 	if(units < 0.f) mFBK = -mFBK;
 }
 
-TM1 inline void Comb<TM2>::fbk(const Tf& v){ mFBK=v; }
-TM1 inline void Comb<TM2>::fbkAllPass(const Tf& v){ fbk(v); ffd(-v); }
-TM1 inline void Comb<TM2>::ffd(const Tf& v){ mFFD=v; }
-TM1 inline void Comb<TM2>::set(float d, const Tf& ff, const Tf& fb){ this->delay(d); ffd(ff); fbk(fb); }
+TM1 inline void Comb<TM2>::fbk(const Tp& v){ mFBK=v; }
+TM1 inline void Comb<TM2>::fbkAllPass(const Tp& v){ fbk(v); ffd(-v); }
+TM1 inline void Comb<TM2>::ffd(const Tp& v){ mFFD=v; }
+TM1 inline void Comb<TM2>::set(float d, const Tp& ff, const Tp& fb){ this->delay(d); ffd(ff); fbk(fb); }
 
-TM1 inline Tf Comb<TM2>::fbk() const { return mFBK; }
-TM1 inline Tf Comb<TM2>::ffd() const { return mFFD; }
+TM1 inline Tp Comb<TM2>::fbk() const { return mFBK; }
+TM1 inline Tp Comb<TM2>::ffd() const { return mFFD; }
 TM1 inline float Comb<TM2>::norm() const { return (1.f - scl::abs(fbk()))/(1.f + scl::abs(ffd())); }
 TM1 inline float Comb<TM2>::normFbk() const { return 1.f - scl::abs(fbk()); }
 TM1 inline float Comb<TM2>::normFfd() const { return 1.f/(1.f + scl::abs(ffd())); }
