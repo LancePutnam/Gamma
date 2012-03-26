@@ -559,7 +559,7 @@ void addSine(T * dst, uint32_t len, double cycles, double amp, double phs){
 template <int InvPower, class T>
 void addSinesPow(
 	T * dst, uint32_t len,
-	int numh, double hmul, double hshf, double amp, double hphs, double wphs
+	double numh, double hmul, double hshf, double amp, double hphs, double wphs
 ){
 	const double inc1 = M_2PI / len;
 
