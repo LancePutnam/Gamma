@@ -142,7 +142,7 @@ CLS::Player(const Char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {	
 	if(!load(path)){
-		source(defaultBuffer(), 1);
+		this->source(defaultBuffer(), 1);
 	}
 }
 
@@ -167,7 +167,7 @@ bool CLS::load(const Char * pathToSoundFile){
 }
 
 PRE void CLS::buffer(Array<T>& src, double smpRate, int channels){
-	source(src);
+	this->source(src);
 	sampleRate(smpRate);	// sets mSampleRate, mRate, and mInc
 	mChans = channels;
 	mMin = 0;
