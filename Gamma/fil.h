@@ -105,7 +105,8 @@ template <class Tv=double, class Tp=double>
 class Integrator{
 public:
 
-	/// @param[in] v	Initial value
+	/// @param[in] leakCoef		leak coefficient, in [0,1)
+	/// @param[in] v			Initial value
 	Integrator(const Tp& leakCoef=Tp(1), const Tv& v=Tv(0)){
 		mo[0]=v;
 		leak(leakCoef);
