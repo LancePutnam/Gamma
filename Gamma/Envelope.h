@@ -493,6 +493,7 @@ public:
 	/// @param[in] len		Length of segment in domain units
 	/// @param[in] start	Start value
 	/// @param[in] end		End value
+	/// @param[in] phase	Start phase along segment, in [0,1)
 	Seg(Tp len=0.5, Tv start=1, Tv end=0, Tp phase=0):
 		mFreq((Tp)1/len), mAcc(0, phase), mIpl(start)
 	{
