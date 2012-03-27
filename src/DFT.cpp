@@ -96,7 +96,7 @@ void DFT::forward(const float * src){ //printf("DFT::forward(const float *)\n");
 	if(src != bufPos()) mem::deepCopy(bufPos(), src, sizeWin());
 	mem::deepZero(bufPos() + sizeWin(), sizePad());	// zero pad
 
-	mFFT.forward(mBuf, true, true);
+	mFFT.forward(mBuf, true, true); // complex buffer and normalize
 
 //	// do a mem move rather than offsetting input buffer pointer...
 //	if(src != mBuf) mem::deepCopy(mBuf, src, sizeWin());
@@ -315,27 +315,30 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 	// compute frequency estimates?
 	if(MAG_FREQ == mSpctFormat){
 		
-		// This will effectively subtract the expected phase difference from the computed.
-		// This extra step seems to give more precise frequency estimates.
-		{
-			float diff = float(M_2PI * sizeHop()) / sizeDFT();
-			for(uint32_t i=0; i<numBins(); ++i){
-				mPhases[i] += diff;
-			}
-		}
+//		// This will effectively subtract the expected phase difference from the computed.
+//		// This extra step seems to give more precise frequency estimates.
+//		{
+//			float expdp = float(M_2PI * sizeHop()) / sizeDFT();
+//			for(uint32_t i=0; i<numBins(); ++i){
+//				mPhases[i] += expdp;
+//			}
+//		}
 		
-		// compute relative frequencies
-		//arr::phaseToFreq(phs, mPhases, numBins(), unitsHop());
+		// compute frequency estimates
 		float factor = 1.f / (M_2PI * unitsHop()); // converts phase difference from radians to Hz
+		
+		// expected phase difference of fundamental
+		float expdp1 = float(sizeHop())/sizeWin() * M_2PI;
+
 		for(uint32_t i=1; i<numBins()-1; ++i){
-			float& v2 = bins()[i][1];
-			float dp = scl::wrapPhase(v2 - mPhases[i]);	// wrap phase into [-pi, pi)
-			mPhases[i] = v2;							// prev phase = curr phase
-			v2 = dp*factor;								// convert phase diff to freq
+			float ph = bin(i)[1];						// current phase
+			float dp = ph - mPhases[i] - i*expdp1;		// compute phase difference
+			dp = scl::wrapPhase(dp);					// wrap back into [-pi, pi)
+			mPhases[i] = ph;							// save current phase
+			bin(i)[1] = dp*factor;						// convert phase diff to freq
 		}
 		
 		// compute absolute frequencies by adding respective bin center frequency
-		//slice(mBuf, numBins(), 2) += gen::RAdd<float>(binFreq());
 		for(uint32_t i=0; i<numBins(); ++i){
 			bins()[i][1] += binFreq()*i;
 		}
@@ -346,8 +349,8 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 void STFT::inverse(float * dst){
 	//printf("STFT::inverse(float *)\n");
 	if(MAG_FREQ == mSpctFormat){
-		//mem::copy(bins1(), mPhases, numBins()); // not correct, need to unwrap frequencies
-		for(uint32_t i=1; i<numBins()-1; ++i) bins()[i] = mPhases[i];
+		// TODO:
+		for(uint32_t i=1; i<numBins()-1; ++i) bin(i)[1] = mPhases[i];
 	}	
 	
 	DFT::inverse(0);	// result goes into bufPos()
