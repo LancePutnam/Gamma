@@ -55,6 +55,7 @@
 	#include "Gamma/DFT.h"
 	#include "Gamma/Envelope.h"
 	#include "Gamma/FFT.h"
+	#include "Gamma/Filter.h"
 	#include "Gamma/FormantData.h"
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
