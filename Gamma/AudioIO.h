@@ -68,7 +68,7 @@ public:
 	
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] input		Whether to search input devices
-	/// @param[in] ouput		Whether to search output devices
+	/// @param[in] output		Whether to search output devices
 	AudioDevice(const std::string& nameKeyword, bool input=true, bool output=true);
 
 	~AudioDevice();
