@@ -31,7 +31,7 @@ namespace gam{
 #define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
 #define GAM_USE_THREADEX	(defined(WIN32))
 
-#if GAM_USE_PTHREAD
+#ifdef GAM_USE_PTHREAD
 	#include <pthread.h>
 #elif GAM_USE_THREADEX
 	#include <windows.h>
@@ -43,7 +43,7 @@ public:
 
 	typedef void * (*Function)(void * user);
 
-	#if GAM_USE_PTHREAD
+	#ifdef GAM_USE_PTHREAD
 		typedef pthread_t		Handle;
 	#elif GAM_USE_THREADEX
 		typedef unsigned long	Handle;
@@ -99,7 +99,7 @@ protected:
 
 // Implementation
 
-#if GAM_USE_PTHREAD
+#ifdef GAM_USE_PTHREAD
 
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
