@@ -20,6 +20,17 @@ namespace gam{
 ///	where 'frac' lies in [0, 1).
 namespace ipl{
 
+
+/// Interpolation types
+enum Type{
+	TRUNC=0,	/**< Truncating interpolation */
+	ROUND,		/**< Rounding interpolation */
+	LINEAR,		/**< Linear interpolation */
+	CUBIC,		/**< Cubic interpolation */
+	ALLPASS		/**< Allpass interpolation */
+};
+
+
 /// First order allpass interpolation.
 
 /// Best for delay lines, not good for random access.
