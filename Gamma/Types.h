@@ -204,11 +204,6 @@ struct Multi{
 };
 
 
-template <class T>
-struct Multi3: public Multi<3,T>{
-	Multi3(T v1=0, T v2=0, T v3=0){ (*this)[0]=v1; (*this)[1]=v2; (*this)[2]=v3; }
-};
-
 
 /// A value in the form: base^expo
 template <class T=double>
