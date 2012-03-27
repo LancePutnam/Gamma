@@ -32,7 +32,7 @@ TEM double norm(const T& v);
 TEM double normCompare(const T& v);
 
 
-/// Scalar rank functions for numerical types.
+/// Scalar rank functions for numerical types
 namespace scl{
 
 
@@ -297,10 +297,6 @@ TEM T negative(T v, T bw, T amt);
 
 /// Returns the next representable floating-point or integer value following x in the direction of y
 TEM T nextAfter(T x, T y);
-
-/// Returns pole radius given a bandwidth and sampling interval
-TEM	inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
-//return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
 
 /// Smooth positive map
 

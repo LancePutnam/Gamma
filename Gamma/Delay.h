@@ -33,6 +33,11 @@ enum FilterType{
 };
 
 
+/// Returns pole radius given a bandwidth and sampling interval
+template <class T>
+inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
+//return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
+
 
 /// First-order all-pass filter
 
@@ -138,7 +143,7 @@ public:
 
 	/// Set bandwidth of pole
 	void width(Tp v){
-		mWidth = v; mB1 = scl::poleRadius(v, Ts::ups());
+		mWidth = v; mB1 = poleRadius(v, Ts::ups());
 	}
 
 	void zero(){ d1=0; }
@@ -256,7 +261,8 @@ template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Sy
 class Delays : public Delay<Tv,Si,Ts> {
 public:
 
-	/// @param[in]	delay		Delay length. The size of the delay line will be the smallest possible power of two.
+	/// @param[in]	delay		Delay length. The size of the delay line will 
+	///							be the smallest possible power of two.
 	/// @param[in]	numTaps		Number of reader taps
 	Delays(float delay, uint32_t numTaps)
 	:	Delay<Tv,Si,Ts>(delay)
@@ -286,14 +292,25 @@ protected:
 
 /// Variable length delay-line with feedback and/or feedforward.
 
+/// H(z) = (ffd + z^-m) / (1 - fbk z^-m)
+/// y[n] = ffd x[n] + x[n-m] + fbk y[n-m]
 /// The general comb filter transfer function provides N evenly spaced poles
-/// and/or zeroes around the unit circle.  Feedback and feedforward produce
+/// and/or zeroes around the unit circle. Feedback and feedforward produce
 /// evenly spaced resonances and notches, respectively, in the frequency
 /// response. Positive feeds result in even harmonics and negative feeds give
 /// odd harmonics. If the feedback and feedforward amounts are inverses of each
 /// other, an Nth order all-pass filter results. Comb filters are stable as
 /// long as |feedback| < 1.
-template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Tp=gam::real, class Ts=Synced>
+/// \tparam Tv	value type
+/// \tparam Si	interpolation strategy
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
+template<
+	class Tv=gam::real,
+	template <class> class Si=ipl::Linear,
+	class Tp=gam::real,
+	class Ts=Synced
+>
 class Comb : public Delay<Tv,Si,Ts> {
 
 private:
@@ -305,35 +322,40 @@ public:
 	/// Default constructor. Does not allocate memory.
 	Comb();
 
-	/// @param[in]	delay		Delay length. The size of the delay line will be the smallest possible power of two.
-	/// @param[in]	ffd			Feedforward amount
-	/// @param[in]	fbk			Feedback amount
+	/// @param[in]	delay		Delay length. The size of the delay line will 
+	///							be the smallest possible power of two.
+	/// @param[in]	ffd			Feedforward amount, in [-1, 1]
+	/// @param[in]	fbk			Feedback amount, in (-1, 1)
 	Comb(float delay, const Tp& ffd = Tp(0), const Tp& fbk = Tp(0));
 	
-	/// @param[in]	maxDelay	Maximum delay length. The size of the delay line will be the smallest possible power of two.
+	/// @param[in]	maxDelay	Maximum delay length. The size of the delay line 
+	///							will be the smallest possible power of two.
 	/// @param[in]	delay		Delay length
-	/// @param[in]	ffd			Feedforward amount
-	/// @param[in]	fbk			Feedback amount
+	/// @param[in]	ffd			Feedforward amount, in [-1, 1]
+	/// @param[in]	fbk			Feedback amount, in (-1, 1)
 	Comb(float maxDelay, float delay, const Tp& ffd, const Tp& fbk);
 
 	
-	/// Set number of units for response to decay to end value.
+	/// Set number of units for response to decay to end value
 	
 	/// The sign of the decay length determines the sign of the feedback coefficient.
 	/// The default end value of 0.001 (-60 dB) is the reverberation time of 
 	/// the filter.  Setting the decay amount effects only the feedback value.
 	/// The decay must be updated whenever the delay length of the filter changes.
 	void decay(float units, float end = 0.001f);
-	void fbk(const Tp& v);					///< Set feedback amount (-1, 1).
-	void fbkAllPass(const Tp& v);			///< Set feedback amount (-1, 1) with feedforward set to opposite.
-	void ffd(const Tp& v);					///< Set feedforward amount [-1, 1].
+
+	/// Sets feedback to argument and feedforward to argument negated
+	void allPass(const Tp& v);
+
+	void fbk(const Tp& v);					///< Set feedback amount, in (-1, 1)
+	void ffd(const Tp& v);					///< Set feedforward amount [-1, 1]
 	void feeds(const Tp& fwd, const Tp& bwd){ ffd(fwd); fbk(bwd); }
 
-	void set(float delay, const Tp& ffd, const Tp& fbk); ///< Set several parameters.
+	void set(float delay, const Tp& ffd, const Tp& fbk); ///< Set several parameters
 
-	Tv operator()(const Tv& i0);					///< Returns next filtered value
-	Tv operator()(const Tv& i0, const Tv& oN);		///< Circulate filter with ffd & fbk
-	Tv circulateFbk(const Tv& i0, const Tv& oN);	///< Circulate filter with fbk only	
+	Tv operator()(const Tv& i0);				///< Returns next filtered value
+	Tv operator()(const Tv& i0, const Tv& oN);	///< Circulate filter with ffd & fbk
+	Tv circulateFbk(const Tv& i0, const Tv& oN);///< Circulate filter with fbk only	
 
 	/// Filters sample (feedback only).
 	Tv nextFbk(const Tv& i0);
@@ -361,9 +383,9 @@ public:
 	/// Set bandwidth
 	void width(Tp v){
 		mWidth = v;
-		mRad = scl::poleRadius(mWidth, Ts::ups());
+		mRad = poleRadius(mWidth, Ts::ups());
 		cd2 = -mRad * mRad;
-		computeCoef();
+		computeCoef1();
 	}
 
 	/// Zero delay elements
@@ -380,12 +402,12 @@ protected:
 	void freqRef(Tp& v){
 		mFreq = v;		
 		v = scl::clip<Tp>(v * Ts::ups(), 0.5);
-		mCos = scl::cosP3<Tp>(v);
-		//mCos = scl::cosT8<T>(v * M_2PI);
-		computeCoef();
+		//mCos = scl::cosP3<Tp>(v);
+		mCos = scl::cosT8<Tp>(v * M_2PI);
+		computeCoef1();
 	}
 	
-	void computeCoef(){	cd1 = (Tp)2 * mRad * mCos; }
+	void computeCoef1(){ cd1 = Tp(2) * mRad * mCos; }
 	void delay(Tv v){ d2 = d1; d1 = v; }
 	
 	Tp mFreq, mWidth;
@@ -404,7 +426,8 @@ using Base::d1;\
 using Base::mB0;\
 using Base::cd1;\
 using Base::cd2;\
-using Base::mRad
+using Base::mRad;\
+using Base::mCos
 
 
 /// Second-order all-pass filter
@@ -904,7 +927,8 @@ TM1 Comb<TM2>::Comb(float delayMax, float delay, const Tp& ffd, const Tp& fbk)
 :	Delay<Tv,Si,Ts>(delayMax, delay), mFFD(ffd), mFBK(fbk)
 {}
 
-TM1 inline Tv Comb<TM2>::operator()(const Tv& i0){ return (*this)(i0, (*this)()); }
+TM1 inline Tv Comb<TM2>::operator()(const Tv& i0){
+	return (*this)(i0, (*this)()); }
 
 TM1 inline Tv Comb<TM2>::operator()(const Tv& i0, const Tv& oN){
 	Tv t = i0 + oN * mFBK;
@@ -917,15 +941,16 @@ TM1 inline Tv Comb<TM2>::circulateFbk(const Tv& i0, const Tv& oN){
 	return oN;
 }
 
-TM1 inline Tv Comb<TM2>::nextFbk(const Tv& i0){ return circulateFbk(i0, (*this)()); }
+TM1 inline Tv Comb<TM2>::nextFbk(const Tv& i0){
+	return circulateFbk(i0, (*this)()); }
 
 TM1 inline void Comb<TM2>::decay(float units, float end){
 	mFBK = ::pow(end, this->delay() / scl::abs(units));
 	if(units < 0.f) mFBK = -mFBK;
 }
 
+TM1 inline void Comb<TM2>::allPass(const Tp& v){ fbk(v); ffd(-v); }
 TM1 inline void Comb<TM2>::fbk(const Tp& v){ mFBK=v; }
-TM1 inline void Comb<TM2>::fbkAllPass(const Tp& v){ fbk(v); ffd(-v); }
 TM1 inline void Comb<TM2>::ffd(const Tp& v){ mFFD=v; }
 TM1 inline void Comb<TM2>::set(float d, const Tp& ff, const Tp& fb){ this->delay(d); ffd(ff); fbk(fb); }
 
@@ -965,7 +990,7 @@ T_VPS inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
 	v = scl::max(v, Tp(0));	// ensure positive freq
 	
 	// freq is half the bandwidth of a pole at 0
-	smooth( scl::poleRadius(Tp(2) * v, Ts::ups()) );
+	smooth( poleRadius(Tp(2) * v, Ts::ups()) );
 	//printf("%f, %f, %f\n", Ts::spu(), mB1, v);
 }
 
