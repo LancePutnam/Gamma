@@ -15,18 +15,6 @@
 	//{ unsigned x=0; printf("%ud\n", (x-1)); }
 	//{ ValWrap<int> x(7); x=-1; x++; x+=14; x=(x+1)*8; printf("%f\n", x.fraction()); }
 
-	{	Bits<> b;
-		#define T(x, y) assert(x == y);
-		b.enable(1<<0);				T(b.enabled(1<<0), 1<<0)
-		b.enable(1<<1);				T(b.enabled(1<<1), 1<<1)
-		b.toggle(1<<0);				T(b.enabled(1<<0), 0) T(b.enabled(1<<1), 1<<1)
-		b.set(1<<1, false);			T(b.enabled(1<<1), 0)
-		b.set(b.mask(0,1), true);	T(b.enabled(1<<0), 1<<0) T(b.enabled(1<<1), 1<<1)
-		b.disable(1<<0);			T(b.enabled(1<<0), 0) T(b.enabled(1<<1), 1<<1)
-		b.zero();					T(b(), 0)
-		#undef T
-	}
-
 	{	Complexd c(0,0);
 		#define T(x, y) assert(x == y);
 		T(c, Complexd(0,0))

@@ -59,7 +59,6 @@
 	
 //	{ Array<t> a(N); }
 //	{ ArrayPow2<t> a(N); }
-//	{ DoubleBuffer<t> a(N); }
 //	{ Ring<t> a(N); }
 //	{ DoubleRing<t> a(N); a.copy(); }
 }
