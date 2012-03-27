@@ -47,6 +47,7 @@ int main(){
 	allPass1.zero(); allPass1.freq(1./4*0.5); FREQ_RESP(allPass1.low(v), "1st-order low-pass at 1/4 band")
 	allPass1.zero(); allPass1.freq(1./4*0.5); FREQ_RESP(allPass1.high(v), "1st-order high-pass at 1/4 band")
 
+	allPass2.width(0.1);
 	allPass2.zero(); allPass2.freq(1./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/4 band")
 	allPass2.zero(); allPass2.freq(2./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/2 band")
 	allPass2.zero(); allPass2.freq(3./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 3/4 band")
