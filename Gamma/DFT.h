@@ -225,7 +225,7 @@ public:
 	/// @param[in]	padSize		Number of zeros to append to window
 	/// @param[in]	winType		Type of forward transform window
 	/// @param[in]	specType	Format of spectrum data
-	/// @param[in]	createAux	Whether to create an auxillary spectral buffer (see createAux())
+	/// @param[in]	numAux		Number of auxiliary buffers to create
 	STFT(uint32_t winSize=1024, uint32_t hopSize=256, uint32_t padSize=0,
 		WindowType winType = RECTANGLE,
 		SpectralType specType = COMPLEX,
@@ -236,6 +236,8 @@ public:
 
 
 	using DFT::operator();
+	using DFT::sizeHop;
+
 
 	/// Input next time-domain sample
 	
@@ -275,8 +277,6 @@ public:
 	virtual void print(FILE * fp=stdout, const char * append="\n");	
 
 protected:
-	using DFT::sizeHop;
-	
 	void computeInvWinMul();	// compute inverse normalization factor (due to overlap-add)
 	
 	SlidingWindow<float> mSlide;
