@@ -178,80 +178,6 @@ private: ArrayPow2& operator=(const ArrayPow2& v);
 
 
 
-/// Container for sharing arrays between threads.
-template <class T, class A=gam::Allocator<T> >
-class Buffer : public Array<T,A> {
-public:
-
-	/// @param[in]	size		Number of elements in buffer.
-	explicit Buffer(uint32_t size=0);
-	virtual ~Buffer(){}
-	
-	/// Writes 'src' to buffer and locks buffer.
-	
-	/// The buffer will only be written to if it is unlocked.  'src' must have
-	/// at least this.size() elements.
-	void writeLock(const T * src);
-
-	/// Writes 'src' to a portion of the buffer and locks buffer.
-	
-	/// @param[in]	src			Source array to write into buffer.
-	/// @param[in]	numRead		Number of elements to read from 'src'.
-	/// @param[in]	writeOffset	Starting write position in buffer.
-	/// The buffer will only be written to if it is unlocked.  'src' must have
-	/// at least 'numRead' elements.  'writePos' + 'numRead' should not exceed
-	/// this.size().
-	void writeLock(const T * src, uint32_t numRead, uint32_t writeOffset=0);
-	
-	void lock();		///< Locks buffer to prevent writing.
-	void unlock();		///< Unlocks buffer to permit writing.
-	
-	bool isLocked();	///< Returns whether the buffer is locked.
-	bool isUnlocked();	///< Returns whether the buffer is unlocked.
-	
-protected:
-	bool mLocked;
-};
-
-
-
-
-/// Container for reading and writing arrays using front and back buffers.
-template <class T, class A=gam::Allocator<T> >
-class DoubleBuffer : public Array<T,A>{
-public:
-	
-	/// @param[in]	singleBufSize	Number of elements in single buffer (allocated size will be twice this).
-	explicit DoubleBuffer(uint32_t singleBufSize=0);
-
-	/// Set front buffer element
-	T& operator[](uint32_t i){ return front()[i]; }
-	
-	/// Get front buffer element
-	const T& operator[](uint32_t i) const { return front()[i]; }
-
-	T * back();				///< Returns a pointer to the back (older) buffer
-	T * front();			///< Returns a pointer to the front (newer) buffer
-
-	void swap();			///< Swaps the front and back buffers
-
-	void copyAll(T * dst);	///< Copy contents to dst, back buffer first then front
-
-protected:
-	uint32_t mSizeSingle;
-	T * mFront, * mBack;
-	
-	typedef Array<T,A> Base;
-	
-	virtual void onResize();
-	bool backIsFirst();
-
-	/// Writes single buffer to back and performs swap().
-	//void write(const T * singleBuffer);
-};
-
-
-
 /// Ring buffer
 template <class T, class A=gam::Allocator<T> >
 class Ring : public Array<T,A> {
@@ -298,14 +224,14 @@ protected:
 };
 
 
-/// Ring buffer that keeps track of its fill amount.
+/// Ring buffer that keeps track of its fill amount
 template <class T, class A=gam::Allocator<T> >
 class RingFill : public Ring<T,A> {
 public:
 	typedef Ring<T,A> Base;
 	
-	/// @param[in]	size		Number of elements in ring.
-	/// @param[in]	value		Initial value of all elements.
+	/// @param[in]	size		Number of elements in ring
+	/// @param[in]	value		Initial value of all elements
 	explicit RingFill(uint32_t size=0, const T& value=T())
 	:	Base(size, value), mFill(0)
 	{}
@@ -558,32 +484,6 @@ TEM inline float ArrayPow2<T,A>::fraction(uint32_t phase) const{
 }
 
 
-// Buffer
-
-TEM Buffer<T,A>::Buffer(uint32_t size)
-	: Array<T>(size)
-{
-	unlock();
-}
-
-TEM inline void Buffer<T,A>::writeLock(const T * src){
-	if(isLocked()) return;
-	lock();
-	memcpy(this->elems(), src, this->size() * sizeof(T));
-}
-
-TEM inline void Buffer<T,A>::writeLock(const T * src, uint32_t numRead, uint32_t writeOffset){
-	if(isLocked()) return;
-	lock();
-	memcpy(this->elems() + writeOffset, src, numRead * sizeof(T));
-}
-
-TEM inline void Buffer<T,A>::unlock(){ mLocked = false; }
-TEM inline void Buffer<T,A>::lock(){ mLocked = true; }
-TEM inline bool Buffer<T,A>::isLocked(){ return mLocked; }
-TEM inline bool Buffer<T,A>::isUnlocked(){ return !mLocked; }
-
-
 
 //---- Ring
 
@@ -635,54 +535,6 @@ TEM	inline void Ring<T,A>::writeClip(const T& v){
 	}
 }
 
-
-// DoubleBuffer
-
-TEM DoubleBuffer<T,A>::DoubleBuffer(uint32_t n)
-: Array<T>(n*2), mSizeSingle(n)
-{
-	mBack  = Base::mElems;
-	mFront = Base::mElems + n;
-}
-
-TEM inline bool DoubleBuffer<T,A>::backIsFirst(){ return mBack==Base::mElems; }
-
-TEM inline T * DoubleBuffer<T,A>::back(){ return mBack; }
-TEM inline T * DoubleBuffer<T,A>::front(){ return mFront; }
-TEM inline void DoubleBuffer<T,A>::swap(){
-	if(backIsFirst()){
-		mFront= Base::mElems;
-		mBack = Base::mElems + mSizeSingle;
-	}
-	else{
-		mBack = Base::mElems;
-		mFront= Base::mElems + mSizeSingle;	
-	}
-}
-
-TEM void DoubleBuffer<T,A>::copyAll(T * dst){
-	if(backIsFirst()){
-		memcpy(dst, mBack, (mSizeSingle<<1) * sizeof(T));
-	}
-	else{
-		memcpy(dst, mBack, mSizeSingle * sizeof(T));
-		memcpy(dst + mSizeSingle, mFront, mSizeSingle * sizeof(T));
-	}
-}
-
-TEM void DoubleBuffer<T,A>::onResize(){
-	mSizeSingle = Base::size()/2;
-	mBack  = Base::mElems;
-	mFront = Base::mElems + mSizeSingle;
-}
-
-//TEM inline void DoubleBuffer<T>::write(const T * singleBuffer){
-//	memcpy(mBuffer + mTap, singleBuffer, mSizeSingle * sizeof(T));
-//	swap();
-//}
-
-} // gam::
-
 #undef TEM
-
+} // gam::
 #endif
