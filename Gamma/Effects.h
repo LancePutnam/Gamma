@@ -6,6 +6,7 @@
 
 #include "Gamma/Delay.h"
 #include "Gamma/Envelope.h"
+#include "Gamma/Filter.h"
 #include "Gamma/Noise.h"
 #include "Gamma/Oscillator.h"
 
