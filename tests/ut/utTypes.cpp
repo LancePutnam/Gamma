@@ -52,12 +52,6 @@
 		v = 1; assert(v == 1);
 	}
 	
-	{	ShiftBuffer<2, double> v;
-		assert(v == 0);
-		v(1);		assert(v[0]==1); assert(v[1]==0);
-		v(2);		assert(v[0]==2); assert(v[1]==1);
-	}
-	
 	{	typedef Vec<3,double> Vec3;
 		Vec3 v(0,0,0);
 		assert(v == 0);

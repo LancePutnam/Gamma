@@ -456,27 +456,9 @@ protected:
 };
 
 
-/// Fixed size shift buffer
-template <int N, class T>
-struct ShiftBuffer : public Multi<N,T>{
-
-	typedef Multi<N,T> base;
-	using base::elems;
-	using base::operator=;
-
-	ShiftBuffer(const T& v=T()){ *this = v; }
-
-	/// Push new element onto buffer. Newest element is at index 0.
-	void operator()(const T& v){
-		for(int i=N-1; i>0; --i) elems[i] = elems[i-1];
-		elems[0]=v;
-	}
-};
 
 
-
-
-/// Fixed size vector.
+/// Fixed-size vector
 template <uint32_t N, class T>
 struct Vec : public Multi<N,T> {
 
