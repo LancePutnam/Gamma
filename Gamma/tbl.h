@@ -3,7 +3,7 @@
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
- 
+
 #include <stdlib.h>
 #include "Gamma/arr.h"
 #include "Gamma/mem.h"
@@ -13,6 +13,7 @@
 #define TEM template<class T>
 #define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
 
+/// Main namespace
 namespace gam{
 
 
@@ -42,7 +43,7 @@ enum WaveformType{
 
 
 /// Returns human readable string of window type
-inline static const char * toString(WindowType v){
+inline static const char * toString(gam::WindowType v){
 	#define CS(name) case name: return #name;
 	switch(v){
 		CS(BARTLETT) CS(BLACKMAN) CS(BLACKMAN_HARRIS) CS(HAMMING) CS(HANN)
@@ -56,7 +57,7 @@ inline static const char * toString(WindowType v){
 
 /// Add sine wave to array
 
-/// @param[in] dst		destination array
+/// @param[out] dst		destination array
 /// @param[in] len		length of array
 /// @param[in] cycles	number of cycles of sine wave, must be integer for periodic waves
 /// @param[in] amp		amplitude of sine wave
@@ -75,7 +76,7 @@ void inline addSine(
 
 /// Add harmonic series to array with specified amplitudes
 
-/// @param[in] dst		destination array
+/// @param[out] dst		destination array
 /// @param[in] len		length of destination array
 /// @param[in] amps		amplitudes of harmonic series, size must be numh
 /// @param[in] numh		total number of harmonics
@@ -102,7 +103,7 @@ void inline addSines(
 
 /// Add harmonics to array with specified amplitudes and harmonic numbers
 
-/// @param[in] dst		destination array
+/// @param[out] dst		destination array
 /// @param[in] len		length of destination array
 /// @param[in] amps		harmonic amplitudes of series, size must be numh
 /// @param[in] cycs		harmonic numbers of series, size must be numh
@@ -123,11 +124,12 @@ void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, const C * cycs, in
 /// Add multiple sine waves to array
 
 /// \tparam InvPower	amplitudes will be set to 1 / h^InvPower
-/// @param[in] dst		destination array
+/// @param[out] dst		destination array
 /// @param[in] len		length of destination array
 /// @param[in] numh		total number of harmonics
 /// @param[in] hmul		harmonic number multiplication factor
 /// @param[in] hshf		harmonic number shift amount
+/// @param[in] amp		overall amplitude scaling factor
 /// @param[in] hphs		phase of (sine) harmonics, in [0,1]
 /// @param[in] wphs		phase of composite waveform, in [0,1]
 template <int InvPower, class T>
@@ -149,7 +151,7 @@ inline void addSinesPow(
 
 /// The produced waveforms are not normalized; the fundamental always has a 
 /// unit amplitude.
-/// @param[in] dst		destination array
+/// @param[out] dst		destination array
 /// @param[in] len		length of destination array
 /// @param[in] type		waveform type
 /// @param[in] numh		total number of harmonics
@@ -158,13 +160,13 @@ inline void addSinesPow(
 /// @param[in] hshf		harmonic number shift amount
 template <class T>
 void addWave(
-	T * dst, uint32_t len, WaveformType type,
+	T * dst, uint32_t len, gam::WaveformType type,
 	int numh=32, double amp=1, double phs=0, double hshf=1
 );
 
 template <class T, class Alloc, template<class,class> class ArrayType>
 void inline addWave(
-	ArrayType<T,Alloc>& dst, WaveformType type,
+	ArrayType<T,Alloc>& dst, gam::WaveformType type,
 	int numh=32, double amp=1, double phs=0, double hshf=1
 ){
 	addWave(&dst[0],dst.size(), type,numh,amp,phs,hshf);
@@ -172,7 +174,7 @@ void inline addWave(
 
 
 /// Get Fourier series normalization constant for a waveform
-template<WaveformType W> double normConstant();
+template<gam::WaveformType W> double normConstant();
 
 
 
