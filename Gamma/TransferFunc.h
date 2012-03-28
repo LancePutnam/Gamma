@@ -1,5 +1,5 @@
-#ifndef GAMMA_FIL_H_INC
-#define GAMMA_FIL_H_INC
+#ifndef GAMMA_TRANSFER_FUNC_H_INC
+#define GAMMA_TRANSFER_FUNC_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
@@ -43,8 +43,8 @@ public:
 protected:
 
 	struct DelayUnit{
-		// param[in] c		weighting coefficient
-		// param[in] d		delay in samples
+		/// param[in] c		weighting coefficient
+		/// param[in] d		delay in samples
 		DelayUnit(double c_, double d_): c(c_), d(d_){}
 
 		Complex response(double f){
