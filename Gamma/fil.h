@@ -43,8 +43,8 @@ public:
 protected:
 
 	struct DelayUnit{
-		/// param[in] c		weighting coefficient
-		/// param[in] d		delay in samples
+		// param[in] c		weighting coefficient
+		// param[in] d		delay in samples
 		DelayUnit(double c_, double d_): c(c_), d(d_){}
 
 		Complex response(double f){
