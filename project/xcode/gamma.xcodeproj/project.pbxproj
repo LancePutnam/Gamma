@@ -66,7 +66,6 @@
 		16747A0C115806C800A1556D /* tbl.h in Headers */ = {isa = PBXBuildFile; fileRef = 16EDF9EB094F8C2600549AC9 /* tbl.h */; };
 		16747A0D115806C800A1556D /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 160E7B3E0B36792200CE82F3 /* Timer.h */; };
 		16747A0E115806D500A1556D /* Print.h in Headers */ = {isa = PBXBuildFile; fileRef = 167479501158052400A1556D /* Print.h */; };
-		16747A0F115806FF00A1556D /* fil.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F1305A0FFEE85900DE56F6 /* fil.h */; };
 		16747A10115806FF00A1556D /* Access.h in Headers */ = {isa = PBXBuildFile; fileRef = 1686EA810F8DB1F100D0452F /* Access.h */; };
 		16747A11115806FF00A1556D /* Conversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 16938ABF0FBD0C4400274B2A /* Conversion.h */; };
 		16747A14115806FF00A1556D /* FFT.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E09511E0DECCE18000AF828 /* FFT.h */; };
@@ -210,7 +209,6 @@
 		16EDF9D2094F8C2600549AC9 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../../Gamma/Oscillator.h; sourceTree = SOURCE_ROOT; };
 		16EDF9E9094F8C2600549AC9 /* rnd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rnd.h; path = ../../Gamma/rnd.h; sourceTree = SOURCE_ROOT; };
 		16EDF9EB094F8C2600549AC9 /* tbl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tbl.h; path = ../../Gamma/tbl.h; sourceTree = SOURCE_ROOT; };
-		16F1305A0FFEE85900DE56F6 /* fil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fil.h; path = ../../Gamma/fil.h; sourceTree = SOURCE_ROOT; };
 		16F133850FFF426400DE56F6 /* UnitMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnitMaps.h; sourceTree = "<group>"; };
 		16F7D07C0B5414A1008A2E29 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../Gamma/Node.h; sourceTree = SOURCE_ROOT; };
 		16F836E00A1E888200F05DF5 /* AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AudioIO.cpp; path = ../../src/AudioIO.cpp; sourceTree = SOURCE_ROOT; };
@@ -305,7 +303,6 @@
 			children = (
 				16CEF9120BBCDA0A0049666F /* Gamma.h */,
 				16EDF9B6094F8C2600549AC9 /* arr.h */,
-				16F1305A0FFEE85900DE56F6 /* fil.h */,
 				160351A30D090B9C003CC766 /* gen.h */,
 				16EDF9C5094F8C2600549AC9 /* ipl.h */,
 				16CDD4430ABF788300F66F1B /* mem.h */,
@@ -429,7 +426,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				167479F6115806C800A1556D /* arr.h in Headers */,
-				16747A0F115806FF00A1556D /* fil.h in Headers */,
 				16747A00115806C800A1556D /* gen.h in Headers */,
 				16747A01115806C800A1556D /* ipl.h in Headers */,
 				16747A02115806C800A1556D /* mem.h in Headers */,
