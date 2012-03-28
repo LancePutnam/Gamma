@@ -410,6 +410,101 @@ OF3(RSin,		rSin,		0,0,1)
 #undef INHERIT
 
 
+
+/// Complex resonator
+
+/// A complex resonator consists of two complex numbers- one is an absolute
+/// phase and amplitude and the other is a relative (differential) frequency 
+/// and decay/grow factor.
+template <class T=double>
+class CReson : public Complex<T>{
+public:
+	typedef Complex<T> C;
+	using C::operator();
+	using C::operator=;
+
+	/// @param[in] frq	unit frequency
+	/// @param[in] amp	amplitude
+	/// @param[in] phs	unit phase
+	/// @param[in] dec	unit decay/grow factor
+	CReson(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0), const T& dec=T(1)){
+		set(frq, amp, phs);
+	}
+
+	/// Advance one iteration and return value
+	const C& operator()(){ return (*this)*=mFactor; }
+
+	/// Filter input
+	const C& operator()(const C& v){ return (*this) = (*this)*mFactor + v; }
+	const C& operator()(const T& v){ return (*this) = (*this)*mFactor + v; }
+	
+	/// Recede one iteration and return value
+	const C& recede(){ return (*this)/=mFactor; }
+
+	/// Set amplitude
+	void amp(const T& v){ (*this).fromPolar(v, this->arg()); }
+	
+	/// Set amplitude decay/grow factor after N iterations
+	void decay(const T& target, const T& N=T(1)){
+		// NOTE: this handles negative decays, thought better to leave this to frequency component
+		//factor(freq(), (1==N) ? target : (::pow(scl::abs(target), 1./N)*scl::sgn(target)));
+		factor(freq(), (1==N) ? target : (::pow(scl::abs(target), 1./N)));
+	}
+
+	/// Set recursive multiplication factor (frequency and decay/growth factor)
+	void factor(const T& frq, const T& dec=T(1)){
+		mFactor.fromPolar(dec, frq*M_2PI);
+	}
+	
+	void factor(const Complex<T>& v){ mFactor=v; }
+
+	/// Set unit frequency
+	void freq(const T& v){ factor(v, decay()); }
+
+	/// Set unit frequency, amplitude, unit phase, and decay/grow factor
+	
+	/// The phase state will be rewound 1 iteration so the first function call
+	/// will return a complex number at the desired phase.
+	void set(const T& frq, const T& amp, const T& phs, const T& dec=T(1)){
+		this->fromPolar(amp, phs*M_2PI);
+		factor(frq, dec);
+		recede();
+	}
+
+	void set(const T& frq, const Complex<T>& phs){
+		(*this)(phs.r, phs.i); freq(frq);
+	}
+
+	/// Get value one iteration ahead of current state
+	C ahead() const { return (*this)*mFactor; }
+	
+	/// Get value one iteration behind current state
+	C behind() const { return (*this)/mFactor; }
+
+	/// Get unit decay
+	T decay() const { return mFactor.mag(); }
+	
+	/// Get unit frequency
+	T freq() const { return mFactor.phase()*M_1_2PI; }
+
+	const C& factor() const { return mFactor; }
+	C& factor(){ return mFactor; }
+
+protected:
+	C mFactor;
+	
+	// Set 60 dB decay interval
+	//void decay(const Tv& v){ width(T(2.198806796637603 /* -ln(0.001)/pi */)/v); }
+	
+	// Set unit bandwidth
+	//void width(const Tv& v){ mDecay=::exp(-M_PI*v); freq(freq()); }
+};
+
+typedef CReson<float>	CResonf;
+typedef CReson<double>	CResond;
+
+
+
 struct OnOff{
 	OnOff(uint32_t max, uint32_t ons) : max(max), ons(ons), cnt(0){}
 	
