@@ -45,6 +45,9 @@ public:
 	
 	virtual ~FunctionTable(){}
 	
+	
+	Array<T,A>& array(){ return *this; }
+	const Array<T,A>& array() const { return *this; }
 
 	/// Returns f(x) where x lies in the function domain, [0,1).
 	T operator()(double x) const {
