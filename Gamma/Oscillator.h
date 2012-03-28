@@ -583,15 +583,16 @@ private: typedef AccumPhase<Tv,Ts> Base;
 /// the LFO class.
 template <class Tv=gam::real, class Ts=Synced>
 struct Impulse : public Buzz<Tv,Ts>{
+private: typedef Buzz<Tv,Ts> Base;
 public:
+	using Base::freq;
+
 	Impulse(Tv frq=440, Tv phase=0): Base(frq, phase){ onResync(1); }
 
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v); Base::harmonicsMax(); }
 
 	virtual void onResync(double r){ Base::onResync(r); freq(AccumPhase<Tv, Ts>::freq()); }
-
-private: typedef Buzz<Tv,Ts> Base; using Base::freq;
 };
 
 
