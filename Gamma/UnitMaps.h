@@ -224,11 +224,11 @@ public:
 
 	UnitMapper();
 	
-	/// \param max		upper endpoint of interval
-	/// \param min		lower endpoint of interval
-	/// \param p1		mapping function function parameter
-	/// \param type		mapping function
-	/// \param clip		whether to clip values to interval
+	/// @param[in] max		upper endpoint of interval
+	/// @param[in] min		lower endpoint of interval
+	/// @param[in] p1		mapping function function parameter
+	/// @param[in] type		mapping function
+	/// @param[in] clip		whether to clip values to interval
 	UnitMapper(T max, T min=0., T p1=1., MapType type = MAP_POW, bool clip=true);
 
 
