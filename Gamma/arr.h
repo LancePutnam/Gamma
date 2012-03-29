@@ -95,14 +95,17 @@ void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts sca
 template <class Ts, class Tb>
 void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts scale, Ts offset);
 
+/// Returns index of maximum value
+TEM uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str=1);
+
+/// Returns index of maximum normed value (i.e., magnitude)
+TEM uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str=1);
+
+/// Returns index of minimum value
+TEM uint32_t indexOfMin(const T * src, uint32_t len);
+
 /// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
 void linToDB(float * arr, uint32_t len, float minDB);
-
-/// Returns index of maximum value.
-TEM uint32_t max(const T * src, uint32_t len, uint32_t str=1);
-
-/// Returns index of maximum normed value (i.e., magnitude).
-TEM uint32_t maxNorm(const T * src, uint32_t len, uint32_t str=1);
 
 /// Locates local maxima and writes their indices into 'dst'.
 
@@ -132,9 +135,6 @@ TEM T meanWeighted(const T * src, T * weights, uint32_t len);
 /// Weights must be positive.
 ///		Can be used to compute centroid of spectrum.
 TEM T meanWeightedIndex(const T * weights, uint32_t len);
-
-/// Returns index of minimum value in array.
-TEM uint32_t min(const T * src, uint32_t len);
 
 TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
 
@@ -201,8 +201,6 @@ TEM double normTaxi(const T * src, uint32_t len, uint32_t str=1){
 TEM inline T nyquist(const T * src, uint32_t len, uint32_t str=1){
 	T r=T(0); LOOP(len,(str<<1)){ r += src[i] - src[i+str]; } return r;
 }
-
-TEM void overlapAdd(T * arr, const T * src, uint32_t len, uint32_t hop);
 
 /// Returns root mean square- the normalized norm.
 TEM inline T rms(const T * src, uint32_t len, uint32_t str=1){
@@ -284,30 +282,6 @@ void conversionInit();
 ///
 void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t maxNumIndices);
 
-/// In-place magnitude-frequency to polar conversion.
-void magFrqToPolar(float * frq, float * phsAccum, uint32_t len, float factorUnwrap);
-
-/// Compute frequencies based on phase differences (in-place).
-
-/// Upon completion, p1 holds the current phases and p0 holds the computed 
-/// frequencies.\n\n
-/// The basic algorithm is:\n
-/// p0[i] = p1[i]\n
-/// p1[i] = freq\n
-TEM void phaseToFreq(T * p0, T * p1, uint32_t len, T ups);
-
-/// Compute frequencies based on phase differences.
-
-/// @param[out]	frq		frequency values
-/// @param[in]	phs0	current phases
-/// @param[in]	phs1	previous phases
-/// @param[in]	len		length of arrays
-/// @param[in]	ups		number of units between phase samplings
-TEM void phaseToFreq(T * frq, const T * phs0, const T * phs1, uint32_t len, T ups);
-
-/// In-place polar to magnitude-frequency conversion.
-void polarToMagFrq(float * phs, float * phsPrev, uint32_t len, float factorWrap, float fundFreq, float fundRadians);
-
 /// In-place polar to rectangular conversion.
 void polarToRect(float * mag, float * phs, uint32_t len);
 
@@ -325,22 +299,6 @@ void rectToPolar(float * real, float * imag, uint32_t len, uint32_t str=1);
 /// Call conversionInit() before using.
 ///
 void rectToPolarFast(float * real, float * imag, uint32_t len);
-
-
-//--- TODO: consider for removal or refactoring
-
-/// Estimate the fundamental frequency of a spectrum using HPS.
-
-/// Returns index of detected fundamental.
-///
-uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSample=4);
-
-/// Computes harmonic product spectrum.
-
-/// 'downSample' specifies how many times to downsample and multiply
-///
-void hps(float * dst, const float * src, uint32_t len, uint32_t downSample);
-
 
 
 
@@ -414,16 +372,10 @@ TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 }
 
 TEM double normalize(T * arr, uint32_t len, double scale){
-	double max = gam::norm(arr[maxNorm(arr, len)]);
+	double max = gam::norm(arr[indexOfMaxNorm(arr, len)]);
 	double normFactor = scale/max;
 	if(max != 0.){ for(uint32_t i=0; i<len; ++i){ arr[i]*=normFactor; } }
 	return normFactor;
-}
-
-TEM inline void overlapAdd(T * arr, const T * src, uint32_t len, uint32_t hop){
-	uint32_t lap = len - hop;
-	add(arr, arr + hop, src, lap);
-	mem::copy(arr + lap, src + lap, hop);
 }
 
 TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T threshold){
@@ -468,9 +420,9 @@ TEM inline T dot4(const T * a, const T * b){
 	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 }
 
-TEM void extrema(const T * src, uint32_t len, uint32_t & indexMin, uint32_t & indexMax){
-	indexMin = 0;
-	indexMax = 0;
+TEM void extrema(const T * src, uint32_t len, uint32_t& idxMin, uint32_t& idxMax){
+	idxMin = 0;
+	idxMax = 0;
 	
 	T min = *src++;
 	T max = min;
@@ -479,11 +431,11 @@ TEM void extrema(const T * src, uint32_t len, uint32_t & indexMin, uint32_t & in
 		T val = *src++;
 		if(val > max){
 			max = val;
-			indexMax = i;
+			idxMax = i;
 		}
 		else if(val < min){
 			min = val;
-			indexMin = i;
+			idxMin = i;
 		}
 	}
 }
@@ -550,7 +502,7 @@ inline void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins,
 	}
 }
 
-TEM uint32_t max(const T * src, uint32_t len, uint32_t str){
+TEM uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str){
 	uint32_t r=0;
 	T max = src[0];
 	for(uint32_t i=str; i<len; i+=str){
@@ -560,7 +512,7 @@ TEM uint32_t max(const T * src, uint32_t len, uint32_t str){
 	return r;
 }
 
-TEM uint32_t maxNorm(const T * src, uint32_t len, uint32_t str){
+TEM uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str){
 	uint32_t r = 0;
 	double max = normCompare(src[0]);
 	for(uint32_t i=str; i<len; i+=str){
@@ -568,6 +520,20 @@ TEM uint32_t maxNorm(const T * src, uint32_t len, uint32_t str){
 		if(v > max){ max=v; r=i; }
 	}
 	return r;
+}
+
+TEM uint32_t indexOfMin(const T * src, uint32_t len){
+	uint32_t index = 0;
+	T min = src[0];
+
+	for(uint32_t i=1; i<len; i++){
+		T val = src[i];
+		if(val < min){
+			min = val;
+			index = i;
+		}
+	}
+	return index;
 }
 
 TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str){
@@ -647,21 +613,6 @@ TEM T meanWeightedIndex(const T * weights, uint32_t len){
 		weightFactor += normFactor;
 	}
 	return mean;
-}
-
-
-TEM uint32_t min(const T * src, uint32_t len){
-	uint32_t index = 0;
-	T min = src[0];
-
-	for(uint32_t i=1; i<len; i++){
-		T val = src[i];
-		if(val < min){
-			min = val;
-			index = i;
-		}
-	}
-	return index;
 }
 
 TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
@@ -896,27 +847,6 @@ inline void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t 
 		if(*indices == i)	indices++;
 		else				*comp++ = i;
 	}
-}
-
-TEM void phaseToFreq(T * p0, T * p1, uint32_t len, T ups){
-	T factor = (T)1 / (M_2PI * ups);
-	LOOP(len, 1){
-		T dp = scl::wrapPhase(*p0 - *p1);		// wrap phase into [-pi, pi)
-		*p1++ = *p0;							// prev phase = curr phase
-		*p0++ = dp * factor;
-	}
-}
-
-TEM void phaseToFreq(T * f, const T * p0, const T * p1, uint32_t len, T ups){
-	T factor = (T)1 / (M_2PI * ups);
-	LOOP(len, 1){
-		T dp = scl::wrapPhase(*p0 - *p1);		// wrap phase into [-pi, pi)
-		*f++ = dp * factor;
-		p0++; p1++;
-	}
-//	subtract(f, p0, p1, len);
-//	mul(f, len, factor);
-//	wrap(f, len, -0.5 / ups, 0.5 / ups);
 }
 
 } // arr::

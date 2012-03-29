@@ -49,7 +49,7 @@ int main(){
 	arr::fitLine(table, size, slope, inter);
 	printf("Linear fit:        inter = %f, slope = %f\n", inter, slope);
 
-	featureI = arr::max(table, size);
+	featureI = arr::indexOfMax(table, size);
 	printf("Max:               [%2d] %f\n", featureI, table[featureI]);
 
 	uint32_t peaks[size>>1];

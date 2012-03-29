@@ -108,7 +108,7 @@ int main(int argc, char* argv[]){
 		rnd::fnc(samples, len, interval[1], interval[0]);\
 		mem::zero(bins, numBins);\
 		arr::histogram(samples, len, bins, numBins, (float)numBins/2, (float)numBins/2);\
-		normFactor = (float)len/(float)bins[arr::max(bins, numBins)];\
+		normFactor = (float)len/(float)bins[arr::indexOfMax(bins, numBins)];\
 		for(unsigned long i=0; i<numBins; i++){\
 			float amt = (float)bins[i] / (float)len;\
 			printf("[% 4.2f] %5.3f ", scl::mapLin((float)i, 0.f, (float)numBins, interval[0], interval[1]), amt);\

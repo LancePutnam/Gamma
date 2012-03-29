@@ -92,32 +92,12 @@ void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 //	}
 	for(uint32_t i=0; i<len; i+=chunkSize){
 		uint32_t max;
-		max = maxNorm(src, chunkSize);
+		max = indexOfMaxNorm(src, chunkSize);
 
 		*dst++ = src[max];
 		src += chunkSize;
 	}
 }
-
-uint32_t fundHPS(float * tmp, const float * mag, uint32_t len, uint32_t downSample){
-	hps(tmp, mag, len, downSample);
-	return max(tmp, len);
-}
-
-void hps(float * dst, const float * src, uint32_t len, uint32_t downSample){
-	
-	memcpy(dst, src, len * sizeof(float));
-	
-	for(uint32_t d=2; d <= downSample; d++){
-		for(uint32_t i=0; i<len; i++){
-			dst[i/d] *= src[i];
-		}
-	}
-}
-
-
-
-
 
 
 //uint32_t zeroCross(const float * src, uint32_t len, float prevVal){
@@ -184,77 +164,6 @@ uint32_t zeroCrossN(const float * src, uint32_t len, float prevVal){
 
 	return count;
 }
-
-
-void magFrqToPolar(float * frq, float * phsAccum, uint32_t len, float factorUnwrap){
-
-//	float binFreq = fundFreq;
-//	float expPhaseDiff = fundRadians;
-//	
-//	LOOP(len,
-//		float phaseDiff = (*frq - binFreq) * factorUnwrap;
-//		float phaseNew = *phsAccum;
-//
-//		// original DM style
-//		//phaseNew += phaseDiff;			// UNWRAP phase differences
-//
-//		// SB style
-//		phaseNew += phaseDiff + expPhaseDiff;			// UNWRAP phase differences
-//		
-//		// reduced SB
-//		//phaseNew += *frq * factorUnwrap;
-//		
-//		phaseNew = scl::wrapPhase(phaseNew);		// wrap to [-pi, pi) to retain precision
-//		//phaseNew = scl::wrap(phaseNew, 128.f * (float)M_PI, -128.f * (float)M_PI);
-//		*frq++ = *phsAccum++ = phaseNew;
-//		
-//		binFreq += fundFreq;
-//		expPhaseDiff += fundRadians;
-//	)
-	
-	LOOP(len,1){
-		float phaseNew = *phsAccum + *frq * factorUnwrap;
-		phaseNew = scl::wrapPhase(phaseNew);		// wrap to [-pi, pi) to retain precision
-		*frq++ = *phsAccum++ = phaseNew;
-	}
-	
-}
-
-
-/*
-factorWrap  := spu / (sizeHop * M_2PI)
-fundFreq    := spu / sizeDFT
-fundRadians := M_2PI * sizeHop / sizeDFT
-
-unitsHop := sizeHop * ups;
-*/
-void polarToMagFrq(float * p0, float * p1, uint32_t len, float factorWrap, float fundFreq, float fundRadians){
-	
-	float binFreq = fundFreq;			// center frequency of bin
-	float expPhaseDiff = fundRadians;	// expected phase difference based on bin number
-	
-	LOOP(len,1){
-				
-		// Wrap phase difference into range [-pi, pi)		
-		float dp = scl::wrapPhase(*p0 - *p1 - expPhaseDiff);	// SB
-		//float dp = scl::wrapPhase(*p0 - *p1);					// DM
-
-		*p1++ = *p0;						// Store this frame's phase for next frame
-		*p0++ = dp * factorWrap + binFreq;	// Compute instantaneous frequency
-		
-		binFreq += fundFreq;
-		expPhaseDiff += fundRadians;
-	}
-}
-
-//TEM void phaseToFreq(T * p0, T * p1, uint32_t len, T ups){
-//	T factor = (T)1 / (M_2PI * ups);
-//	LOOP_P(len,
-//		T dp = scl::wrapPhase(*p0 - *p1);		// wrap phase into [-pi, pi)
-//		*p1++ = *p0;							// prev phase = curr phase
-//		*p0++ = dp * factor;
-//	)
-//}
 
 void polarToRect(float * mag, float * phs, uint32_t len){
 	LOOP(len,1){
