@@ -14,30 +14,25 @@
 
 namespace gam{
 
-namespace MapType{
-	/// Mapping types.
-	enum {	Lin,		/**< b0 + u * (b1-b0)		*/
-			Pow,		/**< b0 + u^p * (b1-b0)		*/
-			Exp2		/**< p 2^[b0 + u * (b1-b0)]	*/
-	};
-};
 
-
-
-/// Tabulated function with real number lookup.
-template <class T, template<class> class Sipl=ipl::Linear, class Sacc=acc::Wrap, class A=gam::Allocator<T> >
+/// Maps value in unit interval to a tabulated function
+template<
+	class T,
+	template<class> class Sipl=ipl::Linear,
+	class Sacc=acc::Wrap,
+	class A=gam::Allocator<T>
+>
 class FunctionTable : public Array<T,A>{
 	typedef Array<T,A> Base;
 public:
 	using Base::elems; using Base::size;
 
-	//explicit FunctionTable(): Base(){}
 
 	/// Constructor that allocates an internal table
 
 	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
-	/// @param[in] init		Initializes all elements to this value
-	explicit FunctionTable(uint32_t size, const T& init=T(0))
+	/// @param[in] init		Initial value of elements
+	explicit FunctionTable(uint32_t size=2048, const T& init=T(0))
 	:	Base(size, init)
 	{
 		endpoints(0, size);
@@ -45,11 +40,11 @@ public:
 	
 	virtual ~FunctionTable(){}
 	
-	
+	/// Get array
 	Array<T,A>& array(){ return *this; }
 	const Array<T,A>& array() const { return *this; }
 
-	/// Returns f(x) where x lies in the function domain, [0,1).
+	/// Returns f(x) where x lies in the function domain, [0,1)
 	T operator()(double x) const {
 
 		x = scl::wrap(x);
@@ -63,6 +58,15 @@ public:
 		//return (*this)[i1]*(1.f-f) + (*this)[i2]*f;
 	}
 
+
+	/// Set indexing interval for look-up [min, max)
+	FunctionTable& endpoints(index_t min, index_t max){
+		mInterval.endpoints(min, max-1); // interpolator max index is inclusive
+		mIndMap.max(max-min, 1.);
+		return *this;
+	}
+
+
 	/// Sums generator stream with table elements
 	template <class Gen>
 	FunctionTable& operator+=(Gen& g){
@@ -75,23 +79,14 @@ public:
 		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
 		return *this;
 	}
-	
-	/// Set indexing interval for look-up [min, max)
-	FunctionTable& endpoints(index_t min, index_t max){
-		mInterval.endpoints(min, max-1); // interpolator max index is inclusive
-		mIndMap.max(max-min, 1.);
-		return *this;
-	}
 
 protected:
-
-	virtual void onResize(){ mIndMap.max(size(), 1.); }
-	
 	IndexMap<double> mIndMap;
 	Interval<index_t> mInterval;
-
 	Sipl<T> mIpl;
 	Sacc mAcc;
+
+	virtual void onResize(){ mIndMap.max(size(), 1.); }
 };
 
 
@@ -209,21 +204,39 @@ private:
 
 
 
-// Maps a normalized value to a warped, ranged value.
+/// Maps a unit value through an invertible function
 template <class T>
 class UnitMapper{
 public:
-	UnitMapper();
-	UnitMapper(T bound1, T bound0=0., T p1=1., int type = MapType::Pow, bool clip=true);
 
-	T bound0, bound1, p1;
-	int type;
+	/// Mapping types
+	enum MapType{
+		MAP_LIN,		/**< b0 + u * (b1-b0)		*/
+		MAP_POW,		/**< b0 + u^p * (b1-b0)		*/
+		MAP_EXP2		/**< p 2^[b0 + u * (b1-b0)]	*/
+	};
+
+
+	T min, max, p1;
+	MapType type;
 	bool clip;
 
-	void set(T bound1, T bound0=0., T p1=1., int type = MapType::Pow, bool clip=true);
+
+	UnitMapper();
 	
-	T map(T normal);			///< Map a unit value
-	T unmap(T value);			///< Unmap a value to a unit value
+	/// \param max		upper endpoint of interval
+	/// \param min		lower endpoint of interval
+	/// \param p1		mapping function function parameter
+	/// \param type		mapping function
+	/// \param clip		whether to clip values to interval
+	UnitMapper(T max, T min=0., T p1=1., MapType type = MAP_POW, bool clip=true);
+
+
+	/// Set all attributes
+	UnitMapper& set(T max, T min=0., T p1=1., MapType type = MAP_POW, bool clip=true);
+	
+	T map(T unit);			///< Map a unit value
+	T unmap(T value);		///< Unmap a value to a unit value
 	
 private:
 	T mapLin (T u);
@@ -240,61 +253,63 @@ private:
 // Implementation ______________________________________________________________
 
 template <class T> UnitMapper<T>::UnitMapper(){
-	set((T)1);
+	set(T(1));
 }
 
-template <class T> UnitMapper<T>::UnitMapper(T bound1, T bound0, T p1, int type, bool clip){
-	set(bound1, bound0, p1, type, clip);
+template <class T> UnitMapper<T>::UnitMapper(T max, T min, T p1, MapType type, bool clip){
+	set(max, min, p1, type, clip);
 }
 
-template <class T> void UnitMapper<T>::set(T bound1, T bound0, T p1, int type, bool clip){
-	this->bound1 = bound1;
-	this->bound0 = bound0;
+template <class T> UnitMapper<T>& UnitMapper<T>::set(T max, T min, T p1, MapType type, bool clip){
+	this->max = max;
+	this->min = min;
 	this->p1 = p1;
 	this->type = type;
 	this->clip = clip;
+	return *this;
 }
 
 template <class T> inline T UnitMapper<T>::map(T u){
 	switch(type){
-	case MapType::Lin:	return mapLin(u);
-	case MapType::Pow:	return mapPow(u);
-	case MapType::Exp2:	return mapExp2(u);
+	case MAP_LIN:	return mapLin(u);
+	case MAP_POW:	return mapPow(u);
+	case MAP_EXP2:	return mapExp2(u);
 	default:;
 	}
 }
 
-template <class T> T UnitMapper<T>::unmap(T value){
+template <class T> T UnitMapper<T>::unmap(T v){
 	switch(type){
-	case MapType::Lin:
-		return scl::mapLin(value, bound0, bound1, (T)0, (T)1);
+	case MAP_LIN:
+		return scl::mapLin(v, min, max, T(0), T(1));
 
-	case MapType::Pow:
-		value = scl::mapLin(value, bound0, bound1, (T)0, (T)1);
-		return pow(value, 1. / p1);
-		//return mapPow(pow(value, 1. / p1));
+	case MAP_POW:
+		v = scl::mapLin(v, min, max, T(0), T(1));
+		return pow(v, 1. / p1);
+		//return mapPow(pow(v, 1. / p1));
 
-	case MapType::Exp2:
-		value = log2(value / p1);
-		return scl::mapLin(value, bound0, bound1, (T)0, (T)1);
-		//value = scl::mapLin(value, bound0, bound1, (T)0, (T)1);
+	case MAP_EXP2:
+		v = log2(v / p1);
+		return scl::mapLin(v, min, max, T(0), T(1));
+		//v = scl::mapLin(v, min, max, T(0), T(1));
 		//return mapExp2(value);
-	default: return 0;
+	default:
+		return 0;
 	}
 }
 
 
 template <class T> T UnitMapper<T>::mapLin(T u){
-	doClip(u); return bound0 + u * (bound1 - bound0);
+	doClip(u); return min + u * (max - min);
 }
 
 template <class T> T UnitMapper<T>::mapPow(T u){
-	doClip(u); return (T)scl::mapPower(u, bound1, bound0, p1);
+	doClip(u); return (T)scl::mapPower(u, max, min, p1);
 }
 
 template <class T> T UnitMapper<T>::mapExp2(T u){
 	doClip(u);
-	return (T)(pow(2., scl::mapPower(u, bound1, bound0, 1.)) * p1);
+	return (T)(pow(2., scl::mapPower(u, max, min, 1.)) * p1);
 }
 
 } // gam::
