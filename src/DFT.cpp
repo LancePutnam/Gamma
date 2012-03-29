@@ -49,8 +49,6 @@ DFT::DFT(uint32_t winSize, uint32_t padSize, SpectralType specT, uint32_t numAux
 	resize(winSize, padSize);
 	spectrumType(specT);	
 	numAux(numAuxA);
-	
-	arr::conversionInit();
 }
 
 DFT::~DFT(){

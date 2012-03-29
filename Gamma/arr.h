@@ -104,6 +104,12 @@ TEM uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str=1);
 /// Returns index of minimum value
 TEM uint32_t indexOfMin(const T * src, uint32_t len);
 
+/// Sets indices [numIndices, maxNumIndices) to complement indices.
+
+/// Indices must be sorted from low to high.
+///
+void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t maxNumIndices);
+
 /// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
 void linToDB(float * arr, uint32_t len, float minDB);
 
@@ -270,35 +276,6 @@ TEM uint32_t zeroCrossMax(const T * src, uint32_t len);
 ///
 uint32_t zeroCrossN(const float * src, uint32_t len, float prev);
 
-
-
-
-/// Generates tables for fast conversion methods.
-void conversionInit();
-
-/// Sets indices [numIndices, maxNumIndices) to complement indices.
-
-/// Indices must be sorted from low to high.
-///
-void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t maxNumIndices);
-
-/// In-place polar to rectangular conversion.
-void polarToRect(float * mag, float * phs, uint32_t len);
-
-/// Fast in-place polar to rectangular conversion.
-
-/// Call conversionInit() before using.
-///
-void polarToRectFast(float * real, float * imag, uint32_t len);
-
-/// In-place rectangular to polar conversion.
-void rectToPolar(float * real, float * imag, uint32_t len, uint32_t str=1);
-
-/// Fast in-place rectangular to polar conversion.
-
-/// Call conversionInit() before using.
-///
-void rectToPolarFast(float * real, float * imag, uint32_t len);
 
 
 
