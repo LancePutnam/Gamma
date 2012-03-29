@@ -7,19 +7,6 @@
 
 namespace gam{
 
-char base10To36(int v){
-	static const char * c = "0123456789abcdefghijklmnopqrstuvwxyz";
-	if(v>=0 && v<=35) return c[v];
-	return '0';
-}
-
-int base36To10(char v){
-	v = tolower(v);
-	if(v>='0' && v<='9') return v - '0';
-	if(v>='a' && v<='z') return v - 'a' + 10;
-	return 0;	// non-alphanumeric
-}
-
 uint32_t bits(const char * string){
 	uint32_t v=0; int n = strlen(string);
 	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);

@@ -32,11 +32,7 @@ template<> struct Twiddle<double>{
 	union{ int64_t i; uint64_t u; double f; };
 };
 
-/// Convert decimal integer to ascii base-36 character
-char base10To36(int dec10);
 
-/// Convert ascii base-36 character to decimal integer 
-int base36To10(char ascii36);
 
 /// Convert a string of 1s and 0s to an integer.
 uint32_t bits(const char * string);
@@ -126,9 +122,6 @@ float splitInt512(uint32_t v, uint32_t& intPart);
 
 /// Split integer accumulator into table index (size=1024) and interpolation fraction.
 float splitInt1024(uint32_t v, uint32_t& intPart);
-
-/// Convert numerical type to a string
-template <class T> std::string toString(const T& v);
 
 template<class T> T uintToUnit (uint32_t v);
 template<class T> T uintToUnitS(uint32_t v);
@@ -245,16 +238,6 @@ inline float splitInt1024(uint32_t v, uint32_t& intPart){
 	Twiddle<float> u(((v<<1) & MaskFrac<float>()) | Expo1<float>());
 	intPart = v >> 22;
 	return u.f - 1.f;
-}
-
-template <class T>
-std::string toString(const T& v){
-	using namespace std;
-	stringstream ss(stringstream::in | stringstream::out);
-	ss << v;
-	string r;
-	ss >> r;
-	return r;
 }
 
 template<> inline float uintToUnit<float>(uint32_t v){

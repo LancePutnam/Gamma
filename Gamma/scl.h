@@ -677,9 +677,19 @@ TEM T nearest(T val, const char * intervals, long div){
 	long numWraps = 0;
 	long vm = wrap(vr, numWraps, div, 0L);
 	long min = 0;
+	
+	
+	struct F{
+		static int base36To10(char v){
+			v = tolower(v);
+			if(v>='0' && v<='9') return v - '0';
+			if(v>='a' && v<='z') return v - 'a' + 10;
+			return 0;	// non-alphanumeric
+		}
+	};
 
 	while(*intervals){
-		long dia = base36To10(*intervals++);
+		long dia = F::base36To10(*intervals++);
 		long max = min + dia;
 		if(vm < max){	// are we within current interval?
 			if(vm < (min + dia*0.5))	vm = min;
