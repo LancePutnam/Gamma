@@ -90,11 +90,6 @@ struct Linear{
 	}
 
 	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-//		return ipl::linear(
-//			iFrac,
-//			a[iInt],
-//			a[scl::wrapOnce(iInt + 1, max, min)]
-//		);
 		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
 	}	
 
@@ -166,8 +161,7 @@ struct AllPass{
 
 	/// Return element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-		return ipl::allpass(					// Standard fraction
-		//return Ipol::allpassFixed(				// Fixed fractional delay
+		return ipl::allpass(
 			a.fraction(phase), 
 			a.atPhase(phase), 
 			a.atPhase(phase + a.oneIndex()),
@@ -193,7 +187,7 @@ struct AllPass{
 };
 
 
-//
+/// Dynamically switchable random-access interpolation strategy
 template <class T>
 struct Any{
 
@@ -247,7 +241,7 @@ protected:
 
 
 
-// Sequence (stream-based) interpolation strategies
+/// Sequence (stream-based) interpolation strategies
 
 // interface:
 // 
@@ -256,18 +250,27 @@ protected:
 // push			push new value into interpolation window 
 namespace iplSeq{
 
+	/// Base class for sequence interpolation strategies
 	template <uint32_t N, class T>
 	struct Base{
 		Base(const T& v=0){ set(v); }
 	
+		/// Push a new value onto sequence
 		void push(T va){ for(uint32_t i=N-1; i>0; --i) v[i]=v[i-1]; v[0]=va; }
-		void set(T va){ for(uint32_t i=0; i<N; ++i) v[i]=va; }		
+		
+		/// Set sequence history to value
+		void set(T va){ for(uint32_t i=0; i<N; ++i) v[i]=va; }	
+		
+		/// Get current sequence value
 		T val() const { return v[0]; }
+		
+		/// Set current sequence value
 		void val(const T& va){ v[0]=va; }
 			
-		T v[N];	// value buffer, 0 is newest, N-1 is oldest
+		T v[N];	///< Value buffer, 0 is newest, N-1 is oldest
 	};
 
+	/// Truncating sequence interpolation strategy
 	template <class T>
 	struct Trunc : public Base<1,T>{
 		using Base<1,T>::v;
@@ -275,6 +278,7 @@ namespace iplSeq{
 		T operator()(float f) const { return v[0]; }
 	};
 	
+	/// Linear sequence interpolation strategy
 	template <class T>
 	struct Linear : public Base<2,T>{
 		using Base<2,T>::v;
@@ -282,6 +286,7 @@ namespace iplSeq{
 		T operator()(float f) const { return ipl::linear(f, v[1], v[0]); }
 	};
 
+	/// Cubic sequence interpolation strategy
 	template <class T>
 	struct Cubic : public Base<4,T>{
 		using Base<4,T>::v;
@@ -291,18 +296,19 @@ namespace iplSeq{
 		void val(const T& va){ v[1]=va; }
 	};
 
+	/// Cosine sequence interpolation strategy
 	template <class T>
 	struct Cosine : public Base<2,T>{
 		using Base<2,T>::v;
 		Cosine(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return ipl::linear(scl::warpSinUU(f), v[1], v[0]); }
+		T operator()(float f) const { return ipl::linear(scl::mapSinUU(f), v[1], v[0]); }
 	};
 
 } // iplSeq::
 
 
 
-// Read tap strategies.
+/// Read tap strategies
 
 // The expected interface is:
 //	void operator()(uint32_t& pos, uint32_t inc);	// fixed-point tap increment
@@ -311,7 +317,7 @@ namespace iplSeq{
 //	void reset();									// reset internal state, if any
 namespace tap{
 
-	// Clip (saturate) at boundary
+	/// Clip (saturate) at boundary
 	struct Clip{
 		void reset(){}
 	
@@ -331,7 +337,7 @@ namespace tap{
 		T operator()(T v, T inc, T max, T min){ return scl::clip(v+inc, max, min); }
 	};
 
-	// Reverse direction at boundary
+	/// Reverse direction at boundary
 	struct Fold{
 		Fold(): dir(0){}
 	
@@ -359,7 +365,7 @@ namespace tap{
 	};
 
 
-	// Wrap according to binary on/off pattern
+	/// Wrap according to binary on/off pattern
 	struct Pat{
 	
 		Pat(){
@@ -409,8 +415,7 @@ namespace tap{
 	};
 
 
-	// Repeat a finite number of times
-	//template <uint32_t N>
+	/// Repeat a finite number of times
 	struct Rep{
 		Rep(){ number(1); reset(); }
 		
@@ -446,7 +451,7 @@ namespace tap{
 	};
 
 
-	// Wrap around at boundary
+	/// Wrap around at boundary
 	struct Wrap{
 		void reset(){}
 	
@@ -459,23 +464,5 @@ namespace tap{
 
 } // tap::
 
-
-
-// Functors for warping values in domain/range [0,1]
-namespace warp{
-
-	struct None{
-		template <class T>
-		T operator()(T v){ return v; }
-	};
-
-	struct S{
-		template <class T>
-		T operator()(T v){ return scl::warpSinUU(v); }
-	};
-
-} // warp::
-
 } // gam::
-
 #endif

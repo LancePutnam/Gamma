@@ -18,7 +18,12 @@
 namespace gam{
 
 
-/// Variable length delay-line.
+/// Variable length delay-line
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Si	interpolation strategy
+/// \tparam Ts	sync type
 template <class Tv=gam::real, template<class> class Si=ipl::Linear, class Ts=Synced>
 class Delay : public ArrayPow2<Tv>, Ts{
 public:
@@ -77,24 +82,6 @@ protected:
 };
 
 
-// Delay partial template definitions
-#define DELAY_DEF(l, Ti)\
-template <class Tv=gam::real, class Ts=Synced>\
-struct Delay##l : public Delay<Tv,Ti,Ts>{\
-	typedef Delay<Tv,Ti,Ts> Base;\
-	Delay##l(): Base(){}\
-	Delay##l(float delay): Base(delay){}\
-	Delay##l(float maxDelay, float delay): Base(maxDelay, delay){}\
-};
-
-DELAY_DEF(R, ipl::Round)
-DELAY_DEF(T, ipl::Trunc)
-DELAY_DEF(C, ipl::Cubic)
-DELAY_DEF(A, ipl::AllPass)
-
-#undef DELAY_DEF
-
-
 
 /// Variable delay-line with multiple read taps
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
@@ -131,6 +118,9 @@ protected:
 
 
 /// Fixed-size shift delay
+
+/// \tparam N	size of delay
+/// \tparam T	value (sample) type
 template <uint32_t N, class T>
 class DelayShift{
 public:

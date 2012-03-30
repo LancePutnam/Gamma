@@ -19,7 +19,15 @@ namespace gam{
 
 ///	The number of frames in the sample should not exceed 2^32.  This equates
 ///	to 27 hours at 44.1 kHz.
-template <class T=gam::real, template<class> class Tipol=ipl::Trunc, class Ttap=tap::Clip>
+///
+/// \tparam T	value (sample) type
+/// \tparam Si	interpolation strategy
+/// \tparam St	read tap strategy
+template<
+	class T = real,
+	template<class> class Si = ipl::Trunc,
+	class St = tap::Clip
+>
 class Player: public Synced, public Array<T>{
 public:
 	using Array<T>::size; using Array<T>::elems;
@@ -117,8 +125,8 @@ protected:
 		return &v;
 	}
 
-	Tipol<T> mIpol;
-	Ttap mTap;
+	Si<T> mIpol;
+	St mTap;
 
 	double mPos, mInc;			// real index position and increment
 	double mSampleRate;			// sample rate of array data
@@ -133,8 +141,8 @@ protected:
 	int frames() const { return size()/channels(); }
 };
 
-#define PRE template <class T, template<class> class Ti, class Tt>
-#define CLS Player<T,Ti,Tt>
+#define PRE template <class T, template<class> class Si, class St>
+#define CLS Player<T,Si,St>
 
 PRE
 template<class Char>

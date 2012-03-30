@@ -14,10 +14,16 @@ namespace gam{
 
 /// Brownian noise has a power spectrum of 1/f^2.
 /// It is produced by integrating white (uniform) noise.
-template <class T=RNGLinCon>
+/// The output value is clipped within a specified interval.
+template <class RNG = RNGLinCon>
 class NoiseBrown{
 public:
 
+	/// @param[in] val		start value
+	/// @param[in] step		accumulation step factor
+	/// @param[in] min		minimum of clipping interval
+	/// @param[in] max		maximum of clipping interval
+	/// @param[in] seed		random number generator seed; 0 generates a random seed
 	NoiseBrown(float val=0, float step=0.04, float min=-1, float max=1, uint32_t seed=0) 
 	:	val(val), step(step), min(min), max(max)
 	{	if(seed) rng = seed; }
@@ -28,34 +34,37 @@ public:
 		return val;
 	}
 	
-	void seed(uint32_t v){ rng = v; }	///< Set seed value of RNG
+	/// Set seed value of RNG
+	void seed(uint32_t v){ rng = v; }
 	
-	T rng;
+	RNG rng;
 	float val, step, min, max;
 };
 
 
 /// Pink Noise
 
-/// Pink noise has a power spectrum of 1/f.
-/// It is produced by summing together 12 octaves of white noise.
-template <class T=RNGLinCon>
+/// Pink noise has a power spectrum of 1/f. In this implementation, it is
+/// produced by summing together 12 octaves of downsampled white noise.
+template <class RNG = RNGLinCon>
 class NoisePink{
 public:
 	NoisePink();
 
-	/// @param[in] seed Initial random number generator seed.
+	/// @param[in] seed		random number generator seed
 	NoisePink(uint32_t seed);
 	
-	float operator()();						///< Generate next value
-	void operator()(float * arr, uint32_t len, float mul);
-	void seed(uint32_t v){ rng = v; }		///< Set seed value of RNG
+	/// Generate next value
+	float operator()();
 	
-	T rng;
+	/// Set seed of RNG
+	void seed(uint32_t v){ rng = v; }
+	
+	RNG rng;
 	
 private:
 	float mOctave[11];
-	uint32_t mPhasor;
+	uint32_t mPhase;
 	float mRunningSum;
 	void init();
 };
@@ -65,16 +74,22 @@ private:
 
 /// White noise has a uniform power spectrum.
 ///
-template <class T=RNGLinCon>
+template <class RNG = RNGLinCon>
 class NoiseWhite{
 public:
 	NoiseWhite(): rng(){}
-	NoiseWhite(uint32_t seed) : rng(seed){}
-	float operator()() const { return rnd::uniS_float(rng); }	///< Generate next value
-	float operator[](uint32_t i) const { return (*this)(); }
-	void seed(uint32_t v){ rng = v; }					///< Set seed value of RNG
 	
-	mutable T rng;
+	/// @param[in] seed		random number generator seed
+	NoiseWhite(uint32_t seed) : rng(seed){}
+
+	/// Generate next value
+	float operator()() const { return rnd::uniS_float(rng); }
+	float operator[](uint32_t i) const { return (*this)(); }
+
+	/// Set seed of RNG
+	void seed(uint32_t v){ rng = v; }
+	
+	mutable RNG rng;
 };
 
 
@@ -83,8 +98,6 @@ public:
 // Implementation_______________________________________________________________
 
 #define TEM template<class T>
-
-// NoisePink
 
 TEM NoisePink<T>::NoisePink(): rng(){ init(); }
 TEM NoisePink<T>::NoisePink(uint32_t seed): rng(seed){ init(); }
@@ -96,30 +109,27 @@ TEM void NoisePink<T>::init(){
 		mOctave[i] = r;
 		mRunningSum += r;
 	}
-	mPhasor = 0;
+	mPhase = 0;
 }
 
 TEM inline float NoisePink<T>::operator()(){
 	// phasor range:	[1, 2048]
 	//					[0, 10]		trailing zeroes
-	mPhasor++;
-	if(mPhasor != 2048){
-		uint32_t i = scl::trailingZeroes(mPhasor);	// # trailing zeroes is octave
+	++mPhase;
+	if(mPhase != 2048){
+		uint32_t i = scl::trailingZeroes(mPhase);	// # trailing zeroes is octave
 		float r = rnd::uniS_float(rng);			// uniform random
 		mRunningSum += r - mOctave[i];			// add new & subtract stored
 		mOctave[i] = r;							// store new
 	}
 	else{
-		mPhasor = 0;
+		mPhase = 0;
 	}
 	
 	// add white noise every sample
 	return (mRunningSum + rnd::uniS_float(rng)) * 0.083333333f;
 }
 
-TEM inline void NoisePink<T>::operator()(float * arr, uint32_t len, float mul){	
-	for(uint32_t i=0; i<len; ++i) arr[i] = (*this)() * mul;
-}
 
 /*
 ////////////////////////////////////////////////////////////////////////////////
