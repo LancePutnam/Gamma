@@ -19,40 +19,6 @@ uint32_t bitsToUInt(const char * bits){
 	return r>>(32-i);
 }
 
-uint32_t bytesToUInt32(const uint8_t * bytes4){
-	uint32_t word = 0;
-
-	if(0 == endian){
-		word  = bytes4[3] << 24;
-		word |= (bytes4[2] & 0xff) << 16;
-		word |= (bytes4[1] & 0xff) << 8;
-		word |= bytes4[0] & 0xff;
-	}
-	else{
-		word  = bytes4[0] << 24;
-		word |= (bytes4[1] & 0xff) << 16;
-		word |= (bytes4[2] & 0xff) << 8;
-		word |= bytes4[3] & 0xff;
-	}
-	
-	return word;
-}
-
-uint16_t bytesToUInt16(const uint8_t * bytes2){
-	uint16_t word = 0;
-
-	if(0 == endian){
-		word  = bytes2[0] & 0xff;
-		word |= (bytes2[1] & 0xff) << 8;
-	}
-	else{
-		word  = bytes2[1] & 0xff;
-		word |= (bytes2[0] & 0xff) << 8;
-	}
-	
-	return word;
-}
-
 uint32_t floatToUInt(float value){
 	Twiddle<float> u(value);
 	u.u += 0x800000;

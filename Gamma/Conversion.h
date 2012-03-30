@@ -40,19 +40,11 @@ uint32_t bits(const char * string);
 /// Converts bit string to unsigned integer
 uint32_t bitsToUInt(const char * bits);
 
-
 /// Sets argument to zero if subnormal
 void blockSubnormal(float& v);
 
 /// Sets argument to zero if subnormal
 void blockSubnormal(double& v);
-
-
-/// Convert 2-byte array to 16-bit unsigned integer.
-uint16_t bytesToUInt16(const uint8_t * bytes2);
-
-/// Convert 4-byte array to 32-bit unsigned integer.
-uint32_t bytesToUInt32(const uint8_t * bytes4);
 
 /// Cast value to signed integer using rounding.
 
@@ -118,11 +110,6 @@ inline   double punIF( int64_t v){ Twiddle<double> u(v); return u.f; }
 /// Useful for linearly interpolated table lookups
 float split(float value, int32_t& intPart);
 
-float splitInt512(uint32_t v, uint32_t& intPart);
-
-/// Split integer accumulator into table index (size=1024) and interpolation fraction.
-float splitInt1024(uint32_t v, uint32_t& intPart);
-
 template<class T> T uintToUnit (uint32_t v);
 template<class T> T uintToUnitS(uint32_t v);
 
@@ -146,7 +133,6 @@ uint8_t unitToUInt8(float u);
 
 // Implementation
 
-/// Sets argument to zero if subnormal
 inline void blockSubnormal(float& v){
 	const uint32_t i = punFU(v);
 	const uint32_t frac = i & MaskFrac<float>(); 
@@ -154,7 +140,6 @@ inline void blockSubnormal(float& v){
 	if(expo == 0 && frac != 0) v = 0.f;
 }
 
-/// Sets argument to zero if subnormal
 inline void blockSubnormal(double& v){
 	const uint64_t i = punFU(v);
 	const uint64_t frac = i & MaskFrac<double>(); 
@@ -226,18 +211,6 @@ inline float fraction(uint32_t bits, uint32_t phase){
 inline float intToUnit(int16_t v){
 	uint32_t vu = (((uint32_t)v) + 0x808000) << 7; // set fraction in float [2, 4)
 	return punUF(vu) - 3.f;
-}
-
-inline float splitInt512(uint32_t v, uint32_t& intPart){
-	Twiddle<float> u((v & MaskFrac<float>()) | Expo1<float>());
-	intPart = v >> 22;
-	return u.f - 1.f;
-}
-
-inline float splitInt1024(uint32_t v, uint32_t& intPart){
-	Twiddle<float> u(((v<<1) & MaskFrac<float>()) | Expo1<float>());
-	intPart = v >> 22;
-	return u.f - 1.f;
 }
 
 template<> inline float uintToUnit<float>(uint32_t v){
