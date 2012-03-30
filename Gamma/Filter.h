@@ -30,10 +30,16 @@ enum FilterType{
 };
 
 
+
 /// Returns pole radius given a bandwidth and sampling interval
 template <class T>
 inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
+
+/// Convert domain frequency to radians clipped to interval [0, pi).
+template <class T>
+inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_PI; }
+
 
 
 /// First-order all-pass filter
@@ -47,6 +53,9 @@ inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
 /// When the center frequency is fs/4, the filter acts as a unit delay.
 /// When the center frequency is 0, the filter acts as a no-op.
 /// When the center frequency is fs/2, the filter acts as an inverter.
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass1 : public Ts {
 public:
@@ -85,6 +94,9 @@ protected:
 ///
 /// These filters are adapted from:
 /// http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Biquad : public Ts{
 public:
@@ -126,6 +138,10 @@ protected:
 
 
 /// DC frequency blocker
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class BlockDC : public Ts{
 public:
@@ -154,6 +170,10 @@ protected:
 
 
 /// Nyquist frequency blocker
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class BlockNyq : public BlockDC<Tv,Tp,Ts>{
 public:
@@ -174,6 +194,10 @@ protected:
 
 
 /// Abstract base class for 2-pole or 2-zero filter
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Filter2 : public Ts{
 public:
@@ -232,6 +256,10 @@ using Base::mCos
 
 
 /// Second-order all-pass filter
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass2 : public Filter2<Tv,Tp,Ts>{
 public:
@@ -254,6 +282,10 @@ protected:
 
 
 /// Two-zero notch
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Notch : public Filter2<Tv,Tp,Ts>{
 public:
@@ -286,6 +318,10 @@ protected:
 
 
 /// Two-pole resonator
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Reson : public Filter2<Tv,Tp,Ts>{
 public:
@@ -325,8 +361,11 @@ protected:
 
 
 /// Hilbert transformer, converts real signal into complex
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class Hilbert : public Ts{
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+template <class Tv=gam::real, class Tp=gam::real>
+class Hilbert {
 public:
 	#define SR 44100.
 	Hilbert()
@@ -352,6 +391,9 @@ protected:
 
 
 /// Leaky integrator
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
 template <class Tv=double, class Tp=double>
 class Integrator{
 public:
@@ -416,6 +458,10 @@ protected:
 
 
 /// One-pole smoothing filter
+
+/// \tparam Tv	value (sample) type
+/// \tparam Tp	parameter type
+/// \tparam Ts	sync type
 template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class OnePole : public Ts{ 
 public:
@@ -464,12 +510,12 @@ T_VPS AllPass1<Tv,Tp,Ts>::AllPass1(Tp frq)
 
 T_VPS inline void AllPass1<Tv,Tp,Ts>::freq(Tp v){
 	mFreq = v;
-	c = tan( scl::freqToRad(v, Ts::ups()) - M_PI_4); // valid ang in [-pi/4, pi/4]
+	c = tan( freqToRad(v, Ts::ups()) - M_PI_4); // valid ang in [-pi/4, pi/4]
 }
 
 T_VPS inline void AllPass1<Tv,Tp,Ts>::freqF(Tp v){
 	mFreq = v;
-	c = scl::freqToRad(v, Ts::ups());
+	c = freqToRad(v, Ts::ups());
 	c = Tp(1.27323954474) * c - Tp(1);		// 4/pi * c - 1, linear apx
 	c = c * (Tp(0.76) + Tp(0.24) * c * c);
 }
