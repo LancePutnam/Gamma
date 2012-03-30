@@ -18,7 +18,7 @@ namespace gam{
 
 /// Exponential curve with variable curvature
 
-/// This curve will return values in the interval [0, end] starting from 0 and
+/// This curve will return values in the interval [start, end] starting from 0 and
 /// ending on 'end' over its length in samples.  The last point is exclusive, so
 /// it takes length + 1 samples to reach 'end' inclusively.  For iterations 
 /// exceeding the specified length, the values returned will be unbounded.
