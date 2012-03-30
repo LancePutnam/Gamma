@@ -31,32 +31,13 @@ enum Type{
 };
 
 
-/// First order allpass interpolation.
+/// First order allpass interpolation
 
-/// Best for delay lines, not good for random access.
-///
+/// Allpass interpolation preserves the spectral magnitude of the interpolated
+/// sequence. It should only be used for interpolating at a regular speed across
+/// a sequence. It will fail miserably at random access.
 template <class Tf, class Tv>
 Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
-
-/// First order allpass interpolation with warped fraction.
-template <class Tf, class Tv>
-Tv allpassFixed(Tf frac, const Tv& x, const Tv& y, Tv& o1);
-
-/// Bezier curve, 3-point quadratic.
-
-/// 'frac' [0, 1) is the value on the curve btw x2 and x0
-///
-template <class T> T bezier(T frac, T x2, T x1, T x0);
-
-/// Bezier curve, 4-point cubic.
-
-/// 'frac' [0, 1) is the value on the curve btw x3 and x0
-///
-template <class T> T bezier(T frac, T x3, T x2, T x1, T x0);
-
-template <class Tp, class Tv>
-Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
-
 
 /// Computes FIR coefficients for Waring-Lagrange interpolation.
 
@@ -87,25 +68,22 @@ template <class T> T parabolic(T xm1, T x, T xp1);
 
 /// Cubic interpolation
 
-///	This is also known as a Catmull-Rom spline or Cardinal spline with a=-0.5.
-///
+///	This is a Cardinal spline with a tension of 0 (AKA a Catmull-Rom spline).
+/// The resulting value will never exceed the range of the interpolation points.
 template <class Tf, class Tv>
 Tv cubic(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
-
-template <class Tf, class Tv>
-Tv cubic2(Tf d, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 
 /// Linear interpolation.  Identical to first order Lagrange.
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y);
 
-/// Linear interpolation between three elements.
+/// Linear interpolation between three elements
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
 template <class T> void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T frac);
 
-/// Nearest neighbor interpolation.
+/// Nearest neighbor interpolation
 template <class Tf, class Tv>
 Tv nearest(Tf frac, const Tv& x, const Tv& y);
 
@@ -122,48 +100,6 @@ template <class Tf, class Tv>
 inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
 	//f = f * 0.87 - 0.05;	// avoid pole near z = -1
 	return o1 = (y - o1) * f + x;
-}
-
-
-template <class Tf, class Tv>
-inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
-//	f = 1.f-f;
-//	f = allpassCoef(f);						// compute allpass coefficient
-//	return allpass(f, x, xp1, ym1);	// apply filter
-	
-	//f = f / (2.f - f);	// warp down
-	f = (Tf(2) * f) / (Tf(1) + f);	// warp up
-	//f = (1.5f * f) / (0.5f + f);
-	f -= Tf(0.1);				// avoid pole near z = -1
-	return allpass(f, x, y, o1);	// apply filter
-}
-//
-//inline float Ipol::allpassCoef(float f, float offset){
-//	return (1.f - f) / (1.f + f) + offset;
-//}
-
-template <class T> inline T bezier(T d, T x2, T x1, T x0){
-	T d2 = d * d;
-	T dm1 = T(1) - d;
-	T dm12 = dm1 * dm1;
-	return x2 * dm12 + T(2) * x1 * dm1 * d + x0 * d2;
-
-//	x2 (1-d)(1-d) + 2 x1 (1-d) d + x0 d d
-//	x2 - d 2 x2 + d d x2 + d 2 x1 - d d 2 x1 + d d x0
-//	x2 - d (2 x2 + d x2 + 2 x1 - d 2 x1 + d x0)
-//	x2 - d (2 (x2 + x1) + d (x2 - 2 x1 + x0))
-
-//	float c2 = x2 - 2.f * x1 + x0;
-//	float c1 = 2.f * (x2 + x1);
-//	return x2 - (d * c2 + c1) * d;
-}
-
-
-template <class T> inline T bezier(T d, T x3, T x2, T x1, T x0){
-	T c1 = T(3) * (x2 - x3);
-	T c2 = T(3) * (x1 - x2) - c1;
-	T c3 = x0 - x3 - c1 - c2;
-	return ((c3 * d + c2) * d + c1) * d + x3;
 }
 
 
@@ -197,57 +133,6 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 template <class T>
 void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, uint32_t len, T f){
 	for(uint32_t i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
-}
-
-
-// From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
-template <class Tf, class Tv>
-inline Tv cubic2(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
-	Tv c3 = z - y - w + x;
-	Tv c2 = w - x - c3;
-	Tv c1 = y - w;
-	return ((c3 * f + c2) * f + c1) * f + x;
-}
-
-
-// From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
-/*
-   Tension: 1 is high, 0 normal, -1 is low
-   Bias: 0 is even,
-         positive is towards first segment,
-         negative towards the other
-*/
-template <class Tp, class Tv>
-inline Tv hermite(Tp f,
-	const Tv& w, const Tv& x, const Tv& y, const Tv& z,
-	Tp tension, Tp bias)
-{
-	tension = (Tp(1) - tension)*Tp(0.5);
-
-	// compute endpoint tangents
-	//Tv m0 = ((x-w)*(1+bias) + (y-x)*(1-bias))*tension;
-	//Tv m1 = ((y-x)*(1+bias) + (z-y)*(1-bias))*tension;
-	Tv m0 = ((x*Tv(2) - w - y)*bias + y - w)*tension;
-	Tv m1 = ((y*Tv(2) - x - z)*bias + z - x)*tension;
-	
-//	x - w + x b - w b + y - x - y b + x b
-//	-w + 2x b - w b + y - y b
-//	b(2x - w - y) + y - w			
-//	
-//	y - x + y b - x b + z - y - z b + y b
-//	-x + 2y b - x b + z - z b
-//	b(2y - x - z) + z - x
-
-	Tp f2 = f  * f;
-	Tp f3 = f2 * f;
-
-	// compute hermite basis functions
-	Tp a3 = Tp(-2)*f3 + Tp(3)*f2;
-	Tp a0 = Tp(1) - a3;
-	Tp a2 = f3 - f2;
-	Tp a1 = f3 - Tp(2)*f2 + f;
-
-	return x*a0 + m0*a1 + m1*a2 + y*a3;
 }
 
 

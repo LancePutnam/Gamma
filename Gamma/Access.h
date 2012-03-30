@@ -14,21 +14,6 @@ namespace gam{
 
 typedef int32_t index_t;
 
-/// Compute 2-D array indices from 1-D array index
-template <class T>
-inline void index1to2(T index1, T sizeX, T& x, T& y){
-	y = index1 / sizeX; x = index1 % sizeX;
-}
-
-/// Compute 1-D array index from 3-D array indices
-
-/// The x indices move fastest followed by y, then z.
-///
-template <class T>
-inline T index3to1(T x, T y, T z, T sizeX, T sizeY){
-	return x + sizeX * (y + sizeY * z);
-}
-
 /// Returns last index of an arithmetic iteration starting from 0
 inline uint32_t indexLast(uint32_t len, uint32_t str){ return ((len-1)/str)*str; }
 
@@ -71,7 +56,7 @@ namespace acc{
 template <class T>
 class IndexMap{
 public:
-	IndexMap(index_t indMax=1, const T& posMax=T(1)){ max(indMax, posMax); }
+	IndexMap(index_t idxMax=1, const T& posMax=T(1)){ max(idxMax, posMax); }
 	
 	index_t operator()(const T& x) const { return cast(x*mMul); }
 	
@@ -84,7 +69,7 @@ public:
 	
 	T operator()(index_t i) const { return cast(i) * mRec; }
 
-	void max(index_t indMax, const T& posMax){ mMul=indMax/posMax; mRec=1/mMul; }
+	void max(index_t idxMax, const T& posMax){ mMul=idxMax/posMax; mRec=1/mMul; }
 
 private:
 	T mMul, mRec;
