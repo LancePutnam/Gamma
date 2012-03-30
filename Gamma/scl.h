@@ -242,9 +242,6 @@ TEM T foldOnce(T value, T hi=T(1), T lo=T(0));
 /// as "c5" or "c 5" and the A sharp below that as "a+4".
 double freq(const char * note);
 
-/// Convert domain frequency to radians clipped to interval [0, pi).
-TEM inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_PI; }
-
 /// Convert linear value to log2 in range [0, 1]
 TEM T linLog2(T v, T recMin);
 
@@ -274,6 +271,18 @@ TEM T mapLin(T v, T i0, T i1, T o0, T o1);
 /// Returns v^power linearly mapped to [bound0, bound1].
 double mapPower(double v, double bound1, double bound0, double power=1.);
 
+/// Map a value in [-1,1] to a cubic approximating sin(pi/2 x)
+TEM T mapSinSS(T v);
+
+/// Map a value in [-1,1] to a cubic approximating 1/2 sin(pi/2 x) + 1/2
+TEM T mapSinSU(T v);
+
+/// Map a value in [ 0,1] to a cubic approximating -cos(pi x)
+TEM T mapSinUS(T v);
+
+/// Map a value in [ 0,1] to a cubic approximating -1/2 cos(pi x) + 1/2
+TEM T mapSinUU(T v);
+
 /// Mixes two values together (1 = thru, 0.5 = mono, 0 = swap).
 TEM void mix2(T& io1, T& io2, T mix);
 
@@ -286,23 +295,8 @@ TEM void mix2(T& io1, T& io2, T mix);
 /// The sum of the values in the interval array should be equal to 'mod'.
 TEM T nearest(T v, const char * intervals="2212221", long mod=12);
 
-/// Smooth negative map.
-
-/// The return value is close to 1 if v < 0 and close to 0 if v > 0.
-/// The smoothness is controlled with the bw argument.
-TEM T negative(T v, T bw);
-
-/// Same as negative(T,T), but 'amt' controls positive level (0,1) -> (-1,1)
-TEM T negative(T v, T bw, T amt);
-
 /// Returns the next representable floating-point or integer value following x in the direction of y
 TEM T nextAfter(T x, T y);
-
-/// Smooth positive map
-
-/// The return value is close to 1 if v > 0 and close to 0 if v < 0.
-/// The smoothness is controlled with the bw argument.
-TEM T positive(T v, T bw);
 
 TEM T pow2(T v);			///< Returns value to the 2nd power
 TEM T pow3(T v);			///< Returns value to the 3rd power
@@ -336,13 +330,6 @@ TEM T roundAway(T v, T step);
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
-/// Continuous sign map.
-
-/// The return value is close to 1 if v > 0 and close to -1 if v < 0.
-/// 'bw' controls the width of the transition region. If 'bw' is 0, then this
-/// turns into a signum function.
-TEM T sign(T v, T bw);
-
 //
 TEM T sinFast(T radians);
 
@@ -364,6 +351,55 @@ TEM T sinT7(T radians);
 ///
 TEM T sinT9(T radians);
 
+/// Smooth negative map
+
+/// The return value is close to 1 if v < 0 and close to 0 if v > 0.
+/// The smoothness is controlled with the bw argument.
+TEM T smoothNeg(T v, T bw);
+
+/// Same as smoothNeg(T,T), but 'amt' controls positive level (0,1) -> (-1,1)
+TEM T smoothNeg(T v, T bw, T amt);
+
+/// Smooth positive map
+
+/// The return value is close to 1 if v > 0 and close to 0 if v < 0.
+/// The smoothness is controlled with the bw argument.
+TEM T smoothPos(T v, T bw);
+
+TEM T smoothNotchFunc(T v, T bw);
+TEM T smoothNotch(T v, T bw);
+
+// Same as smoothNotch1, but 'amt' controls notch depth.
+TEM T smoothNotch(T v, T bw, T amt);
+TEM T smoothNotch2(T v, T bw);
+
+/// Peak function.
+
+/// When v is the output of y=x^2,
+/// this formula approximates the true formula for a resonant peak
+/// 1/(1 - 2rcos(theta) + r^2). The argument bw is equivalent to (1-r)^2.
+/// In general, the approximation has a slightly
+/// smaller bandwidth than the true response. Also, the true response is
+/// periodic, while this one is not.
+TEM T smoothPeak(T v, T bw);
+TEM T smoothPeak1(T v, T bw);
+
+/// Continuous sign map
+
+/// The return value is close to 1 if v > 0 and close to -1 if v < 0.
+/// 'bw' controls the width of the transition region. If 'bw' is 0, then this
+/// turns into a signum function.
+TEM T smoothSign(T v, T bw);
+
+/// Same as smoothZero(), but takes a unary function to be applied to the value
+template <class T, class F> T smoothZero(T v, T bw, F f);
+
+/// Returns a continuous value measuring how close to zero the value is
+
+/// The graph of this function resembles a resonant peak. The function uses the
+/// square of the value for evaluation.
+TEM T smoothZero(T v, T bw);
+
 /// Truncates floating point value at decimal.
 TEM T trunc(T value);
 
@@ -375,18 +411,6 @@ TEM T trunc(T value, T step, T recStep);
 
 /// Returns multiplicaton factor for reaching -60 dB after 'samples' iterations.
 double t60(double samples);
-
-/// Warp a value in [-1,1] to a sine-like value with domain [-pi, pi] and range [-1,1]
-TEM T warpSinSS(T v);
-
-/// Warp a value in [-1,1] to a sine-like value with domain [-pi, pi] and range [0,1]
-TEM T warpSinSU(T v);
-
-/// Warp a value in [0,1] to a sine-like value with domain [-pi, pi] and range [-1,1]
-TEM T warpSinUS(T v);
-
-/// Warp a value in [0,1] to a sine-like value with domain [-pi, pi] and range [0,1]
-TEM T warpSinUU(T v);
 
 /// Returns value wrapped in [lo, hi).
 TEM T wrap(T value, T hi=(T)1, T lo=(T)0);
@@ -405,37 +429,8 @@ TEM T wrapOnce(T value, T hi=(T)1);
 
 TEM T wrapOnce(T value, T hi, T lo);
 
-TEM T wrapPhase(T radians);			///< Returns value wrapped in [-pi, pi).
-TEM T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only wraps once.
-
-/// Returns a continuous value measuring how close to zero the value is.
-
-/// The graph of this function resembles a resonant peak. The function uses the
-/// square of the value for evaluation.
-TEM T zero(T v, T bw);
-
-/// Same as zero(), but takes a unary function to be applied to the value.
-template <class T, class F>
-T zero(T v, T bw, F f);
-
-
-TEM T notch(T v, T bw){ return v/(v+bw); }
-TEM T notch1(T v, T bw){ return notch(scl::abs(v), bw); }
-
-// Same as notch1, but 'amt' controls notch depth.
-TEM T notch1(T v, T bw, T amt){ return (T)1 - amt*peak1(v, bw); }
-TEM T notch2(T v, T bw){ return notch(v*v, bw); }
-
-/// Peak function.
-
-/// When v is the output of y=x^2,
-/// this formula approximates the true formula for a resonant peak
-/// 1/(1 - 2rcos(theta) + r^2). The argument bw is equivalent to (1-r)^2.
-/// In general, the approximation has a slightly
-/// smaller bandwidth than the true response. Also, the true response is
-/// periodic, while this one is not.
-TEM T peak(T v, T bw){ return bw/(v+bw); }
-TEM T peak1(T v, T bw){ return bw/(scl::abs(v)+bw); }
+TEM T wrapPhase(T radians);			///< Returns value wrapped in [-pi, pi)
+TEM T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only wraps once
 
 
 
@@ -663,6 +658,11 @@ inline double mapPower(double v, double b1, double b0, double p){
 	return b0 + (b1 - b0) * v;
 }
 
+TEM inline T mapSinSS(T v){ return v*(T(1.5 ) - v*v*T(0.50)); }
+TEM inline T mapSinSU(T v){ return v*(T(0.75) - v*v*T(0.25)) + T(0.5); }
+TEM inline T mapSinUS(T v){ return v*v*(T(6) - v*T(4)) - T(1); }
+TEM inline T mapSinUU(T v){ return v*v*(T(3) - v*T(2)); }
+
 TEM inline void mix2(T& io1, T& io2, T mix){
 	T t1 = (io1 - io2) * mix;
 	T t2 = io1 - t1;
@@ -702,17 +702,13 @@ TEM T nearest(T val, const char * intervals, long div){
 	return T(vm + numWraps * div);
 }
 
-TEM inline T negative(T v, T bw){ return T(0.5) - sign(v, bw)*T(0.5); }
-TEM inline T negative(T v, T bw, T a){ return a - (T(1)-a)*sign(v, bw); }
 TEM inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<> inline float nextAfter(float x, float y){ return nextafterf(x,y); }
 template<> inline double nextAfter(double x, double y){ return nextafter(x,y); }
 template<> inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
-TEM inline T positive(T v, T bw){ return T(0.5) + sign(v, bw)*T(0.5); }
 TEM inline T pow2 (T v){ return v*v; }
 TEM inline T pow3 (T v){ return v*v*v; }
 TEM inline T pow4 (T v){ return pow2(pow2(v)); }
-
 TEM inline T ratioET(T pc, T divs, T ival){
 	return T(::pow(double(ival), double(pc) / double(divs)));
 }
@@ -740,7 +736,19 @@ TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //	return float(long(val * stepRec + u.f)) * step;
 //}
 
-TEM inline T sign(T v, T bw){ return v/(scl::abs(v) + bw); }
+TEM inline T smoothNeg		(T v, T bw){ return T(0.5) - smoothSign(v, bw)*T(0.5); }
+TEM inline T smoothNeg		(T v, T bw, T a){ return a - (T(1)-a)*smoothSign(v, bw); }
+TEM inline T smoothPos		(T v, T bw){ return T(0.5) + smoothSign(v, bw)*T(0.5); }
+TEM inline T smoothNotchFunc(T v, T bw){ return v/(v+bw); }
+TEM inline T smoothNotch	(T v, T bw){ return smoothNotchFunc(scl::abs(v), bw); }
+TEM inline T smoothNotch	(T v, T bw, T amt){ return (T)1 - amt*smoothPeak1(v, bw); }
+TEM inline T smoothNotch2	(T v, T bw){ return smoothNotchFunc(v*v, bw); }
+TEM inline T smoothPeak		(T v, T bw){ return bw/(v+bw); }
+TEM inline T smoothPeak1	(T v, T bw){ return bw/(scl::abs(v)+bw); }
+TEM inline T smoothSign		(T v, T bw){ return v/(scl::abs(v) + bw); }
+template <class T, class F>
+inline T smoothZero			(T v, T bw, F f){ return bw/(f(v) + bw); }
+TEM inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
 
 TEM inline T taylorFactor3(T vv, T c1, T c2, T c3){
 	return c1 * vv * (c2 - vv * (c3 - vv));
@@ -910,11 +918,6 @@ TEM inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
 //
 //}
 
-TEM inline T warpSinSS(T v){ return v*((T)1.50 - v*v*(T)0.50); }
-TEM inline T warpSinSU(T v){ return v*((T)0.75 - v*v*(T)0.25) + (T)0.5; }
-TEM inline T warpSinUS(T v){ return v*v*((T)6 - v*(T)4) - (T)1; }
-TEM inline T warpSinUU(T v){ return v*v*(v*(T)-2 + (T)3); }
-
 TEM inline T wrap(T v, T hi, T lo){
 	if(lo == hi) return lo;
 
@@ -990,10 +993,7 @@ TEM inline T wrapPhaseOnce(T r){
 	return r;
 }
 
-TEM inline T zero(T v, T bw){ return zero(v, bw, scl::pow2<T>); }
 
-template <class T, class F>
-inline T zero(T v, T bw, F f){ return bw/(f(v) + bw); }
 
 
 TEM inline bool even(T v){ return 0 == odd(v); }
