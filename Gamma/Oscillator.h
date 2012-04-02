@@ -37,16 +37,17 @@ public:
 	void phaseMax();				///< Set phase to maximum value
 	void phaseAdd(float v);			///< Add value to phase [0, 1)
 	void period(float v);			///< Set period length
-	void reset(){ mTap.reset(); }	///< Reset phase accumulator
+	void reset(){ mPhaseI=0; mTap.reset(); }	///< Reset phase accumulator
+	Stap& tap(){ return mTap; }
 
-	bool done(){ return mTap.done(phaseI()); }
-//	Stap& tap(){ return mTap; }
+	/// Returns true if tap is done
+	bool done() const { return mTap.done(phaseI()); }
 
 	float freq() const;				///< Get frequency
-	float phase() const;			///< Get current unit phase
-	uint32_t phaseI() const;		///< Get current fixed-point phase value
-	float phaseInc() const;			///< Get unit phase increment in [0, 1)
-	uint32_t phaseIncI() const;		///< Get current fixed-point phase increment value
+	uint32_t freqI() const;			///< Get fixed-point frequency
+	float freqUnit() const;			///< Get frequency in [0, 1)
+	float phase() const;			///< Get phase in [0, 1)
+	uint32_t phaseI() const;		///< Get fixed-point phase
 
 	/// Returns 0x80000000 on phase wrap, 0 otherwise
 	
@@ -55,28 +56,30 @@ public:
 	uint32_t cycle();
 	uint32_t operator()();			///< Alias of cycle()
 
-	uint32_t cycles();		///< Get 1 to 0 transitions of all accumulator bits
+	uint32_t nextPhase();			///< Increment phase and return pre-incremented phase
+	uint32_t nextPhase(float freqOffset);
+	uint32_t nextPhasePost();		///< Increment phase and return post-incremented phase
+	uint32_t cycles();				///< Get 1 to 0 transitions of all accumulator bits
 	uint32_t once();
-	uint32_t incPhase();	///< Increment phase and return post-incremented phase
-	uint32_t incPhasePre();	///< Increment phase and return pre-incremented phase
 
 	virtual void onResync(double r);
 
 protected:
-	float mFreq;			// Current frequency
-	uint32_t mPhase;		// Current phase in [0, 2^32)
-	uint32_t mPhaseInc;
+	float mFreq;		// Current frequency
+	uint32_t mPhaseI;	// Current fixed-point phase in [0, 2^32)
+	uint32_t mFreqI;	// Current fixed-point frequency
 	Stap mTap;
 	
-	uint32_t phaseFI(float v) const;	// convert unit floating-point to fixed-point integer
-	float phaseIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
+	uint32_t mapFI(float v) const;	// convert unit floating-point to fixed-point integer
+	float mapIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
+	uint32_t mapFreq(float v) const;
 };
 
 #define ACCUM_INHERIT\
 	using Accum<Stap,Ts>::phaseI;\
-	using Accum<Stap,Ts>::phaseIncI;\
-	using Accum<Stap,Ts>::incPhase;\
-	using Accum<Stap,Ts>::incPhasePre;
+	using Accum<Stap,Ts>::freqI;\
+	using Accum<Stap,Ts>::nextPhase;\
+	using Accum<Stap,Ts>::nextPhasePost;
 
 
 
@@ -151,17 +154,17 @@ public:
 
 	/// Constructor that allocates an internal table
 
-	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phs			Initial unit phase in [0, 1)
-	/// @param[in]	size		Number of table elements (actual number is power of 2 ceiling)
+	/// @param[in]	frq			Frequency
+	/// @param[in]	phs			Phase in [0, 1)
+	/// @param[in]	size		Size of table (actual number is power of 2 ceiling)
 	Osc(float frq=440, float phs=0, uint32_t size=512)
 	:	Base(frq, phs), ArrayPow2<Tv>(size)
 	{}
 
 	/// Constructor that references an external table
 
-	/// @param[in]	frq			Initial frequency
-	/// @param[in]	phs			Initial unit phase in [0, 1)
+	/// @param[in]	frq			Frequency
+	/// @param[in]	phs			Phase in [0, 1)
 	/// @param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, ArrayPow2<Tv>& src)
 	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
@@ -170,7 +173,7 @@ public:
 
 	/// Generate next sample
 	Tv operator()(){
-		Tv o0 = val(); mTap(this->mPhase, phaseIncI()); return o0;
+		Tv r = val(); this->nextPhasePost(); return r;
 	}
 
 	/// Get current value
@@ -192,6 +195,8 @@ public:
 
 	/// Zero table elements
 	void zero(){ for(unsigned i=0; i<this->size(); ++i) (*this)[i] = Tv(0); }
+
+	ArrayPow2<Tv>& table(){ return *this; }
 
 //	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 protected:
@@ -220,10 +225,10 @@ public:
 
 	typedef Complex<Tv> complex;
 
-	/// @param[in] frq		Initial frequency
-	/// @param[in] amp		Initial amplitude
-	/// @param[in] dcy		Initial decay time. Negative means no decay.
-	/// @param[in] phs		Initial unit phase in [0, 1)
+	/// @param[in] frq		Frequency
+	/// @param[in] amp		Amplitude
+	/// @param[in] dcy		Decay time (negative means no decay)
+	/// @param[in] phs		Phase in [0, 1)
 	Quadra(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 
 
@@ -257,17 +262,14 @@ protected:
 /// lookup. In most cases, Taylor series are also more spectrally pure than 
 /// table lookup methods since the distortion arises as harmonics.
 template<class Tv=gam::real, class Ts=Synced>
-class Sine : public AccumPhase<Tv, Ts> {
+class Sine : public AccumPhase<Tv,Ts> {
 public:
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phs		Initial unit phase in [0, 1)
-	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv, Ts>(frq, phs){}
-
-	/// Generate next sample
-	Tv operator()(){ return (*this)(Tv(0)); }
+	/// @param[in]	frq		Frequency
+	/// @param[in]	phs		Phase in [0, 1)
+	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv,Ts>(frq, phs){}
 	
 	/// Generate next sample with a frequency offset
-	Tv operator()(Tv frqOffset){
+	Tv operator()(Tv frqOffset = Tv(0)){
 		return scl::sinP9(this->nextPhase(frqOffset) * M_1_PI);
 	}
 };
@@ -288,7 +290,7 @@ public:
 
 	/// @param[in]	frq		Frequency
 	/// @param[in]	amp		Amplitude
-	/// @param[in]	phs		Unit phase in [0, 1)
+	/// @param[in]	phs		Phase in [0, 1)
 	SineR(Tv frq=440, Tv amp=1, Tv phs=0){ set(frq, amp, phs); }
 
 	/// Get frequency
@@ -324,20 +326,16 @@ public:
 	SineRs(uint32_t num): Base(num){ Ts::initSynced(); }
 
 	/// Generate next sum of all oscillators
-	Tv operator()(){ Tv r=(Tv)0; for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j](); return r; }
-	
-	/// Generate next samples adding into a buffer
-	template <class V>
-	void add(V * dst, uint32_t n){
-		for(uint32_t j=0; j<this->size(); ++j){
-			for(uint32_t i=0; i<n; ++i)	dst[i] += (*this)[j]();
-		}
+	Tv operator()(){
+		Tv r= Tv(0);
+		for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j]();
+		return r;
 	}
 
-	/// Get ith oscillator's last value
-	Tv last(uint32_t i){ return (*this)[i].val; }
+	/// Get last output of oscillator i
+	Tv last(uint32_t i) const { return (*this)[i].val; }
 
-	/// Set all control parameters
+	/// Set all control parameters of oscillator i
 	void set(uint32_t i, Tv frq, Tv amp, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, phs); }
 
 private:
@@ -354,10 +352,10 @@ template <class Tv=double, class Ts=Synced>
 class SineD : public gen::RSin2<Tv>, Ts{
 public:
 
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	amp		Initial amplitude
-	/// @param[in]	dcy		Initial T60 decay length
-	/// @param[in]	phs		Initial unit phase in [0, 1)
+	/// @param[in]	frq		Frequency
+	/// @param[in]	amp		Amplitude
+	/// @param[in]	dcy		T60 decay length
+	/// @param[in]	phs		Phase in [0, 1)
 	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ set(frq, amp, dcy, phs); }
 
 	/// Get frequency
@@ -402,21 +400,18 @@ public:
 	}
 
 	/// Generate next sum of all oscillators
-	Tv operator()(){ Tv r=(Tv)0; for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j](); return r; }
-	
-	/// Generate next samples adding into a buffer
-	template <class V>
-	void add(V * dst, uint32_t n){
-		for(uint32_t j=0; j<this->size(); ++j){
-			for(uint32_t i=0; i<n; ++i)	dst[i] += (*this)(j);
-		}
+	Tv operator()(){
+		Tv r=Tv(0);
+		for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j]();
+		return r;
 	}
 
-	/// Get ith oscillator's last value
-	Tv last(uint32_t i){ return (*this)[i].val; }
+	/// Get last output of oscillator i
+	Tv last(uint32_t i) const { return (*this)[i].val; }
 
-	/// Set all control parameters
-	void set(uint32_t i, Tv frq, Tv amp, Tv dcy, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, dcy*Ts::spu(), phs); }
+	/// Set all control parameters of oscillator i
+	void set(uint32_t i, Tv frq, Tv amp, Tv dcy, Tv phs=0){
+		(*this)[i].set(frq*Ts::ups(), amp, dcy*Ts::spu(), phs); }
 
 private:
 	typedef Array<SineD<Tv, Synced1> > Base;
@@ -436,13 +431,13 @@ template <class Stap=tap::Wrap, class Ts=Synced>
 class TableSine : public Accum<Stap,Ts> {
 public:
 
-	/// @param[in]	frq		Initial frequency
-	/// @param[in]	phase	Initial unit phase in [0, 1)
+	/// @param[in]	frq		Frequency
+	/// @param[in]	phase	Phase in [0, 1)
 	TableSine(float frq=440, float phase=0);
 
-	float operator()();			///< Return next linearly-interpolated sample
-	float nextN();				///< Return next non-interpolated sample
-	float nextL();				///< Return next linearly-interpolated sample
+	float operator()(float freqOffset=0);	///< Return next linearly-interpolated sample
+	float nextN(float freqOffset=0);		///< Return next non-interpolated sample
+	float nextL(float freqOffset=0);		///< Return next linearly-interpolated sample
 
 	/// Resize global sine table
 	
@@ -455,11 +450,11 @@ public:
 	static void resize(uint32_t bits);
 
 protected:
-//	static ArrayPow2<float> mTable; // can't use because need 2**N+1 table
-	static float * mTable;		// Reference to my sample table. Must be 1<<bits.
-	static uint32_t mTblBits;
-	static uint32_t mFracBits;	// # of bits in fractional part of accumulator
-	static uint32_t mOneIndex;
+//	static ArrayPow2<float> cTable; // can't use because need 2**N+1 table
+	static float * cTable;		// Reference to my sample table. Must be 1<<bits.
+	static uint32_t cTblBits;
+	static uint32_t cFracBits;	// # of bits in fractional part of accumulator
+	static uint32_t cOneIndex;
 private:
 	typedef Accum<Stap,Ts> Base;
 	ACCUM_INHERIT
@@ -510,6 +505,7 @@ public:
 	float downU();		///< Unipolar downward ramp
 	float hann();		///< Hann window
 	float line2U();		///< Unipolar line2
+	float paraU();		///< Unipolar parabolic wave
 	float pulseU();		///< Unipolar pulse
 	float stairU();		///< Unipolar stair
 	float sqrU();		///< Unipolar square
@@ -542,9 +538,9 @@ template<class Tv=gam::real, class Ts=Synced>
 class Buzz : public AccumPhase<Tv,Ts> {
 public:
 
-	/// @param[in]	frq			frequency
-	/// @param[in]	phase		phase in [0, 1)
-	/// @param[in]	harmonics	number of harmonics
+	/// @param[in]	frq			Frequency
+	/// @param[in]	phase		Phase in [0, 1)
+	/// @param[in]	harmonics	Number of harmonics
 	Buzz(Tv frq=440, Tv phase=0, Tv harmonics=8);
 	virtual ~Buzz(){}
 
@@ -583,11 +579,15 @@ private: typedef AccumPhase<Tv,Ts> Base;
 /// the LFO class.
 template <class Tv=gam::real, class Ts=Synced>
 struct Impulse : public Buzz<Tv,Ts>{
+
 private: typedef Buzz<Tv,Ts> Base;
+
 public:
 	using Base::freq;
 
-	Impulse(Tv frq=440, Tv phase=0): Base(frq, phase){ onResync(1); }
+	/// @param[in] frq		Frequency
+	/// @param[in] phs		Phase, in [0, 1)
+	Impulse(Tv frq=440, Tv phs=0): Base(frq, phs){ onResync(1); }
 
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v); Base::harmonicsMax(); }
@@ -654,13 +654,13 @@ template<class Tv=gam::real, class Ts=Synced>
 class DSF : public AccumPhase<Tv,Ts> {
 public:
 
-	/// @param[in]	frq			frequency in Hz
-	/// @param[in]	freqRatio	frequency ratio of partials
-	/// @param[in]	ampRatio	amplitude ratio of partials
-	/// @param[in]	harmonics	number of harmonics
+	/// @param[in]	frq			Frequency
+	/// @param[in]	freqRatio	Frequency ratio of partials
+	/// @param[in]	ampRatio	Amplitude ratio of partials
+	/// @param[in]	harmonics	Number of harmonics
 	DSF(Tv frq=440, Tv freqRatio=1, Tv ampRatio=0.5, Tv harmonics=8);
 	
-	Tv operator()();			///< Returns next sample
+	Tv operator()();			///< Generate next sample
 	
 	void ampRatio(Tv v);		///< Set amplitude ratio of partials
 	void antialias();			///< Adjust harmonics so partials do not alias
@@ -697,11 +697,10 @@ protected:
 // but only operates at integer divisions of the Nyquist frequency.
 class ImpulseFast : public Synced {
 public:
-	/// Constructor.
 	ImpulseFast(): mPhase(0), mOffset(0){ freq(0); }
 
 
-	/// Set frequency of oscillation.
+	/// Set frequency
 	void freq(double v){
 		double samples = spu() / v;
 		
@@ -749,20 +748,25 @@ protected:
 //---- Accum
 #define TACCUM	Accum<St,Ts>
 
-TEMTS TACCUM::Accum(float freq, float phase): mFreq(freq){
+TEMTS TACCUM::Accum(float f, float p): mFreq(f){
 	Ts::initSynced();
-	(phase >= 1.f) ? phaseMax() : this->phase(phase);
+	(p >= 1.f) ? phaseMax() : this->phase(p);
+	//printf("%u\n", mPhaseI);
 }
 
-TEMTS inline uint32_t TACCUM::phaseFI(float v) const {
+TEMTS inline uint32_t TACCUM::mapFI(float v) const {
 	//return scl::unitToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
 	return castIntRound(v * 4294967296.);
 }
 
-TEMTS inline float TACCUM::phaseIF(uint32_t v) const {
+TEMTS inline float TACCUM::mapIF(uint32_t v) const {
 	//return v/4294967296.;
 	return uintToUnit<float>(v);
+}
+
+TEMTS inline uint32_t TACCUM::mapFreq(float v) const {
+	return mapFI(v * Ts::ups());
 }
 
 TEMTS void TACCUM::onResync(double r){ //printf("Accum: onSyncChange (%p)\n", this);
@@ -770,23 +774,31 @@ TEMTS void TACCUM::onResync(double r){ //printf("Accum: onSyncChange (%p)\n", th
 }
 
 TEMTS inline void TACCUM::freq(float v){
-	mFreq = v;
-	mPhaseInc = phaseFI(v * Ts::ups());
+	mFreq  = v;
+	mFreqI = mapFreq(v);
 }
 
-TEMTS inline void TACCUM::period(float value){ freq(1.f / value); }
-TEMTS inline void TACCUM::phase(float v){ mPhase = phaseFI(v); }
-TEMTS inline void TACCUM::phaseAdd(float v){ mTap(mPhase, phaseFI(v)); }
-TEMTS inline void TACCUM::phaseMax(){ mPhase = 0xffffffff; }
+TEMTS inline void TACCUM::period(float v){ freq(1.f/v); }
+TEMTS inline void TACCUM::phase(float v){ mPhaseI = mapFI(v); }
+TEMTS inline void TACCUM::phaseAdd(float v){ mTap(mPhaseI, mapFI(v)); }
+TEMTS inline void TACCUM::phaseMax(){ mPhaseI = 0xffffffff; }
 
 TEMTS inline float TACCUM::freq() const { return mFreq; }
-TEMTS inline float TACCUM::phase() const { return phaseIF(phaseI()); }
-TEMTS inline uint32_t TACCUM::phaseI() const { return mPhase; }
-TEMTS inline float TACCUM::phaseInc() const { return phaseIF(phaseIncI()); }
-TEMTS inline uint32_t TACCUM::phaseIncI() const { return mPhaseInc; }
-//TEMTS inline uint32_t TACCUM::incPhase(){ return mPhase += phaseIncI(); }
-TEMTS inline uint32_t TACCUM::incPhase(){ return mTap(mPhase, phaseIncI()); }
-TEMTS inline uint32_t TACCUM::incPhasePre(){ uint32_t r=phaseI(); mTap(mPhase, phaseIncI()); return r; }
+TEMTS inline uint32_t TACCUM::freqI() const { return mFreqI; }
+TEMTS inline float TACCUM::freqUnit() const { return mapIF(mFreqI); }
+TEMTS inline float TACCUM::phase() const { return mapIF(mPhaseI); }
+TEMTS inline uint32_t TACCUM::phaseI() const { return mPhaseI; }
+
+TEMTS inline uint32_t TACCUM::nextPhase(float frqOffset){
+	uint32_t r=mPhaseI;
+	mTap(mPhaseI, mFreqI + mapFreq(frqOffset));
+	return r;
+}
+
+TEMTS inline uint32_t TACCUM::nextPhase(){ uint32_t r=mPhaseI; nextPhasePost(); return r; }
+TEMTS inline uint32_t TACCUM::nextPhasePost(){ return mTap(mPhaseI, mFreqI); }
+
+
 
 TEMTS inline uint32_t TACCUM::operator()(){ return cycle(); }
 
@@ -798,14 +810,14 @@ TEMTS inline uint32_t TACCUM::cycle(){ return cycles() & 0x80000000; }
 
 TEMTS inline uint32_t TACCUM::cycles(){
 	uint32_t prev = phaseI();
-	incPhase();	
+	nextPhasePost();	
 	return ~phaseI() & prev;
 }
 
 TEMTS inline uint32_t TACCUM::once(){
 	uint32_t prev = phaseI();
 	uint32_t c = cycle();
-	if(c) mPhase = prev;
+	if(c) mPhaseI = prev;
 	return c;
 }
 
@@ -815,11 +827,11 @@ TEMTS inline uint32_t TACCUM::once(){
 
 //---- AccumPhase
 
-TEM AccumPhase<Tv, Ts>::AccumPhase(Tv frq, Tv phase)
-:	mFreq(frq), m2PiUPS(1)
+TEM AccumPhase<Tv, Ts>::AccumPhase(Tv f, Tv p)
+:	mFreq(f), m2PiUPS(1)
 {
 	Ts::initSynced();
-	this->phase(phase);
+	this->phase(p);
 }
 
 TEM inline Tv AccumPhase<Tv, Ts>::mapFreq(Tv v) const { return v*m2PiUPS; }
@@ -830,7 +842,6 @@ TEM inline Tv AccumPhase<Tv, Ts>::nextPhaseUsing(Tv frq){
 	Tv r = mPhase;
 	mPhase += frq;
 	return r;
-
 }
 
 TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(){
@@ -843,8 +854,8 @@ TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(Tv frqMod){
 
 TEM inline void AccumPhase<Tv, Ts>::freq(Tv v){ mFreq = mapFreq(v); }
 TEM inline void AccumPhase<Tv, Ts>::period(Tv v){ freq(Tv(1)/v); }
-TEM inline void AccumPhase<Tv, Ts>::phase(Tv u){ mPhase = mapPhase(u); }
-TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv u){ mPhase += mapPhase(u); }
+TEM inline void AccumPhase<Tv, Ts>::phase(Tv v){ mPhase = mapPhase(v); }
+TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
 
 TEM inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq/m2PiUPS; } //mFreq; }
 TEM inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / freq(); }
@@ -854,18 +865,18 @@ TEM void AccumPhase<Tv, Ts>::onResync(double r){ Tv f=freq(); recache(); freq(f)
 TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
 
 TEM void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
-//	fprintf(fp, "%f %f %f%s", freq(), phase(), mPhaseInc, append);
+//	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreqI, append);
 	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreq, append);
 }
 
 
 //---- Quadra
 
-TEM Quadra<Tv, Ts>::Quadra(Tv frq, Tv amp, Tv dcy60, Tv phase)
-	: val(amp, 0), mAmp(amp), mFreq(frq), mDcy60(dcy60)
+TEM Quadra<Tv, Ts>::Quadra(Tv f, Tv a, Tv dcy60, Tv p)
+	: val(a, 0), mAmp(a), mFreq(f), mDcy60(dcy60)
 {
 	Ts::initSynced();
-	this->phase(phase);
+	this->phase(p);
 }
 
 TEM void Quadra<Tv, Ts>::amp(Tv v){
@@ -921,46 +932,44 @@ TEM void Quadra<Tv, Ts>::onResync(double r){
 //---- TableSine
 
 #define TTABLESINE TableSine<St,Ts>
-TEMTS uint32_t TTABLESINE::mTblBits  = 0;	
-TEMTS uint32_t TTABLESINE::mFracBits = 0;
-TEMTS uint32_t TTABLESINE::mOneIndex = 0;
-TEMTS float * TTABLESINE::mTable = 0;
+TEMTS uint32_t TTABLESINE::cTblBits  = 0;	
+TEMTS uint32_t TTABLESINE::cFracBits = 0;
+TEMTS uint32_t TTABLESINE::cOneIndex = 0;
+TEMTS float * TTABLESINE::cTable = 0;
 
-TEMTS TTABLESINE::TableSine(float freq, float phase): Base(freq, phase){
+TEMTS TTABLESINE::TableSine(float f, float p): Base(f, p){
 	// initialize global table ONCE
-	if(0 == mTable){ resize(11); }
+	if(0 == cTable){ resize(11); }
 }
 
 TEMTS void TTABLESINE::resize(uint32_t bits){
-	if(bits != mTblBits){
-		if(mTable) delete[] mTable;
+	if(bits != cTblBits){
+		if(cTable) delete[] cTable;
 
-		mTblBits = bits;
-		mFracBits = 32UL - mTblBits;
-		mOneIndex = 1<<mFracBits;
-		uint32_t size = 1<<(mTblBits-2);
-		mTable = new float[size + 1];
-		tbl::sinusoid(mTable, size, 0, 0.25);
-		mTable[size] = 1;		
+		cTblBits = bits;
+		cFracBits = 32UL - cTblBits;
+		cOneIndex = 1<<cFracBits;
+		uint32_t size = 1<<(cTblBits-2);
+		cTable = new float[size + 1];
+		tbl::sinusoid(cTable, size, 0, 0.25);
+		cTable[size] = 1;		
 	}
 }
 
-TEMTS inline float TTABLESINE::operator()(){ return nextL(); }
+TEMTS inline float TTABLESINE::operator()(float df){ return nextL(df); }
 
-TEMTS inline float TTABLESINE::nextN(){
-	float output = tbl::atQ(mTable, mFracBits, phaseI());
-	incPhase();
-	return output;
+TEMTS inline float TTABLESINE::nextN(float df){	
+	return tbl::atQ(cTable, cFracBits, nextPhase(df));
 }
 
-TEMTS inline float TTABLESINE::nextL(){
-	float output = ipl::linear(
-		gam::fraction(mTblBits, phaseI()),
-		tbl::atQ(mTable, mFracBits, phaseI()),
-		tbl::atQ(mTable, mFracBits, phaseI() + mOneIndex)
+TEMTS inline float TTABLESINE::nextL(float df){
+	uint32_t P = nextPhase(df);
+
+	return ipl::linear(
+		gam::fraction(cTblBits, P),
+		tbl::atQ(cTable, cFracBits, P),
+		tbl::atQ(cTable, cFracBits, P + cOneIndex)
 	);
-	incPhase();
-	return output;
 }
 
 #undef TTABLESINE
@@ -989,7 +998,7 @@ TEMTS inline float TLFO::line2(){
 	float p  = rampUpU(m);
 
 	float r = (r1*r1 - r2*r2)/(4.f*p*(1.f - p));
-	incPhase();
+	nextPhasePost();
 	return r;
 }
 
@@ -998,30 +1007,31 @@ TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 #define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; return r; }
 //DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
 DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
-DEF(down(),		scl::rampDown(incPhasePre()))
+DEF(down(),		scl::rampDown(nextPhase()))
 DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
-DEF(imp(),		scl::pulseU(incPhasePre(), this->phaseIncI()) )
-DEF(para(),		down(); r = 1.5f * r*r - 0.5f;)
-DEF(pulse(),	scl::pulse(incPhasePre(), modi))
-DEF(sinPara(),	scl::sinPara(incPhasePre()))
-DEF(stair(),	scl::stair(incPhasePre(), modi))
-DEF(sqr(),		scl::square(incPhasePre()))
-DEF(tri(),		scl::triangle(incPhasePre()))
-DEF(up(),		scl::rampUp(incPhasePre()))
-DEF(up2(),		scl::rampUp2(incPhasePre(), modi))
-DEF(cosU(),		tri(); r = scl::warpSinSU(r))
-DEF(downU(),	scl::rampDownU(incPhasePre()))
+DEF(imp(),		scl::pulseU(nextPhase(), this->freqI()) )
+DEF(para(),		paraU()*1.5f - 0.5f)
+DEF(pulse(),	scl::pulse(nextPhase(), modi))
+DEF(sinPara(),	scl::sinPara(nextPhase()))
+DEF(stair(),	scl::stair(nextPhase(), modi))
+DEF(sqr(),		scl::square(nextPhase()))
+DEF(tri(),		scl::triangle(nextPhase()))
+DEF(up(),		scl::rampUp(nextPhase()))
+DEF(up2(),		scl::rampUp2(nextPhase(), modi))
+DEF(cosU(),		tri(); r = scl::mapSinSU(r))
+DEF(downU(),	scl::rampDownU(nextPhase()))
 DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
-DEF(pulseU(),	scl::pulseU(incPhasePre(), modi))
-DEF(sqrU(),		scl::squareU(incPhasePre()))
-DEF(stairU(),	scl::stairU(incPhasePre(), modi))
-DEF(triU(),		scl::triangleU(incPhasePre()))
-DEF(upU(),		scl::rampUpU(incPhasePre()))
-DEF(up2U(),		scl::rampUp2U(incPhasePre(), modi))
-DEF(patU(),		scl::rampUpU(incPhasePre() & modi))
+DEF(paraU(),	up(); r*=r;)
+DEF(pulseU(),	scl::pulseU(nextPhase(), modi))
+DEF(sqrU(),		scl::squareU(nextPhase()))
+DEF(stairU(),	scl::stairU(nextPhase(), modi))
+DEF(triU(),		scl::triangleU(nextPhase()))
+DEF(upU(),		scl::rampUpU(nextPhase()))
+DEF(up2U(),		scl::rampUp2U(nextPhase(), modi))
+DEF(patU(),		scl::rampUpU(nextPhase() & modi))
 
-DEF(patU(uint32_t mul), scl::rampUpU((incPhasePre() & modi) * mul))
+DEF(patU(uint32_t mul), scl::rampUpU((nextPhase() & modi) * mul))
 
 DEF(sineT9(),	up(); r = scl::sinT9(r * M_PI))
 DEF(sineP9(),	up(); r = scl::sinP9(r))
@@ -1029,7 +1039,7 @@ DEF(sineP9(),	up(); r = scl::sinP9(r))
 #undef DEF
 
 TEMTS inline bool TLFO::seq(){
-	uint32_t prev = incPhasePre();
+	uint32_t prev = nextPhase();
 	if( (phaseI() ^ prev) & 0xf8000000 ){
 		if( (modi >> (phaseI()>>27)) & 0x1 ) return true;
 	}
@@ -1041,17 +1051,17 @@ TEMTS inline bool TLFO::seq(){
 
 //---- Buzz
 
-TEM Buzz<Tv,Ts>::Buzz(Tv frq, Tv phase, Tv harmonics)
-:	Base(frq, phase), mAmp(0), mPrev(Tv(0))
+TEM Buzz<Tv,Ts>::Buzz(Tv f, Tv p, Tv harmonics)
+:	Base(f, p), mAmp(0), mPrev(Tv(0))
 {
 	onResync(1);
 	this->harmonics(harmonics);
 }
 
-TEM inline void Buzz<Tv,Ts>::harmonics(Tv value){
-	mN = mNDesired = scl::floor(value);
+TEM inline void Buzz<Tv,Ts>::harmonics(Tv v){
+	mN = mNDesired = scl::floor(v);
 	setAmp();
-	mNFrac = value - mN;
+	mNFrac = v - mN;
 }
 
 TEM inline void Buzz<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
@@ -1233,23 +1243,6 @@ TEM void DSF<Tv,Ts>::onResync(double r){
 	freq(Base::freq());
 	harmonics(mNDesired);
 }
-
-
-// This object stores a accumulator increment value.
-template <class Tv=gam::real, class Ts=Synced>
-class Increment : public Ts{
-public:
-	Increment(double frq): mInc(0){ Ts::initSynced(); freq(frq); }
-	
-	void freq(double v){ mInc = (Tv)(v * Ts::ups()); }
-	Tv& operator()(Tv& v){ return v = scl::wrap(v + mInc); }
-	virtual void onResync(double r){ mInc/=r; }
-	
-protected:
-	Tv mInc;
-};
-
-
 
 #undef TEM
 #undef TEMS
