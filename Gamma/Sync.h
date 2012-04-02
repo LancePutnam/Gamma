@@ -75,7 +75,7 @@ public:
 	Synced& operator= (const Synced& rhs);
 
 protected:
-	void initSynced();
+	void initSynced(); ///< To be called from the constructor(s) of derived classes
 
 private:
 	friend class Sync;

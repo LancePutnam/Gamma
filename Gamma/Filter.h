@@ -257,6 +257,8 @@ using Base::mCos
 
 /// Second-order all-pass filter
 
+/// This all-pass filter shifts phases from 0 to 2 pi from 0 to Nyquist. The
+/// center frequency controls where the phase is shifted by pi.
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type

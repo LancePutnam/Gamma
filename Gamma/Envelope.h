@@ -31,7 +31,10 @@ public:
 	Curve();
 	
 	/// @param[in] length	length of curve in samples
-	/// @param[in] curve	curvature; >0 approaches slowly, <0 approaches rapidly, 0 approaches linearly
+	/// @param[in] curve	curvature, c, where 
+	///						c > 0 approaches slowly (accelerates),
+	///						c < 0 approaches rapidly (decelerates), and
+	///						c = 0 approaches linearly
 	/// @param[in] end		end value
 	/// @param[in] start	start value
 	Curve(Tp length, Tp curve, Tv end=Tv(1), Tv start=Tv(0));
