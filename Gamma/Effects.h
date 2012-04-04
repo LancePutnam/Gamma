@@ -223,85 +223,6 @@ struct Chorus{
 
 
 
-/// Group of 4 comb filters
-template <class T = gam::real, template<class> class Tipol=ipl::Linear>
-struct Combs4{
-
-	/// @param[in] d1		Delay length of filter 1
-	/// @param[in] d2		Delay length of filter 2
-	/// @param[in] d3		Delay length of filter 3
-	/// @param[in] d4		Delay length of filter 4
-	/// @param[in] ffd		Feedforward amount for all filters
-	/// @param[in] fbk		Feedback amount for all filters
-	Combs4(float d1, float d2, float d3, float d4, float ffd, float fbk)
-	: c1(d1, ffd, fbk), c2(d2, ffd, fbk), c3(d3, ffd, fbk), c4(d4, ffd, fbk){}
-	
-	/// Set decay length for filters
-	void decay(float v, float end = 0.001f){
-		c1.decay(v, end); c2.decay(v, end); c3.decay(v, end); c4.decay(v, end);
-	}
-	
-	/// Set delay length for filters
-	void delay(float d1, float d2, float d3, float d4){
-		c1.delay(d1); c2.delay(d2); c3.delay(d3); c4.delay(d4);
-	}
-
-	/// Returns next sample processed through combs in parallel
-	T nextP(const T& v){ return c1(v) + c2(v) + c3(v) + c4(v); }
-	
-	/// Returns next sample processed through combs in series
-	T nextS(const T& v){ return c4(c3(c2(c1(v)))); }
-	
-	Comb<T, Tipol> c1, c2, c3, c4;
-};
-
-
-
-/// Diffuser using 4 parallel combs and 4 series comb allpass
-template <class T=gam::real>
-struct Diffuser{
-
-	/// param[in] decay		Decay length of parallel combs
-	Diffuser(float decay = 1.f) :
-		// amounts based on Schroeder model
-		comb4P(0.0297, 0.0371, 0.0411, 0.0437 , 0, 0.85),
-	
-		// |feedback| < 0.85 (22 dB p2p)
-		// gain should be fixed at 1/sqrt(2)
-		comb4S(0.0137, 0.0127, 0.0101, 0.00773, -0.707, 0.707)
-	{
-		this->decay(decay);
-	}
-	
-	/// Returns next processed sample
-	T operator()(T v){
-		v = comb4P.nextP(v);	// needs precision to avoid beating
-		return comb4S.nextS(v);
-	}
-	
-	/// Set 60 dB decay length of parallel combs
-	void decay(float value){ comb4P.decay(value); }
-
-	Combs4<T, ipl::AllPass> comb4P;	///< Parallel feedback comb filters
-	Combs4<T, ipl::Trunc> comb4S;	///< Series allpass comb filters	
-};
-
-
-
-template <class T=gam::real>
-struct Modulet{
-	Modulet(T cfreq=1000, T q=10, T mfreq=1, T mphs=0, T depth=1)
-	:	fil(cfreq, q, BAND_PASS_UNIT), osc(mfreq, mphs), depth(depth){}
-	
-	T operator()(T in){ return fil(in) * scl::mapDepth(osc.cos(), depth); }
-
-	Biquad<> fil;
-	LFO<> osc;
-	T depth;
-};
-
-
-
 /// Frequency shifter
 template <class T=gam::real>
 struct FreqShift{
@@ -348,7 +269,7 @@ struct MonoSynth{
 
 
 
-/// Equal-power 2-channel panner.
+/// Equal-power 2-channel panner
 template <class T=gam::real>
 class Pan{
 public:
@@ -494,38 +415,15 @@ struct Threshold{
 	/// @param[in] freq		Cutoff frequency of output smoother
 	Threshold(T thresh, T freq=10):lpf(freq), thresh(thresh){}
 	
-	inline T operator()(T i0){ return lpf(scl::abs(i0) > thresh ? (T)1 : (T)0); }	///< Returns next sample
-	inline T        inv(T i0){ return lpf(scl::abs(i0) > thresh ? (T)0 : (T)1); }	///< Returns 1 if less than threshold, 0 otherwise.
+	/// Returns 0 if less than threshold, 1 otherwise
+	T operator()(T i0){ return lpf(scl::abs(i0) > thresh ? T(1) : T(0)); }
+	
+	/// Returns 1 if less than threshold, 0 otherwise
+	T inv(T i0){ return lpf(scl::abs(i0) > thresh ? T(0) : T(1)); }
 	
 	OnePole<T> lpf;	///< Output smoother
 	T thresh;		///< Threshold value
 };
-
-
-
-/*
-// Generates 7 octaves of a unitary amplitude cosine input.
-template <class T=gam::real> 
-struct Fract8{
-	T c[7];									///< 2nd-8th octave coefficients
-	
-	Fract8(T o2=0, T o3=0, T o4=0, T o5=0, T o6=0, T o7=0, T o8=0){
-		c[0]=o2; c[1]=o3; c[2]=o4; c[3]=o5; c[4]=o6; c[5]=o7; c[6]=o8;
-	}
-	
-	/// Returns filtered sample
-	T operator()(T i0){ return i0 + wet(i0); }
-	
-	/// Returns 2nd-8th octaves of cosine input
-	T wet(T i0){	
-		T t = i0, o0 = (T)0;
-		#define DO(i) t = t*t*(T)2 - (T)1; o0 += t * c[i];
-			DO(0) DO(1) DO(2) DO(3) DO(4) DO(5) DO(6)
-		#undef DO
-		return o0;
-	}
-};
-*/
 
 } // gam::
 #undef TEM

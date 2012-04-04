@@ -8,6 +8,26 @@
 
 #include "../examples.h"
 
+template <class T = gam::real>
+struct Combs4{
+
+	Combs4(float d1, float d2, float d3, float d4, float ffd, float fbk)
+	: c1(d1, ffd, fbk), c2(d2, ffd, fbk), c3(d3, ffd, fbk), c4(d4, ffd, fbk){}
+
+	void decay(float v, float end = 0.001f){
+		c1.decay(v, end); c2.decay(v, end); c3.decay(v, end); c4.decay(v, end);
+	}
+
+	void delay(float d1, float d2, float d3, float d4){
+		c1.delay(d1); c2.delay(d2); c3.delay(d3); c4.delay(d4);
+	}
+
+	T nextP(const T& v){ return c1(v) + c2(v) + c3(v) + c4(v); }
+	T nextS(const T& v){ return c4(c3(c2(c1(v)))); }
+	
+	Comb<T, ipl::Linear> c1, c2, c3, c4;
+};
+
 Accum<> tmr(16, 2);
 LFO<> lfoD(2.51);
 Chirp<> src(100., 1, 0.1);
