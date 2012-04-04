@@ -20,13 +20,16 @@ template <class Tv=real, class Tp=real, class Ts=Synced>
 struct AmpEnv{
 
 	/// @param[in] freq		Cutoff frequency of smoothing filter
-	AmpEnv(Tp freq=10):lpf(freq){}
+	AmpEnv(Tp freq=10)
+	:	lpf(freq){}
 
 	/// Filter next sample
 	Tv operator()(Tv i0){ return lpf(scl::abs(i0)); }
 
 	/// Returns current amplitude estimate
 	Tv value() const { return lpf.last(); }
+	
+	bool done(Tv eps=0.001) const { return value() < eps; }
 
 	OnePole<Tv,Tp,Ts> lpf;	///< Low-pass filter
 };
@@ -127,7 +130,7 @@ struct ChebyN{
 	/// Returns filtered sample
 	T operator()(T i0) const { return i0*c[0] + wet(i0); }
 	
-	/// Returns cosinusoidal overtones of sinusoidal input
+	/// Returns cosine overtones of sinusoidal input
 	T wet(T i0) const {
 //		T d1 = i0 * T(2);	// Chebyshev polynomial of 2nd kind
 		T d1 = i0;			// Chebyshev polynomial of 1st kind
@@ -144,7 +147,11 @@ struct ChebyN{
 		return o0;
 	}
 	
+	/// Get number of harmonics
 	unsigned size() const { return N; }
+
+	/// Get reference to harmonic coefficient
+	T& coef(int i){ return c[i]; }
 
 	/// Set harmonic amplitudes
 	template <class V>
@@ -402,7 +409,9 @@ protected:
 
 /// Plucked string source/filter
 struct Pluck{
-	Pluck() : env(0.1), fil(3000, 0.2, LOW_PASS), comb(1./27.5, 1./440., 1, 0.99){}
+	Pluck(double freq=440, double decay=0.99)
+	:	env(0.1), fil(3000, 1, LOW_PASS), comb(1./27.5, 1./freq, 1, decay)
+	{}
 	
 	float operator()(){ return comb(fil(noise() * env())); }
 	float operator()(float in){ return comb(fil(in * env())); }
@@ -423,7 +432,7 @@ class Quantizer : public Synced{
 public:
 	/// @param[in] freq		Frequency of sequence quantization
 	/// @param[in] step		Step size of amplitude quantization
-	Quantizer(double freq, T step=0);
+	Quantizer(double freq=2000, T step=0);
 
 	void freq(double value);	///< Set freqency of sequence quantization
 	void period(double value);	///< Set period of sequence quantization

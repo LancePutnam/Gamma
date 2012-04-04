@@ -336,7 +336,8 @@ public:
 	Tv last(uint32_t i) const { return (*this)[i].val; }
 
 	/// Set all control parameters of oscillator i
-	void set(uint32_t i, Tv frq, Tv amp, Tv phs=0){ (*this)[i].set(frq*Ts::ups(), amp, phs); }
+	void set(uint32_t i, Tv frq, Tv amp=1, Tv phs=0){
+		(*this)[i].set(frq*Ts::ups(), amp, phs); }
 
 private:
 	typedef Array<SineR<Tv, Synced1> > Base;
@@ -1006,7 +1007,8 @@ TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
 #define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; return r; }
 //DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
-DEF(cos(),		up(); r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
+//DEF(cos(),		up(); r=scl::abs(r*r) )//r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
+DEF(cos(),		up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
 DEF(down(),		scl::rampDown(nextPhase()))
 DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
