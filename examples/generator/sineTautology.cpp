@@ -9,7 +9,7 @@
 
 Osc<>        sineT1(440);			// Table look-up (full-wave)
 TableSine<>  sineT2(440);			// Table look-up (quarter-wave)
-Quadra<>     sineQd(440);			// Complex mul
+CSine<>      sineCS(440);			// Complex mul
 LFO<>        sineC1(440, -0.25f);	// Computed 3rd order poly
 Sine<>       sineC2(440);			// Computed taylor
 SineR<>      sineRs(440);			// Real-valued resonator
@@ -21,7 +21,7 @@ void audioCB(AudioIOData& io){
 	while(io()){
 		float s	= sineT1()
 				+ sineT2.nextL()
-				+ sineQd().i
+				+ sineCS().i
 				+ sineC1.cos()
 				+ sineC2()
 				+ sineRs()

@@ -8,13 +8,13 @@
 
 #include "../examples.h"
 
-int main(int argc, char* argv[]){
+int main(){
 
 	const int NP=256;				// Number of points in curve
 	const int N1=17, N2=N1*N1;		// Size of graph
 	float pixels[N2];				// Accumulation buffer
 
-	Quadra<> osc(1./NP);
+	CSine<> osc(1./NP);
 	SineR<> oscAM;
 
 	for(int k=2; k<5; ++k){
@@ -35,6 +35,4 @@ int main(int argc, char* argv[]){
 		print2D(pixels, N1, N1);
 		printf("\n");
 	}}
-
-	return 0;
 }

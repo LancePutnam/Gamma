@@ -7,7 +7,7 @@
 
 #include "../examples.h"
 
-int main(int argc, char* argv[]){
+int main(){
 
 	const int NP=256;				// Number of points in curve
 	const int N1=31, N2=N1*N1;		// Size of graph
@@ -39,6 +39,4 @@ int main(int argc, char* argv[]){
 		pixels[iy*N1 + ix] += 0.125;
 	}
 	print2D(pixels, N1, N1);	
-
-	return 0;
 }

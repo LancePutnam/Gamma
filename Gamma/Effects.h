@@ -217,7 +217,7 @@ struct Chorus{
 	}
 
 	Comb<T, ipl::Cubic> comb1, comb2;		///< Comb filters
-	Quadra<double> mod;						///< Modulator
+	CSine<double> mod;						///< Modulator
 	float delay;							///< Delay interval
 };
 
@@ -314,7 +314,7 @@ struct FreqShift{
 	
 	void freq(T v){ mod.freq(v); }
 
-	Quadra<T> mod;
+	CSine<T> mod;
 	Hilbert<T> hil;
 };
 

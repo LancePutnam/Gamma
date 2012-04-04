@@ -13,7 +13,7 @@
 LFO<> osc(100);
 LFO<> shiftMod(0.1);
 Hilbert<> hil;
-Quadra<> shifter(100);
+CSine<> shifter(100);
 
 void audioCB(AudioIOData& io){
 	using namespace gam::rnd;

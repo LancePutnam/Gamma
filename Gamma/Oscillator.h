@@ -208,7 +208,7 @@ private:
 
 
 
-/// Sine-cosine quadrature wave oscillator.
+/// Complex sinusoid oscillator
 
 /// This oscillator outputs a sine and cosine wave simultaneously.  Efficiency 
 /// wise, it's comparable to a non-interpolating table oscillator, but gives a 
@@ -220,7 +220,7 @@ private:
 /// "Methods for synthesizing very high Q parametrically well behaved two pole 
 /// filters."
 template<class Tv=gam::real, class Ts=Synced>
-class Quadra : public Ts{
+class CSine : public Ts{
 public:
 
 	typedef Complex<Tv> complex;
@@ -229,7 +229,7 @@ public:
 	/// @param[in] amp		Amplitude
 	/// @param[in] dcy		Decay time (negative means no decay)
 	/// @param[in] phs		Phase in [0, 1)
-	Quadra(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
+	CSine(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 
 
 	complex val;			///< Current complex output
@@ -871,16 +871,16 @@ TEM void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
 }
 
 
-//---- Quadra
+//---- CSine
 
-TEM Quadra<Tv, Ts>::Quadra(Tv f, Tv a, Tv dcy60, Tv p)
+TEM CSine<Tv, Ts>::CSine(Tv f, Tv a, Tv dcy60, Tv p)
 	: val(a, 0), mAmp(a), mFreq(f), mDcy60(dcy60)
 {
 	Ts::initSynced();
 	this->phase(p);
 }
 
-TEM void Quadra<Tv, Ts>::amp(Tv v){
+TEM void CSine<Tv, Ts>::amp(Tv v){
 	if(scl::abs(mAmp) > Tv(0.000001)){
 		Tv factor = v / mAmp;
 		val *= factor;
@@ -890,42 +890,42 @@ TEM void Quadra<Tv, Ts>::amp(Tv v){
 	mAmp = v;
 }
 
-TEM void Quadra<Tv, Ts>::decay(Tv v){
+TEM void CSine<Tv, Ts>::decay(Tv v){
 	mDcy60 = v;
 	mDcy = v > Tv(0) ? Tv(scl::t60(v * Ts::spu())) : Tv(1);
 	freq(mFreq);
 }
 
-TEM void Quadra<Tv, Ts>::freq(Tv v){
+TEM void CSine<Tv, Ts>::freq(Tv v){
 	mFreq = v;
 	Tv phaseInc = v * Ts::ups() * Tv(M_2PI);
 	mInc.fromPolar(mDcy, phaseInc);
 	//printf("%f %f %f %f\n", phaseInc, mDcy, c1, s1);
 }
 
-TEM void Quadra<Tv, Ts>::phase(Tv v){
+TEM void CSine<Tv, Ts>::phase(Tv v){
 	// set phase without changing current magnitude
 	val.fromPolar(val.norm(), v*Tv(M_2PI));
 }
 
-TEM void Quadra<Tv, Ts>::reset(){ val(mAmp, Tv(0)); }
+TEM void CSine<Tv, Ts>::reset(){ val(mAmp, Tv(0)); }
 
-TEM void Quadra<Tv, Ts>::set(Tv frq, Tv phase, Tv amp, Tv dcy60){
+TEM void CSine<Tv, Ts>::set(Tv frq, Tv phase, Tv amp, Tv dcy60){
 	mFreq = frq;
 	decay(dcy60);
 	this->amp(amp);
 	this->phase(phase);
 }
 
-TEM inline Complex<Tv> Quadra<Tv, Ts>::operator()(){
+TEM inline Complex<Tv> CSine<Tv, Ts>::operator()(){
 	complex c = val;
 	val *= mInc;
 	return c;
 }
 
-TEM inline Tv Quadra<Tv, Ts>::freq(){ return mFreq; }
+TEM inline Tv CSine<Tv, Ts>::freq(){ return mFreq; }
 
-TEM void Quadra<Tv, Ts>::onResync(double r){
+TEM void CSine<Tv, Ts>::onResync(double r){
 	decay(mDcy60); // this sets frequency as well
 }
 
