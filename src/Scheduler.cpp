@@ -87,12 +87,10 @@ Process& Process::free(){
 	mStatus = DONE;
 	return *this;
 }
-	
-Process& Process::activate(){ mStatus=ACTIVE; return *this; }
+
+Process& Process::active(bool v){ mStatus = v ? ACTIVE : INACTIVE; return *this; }
 
 Process& Process::reset(){ onReset(); return *this; }
-
-Process& Process::inactivate(){ mStatus=INACTIVE; return *this; }
 
 Process * Process::update(const Process * top, AudioIOData& io){
 	double dt = io.secondsPerBuffer();
@@ -230,9 +228,19 @@ void Scheduler::updateControlFuncs(double dt){
 }
 
 
+//void Scheduler::cmdAdd(Process * v){
+//	v->mDeletable=true;
+//	Command c = { Command::ADD_FIRST_CHILD, this, v };
+//	mAddCommands.push(c);
+//}
+
 void Scheduler::cmdAdd(Process * v){
-	v->mDeletable=true;
-	Command c = { Command::ADD_FIRST_CHILD, this, v };
+	pushCommand(Command::ADD_FIRST_CHILD, this, v);
+}
+
+void Scheduler::pushCommand(Command::Type type, Process * object, Process * other){
+	other->mDeletable=true;
+	Command c = { type, object, other };
 	mAddCommands.push(c);
 }
 

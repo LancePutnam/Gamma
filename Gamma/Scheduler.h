@@ -200,13 +200,13 @@ public:
 	/// Flag self (and consequently all descendents) for deletion
 	Process& free();
 	
-	/// Make processor active
-	Process& activate();
+	/// Set whether processor is active
+	
+	/// If true, then the processor is executed in the synthesis network.
+	/// If false, the processor and its descendents are skipped.
+	Process& active(bool v);
 
 	Process& reset();
-
-	/// Make processor inactive
-	Process& inactivate();
 
 	/// Call processing algorithm, onProcessAudio()
 	Process * update(const Process * top, AudioIOData& io);
@@ -282,10 +282,10 @@ public:
 	///
 	int reclaim();
 	
-	/// Add a new dynamically allocated process to graph
+	/// Add dynamically allocated process as first child of root node
 	template <class AProcess>
 	AProcess& add(){
-		AProcess * v = new AProcess();
+		AProcess * v = new AProcess;
 		cmdAdd(v); return *v;
 	}
 
@@ -334,10 +334,23 @@ public:
 		cmdAdd(v); return *v;
 	}
 
+
+	/// Add dynamically allocated process as first child of specified node
+	template <class AProcess>
+	AProcess& add(Process& parent){
+		AProcess * v = new AProcess;
+		pushCommand(Command::ADD_FIRST_CHILD, &parent, v);
+		return *v;
+	}
+
+
+
 	ControlFunc& add(const Func& f){
 		mFuncs.push_back(f);
 		return mFuncs.back();
 	}
+	
+	
 
 //	template <class AProcess>
 //	Pool& getPool(){
@@ -397,6 +410,7 @@ protected:
 	
 	void updateControlFuncs(double dt);
 
+	void pushCommand(Command::Type c, Process * object, Process * other);
 	void cmdAdd(Process * v);
 
 	// Execute pending graph manipulation commands from HPT.

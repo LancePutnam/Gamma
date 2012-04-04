@@ -46,6 +46,7 @@ EXEC_TARGETS = examples/%.cpp tests/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): $(LIB_PATH) FORCE
 	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
+#	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ -lGamma -Lbuild/lib $(LDFLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
