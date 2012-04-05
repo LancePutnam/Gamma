@@ -5,6 +5,8 @@
 #include "Gamma/AudioIO.h"
 #include "Gamma/Thread.h"
 #include "Gamma/Timer.h"
+#include <stdlib.h> // exit
+#include <string.h> // memcpy
 #include <queue>
 #include <list>
 
