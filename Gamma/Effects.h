@@ -227,13 +227,16 @@ struct Chorus{
 template <class T=gam::real>
 struct FreqShift{
 
+	/// @param[in] shift	frequency shift amount
 	FreqShift(float shift=1): mod(shift){}
 
+	/// Frequency shift input
 	T operator()(T in){
 		return (hil(in) * mod()).r;
 	}
 	
-	void freq(T v){ mod.freq(v); }
+	/// Set frequency shift amount
+	FreqShift& freq(T v){ mod.freq(v); return *this; }
 
 	CSine<T> mod;
 	Hilbert<T> hil;
