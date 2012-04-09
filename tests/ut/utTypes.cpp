@@ -34,7 +34,8 @@
 		#undef T
 	}
 
-	{	Multi<3, double> v = {{0,0,0}};
+	{	Multi<3, double> v;
+		v = 0;
 		assert(v == 0);
 		assert(v != 1);
 		v = 1; assert(v == 1);

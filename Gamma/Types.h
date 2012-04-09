@@ -166,24 +166,35 @@ TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm
 #undef TEM
 
 
+template <uint32_t N, class T> struct NamedElems{ union{ T x; T mElems[N]; }; };
+template<class T> struct NamedElems<0,T>{ static T x; };
+template<class T> struct NamedElems<1,T>{ T x; };
+template<class T> struct NamedElems<2,T>{ T x,y; };
+template<class T> struct NamedElems<3,T>{ T x,y,z; };
+template<class T> struct NamedElems<4,T>{ T x,y,z,w; };
+
 
 /// Multi-element container
 
 /// This is a fixed size array to enable better loop unrolling optimizations
 /// by the compiler and to avoid an extra 'size' data member for small-sized
-/// arrays. It intentionally lacks a constructor to allow C-style struct 
-/// initializations.
+/// arrays. Elements are not initialized by default for efficiency.
 template <uint32_t N, class T>
-struct Multi{
+struct Multi : public NamedElems<N,T> {
+
+	using NamedElems<N,T>::x;
+
 	typedef Multi M;
 
-	T elems[N];
-	
+
+	T * elems(){ return &x; }
+	const T * elems() const { return &x; }
+
 	/// Set element at index with no bounds checking
-	T& operator[](uint32_t i){ return elems[i];}
+	T& operator[](uint32_t i){ return elems()[i];}
 	
 	/// Get element at index with no bounds checking
-	const T& operator[](uint32_t i) const { return elems[i]; }
+	const T& operator[](uint32_t i) const { return elems()[i]; }
 
 	#define IT for(uint32_t i=0; i<N; ++i)
 
@@ -200,7 +211,7 @@ struct Multi{
 	static uint32_t size(){ return N; }
 
 	/// Zeros all elements.
-	void zero(){ memset(elems, 0, N * sizeof(T)); }
+	void zero(){ memset(elems(), 0, N * sizeof(T)); }
 };
 
 
