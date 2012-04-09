@@ -8,7 +8,7 @@
 	Interface for and default implementation of memory allocator
 */
 
-#include <stddef.h>
+#include <cstddef>
 #include <stdlib.h>		/* size_t */
 
 namespace gam{
