@@ -66,15 +66,16 @@ AudioDevice::AudioDevice(int deviceNum)
 	setImpl(deviceNum);
 }
 
-AudioDevice::AudioDevice(const std::string& nameKeyword, bool input, bool output)
+AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
 :	mID(-1), mImpl(0)
 {
 	for(int i=0; i<numDevices(); ++i){
 		AudioDevice d(i);
+		bool bi = (stream &  INPUT) && d.hasInput();
+		bool bo = (stream & OUTPUT) && d.hasOutput();
 		std::string n = d.name();
-		if(	((input & d.hasInput()) || (output & d.hasOutput())) &&
-			n.find(nameKeyword) != std::string::npos
-		){
+
+		if(	(bi || bo) && n.find(nameKeyword) != std::string::npos){
 			setImpl(i);
 			break;
 		}

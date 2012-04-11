@@ -25,9 +25,22 @@ void audioCB(AudioIOData& io){
 		
 		float s = io.in(0,i);		// get the line-in or microphone sample
 		
-		io.out(0,i) = s * ampL;	// set left and right output channel samples
-		io.out(1,i) = s * ampR;
+		io.out(0,i) = s * ampL;		// set left  output sample
+		io.out(1,i) = s * ampR;		// set right output sample
 	}
+
+	// an alternative way to loop through the sample buffers
+	while(io()){
+		io.out(0) *= 0.5;			// scale left  output sample
+		io.out(1) *= 0.5;			// scale right output sample
+	}
+
+	// if looping again, you must reset the frame iterator
+	io.frame(0);
+	while(io()){
+		io.out(0) *= 2;				// scale left  output sample
+		io.out(1) *= 2;				// scale right output sample
+	}	
 }
 
 
@@ -46,7 +59,16 @@ int main(){
 
 	// create an audio i/o object using default input and output devices
 	AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
-	
+
+	// we can also set the input and output devices explicitly
+	// use device 0 for input and output
+	//io.deviceIn (AudioDevice(0));
+	//io.deviceOut(AudioDevice(0));
+
+	// use devices matching keyword in name
+	//io.deviceIn (AudioDevice("Microphone", AudioDevice::INPUT));
+	//io.deviceOut(AudioDevice("Built-in", AudioDevice::OUTPUT));
+
 	// set the global sample rate "subject"
 	Sync::master().spu(io.framesPerSecond());
 	

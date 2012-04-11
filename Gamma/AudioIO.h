@@ -2,50 +2,10 @@
 #define GAMMA_AUDIOIO_H_INC
 
 /*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
+	See COPYRIGHT file for authors and license information
 
-
-/*	This is a simple example demonstrating how to set up a callback
-	and process input and output buffers.
-	
-	struct MyStuff{};
-
-	// Simple: Using automatic indexing
-	void audioCBSimple(AudioIOData& io){
-		
-		MyStuff& stuff = io.user<MyStuff>();
-
-		while(io()){
-
-			float inSample1 = io.in(0);
-			float inSample2 = io.in(1);
-
-			io.out(0) = -inSample1;
-			io.out(1) = -inSample2;
-		}
-	}
-
-	// Advanced: Using manual indexing
-	void audioCB(AudioIOData& io){
-		
-		MyStuff& stuff = io.user<MyStuff>();
-
-		for(unsigned i=0; i<io.framesPerBuffer(); ++i){
-
-			float inSample1 = io.in(0,i);
-			float inSample2 = io.in(1,i);
-
-			io.out(0,i) = -inSample1;
-			io.out(1,i) = -inSample2;
-		}
-	}
-	
-	int main(){
-		MyStuff stuff;
-		
-		AudioIO audioIO(128, 44100, audioCB, &stuff, 2,2);
-		audioIO.start();
-	}
+	File Description:
+	Classes for performing audio input/output streaming
 */
 
 #include <string>
@@ -63,13 +23,19 @@ typedef void (* audioCallback)(AudioIOData& io);
 class AudioDevice{
 public:
 
+	/// Stream mode
+	enum StreamMode{
+		INPUT	= 1,	/**< Input stream */
+		OUTPUT	= 2		/**< Output stream */
+	};
+
+
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum);
 	
 	/// @param[in] nameKeyword	Keyword to search for in device name
-	/// @param[in] input		Whether to search input devices
-	/// @param[in] output		Whether to search output devices
-	AudioDevice(const std::string& nameKeyword, bool input=true, bool output=true);
+	/// @param[in] stream		Whether to search for input and/or output devices
+	AudioDevice(const std::string& nameKeyword, StreamMode stream = INPUT | OUTPUT);
 
 	~AudioDevice();
 
@@ -97,6 +63,9 @@ private:
 	const void * mImpl;
 };
 
+inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
+	return static_cast<AudioDevice::StreamMode>(+a|+b);
+}
 
 
 /// Audio data to be sent to callback
