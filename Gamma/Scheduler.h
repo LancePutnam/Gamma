@@ -291,15 +291,6 @@ public:
 		cmdAdd(v); return *v;
 	}
 
-//	template <class AProcess>
-//	AProcess& add(){
-//		Pool& pool = getPool<AProcess>();
-//		
-//		Process * proc = pool.create<AProcess>();
-//
-//		cmdAdd(proc); return *v;
-//	}
-
 	template <class AProcess, class A>
 	AProcess& add(const A& a){
 		AProcess * v = new AProcess(a);
@@ -346,18 +337,35 @@ public:
 	}
 
 
-
+	// Add deferred function call
 	ControlFunc& add(const Func& f){
 		mFuncs.push_back(f);
 		return mFuncs.back();
 	}
 	
-	
 
-//	template <class AProcess>
-//	Pool& getPool(){
-//	
-//	}
+	/// Execute all audio processes in execution tree
+
+	/// This should be called at the audio block rate. 
+	/// The latency of events will be determined by the block size.
+	void update(AudioIOData& io);
+
+	/// Set time period between low-priority actions
+	Scheduler& period(float v);
+
+	/// Start scheduler
+	void start();
+
+	/// Stop scheduler
+	void stop();
+
+	/// Scheduler audio callback
+	static void audioCB(AudioIOData& io){
+		Scheduler& s = io.user<Scheduler>();
+		s.update(io);
+	}
+
+
 
 //	void print(){
 //		printf("%d events\n", (int)events().size());
@@ -366,24 +374,6 @@ public:
 //			printf("\t"); (*it)->print();
 //		}
 //	}
-
-	/// Execute all audio processes in synthesis graph
-
-	/// This should be called at the audio block rate. 
-	/// The latency of events will be determined by the block size.
-	void update(AudioIOData& io);
-
-	Scheduler& period(float v);
-
-	void start();
-
-	void stop();
-
-	static void audioCB(AudioIOData& io){
-		Scheduler& s = io.user<Scheduler>();
-		s.update(io);
-	}
-
 protected:
 
 	struct Command{
@@ -401,14 +391,14 @@ protected:
 	// LPT:  low-priority thread
 	// HPT: high-priority thread
 	std::queue<Command> mAddCommands;	// items newly allocated in LPT to be added to tree in HPT
-	FreeList mFreeList;	// items removed from tree in HPT to be deleted in LPT
+	FreeList mFreeList;		// items removed from tree in HPT to be deleted in LPT
 	Funcs mFuncs;
-	Thread mThread;	// garbage collection thread
+	Thread mLPThread;		// low-priority thread for garbage collection, etc.
 	float mPeriod;
 	double mTime;
 	bool mRunning;
 	
-	static void * cThreadFunc(void * user);
+	static void * cLPThreadFunc(void * user);
 	
 	void updateControlFuncs(double dt);
 

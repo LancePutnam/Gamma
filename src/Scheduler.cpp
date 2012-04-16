@@ -23,9 +23,9 @@ Audio thread:
 ) move finished events from list to somewhere else for main thread reclamation
 ) unlock event list
 
-
+Responsibilities of threads:
 Low-priority thread:
-Allocate/deallocate Process objects
+	Allocate/deallocate Process objects
 
 High-priority thread:
 	Add nodes:
@@ -34,6 +34,7 @@ High-priority thread:
 		Move node from processing tree to free list
 
 */
+
 /*
 A Process is a node in a processing tree. Its placement in the tree determines 
 when it is executed in relation to other nodes in the tree.
@@ -148,7 +149,7 @@ int Scheduler::reclaim(){
 		while(it != mFuncs.end()){
 			const void * funcObj = it->mFunc.obj();
 			if(funcObj == v){
-				printf("reclaiming Process with active functions\n");
+				printf("Scheduler: reclaiming Process with active functions assigned\n");
 				//printf("does %p == %p ?\n", (void *)v, funcObj);
 				//it->mObjDel = 1;
 				//while(it->mObjDel != 2){}
@@ -156,7 +157,7 @@ int Scheduler::reclaim(){
 			++it;
 		}
 		
-		//printf("reclaim %p\n", v);
+		//printf("Scheduler: reclaiming %p\n", v);
 		delete v;
 		mFreeList.pop();
 		++r;
@@ -184,10 +185,10 @@ Scheduler& Scheduler::period(float v){
 }
 
 
-void * Scheduler::cThreadFunc(void * user){
+void * Scheduler::cLPThreadFunc(void * user){
 	Scheduler& s = *(Scheduler*)user;
 	while(s.mRunning){
-		s.mTime = toSec(timeNow());
+		s.mTime = gam::toSec(gam::timeNow());
 		s.reclaim();
 		//double dt = toSec(timeNow()) - s.mTime;
 		//printf("%g\n", dt);
@@ -197,16 +198,26 @@ void * Scheduler::cThreadFunc(void * user){
 }
 
 void Scheduler::start(){
-	mThread.joinOnDestroy(true);
+	mLPThread.joinOnDestroy(true);
 	mRunning = true;
-	mThread.start(cThreadFunc, this);
+	mLPThread.start(cLPThreadFunc, this);
 }
 
 void Scheduler::stop(){
 	mRunning=false;
 }
 
-	
+
+void Scheduler::cmdAdd(Process * v){
+	pushCommand(Command::ADD_FIRST_CHILD, this, v);
+}
+
+void Scheduler::pushCommand(Command::Type type, Process * object, Process * other){
+	other->mDeletable=true;
+	Command c = { type, object, other };
+	mAddCommands.push(c);
+}
+
 void Scheduler::updateControlFuncs(double dt){
 	Funcs::iterator it = mFuncs.begin();
 	while(it != mFuncs.end()){
@@ -227,24 +238,21 @@ void Scheduler::updateControlFuncs(double dt){
 	}
 }
 
-
-//void Scheduler::cmdAdd(Process * v){
-//	v->mDeletable=true;
-//	Command c = { Command::ADD_FIRST_CHILD, this, v };
-//	mAddCommands.push(c);
-//}
-
-void Scheduler::cmdAdd(Process * v){
-	pushCommand(Command::ADD_FIRST_CHILD, this, v);
-}
-
-void Scheduler::pushCommand(Command::Type type, Process * object, Process * other){
-	other->mDeletable=true;
-	Command c = { type, object, other };
-	mAddCommands.push(c);
-}
-
 void Scheduler::updateTree(){
+
+	/* TODO:
+	The tree should only contain processes that are active during the 
+	current block. Processes still in the future should be kept in a 
+	separate list and added to the tree when their time comes.
+	In order to avoid scanning the whole list of future events, the events
+	should be sorted according to their activation time. It is probably
+	better to use absolute times rather than delta times so we don't
+	have to perform any arithmetic to update timing status of the events.
+	
+	We should also avoid allocating memory for future Processes until when they
+	are actually used. This will also allow us to use memory pools.
+	*/
+
 	while(!mAddCommands.empty()){
 		Command& c = mAddCommands.front();
 		
