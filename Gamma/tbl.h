@@ -579,7 +579,7 @@ void addSinesPow(
 		default:A *= ::pow(h, -InvPower);
 		}
 		
-		double P = hphs + h*wphs;
+		double P = (hphs + h*wphs) * M_2PI;
 		
 		for(uint32_t i=0; i<len; ++i){
 			dst[i] += A*sin(inch*i + P);
@@ -607,7 +607,7 @@ void addWave(
 	case PARABOLIC:	addSinesPow<2>(dst,len, numh,1,hshf,amp*csaw,0.25,phs); break;
 	case SQUARE:	addSinesPow<1>(dst,len, numh,2,hshf,amp*csqr,0.00,phs); break;
 	case SAW:		addSinesPow<1>(dst,len, numh,1,hshf,amp*csaw,0.00,phs); break;
-	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp      ,0.25,phs); break;
+	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp     ,0.25,phs); break;
 	default:;
 	}
 }
