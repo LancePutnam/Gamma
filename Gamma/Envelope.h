@@ -80,13 +80,36 @@ class Env : public Ts{
 public:
 
 	Env()
-	:	mSustain(N), mLoop(0)
-	{
+	:	mSustain(N), mLoop(0){
 		for(int i=0; i<N; ++i){
 			mLengths[i]= 1e-8;
 			mCurves[i] =-4;
 			mLevels[i] = 1e-8;
 		}	mLevels[N] = 1e-8;
+		reset();
+	}
+
+	Env(Tp lvl1, Tp len1, Tp lvl2)
+	:	mSustain(N), mLoop(0){
+		levels(lvl1,lvl2);
+		lengths()[0] = len1;
+		curve(-4);
+		reset();
+	}
+
+	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
+	:	mSustain(N), mLoop(0){
+		levels(lvl1,lvl2,lvl3);
+		lengths(len1,len2);
+		curve(-4);
+		reset();
+	}
+
+	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4)
+	:	mSustain(N), mLoop(0){
+		levels(lvl1,lvl2,lvl3,lvl4);
+		lengths(len1,len2,len3);
+		curve(-4);
 		reset();
 	}
 
