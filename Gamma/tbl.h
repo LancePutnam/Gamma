@@ -92,6 +92,7 @@ void inline addSines(
 		if(A(0) != amps[i]) addSine(dst,len, i*hmul+hshf, amps[i], hphs);
 	}
 }
+
 template <class T, class Alloc, template<class,class> class ArrayType, class A>
 void inline addSines(
 	ArrayType<T,Alloc>& dst, const A * amps, int numh,
@@ -115,13 +116,14 @@ void addSines(
 ){
 	for(int i=0; i<numh; ++i) addSine(dst,len,cycs[i],amps[i],hphs);
 }
+
 template <class T, class Alloc, template<class,class> class ArrayType, class A, class C>
 void inline addSines(ArrayType<T,Alloc>& dst, const A * amps, const C * cycs, int numh, double hphs=0){
 	addSines(&dst[0],dst.size(), amps,cycs,numh,hphs);
 }
 
 
-/// Add multiple sine waves to array
+/// Add sine waves to array using inverse power law for amplitudes
 
 /// \tparam InvPower	amplitudes will be set to 1 / h^InvPower
 /// @param[out] dst		destination array
@@ -138,7 +140,7 @@ void addSinesPow(
 	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
 );
 
-template <int InvPower, class Alloc, class T, template<class,class> class ArrayType>
+template <int InvPower, class T, class Alloc, template<class,class> class ArrayType>
 inline void addSinesPow(
 	ArrayType<T,Alloc>& dst, int numh,
 	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
