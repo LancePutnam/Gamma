@@ -67,6 +67,10 @@ public:
 	/// Sets all elements to value
 	ArrayBase& assign(const T& v);
 
+	/// Assign elements from another array
+	template <class Arr>
+	ArrayBase& assign(const Arr& src);
+
 	/// Sets linear slice of elements to value
 	
 	/// @param[in] v		value to be copied as new content
@@ -74,6 +78,7 @@ public:
 	/// @param[in] stride	index stride amount
 	/// @param[in] start	start index (inclusive)
 	ArrayBase& assign(const T& v, uint32_t end, uint32_t stride=1, uint32_t start=0);
+
 
 	T * elems();					///< Get writable pointer to elements	
 	const T * elems() const;		///< Get read-only pointer to elements
@@ -357,11 +362,20 @@ TEM3 ArrayBase<T,S,A>::ArrayBase(ArrayBase<T,S,A>& src)
 
 TEM3 ArrayBase<T,S,A>::~ArrayBase(){ clear(); }
 
-TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(const T& v){
+TEM3 ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(const T& v){
 	return assign(v, size());
 }
 
-TEM3 inline ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
+TEM3
+template <class Arr>
+ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(const Arr& src){
+	unsigned N = src.size();
+	if(N > size()) N = size();
+	for(unsigned i=0; i<N; ++i) A::construct(mElems+i, T(src[i]));
+	return *this;
+}
+
+TEM3 ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
 	const T& v, uint32_t end, uint32_t stride, uint32_t start
 ){
 	for(uint32_t i=start; i<end; i+=stride) A::construct(mElems+i, v);
