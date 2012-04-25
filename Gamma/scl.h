@@ -5,23 +5,30 @@
 	See COPYRIGHT file for authors and license information
 
 	File Description:
-	Scalar-oriented functions.
+	This file defines some commonly needed scalar functions.
 */
 
 #include <math.h>
 #include <stdlib.h>				/* labs(long) */
 #include "Gamma/Conversion.h"
 
-
-#define TEM template<class T>
-
-// undefine macros in windows.h
+// Undefine macros in windows.h
 #ifdef max
 #undef max
 #endif
 #ifdef min
 #undef min
 #endif
+
+// Define some standard C99 functions that Windows is too stubborn to support.
+#if (defined(WIN32) || defined(WIN64))
+	#define nextafterf(x,y)	_nextafterf(x,y)
+	#define nextafter(x,y)	_nextafter(x,y)
+	#define nextafterl(x,y)	_nextafter(x,y)
+#endif
+
+#define TEM template<class T>
+
 
 namespace gam{
 
