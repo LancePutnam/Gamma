@@ -124,19 +124,41 @@ inline bool Thread::join(){
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
 	
+//	struct F{
+//		Thread::Function func;
+//		void * user;
+//
+//		static unsigned _stdcall * call(void * user){
+//			F& f = *(F*)user;
+//			f.func(f.userData);
+//			return 0;
+//		}
+//	} f = { func, user };
+//	
+//	unsigned thread_id;
+//	mHandle = _beginthreadex(NULL, 0, F::call, &f, 0, &thread_id);
+//	if(mHandle) return true;
+//	return false;
+
+
 	struct F{
 		Thread::Function func;
-		void * user;
+		void * userData;
 
 		static unsigned _stdcall * call(void * user){
-			F& f = *(F*)user;
-			f.func(f.userData);
+			F *pF = reinterpret_cast<F*>(user);
+			(*(pF->func))(pF->userData);
+			delete pF;
 			return 0;
 		}
-	} f = { func, user };
-	
+	};
+
+	struct F* f = new F;
+	f->func = func;
+	f->userdata = user;
+
 	unsigned thread_id;
-	mHandle = _beginthreadex(NULL, 0, F::call, &f, 0, &thread_id);
+	mHandle = _beginthreadex(NULL, 0, F::call, f, 0, &thread_id);
 	if(mHandle) return true;
 	return false;
 }
