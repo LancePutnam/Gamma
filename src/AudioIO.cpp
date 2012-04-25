@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>		/* memset() */
-#include <strings.h>
 #include <math.h>
 
 #include "portaudio.h"
@@ -36,7 +35,7 @@ static int resize(T *& buf, int n){
 }
 
 template <class T>
-static inline void zero(T * buf, int n){ bzero(buf, n*sizeof(T)); }
+static inline void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
 
 template <class T>
 static void deinterleave(T * dst, const T * src, int numFrames, int numChannels){
