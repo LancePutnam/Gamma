@@ -29,7 +29,7 @@
 namespace gam{
 
 #define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
-#define GAM_USE_THREADEX	(defined(WIN32))
+#define GAM_USE_THREADEX	(defined(WIN32) || defined(WIN64))
 
 #ifdef GAM_USE_PTHREAD
 	#include <pthread.h>
