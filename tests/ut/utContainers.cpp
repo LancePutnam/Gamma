@@ -1,4 +1,30 @@
 {
+	{	// Test onResize
+		struct TestArray : public Array<int>{
+			TestArray(): resized(false){}
+
+			void onResize(){
+				resized = true;
+			}
+			
+			bool resized;
+		};
+	
+		TestArray a;
+		assert(!a.resized);	// default ctor should not resize
+
+		a.resized = false;	// onResize should be called whenever the size changes
+		a.resize(16);
+		assert(a.resized);
+		a.resized = false;	
+		a.resize(8);
+		assert(a.resized);
+		
+		a.resized = false;	// onResize should NOT be called since the size didn't change
+		a.resize(8);
+		assert(!a.resized);
+	}
+
 	{
 		const int N=16;
 		typedef int t;
@@ -44,6 +70,7 @@
 		assert(array_t::references(elemsA) == 0);
 		assert(array_t::references(elemsB) == 2);
 	}
+
 
 	{
 		DelayN<int> d(2);
