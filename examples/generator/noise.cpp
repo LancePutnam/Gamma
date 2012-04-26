@@ -8,9 +8,9 @@
 #include "../examples.h"
 
 Accum<> tmr(1./2);
-NoiseWhite<> white;		// 1/f0 noise
-NoisePink<> pink;		// 1/f1 noise
-NoiseBrown<> brown;		// 1/f2 noise
+NoiseWhite<> white;		// 1/f^0 noise
+NoisePink<> pink;		// 1/f^1 noise
+NoiseBrown<> brown;		// 1/f^2 noise
 int type = 0;			// Noise type
 
 

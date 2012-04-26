@@ -2,7 +2,9 @@
 	See COPYRIGHT file for authors and license information
 	
 	Example:		Filter / One-pole Smoothing
-	Description:	Smoothing frequency changes with a one-pole filter
+	Description:	The demonstrates how a one-pole filter can be used to smooth
+					out control signals--in this case random stepping of the 
+					frequency of an oscillator.
 */
 
 #include "../examples.h"

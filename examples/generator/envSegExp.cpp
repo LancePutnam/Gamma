@@ -8,7 +8,7 @@
 
 #include "../examples.h"
 
-Accum<> tmr(1,1);			// Timer for resetting envelope
+Accum<> tmr(1);			// Timer for resetting envelope
 NoiseWhite<> src;		// Noise source
 
 SegExp<> env(	// Exponential envelope

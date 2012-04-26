@@ -26,7 +26,7 @@ int main(){
 	Sync::master().spu(io.framesPerSecond());
 
 	float k1 = 0.;					// velocity
-	float k2 = 0.0001;				// dispersion
+	float k2 = 0.00001;				// dispersion
 	float rs = 1./oscs.size();
 
 	for(unsigned i=0; i<oscs.size(); ++i){

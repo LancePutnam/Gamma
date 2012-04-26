@@ -22,7 +22,7 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-int main(int argc, char* argv[]){
+int main(){
 
 	// Fill sine table
 	for(int i=0; i<N; ++i){
@@ -33,5 +33,4 @@ int main(int argc, char* argv[]){
 	Sync::master().spu(io.framesPerSecond());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
 }

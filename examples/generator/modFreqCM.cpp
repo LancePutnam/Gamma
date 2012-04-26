@@ -8,7 +8,7 @@
 #include "../examples.h"
 
 float ff = 220;					// fundamental frequency
-Accum<> tmr(1./2., 2);
+Accum<> tmr(1./2);
 Sine<> oscC(ff);				// carrier
 Sine<> oscM;					// modulator
 LFO<> modIndex(tmr.freq());		// envelope for changing modulator frequency

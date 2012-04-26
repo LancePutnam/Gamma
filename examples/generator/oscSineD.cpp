@@ -7,7 +7,7 @@
 
 #include "../examples.h"
 
-Accum<> tmr(2, 2);			// Timer for randomizing parameters
+Accum<> tmr(2);				// Timer for randomizing parameters
 SineD<> osc(440, 0.2, 1);	// Decaying sinusoid
 
 void audioCB(AudioIOData& io){
@@ -23,6 +23,5 @@ void audioCB(AudioIOData& io){
 		io.out(0) = io.out(1) = s;
 	}
 }
-
 
 RUN(audioCB)

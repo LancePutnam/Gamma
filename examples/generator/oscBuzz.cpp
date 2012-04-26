@@ -2,7 +2,9 @@
 	See COPYRIGHT file for authors and license information
 	
 	Example:		Generator / Oscillator / Buzz
-	Description:	Variable harmonic impulse
+	Description:	Buzz is a variable harmonic impulse train. Note that
+					changing the number of harmonics during playback will 
+					usually create a click.
 */
 
 #include "../examples.h"

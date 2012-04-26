@@ -12,7 +12,7 @@ Sine<> osc(440);		// The signal we want to hear
 Sine<> oscLow(0.1);		// Unwanted low-frequency component
 BlockDC<> blockDC;
 
-Accum<> tmr(1./4,2);
+Accum<> tmr(1./4);
 int blockingOn = 1;
 
 void audioCB(AudioIOData& io){

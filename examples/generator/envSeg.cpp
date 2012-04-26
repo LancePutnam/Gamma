@@ -9,7 +9,7 @@
 #include "../examples.h"
 
 float fund = 440;					// fundamental frequency
-Accum<> tmr(1/1.2, 2);				// timer for resetting envelope
+Accum<> tmr(1/1.2);					// timer for resetting envelope
 Sine<> osc1(fund), osc2(fund*2);	// source oscillators
 Seg<> env(1, fund*2, fund*2);		// beat envelope
 

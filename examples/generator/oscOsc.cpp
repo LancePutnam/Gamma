@@ -8,7 +8,7 @@
 #include "../examples.h"
 
 float ff = 110;						// Fundamental frequency
-Accum<> tmr(0.2, 2);				// Timer for modifying wavetable contents
+Accum<> tmr(0.2);					// Timer for modifying wavetable contents
 Osc<> osc1(ff       , 0, 512);		// Oscillator owning a 512-element wavetable
 Osc<> osc2(ff + 0.17, 0, osc1);		// Detuned oscillator sharing osc1's table
 Osc<> osc3(ff + 0.03, 0, osc1);		// Detuned oscillator sharing osc1's table

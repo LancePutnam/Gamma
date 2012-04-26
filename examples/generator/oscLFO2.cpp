@@ -7,7 +7,7 @@
 
 #include "../examples.h"
 
-Accum<> tmr(0.5,2);			// Timer to switch between LFO types
+Accum<> tmr(0.5);			// Timer to switch between LFO types
 NoiseWhite<> noise;			// Noise source
 LFO<> env(5,0,0.25);		// LFO as amplitude envelope
 LFO<> osc(100, 0, 0.25);    // Oscillator for pitch modulation

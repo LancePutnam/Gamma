@@ -2,7 +2,9 @@
 	See COPYRIGHT file for authors and license information
 	
 	Example:		Generator / Oscillator / Additive
-	Description:	Two-oscillator binaural beating
+	Description:	This demonstrates the binaural beating effect produced
+					from playing two sinusoids with slightly different
+					frequencies in each ear.
 */
 
 #include "../examples.h"
@@ -10,9 +12,8 @@
 float ff = 220;
 float freqBeat = 1;
 
-Sine<> osc1(ff);					// fundamental oscillator
-Sine<> osc2(ff + freqBeat, 0.5);	// beat oscillator starting 180 out-of-phase
-									// from fundamental
+Sine<> osc1(ff);				// "left" sinusoid
+Sine<> osc2(ff + freqBeat);		// "right" sinusoid
 
 void audioCB(AudioIOData& io){
 

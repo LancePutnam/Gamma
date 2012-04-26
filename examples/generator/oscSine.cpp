@@ -2,12 +2,10 @@
 	See COPYRIGHT file for authors and license information
 	
 	Example:		Generator / Oscillator / Sine
-	Description:	Plays a sinusoid
+	Description:	Plays a sinusoid at 440 Hz.
 */
 
-#include <stdio.h>
-#include "Gamma/AudioIO.h"
-#include "Gamma/Oscillator.h"
+#include "../examples.h"
 
 using namespace gam;
 
@@ -21,10 +19,4 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-int main(){
-	AudioIO io(256, 44100., audioCB);
-	Sync::master().spu(io.framesPerSecond());
-	io.start();
-	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
-}
+RUN(audioCB);

@@ -9,7 +9,7 @@
 
 int feedType=0;				// Feed type
 double sweepFreq = 1./4;
-Accum<> tmr(sweepFreq, 2);	// Switch between flanging types
+Accum<> tmr(sweepFreq);		// Switch between flanging types
 Saw<> src(100);
 //NoiseWhite<> src;
 LFO<> mod(sweepFreq);

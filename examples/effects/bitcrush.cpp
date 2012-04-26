@@ -10,7 +10,7 @@
 #include "../examples.h"
 
 SineDs<> src(3);			// Modal strike
-Accum<> tmr(1,1);
+Accum<> tmr(1);
 LFO<> modSR(1./ 8, 0.0);	// Sample rate reduction modulator
 LFO<> modQn(1./32, 0.5);	// Quantization modulator
 Quantizer<> qnt;			// The bitcrush effect

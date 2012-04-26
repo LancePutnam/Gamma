@@ -43,10 +43,4 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-int main(){
-	AudioIO io(128, 44100, audioCB, 0, 2, 1);
-	Sync::master().spu(io.framesPerSecond());
-	io.start();
-	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
-}
+RUN(audioCB);
