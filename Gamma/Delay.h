@@ -277,20 +277,22 @@ TM1 Delay<TM2>::Delay()
 :	ArrayPow2<Tv>(), DELAY_INIT
 {	Ts::initSynced(); }
 
-TM1 Delay<TM2>::Delay(float maxDelay, float delay)
+TM1 Delay<TM2>::Delay(float maxDly, float dly)
 :	ArrayPow2<Tv>(), DELAY_INIT
 {
 	Ts::initSynced();
-	this->maxDelay(maxDelay);
-	this->delay(delay);
+	maxDelay(maxDly);
+	zero();
+	delay(dly);
 }
 
-TM1 Delay<TM2>::Delay(float delay)
+TM1 Delay<TM2>::Delay(float dly)
 :	ArrayPow2<Tv>(), DELAY_INIT
 {	//printf("Delay::Delay(float)\n");
 	Ts::initSynced();
-	this->maxDelay(delay);
-	this->delay(delay);
+	maxDelay(dly);
+	zero();
+	delay(dly);
 }
 
 #undef DELAY_INIT
@@ -300,9 +302,9 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 	if(Ts::sync() && Ts::sync()->hasBeenSet()){
 		//printf("Delay::maxDelay(): resize to %d\n", (uint32_t)(mMaxDelay * spu()));
 		
-		// This will only trigger onResize() -> onResync(double r) calls if
-		// the size changes, thereby preventing infinite recursion.
-		this->resize((uint32_t)(mMaxDelay * Ts::spu()));
+		// This will trigger onResize() -> onResync(double r) calls ONLY if
+		// the size changes to prevent infinite recursion.
+		this->resize(uint32_t(mMaxDelay * Ts::spu()));
 	}
 }
 

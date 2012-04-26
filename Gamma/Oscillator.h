@@ -173,7 +173,7 @@ public:
 	/// @param[in]	phs			Phase in [0, 1)
 	/// @param[in]	size		Size of table (actual number is power of 2 ceiling)
 	Osc(float frq=440, float phs=0, uint32_t size=512)
-	:	Base(frq, phs), ArrayPow2<Tv>(size)
+	:	Base(frq, phs), ArrayPow2<Tv>(size, Tv())
 	{}
 
 	/// Constructor that references an external table
@@ -209,8 +209,9 @@ public:
 	}
 
 	/// Zero table elements
-	void zero(){ for(unsigned i=0; i<this->size(); ++i) (*this)[i] = Tv(0); }
+	void zero(){ this->assign(Tv(0)); }
 
+	/// Get reference to table
 	ArrayPow2<Tv>& table(){ return *this; }
 
 //	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
@@ -242,29 +243,32 @@ public:
 
 	/// @param[in] frq		Frequency
 	/// @param[in] amp		Amplitude
-	/// @param[in] dcy		Decay time (negative means no decay)
+	/// @param[in] dcy		-60 dB decay length, in units (or negative for no decay)
 	/// @param[in] phs		Phase in [0, 1)
 	CSine(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 
 
-	complex val;			///< Current complex output
-	
-	void amp(Tv val);		///< Set amplitude
-	void decay(Tv val);		///< Set number of units to decay -60 dB. Negative = no decay.
-	void freq(Tv val);		///< Set frequency
+	complex val;				///< Current value
+
+	complex operator()();		///< Generate next sample
+
+	void amp(Tv val);			///< Set amplitude
+	void decay(Tv val);			///< Set -60 dB decay length, in units (or negative for no decay)
+	void freq(Tv val);			///< Set frequency
 	void freq(const complex& val){ mInc=val; }
-	void phase(Tv radians);	///< Set phase
-	void reset();			///< Resets amplitude and sets phase to 0
+	void phase(Tv radians);		///< Set phase
+	void reset();				///< Reset amplitude and set phase to 0
 	void set(Tv frq, Tv phs, Tv amp, Tv dcy);
 
-	complex operator()();	///< Iterate and return current complex output.
-	Tv freq();				///< Return frequency.
+	Tv amp() const {return mAmp;}		///< Get amplitude
+	Tv decay() const {return mDcy60;}	///< Get decay length
+	Tv freq() const {return mFreq;}		///< Get frequency
 
 	virtual void onResync(double r);
 
 protected:
 	Tv mAmp, mFreq, mDcy60;
-	Tv mDcy;				// phasor amp
+	Tv mDcy;			// phasor amp
 	complex mInc;		// rotation increment
 };
 
@@ -955,8 +959,6 @@ TEM inline Complex<Tv> CSine<Tv, Ts>::operator()(){
 	val *= mInc;
 	return c;
 }
-
-TEM inline Tv CSine<Tv, Ts>::freq(){ return mFreq; }
 
 TEM void CSine<Tv, Ts>::onResync(double r){
 	decay(mDcy60); // this sets frequency as well
