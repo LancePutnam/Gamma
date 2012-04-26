@@ -348,7 +348,7 @@ TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t sz)
 
 TEM3 ArrayBase<T,S,A>::ArrayBase(uint32_t sz, const T& initial)
 :	ARRAYBASE_INIT
-{	resize(sz); for(uint32_t i=0;i<this->size();++i) (*this)[i] = initial; }
+{	resize(sz); assign(initial); }
 
 TEM3 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t sz)
 :	ARRAYBASE_INIT
