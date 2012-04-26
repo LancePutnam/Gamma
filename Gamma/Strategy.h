@@ -308,20 +308,20 @@ namespace iplSeq{
 
 
 
-/// Read tap strategies
+/// Phase increment strategies
 
 // The expected interface is:
-//	void operator()(uint32_t& pos, uint32_t inc);	// fixed-point tap increment
-//	bool done(uint32_t pos);						// fixed-point tap done reading
-//	T operator()(T v, T max, T min);				// float tap post increment check
-//	void reset();									// reset internal state, if any
-namespace tap{
+//	uint32_t operator()(uint32_t& pos, uint32_t inc);	// fixed-point tap increment
+//	bool done(uint32_t pos);							// fixed-point tap done reading
+//	T operator()(T v, T max, T min);					// float tap post increment check
+//	void reset();										// reset internal state, if any
+namespace phsInc{
 
 	/// Clip (saturate) at boundary
 	struct Clip{
 		void reset(){}
 	
-		uint32_t& operator()(uint32_t& pos, uint32_t inc){
+		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += inc;
 			if(~pos & prev & 0x80000000) pos = 0xffffffff;
@@ -337,13 +337,14 @@ namespace tap{
 		T operator()(T v, T inc, T max, T min){ return scl::clip(v+inc, max, min); }
 	};
 
+
 	/// Reverse direction at boundary
 	struct Fold{
 		Fold(): dir(0){}
 	
 		void reset(){ dir=0; }
 	
-		uint32_t& operator()(uint32_t& pos, uint32_t inc){
+		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += dir ? -inc : inc;
 			if(~pos & prev & 0x80000000) dir^=1;
@@ -375,7 +376,7 @@ namespace tap{
 	
 		void reset(){ mPhase=0; mIndex=0; }
 
-		uint32_t& operator()(uint32_t& pos, uint32_t inc){
+		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = mPhase;
 			mPhase += inc;
 
@@ -421,7 +422,7 @@ namespace tap{
 		
 		void reset(){ mCount=0; }
 
-		uint32_t& operator()(uint32_t& pos, uint32_t inc){
+		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
 			pos += inc;
 			
@@ -455,14 +456,17 @@ namespace tap{
 	struct Wrap{
 		void reset(){}
 	
-		uint32_t& operator()(uint32_t& pos, uint32_t inc){ return pos+=inc; }
+		uint32_t operator()(uint32_t& pos, uint32_t inc){ return pos+=inc; }
 		bool done(uint32_t pos) const { return false; }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){ return scl::wrap(v+inc, max, min); }
 	};
 
-} // tap::
+} // phsInc::
+
+namespace tap = phsInc;
+
 
 } // gam::
 #endif
