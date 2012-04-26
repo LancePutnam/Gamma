@@ -50,13 +50,28 @@ template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
 
+	/// Default constructor that does not allocate memory
 	ArrayBase();
+
+	/// Constructor that allocates memory, but does not initialize elements
+
+	/// @param[in] size		number of elements to allocate
+	///
 	explicit ArrayBase(uint32_t size);
+
+	/// @param[in] size		number of elements to allocate
+	/// @param[in] init		value to initialize all elements to
 	ArrayBase(uint32_t size, const T& init);
+
+	/// @param[in] src		external array to reference
+	/// @param[in] size		size of external array
 	ArrayBase(T * src, uint32_t size);
+
+	/// @param[in] src		external array to reference
 	explicit ArrayBase(ArrayBase<T,S,A>& src);
 
 	virtual ~ArrayBase();
+
 
 	/// Get write reference to element
 	T& operator[](uint32_t i);
@@ -107,6 +122,7 @@ public:
 	void source(ArrayBase<T,S,A>& src);		///< Sets source of array elements to another array
 	void source(T * src, uint32_t size);	///< Sets source of array elements to another array
 
+	/// Called whenever the size changes
 	virtual void onResize(){}
 
 	/// Returns number of pointers to memory address being managed
