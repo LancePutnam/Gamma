@@ -33,6 +33,7 @@ public:
 
 
 	void freq(float v);				///< Set frequency
+	void freqI(uint32_t v);			///< Set fixed-point frequency
 	void phase(float v);			///< Set phase from [0, 1) of one period
 	void phaseMax();				///< Set phase to maximum value
 	void phaseAdd(float v);			///< Add value to phase [0, 1)
@@ -56,11 +57,26 @@ public:
 	uint32_t cycle();
 	uint32_t operator()();			///< Alias of cycle()
 
-	uint32_t nextPhase();			///< Increment phase and return pre-incremented phase
+	uint32_t nextPhase();			///< Increment phase and return updated phase
 	uint32_t nextPhase(float freqOffset);
-	uint32_t nextPhasePost();		///< Increment phase and return post-incremented phase
 	uint32_t cycles();				///< Get 1 to 0 transitions of all accumulator bits
 	uint32_t once();
+
+	/// Returns sequence of 32 triggers based on a pattern of bits
+
+	/// The 5 MSBs of the phase are used to determine how much to right
+	/// bit-shift the pattern value to check its bit.
+	/// This means we get a pattern of 32 triggers over one oscillation period.
+	/// If the oscillation frequency is positive then the pattern bits are
+	/// scanned from the LSB (bit 0) to the MSB (bit 31). If the frequency is
+	/// negative, then the bits are scanned (perhaps more intuitively) from the 
+	/// MSB to the LSB.
+	/// The following shows all 4-bit patterns made from hex values:
+	///		0	. . . .		4	. / . .		8	/ . . .		c	/ / . .
+	///		1	. . . /		5	. / . /		9	/ . . /		d	/ / . /
+	///		2	. . / .		6	. / / .		a	/ . / .		e	/ / / .
+	///		3	. . / /		7	. / / /		b	/ . / /		f	/ / / /
+	bool seq(uint32_t pattern);
 
 	virtual void onResync(double r);
 
@@ -71,15 +87,14 @@ protected:
 	Stap mTap;
 	
 	uint32_t mapFI(float v) const;	// convert unit floating-point to fixed-point integer
-	float mapIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
+	double mapIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
 	uint32_t mapFreq(float v) const;
 };
 
 #define ACCUM_INHERIT\
 	using Accum<Stap,Ts>::phaseI;\
 	using Accum<Stap,Ts>::freqI;\
-	using Accum<Stap,Ts>::nextPhase;\
-	using Accum<Stap,Ts>::nextPhasePost;
+	using Accum<Stap,Ts>::nextPhase;
 
 
 
@@ -173,7 +188,7 @@ public:
 
 	/// Generate next sample
 	Tv operator()(){
-		Tv r = val(); this->nextPhasePost(); return r;
+		this->nextPhase(); return val();
 	}
 
 	/// Get current value
@@ -479,13 +494,16 @@ public:
 	/// @param[in] mod		Modifier amount in [0, 1)
 	LFO(float frq, float phase=0, float mod=0.5);
 
-	uint32_t modi;			///< Modifier parameter
 
 	/// Set frequency, phase and modifier amount
 	LFO& set(float f, float p, float m);
 
-	LFO& mod(double n);	///< Sets modifier parameter of waveform from unit value
+	LFO& mod(double n);		///< Set modifier from unit value
+	LFO& modI(uint32_t v);	///< Set modifier from integer
 
+	/// Get modifier value
+	uint32_t modI() const { return mMod; }
+	double mod() const { return mMod / 4294967296.; }
 
 	float cos();		///< Cosine based on 3rd order polynomial
 	float down();		///< Downward ramp (1 to -1)
@@ -519,11 +537,10 @@ public:
 	float sineT9();
 	float sineP9();
 
-	bool seq();			// Returns 'mod' as sequence of triggers
-
 	ACCUM_INHERIT
 private:
 	typedef Accum<Stap,Ts> Base;
+	uint32_t mMod;			// Modifier parameter
 };
 
 
@@ -751,19 +768,20 @@ protected:
 
 TEMTS TACCUM::Accum(float f, float p): mFreq(f){
 	Ts::initSynced();
-	(p >= 1.f) ? phaseMax() : this->phase(p);
-	//printf("%u\n", mPhaseI);
+	phase(p);
+	//(p >= 1.f) ? phaseMax() : this->phase(p);
 }
 
+// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
 TEMTS inline uint32_t TACCUM::mapFI(float v) const {
 	//return scl::unitToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
 	return castIntRound(v * 4294967296.);
 }
 
-TEMTS inline float TACCUM::mapIF(uint32_t v) const {
-	//return v/4294967296.;
-	return uintToUnit<float>(v);
+TEMTS inline double TACCUM::mapIF(uint32_t v) const {
+	return v/4294967296.;
+	//return uintToUnit<float>(v); // not enough precision
 }
 
 TEMTS inline uint32_t TACCUM::mapFreq(float v) const {
@@ -771,16 +789,25 @@ TEMTS inline uint32_t TACCUM::mapFreq(float v) const {
 }
 
 TEMTS void TACCUM::onResync(double r){ //printf("Accum: onSyncChange (%p)\n", this);
+	uint32_t fprev = mFreqI;
 	freq(mFreq);
+	
+	// ensure phase will be correct value upon next increment
+	mPhaseI = mPhaseI + fprev - mFreqI;
 }
 
 TEMTS inline void TACCUM::freq(float v){
-	mFreq  = v;
-	mFreqI = mapFreq(v);
+	mFreq = v;
+	mFreqI= mapFreq(v);
+}
+
+TEMTS inline void TACCUM::freqI(uint32_t v){
+	mFreqI= v;
+	mFreq = mapIF(v) * Ts::spu();
 }
 
 TEMTS inline void TACCUM::period(float v){ freq(1.f/v); }
-TEMTS inline void TACCUM::phase(float v){ mPhaseI = mapFI(v); }
+TEMTS inline void TACCUM::phase(float v){ mPhaseI = mapFI(v) - mFreqI; }
 TEMTS inline void TACCUM::phaseAdd(float v){ mTap(mPhaseI, mapFI(v)); }
 TEMTS inline void TACCUM::phaseMax(){ mPhaseI = 0xffffffff; }
 
@@ -791,15 +818,10 @@ TEMTS inline float TACCUM::phase() const { return mapIF(mPhaseI); }
 TEMTS inline uint32_t TACCUM::phaseI() const { return mPhaseI; }
 
 TEMTS inline uint32_t TACCUM::nextPhase(float frqOffset){
-	uint32_t r=mPhaseI;
-	mTap(mPhaseI, mFreqI + mapFreq(frqOffset));
-	return r;
+	return mTap(mPhaseI, mFreqI + mapFreq(frqOffset));
 }
 
-TEMTS inline uint32_t TACCUM::nextPhase(){ uint32_t r=mPhaseI; nextPhasePost(); return r; }
-TEMTS inline uint32_t TACCUM::nextPhasePost(){ return mTap(mPhaseI, mFreqI); }
-
-
+TEMTS inline uint32_t TACCUM::nextPhase(){ return mTap(mPhaseI, mFreqI); }
 
 TEMTS inline uint32_t TACCUM::operator()(){ return cycle(); }
 
@@ -811,7 +833,7 @@ TEMTS inline uint32_t TACCUM::cycle(){ return cycles() & 0x80000000; }
 
 TEMTS inline uint32_t TACCUM::cycles(){
 	uint32_t prev = phaseI();
-	nextPhasePost();	
+	nextPhase();
 	return ~phaseI() & prev;
 }
 
@@ -820,6 +842,17 @@ TEMTS inline uint32_t TACCUM::once(){
 	uint32_t c = cycle();
 	if(c) mPhaseI = prev;
 	return c;
+}
+
+TEMTS inline bool TACCUM::seq(uint32_t pat){
+	uint32_t prev = phaseI();
+	nextPhase();
+
+	// Did any of the 5 MSBs change?
+	if((phaseI() ^ prev) & 0xf8000000){
+		return (pat >> (phaseI()>>27)) & 0x1;
+	}
+	return false;
 }
 
 #undef TACCUM
@@ -983,23 +1016,24 @@ TEMTS TLFO::LFO(): Base(){ mod(0.5); }
 TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
 TEMTS inline TLFO& TLFO::set(float f, float p, float m){ this->freq(f); this->phase(p); return mod(m); }
-TEMTS inline TLFO& TLFO::mod(double v){ modi = castIntRound(v*4294967296.); return *this; }
+TEMTS inline TLFO& TLFO::mod(double v){ return modI(castIntRound(v*4294967296.)); }
+TEMTS inline TLFO& TLFO::modI(uint32_t v){ mMod=v; return *this; }
 
 TEMTS inline float TLFO::line2(){
 	using namespace gam::scl;
 	
 //	// Starts at 1
 //	float r1 = rampDown(phaseI());
-//	float r2 = rampDown(phaseI() + modi);
+//	float r2 = rampDown(phaseI() + mMod);
 
 	// Starts at -1 (better for creating attack/decay like envelopes)
-	uint32_t m = scl::clip<uint32_t>(modi, 0xffefffff, 512); // avoid div by zero
+	uint32_t m = scl::clip<uint32_t>(mMod, 0xffefffff, 512); // avoid div by zero
 	float r1 = rampDown(phaseI() - m);
 	float r2 = rampDown(phaseI());
 	float p  = rampUpU(m);
 
 	float r = (r1*r1 - r2*r2)/(4.f*p*(1.f - p));
-	nextPhasePost();
+	nextPhase();
 	return r;
 }
 
@@ -1014,39 +1048,31 @@ DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
 DEF(imp(),		scl::pulseU(nextPhase(), this->freqI()) )
 DEF(para(),		paraU()*1.5f - 0.5f)
-DEF(pulse(),	scl::pulse(nextPhase(), modi))
+DEF(pulse(),	scl::pulse(nextPhase(), mMod))
 DEF(sinPara(),	scl::sinPara(nextPhase()))
-DEF(stair(),	scl::stair(nextPhase(), modi))
+DEF(stair(),	scl::stair(nextPhase(), mMod))
 DEF(sqr(),		scl::square(nextPhase()))
 DEF(tri(),		scl::triangle(nextPhase()))
 DEF(up(),		scl::rampUp(nextPhase()))
-DEF(up2(),		scl::rampUp2(nextPhase(), modi))
+DEF(up2(),		scl::rampUp2(nextPhase(), mMod))
 DEF(cosU(),		tri(); r = scl::mapSinSU(r))
 DEF(downU(),	scl::rampDownU(nextPhase()))
 DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
 DEF(paraU(),	up(); r*=r;)
-DEF(pulseU(),	scl::pulseU(nextPhase(), modi))
+DEF(pulseU(),	scl::pulseU(nextPhase(), mMod))
 DEF(sqrU(),		scl::squareU(nextPhase()))
-DEF(stairU(),	scl::stairU(nextPhase(), modi))
+DEF(stairU(),	scl::stairU(nextPhase(), mMod))
 DEF(triU(),		scl::triangleU(nextPhase()))
 DEF(upU(),		scl::rampUpU(nextPhase()))
-DEF(up2U(),		scl::rampUp2U(nextPhase(), modi))
-DEF(patU(),		scl::rampUpU(nextPhase() & modi))
+DEF(up2U(),		scl::rampUp2U(nextPhase(), mMod))
+DEF(patU(),		scl::rampUpU(nextPhase() & mMod))
 
-DEF(patU(uint32_t mul), scl::rampUpU((nextPhase() & modi) * mul))
+DEF(patU(uint32_t mul), scl::rampUpU((nextPhase() & mMod) * mul))
 
 DEF(sineT9(),	up(); r = scl::sinT9(r * M_PI))
 DEF(sineP9(),	up(); r = scl::sinP9(r))
 
 #undef DEF
-
-TEMTS inline bool TLFO::seq(){
-	uint32_t prev = nextPhase();
-	if( (phaseI() ^ prev) & 0xf8000000 ){
-		if( (modi >> (phaseI()>>27)) & 0x1 ) return true;
-	}
-	return false;
-}
 
 #undef TLFO
 
