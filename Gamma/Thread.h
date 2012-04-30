@@ -31,7 +31,7 @@ namespace gam{
 #define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
 #define GAM_USE_THREADEX	(defined(WIN32) || defined(WIN64))
 
-#ifdef GAM_USE_PTHREAD
+#if GAM_USE_PTHREAD
 	#include <pthread.h>
 #elif GAM_USE_THREADEX
 	#include <windows.h>
@@ -43,7 +43,7 @@ public:
 
 	typedef void * (*Function)(void * user);
 
-	#ifdef GAM_USE_PTHREAD
+	#if GAM_USE_PTHREAD
 		typedef pthread_t		Handle;
 	#elif GAM_USE_THREADEX
 		typedef unsigned long	Handle;
@@ -99,7 +99,7 @@ protected:
 
 // Implementation
 
-#ifdef GAM_USE_PTHREAD
+#if GAM_USE_PTHREAD
 
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
@@ -145,7 +145,7 @@ inline bool Thread::start(Thread::Function func, void * user){
 		Thread::Function func;
 		void * userData;
 
-		static unsigned _stdcall * call(void * user){
+		static unsigned _stdcall call(void * user){
 			F *pF = reinterpret_cast<F*>(user);
 			(*(pF->func))(pF->userData);
 			delete pF;
@@ -155,7 +155,7 @@ inline bool Thread::start(Thread::Function func, void * user){
 
 	struct F* f = new F;
 	f->func = func;
-	f->userdata = user;
+	f->userData = user;
 
 	unsigned thread_id;
 	mHandle = _beginthreadex(NULL, 0, F::call, f, 0, &thread_id);

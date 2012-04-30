@@ -194,6 +194,9 @@ else ifeq ($(PLATFORM), macosx)
 else ifeq ($(PLATFORM), windows)
 
 	PLATFORM_DIR = windows/
+	
+	# This is needed for MinGW/MSYS
+	CPPFLAGS += -I`pwd`
 
 	SLIB_EXT = lib
 	DLIB_EXT = dll
