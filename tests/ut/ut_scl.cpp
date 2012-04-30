@@ -96,6 +96,11 @@
 	T(0., 0.)	T( 0.5, 0.5) T( 1.,-1.) T( 1.2,-0.8) T( 2.2, 0.2)
 				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)
 	#undef T
+	
+	#define T(x, y) assert(scl::almostEqual(scl::wrapPhase(x), y));
+	T(0., 0.)	T( 1., 1.) T( M_PI,-M_PI) T( M_PI+1, -M_PI+1) T( 7*M_PI+1, -M_PI+1)
+				T(-1.,-1.) T(-M_PI,-M_PI) T(-M_PI-1,  M_PI-1) T(-7*M_PI+1, -M_PI+1)
+	#undef T
 
 //	for(int i=0; i<36; ++i){
 //		printf("%2d -> %f\n", i, scl::nearest<float>(i, "a2"));
