@@ -21,7 +21,8 @@
 #endif
 
 // Define some standard C99 functions that Windows is too stubborn to support.
-#if (defined(WIN32) || defined(WIN64))
+//#if (defined(WIN32) || defined(WIN64))
+#if defined(WIN64)
 	#define nextafterf(x,y)	_nextafterf(x,y)
 	#define nextafter(x,y)	_nextafter(x,y)
 	#define nextafterl(x,y)	_nextafter(x,y)
@@ -972,7 +973,7 @@ TEM inline T wrap(T v, long& numWraps, T hi, T lo){
 
 TEM inline T wrapOnce(T v, T hi){
 	     if(v >= hi ) return v - hi;
-	else if(v < (T)0) return v + hi;
+	else if(v < T(0)) return v + hi;
 	return v;
 }
 
@@ -983,22 +984,24 @@ TEM inline T wrapOnce(T v, T hi, T lo){
 }
 
 TEM inline T wrapPhase(T r){
-	if(r >= (T)M_PI){
-		r -= (T)M_2PI;
-		if(r < (T)M_PI) return r;
+	// The result is		[r+pi - 2pi floor([r+pi] / 2pi)] - pi
+	// which simplified is	r - 2pi floor([r+pi] / 2pi) .
+	if(r >= T(M_PI)){
+		r -= T(M_2PI);
+		if(r < T(M_PI)) return r;
+		return r - T(long((r+M_PI)*M_1_2PI)  )*M_2PI;
 	}
-	else if (r < (T)-M_PI){
-		r += (T)M_2PI;
-		if(r >= (T)-M_PI) return r;
+	else if (r < T(-M_PI)){
+		r += T(M_2PI);
+		if(r >= T(-M_PI)) return r;
+		return r - T(long((r+M_PI)*M_1_2PI)-1)*M_2PI;
 	}
 	else return r;
-
-	return r - (T)M_2PI * scl::floor<T>((r + (T)M_PI) * (T)M_1_2PI);
 }
 
 TEM inline T wrapPhaseOnce(T r){
-	if(r >= (T)M_PI)		return r - (T)M_2PI;
-	else if(r < (T)-M_PI)	return r + (T)M_2PI;
+	if(r >= T(M_PI))		return r - T(M_2PI);
+	else if(r < T(-M_PI))	return r + T(M_2PI);
 	return r;
 }
 
