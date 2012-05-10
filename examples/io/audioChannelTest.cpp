@@ -22,7 +22,7 @@ struct TestSound{
 		env *= 0.9997;
 		return r;
 	}
-	
+
 	void reset(){ env = 1; }
 	bool done(){ return env < 0.001; }
 };
@@ -32,7 +32,7 @@ int chan=-1;
 
 
 void audioCB(AudioIOData & io){
-	
+
 	while(io()){
 
 		if(src.done()){
@@ -48,22 +48,33 @@ void audioCB(AudioIOData & io){
 
 
 int main(){
-	
-	int maxOChans = AudioDevice::defaultOutput().channelsOutMax();
-	int maxIChans = AudioDevice::defaultOutput().channelsOutMax();
+
+	AudioDevice adevi = AudioDevice::defaultInput();
+	AudioDevice adevo = AudioDevice::defaultOutput();
+	//AudioDevice adevi = AudioDevice("firewire_pcm");
+	//AudioDevice adevo = AudioDevice("firewire_pcm");
+
+	int maxOChans = adevo.channelsOutMax();
+	int maxIChans = adevi.channelsOutMax();
 	printf("Max input channels:  %d\n", maxIChans);
 	printf("Max output channels: %d\n", maxOChans);
 
 	// To open the maximum number of channels, we can hand in the queried values...
 	//AudioIO io(256, 44100., audioCB, NULL, maxOChans, maxIChans);
-	
+
 	// ... or just use -1
 	AudioIO io(256, 44100., audioCB, NULL, -1, -1);
 
+	io.deviceIn(adevi);
+	io.deviceOut(adevo);
+
 	//Sync::master().spu(io.framesPerSecond());
-	io.start();
-	//io.print();
-	
-	printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
+	if(io.start()){
+		printf("start successful\n");
+		io.print();
+		printf("\nPress 'enter' to quit...\n"); getchar();
+	}
+	else{
+		printf("start failed\n");
+	}
 }
