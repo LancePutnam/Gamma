@@ -17,7 +17,7 @@
 	else{\
 		for(uint32_t i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
-			float m = c.norm2();\
+			float m = c.normSqr();\
 			float p = scl::atan2Fast(c.i,c.r);\
 			c(scl::sqrt<1>(m), p);\
 		}\
