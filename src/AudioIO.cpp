@@ -320,6 +320,9 @@ void AudioIO::deviceOut(const AudioDevice& v){
 	}
 }
 
+void AudioIO::device(const AudioDevice& v){
+	deviceIn(v); deviceOut(v);
+}
 
 void AudioIO::channelsBus(int num){
 	resize(mBufB, num * mFramesPerBuffer);

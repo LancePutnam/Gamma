@@ -214,6 +214,7 @@ public:
 	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
+	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)
 	void deviceIn(const AudioDevice& v);		///< Set input device
 	void deviceOut(const AudioDevice& v);		///< Set output device
 	void framesPerSecond(double v);				///< Set number of frames per second
