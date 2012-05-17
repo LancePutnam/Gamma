@@ -403,9 +403,9 @@ bool AudioIO::open(){
 			this
 		);
 
-		i.mIsOpen = paNoError == i.mErrNum;
+		i.mIsOpen = (paNoError == i.mErrNum);
 	}
-	//printf("AudioIO::open()\n"); printError();
+	//printf("AudioIO::open(): "); i.printError();
 	return paNoError == i.mErrNum;
 }
 
