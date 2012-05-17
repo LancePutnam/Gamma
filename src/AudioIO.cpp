@@ -161,13 +161,17 @@ struct AudioIOData::Impl{
 
 	bool error() const { return mErrNum != paNoError; }
 
-	void printError() const { printf("%s \n", Pa_GetErrorText(mErrNum)); }
+	void printError(const char * text = "") const {
+		if(error()){
+			fprintf(stderr, "%s: %s\n", text, Pa_GetErrorText(mErrNum));
+		}
+	}
 
 	bool supportsFPS(double fps) const {
 		const PaStreamParameters * pi = mInParams.channelCount  == 0 ? 0 : &mInParams;
 		const PaStreamParameters * po = mOutParams.channelCount == 0 ? 0 : &mOutParams;	
 		mErrNum = Pa_IsFormatSupported(pi, po, fps);
-		if(error()){ printf("AudioIO error: "); printError(); }
+		printError("gam::AudioIO::Impl::supportsFPS");
 		return paFormatIsSupported == mErrNum;
 	}
 
@@ -405,7 +409,7 @@ bool AudioIO::open(){
 
 		i.mIsOpen = (paNoError == i.mErrNum);
 	}
-	//printf("AudioIO::open(): "); i.printError();
+	i.printError("Error in gam::AudioIO::open()");
 	return paNoError == i.mErrNum;
 }
 
@@ -510,6 +514,7 @@ bool AudioIO::start(){
 	if(!i.mIsOpen) open();
 	if(i.mIsOpen && !i.mIsRunning)	i.mErrNum = Pa_StartStream(i.mStream);
 	if(paNoError == i.mErrNum)	mImpl->mIsRunning = true;
+	i.printError("Error in gam::AudioIO::start()");
 	return paNoError == i.mErrNum;
 }
 
