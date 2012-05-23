@@ -139,8 +139,6 @@ ifeq ($(PLATFORM), linux)
 	ifneq ($(USING_PUREDYNE), 0)
 		CXX = gcc
 	endif
-	
-	#CXX = clang++
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -m32
@@ -169,18 +167,22 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -arch i386 -arch x86_64
 	endif
 
-	# This triggers an ocean of loader warnings...
-	#CFLAGS += -fvisibility=hidden -fvisibility-inlines-hidden
+	# Oh where, oh where have my SDKs gone?
+	ifeq "$(wildcard /Applications/XCode.app)" ""
+		OSX_SDK_PATH := /Developer/SDKs/
+	else
+		OSX_SDK_PATH := /Applications/XCode.app/Contents/Developer/Platforms/
+	endif
 
-	# Set system root directory
+	# Set system root directory for stdc++ etc.
 	ifeq ($(OSX_VERSION), 10_7)
-		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
 	else ifeq ($(OSX_VERSION), 10_6)
-		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.6.sdk -mmacosx-version-min=10.6
 	else ifeq ($(OSX_VERSION), 10_5)
-		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.5.sdk -mmacosx-version-min=10.5
 	else ifeq ($(OSX_VERSION), 10_4)
-		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
 	endif
 
 	LDFLAGS	+= -lm -lstdc++
@@ -202,18 +204,22 @@ else ifeq ($(PLATFORM), windows)
 	DLIB_EXT = dll
 endif
 
-ifeq ($(BUILD_CONFIG), Release)
-	CFLAGS += -O3 -fpeel-loops
-else
-	CFLAGS += -g -O0 -fno-inline
-endif
 
+# Whether to echo commands to the terminal...
 ifeq ($(VERBOSE), 0)
 	AR  := @$(AR)
 	CC  := @$(CC)
 	CXX := @$(CXX)
 endif
 
+# Append optimization flags
+ifeq ($(BUILD_CONFIG), Release)
+	CFLAGS += -O3 -fpeel-loops
+else
+	CFLAGS += -g -O0 -fno-inline
+endif
+
+# Append warning flags
 ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
@@ -238,7 +244,6 @@ else
 	LIB_FILE = $(SLIB_FILE)
 	LIB_PATH = $(SLIB_PATH)
 endif
-
 
 
 #--------------------------------------------------------------------------
