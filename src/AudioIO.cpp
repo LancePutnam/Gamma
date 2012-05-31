@@ -302,7 +302,7 @@ void AudioIO::deviceIn(const AudioDevice& v){
 		mImpl->mInParams.hostApiSpecificStreamInfo = NULL;
 	}
 	else{
-		warn("attempt to set input device to a device without inputs", "io::AudioIO");
+		warn("attempt to set input device to a device without inputs", "gam::AudioIO");
 	}
 }
 
@@ -316,7 +316,7 @@ void AudioIO::deviceOut(const AudioDevice& v){
 		mImpl->mOutParams.hostApiSpecificStreamInfo = NULL;
 	}
 	else{
-		warn("attempt to set output device to a device without outputs", "io::AudioIO");
+		warn("attempt to set output device to a device without outputs", "gam::AudioIO");
 	}
 }
 
@@ -342,8 +342,8 @@ void AudioIO::channels(int num, bool forOutput){
 
 	const PaDeviceInfo * info = Pa_GetDeviceInfo(params->device);
 	if(0 == info){
-		if(forOutput)	warn("attempt to set number of channels on invalid output device", "io::AudioIO");
-		else			warn("attempt to set number of channels on invalid input device", "io::AudioIO");
+		if(forOutput)	warn("attempt to set number of channels on invalid output device", "gam::AudioIO");
+		else			warn("attempt to set number of channels on invalid input device", "gam::AudioIO");
 		return;	// this particular device is not open, so return
 	}
 
