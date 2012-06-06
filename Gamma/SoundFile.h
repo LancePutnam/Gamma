@@ -63,9 +63,10 @@ public:
 	
 	/// Opens sound file for writing.
 	
-	/// Before calling this method it is necessary to set the format of the
-	/// file using format(), e.g. format(SF_FORMAT_AIFF | SF_FORMAT_PCM_16).
-	/// Returns true on success and false otherwise.
+	/// Before calling this method it is necessary to set the number of 
+	/// channels and frame rate. If no EncodingType is set, then PCM_16 is 
+	/// used. The Format of the sound file is derived from the extension.
+	/// \returns true on success and false otherwise.
 	bool openWrite();
 	
 	bool close();		///< Closes sound file.  Files are closed in destructor.
