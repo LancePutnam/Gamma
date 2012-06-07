@@ -9,6 +9,7 @@
 */
 
 #include <string>
+#include <vector>
 
 namespace gam{
 
@@ -68,7 +69,11 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 }
 
 
+
 /// Audio data to be sent to callback
+
+/// Audio buffers are guaranteed to be stored in a contiguous non-interleaved 
+/// format, i.e., frames are tightly packed per channel.
 class AudioIOData {
 public:
 	/// Constructor
@@ -139,10 +144,13 @@ public:
 	double time() const;				///< Get current stream time in seconds
 	double time(int frame) const;		///< Get current stream time in seconds of frame
 
-
+	void user(void * v){ mUser=v; }		///< Set user data
 	void frame(int v){ mFrame=v-1; }	///< Set frame count for next iteration
 	void zeroBus();						///< Zeros all the bus buffers
 	void zeroOut();						///< Zeros all the internal output buffers
+
+	AudioIOData& gain(float v){ mGain=v; return *this; }
+	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
 
 protected:
 	class Impl; Impl * mImpl;
@@ -153,8 +161,18 @@ protected:
 	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
 	float * mBufT;					// temporary one channel buffer
 	int mNumI, mNumO, mNumB;		// input, output, and aux channels
+public:
+	float mGain, mGainPrev;
 };
 
+
+
+/// Interface for objects which can be registered with an audio IO stream
+class AudioCallback {
+public:
+	virtual ~AudioCallback() {}
+	virtual void onAudioCB(AudioIOData& io) = 0;	///< Callback
+};
 
 
 /// Audio input/output streaming
@@ -162,11 +180,11 @@ class AudioIO : public AudioIOData {
 public:
 
 	/// Creates AudioIO using default I/O devices.
-	///
+
 	/// @param[in] framesPerBuf		Number of sample frames to process per callback
 	/// @param[in] framesPerSec		Frame rate.  Unsupported values will use default rate of device.
-	/// @param[in] callback			Audio processing callback
-	/// @param[in] userData			Pointer to user data accessible within callback
+	/// @param[in] callback			Audio processing callback (optional)
+	/// @param[in] userData			Pointer to user data accessible within callback (optional)
 	/// @param[in] outChans			Number of output channels to open
 	/// @param[in] inChans			Number of input channels to open
 	/// If the number of input or output channels is greater than the device
@@ -184,6 +202,13 @@ public:
 	using AudioIOData::framesPerSecond;
 
 	audioCallback callback;						///< User specified callback function.
+	
+	/// Add an AudioCallback handler (internal callback is always called first)
+	AudioIO& append(AudioCallback& v);		
+	AudioIO& prepend(AudioCallback& v);
+
+	/// Remove all input event handlers matching argument
+	AudioIO& remove(AudioCallback& v);
 
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
@@ -192,7 +217,7 @@ public:
 	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
 	bool zeroNANs() const;						///< Returns whether to zero NANs in output buffer going to DAC
 	
-	void operator()();							///< Call callback manually
+	void processAudio();						///< Call callback manually
 	bool open();								///< Opens audio device.
 	bool close();								///< Closes audio device. Will stop active IO.
 	bool start();								///< Starts the audio IO.  Will open audio device if necessary.
@@ -211,7 +236,7 @@ public:
 	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
-	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)
+	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)	
 	void deviceIn(const AudioDevice& v);		///< Set input device
 	void deviceOut(const AudioDevice& v);		///< Set output device
 	void framesPerSecond(double v);				///< Set number of frames per second
@@ -224,19 +249,21 @@ public:
 
 private:
 	AudioDevice mInDevice, mOutDevice;
-
 	bool mZeroNANs;			// whether to zero NANs
 	bool mClipOut;			// whether to clip output between -1 and 1
 	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
+	std::vector<AudioCallback *> mAudioCallbacks;
 
-	void init();			// 
+	void init();			//
 	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
 
 
-//==============================================================================
 
+
+
+//==============================================================================
 inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
 inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
 inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
