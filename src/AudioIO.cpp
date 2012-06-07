@@ -248,7 +248,6 @@ AudioIO::AudioIO(
 :	AudioIOData(userData),
 	callback(callbackA),
 	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
-	mInResizeDeferred(false), mOutResizeDeferred(false),
 	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
 {
 	init();
@@ -325,12 +324,23 @@ void AudioIO::device(const AudioDevice& v){
 }
 
 void AudioIO::channelsBus(int num){
+
+	if(mImpl->mIsOpen){
+		warn("the number of channels cannnot be set with the stream open", "gam::AudioIO");
+		return;
+	}
+	
 	resize(mBufB, num * mFramesPerBuffer);
 	mNumB = num;
 }
 
 
 void AudioIO::channels(int num, bool forOutput){
+	
+	if(mImpl->mIsOpen){
+		warn("the number of channels cannnot be set with the stream open", "gam::AudioIO");
+		return;
+	}
 	
 	PaStreamParameters * params = forOutput ? &mImpl->mOutParams : &mImpl->mInParams;
 	
@@ -360,23 +370,14 @@ void AudioIO::channels(int num, bool forOutput){
 	int currentNum = channels(forOutput);
 	
 	if(num != currentNum){
-
 		params->channelCount = min(num, maxChans);
-
 		forOutput ? mNumO = num : mNumI = num;
-		
-		deferBufferResize(forOutput);
+		resizeBuffer(forOutput);
 	}
 }
 
 
 bool AudioIO::close(){ return mImpl->close(); }
-
-
-void AudioIO::deferBufferResize(bool forOutput){
-	if(forOutput)	mOutResizeDeferred = true;
-	else			mInResizeDeferred = true;
-}
 
 
 bool AudioIO::open(){
@@ -386,11 +387,12 @@ bool AudioIO::open(){
 
 	if(!(i.mIsOpen || i.mIsRunning)){
 
-		resizeBuffer(false);
+		// LJP
+		/*resizeBuffer(false);
 		resizeBuffer(true);
 
 		resize(mBufT, mFramesPerBuffer);
-		
+		*/
 		PaStreamParameters * inParams = &i.mInParams;
 		PaStreamParameters * outParams = &i.mOutParams;
 		
@@ -472,30 +474,22 @@ void AudioIO::reopen(){
 }
 
 void AudioIO::resizeBuffer(bool forOutput){
-
 	float *& buffer = forOutput ? mBufO : mBufI;
 	int& chans      = forOutput ? mNumO : mNumI;
-	bool& deferred  = forOutput ? mOutResizeDeferred : mInResizeDeferred;
 
-	if(deferred){
-		if(chans > 0){			
-			int n = resize(buffer, chans * mFramesPerBuffer);
-			if(n){	deferred = false; }
-			else{	chans = 0; }
-		}
-		else{
-			deleteBuf(buffer);
-			deferred = false;
-		}
+	if(chans > 0){			
+		int n = resize(buffer, chans * mFramesPerBuffer);
+		if(0 == n) chans = 0;
+	}
+	else{
+		deleteBuf(buffer);
 	}
 }
 
 
 void AudioIO::framesPerSecond(double v){	//printf("AudioIO::fps(%f)\n", v);
 	if(AudioIOData::framesPerSecond() != v){
-                
 		if(!supportsFPS(v)) v = mOutDevice.defaultSampleRate();
-
 		mFramesPerSecond = v;
 		reopen();
 	}
@@ -503,10 +497,17 @@ void AudioIO::framesPerSecond(double v){	//printf("AudioIO::fps(%f)\n", v);
 
 
 void AudioIO::framesPerBuffer(int n){
+	if(mImpl->mIsOpen){
+		warn("the number of frames/buffer cannnot be set with the stream open", "gam::AudioIO");
+		return;
+	}
+
 	if(framesPerBuffer() != n){
 		mFramesPerBuffer = n;
+		resizeBuffer(true);
+		resizeBuffer(false);
 		channelsBus(AudioIOData::channelsBus());
-		reopen();
+		resize(mBufT, mFramesPerBuffer);
 	}
 }
 
