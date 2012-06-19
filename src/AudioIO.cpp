@@ -1,6 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>		/* memset() */
