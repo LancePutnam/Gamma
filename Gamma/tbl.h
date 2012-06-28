@@ -507,28 +507,28 @@ TEM void nyquist(T * dst, uint32_t len, uint32_t str){
 	}
 }
 
-inline float atQ(const float * src, uint32_t fbits, uint32_t phase){
-	uint32_t sign = phase & MaskSign<float>();
-	uint32_t dir = (phase >> 30) & 1; // 0 = fwd or 1 = bwd
-	Twiddle<float> v(src[(((phase^-dir) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
+inline float atH(const float * src, uint32_t bits, uint32_t phs){
+	Twiddle<float> v(src[(phs & 0x7fffffff) >> bits]);
+	v.i |= phs & MaskSign<float>();				// sign bit
+	return v.f;
+}
+
+inline float atQ(const float * src, uint32_t fbits, uint32_t phs){
+	uint32_t sign = phs & MaskSign<float>();
+	uint32_t dir = (phs >> 30) & 1; // 0 = fwd or 1 = bwd
+	Twiddle<float> v(src[(((phs^-dir) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
 	v.i |= sign;	// sign bit
 	return v.f;
 }
 
-/* inline float tbl::atQ(float * table, uint32_t bits, uint32_t phase){
-	switch(phase>>30){
-	case 0: return  table[( phase & 0x3fffffff) >> bits]; break;
-	case 1: return  table[(-phase & 0x7fffffff) >> bits]; break;
-	case 2: return -table[( phase & 0x3fffffff) >> bits]; break;
-	default:return -table[(-phase & 0x7fffffff) >> bits]; break;
+/*inline float atQ(const float * src, uint32_t bits, uint32_t phs){
+	switch(phs>>30){
+	case 0: return  src[( phs & 0x3fffffff) >> bits]; break;
+	case 1: return  src[(-phs & 0x7fffffff) >> bits]; break;
+	case 2: return -src[( phs & 0x3fffffff) >> bits]; break;
+	default:return -src[(-phs & 0x7fffffff) >> bits]; break;
 	}
 }*/
-
-inline float atH(const float * src, uint32_t bits, uint32_t phase){
-	Twiddle<float> v(src[(phase & 0x7fffffff) >> bits]);
-	v.i |= phase & MaskSign<float>();				// sign bit
-	return v.f;
-}
 
 // i: 0 1 2 3 4 5 6 7
 // o: 0 1 2 3 0 1 2 3
