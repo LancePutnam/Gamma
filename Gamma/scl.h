@@ -341,21 +341,27 @@ inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 //
 TEM T sinFast(T radians);
 
-/// 7th order minimax polynomial approximation to a sine.
+/// 7th order minimax polynomial approximation to sin(pi x).
+
+/// Error is spread evenly across domain.
+/// @param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
 TEM T sinP7(T normal);
 
-/// 9th order minimax polynomial approximation to a sine.
+/// 9th order minimax polynomial approximation to sin(pi x).
+
+/// Error is spread evenly across domain.
+/// @param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
 TEM T sinP9(T normal);
 
 /// 7th order Taylor series approximation to a sine.
 
-/// 'radians' must be in [-pi, pi].
+/// @param[in] radians	phase, in [-pi, pi]
 ///
 TEM T sinT7(T radians);
 
 /// 9th order Taylor series approximation to a sine.
 
-/// 'radians' must be in [-pi, pi].
+/// @param[in] radians	phase, in [-pi, pi]
 ///
 TEM T sinT9(T radians);
 
@@ -772,7 +778,7 @@ TEM inline T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5){
 
 
 TEM inline T cosP3(T n){
-	return (T)1 - (T)32 * n * n * ((T)0.75 - n);
+	return T(1) - T(32) * n * n * (T(0.75) - n);
 }
 
 
@@ -803,7 +809,7 @@ TEM inline T cosT8(T r){
 }
 
 
-TEM inline T sinFast(const T& r){
+TEM inline T sinFast(T r){
     const T B = 4 / M_PI, C = -4 / (M_PI*M_PI);
     T y = B * r + C * r * scl::abs(r);
 	const T P = 0.225; // const float Q = 0.775;
@@ -812,12 +818,12 @@ TEM inline T sinFast(const T& r){
 
 TEM inline T sinP7(T n){
 	T nn = n*n;
-	return n * ((T)3.138982 + nn * ((T)-5.133625 + nn * ((T)2.428288 - nn * (T)0.433645)));
+	return n * (T(3.138982) + nn * (T(-5.133625) + nn * (T(2.428288) - nn * T(0.433645))));
 }
 
 TEM inline T sinP9(T n){
 	T nn = n*n;
-	return n * ((T)3.1415191 + nn * ((T)-5.1662729 + nn * ((T)2.5422065 + nn * ((T)-0.5811243 + nn * (T)0.0636716))));
+	return n * (T(3.1415191) + nn * (T(-5.1662729) + nn * (T(2.5422065) + nn * (T(-0.5811243) + nn * T(0.0636716)))));
 }
 
 TEM inline T sinT7(T r){
