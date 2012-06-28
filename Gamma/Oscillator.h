@@ -80,12 +80,13 @@ public:
 
 	virtual void onResync(double r);
 
-protected:
+//protected:
+private:
 	float mFreq;		// Current frequency
 	uint32_t mPhaseI;	// Current fixed-point phase in [0, 2^32)
 	uint32_t mFreqI;	// Current fixed-point frequency
 	Stap mTap;
-	
+
 	uint32_t mapFI(float v) const;	// convert unit floating-point to fixed-point integer
 	double mapIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
 	uint32_t mapFreq(float v) const;
@@ -276,9 +277,9 @@ protected:
 
 /// Computed sine wave oscillator.
 
-/// This oscillator uses a 7th order Taylor series approximation to compute sine 
-/// values. Computation time is about as much as a linearly-interpolating table 
-/// lookup. In most cases, Taylor series are also more spectrally pure than 
+/// This oscillator uses a polynomial approximation to compute sine values. 
+/// Computation time is about as much as a linearly-interpolating table lookup.
+/// In addition, polynomial approximations are often more spectrally pure than 
 /// table lookup methods since the distortion arises as harmonics.
 template<class Tv=gam::real, class Ts=Synced>
 class Sine : public AccumPhase<Tv,Ts> {
@@ -289,7 +290,11 @@ public:
 	
 	/// Generate next sample with a frequency offset
 	Tv operator()(Tv frqOffset = Tv(0)){
+		// TODO: phase accum in [-1, 1] to avoid multiply?
 		return scl::sinP9(this->nextPhase(frqOffset) * M_1_PI);
+		//return scl::sinP7(this->nextPhase(frqOffset) * M_1_PI);
+		//return scl::sinT7(this->nextPhase(frqOffset));
+		//return scl::sinFast(this->nextPhase(frqOffset));
 	}
 };
 
@@ -988,7 +993,14 @@ TEMTS void TTABLESINE::resize(uint32_t bits){
 		uint32_t size = 1<<(cTblBits-2);
 		cTable = new float[size + 1];
 		tbl::sinusoid(cTable, size, 0, 0.25);
-		cTable[size] = 1;		
+		cTable[size] = 1;
+
+		/*cTblBits = bits;
+		cFracBits = 32UL - cTblBits;
+		cOneIndex = 1<<cFracBits;
+		uint32_t size = 1<<(cTblBits);
+		cTable = new float[size ];
+		tbl::sinusoid(cTable, size, 0, 1);*/
 	}
 }
 
@@ -1006,6 +1018,12 @@ TEMTS inline float TTABLESINE::nextL(float df){
 		tbl::atQ(cTable, cFracBits, P),
 		tbl::atQ(cTable, cFracBits, P + cOneIndex)
 	);
+
+	/*return ipl::linear(
+		gam::fraction(cTblBits, P),
+		cTable[P>>cFracBits],
+		cTable[(P+cOneIndex)>>cFracBits]
+	);*/
 }
 
 #undef TTABLESINE
