@@ -33,6 +33,23 @@ High-priority thread:
 	Remove nodes:
 		Move node from processing tree to free list
 
+
+What happens when we add an event in the LPT?
+
+In LPT:
+1. Get current time, in seconds, from Scheduler start
+2. Add event to queue with time plus event delta
+
+In HPT:
+1. Iterate through time-sorted event list
+	If event time in block, then remove from list and add to process tree.
+	Otherwise, end iteration.
+	
+2. Iterate through LP->HP event queue
+	If event time in block, then add to process tree
+	Otherwise, add to time-sorted event list
+
+
 */
 
 /*
@@ -93,7 +110,7 @@ Process& Process::active(bool v){ mStatus = v ? ACTIVE : INACTIVE; return *this;
 
 Process& Process::reset(){ onReset(); return *this; }
 
-Process * Process::update(const Process * top, AudioIOData& io){
+Process * Process::update(const Process * top, GAM_SCHEDULER_IO_DATA& io){
 	double dt = io.secondsPerBuffer();
 	int frame = 0;
 	if(mDelay >= dt){
@@ -110,7 +127,7 @@ Process * Process::update(const Process * top, AudioIOData& io){
 
 void Process::print(){ printf("%p: %g sec, stat=%d\n", this, mDelay, mStatus); }
 
-Process * Process::process(const Process * top, AudioIOData& io, int frameStart){
+Process * Process::process(const Process * top, GAM_SCHEDULER_IO_DATA& io, int frameStart){
 	if(active()){
 		io.frame(frameStart);
 		onProcess(io);
@@ -123,7 +140,7 @@ Process * Process::process(const Process * top, AudioIOData& io, int frameStart)
 
 
 Scheduler::Scheduler()
-:	mPeriod(1./10), mRunning(false)
+:	mPeriod(1./10), mTime(0), mRunning(false)
 {
 	mDeletable = false;
 }
@@ -165,10 +182,10 @@ int Scheduler::reclaim(){
 	return r;
 }
 
-void Scheduler::update(AudioIOData& io){
-	updateTree();
-	updateControlFuncs(io.secondsPerBuffer());
-	
+void Scheduler::update(GAM_SCHEDULER_IO_DATA& io){
+	hpUpdateTree();
+	hpUpdateControlFuncs(io.secondsPerBuffer());
+
 	// traverse tree
 	Process * v = this;
 	do{
@@ -176,7 +193,9 @@ void Scheduler::update(AudioIOData& io){
 	} while(v);
 	
 	// put nodes marked as 'done' into free list
-	updateFreeList();
+	hpUpdateFreeList();
+	
+	mTime += io.secondsPerBuffer();
 }
 
 Scheduler& Scheduler::period(float v){
@@ -188,11 +207,11 @@ Scheduler& Scheduler::period(float v){
 void * Scheduler::cLPThreadFunc(void * user){
 	Scheduler& s = *(Scheduler*)user;
 	while(s.mRunning){
-		s.mTime = gam::toSec(gam::timeNow());
+		//double t = gam::toSec(gam::timeNow());
 		s.reclaim();
-		//double dt = toSec(timeNow()) - s.mTime;
+		//double dt = toSec(timeNow()) - t;
 		//printf("%g\n", dt);
-		gam::sleepSec(s.mPeriod);
+		::gam::sleepSec(s.mPeriod);
 	}
 	return NULL;
 }
@@ -218,7 +237,7 @@ void Scheduler::pushCommand(Command::Type type, Process * object, Process * othe
 	mAddCommands.push(c);
 }
 
-void Scheduler::updateControlFuncs(double dt){
+void Scheduler::hpUpdateControlFuncs(double dt){
 	Funcs::iterator it = mFuncs.begin();
 	while(it != mFuncs.end()){
 		Funcs::value_type& f = *it;
@@ -238,7 +257,7 @@ void Scheduler::updateControlFuncs(double dt){
 	}
 }
 
-void Scheduler::updateTree(){
+void Scheduler::hpUpdateTree(){
 
 	/* TODO:
 	The tree should only contain processes that are active during the 
@@ -269,7 +288,7 @@ void Scheduler::updateTree(){
 	}	
 }
 
-void Scheduler::updateFreeList(){
+void Scheduler::hpUpdateFreeList(){
 	
 	Process * p = this;
 	Process * v = p->next(this);
@@ -286,5 +305,48 @@ void Scheduler::updateFreeList(){
 		}
 	}		
 }
+
+
+void Scheduler::recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durationSec){
+	int numFrames = io.framesPerBuffer();
+	int numChans  = io.channelsOut();
+
+	SoundFile sf(soundFilePath);
+	sf	.encoding(SoundFile::FLOAT)
+		.channels(numChans)
+		.frameRate(io.fps())
+	;
+	if(sf.openWrite()){
+		double  t = 0;
+		double dt = io.secondsPerBuffer();
+		
+		// create buffer for interleaved samples
+		float * buf = new float[numFrames*numChans];
+		
+		while(t < durationSec){
+
+			io.zeroOut();
+			update(io);
+			
+			// interleave channel data
+			for(int j=0; j<numChans; ++j){
+				float * dst = buf + j;
+				const float * src = io.outBuffer(j);
+				for(int i=0; i<numFrames; ++i){
+					//printf("%d\n", i*numChans + j);
+					dst[i*numChans] = src[i];
+				}
+			}
+
+			// write to file
+			sf.write(buf, numFrames);
+			
+			t += dt;
+		}
+		
+		delete[] buf;
+	}
+}
+
 
 } //gam::

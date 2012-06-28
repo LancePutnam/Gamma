@@ -1,22 +1,27 @@
 #ifndef INC_GAM_SCHEDULER_H
 #define INC_GAM_SCHEDULER_H
 
-#include "Gamma/Node.h"
-#include "Gamma/AudioIO.h"
-#include "Gamma/Thread.h"
-#include "Gamma/Timer.h"
 #include <stdlib.h> // exit
 #include <string.h> // memcpy
 #include <queue>
 #include <list>
 
+#include "Gamma/Node.h"
+#include "Gamma/Thread.h"
+#include "Gamma/Timer.h"
+#include "Gamma/SoundFile.h"
+
+#ifndef GAM_SCHEDULER_IO_DATA
+	#include "Gamma/AudioIO.h"
+	#define GAM_SCHEDULER_IO_DATA ::gam::AudioIOData
+#endif
+
 namespace gam{
 
 class Scheduler;
 
-
-#ifndef FUNC_MAX_DATA_SIZE
-#define FUNC_MAX_DATA_SIZE 64
+#ifndef GAM_FUNC_MAX_DATA_SIZE
+	#define GAM_FUNC_MAX_DATA_SIZE 64
 #endif
 
 /// Deferrable function
@@ -166,7 +171,7 @@ public:
 
 private:
 	union{
-		char mData[FUNC_MAX_DATA_SIZE];
+		char mData[GAM_FUNC_MAX_DATA_SIZE];
 		void * mObj;
 	};
 	func_t mFunc;
@@ -174,10 +179,10 @@ private:
 	void set(func_t f, void * data, int size){
 		mFunc = f;
 		#ifndef NDEBUG
-		if(size > FUNC_MAX_DATA_SIZE){
+		if(size > GAM_FUNC_MAX_DATA_SIZE){
 			printf("Func maximum data size exceeded. "
 				"Attempt to use %d bytes with maximum size set to %d.\n",
-				size, FUNC_MAX_DATA_SIZE);
+				size, GAM_FUNC_MAX_DATA_SIZE);
 			exit(-1);
 		}
 		#endif
@@ -211,7 +216,7 @@ public:
 	Process& reset();
 
 	/// Call processing algorithm, onProcessAudio()
-	Process * update(const Process * top, AudioIOData& io);
+	Process * update(const Process * top, GAM_SCHEDULER_IO_DATA& io);
 
 	bool deletable() const { return mDeletable; }
 	bool done() const { return DONE==mStatus; }
@@ -233,10 +238,10 @@ protected:
 	double mDelay;
 	bool mDeletable;
 
-	virtual void onProcess(AudioIOData& io){}
+	virtual void onProcess(GAM_SCHEDULER_IO_DATA& io){}
 	virtual void onReset(){}
 
-	Process * process(const Process * top, AudioIOData& io, int frameStart=0);
+	Process * process(const Process * top, GAM_SCHEDULER_IO_DATA& io, int frameStart=0);
 };
 
 
@@ -274,9 +279,6 @@ public:
 
 	/// Test whether the synthesis graph is empty
 	bool empty() const;
-	
-	/// Reclaims memory and returns number of events playing
-	bool check();
 	
 	/// Check free list for finished events and reclaim their memory
 	
@@ -348,7 +350,7 @@ public:
 
 	/// This should be called at the audio block rate. 
 	/// The latency of events will be determined by the block size.
-	void update(AudioIOData& io);
+	void update(GAM_SCHEDULER_IO_DATA& io);
 
 	/// Set time period between low-priority actions
 	Scheduler& period(float v);
@@ -360,11 +362,18 @@ public:
 	void stop();
 
 	/// Scheduler audio callback
-	static void audioCB(AudioIOData& io){
+	static void audioCB(GAM_SCHEDULER_IO_DATA& io){
 		Scheduler& s = io.user<Scheduler>();
 		s.update(io);
 	}
 
+
+	/// Record output to sound file in non-real-time
+	
+	/// @param[in] io				audio i/o data (buffers, sample rate, block size, etc.)
+	/// @param[in] soundFilePath	path to sound file
+	/// @param[in] durSec			duration, in seconds, of recording
+	void recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durSec);
 
 
 //	void print(){
@@ -374,6 +383,7 @@ public:
 //			printf("\t"); (*it)->print();
 //		}
 //	}
+
 protected:
 
 	struct Command{
@@ -383,10 +393,22 @@ protected:
 			REMOVE_CHILD
 		};
 		
+		//double time;
 		Type type;
 		Process * object;
 		Process * other;
+
+//		struct Compare{
+//			bool operator()(const Command& a, const Command& b){
+//				return a.time < b.time;
+//			}
+//		};
 	};
+	
+	
+//	std::priority_queue<Command, std::vector<Command>, Command::Compare> 
+//		mCommandQueue;
+	
 
 	// LPT:  low-priority thread
 	// HPT: high-priority thread
@@ -395,12 +417,10 @@ protected:
 	Funcs mFuncs;
 	Thread mLPThread;		// low-priority thread for garbage collection, etc.
 	float mPeriod;
-	double mTime;
+	double mTime;			// scheduler's time, in seconds
 	bool mRunning;
 	
 	static void * cLPThreadFunc(void * user);
-	
-	void updateControlFuncs(double dt);
 
 	void pushCommand(Command::Type c, Process * object, Process * other);
 	void cmdAdd(Process * v);
@@ -408,11 +428,17 @@ protected:
 	// Execute pending graph manipulation commands from HPT.
 	// This is to be called from the same thread that is executing the
 	// processing within nodes (i.e., from the audio thread).
-	void updateTree();
+	void hpUpdateTree();
+
+	void hpUpdateControlFuncs(double dt);
 	
 	// Moves branches marked as being done to a free list for cleanup by a 
 	// lower priority thread.
-	void updateFreeList();
+	void hpUpdateFreeList();
+
+	// TODO: are these needed???
+	// Reclaims memory and returns number of events playing
+	bool check();
 };
 
 } //gam::
