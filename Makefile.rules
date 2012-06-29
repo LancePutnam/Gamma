@@ -2,8 +2,8 @@
 # Common rules for all Makefiles
 #=========================================================================
 
-CPPFLAGS	+= $(EXT_CPPFLAGS)
-LDFLAGS		+= $(EXT_LDFLAGS)
+#CPPFLAGS	+= $(EXT_CPPFLAGS)
+#LDFLAGS		+= $(EXT_LDFLAGS)
 
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
 CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
@@ -13,7 +13,7 @@ ifneq ($(DEP_TRACK), 0)
 	DEPFLAGS = -MMD -MF $(basename $@).dep
 endif
 
-ALL_BUILD_DIRS = $(BIN_DIR) $(OBJ_DIR) $(BUILD_DIR)include $(BUILD_DIR)lib
+ALL_BUILD_DIRS = $(BIN_DIR)/ $(OBJ_DIR)/ $(BUILD_DIR)include/ $(BUILD_DIR)lib/
 
 #--------------------------------------------------------------------------
 # Rules
@@ -42,18 +42,22 @@ $(OBJ_DIR)%.o:: %.mm
 
 # Build static library
 $(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+ifneq ($(OBJS),)
 	@echo AR $@
 	@$(RM) $@
 	$(AR) $@ $(filter %.o, $^) $(SLIB_FLAGS)
 #	@$(RANLIB) $@
 #	libtool --mode=link --tag=CXX $(filter %.o, $^) $(SLIB_FLAGS) -o $@
 #	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
+endif
 
 
 # Build dynamic library
 $(DLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+ifneq ($(OBJS),)
 	@echo DY $@
 	$(CXX) $(DLIB_FLAGS) $(CXXFLAGS) -o $@ $(filter %.o, $^) $(LDFLAGS)
+endif
 
 
 # Dummy target to force rebuilds
@@ -69,5 +73,21 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 
 # Create file with settings for linking to external libraries
-external:
-	@printf "%b\n" "CPPFLAGS +=$(EXT_CPPFLAGS)\r\nLDFLAGS +=$(EXT_LDFLAGS)"> Makefile.external
+linkfile:
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=$(LINK_LDFLAGS) -l$(LIB_NAME)"> Makefile.link
+
+
+# Archive repository
+archive:
+	@echo Creating archive $(LIB_NAME).zip...
+	@git archive --format zip --output ./$(LIB_NAME).zip master
+
+##	svn version
+#	$(eval $@_TMP := $(shell mktemp -d tmp.XXXXXXXXXX))
+#	@echo Creating archive, this may take some time...
+#	@echo Creating temporary export...
+#	@svn export --force . $($@_TMP)
+#	@echo Compressing...
+#	@cd $($@_TMP) && tar -czf ../$(LIB_NAME).tar.gz .
+#	@echo Compression complete.
+#	@$(RM) -R $($@_TMP)

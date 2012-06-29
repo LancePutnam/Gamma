@@ -1,12 +1,27 @@
-# Compiled Object files
+build/
+xcuserdata
+doxygen_objdb_*
+.DS_Store
+
+*~
+*.link
+*.a
+*.o
+*.so
 *.slo
 *.lo
-*.o
-
-# Compiled Dynamic libraries
-*.so
-
-# Compiled Static libraries
 *.lai
 *.la
-*.a
+*.lib
+*.spec
+*.d
+*.framework
+*.perspectivev3
+*.pbxuser
+*.mode1v3
+*.xcworkspace
+*.tm_build_errors
+*.ncb
+*.suo
+*.vcproj.*
+*.wwdb
