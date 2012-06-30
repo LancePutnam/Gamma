@@ -26,8 +26,6 @@
 */
 /***************************************************/
 
-namespace gam{
-
 #define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
 #define GAM_USE_THREADEX	(defined(WIN32) || defined(WIN64))
 
@@ -37,6 +35,8 @@ namespace gam{
 	#include <windows.h>
 	#include <process.h>
 #endif
+
+namespace gam{
 
 class Thread{
 public:
