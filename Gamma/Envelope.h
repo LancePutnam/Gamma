@@ -654,7 +654,11 @@ TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv end, Tv start){
 	set(length, curve, end, start);
 }
 
-TEM inline bool Curve<Tv,Tp>::done() const { return scl::abs(mA - mB*mMul) >= scl::abs(end()); }
+TEM inline bool Curve<Tv,Tp>::done() const {
+	Tv dv = mB - mB*mMul; // linear apx of derivative
+	if(dv > Tv(0))	return value() >= end();
+	else			return value() <= end();
+}
 
 TEM inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
 
