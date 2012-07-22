@@ -2,8 +2,8 @@
 # Common rules for all Makefiles
 #=========================================================================
 
-#CPPFLAGS	+= $(EXT_CPPFLAGS)
-#LDFLAGS		+= $(EXT_LDFLAGS)
+CPPFLAGS	+= $(LINK_CPPFLAGS)
+LDFLAGS		+= $(LINK_LDFLAGS)
 
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
 CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
