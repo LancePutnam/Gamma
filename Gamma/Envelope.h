@@ -35,9 +35,9 @@ public:
 	///						c > 0 approaches slowly (accelerates),
 	///						c < 0 approaches rapidly (decelerates), and
 	///						c = 0 approaches linearly
-	/// @param[in] end		end value
 	/// @param[in] start	start value
-	Curve(Tp length, Tp curve, Tv end=Tv(1), Tv start=Tv(0));
+	/// @param[in] end		end value
+	Curve(Tp length, Tp curve, Tv start=Tv(0), Tv end=Tv(1));
 
 	bool done() const;				///< Returns whether curve has gone past end value
 	Tv end() const { return mEnd; }	///< Get end value
@@ -51,9 +51,9 @@ public:
 	
 	/// @param[in] length	length of curve in samples
 	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
-	/// @param[in] end		end value
 	/// @param[in] start	start value
-	Curve& set(Tp length, Tp curve, Tv end=Tv(1), Tv start=Tv(0));
+	/// @param[in] end		end value
+	Curve& set(Tp length, Tp curve, Tv start=Tv(0), Tv end=Tv(1));
 
 protected:
 	Tv mEnd, mA, mB;
@@ -153,7 +153,7 @@ public:
 			if(!done()){
 				mPos = 0;
 				setLen(mStage);
-				mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], mLevels[mStage]);
+				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[mStage+1]);
 				return (*this)(); // return level of new stage
 			}
 		}
@@ -170,7 +170,7 @@ public:
 		if(!done()){
 			mPos = 0;
 			setLen(mStage);
-			mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], curVal);
+			mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
 		}
 	}
 
@@ -628,7 +628,7 @@ public:
 	/// Set length and curvature
 	void set(T len, T crv){
 		mLen = len; mCrv = crv;
-		mFnc.set(len * Ts::spu(), crv);
+		mFnc.set(len * Ts::spu(), crv, T(0),T(1));
 	}
 	
 	virtual void onResync(double r){ set(mLen, mCrv); }
@@ -650,8 +650,8 @@ protected:
 TEM Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
-TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv end, Tv start){
-	set(length, curve, end, start);
+TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv start, Tv end){
+	set(length, curve, start, end);
 }
 
 TEM inline bool Curve<Tv,Tp>::done() const {
@@ -663,7 +663,10 @@ TEM inline bool Curve<Tv,Tp>::done() const {
 TEM inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
 
 // dividing by mMul goes back one step
-TEM inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
+TEM inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){
+	mB = (mA-start) / mMul;
+	return *this;
+}
 
 
 // hack to get proper max floating point value
@@ -674,7 +677,7 @@ namespace{
 	template<> inline float		maxReal<float>(){ return FLT_MAX; }
 }
 
-TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv end, Tv start){
+TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	static const Tp EPS = eps<Tp>();
 
 	if(len == Tp(0)){ // if length is 0, return end value immediately

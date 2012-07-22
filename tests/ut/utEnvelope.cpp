@@ -4,7 +4,7 @@
 	{
 		const int N = 80000;
 		const double eps = 1e-4;
-		Curve<double,double> c(N, 0,-0.5);
+		Curve<double,double> c(N, 0, 0.0,-0.5);
 		assert(!c.done());
 		assert(c.end() == -0.5);
 		
@@ -36,7 +36,7 @@
 		for(int j=0; j<4; ++j){
 			float start = points[j][0];
 			float end   = points[j][1];
-			Curve<> c(N, 0, end,start);
+			Curve<> c(N, 0, start,end);
 			assert(!c.done());
 			assert(c.end() == end);
 			
