@@ -1,4 +1,6 @@
 {
+
+	// test double precision
 	{
 		const int N = 80000;
 		const double eps = 1e-4;
@@ -13,35 +15,43 @@
 			assert(v == c.value());
 		}
 		
-		c(); // cannot hit end point exactly
+		c(); c();  // do a couple more iterations to reach endpoint
 		assert(c.done());
 
+		// test reset
 		c.reset();
 		for(int i=0; i<N; ++i){
 			double v = c();
 			assert(scl::abs(v - double(i)/N*c.end()) < eps);
-			assert(v == c.value());
 		}
 	}
 
+	
+	// test various start and end points
 	{
-		const int N = 80000;
+		const float points[4][2] = {{0,1}, {1,0}, {-1,1}, {1,-1}};
+		const int N = 8000;
 		const float eps = 1e-1;
-		Curve<float> c(N, 0,-0.5);
-		assert(!c.done());
-		assert(c.end() == -0.5);
-		
-		for(int i=0; i<N; ++i){
-			double v = c();
-//			printf("%g ?= %g\n", v, float(i)/N*c.end());
-			assert(scl::abs(v - float(i)/N*c.end()) < eps);
-			assert(v == c.value());
+
+		for(int j=0; j<4; ++j){
+			float start = points[j][0];
+			float end   = points[j][1];
+			Curve<> c(N, 0, end,start);
+			assert(!c.done());
+			assert(c.end() == end);
+			
+			for(int i=0; i<N; ++i){
+				double v = c();
+				//printf("%g ?= %g\n", v, 100 - float(i)/N*50);
+				assert(scl::abs(v - (float(i)/N*(end-start) + start)) < eps);
+			}
+			
+			c(); // do one more iteration to reach endpoint
+			assert(c.done());
 		}
-		
-		c(); // cannot hit end point exactly
-		assert(c.done());
 	}
 	
+
 	{
 		Env<3> e;
 		assert(e.size() == 3);
