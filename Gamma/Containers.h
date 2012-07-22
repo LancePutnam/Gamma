@@ -20,7 +20,7 @@
 namespace gam{
 
 
-/// Size type for ArrayPow2
+/// Size functor for ArrayPow2
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
 	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
@@ -31,7 +31,7 @@ struct SizeArrayPow2{
 };
 
 
-/// Size type for Array
+/// Size functor for Array
 struct SizeArray{
 	SizeArray(uint32_t size): mSize(size){}
 	uint32_t operator()() const { return mSize; }
