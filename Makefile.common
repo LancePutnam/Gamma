@@ -168,10 +168,10 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Oh where, oh where have my SDKs gone?
-	ifeq "$(wildcard /Applications/XCode.app)" ""
+	ifeq "$(wildcard /Applications/XCode.app)" " "
 		OSX_SDK_PATH := /Developer/SDKs/
 	else
-		OSX_SDK_PATH := /Applications/XCode.app/Contents/Developer/Platforms/
+		OSX_SDK_PATH := /Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/
 	endif
 
 	# Set system root directory for stdc++ etc.
