@@ -4,6 +4,11 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+
+/// @defgroup filters Filters
+/// <A HREF="https://ccrma.stanford.edu/~jos/filters/What_Filter.html">
+/// When you think about it, everything is a filter.</A>
+
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
 
@@ -56,6 +61,7 @@ inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass1 : public Ts {
 public:
@@ -97,6 +103,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Biquad : public Ts{
 public:
@@ -142,6 +149,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class BlockDC : public Ts{
 public:
@@ -174,6 +182,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters  
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class BlockNyq : public BlockDC<Tv,Tp,Ts>{
 public:
@@ -198,6 +207,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Filter2 : public Ts{
 public:
@@ -262,6 +272,7 @@ using Base::mCos
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass2 : public Filter2<Tv,Tp,Ts>{
 public:
@@ -288,6 +299,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Notch : public Filter2<Tv,Tp,Ts>{
 public:
@@ -324,6 +336,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Reson : public Filter2<Tv,Tp,Ts>{
 public:
@@ -366,6 +379,7 @@ protected:
 
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
+/// \ingroup filters
 template <class Tv=gam::real, class Tp=gam::real>
 class Hilbert {
 public:
@@ -396,6 +410,7 @@ protected:
 
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
+/// \ingroup filters
 template <class Tv=double, class Tp=double>
 class Integrator{
 public:
@@ -427,6 +442,7 @@ protected:
 /// size. Due to the symmetry of the window, the moving average filter can be
 /// implemented efficiently using a single delay line with O(1) processing time
 /// complexity.
+/// \ingroup filters
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
@@ -464,6 +480,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
+/// \ingroup filters
 template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class OnePole : public Ts{ 
 public:

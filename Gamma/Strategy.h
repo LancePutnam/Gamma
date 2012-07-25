@@ -4,6 +4,15 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+
+/// @defgroup ipl Interpolation
+
+/// Gamma supports several interpolation strategies.  These can be used, for example,
+/// to make a delay line whose delay amount is a non-integer number of samples.
+/// Julius Smith's <A HREF="https://ccrma.stanford.edu/~jos/pasp/Delay_Line_Interpolation.html">
+/// Delay-Line Interpolation page</A>
+
+
 #include "Gamma/Access.h"
 #include "Gamma/Containers.h"
 #include "Gamma/ipl.h"
@@ -12,7 +21,9 @@
 namespace gam{
 namespace ipl{
 
-/// Truncating random-access interpolation strategy
+/// @brief Truncating random-access interpolation strategy
+/// \ingroup ipl
+
 template <class T>
 struct Trunc{
 
@@ -35,7 +46,8 @@ struct Trunc{
 };
 
 
-/// Nearest neighbor random-access interpolation strategy
+/// @brief Nearest neighbor random-access interpolation strategy
+/// \ingroup ipl
 template <class T>
 struct Round{
 
@@ -64,7 +76,8 @@ struct Round{
 };
 
 
-/// Linear random-access interpolation strategy
+/// @brief Linear random-access interpolation strategy
+/// \ingroup ipl
 template <class T>
 struct Linear{
 
@@ -96,7 +109,8 @@ struct Linear{
 };
 
 
-/// Cubic random-access interpolation strategy
+/// @brief Cubic random-access interpolation strategy
+/// \ingroup ipl
 template <class T>
 struct Cubic{
 
@@ -150,7 +164,8 @@ struct Cubic{
 };
 
 
-/// Allpass random-access interpolation strategy
+/// @brief Allpass random-access interpolation strategy
+/// \ingroup ipl
 template <class T>
 struct AllPass{
 
@@ -187,7 +202,8 @@ struct AllPass{
 };
 
 
-/// Dynamically switchable random-access interpolation strategy
+/// @brief Dynamically switchable random-access interpolation strategy
+/// \ingroup ipl
 template <class T>
 struct Any{
 
