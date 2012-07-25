@@ -36,7 +36,8 @@ struct AmpEnv{
 
 
 
-/// 3 biquad filters in parallel
+/// @brief 3 biquad filters (of floats) in parallel
+/// \ingroup filters
 struct Biquad3{
 	/// Constructor
 	Biquad3(float f0, float f1, float f2, float q=8, FilterType type=BAND_PASS):
