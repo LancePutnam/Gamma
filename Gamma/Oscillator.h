@@ -164,6 +164,9 @@ protected:
 /// \tparam Tv		table element type
 /// \tparam Sipol	interpolation strategy
 /// \tparam Stap	table reading strategy
+/// \sa Other ways to synthesize sine waves: TableSine, CSine, LFO, Sine, SineR
+/// \sa Functions for building waveforms in tables with additive synthesis: addSine, addSines, addSinesPow, addWave
+  
 template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
 class Osc : public Accum<Stap,Ts>, public ArrayPow2<Tv>{
 public:
@@ -236,6 +239,7 @@ private:
 /// its frequency.  This is implemented from Mathews, M., Smith, J. 2003.
 /// "Methods for synthesizing very high Q parametrically well behaved two pole 
 /// filters."
+///  \sa Osc, TableSine, CSine, LFO, Sine, SineR
 template<class Tv=gam::real, class Ts=Synced>
 class CSine : public Ts{
 public:
@@ -281,6 +285,7 @@ protected:
 /// Computation time is about as much as a linearly-interpolating table lookup.
 /// In addition, polynomial approximations are often more spectrally pure than 
 /// table lookup methods since the distortion arises as harmonics.
+/// \sa Osc, TableSine, CSine, LFO, SineR
 template<class Tv=gam::real, class Ts=Synced>
 class Sine : public AccumPhase<Tv,Ts> {
 public:
@@ -308,6 +313,7 @@ public:
 /// to prevent growing or decaying in amplitude over time.  This generator is 
 /// ideal in situations where a stationary sinusoid is all that is required, 
 /// e.g. a grain or modulator.
+/// \sa Osc, TableSine, CSine, LFO, Sine, SineRs (Synthesizes multiple sines)
 template <class Tv=double, class Ts=Synced>
 class SineR : public gen::RSin<Tv>, Ts{
 public:
@@ -342,6 +348,7 @@ private:
 /// For efficiency reasons, this object does not keep its frequencies synchronized
 /// with the sample rate. If the sample rate changes, each oscillator must be
 /// manually re-set.
+/// \sa SineR (synthesizes a single sine)
 template <class Tv=double, class Ts=Synced>
 class SineRs : public Array<SineR<Tv, Synced1> >, Ts{
 public:
@@ -373,6 +380,7 @@ private:
 
 /// This oscillator is similar to SineR, however, it has an extra multiply
 /// in its sample generation to allow the oscillator to decay.
+/// \sa SineR, SineDs
 template <class Tv=double, class Ts=Synced>
 class SineD : public gen::RSin2<Tv>, Ts{
 public:
@@ -414,6 +422,7 @@ private:
 /// For efficiency reasons, this object does not keep its frequencies synchronized
 /// with the sample rate. If the sample rate changes, each oscillator must be
 /// manually re-set.
+/// \sa SineD
 template <class Tv=double, class Ts=Synced>
 class SineDs : public Array<SineD<Tv, Synced1> >, Ts{
 public:
@@ -452,6 +461,7 @@ private:
 /// generally not as spectrally pure and additional memory needs to be allocated
 /// to store the lookup table (although it's relatively small and only allocated
 /// once).
+/// \sa Osc, CSine, LFO, Sine, SineR
 template <class Stap=tap::Wrap, class Ts=Synced>
 class TableSine : public Accum<Stap,Ts> {
 public:
@@ -492,6 +502,7 @@ private:
 
 /// This object generates various waveform types by mapping the output of a 
 /// an accumulator through mathematical functions.
+/// \sa Osc, TableSine, CSine, Sine, SineR
 template <class Stap=tap::Wrap, class Ts=Synced>
 class LFO : public Accum<Stap,Ts>{
 public:

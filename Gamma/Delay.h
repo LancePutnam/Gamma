@@ -198,6 +198,7 @@ public:
 /// \tparam Ts	sync type
 // H(z) = (ffd + z^-m) / (1 - fbk z^-m)
 // y[n] = ffd x[n] + x[n-m] + fbk y[n-m]
+/// \ingroup filters  
 template<
 	class Tv=gam::real,
 	template <class> class Si=ipl::Linear,
