@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Generator / Envelope
+	Example:		Tutorial / Pan_tutorial by Josh Dickinson, 2012
 	Description:	Panning noise back and forth using the Pan<> class
 */
 
@@ -40,8 +40,7 @@ void audioCB(AudioIOData& io){
         
         //calling the panner object like this takes an input (s) and two destinations(leftChannel and rightChannel).  It sets leftChannel and rightChannel to an appropriate volume based on the current panning position. You can also pass it two inputs and two outputs in order to pan a stereo source.   
         panner(s, leftChannel, rightChannel);
-        
-
+    
 		io.out(0) = leftChannel;
         io.out(1) = rightChannel;
         
