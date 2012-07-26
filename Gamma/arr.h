@@ -192,7 +192,12 @@ template<class T, template<class> class ArrayType>
 double inline normalize(ArrayType<T>& arr, double scale=1){
 	return normalize(&arr[0], arr.size(), scale);
 }
-
+    
+/// Returns sum of values squared
+TEM inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
+    return dot(src,src,len,str);
+}
+    
 /// Returns norm of array values.
 TEM double norm(const T * src, uint32_t len, uint32_t str=1){
 	return sqrt((double)sumSquares(src, len,str));
@@ -239,11 +244,6 @@ TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end);
 
 /// Returns sum of values
 TEM T sum(const T * src, uint32_t len, uint32_t str=1);
-
-/// Returns sum of values squared
-TEM inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
-	return dot(src,src,len,str);
-}
 
 /// Variance (deviation from mean).
 TEM T variance(const T * src, uint32_t len, uint32_t str=1);

@@ -7,29 +7,39 @@
 
 #include "../examples.h"
 
-//length, curve, end, start
-//Curve<> mySegExp(10000,1, 50.0, 100.0);//,1.0,100.0);
-SegExp<> mySegExp(10000,-0.01, 0.0, -100.0);//,1.0,100.0);
+// Timer to reset the curve
+Accum<> tmr(0.25);
+
+//SegExp is an exponential curve which asymptotically approaches a target value.  It is initialized with the arguments (length, curve, end, start)
+SegExp<> mySegExp(2,-3.0, 0.0, 1.0);
+
+//sound source
+NoisePink<> pinkNoise;
+
+int frameCount = 0;
 
 void audioCB(AudioIOData& io){
     
     while(io()){
         //every frame we increment the internal clock of the attack timer.  It only returns true every 2.0 seconds. 
-		if(mySegExp.done()){
+		if(tmr()){
             //mySegExp.set(10000,0,1.0,100.0);
             mySegExp.reset();
         }
         
         float tempValue = mySegExp();
         
-        //print the current value of the curve every frame
-        std::cout<< "current curve value: " << tempValue <<std::endl;
+        //print the current value of the curve every 1000 frames
+        if((frameCount %1000) == 0)
+        	std::cout<< "current SegExp value: " << tempValue <<std::endl;
         
         //multiply constant white noise times our curve every frame
-		float s = 0;
+		float s = pinkNoise()*0.2*tempValue;
 
         //left channel = right channel = s
 		io.out(0) = io.out(1) = s;
+		
+		frameCount++;
 	}
 }
 
