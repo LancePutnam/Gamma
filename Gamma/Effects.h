@@ -15,12 +15,12 @@
 namespace gam{
 
 
-/// Amplitude envelope extractor
+/// Envelope Follower
 template <class Tv=real, class Tp=real, class Ts=Synced>
-struct AmpEnv{
+struct EnvFollow{
 
 	/// @param[in] freq		Cutoff frequency of smoothing filter
-	AmpEnv(Tp freq=10)
+	EnvFollow(Tp freq=10)
 	:	lpf(freq){}
 
 	/// Filter next sample
