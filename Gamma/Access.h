@@ -8,6 +8,8 @@
 	Functions/objects for accessing and indexing arrays.
 */
 
+/// @defgroup access Array access
+
 #include "Gamma/pstdint.h"
 
 namespace gam{
@@ -53,6 +55,7 @@ namespace acc{
 
 
 /// Maps a real number in [0, pmax) to an integer in [0, imax).
+///  \ingroup access
 template <class T>
 class IndexMap{
 public:
@@ -91,6 +94,7 @@ private:
 /// two slices will be used for iteration.
 /// All operations requiring elements to be copied perform a shallow copy
 /// (i.e. use '=' operator) and therefore are safe to use with objects.
+///  \ingroup access
 template <class T>
 class Slice{
 public:
