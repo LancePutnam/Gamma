@@ -58,16 +58,16 @@
 	}
 
 	{
-		{ Player<> p; }
-		{ Player<> p; Player<> q(p); }
-		{ Array<float> a; Player<> p(a, 1); }
-		//{ Player<> p("path/to/soundfile.wav"); }
+		{ SamplePlayer<> p; }
+		{ SamplePlayer<> p; SamplePlayer<> q(p); }
+		{ Array<float> a; SamplePlayer<> p(a, 1); }
+		//{ SamplePlayer<> p("path/to/soundfile.wav"); }
 		
 		{
 			const double SR = 44100;
 
 			Array<float> a(N);
-			Player<float, ipl::Trunc, tap::Clip> p(a, SR);
+			SamplePlayer<float, ipl::Trunc, tap::Clip> p(a, SR);
 			
 			Sync::master().spu(SR);
 			

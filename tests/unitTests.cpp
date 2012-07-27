@@ -13,7 +13,7 @@
 
 #include "../Gamma/Envelope.h"
 #include "../Gamma/Oscillator.h"
-#include "../Gamma/Player.h"
+#include "../Gamma/SamplePlayer.h"
 
 using namespace gam;
 

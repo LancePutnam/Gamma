@@ -1,5 +1,5 @@
-#ifndef GAMMA_PLAYER_H_INC
-#define GAMMA_PLAYER_H_INC
+#ifndef GAMMA_SAMPLE_PLAYER_H_INC
+#define GAMMA_SAMPLE_PLAYER_H_INC
 
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
@@ -28,11 +28,11 @@ template<
 	template<class> class Si = ipl::Trunc,
 	class St = tap::Clip
 >
-class Player: public Synced, public Array<T>{
+class SamplePlayer: public Synced, public Array<T>{
 public:
 	using Array<T>::size; using Array<T>::elems;
 
-	Player()
+	SamplePlayer()
 	:	Array<T>(defaultBuffer(), 1),
 		mPos(0), mInc(0),
 		mSampleRate(1), mChans(1),
@@ -40,9 +40,9 @@ public:
 	{}
 
 
-	/// @param[in] src		Another Player to read data from
+	/// @param[in] src		Another SamplePlayer to read data from
 	/// @param[in] rate		Playback rate
-	explicit Player(Player<T>& src, double rate=1)
+	explicit SamplePlayer(SamplePlayer<T>& src, double rate=1)
 	:	Array<T>(src), 
 		mPos(0), mInc(1), 
 		mSampleRate(src.sampleRate()), mChans(src.channels()), 
@@ -53,7 +53,7 @@ public:
 	/// @param[in] src		Sample array to reference
 	/// @param[in] smpRate	Sample rate of samples
 	/// @param[in] rate		Playback rate
-	Player(Array<T>& src, double smpRate, double rate=1)
+	SamplePlayer(Array<T>& src, double smpRate, double rate=1)
 	:	Array<T>(src),
 		mPos(0), mInc(1),
 		mSampleRate(smpRate), mChans(1),
@@ -67,7 +67,7 @@ public:
 	/// @param[in] pathToSoundFile		Path to sound file
 	/// @param[in] rate					Playback rate
 	template<class Char>
-	explicit Player(const Char * pathToSoundFile, double rate=1);
+	explicit SamplePlayer(const Char * pathToSoundFile, double rate=1);
 
 
 	/// Load a sound file into internal buffer
@@ -142,11 +142,11 @@ protected:
 };
 
 #define PRE template <class T, template<class> class Si, class St>
-#define CLS Player<T,Si,St>
+#define CLS SamplePlayer<T,Si,St>
 
 PRE
 template<class Char>
-CLS::Player(const Char * path, double rate)
+CLS::SamplePlayer(const Char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {	
 	if(!load(path)){
