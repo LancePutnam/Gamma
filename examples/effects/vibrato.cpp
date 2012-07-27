@@ -42,4 +42,4 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-RUN(audioCB);
+RUN_AUDIO_MAIN
