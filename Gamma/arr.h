@@ -20,6 +20,7 @@
 
 namespace gam{
 
+
 /// Array rank functions for numerical types.
 
 /// The following are names commonly used for input parameters. \n\n
@@ -33,6 +34,12 @@ namespace gam{
 /// is required to understand one or more of arithmetic operators +, -, *, \,
 /// and/or relational operators <, <=, >, >=.
 namespace arr{
+
+
+// Prototypes of functions that are both defined and used within this file
+TEM T sumSquares(const T * src, uint32_t len, uint32_t str);
+
+
 
 /// Add source array to destination array
 TEM void add(T * dst, const T * src, uint32_t len, uint32_t str=1){
