@@ -85,13 +85,13 @@ protected:
 
 /// Variable delay-line with multiple read taps
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
-class Delays : public Delay<Tv,Si,Ts> {
+class Multitap : public Delay<Tv,Si,Ts> {
 public:
 
 	/// @param[in]	delay		Delay length. The size of the delay line will 
 	///							be the smallest possible power of two.
 	/// @param[in]	numTaps		Number of reader taps
-	Delays(float delay, uint32_t numTaps)
+	Multitap(float delay, uint32_t numTaps)
 	:	Delay<Tv,Si,Ts>(delay)
 	{	taps(numTaps); }
 
