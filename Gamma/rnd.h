@@ -291,7 +291,7 @@ TEM inline float uni_float(T& rng){ return uintToUnit<float>(rng()); }
 TEM inline float uniS_float(T& rng){ return uintToUnitS<float>(rng()); }
 
 TEM inline float binS_float(T & rng){
-	uint32_t r = rng() & MaskSign<float>() | Expo1<float>();
+	uint32_t r = (rng() & MaskSign<float>()) | Expo1<float>();
 	return punUF(r);
 }
 

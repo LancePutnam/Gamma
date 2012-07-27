@@ -252,7 +252,7 @@ TEM void Node2<T>::printAll(const char * append, FILE * fp) const {
 		fprintf(fp, n == this ? "(%p) " : " %p  ", n);
 		n = n->nodeR;
 	}
-	fprintf(fp, append);
+	fprintf(fp, "%s", append);
 }
 
 // Node4

@@ -41,10 +41,10 @@ Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 
 /// Computes FIR coefficients for Waring-Lagrange interpolation.
 
-///		'h' are the FIR coefficients and should be of size ('order' + 1). \n
-///		'delay' is a fractional delay in samples. \n
-///		As order increases, this converges to sinc interpolation.
-template <class T> void lagrange(T * h, T delay, int order);
+/// @param[in] h		FIR coefficients; should be of size ('order' + 1).
+///	@param[in] delay	Fractional delay in samples
+///	@param[in] order	As order increases, this converges to sinc interpolation
+template <class T> void lagrange(T * h, T delay, uint32_t order);
 
 /// Optimized lagrange() for first order.
 template <class T> void lagrange1(T * h, T delay);
@@ -136,11 +136,11 @@ void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s
 }
 
 
-template <class T> void lagrange(T * a, T delay, int order){
-	for(uint32_t i=0; i<=order; i++){
+template <class T> void lagrange(T * a, T delay, uint32_t order){
+	for(uint32_t i=0; i<=order; ++i){
 		T coef = T(1);
 		T i_f = T(i); 
-		for(uint32_t j=0; j<=order; j++){
+		for(uint32_t j=0; j<=order; ++j){
 			if(j != i){
 				T j_f = (T)j;
 				coef *= (delay - j_f) / (i_f - j_f);
