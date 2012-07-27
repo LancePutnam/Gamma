@@ -1,17 +1,17 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Effect / Amplitude Envelope
-	Description:	This demonstrates the AmpEnv object which can be used to
+	Example:		Effect / Envelope Follower
+	Description:	This demonstrates the EnvFollow object which can be used to
 					estimate the amplitude of a signal. The example uses an
-					AmpEnv to reset a plucked string whenever its amplitude
+					EnvFollow to reset a plucked string whenever its amplitude
 					goes below a certain threshold.
 */
 
 #include "../examples.h"
 
 Pluck pluck(440);
-AmpEnv<> ampEnv;
+EnvFollow<> envFollow;
 
 void audioCB(AudioIOData& io){
 
@@ -19,7 +19,7 @@ void audioCB(AudioIOData& io){
 
 		float s = pluck() * 0.2;
 
-		if(ampEnv(s) < 0.001){
+		if(envFollow(s) < 0.001){
 			pluck.reset();
 			pluck.freq(rnd::uni(1, 20)*100);
 		}
@@ -28,4 +28,4 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-RUN(audioCB);
+RUN_AUDIO_MAIN

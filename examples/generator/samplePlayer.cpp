@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Generator / Player
+	Example:		Generator / SamplePlayer
 	Description:	Demonstration of playing back a sound file at different
 					rates.
 */
@@ -9,8 +9,8 @@
 #include "../examples.h"
 
 Accum<> tmr(1);
-Player<float, ipl::Cubic, tap::Wrap> player("../../sounds/water3.wav");
-//Player<float, ipl::Cubic, tap::Wrap> player("recording.aif");
+SamplePlayer<float, ipl::Cubic, tap::Wrap> player("../../sounds/water3.wav");
+//SamplePlayer<float, ipl::Cubic, tap::Wrap> player("recording.aif");
 
 void audioCB(AudioIOData& io){
 
@@ -37,4 +37,4 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-RUN(audioCB);
+RUN_AUDIO_MAIN

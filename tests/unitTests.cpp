@@ -13,7 +13,7 @@
 
 #include "../Gamma/Envelope.h"
 #include "../Gamma/Oscillator.h"
-#include "../Gamma/Player.h"
+#include "../Gamma/SamplePlayer.h"
 
 using namespace gam;
 
@@ -52,10 +52,10 @@ int main(int argc, char* argv[]){
 		f.close();
 	}
 	
-	// FunctionTable
+	// LookupTable
 	{
 		const int N=4;
-		FunctionTable<double, ipl::Linear, acc::Wrap> ft(N);
+		LookupTable<double, ipl::Linear, acc::Wrap> ft(N);
 		for(int i=0; i<N; ++i) ft[i]=i;
 		
 		assert(ft(0./N) == 0);
