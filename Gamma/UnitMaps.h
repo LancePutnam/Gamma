@@ -22,7 +22,7 @@ template<
 	class Sacc=acc::Wrap,
 	class A=gam::Allocator<T>
 >
-class FunctionTable : public Array<T,A>{
+class LookupTable : public Array<T,A>{
 	typedef Array<T,A> Base;
 public:
 	using Base::elems; using Base::size;
@@ -32,13 +32,13 @@ public:
 
 	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
 	/// @param[in] init		Initial value of elements
-	explicit FunctionTable(uint32_t size=2048, const T& init=T(0))
+	explicit LookupTable(uint32_t size=2048, const T& init=T(0))
 	:	Base(size, init)
 	{
 		endpoints(0, size);
 	}
 	
-	virtual ~FunctionTable(){}
+	virtual ~LookupTable(){}
 	
 	/// Get array
 	Array<T,A>& array(){ return *this; }
@@ -60,7 +60,7 @@ public:
 
 
 	/// Set indexing interval for look-up [min, max)
-	FunctionTable& endpoints(index_t min, index_t max){
+	LookupTable& endpoints(index_t min, index_t max){
 		mInterval.endpoints(min, max-1); // interpolator max index is inclusive
 		mIndMap.max(max-min, 1.);
 		return *this;
@@ -69,13 +69,13 @@ public:
 
 	/// Sums generator stream with table elements
 	template <class Gen>
-	FunctionTable& operator+=(Gen& g){
+	LookupTable& operator+=(Gen& g){
 		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
 		return *this;
 	}
 
 	template <class Gen>
-	FunctionTable& operator+=(const Gen& g){
+	LookupTable& operator+=(const Gen& g){
 		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
 		return *this;
 	}
