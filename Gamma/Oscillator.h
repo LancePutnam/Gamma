@@ -169,13 +169,14 @@ protected:
 /// \tparam Tv		table element type
 /// \tparam Sipol	interpolation strategy
 /// \tparam Stap	table reading strategy
-/// \ingroup Oscillators     
+/// \ingroup Oscillators
+/// \ingroup Envelopes
 /// \sa Other ways to synthesize sine waves: TableSine, CSine, LFO, Sine, SineR
 /// \sa Functions for building waveforms in tables with additive synthesis: addSine, addSines, addSinesPow, addWave
   
 template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
 class Osc : public Accum<Stap,Ts>, public ArrayPow2<Tv>{
-/// \ingroup env
+
 public:
 
 	/// Constructor that allocates an internal table
