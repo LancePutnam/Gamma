@@ -285,7 +285,8 @@ public:
 	Tv operator()(Tv i0){
 		i0 += d1*cd1 + d2*cd2;
 		Tv o0 = i0*-cd2 - d1*cd1 + d2;
-		delay(i0); return o0;
+		this->delay(i0);
+		return o0;
 	}
 
 protected:
@@ -317,7 +318,9 @@ public:
 	/// Filter sample
 	Tv operator()(Tv i0){
 		i0 *= mB0;
-		Tv o0 = i0 - d1*cd1 - d2*cd2; delay(i0); return o0;
+		Tv o0 = i0 - d1*cd1 - d2*cd2;
+		this->delay(i0);
+		return o0;
 	}
 
 	virtual void onResync(double r){ freq(mFreq); width(mWidth); }
@@ -360,7 +363,9 @@ public:
 	/// Filter sample
 	Tv operator()(Tv i0){
 		i0 *= mB0;
-		i0 += d1*cd1 + d2*cd2; delay(i0); return i0; 
+		i0 += d1*cd1 + d2*cd2;
+		this->delay(i0);
+		return i0; 
 	}
 
 	void onResync(double r){ freq(mFreq); width(mWidth); }
@@ -459,7 +464,7 @@ public:
 		return mSum * mRSize;
 	}
 	
-	void zero(){ assign(Tv(0)); }
+	void zero(){ this->assign(Tv(0)); }
 
 	virtual void onResize(){
 		mRSize = 1./Base::size();

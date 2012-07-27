@@ -358,8 +358,8 @@ public:
 	AD(Tp att =Tp(0.01), Tp dec =Tp(0.1), Tv amp = Tv(1), Tp crv =Tp(-4))
 	{
 		attack(att).decay(dec);
-		levels(0,amp,0);
-		curve(crv);
+		this->levels(0,amp,0);
+		this->curve(crv);
 	}
 
 	/// Set attack length
@@ -411,9 +411,9 @@ public:
 	)
 	{
 		this->sustainPoint(2);
-		levels(0,amp,sus*amp,0);
+		this->levels(0,amp,sus*amp,0);
 		attack(att).decay(dec).release(rel);
-		curve(crv);
+		this->curve(crv);
 	}
 
 	/// Set attack length
