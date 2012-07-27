@@ -159,7 +159,7 @@ public:
 			if(!done()){
 				mPos = 0;
 				setLen(mStage);
-				mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], mLevels[mStage]);
+				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[mStage+1]);
 				return (*this)(); // return level of new stage
 			}
 		}
@@ -176,7 +176,7 @@ public:
 		if(!done()){
 			mPos = 0;
 			setLen(mStage);
-			mCurve.set(mLen, mCurves[mStage], mLevels[mStage+1], curVal);
+			mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
 		}
 	}
 
@@ -611,19 +611,19 @@ public:
 	}
 	
 	/// Returns whether envelope is done
-	bool done() const { return mFnc.value() >= T(1); }
+	bool done() const { return mCurve.value() >= T(1); }
 	
 	/// Generate next value
 	T operator()(){
 		if(done()) return mVal0;
-		return ipl::linear(scl::min(mFnc(), T(1)), mVal1, mVal0);
+		return ipl::linear(scl::min(mCurve(), T(1)), mVal1, mVal0);
 	}
 	
 	/// Set new end value.  Start value is set to current value.
 	void operator= (T v){
-		mVal1 = ipl::linear(scl::min(mFnc.value(), T(1)), mVal1, mVal0);
+		mVal1 = ipl::linear(scl::min(mCurve.value(), T(1)), mVal1, mVal0);
 		mVal0 = v;
-		mFnc.reset();
+		mCurve.reset();
 	}
 	
 	/// Set curvature.  Negative gives faster change, positive gives slower change.
@@ -632,19 +632,19 @@ public:
 	/// Set length in domain units.
 	void period(T v){ set(v, mCrv); }
 
-	void reset(){ mFnc.reset(); }
+	void reset(){ mCurve.reset(); }
 
 	/// Set length and curvature
 	void set(T len, T crv){
 		mLen = len; mCrv = crv;
-		mFnc.set(len * Ts::spu(), crv);
+		mCurve.set(len * Ts::spu(), crv);
 	}
 	
 	virtual void onResync(double r){ set(mLen, mCrv); }
 	
 protected:
 	T mLen, mCrv, mVal1, mVal0;
-	Curve<T,T> mFnc;
+	Curve<T,T> mCurve;
 };
 
 
