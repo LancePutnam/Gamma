@@ -100,7 +100,7 @@ CONFPREFIX	= $(PREFIX)/etc/
 MANPREFIX	= $(PREFIX)/share/man/
 
 # Locations of built objects
-BUILD_DIR	= build/
+BUILD_DIR	?= build/
 BIN_DIR		= $(BUILD_DIR)bin/
 OBJ_DIR		= $(BUILD_DIR)obj/
 
@@ -185,6 +185,14 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
 	endif
 
+	# Needed to link to libraries installed through MacPorts
+	LDFLAGS += -L/opt/local/lib/
+	CPPFLAGS += -I/opt/local/include/
+
+	# Same for homebrew...
+	LDFLAGS += -L/usr/local/lib/
+	CPPFLAGS += -I/usr/local/include/
+
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
@@ -250,3 +258,12 @@ endif
 # Utility functions
 #--------------------------------------------------------------------------
 RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
+
+define RemoveBuildDir 
+       $(call RemoveDir, $(BUILD_DIR)include/)
+       $(call RemoveDir, $(BUILD_DIR)lib/)
+       $(call RemoveDir, $(BIN_DIR))
+       $(call RemoveDir, $(OBJ_DIR))
+       $(call RemoveDir, $(BUILD_DIR))
+endef
+
