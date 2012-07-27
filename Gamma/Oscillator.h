@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-/// @defgroup osc Oscillators
+///@defgroup Oscillators
 
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"
@@ -25,7 +25,7 @@ namespace gam{
 /// results of addition are taken modulo the maximum size of the integer.
 /// \tparam Stap	Read tap strategy (tap::Clip, tap::Fold, tap::Rep, or tap::Wrap)
 /// \tparam Ts		Synced type
-/// \ingroup osc     
+/// \ingroup Oscillators     
 template <class Stap=tap::Wrap, class Ts=Synced>
 class Accum : public Ts {
 public:
@@ -101,8 +101,9 @@ private:
 	using Accum<Stap,Ts>::nextPhase;
 
 
-/// \ingroup osc 
 /// Linear sweep in interval [0,1)
+    
+///\ingroup Oscillators 
 template <class Stap=tap::Wrap, class Ts=Synced>
 class Sweep : public Accum<Stap, Ts> {
 public:
@@ -115,9 +116,10 @@ public:
 private: typedef Accum<Stap,Ts> Base;
 };
 
-
-/// \ingroup osc 
+    
 /// Floating-point phase accumulator with output in [-pi, pi).
+
+///\ingroup Oscillators     
 template <class Tv=gam::real, class Ts=Synced>
 class AccumPhase : public Ts{
 public:
@@ -167,7 +169,7 @@ protected:
 /// \tparam Tv		table element type
 /// \tparam Sipol	interpolation strategy
 /// \tparam Stap	table reading strategy
-/// \ingroup osc     
+/// \ingroup Oscillators     
 /// \sa Other ways to synthesize sine waves: TableSine, CSine, LFO, Sine, SineR
 /// \sa Functions for building waveforms in tables with additive synthesis: addSine, addSines, addSinesPow, addWave
   
@@ -244,7 +246,7 @@ private:
 /// its frequency.  This is implemented from Mathews, M., Smith, J. 2003.
 /// "Methods for synthesizing very high Q parametrically well behaved two pole 
 /// filters."
-/// \ingroup osc 
+/// \ingroup Oscillators 
 ///  \sa Osc, TableSine, CSine, LFO, Sine, SineR
 template<class Tv=gam::real, class Ts=Synced>
 class CSine : public Ts{
@@ -291,7 +293,7 @@ protected:
 /// Computation time is about as much as a linearly-interpolating table lookup.
 /// In addition, polynomial approximations are often more spectrally pure than 
 /// table lookup methods since the distortion arises as harmonics.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa Osc, TableSine, CSine, LFO, SineR
 template<class Tv=gam::real, class Ts=Synced>
 class Sine : public AccumPhase<Tv,Ts> {
@@ -320,7 +322,7 @@ public:
 /// to prevent growing or decaying in amplitude over time.  This generator is 
 /// ideal in situations where a stationary sinusoid is all that is required, 
 /// e.g. a grain or modulator.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa Osc, TableSine, CSine, LFO, Sine, SineRs (Synthesizes multiple sines)
 template <class Tv=double, class Ts=Synced>
 class SineR : public gen::RSin<Tv>, Ts{
@@ -356,7 +358,7 @@ private:
 /// For efficiency reasons, this object does not keep its frequencies synchronized
 /// with the sample rate. If the sample rate changes, each oscillator must be
 /// manually re-set.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa SineR (synthesizes a single sine)
 template <class Tv=double, class Ts=Synced>
 class SineRs : public Array<SineR<Tv, Synced1> >, Ts{
@@ -389,7 +391,7 @@ private:
 
 /// This oscillator is similar to SineR, however, it has an extra multiply
 /// in its sample generation to allow the oscillator to decay.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa SineR, SineDs
 template <class Tv=double, class Ts=Synced>
 class SineD : public gen::RSin2<Tv>, Ts{
@@ -432,7 +434,7 @@ private:
 /// For efficiency reasons, this object does not keep its frequencies synchronized
 /// with the sample rate. If the sample rate changes, each oscillator must be
 /// manually re-set.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa SineD
 template <class Tv=double, class Ts=Synced>
 class SineDs : public Array<SineD<Tv, Synced1> >, Ts{
@@ -472,7 +474,7 @@ private:
 /// generally not as spectrally pure and additional memory needs to be allocated
 /// to store the lookup table (although it's relatively small and only allocated
 /// once).
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa Osc, CSine, LFO, Sine, SineR
 template <class Stap=tap::Wrap, class Ts=Synced>
 class TableSine : public Accum<Stap,Ts> {
@@ -514,7 +516,7 @@ private:
 
 /// This object generates various waveform types by mapping the output of a 
 /// an accumulator through mathematical functions.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 /// \sa Osc, TableSine, CSine, Sine, SineR
 template <class Stap=tap::Wrap, class Ts=Synced>
 class LFO : public Accum<Stap,Ts>{
@@ -585,7 +587,7 @@ private:
 /// Due to numerical issues, this generator should not be used for producing 
 /// very low frequency modulation signals. For that purpose, it is better to use
 /// the LFO class.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 template<class Tv=gam::real, class Ts=Synced>
 class Buzz : public AccumPhase<Tv,Ts> {
 public:
@@ -629,7 +631,7 @@ private: typedef AccumPhase<Tv,Ts> Base;
 /// Due to numerical issues, this generator should not be used for producing 
 /// very low frequency modulation signals. For that purpose, it is better to use
 /// the LFO class.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 template <class Tv=gam::real, class Ts=Synced>
 struct Impulse : public Buzz<Tv,Ts>{
 
@@ -657,7 +659,7 @@ public:
 /// Due to numerical issues, this generator should not be used for producing 
 /// very low frequency modulation signals. For that purpose, it is better to use
 /// the LFO class.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 template <class Tv=gam::real, class Ts=Synced>
 struct Saw : public Impulse<Tv,Ts> {
 
@@ -681,7 +683,7 @@ struct Saw : public Impulse<Tv,Ts> {
 /// Due to numerical issues, this generator should not be used for producing 
 /// very low frequency modulation signals. For that purpose, it is better to use
 /// the LFO class.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 template <class Tv=gam::real, class Ts=Synced>
 struct Square : public Impulse<Tv,Ts> {
 
@@ -705,7 +707,7 @@ struct Square : public Impulse<Tv,Ts> {
 /// amplitude ratio. The frequency of harmonic i is (i * fr + 1) where 'fr' is
 /// called the frequency ratio. Harmonics run from i=0 (the fundamental) to
 /// the maximum specified harmonic.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 template<class Tv=gam::real, class Ts=Synced>
 class DSF : public AccumPhase<Tv,Ts> {
 public:
@@ -751,7 +753,7 @@ protected:
 
 // This uses a fast, simplified formula for generating a band-limited impulse,
 // but only operates at integer divisions of the Nyquist frequency.
-/// \ingroup osc 
+/// \ingroup Oscillators 
 class ImpulseFast : public Synced {
 public:
 	ImpulseFast(): mPhase(0), mOffset(0){ freq(0); }

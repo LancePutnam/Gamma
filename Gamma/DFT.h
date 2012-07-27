@@ -17,6 +17,7 @@
 
 namespace gam{
 
+/// @defgroup DFT
 
 /// Spectral data types
 enum SpectralType{
@@ -28,6 +29,9 @@ enum SpectralType{
 
 
 /// Sliding window for analysis
+    
+///@ingroup DFT
+    
 template <class T=gam::real>
 class SlidingWindow{
 public:
@@ -75,6 +79,9 @@ private:
 
 
 /// Base class for DFTs
+    
+///@ingroup DFT
+    
 template <class T=gam::real>
 class DFTBase : public Synced{
 public:
@@ -119,6 +126,9 @@ protected:
 
 
 /// Discrete Fourier transform
+
+///@ingroup DFT
+
 class DFT : public DFTBase<float>{
 public:
 	/// Constructor
@@ -217,6 +227,9 @@ protected:
 /// to obtain better time resolution between successive spectral frames. The 
 /// resolution within each individual spectral frame is still determined by the
 /// window size.
+
+/// @ingroup DFT
+    
 class STFT : public DFT {
 public:
 
@@ -296,6 +309,9 @@ protected:
 /// This transform computes the DFT with a fixed hop size of 1 sample and
 /// within a specified frequency interval. The computational complexity per
 /// sample is O(M), where M is the size, in samples, of the frequency interval.
+
+/// @ingroup DFT
+    
 template <class T>
 class SlidingDFT : public DFTBase<T> {
 public:

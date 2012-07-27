@@ -55,9 +55,11 @@ namespace acc{
 
 
 /// Maps a real number in [0, pmax) to an integer in [0, imax).
-///  \ingroup access
+    
+///\ingroup access    
 template <class T>
 class IndexMap{
+
 public:
 	IndexMap(index_t idxMax=1, const T& posMax=T(1)){ max(idxMax, posMax); }
 	

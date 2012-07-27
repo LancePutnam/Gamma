@@ -86,6 +86,7 @@ protected:
 
 
 /// Variable delay-line with multiple read taps
+    
 /// @ingroup Delays    
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
 class Multitap : public Delay<Tv,Si,Ts> {
@@ -163,6 +164,7 @@ protected:
 
 
 /// One element delay
+
 /// @ingroup Delays    
 template<class T=gam::real> 
 class Delay1 : public DelayShift<1,T>{
@@ -174,6 +176,7 @@ public:
 
 
 /// Two element delay
+    
 /// @ingroup Delays    
 template<class T=gam::real> 
 class Delay2 : public DelayShift<2,T>{

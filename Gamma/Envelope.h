@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-/// @defgroup env Envelopes
+/// @defgroup Envelopes
 /// Everything in Gamma having to do with envelopes.
 
 
@@ -29,7 +29,7 @@ namespace gam{
 ///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \ingroup env  
+/// \ingroup Envelopes 
 template <class Tv=real, class Tp=real>
 class Curve{
 public:
@@ -80,7 +80,7 @@ protected:
 /// \tparam N	number of segments
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \ingroup env  
+/// \ingroup Envelopes 
 template <int N, class Tv=real, class Tp=real, class Ts=Synced>
 class Env : public Ts{
 public:
@@ -345,7 +345,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
-/// \ingroup env  
+/// \ingroup Envelopes 
 template <class Tv=real, class Tp=real, class Ts=Synced>
 class AD : public Env<2,Tv,Tp,Ts>{
 public:
@@ -392,7 +392,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
-/// \ingroup env  
+/// \ingroup Envelopes 
 template <class Tv=real, class Tp=real, class Ts=Synced>
 class ADSR : public Env<3,Tv,Tp,Ts>{
 public:
@@ -449,7 +449,7 @@ protected:
 /// envelope is -60 dB down from its initial value. This envelope is one of the 
 /// most computationally efficient envelopes requiring only a single multiply
 /// per iteration.
-/// \ingroup env  
+/// \ingroup Envelopes 
 template <class T=real, class Ts=Synced>
 class Decay : public Ts{
 public:

@@ -21,7 +21,8 @@ class AudioIOData;
 /// Audio callback type
 typedef void (* audioCallback)(AudioIOData& io);
 
-/// Audio device abstraction    
+/// Audio device abstraction  
+    
 /// @ingroup io     
 class AudioDevice{
 public:
@@ -76,6 +77,7 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 
 /// Audio buffers are guaranteed to be stored in a contiguous non-interleaved 
 /// format, i.e., frames are tightly packed per channel.
+    
 /// @ingroup io     
 class AudioIOData {
 public:
@@ -171,6 +173,7 @@ public:
 
 
 /// Interface for objects which can be registered with an audio IO stream
+    
 /// @ingroup io 
 class AudioCallback {
 public:
