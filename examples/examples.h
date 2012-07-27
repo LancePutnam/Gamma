@@ -15,7 +15,7 @@
 #include "Gamma/FormantData.h"
 #include "Gamma/Noise.h"
 #include "Gamma/Oscillator.h"
-#include "Gamma/Player.h"
+#include "Gamma/SamplePlayer.h"
 #include "Gamma/Print.h"
 #include "Gamma/Recorder.h"
 #include "Gamma/Scheduler.h"
@@ -26,7 +26,7 @@
 
 using namespace gam;
 
-#define RUN(audioCB)\
+#define RUN_AUDIO_MAIN \
 int main(int argc, char* argv[]){\
 	AudioIO io(256, 44100, audioCB, NULL, 2);\
 	Sync::master().spu(io.framesPerSecond());\

@@ -14,13 +14,19 @@
 
 namespace gam{
 
+///@defgroup Effects
 
-/// Amplitude envelope extractor
+/// Envelope Follower
+
+///@ingroup Filters    
+///@ingroup Envelopes
 template <class Tv=real, class Tp=real, class Ts=Synced>
-struct AmpEnv{
+struct EnvFollow{
 
 	/// @param[in] freq		Cutoff frequency of smoothing filter
-	AmpEnv(Tp freq=10)
+    
+    
+	EnvFollow(Tp freq=10)
 	:	lpf(freq){}
 
 	/// Filter next sample
@@ -36,8 +42,10 @@ struct AmpEnv{
 
 
 
-/// @brief 3 biquad filters (of floats) in parallel
-/// \ingroup filters
+/// 3 biquad filters (of floats) in parallel
+    
+/// @ingroup Filters
+/// @ingroup Effects
 struct Biquad3{
 	/// Constructor
 	Biquad3(float f0, float f1, float f2, float q=8, FilterType type=BAND_PASS):
@@ -171,6 +179,8 @@ struct ChebyN{
 
 
 /// Dual delay-line chorus driven by quadrature sinusoid
+
+/// @ingroup Effects
 template <class T=gam::real>
 struct Chorus{
 	/// @param[in] delay	Delay interval
@@ -225,6 +235,8 @@ struct Chorus{
 
 
 /// Frequency shifter
+    
+/// @ingroup Effects
 template <class T=gam::real>
 struct FreqShift{
 
@@ -246,6 +258,7 @@ struct FreqShift{
 
 
 // Saw oscillator with sweepable filter.
+       
 struct MonoSynth{
 	MonoSynth(float freq=440, float dur=0.8, float ctf1=1000, float ctf2=100, float res=3):
 		osc(freq), filter(ctf1, res), env(dur), opEnv(100), ctf1(ctf1), ctf2(ctf2)

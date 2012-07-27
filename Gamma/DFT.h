@@ -17,6 +17,7 @@
 
 namespace gam{
 
+/// @defgroup DFT
 
 /// Spectral data types
 enum SpectralType{
@@ -28,6 +29,9 @@ enum SpectralType{
 
 
 /// Sliding window for analysis
+    
+///@ingroup DFT
+    
 template <class T=gam::real>
 class SlidingWindow{
 public:
@@ -75,6 +79,9 @@ private:
 
 
 /// Base class for DFTs
+    
+///@ingroup DFT
+    
 template <class T=gam::real>
 class DFTBase : public Synced{
 public:
@@ -119,6 +126,9 @@ protected:
 
 
 /// Discrete Fourier transform
+
+///@ingroup DFT
+
 class DFT : public DFTBase<float>{
 public:
 	/// Constructor
@@ -217,6 +227,9 @@ protected:
 /// to obtain better time resolution between successive spectral frames. The 
 /// resolution within each individual spectral frame is still determined by the
 /// window size.
+
+/// @ingroup DFT
+    
 class STFT : public DFT {
 public:
 
@@ -291,25 +304,28 @@ protected:
 
 
 
-/// Sliding discrete Fourier transform (SDFT)
+/// Sliding discrete Fourier transform
 
 /// This transform computes the DFT with a fixed hop size of 1 sample and
 /// within a specified frequency interval. The computational complexity per
 /// sample is O(M), where M is the size, in samples, of the frequency interval.
+
+/// @ingroup DFT
+    
 template <class T>
-class SDFT : public DFTBase<T> {
+class SlidingDFT : public DFTBase<T> {
 public:
 
 	/// @param[in] sizeDFT	transform size, in samples
 	/// @param[in] binLo	lower closed endpoint of frequency interval
 	/// @param[in] binHi	upper open endpoint of frequency interval
-	SDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
+	SlidingDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
 	
 	/// Input next sample and perform forward transform
 	void forward(T input);
 	
 	/// Set endpoints of frequency interval
-	SDFT& interval(uint32_t binLo, uint32_t binHi);
+	SlidingDFT& interval(uint32_t binLo, uint32_t binHi);
 
 	/// Resize transform
 	void resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
@@ -486,15 +502,15 @@ inline float * STFT::phases(){ return mPhases; }
 
 
 
-//---- SDFT
+//---- SlidingDFT
 
-TEM SDFT<T>::SDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
+TEM SlidingDFT<T>::SlidingDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
 	: DFTBase<T>(), mBinLo(0), mBinHi(0), mDelay(0)
 {
 	resize(sizeDFT, binLo, binHi);
 }
 
-TEM void SDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
+TEM void SlidingDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	// may be able to keep these smaller?
 	mem::resize(this->mBuf, this->mSizeDFT + 2, sizeDFT + 2);
 	mem::deepZero(this->mBuf, sizeDFT + 2);
@@ -509,7 +525,7 @@ TEM void SDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	//this->onSyncChange();
 }
 
-TEM SDFT<T>& SDFT<T>::interval(uint32_t binLo, uint32_t binHi){
+TEM SlidingDFT<T>& SlidingDFT<T>::interval(uint32_t binLo, uint32_t binHi){
 	mBinLo = binLo;
 	mBinHi = binHi;
 	
@@ -522,7 +538,7 @@ TEM SDFT<T>& SDFT<T>::interval(uint32_t binLo, uint32_t binHi){
 }
 
 //
-TEM inline void SDFT<T>::forward(T input){
+TEM inline void SlidingDFT<T>::forward(T input){
 	T dif = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
 												// difference between temporal 'frames'
 	Complex<T> c = mFL;							// phasor at low bin
@@ -538,7 +554,7 @@ TEM inline void SDFT<T>::forward(T input){
 	}
 }
 
-//TEM inline T SDFT<T>::inverse(){}
+//TEM inline T SlidingDFT<T>::inverse(){}
 
 
 
