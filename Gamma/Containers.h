@@ -8,6 +8,8 @@
 	Dynamically sizable generic containers.
 */
 
+/// @defgroup Containers
+
 #include <stdlib.h>
 #include <vector>
 #include <map>
@@ -21,6 +23,8 @@ namespace gam{
 
 
 /// Size functor for ArrayPow2
+/// @ingroup Containers
+    
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
 	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
@@ -32,6 +36,8 @@ struct SizeArrayPow2{
 
 
 /// Size functor for Array
+/// @ingroup Containers
+    
 struct SizeArray{
 	SizeArray(uint32_t size): mSize(size){}
 	uint32_t operator()() const { return mSize; }
@@ -46,6 +52,8 @@ struct SizeArray{
 /// When the array is resized, if the elements are class-types, then their
 /// default constructors are called and if the elements are non-class-types,
 /// then they are left uninitialized.
+/// @ingroup Containers
+    
 template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
@@ -151,6 +159,8 @@ private: ArrayBase& operator=(const ArrayBase& v);
 
 
 /// Resizable array
+/// @ingroup Containers
+    
 template <class T, class A=gam::Allocator<T> >
 class Array : public ArrayBase<T, SizeArray, A>{
 public:
@@ -170,6 +180,8 @@ private: Array& operator=(const Array& v);
 
 
 /// Resizable array with a power-of-2 number of elements
+/// @ingroup Containers
+    
 template <class T, class A=gam::Allocator<T> >
 class ArrayPow2 : public ArrayBase<T, SizeArrayPow2, A>{
 public:
@@ -200,6 +212,8 @@ private: ArrayPow2& operator=(const ArrayPow2& v);
 
 
 /// Ring buffer
+/// @ingroup Containers
+    
 template <class T, class A=gam::Allocator<T> >
 class Ring : public Array<T,A> {
 public:
@@ -246,6 +260,8 @@ protected:
 
 
 /// Ring buffer that keeps track of its fill amount
+/// @ingroup Containers
+    
 template <class T, class A=gam::Allocator<T> >
 class RingFill : public Ring<T,A> {
 public:
@@ -284,6 +300,8 @@ protected:
 
 /// This is a two-part buffer consisting of a ring buffer for writing and
 /// a standard (absolute indexed) array for reading.
+/// @ingroup Containers
+    
 template <class T, class A=gam::Allocator<T> >
 class DoubleRing : public Ring<T,A>{
 public:
@@ -323,6 +341,8 @@ protected:
 
 
 /// N-sample delay
+/// @ingroup Containers
+    
 template <class T, class A=gam::Allocator<T> >
 struct DelayN: public Ring<T,A>{
 	using Ring<T,A>::incPos; using Ring<T,A>::pos;
