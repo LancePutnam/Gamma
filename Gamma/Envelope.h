@@ -40,9 +40,9 @@ public:
 	///						c > 0 approaches slowly (accelerates),
 	///						c < 0 approaches rapidly (decelerates), and
 	///						c = 0 approaches linearly
-	/// @param[in] end		end value
 	/// @param[in] start	start value
-	Curve(Tp length, Tp curve, Tv end=Tv(1), Tv start=Tv(0));
+	/// @param[in] end		end value
+	Curve(Tp length, Tp curve, Tv start=Tv(1), Tv end=Tv(0));
 
 	bool done() const;				///< Returns whether curve has gone past end value
 	Tv end() const { return mEnd; }	///< Get end value
@@ -56,9 +56,9 @@ public:
 	
 	/// @param[in] length	length of curve in samples
 	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
-	/// @param[in] end		end value
 	/// @param[in] start	start value
-	Curve& set(Tp length, Tp curve, Tv end=Tv(1), Tv start=Tv(0));
+	/// @param[in] end		end value
+	Curve& set(Tp length, Tp curve, Tv start=Tv(0), Tv end=Tv(1));
 
 protected:
 	Tv mEnd, mA, mB;
@@ -659,11 +659,15 @@ protected:
 TEM Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
-TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv end, Tv start){
-	set(length, curve, end, start);
+TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv start, Tv end){
+	set(length, curve, start, end);
 }
 
-TEM inline bool Curve<Tv,Tp>::done() const { return scl::abs(mA - mB*mMul) >= scl::abs(end()); }
+TEM inline bool Curve<Tv,Tp>::done() const {
+	Tv dv = mB - mB*mMul; // linear apx of derivative
+	if(dv > Tv(0))	return value() >= end();
+	else			return value() <= end();
+}
 
 TEM inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
 
@@ -679,7 +683,7 @@ namespace{
 	template<> inline float		maxReal<float>(){ return FLT_MAX; }
 }
 
-TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv end, Tv start){
+TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	static const Tp EPS = eps<Tp>();
 
 	if(len == Tp(0)){ // if length is 0, return end value immediately
