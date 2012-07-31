@@ -61,7 +61,8 @@ struct Biquad3{
 };
 
 
-
+/// Percussive noise burst consisting of resonant-filtered white noise with a rapidly decaying amplitude
+    
 struct Burst{
 	Burst(float frq1=20000, float frq2=4000, float dec=0.1, float res=2) : 
 		freq1(frq1), freq2(frq2), fil(frq1, res, BAND_PASS), env(dec)
