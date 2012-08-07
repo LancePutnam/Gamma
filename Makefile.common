@@ -62,6 +62,9 @@ DLIB_MAJ	= 1
 DLIB_MIN	= 0
 
 # Build configuration: 'Release' or 'Debug'
+# 'Release' aggressively optimizes for speed at the expense of greater
+# compile times and program size. 'Debug' generates code suitable for a
+# debugging tool.
 BUILD_CONFIG	= Release
 
 # Whether to build a dynamic library versus a static library
@@ -81,14 +84,16 @@ STRICT_WARNINGS = 1
 # Whether to automatically run executables after building
 AUTORUN		= 1
 
+# Platform-specific library file extensions
 SLIB_EXT	= a
 DLIB_EXT	= so
 DLIB_OPT	= shared
 
 # Flags required for including and linking against library
-EXT_CPPFLAGS	?=
-EXT_LDFLAGS	?=
+LINK_CPPFLAGS	?=
+LINK_LDFLAGS	?=
 
+# Flags handed to 'ar' command
 SLIB_FLAGS 	?=
 DLIB_FLAGS 	?=
 
@@ -127,6 +132,8 @@ RM		= rm -f
 #--------------------------------------------------------------------------
 # Finalize variables
 #--------------------------------------------------------------------------
+
+# Dependency tracking doesn't work with universal libraries, so disable it
 ifeq ($(ARCH), 32_64)
 	DEP_TRACK = 0
 endif
@@ -266,4 +273,3 @@ define RemoveBuildDir
        $(call RemoveDir, $(OBJ_DIR))
        $(call RemoveDir, $(BUILD_DIR))
 endef
-
