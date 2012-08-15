@@ -60,7 +60,7 @@ struct Impulse : public Val<T>{ INHERIT;
 	T operator()() const {T t=val; val=0; return t;}	///< Generate next value
 };
 
-/// Nyquist sequence generator
+/// Generates a Nyquist signal, i.e., -1, 1, -1, 1, …
 template<class T=gam::real>
 struct Nyquist : public Val<T>{ INHERIT;
 	Nyquist(const T& val=T(1)): Val<T>(-val){}			///< Constructor

@@ -122,6 +122,8 @@ protected:
 
 
 /// Fixed-size shift delay
+    
+/// Insertion is slower than the average ring buffer, for example that used with DelayN. Acessing is faster. Consider using when you have substantially more accesses than insertions.
 
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
