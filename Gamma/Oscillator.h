@@ -513,7 +513,7 @@ private:
 
 
 
-/// Low-frequency oscillator (non band-limited).
+/// Low-frequency oscillator capable of generating a large variety of (non band-limited) waveforms.   
 
 /// This object generates various waveform types by mapping the output of a 
 /// an accumulator through mathematical functions.
