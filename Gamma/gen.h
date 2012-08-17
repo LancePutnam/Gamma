@@ -554,7 +554,9 @@ private:
 };
 
 
-/// Triggers after a specified number of iterations and then resets
+/// \brief Triggers after a specified number of iterations and then resets. (Outputs true on every nth sample and false on the rest.)  
+    
+/// Argument "num" determines the length of the sequence.  "val", with a default value of zero can be set by the user to adjust the location of the triggering sample within the sequence.
 struct Trigger{
 	Trigger(uint32_t num, uint32_t val=0) : val(val), num(num){}
 	
