@@ -67,7 +67,12 @@ struct Nyquist : public Val<T>{ INHERIT;
 	T operator()() const { return val = -val; }			///< Generate next value
 };
 
-/// Reciprocal sequence generator
+///\brief Reciprocal sequence generator. \n
+///Given a type that can be initialized by passing
+///the integer 1 to the constructor (let the value be “x”), 
+///it generates the sequence x/1, x/2, x/3, x/4, etc.   
+    
+///http://www.britannica.com/EBchecked/topic/1500010/harmonic-sequence
 template <class T=gam::real>
 struct Recip : public Val<T>{ INHERIT;
 	Recip(const T& val=T(1)): Val<T>(val){}				///< Constructor
