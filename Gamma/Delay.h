@@ -165,7 +165,7 @@ protected:
 };
 
 
-/// One element delay
+/// One sample delay. Returns last input sample.
 
 /// @ingroup Delays    
 template<class T=gam::real> 
@@ -177,7 +177,7 @@ public:
 };
 
 
-/// Two element delay
+/// Two sample delay. Returns second to last input sample.
     
 /// @ingroup Delays    
 template<class T=gam::real> 
