@@ -193,11 +193,11 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Needed to link to libraries installed through MacPorts
-	LDFLAGS += -L/opt/local/lib/
+	LDFLAGS  += -L/opt/local/lib/
 	CPPFLAGS += -I/opt/local/include/
 
 	# Same for homebrew...
-	LDFLAGS += -L/usr/local/lib/
+	LDFLAGS  += -L/usr/local/lib/
 	CPPFLAGS += -I/usr/local/include/
 
 	LDFLAGS	+= -lm -lstdc++
@@ -211,8 +211,14 @@ else ifeq ($(PLATFORM), macosx)
 else ifeq ($(PLATFORM), windows)
 
 	PLATFORM_DIR = windows/
-	
-	# This is needed for MinGW/MSYS
+
+	# Needed for MinGW libs...
+	LDFLAGS  += -L/mingw/lib/
+	CPPFLAGS += -I/mingw/include/
+
+	# Needed for MSYS libs...
+	LDFLAGS  += -L/local/lib/
+	CPPFLAGS += -I/local/include/
 	CPPFLAGS += -I`pwd`
 
 	SLIB_EXT = lib
