@@ -6,8 +6,6 @@
 
 #include <stdio.h>
 
-#define TEM template <class T>
-
 namespace gam{
 
 /// Doubly-linked node
@@ -162,38 +160,44 @@ private:
 
 // Node2
 
-TEM Node2<T>::Node2()
+template <class T>
+Node2<T>::Node2()
 :	nodeL(0), nodeR(0)
 {
 }
 
-TEM Node2<T>::Node2(bool zeroLinks){
+template <class T>
+Node2<T>::Node2(bool zeroLinks){
 	if(zeroLinks){
 		nodeL = 0;
 		nodeR = 0;
 	}
 }
 
-TEM Node2<T>::~Node2(){
+template <class T>
+Node2<T>::~Node2(){
 	//printf("~Node2\n");
 	nodeRemove();
 }
 
-TEM void Node2<T>::nodeInsertL(T & node){
+template <class T>
+void Node2<T>::nodeInsertL(T & node){
 	nodeL = node.nodeL;
 	nodeR = &node;
 	if(nodeL) nodeL->nodeR = (T *)this;
 	node.nodeL = (T *)this;
 }
 
-TEM void Node2<T>::nodeInsertR(T & node){
+template <class T>
+void Node2<T>::nodeInsertR(T & node){
 	nodeR = node.nodeR;
 	nodeL = &node;
 	if(nodeR) nodeR->nodeL = (T *)this;
 	node.nodeR = (T *)this;
 }
 
-TEM void Node2<T>::nodeRemove(){
+template <class T>
+void Node2<T>::nodeRemove(){
 	// connect neighbors
 	if(nodeL){ nodeL->nodeR = nodeR; }
 	if(nodeR){ nodeR->nodeL = nodeL; }
@@ -203,11 +207,13 @@ TEM void Node2<T>::nodeRemove(){
 
 
 
-TEM void Node2<T>::print(const char * append, FILE * fp) const {
+template <class T>
+void Node2<T>::print(const char * append, FILE * fp) const {
 	fprintf(fp, "%p %p %p%s", nodeL, this, nodeR, append);
 }
 
-TEM void Node2<T>::printAll(const char * append, FILE * fp) const {
+template <class T>
+void Node2<T>::printAll(const char * append, FILE * fp) const {
 
 	Node2<T> const * n = &leftmost();
 	
@@ -220,6 +226,5 @@ TEM void Node2<T>::printAll(const char * append, FILE * fp) const {
 
 } // gam::
 
-#undef TEM
 #endif
 
