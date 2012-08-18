@@ -476,7 +476,7 @@ protected:
 
 
 
-/// Binary gate controlled by threshold comparison
+/// Binary gate controlled by threshold comparison. The gate closes if the (norm of the) input value remains below threshold for at least closingDelay units of time (typically seconds).
 template <class T=real, class Ts=Synced>
 class Gate : public Ts{
 public:
