@@ -346,39 +346,52 @@ protected:
 // Implementation_______________________________________________________________
 
 //---- SlidingWindow
-#define TEM template<class T>
-TEM SlidingWindow<T>::SlidingWindow(uint32_t winSize, uint32_t hopSize)
+
+template<class T>
+SlidingWindow<T>::SlidingWindow(uint32_t winSize, uint32_t hopSize)
 	: mBuf(0), mSizeWin(0), mSizeHop(0), mHopCnt(0)
 {
 	resize(winSize, hopSize);
 	mem::deepZero(mBuf, sizeWin());
 }
 
-TEM SlidingWindow<T>::~SlidingWindow(){
+template<class T>
+SlidingWindow<T>::~SlidingWindow(){
 	if(mBuf){ free(mBuf); mBuf = 0; }
 }
 
-TEM void SlidingWindow<T>::resize(uint32_t winSize, uint32_t hopSize){
+template<class T>
+void SlidingWindow<T>::resize(uint32_t winSize, uint32_t hopSize){
 	sizeWin(winSize);
 	sizeHop(hopSize);
 	//mTapW = hopStart();	// for single-buffer slide mode
 	mTapW = 0;				// for single-buffer rotate mode
 }
 
-TEM void SlidingWindow<T>::sizeWin(uint32_t size){
+template<class T>
+void SlidingWindow<T>::sizeWin(uint32_t size){
 	if(mem::resize(mBuf, sizeWin(), size)) mSizeWin = size;
 }
 
-TEM void SlidingWindow<T>::sizeHop(uint32_t size){
+template<class T>
+void SlidingWindow<T>::sizeHop(uint32_t size){
 	mSizeHop = scl::clip(size, sizeWin(), (uint32_t)1);
 }
 
-TEM inline uint32_t SlidingWindow<T>::sizeHop() const { return mSizeHop; }
-TEM inline uint32_t SlidingWindow<T>::sizeWin() const { return mSizeWin; }
-TEM inline const T * SlidingWindow<T>::window(){ return mBuf; }
-TEM inline const T * SlidingWindow<T>::operator()(){ return mBuf; }
+template<class T>
+inline uint32_t SlidingWindow<T>::sizeHop() const { return mSizeHop; }
+    
+template<class T>
+inline uint32_t SlidingWindow<T>::sizeWin() const { return mSizeWin; }
+    
+template<class T>
+inline const T * SlidingWindow<T>::window(){ return mBuf; }
+    
+template<class T>
+inline const T * SlidingWindow<T>::operator()(){ return mBuf; }
 
-TEM inline bool SlidingWindow<T>::operator()(T input){
+template<class T>
+inline bool SlidingWindow<T>::operator()(T input){
 
 // faster, but requires explicit call to slide() by user which is error prone
 //	mBuf[mTapW] = input;
@@ -399,7 +412,8 @@ TEM inline bool SlidingWindow<T>::operator()(T input){
 	return false;
 }
 
-TEM inline bool SlidingWindow<T>::operator()(T * output, T input){
+template<class T>
+inline bool SlidingWindow<T>::operator()(T * output, T input){
 	mBuf[mTapW] = input;
 	if(++mTapW == sizeWin()) mTapW = 0;
 
@@ -411,35 +425,52 @@ TEM inline bool SlidingWindow<T>::operator()(T * output, T input){
 	return false;
 }
 
-TEM inline void SlidingWindow<T>::slide(){
+template<class T>
+inline void SlidingWindow<T>::slide(){
 	mem::deepMove(mBuf, mBuf + sizeHop(), hopStart());
 }
 
-TEM inline uint32_t SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(); }
+template<class T>
+inline uint32_t SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(); }
 
 
 
 //---- DFTBase
 
-TEM DFTBase<T>::DFTBase() : mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0){ initSynced(); }
+template<class T>
+DFTBase<T>::DFTBase() : mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0){ initSynced(); }
 
-TEM DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
+template<class T>
+DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
 	mem::free(mBuf);
 	mem::free(mAux);
 }
 
-TEM inline T *		DFTBase<T>::aux(uint32_t num){ return mAux + numBins() * num; }
-TEM inline double	DFTBase<T>::binFreq() const { return spu() / (double)sizeDFT(); }
-TEM inline uint32_t	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
-TEM inline uint32_t	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
-TEM inline Sync&	DFTBase<T>::syncFreq(){ return mSyncFreq; }
-TEM inline T		DFTBase<T>::normForward() const { return (T)2 / (T)sizeDFT(); }
+template<class T>
+inline T *		DFTBase<T>::aux(uint32_t num){ return mAux + numBins() * num; }
+    
+template<class T>
+inline double	DFTBase<T>::binFreq() const { return spu() / (double)sizeDFT(); }
+    
+template<class T>
+inline uint32_t	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
+    
+template<class T>
+inline uint32_t	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
+    
+template<class T>
+inline Sync&	DFTBase<T>::syncFreq(){ return mSyncFreq; }
+    
+template<class T>
+inline T		DFTBase<T>::normForward() const { return (T)2 / (T)sizeDFT(); }
 
-TEM void DFTBase<T>::numAux(uint32_t num){
+template<class T>
+void DFTBase<T>::numAux(uint32_t num){
 	if(mem::resize(mAux, mNumAux * numBins(), num * numBins())) mNumAux = num;
 }
 
-TEM void DFTBase<T>::onResync(double r){
+template<class T>
+void DFTBase<T>::onResync(double r){
 	mSyncFreq.ups(binFreq());
 }
 
@@ -504,13 +535,15 @@ inline float * STFT::phases(){ return mPhases; }
 
 //---- SlidingDFT
 
-TEM SlidingDFT<T>::SlidingDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
+template<class T>
+SlidingDFT<T>::SlidingDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
 	: DFTBase<T>(), mBinLo(0), mBinHi(0), mDelay(0)
 {
 	resize(sizeDFT, binLo, binHi);
 }
 
-TEM void SlidingDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
+template<class T>
+void SlidingDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi){
 	// may be able to keep these smaller?
 	mem::resize(this->mBuf, this->mSizeDFT + 2, sizeDFT + 2);
 	mem::deepZero(this->mBuf, sizeDFT + 2);
@@ -525,7 +558,8 @@ TEM void SlidingDFT<T>::resize(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
 	//this->onSyncChange();
 }
 
-TEM SlidingDFT<T>& SlidingDFT<T>::interval(uint32_t binLo, uint32_t binHi){
+template<class T>
+SlidingDFT<T>& SlidingDFT<T>::interval(uint32_t binLo, uint32_t binHi){
 	mBinLo = binLo;
 	mBinHi = binHi;
 	
@@ -538,7 +572,8 @@ TEM SlidingDFT<T>& SlidingDFT<T>::interval(uint32_t binLo, uint32_t binHi){
 }
 
 //
-TEM inline void SlidingDFT<T>::forward(T input){
+template<class T>
+inline void SlidingDFT<T>::forward(T input){
 	T dif = (input - mDelay(input)) * mNorm;	// ffd comb zeroes
 												// difference between temporal 'frames'
 	Complex<T> c = mFL;							// phasor at low bin
@@ -554,12 +589,14 @@ TEM inline void SlidingDFT<T>::forward(T input){
 	}
 }
 
-//TEM inline T SlidingDFT<T>::inverse(){}
+//template<class T>
+//inline T SlidingDFT<T>::inverse(){}
 
 
 
 /*
-TEM class Counter{
+template<class T>
+class Counter{
 public:
 
 	bool operator()(){
@@ -577,8 +614,6 @@ protected:
 	T mVal, mMax;
 };
 */
-
-#undef TEM
 
 } // gam::
 
