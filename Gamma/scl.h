@@ -727,16 +727,13 @@ template<class T> T nearest(T val, const char * intervals, long div){
 
 template<class T>
 inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
-    
 template<>
 inline float nextAfter(float x, float y){ return nextafterf(x,y); }
-    
 template<>
 inline double nextAfter(double x, double y){ return nextafter(x,y); }
-    
 template<>
 inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
-    
+
 template<class T> inline T pow2 (T v){ return v*v; }
 template<class T> inline T pow3 (T v){ return v*v*v; }
 template<class T> inline T pow4 (T v){ return pow2(pow2(v)); }
@@ -747,16 +744,12 @@ template<class T> inline T ratioET(T pc, T divs, T ival){
 //template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
 template<class T>
 inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
-    
 template<class T>
 inline T round(T v, T s){ return round<double>(v/s) * s; }
-    
 template<class T>
 inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
-    
 template<class T>
 inline T roundAway(T v){ return v<T(0) ? floor(v) : ceil(v); }
-    
 template<class T>
 inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 
