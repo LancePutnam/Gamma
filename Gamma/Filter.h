@@ -523,69 +523,81 @@ protected:
 
 // Implementation_______________________________________________________________
 
-#define TEM template <class Tv>
-#define T_VPS template <class Tv, class Tp, class Ts>
-
 //---- AllPass1
 
-T_VPS AllPass1<Tv,Tp,Ts>::AllPass1(Tp frq)
+template <class Tv, class Tp, class Ts>
+AllPass1<Tv,Tp,Ts>::AllPass1(Tp frq)
 :	d1(Tv(0)), mFreq(frq)
 {	Ts::initSynced(); }
 
-T_VPS inline void AllPass1<Tv,Tp,Ts>::freq(Tp v){
+template <class Tv, class Tp, class Ts>
+inline void AllPass1<Tv,Tp,Ts>::freq(Tp v){
 	mFreq = v;
 	c = tan( freqToRad(v, Ts::ups()) - M_PI_4); // valid ang in [-pi/4, pi/4]
 }
 
-T_VPS inline void AllPass1<Tv,Tp,Ts>::freqF(Tp v){
+template <class Tv, class Tp, class Ts>
+inline void AllPass1<Tv,Tp,Ts>::freqF(Tp v){
 	mFreq = v;
 	c = freqToRad(v, Ts::ups());
 	c = Tp(1.27323954474) * c - Tp(1);		// 4/pi * c - 1, linear apx
 	c = c * (Tp(0.76) + Tp(0.24) * c * c);
 }
 
-T_VPS inline Tv AllPass1<Tv,Tp,Ts>::operator()(Tv i0){ 
+template <class Tv, class Tp, class Ts> 
+inline Tv AllPass1<Tv,Tp,Ts>::operator()(Tv i0){
 	i0 -= d1 * c;			// o0 = c * (i0 - c * d1) + d1
 	Tv o0 = i0 * c + d1;	//    = c * i0 + (1 - c*c) * d1
 	d1 = i0;
 	return o0;
 }
 
-T_VPS inline Tv AllPass1<Tv,Tp,Ts>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
-T_VPS inline Tv AllPass1<Tv,Tp,Ts>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
+template <class Tv, class Tp, class Ts>
+inline Tv AllPass1<Tv,Tp,Ts>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
+    
+template <class Tv, class Tp, class Ts>
+inline Tv AllPass1<Tv,Tp,Ts>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
 
-T_VPS inline Tp AllPass1<Tv,Tp,Ts>::freq(){ return mFreq; }
-T_VPS void AllPass1<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
-
+template <class Tv, class Tp, class Ts>
+inline Tp AllPass1<Tv,Tp,Ts>::freq(){ return mFreq; }
+    
+template <class Tv, class Tp, class Ts>
+void AllPass1<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
 
 
 
 //---- Biquad
-T_VPS Biquad<Tv,Tp,Ts>::Biquad(Tp frq, Tp res, FilterType type)
+template <class Tv, class Tp, class Ts>
+Biquad<Tv,Tp,Ts>::Biquad(Tp frq, Tp res, FilterType type)
 :	d1(0), d2(0)
 {
 	Ts::initSynced();
 	set(frq, res, type);
 }
 
-T_VPS void Biquad<Tv,Tp,Ts>::onResync(double r){
+template <class Tv, class Tp, class Ts>
+void Biquad<Tv,Tp,Ts>::onResync(double r){
 	mFrqToRad = M_2PI * Ts::ups();
 	freq(mFreq);
 }
 
-T_VPS void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, FilterType typeA){
+template <class Tv, class Tp, class Ts>
+void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, FilterType typeA){
 	mRes = resA;
 	mType = typeA;
 	freq(freqA);
 }
 
-T_VPS void Biquad<Tv,Tp,Ts>::zero(){ d1=d2=(Tv)0; }
+template <class Tv, class Tp, class Ts>
+void Biquad<Tv,Tp,Ts>::zero(){ d1=d2=(Tv)0; }
 
-T_VPS void Biquad<Tv,Tp,Ts>::coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2){
+template <class Tv, class Tp, class Ts>
+void Biquad<Tv,Tp,Ts>::coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2){
 	mA0=a0; mA1=a1; mA2=a2; mB0=b0; mB1=b1; mB2=b2;
 }
 
-T_VPS inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
+template <class Tv, class Tp, class Ts>
+inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
 //	float w = freqA * mFrqToRad;	// radial frequency [0, pi)
 //	mReal = cos(w);
 //	mImag = sin(w);
@@ -597,7 +609,8 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
 	res(mRes);
 }
 
-T_VPS inline void Biquad<Tv,Tp,Ts>::res(Tp v){
+template <class Tv, class Tp, class Ts>
+inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	mRes = v;
 	mAlpha = mImag / mRes;
 	mB0 = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of mB0
@@ -607,7 +620,8 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	type(mType);
 }
 
-T_VPS inline void Biquad<Tv,Tp,Ts>::set(Tp frq, Tp res){ set(frq, res, mType); }
+template <class Tv, class Tp, class Ts>
+inline void Biquad<Tv,Tp,Ts>::set(Tp frq, Tp res){ set(frq, res, mType); }
 
 /*
 void setAllpass(float fr, float R){
@@ -621,7 +635,8 @@ void setAllpass(float fr, float R){
 }
 */
 
-T_VPS inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
+template <class Tv, class Tp, class Ts>
+inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 	mType = typeA;
 	
 	switch(mType){
@@ -659,7 +674,8 @@ T_VPS inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 	};
 }
 
-T_VPS inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
+template <class Tv, class Tp, class Ts>
+inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
 	// Direct form II
 	i0 = i0 - d1*mB1 - d2*mB2;
 	Tv o0 = i0*mA0 + d1*mA1 + d2*mA2;
@@ -667,7 +683,8 @@ T_VPS inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
 	return o0;
 }
 
-T_VPS inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
+template <class Tv, class Tp, class Ts>
+inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
 	i0 = i0 - d1*mB1 - d2*mB2;	
 	Tv o0 = (i0 - d2)*mA0;
 	d2 = d1; d1 = i0;
@@ -676,18 +693,24 @@ T_VPS inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
 
 
 //---- OnePole
-T_VPS OnePole<Tv,Tp,Ts>::OnePole()
+template <class Tv, class Tp, class Ts>
+OnePole<Tv,Tp,Ts>::OnePole()
 :	mFreq(10), mStored(Tv(0)), o1(Tv(0))
 {	Ts::initSynced(); }
 
-T_VPS OnePole<Tv,Tp,Ts>::OnePole(Tp frq, const Tv& stored)
+template <class Tv, class Tp, class Ts>
+OnePole<Tv,Tp,Ts>::OnePole(Tp frq, const Tv& stored)
 :	mFreq(frq), mStored(stored), o1(stored)
 {	Ts::initSynced(); }
 
-T_VPS void OnePole<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
+template <class Tv, class Tp, class Ts>
+void OnePole<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
 
-T_VPS inline void OnePole<Tv,Tp,Ts>::operator  = (const Tv& v){ mStored  = v; }
-T_VPS inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
+template <class Tv, class Tp, class Ts>
+inline void OnePole<Tv,Tp,Ts>::operator  = (const Tv& v){ mStored  = v; }
+    
+template <class Tv, class Tp, class Ts>
+inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
 
 // f = ln(mB1) / -M_2PI * SR  ( @ 44.1 f = ln(c01) * -7018.733)
 // @ 44.1 : 0.9     <=> 739.5
@@ -695,7 +718,8 @@ T_VPS inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
 // @ 44.1 : 0.999   <=>   7.022
 // @ 44.1 : 0.9999  <=>   0.702
 // @ 44.1 : 0.99999 <=>   0.0702
-T_VPS inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
+template <class Tv, class Tp, class Ts>
+inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
 	mFreq = v;	
 	v = scl::max(v, Tp(0));	// ensure positive freq
 	
@@ -704,18 +728,25 @@ T_VPS inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
 	//printf("%f, %f, %f\n", Ts::spu(), mB1, v);
 }
 
-T_VPS inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
+template <class Tv, class Tp, class Ts>
+inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
 
-T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::operator()(){ return (*this)(mStored); }
-T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
+template <class Tv, class Tp, class Ts>
+inline const Tv& OnePole<Tv,Tp,Ts>::operator()(){ return (*this)(mStored); }
+    
+template <class Tv, class Tp, class Ts>
+inline const Tv& OnePole<Tv,Tp,Ts>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
 
-T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::last() const { return o1; }
-T_VPS inline const Tv& OnePole<Tv,Tp,Ts>::stored() const { return mStored; }
-T_VPS inline Tv& OnePole<Tv,Tp,Ts>::stored(){ return mStored; }
-T_VPS inline bool OnePole<Tv,Tp,Ts>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == Tv(0); }
-
-#undef TEM
-#undef T_VPS
-
+template <class Tv, class Tp, class Ts>
+inline const Tv& OnePole<Tv,Tp,Ts>::last() const { return o1; }
+    
+template <class Tv, class Tp, class Ts>
+inline const Tv& OnePole<Tv,Tp,Ts>::stored() const { return mStored; }
+    
+template <class Tv, class Tp, class Ts>
+inline Tv& OnePole<Tv,Tp,Ts>::stored(){ return mStored; }
+    
+template <class Tv, class Tp, class Ts>
+inline bool OnePole<Tv,Tp,Ts>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == Tv(0); }
 } // gam::
 #endif
