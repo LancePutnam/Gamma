@@ -653,27 +653,30 @@ protected:
 
 // Implementation_______________________________________________________________
 
-#define TEM template <class Tv,class Tp>
 
 //---- Curve
-TEM Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
+template <class Tv,class Tp>
+Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
-TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv start, Tv end){
+template <class Tv,class Tp>
+Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv start, Tv end){
 	set(length, curve, start, end);
 }
 
-TEM inline bool Curve<Tv,Tp>::done() const {
+template <class Tv,class Tp>
+inline bool Curve<Tv,Tp>::done() const {
 	Tv dv = mB - mB*mMul; // linear apx of derivative
 	if(dv > Tv(0))	return value() >= end();
 	else			return value() <= end();
 }
 
-TEM inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
+template <class Tv,class Tp>
+inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
 
 // dividing by mMul goes back one step
-TEM inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
-
+template <class Tv,class Tp>
+inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
 
 // hack to get proper max floating point value
 namespace{
@@ -683,7 +686,8 @@ namespace{
 	template<> inline float		maxReal<float>(){ return FLT_MAX; }
 }
 
-TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
+template <class Tv,class Tp>
+Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	static const Tp EPS = eps<Tp>();
 
 	if(len == Tp(0)){ // if length is 0, return end value immediately
@@ -727,45 +731,53 @@ TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	return *this;
 }
 
-TEM inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
+template <class Tv,class Tp>
+inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
 
-TEM inline Tv Curve<Tv,Tp>::operator()(){
+template <class Tv,class Tp>
+inline Tv Curve<Tv,Tp>::operator()(){
 	mB *= mMul;
 	return value();
 }
-#undef TEM
 
+    
 
-
-#define TM1 template <class T, class Ts>
-#define TM2 T,Ts
 //---- Decay
 
-TM1 Decay<TM2>::Decay(T decay_, T val)
+template <class T, class Ts>
+Decay<T,Ts>::Decay(T decay_, T val)
 :	mVal(val)
 {
 	Ts::initSynced();
 	decay(decay_);
 }
 
-TM1 inline T Decay<TM2>::operator()(){ T o = mVal; mVal *= mMul; return o; }
+template <class T, class Ts>
+inline T Decay<T,Ts>::operator()(){ T o = mVal; mVal *= mMul; return o; }
 
-TM1 inline void Decay<TM2>::decay(T v){
+template <class T, class Ts>
+inline void Decay<T,Ts>::decay(T v){
 	mDcy = v;
 	mMul = scl::t60(v * Ts::spu());
 }
 
-TM1 inline void Decay<TM2>::reset(){ mVal = 1; }
-TM1 inline void Decay<TM2>::value(T v){ mVal = v; }
+template <class T, class Ts>
+inline void Decay<T,Ts>::reset(){ mVal = 1; }
+    
+template <class T, class Ts>
+inline void Decay<T,Ts>::value(T v){ mVal = v; }
 
-TM1 inline T Decay<TM2>::decay() const { return mDcy; }
-TM1 inline bool Decay<TM2>::done(T thr) const { return mVal < thr; }
-TM1 inline T Decay<TM2>::value() const { return mVal; }
+template <class T, class Ts>
+inline T Decay<T,Ts>::decay() const { return mDcy; }
+    
+template <class T, class Ts>
+inline bool Decay<T,Ts>::done(T thr) const { return mVal < thr; }
+    
+template <class T, class Ts>
+inline T Decay<T,Ts>::value() const { return mVal; }
 
-TM1 void Decay<TM2>::onResync(double r){ decay(mDcy); }
-
-#undef TM1
-#undef TM2
+template <class T, class Ts>
+void Decay<T,Ts>::onResync(double r){ decay(mDcy); }
 
 
 } // gam::
