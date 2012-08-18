@@ -121,9 +121,9 @@ protected:
 
 
 
-/// Fixed-size shift delay
+/// Fixed-size shift delay. See detailed explanation for usage information.
     
-/// Insertion is slower than the average ring buffer, for example that used with DelayN. Acessing is faster. Consider using when you have substantially more accesses than insertions.
+/// Where N is the number of elements in the delay, insertion is O(N) which is slower than that of the average ring buffer at O(1).  Access, however will be faster than that of the ring buffer.
 
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
@@ -165,7 +165,7 @@ protected:
 };
 
 
-/// One element delay
+/// One sample delay. Returns last input sample.
 
 /// @ingroup Delays    
 template<class T=gam::real> 
@@ -177,7 +177,7 @@ public:
 };
 
 
-/// Two element delay
+/// Two sample delay. Returns second to last input sample.
     
 /// @ingroup Delays    
 template<class T=gam::real> 

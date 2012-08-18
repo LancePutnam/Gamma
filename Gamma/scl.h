@@ -28,16 +28,13 @@
 	#define nextafterl(x,y)	_nextafter(x,y)
 #endif
 
-#define TEM template<class T>
-
-
 namespace gam{
 
 /// Returns a positive length associated with argument
-TEM double norm(const T& v);
+template<class T> double norm(const T& v);
 
 /// Returns a positive number valid for comparing norms
-TEM double normCompare(const T& v);
+template<class T> double normCompare(const T& v);
 
 
 /// Scalar rank functions for numerical types
@@ -144,7 +141,7 @@ DEF(char) DEF(unsigned char)
 
 
 // Returns absolute value.
-//TEM T abs(T value);
+//template<class T> T abs(T value);
 
 /// Tests whether two values are close in value
 
@@ -158,12 +155,12 @@ bool almostEqual(double a, double b, int maxUlps=10);
 
 // Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
 // |error| < 0.01 rad
-TEM T atan2Fast(T y, T x);
+template<class T> T atan2Fast(T y, T x);
 
 /// Returns floating point value rounded to next highest integer.
-TEM T ceil(T val);
-TEM T ceil(T val, T step);
-TEM T ceil(T val, T step, T recStep);
+template<class T> T ceil(T val);
+template<class T> T ceil(T val, T step);
+template<class T> T ceil(T val, T step, T recStep);
 
 /// Returns power of two ceiling of value.
 
@@ -172,17 +169,17 @@ TEM T ceil(T val, T step, T recStep);
 uint32_t ceilPow2(uint32_t value);
 
 /// Returns value clipped to [lo, hi].
-TEM T clip(T value, T hi=T(1), T lo=T(0));
+template<class T> T clip(T value, T hi=T(1), T lo=T(0));
 
 /// Returns value clipped to [-hi, hi].
-TEM T clipS(T value, T hi=T(1));
+template<class T> T clipS(T value, T hi=T(1));
 
 /// Returns value clipped to [lo, hi] and signifies clipping behavior.
 
 /// clipFlag signifies if and where clipping occured.  0 means no clipping
 /// occured, -1 means clipping occured at the lower bound, and 1 means
 /// clipping at the upper bound.
-TEM T clip(T value, int & clipFlag, T hi, T lo);
+template<class T> T clip(T value, int & clipFlag, T hi, T lo);
 
 /// Returns value whose magnitude is clipped to [min, max].
 float clipMag(float value, float max=1.f, float min=0.f);
@@ -191,13 +188,13 @@ float clipMag(float value, float max=1.f, float min=0.f);
 
 /// 'u' must be in the range [0, 0.5] which corresponds to the first half
 /// of the cosine.
-TEM T cosP3(T u);
+template<class T> T cosP3(T u);
 
 /// 8th order Taylor series approximation to a cosine.
 
 /// 'radians' must be in [-pi, pi].
 ///
-TEM T cosT8(T radians);
+template<class T> T cosT8(T radians);
 
 /// Convert decibels to amplitude
 template <class T>
@@ -208,7 +205,7 @@ template <class T>
 inline T ampTodB(const T& amp){ return 20*::log(amp); }
 
 /// Returns weights for linear fade.
-TEM void fadeLin(T& weight1, T& weight2, T fade);
+template<class T> void fadeLin(T& weight1, T& weight2, T fade);
 
 /// Returns weights for triangular window fade.
 
@@ -218,29 +215,29 @@ TEM void fadeLin(T& weight1, T& weight2, T fade);
 /// 0.25	1			0       \n
 /// 0.5		0.5			0.5		\n
 /// 0.75	0			1
-TEM void fadeTri(T& weight1, T& weight2, T fade);
+template<class T> void fadeTri(T& weight1, T& weight2, T fade);
 
 /// Return Fejer weighting factor for kth harmonic in a Fourier series of length n.
 
 /// The function is a line from (0,1) to (n,0). This is used for reducing the
 /// Gibbs effect from a Fourier series summation.
-TEM T fejer(T k, T n){ return (n-k)/n; }
+template<class T> T fejer(T k, T n){ return (n-k)/n; }
 
 /// Returns floor of floating point value.
-TEM T floor(T val);
-TEM T floor(T val, T step);
-TEM T floor(T val, T step, T recStep);
+template<class T> T floor(T val);
+template<class T> T floor(T val, T step);
+template<class T> T floor(T val, T step, T recStep);
 
 /// Returns value folded into [lo, hi].
 
 /// For out-of-range values, the boundaries act like mirrors reflecting
 /// the value into the range. For an even number of periods out of the range
 /// this is identical to a wrap().
-TEM T fold(T value, T hi=T(1), T lo=T(0));
-TEM T fold(T v, long& numFolds, T hi=T(1), T lo=T(0));
+template<class T> T fold(T value, T hi=T(1), T lo=T(0));
+template<class T> T fold(T v, long& numFolds, T hi=T(1), T lo=T(0));
 
 /// Returns value folded into [lo, hi] one time.
-TEM T foldOnce(T value, T hi=T(1), T lo=T(0));
+template<class T> T foldOnce(T value, T hi=T(1), T lo=T(0));
 
 /// Returns frequency in Hz from a 12-TET note string.
 
@@ -251,7 +248,7 @@ TEM T foldOnce(T value, T hi=T(1), T lo=T(0));
 double freq(const char * note);
 
 /// Convert linear value to log2 in range [0, 1]
-TEM T linLog2(T v, T recMin);
+template<class T> T linLog2(T v, T recMin);
 
 /// Returns base 2 logarithm of value.
 
@@ -265,34 +262,37 @@ uint32_t log2(uint32_t v);
 float log2Fast(float v);
 
 /// Maps value from [-1,1] to [depth, 1].
-TEM T mapDepth(T v, T depth){ return (v - T(1)) * T(0.5) * depth + T(1);  }
+template<class T>
+T mapDepth(T v, T depth){ return (v - T(1)) * T(0.5) * depth + T(1);  }
 
 /// Inverse 2nd power mapping for interval [0, 1].
-TEM T mapInvPow2(T v);
+template<class T> T mapInvPow2(T v);
 
 /// Computes scale and offset necessary to map value from [i0, i1] to [o0, o1].
-TEM void mapLin(T i0, T i1, T o0, T o1, T & scale, T & offset);
+template<class T>
+void mapLin(T i0, T i1, T o0, T o1, T & scale, T & offset);
 
 /// Linearly maps value from [i0, i1] to [o0, o1].
-TEM T mapLin(T v, T i0, T i1, T o0, T o1);
+template<class T>
+T mapLin(T v, T i0, T i1, T o0, T o1);
 
 /// Returns v^power linearly mapped to [bound0, bound1].
 double mapPower(double v, double bound1, double bound0, double power=1.);
 
 /// Map a value in [-1,1] to a cubic approximating sin(pi/2 x)
-TEM T mapSinSS(T v);
+template<class T> T mapSinSS(T v);
 
 /// Map a value in [-1,1] to a cubic approximating 1/2 sin(pi/2 x) + 1/2
-TEM T mapSinSU(T v);
+template<class T> T mapSinSU(T v);
 
 /// Map a value in [ 0,1] to a cubic approximating -cos(pi x)
-TEM T mapSinUS(T v);
+template<class T> T mapSinUS(T v);
 
 /// Map a value in [ 0,1] to a cubic approximating -1/2 cos(pi x) + 1/2
-TEM T mapSinUU(T v);
+template<class T> T mapSinUU(T v);
 
 /// Mixes two values together (1 = thru, 0.5 = mono, 0 = swap).
-TEM void mix2(T& io1, T& io2, T mix);
+template<class T> void mix2(T& io1, T& io2, T mix);
 
 /// Returns nearest "note" within a pitch class set
 
@@ -301,14 +301,15 @@ TEM void mix2(T& io1, T& io2, T mix);
 /// @param[in] mod			modulo amount
 ///
 /// The sum of the values in the interval array should be equal to 'mod'.
-TEM T nearest(T v, const char * intervals="2212221", long mod=12);
+template<class T>
+T nearest(T v, const char * intervals="2212221", long mod=12);
 
 /// Returns the next representable floating-point or integer value following x in the direction of y
-TEM T nextAfter(T x, T y);
+template<class T> T nextAfter(T x, T y);
 
-TEM T pow2(T v);			///< Returns value to the 2nd power
-TEM T pow3(T v);			///< Returns value to the 3rd power
-TEM T pow4(T v);			///< Returns value to the 4th power
+template<class T> T pow2(T v);			///< Returns value to the 2nd power
+template<class T> T pow3(T v);			///< Returns value to the 3rd power
+template<class T> T pow4(T v);			///< Returns value to the 4th power
 
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
@@ -318,74 +319,74 @@ inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups);
 /// @param[in] pitch	pitch class
 /// @param[in] divs		number of equally tempered divisions in octave
 /// @param[in] octave	base multiplier of (pseudo) octave
-TEM T ratioET(T pitch, T divs=12, T octave=2);
+template<class T> T ratioET(T pitch, T divs=12, T octave=2);
 
 /// Returns floating point value rounded to nearest integer.
-TEM T round(T v);
+template<class T> T round(T v);
 
 /// Returns floating point value rounded to nearest integer multiple of 'step'.
-TEM T round(T v, T step);
+template<class T> T round(T v, T step);
 
 /// Returns floating point value rounded to nearest integer multiple of 'step'. Faster version to avoid 1/step divide.
-TEM T round(T v, T step, T recStep);
+template<class T> T round(T v, T step, T recStep);
 
 /// Returns value rounded to nearest integer away from zero.
-TEM T roundAway(T v);
+template<class T> T roundAway(T v);
 
 /// Returns value rounded to nearest to nearest integer multiple of 'step' away from zero.
-TEM T roundAway(T v, T step);
+template<class T> T roundAway(T v, T step);
 
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
 //
-TEM T sinFast(T radians);
+template<class T> T sinFast(T radians);
 
 /// 7th order minimax polynomial approximation to sin(pi x).
 
 /// Error is spread evenly across domain.
 /// @param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
-TEM T sinP7(T normal);
+template<class T> T sinP7(T normal);
 
 /// 9th order minimax polynomial approximation to sin(pi x).
 
 /// Error is spread evenly across domain.
 /// @param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
-TEM T sinP9(T normal);
+template<class T> T sinP9(T normal);
 
 /// 7th order Taylor series approximation to a sine.
 
 /// @param[in] radians	phase, in [-pi, pi]
 ///
-TEM T sinT7(T radians);
+template<class T> T sinT7(T radians);
 
 /// 9th order Taylor series approximation to a sine.
 
 /// @param[in] radians	phase, in [-pi, pi]
 ///
-TEM T sinT9(T radians);
+template<class T> T sinT9(T radians);
 
 /// Smooth negative map
 
 /// The return value is close to 1 if v < 0 and close to 0 if v > 0.
 /// The smoothness is controlled with the bw argument.
-TEM T smoothNeg(T v, T bw);
+template<class T> T smoothNeg(T v, T bw);
 
 /// Same as smoothNeg(T,T), but 'amt' controls positive level (0,1) -> (-1,1)
-TEM T smoothNeg(T v, T bw, T amt);
+template<class T> T smoothNeg(T v, T bw, T amt);
 
 /// Smooth positive map
 
 /// The return value is close to 1 if v > 0 and close to 0 if v < 0.
 /// The smoothness is controlled with the bw argument.
-TEM T smoothPos(T v, T bw);
+template<class T> T smoothPos(T v, T bw);
 
-TEM T smoothNotchFunc(T v, T bw);
-TEM T smoothNotch(T v, T bw);
+template<class T> T smoothNotchFunc(T v, T bw);
+template<class T> T smoothNotch(T v, T bw);
 
 // Same as smoothNotch1, but 'amt' controls notch depth.
-TEM T smoothNotch(T v, T bw, T amt);
-TEM T smoothNotch2(T v, T bw);
+template<class T> T smoothNotch(T v, T bw, T amt);
+template<class T> T smoothNotch2(T v, T bw);
 
 /// Peak function.
 
@@ -395,15 +396,15 @@ TEM T smoothNotch2(T v, T bw);
 /// In general, the approximation has a slightly
 /// smaller bandwidth than the true response. Also, the true response is
 /// periodic, while this one is not.
-TEM T smoothPeak(T v, T bw);
-TEM T smoothPeak1(T v, T bw);
+template<class T> T smoothPeak(T v, T bw);
+template<class T> T smoothPeak1(T v, T bw);
 
 /// Continuous sign map
 
 /// The return value is close to 1 if v > 0 and close to -1 if v < 0.
 /// 'bw' controls the width of the transition region. If 'bw' is 0, then this
 /// turns into a signum function.
-TEM T smoothSign(T v, T bw);
+template<class T> T smoothSign(T v, T bw);
 
 /// Same as smoothZero(), but takes a unary function to be applied to the value
 template <class T, class F> T smoothZero(T v, T bw, F f);
@@ -412,39 +413,39 @@ template <class T, class F> T smoothZero(T v, T bw, F f);
 
 /// The graph of this function resembles a resonant peak. The function uses the
 /// square of the value for evaluation.
-TEM T smoothZero(T v, T bw);
+template<class T> T smoothZero(T v, T bw);
 
 /// Truncates floating point value at decimal.
-TEM T trunc(T value);
+template<class T> T trunc(T value);
 
 /// Truncates floating point value to step.
-TEM T trunc(T value, T step);
+template<class T> T trunc(T value, T step);
 
 /// Truncates floating point value to step. Faster version to avoid 1/step divide.
-TEM T trunc(T value, T step, T recStep);
+template<class T> T trunc(T value, T step, T recStep);
 
 /// Returns multiplicaton factor for reaching -60 dB after 'samples' iterations.
 double t60(double samples);
 
 /// Returns value wrapped in [lo, hi).
-TEM T wrap(T value, T hi=(T)1, T lo=(T)0);
+template<class T> T wrap(T value, T hi=(T)1, T lo=(T)0);
 
 /// Returns value wrapped in [lo, hi).
 
 /// 'numWraps' reports how many wrappings occured where the sign, + or -,
 /// signifies above 'hi' or below 'lo', respectively.
-TEM T wrap(T value, long & numWraps, T hi=(T)1, T lo=(T)0);
+template<class T> T wrap(T value, long & numWraps, T hi=(T)1, T lo=(T)0);
 
 /// Returns value incremented by 1 and wrapped into interval [0, max).
-TEM T wrapAdd1(T v, T max){ ++v; return v == max ? 0 : v; }
+template<class T> T wrapAdd1(T v, T max){ ++v; return v == max ? 0 : v; }
 
 /// Like wrap(), but only adds or subtracts 'hi' once from value.
-TEM T wrapOnce(T value, T hi=(T)1);
+template<class T> T wrapOnce(T value, T hi=(T)1);
 
-TEM T wrapOnce(T value, T hi, T lo);
+template<class T> T wrapOnce(T value, T hi, T lo);
 
-TEM T wrapPhase(T radians);			///< Returns value wrapped in [-pi, pi)
-TEM T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only wraps once
+template<class T> T wrapPhase(T radians);			///< Returns value wrapped in [-pi, pi)
+template<class T> T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only wraps once
 
 
 
@@ -453,25 +454,25 @@ TEM T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only wraps once
 //
 
 /// Returns whether or not an integer value is even.
-TEM bool even(T v);
+template<class T> bool even(T v);
 
 // Returns maximum of two values.
-//TEM T max(T v1, T v2);
+//template<class T> T max(T v1, T v2);
 
 /// Returns maximum of three values.
-TEM T max(T v1, T v2, T v3);
+template<class T> T max(T v1, T v2, T v3);
 
 // Returns minimum of two values.
-//TEM T min(T v1, T v2);
+//template<class T> T min(T v1, T v2);
 
 /// Returns minimum of three values.
-TEM T min(T v1, T v2, T v3);
+template<class T> T min(T v1, T v2, T v3);
 
 /// Returns whether or not an integer value is odd.
-TEM bool odd(T v);
+template<class T> bool odd(T v);
 
 /// Returns slope of line passing through two points.
-TEM T slope(T x1, T y1, T x2, T y2);
+template<class T> T slope(T x1, T y1, T x2, T y2);
 
 /// Returns number of trailing zeros in 32-bit int
 
@@ -481,7 +482,7 @@ TEM T slope(T x1, T y1, T x2, T y2);
 uint32_t trailingZeroes(uint32_t v);
 
 /// Returns whether value is within [lo, hi].
-TEM bool within(T v, T lo, T hi);
+template<class T> bool within(T v, T lo, T hi);
 
 /// Returns whether a positive zero crossing occured.
 bool zeroCrossP(float prev, float now);
@@ -517,13 +518,13 @@ float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
 float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
 float triangleU	(uint32_t phase);	///< Returns value of unipolar triangle function.
 
-TEM T bartlett(T nphase);				///< Bartlett window. nphase => [-1, 1)
-TEM T blackman(T phase);				///< Blackman window function.
-TEM T blackmanHarris(T phase);			///< Blackman-Harris window function.
-TEM T hamming(T phase);					///< Hamming window function.
-TEM T hann(T phase);					///< von Hann window function.
-TEM T raisedCosine(T phase, T a, T b);	///< Raised cosine f(x) = a - b cos(x).
-TEM T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
+template<class T> T bartlett(T nphase);				///< Bartlett window. nphase => [-1, 1)
+template<class T> T blackman(T phase);				///< Blackman window function.
+template<class T> T blackmanHarris(T phase);			///< Blackman-Harris window function.
+template<class T> T hamming(T phase);					///< Hamming window function.
+template<class T> T hann(T phase);					///< von Hann window function.
+template<class T> T raisedCosine(T phase, T a, T b);	///< Raised cosine f(x) = a - b cos(x).
+template<class T> T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
 
 
 // internal
@@ -540,9 +541,9 @@ namespace{
 		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
 
-	TEM T taylorFactor3(T vv, T c1, T c2, T c3);
-	TEM T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
-	TEM T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
+	template<class T> T taylorFactor3(T vv, T c1, T c2, T c3);
+	template<class T> T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
+	template<class T> T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
 }
 
 
@@ -550,11 +551,11 @@ namespace{
 
 //#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
 //GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
-////TEM inline T abs(T v){ return v < T(0) ? -v : v; } // only allow specializations
+////template<class T> inline T abs(T v){ return v < T(0) ? -v : v; } // only allow specializations
 //#undef GEN
 
 
-TEM T atan2Fast(T y, T x){
+template<class T> T atan2Fast(T y, T x){
 
 	T r, angle;
 	T ay = scl::abs(y) + (T)1e-10;      // kludge to prevent 0/0 condition
@@ -572,9 +573,9 @@ TEM T atan2Fast(T y, T x){
 	return y < (T)0 ? -angle : angle;
 }
 
-TEM inline T ceil(T v){ return round(v + roundEps<T>()); }
-TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
-TEM inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
+template<class T> inline T ceil(T v){ return round(v + roundEps<T>()); }
+template<class T> inline T ceil(T v, T s){ return ceil(v/s)*s; }
+template<class T> inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
 
 inline uint32_t ceilPow2(uint32_t v){
 	v--;
@@ -586,29 +587,33 @@ inline uint32_t ceilPow2(uint32_t v){
 	return ++v;
 }
 
-TEM inline T clip(T v, T hi, T lo){
+template<class T> inline T clip(T v, T hi, T lo){
 	     if(v < lo) return lo;
 	else if(v > hi)	return hi;
 	return v;
 }
 
-TEM inline T clip(T v, int & clipFlag, T hi, T lo){
+template<class T> inline T clip(T v, int & clipFlag, T hi, T lo){
 	clipFlag = 0;
 	     if(v < lo){ clipFlag = -1; return lo; }
 	else if(v > hi){ clipFlag =  1; return hi; }
 	return v;
 }
 
-TEM inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
+template<class T>
+inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
 
-TEM inline T equals(T v1, T v2, T bw){ return equals(v1, v2, bw, pow2<T>); }
+template<class T>
+inline T equals(T v1, T v2, T bw){ return equals(v1, v2, bw, pow2<T>); }
 
 template <class T, class F>
 inline T equals(T v1, T v2, T bw, F f){ return bw/(f(v1-v2) + bw); }
 
-TEM inline void fadeLin(T & w1, T & w2, T f){ w1 = (T)1 - f; w2 = f; }
+template<class T>
+inline void fadeLin(T & w1, T & w2, T f){ w1 = (T)1 - f; w2 = f; }
 
-TEM inline void fadeTri(T & w1, T & w2, T f){
+template<class T>
+inline void fadeTri(T & w1, T & w2, T f){
 	if(f < 0.25){
 		w1 = f * 4;
 		w2 = 0;
@@ -622,16 +627,16 @@ TEM inline void fadeTri(T & w1, T & w2, T f){
 	}
 }
 
-TEM inline T floor(T v){ return round(v - roundEps<T>()); }
-TEM inline T floor(T v, T s){ return floor(v/s)*s; }
-TEM inline T floor(T v, T s, T r){ return floor(v*r)*s; }
+template<class T> inline T floor(T v){ return round(v - roundEps<T>()); }
+template<class T> inline T floor(T v, T s){ return floor(v/s)*s; }
+template<class T> inline T floor(T v, T s, T r){ return floor(v*r)*s; }
 
-TEM inline T fold(T v, T hi, T lo){
+template<class T> inline T fold(T v, T hi, T lo){
 	long t;
 	return fold(v,t,hi,lo);
 }
 
-TEM inline T fold(T v, long& numFolds, T hi, T lo){
+template<class T> inline T fold(T v, long& numFolds, T hi, T lo){
 	long numWraps;
 	v = wrap(v, numWraps, hi, lo);
 	if(numWraps & 1) v = hi + lo - v;
@@ -639,13 +644,13 @@ TEM inline T fold(T v, long& numFolds, T hi, T lo){
 	return v;
 }
 
-TEM inline T foldOnce(T v, T hi, T lo){
+template<class T> inline T foldOnce(T v, T hi, T lo){
 	if(v > hi) return hi + (hi - v);
 	if(v < lo) return lo + (lo - v);
 	return v;
 }
 
-TEM inline T linLog2(T v, T recMin){
+template<class T> inline T linLog2(T v, T recMin){
 	v = log2Fast(scl::abs(v) + T(0.000001));	// offset to avoid -inf
 	return scl::max(v * recMin, T(-1)) + T(1);
 }
@@ -657,14 +662,16 @@ inline float log2Fast(float v){
 	return (float)((u.i - int32_t(Expo1<float>()))) * 0.0000001192092896f;// / 8388608.f;
 }
 
-TEM inline T mapInvPow2(T v){ return v*(T(2)-v); }
+template<class T> inline T mapInvPow2(T v){ return v*(T(2)-v); }
 
-TEM inline void mapLin(T i0, T i1, T o0, T o1, T& scale, T& offset){
+template<class T>
+inline void mapLin(T i0, T i1, T o0, T o1, T& scale, T& offset){
 	scale = slope(i0, o0, i1, o1);
 	offset = o0 - scale * i0;
 }
 
-TEM inline T mapLin(T v, T i0, T i1, T o0, T o1){
+template<class T>
+inline T mapLin(T v, T i0, T i1, T o0, T o1){
 	float scale = slope(i0, o0, i1, o1);
 	return (v - i0) * scale + o0;
 }
@@ -674,12 +681,12 @@ inline double mapPower(double v, double b1, double b0, double p){
 	return b0 + (b1 - b0) * v;
 }
 
-TEM inline T mapSinSS(T v){ return v*(T(1.5 ) - v*v*T(0.50)); }
-TEM inline T mapSinSU(T v){ return v*(T(0.75) - v*v*T(0.25)) + T(0.5); }
-TEM inline T mapSinUS(T v){ return v*v*(T(6) - v*T(4)) - T(1); }
-TEM inline T mapSinUU(T v){ return v*v*(T(3) - v*T(2)); }
+template<class T> inline T mapSinSS(T v){ return v*(T(1.5 ) - v*v*T(0.50)); }
+template<class T> inline T mapSinSU(T v){ return v*(T(0.75) - v*v*T(0.25)) + T(0.5); }
+template<class T> inline T mapSinUS(T v){ return v*v*(T(6) - v*T(4)) - T(1); }
+template<class T> inline T mapSinUU(T v){ return v*v*(T(3) - v*T(2)); }
 
-TEM inline void mix2(T& io1, T& io2, T mix){
+template<class T> inline void mix2(T& io1, T& io2, T mix){
 	T t1 = (io1 - io2) * mix;
 	T t2 = io1 - t1;
 	io1 = t1 + io2;
@@ -688,7 +695,7 @@ TEM inline void mix2(T& io1, T& io2, T mix){
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
 }
 
-TEM T nearest(T val, const char * intervals, long div){
+template<class T> T nearest(T val, const char * intervals, long div){
 	long vr = castIntRound(val);
 	long numWraps = 0;
 	long vm = wrap(vr, numWraps, div, 0L);
@@ -718,23 +725,33 @@ TEM T nearest(T val, const char * intervals, long div){
 	return T(vm + numWraps * div);
 }
 
-TEM inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
-template<> inline float nextAfter(float x, float y){ return nextafterf(x,y); }
-template<> inline double nextAfter(double x, double y){ return nextafter(x,y); }
-template<> inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
-TEM inline T pow2 (T v){ return v*v; }
-TEM inline T pow3 (T v){ return v*v*v; }
-TEM inline T pow4 (T v){ return pow2(pow2(v)); }
-TEM inline T ratioET(T pc, T divs, T ival){
+template<class T>
+inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
+template<>
+inline float nextAfter(float x, float y){ return nextafterf(x,y); }
+template<>
+inline double nextAfter(double x, double y){ return nextafter(x,y); }
+template<>
+inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
+
+template<class T> inline T pow2 (T v){ return v*v; }
+template<class T> inline T pow3 (T v){ return v*v*v; }
+template<class T> inline T pow4 (T v){ return pow2(pow2(v)); }
+template<class T> inline T ratioET(T pc, T divs, T ival){
 	return T(::pow(double(ival), double(pc) / double(divs)));
 }
 
-//TEM inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
-TEM inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
-TEM inline T round(T v, T s){ return round<double>(v/s) * s; }
-TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
-TEM inline T roundAway(T v){ return v<T(0) ? floor(v) : ceil(v); }
-TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
+//template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
+template<class T>
+inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
+template<class T>
+inline T round(T v, T s){ return round<double>(v/s) * s; }
+template<class T>
+inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
+template<class T>
+inline T roundAway(T v){ return v<T(0) ? floor(v) : ceil(v); }
+template<class T>
+inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 
 //inline float round(float val, float step){
 //	union { float f; unsigned long i; } u;
@@ -752,32 +769,46 @@ TEM inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //	return float(long(val * stepRec + u.f)) * step;
 //}
 
-TEM inline T smoothNeg		(T v, T bw){ return T(0.5) - smoothSign(v, bw)*T(0.5); }
-TEM inline T smoothNeg		(T v, T bw, T a){ return a - (T(1)-a)*smoothSign(v, bw); }
-TEM inline T smoothPos		(T v, T bw){ return T(0.5) + smoothSign(v, bw)*T(0.5); }
-TEM inline T smoothNotchFunc(T v, T bw){ return v/(v+bw); }
-TEM inline T smoothNotch	(T v, T bw){ return smoothNotchFunc(scl::abs(v), bw); }
-TEM inline T smoothNotch	(T v, T bw, T amt){ return (T)1 - amt*smoothPeak1(v, bw); }
-TEM inline T smoothNotch2	(T v, T bw){ return smoothNotchFunc(v*v, bw); }
-TEM inline T smoothPeak		(T v, T bw){ return bw/(v+bw); }
-TEM inline T smoothPeak1	(T v, T bw){ return bw/(scl::abs(v)+bw); }
-TEM inline T smoothSign		(T v, T bw){ return v/(scl::abs(v) + bw); }
+template<class T>
+inline T smoothNeg		(T v, T bw){ return T(0.5) - smoothSign(v, bw)*T(0.5); }
+template<class T>
+inline T smoothNeg		(T v, T bw, T a){ return a - (T(1)-a)*smoothSign(v, bw); }
+template<class T>
+inline T smoothPos		(T v, T bw){ return T(0.5) + smoothSign(v, bw)*T(0.5); }
+template<class T>
+inline T smoothNotchFunc(T v, T bw){ return v/(v+bw); }
+template<class T>
+inline T smoothNotch	(T v, T bw){ return smoothNotchFunc(scl::abs(v), bw); }
+template<class T>
+inline T smoothNotch	(T v, T bw, T amt){ return (T)1 - amt*smoothPeak1(v, bw); }
+template<class T>
+inline T smoothNotch2	(T v, T bw){ return smoothNotchFunc(v*v, bw); }
+template<class T>
+inline T smoothPeak		(T v, T bw){ return bw/(v+bw); }
+template<class T>
+inline T smoothPeak1	(T v, T bw){ return bw/(scl::abs(v)+bw); }
+template<class T>
+inline T smoothSign		(T v, T bw){ return v/(scl::abs(v) + bw); }
 template <class T, class F>
 inline T smoothZero			(T v, T bw, F f){ return bw/(f(v) + bw); }
-TEM inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
+template<class T>
+inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
 
-TEM inline T taylorFactor3(T vv, T c1, T c2, T c3){
+template<class T>
+inline T taylorFactor3(T vv, T c1, T c2, T c3){
 	return c1 * vv * (c2 - vv * (c3 - vv));
 }
-TEM inline T taylorFactor4(T vv, T c1, T c2, T c3, T c4){
+template<class T>
+inline T taylorFactor4(T vv, T c1, T c2, T c3, T c4){
 	return c1 * vv * (c2 - vv * (c3 - vv * (c4 - vv)));
 }
-TEM inline T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5){
+template<class T>
+inline T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5){
 	return c1 * vv * (c2 - vv * (c3 - vv * (c4 - vv * (c5 - vv))));
 }
 
 
-TEM inline T cosP3(T n){
+template<class T> inline T cosP3(T n){
 	return T(1) - T(32) * n * n * (T(0.75) - n);
 }
 
@@ -790,7 +821,7 @@ TEM inline T cosP3(T n){
 #define t72 840.
 #define t71 1.9841269841e-04
 
-TEM inline T cosT8(T r){
+template<class T> inline T cosT8(T r){
 
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		float rr = r*r;
@@ -809,24 +840,24 @@ TEM inline T cosT8(T r){
 }
 
 
-TEM inline T sinFast(T r){
+template<class T> inline T sinFast(T r){
     const T B = 4 / M_PI, C = -4 / (M_PI*M_PI);
     T y = B * r + C * r * scl::abs(r);
 	const T P = 0.225; // const float Q = 0.775;
 	return P * (y * scl::abs(y) - y) + y;   // Q * y + P * y * abs(y)
 }
 
-TEM inline T sinP7(T n){
+template<class T> inline T sinP7(T n){
 	T nn = n*n;
 	return n * (T(3.138982) + nn * (T(-5.133625) + nn * (T(2.428288) - nn * T(0.433645))));
 }
 
-TEM inline T sinP9(T n){
+template<class T> inline T sinP9(T n){
 	T nn = n*n;
 	return n * (T(3.1415191) + nn * (T(-5.1662729) + nn * (T(2.5422065) + nn * (T(-0.5811243) + nn * T(0.0636716)))));
 }
 
-TEM inline T sinT7(T r){
+template<class T> inline T sinT7(T r){
 
 //	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 //		return r * ((T)1 - taylorFactor3<T>(r*r, t71, t72, t73));
@@ -873,7 +904,7 @@ TEM inline T sinT7(T r){
 #define t92 60480.
 #define t91 2.7557319224e-06
 
-TEM inline T sinT9(T r){
+template<class T> inline T sinT9(T r){
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		T rr = r*r;
 		return r * ((T)1 - (T)t91 * rr * ((T)t92 - rr * ((T)t93 - rr * ((T)t94 - rr))));
@@ -901,9 +932,14 @@ TEM inline T sinT9(T r){
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
-TEM inline T trunc(T v){ return round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
-TEM inline T trunc(T v, T s){ return trunc(v/s)*s; }
-TEM inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
+template<class T>
+inline T trunc(T v){ return round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
+    
+template<class T>
+inline T trunc(T v, T s){ return trunc(v/s)*s; }
+
+template<class T>
+inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
 
 /*
 
@@ -934,7 +970,7 @@ TEM inline T trunc(T v, T s, T r){ return trunc(v*r)*s; }
 //
 //}
 
-TEM inline T wrap(T v, T hi, T lo){
+template<class T> inline T wrap(T v, T hi, T lo){
 	if(lo == hi) return lo;
 
 	//if(v >= hi){
@@ -952,7 +988,7 @@ TEM inline T wrap(T v, T hi, T lo){
 	return v;
 }
 
-TEM inline T wrap(T v, long& numWraps, T hi, T lo){
+template<class T> inline T wrap(T v, long& numWraps, T hi, T lo){
 	if(lo == hi){ numWraps = 0xFFFFFFFF; return lo; }
 
 	T diff = hi - lo;
@@ -977,19 +1013,19 @@ TEM inline T wrap(T v, long& numWraps, T hi, T lo){
 	return v;
 }
 
-TEM inline T wrapOnce(T v, T hi){
+template<class T> inline T wrapOnce(T v, T hi){
 	     if(v >= hi ) return v - hi;
 	else if(v < T(0)) return v + hi;
 	return v;
 }
 
-TEM inline T wrapOnce(T v, T hi, T lo){
+template<class T> inline T wrapOnce(T v, T hi, T lo){
 	     if(v >= hi) return v - hi + lo;
 	else if(v <  lo) return v + hi - lo;
 	return v;
 }
 
-TEM inline T wrapPhase(T r){
+template<class T> inline T wrapPhase(T r){
 	// The result is		[r+pi - 2pi floor([r+pi] / 2pi)] - pi
 	// which simplified is	r - 2pi floor([r+pi] / 2pi) .
 	if(r >= T(M_PI)){
@@ -1005,7 +1041,7 @@ TEM inline T wrapPhase(T r){
 	else return r;
 }
 
-TEM inline T wrapPhaseOnce(T r){
+template<class T> inline T wrapPhaseOnce(T r){
 	if(r >= T(M_PI))		return r - T(M_2PI);
 	else if(r < T(-M_PI))	return r + T(M_2PI);
 	return r;
@@ -1014,20 +1050,21 @@ TEM inline T wrapPhaseOnce(T r){
 
 
 
-TEM inline bool even(T v){ return 0 == odd(v); }
+template<class T> inline bool even(T v){ return 0 == odd(v); }
 
-//TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
-TEM inline T max(T v1, T v2, T v3){ return max(max(v1,v2),v3); }
-//TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
-TEM inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
+//template<class T> inline T max(T v1, T v2){ return v1<v2?v2:v1; }
+template<class T>
+inline T max(T v1, T v2, T v3){ return max(max(v1,v2),v3); }
+//template<class T> inline T min(T v1, T v2){ return v1<v2?v1:v2; }
+template<class T> inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
 
-TEM inline bool odd(T v){ return v & T(1); }
+template<class T> inline bool odd(T v){ return v & T(1); }
 
-TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
+template<class T> inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
 inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
 
-TEM inline bool within(T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
+template<class T> inline bool within(T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 
 inline bool zeroCrossP(float prev, float now){
 	union{ float f; int32_t i; } u1, u0;
@@ -1182,25 +1219,24 @@ inline float triangleU(uint32_t p){
 }
 
 
-TEM inline T bartlett(T n){	return (T)1 - scl::abs(n); }
+template<class T> inline T bartlett(T n){	return (T)1 - scl::abs(n); }
 
-TEM inline T blackman(T r){
+template<class T> inline T blackman(T r){
 	return (T)0.42 + (T)0.08 * cos((T)2. * r) - (T)0.5 * cos(r);	// prevents -0s
 }
-TEM inline T blackmanHarris(T r){
+template<class T> inline T blackmanHarris(T r){
 	return (T)0.35875 - (T)0.48829 * cos(r) + (T)0.14128 * cos((T)2. * r) - (T)0.01168 * cos((T)3. * r);
 }
-TEM inline T hamming(T r){ return raisedCosine(r, (T)0.53836, (T)0.46164); }
-TEM inline T hann(T r){ return raisedCosine(r, (T)0.5, (T)0.5); }
-TEM inline T raisedCosine(T r, T a, T b){ return a - b * cos(r); }
-TEM inline T welch(T n){ return (T)1 - n*n; }
+template<class T> inline T hamming(T r){ return raisedCosine(r, (T)0.53836, (T)0.46164); }
+template<class T> inline T hann(T r){ return raisedCosine(r, (T)0.5, (T)0.5); }
+template<class T> inline T raisedCosine(T r, T a, T b){ return a - b * cos(r); }
+template<class T> inline T welch(T n){ return (T)1 - n*n; }
 
 } // scl::
 
-TEM inline double norm(const T& v){ return scl::abs(v); }
-TEM inline double normCompare(const T& v){ return norm(v); }
+template<class T> inline double norm(const T& v){ return scl::abs(v); }
+template<class T> inline double normCompare(const T& v){ return norm(v); }
 
 } // gam::
 
-#undef TEM
 #endif

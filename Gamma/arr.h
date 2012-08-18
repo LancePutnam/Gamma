@@ -16,7 +16,6 @@
 #include "Gamma/Containers.h"
 
 #define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
-#define TEM template <class T>
 
 namespace gam{
 
@@ -40,26 +39,29 @@ namespace arr{
 // defined in this file...
 
 /// Returns dot-product of two arrays
-TEM inline T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
+template <class T> 
+inline T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
 	T r=T(0); LOOP(len, str){ r += src1[i]*src2[i]; } return r;
 }
 
 /// Returns sum of values squared
-TEM inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
 	return dot(src,src,len,str);
 }
 
 
 
 
-
 /// Add source array to destination array
-TEM void add(T * dst, const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+void add(T * dst, const T * src, uint32_t len, uint32_t str=1){
 	LOOP(len,str){ dst[i] += src[i]; }
 }
 
 /// Add two source arrays into destination array
-TEM void add(T * dst, const T * src1, const T * src2, uint32_t len, uint32_t str=1){
+template <class T>
+void add(T * dst, const T * src1, const T * src2, uint32_t len, uint32_t str=1){
 	LOOP(len,str){ dst[i] = src1[i] + src2[i]; }
 }
 
@@ -67,7 +69,8 @@ TEM void add(T * dst, const T * src1, const T * src2, uint32_t len, uint32_t str
 
 /// Returns the next tap index.  This will not guaranteed to be in the range [0, ringSize).
 ///
-TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len);
+template <class T>
+uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len);
 
 /// Clip array values between [-1, 1].
 void clip1(float * arr, uint32_t len, uint32_t str=1);
@@ -80,15 +83,18 @@ void clip1(float * arr, uint32_t len, uint32_t str=1);
 /// @param[in]  numIndices	Number of source indices.
 /// @param[out] numIndices	Number of cluster indices.
 /// @param[in]  threshold	Magnitude threshold of cluster.
-TEM void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T threshold);
+template <class T>
+void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T threshold);
 
 void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize);
 
 /// Returns dot-product of two arrays of length 4.
-TEM T dot4(const T * src1, const T * src2);
+template <class T>
+T dot4(const T * src1, const T * src2);
 
 /// Get indices of min and max values.
-TEM void extrema(const T * src, uint32_t len, uint32_t& indexMin, uint32_t& indexMax);
+template <class T>
+void extrema(const T * src, uint32_t len, uint32_t& indexMin, uint32_t& indexMax);
 
 /// Perform linear least squares fitting of array.
 
@@ -110,13 +116,16 @@ template <class Ts, class Tb>
 void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins, Ts scale, Ts offset);
 
 /// Returns index of maximum value
-TEM uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns index of maximum normed value (i.e., magnitude)
-TEM uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns index of minimum value
-TEM uint32_t indexOfMin(const T * src, uint32_t len);
+template <class T>
+uint32_t indexOfMin(const T * src, uint32_t len);
 
 /// Sets indices [numIndices, maxNumIndices) to complement indices.
 
@@ -131,32 +140,39 @@ void linToDB(float * arr, uint32_t len, float minDB);
 
 ///	Returns number of maxima found.
 ///
-TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns the mean (average) value of array values
-TEM T mean(const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+T mean(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns the mean norm of array values.
-TEM inline T meanNorm(const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+inline T meanNorm(const T * src, uint32_t len, uint32_t str=1){
 	T r=T(0); LOOP(len,str){ r += gam::norm(src[i]); } return r / T(len/str);
 }
 
 /// Returns mean absolute difference of array values.
-TEM T meanAbsDiff(const T * src, uint32_t len);
+template <class T>
+T meanAbsDiff(const T * src, uint32_t len);
 
 /// Returns weighted mean of array values.
 
 /// Weights must be positive.
 ///
-TEM T meanWeighted(const T * src, T * weights, uint32_t len);
+template <class T>
+T meanWeighted(const T * src, T * weights, uint32_t len);
 
 /// Returns weighted mean in [0, len) of indices of weights.
 
 /// Weights must be positive.
 ///		Can be used to compute centroid of spectrum.
-TEM T meanWeightedIndex(const T * weights, uint32_t len);
+template <class T>
+T meanWeightedIndex(const T * weights, uint32_t len);
 
-TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
+template <class T>
+void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
 
 //	/// Applies mirror isometry sequence [dbqp] from first quarter of array.
 //	
@@ -165,24 +181,27 @@ TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t& numIndices);
 //	/// len/4 + 1 elements of the signal.\n
 //	/// Ex.: [ 1, 2, 3, x, x, x, x, x] -> [ 1, 2, 3, 2, -1,-2,-3,-2]
 //	/// Ex.: [ 1, 2, x, x, x, x, x, x] -> [ 1, 2, 2, 1, -1,-2,-2,-1]
-//	TEM void mirror_dbqp(T * arr, uint32_t len);
+//	template <class T> void mirror_dbqp(T * arr, uint32_t len);
 
 /// Applies mirror isometry sequence [dp] from first half of array.
 
 /// The sequence of mirror isometries are identity (d) and rotation (p).
 /// The first len/2 elements of the array are mirrored.\n
 /// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-4,-3,-2,-1]
-TEM void mirror_dp(T * arr, uint32_t len);
+template <class T>
+void mirror_dp(T * arr, uint32_t len);
 
 /// Applies mirror isometry sequence [dq] from first half of array.
 
 /// The sequence of mirror isometries are identity (d) and glide relfection (q).
 /// The first len/2 elements of the array are mirrored.\n
 /// Ex.: [ 1, 2, 3, 4, x, x, x, x] -> [ 1, 2, 3, 4,-1,-2,-3,-4]
-TEM void mirror_dq(T * arr, uint32_t len);
+template <class T>
+void mirror_dq(T * arr, uint32_t len);
 
 /// Multiply destination array by source array
-TEM void mul(T * dst, const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+void mul(T * dst, const T * src, uint32_t len, uint32_t str=1){
 	LOOP(len,str){ dst[i] *= src[i]; }
 }
 
@@ -190,17 +209,20 @@ TEM void mul(T * dst, const T * src, uint32_t len, uint32_t str=1){
 
 /// Works only for even sized arrays.
 ///
-TEM void mulBartlett(T * arr, uint32_t len);
+template <class T>
+void mulBartlett(T * arr, uint32_t len);
 
 /// Multiply 'arr' by 'src' where 'src' is the first 'len'/2 + 1 elements
 /// of a symmetric window.
-TEM void mulHalfWindow(T * arr, const T * src, uint32_t len);
+template <class T>
+void mulHalfWindow(T * arr, const T * src, uint32_t len);
 
 /// Uniformly scale array values to fit in [-1, 1].
 
 /// Returns the applied normalization multiplication factor.
 ///
-TEM double normalize(T * arr, uint32_t len, double scale=1);
+template <class T>
+double normalize(T * arr, uint32_t len, double scale=1);
 
 template<class T, template<class> class ArrayType>
 double inline normalize(ArrayType<T>& arr, double scale=1){
@@ -208,63 +230,77 @@ double inline normalize(ArrayType<T>& arr, double scale=1){
 }
 
 /// Returns norm of array values.
-TEM double norm(const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+double norm(const T * src, uint32_t len, uint32_t str=1){
 	return sqrt((double)sumSquares(src, len,str));
 }
 
 /// Returns taxicab norm of array values (sum of absolute values).
-TEM double normTaxi(const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+double normTaxi(const T * src, uint32_t len, uint32_t str=1){
 	double r=0; LOOP(len,str){ r+=gam::norm(src[i]); } return r;
 }
 
 /// Returns unnormalized Nyquist value for use with DFT.
-TEM inline T nyquist(const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+inline T nyquist(const T * src, uint32_t len, uint32_t str=1){
 	T r=T(0); LOOP(len,(str<<1)){ r += src[i] - src[i+str]; } return r;
 }
 
 /// Returns root mean square- the normalized norm.
-TEM inline T rms(const T * src, uint32_t len, uint32_t str=1){
+template <class T>
+inline T rms(const T * src, uint32_t len, uint32_t str=1){
 	return norm(src, len,str) / T(len/str);	
 }
 
 /// Returns index of absolute maximum slope in array.
-TEM uint32_t slopeAbsMax(const T * src, uint32_t len);
+template <class T>
+uint32_t slopeAbsMax(const T * src, uint32_t len);
 
 /// Returns index of maximum slope in array.
-TEM uint32_t slopeMax(const T * src, uint32_t len);
+template <class T>
+uint32_t slopeMax(const T * src, uint32_t len);
 
 /// Insertion sort of elements.
 
 /// Elements are sorted from lowest to highest.
 /// This sort is fastest for small length arrays and mostly sorted sets.
-TEM void sortInsertion(T * arr, uint32_t len);
+template <class T>
+void sortInsertion(T * arr, uint32_t len);
 
 /// Insertion sort of indexed elements.
 
 /// Elements are sorted from lowest to highest.
 /// This sort is fastest for small length arrays and mostly sorted sets.
-TEM void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices);
+template <class T>
+void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices);
 
 /// Quick sort of elements.
 
 /// Elements are sorted from lowest to highest.
 ///
-TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end);
+template <class T>
+void sortQuick(const T * src, uint32_t * indices, long beg, long end);
 
 /// Returns sum of values
-TEM T sum(const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+T sum(const T * src, uint32_t len, uint32_t str=1);
 
 /// Variance (deviation from mean).
-TEM T variance(const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+T variance(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns number of values within [-threshold, theshold].
-TEM uint32_t within(const T * src, uint32_t len, T threshold);
+template <class T>
+uint32_t within(const T * src, uint32_t len, T threshold);
 
 /// Returns number of values within [lo, hi].
-TEM uint32_t within(const T * src, uint32_t len, T lo, T hi);
+template <class T>
+uint32_t within(const T * src, uint32_t len, T lo, T hi);
 
 /// Returns number of values that equal zero.
-TEM uint32_t zeroCount(const T * src, uint32_t len, uint32_t str=1);
+template <class T>
+uint32_t zeroCount(const T * src, uint32_t len, uint32_t str=1);
 
 /// Returns number of zero-crossings in array.
 
@@ -272,12 +308,14 @@ TEM uint32_t zeroCount(const T * src, uint32_t len, uint32_t str=1);
 ///
 uint32_t zeroCross(const float * src, uint32_t len, float prev);
 
-TEM void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc);
+template <class T>
+void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc);
 
 /// Returns index of first zero-crossing or 0 if none detected.
 uint32_t zeroCrossFirst(const float * src, uint32_t len);
 
-TEM uint32_t zeroCrossMax(const T * src, uint32_t len);
+template <class T>
+uint32_t zeroCrossMax(const T * src, uint32_t len);
 
 /// Returns # of negative slope zero-crossings.
 
@@ -290,7 +328,8 @@ uint32_t zeroCrossN(const float * src, uint32_t len, float prev);
 
 // Implementation_______________________________________________________________
 
-TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len){
+template <class T>
+uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * src, uint32_t len){
 	uint32_t endTap = ringTap + len;
 
 	if(endTap <= ringSize){		// haven't gone past end
@@ -305,7 +344,7 @@ TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * 
 	return endTap;
 }
 
-//TEM inline void mirror_dbqp(T * arr, uint32_t len){
+//template <class T> inline void mirror_dbqp(T * arr, uint32_t len){
 //	
 //	T * arr3 = arr + (len>>1);	// 3rd quad start
 //	T * arr2 = arr3 - 2;		// 2nd quad end
@@ -320,17 +359,20 @@ TEM uint32_t addToRing(T * ring, uint32_t ringSize, uint32_t ringTap, const T * 
 //	}
 //}
 
-TEM inline void mirror_dp(T * arr, uint32_t len){
+template <class T>
+inline void mirror_dp(T * arr, uint32_t len){
 	T * arr2 = arr + len - 1;	// 2nd half end
 	LOOP(len, 2){ *arr2-- = -*arr++; }
 }
 
-TEM inline void mirror_dq(T * arr, uint32_t len){
+template <class T>
+inline void mirror_dq(T * arr, uint32_t len){
 	T * arr2 = arr + (len>>1);	// 2nd half begin
 	LOOP(len, 2){ *arr2++ = -*arr++; }
 }
 
-TEM inline void mulBartlett(T * arr, uint32_t len){
+template <class T>
+inline void mulBartlett(T * arr, uint32_t len){
 	T * end = arr + len - 1;
 	uint32_t len_2 = len >> 1;
 	const T slope = (T)1. / (T)len_2;
@@ -344,7 +386,8 @@ TEM inline void mulBartlett(T * arr, uint32_t len){
 	}
 }
 
-TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
+template <class T>
+inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 	T * end = arr + len - 1;
 	len >>= 1;
 	
@@ -357,14 +400,16 @@ TEM inline void mulHalfWindow(T * arr, const T * src, uint32_t len){
 	*arr *= *src;
 }
 
-TEM double normalize(T * arr, uint32_t len, double scale){
+template <class T>
+double normalize(T * arr, uint32_t len, double scale){
 	double max = gam::norm(arr[indexOfMaxNorm(arr, len)]);
 	double normFactor = scale/max;
 	if(max != 0.){ for(uint32_t i=0; i<len; ++i){ arr[i]*=normFactor; } }
 	return normFactor;
 }
 
-TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T threshold){
+template <class T>
+void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T threshold){
 	
 	if(numIndices == 0) return;
 	
@@ -402,11 +447,13 @@ TEM void cluster(const T * src, uint32_t * indices, uint32_t & numIndices, T thr
 	numIndices = newNumIndices;
 }
 
-TEM inline T dot4(const T * a, const T * b){
+template <class T>
+inline T dot4(const T * a, const T * b){
 	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 }
 
-TEM void extrema(const T * src, uint32_t len, uint32_t& idxMin, uint32_t& idxMax){
+template <class T>
+void extrema(const T * src, uint32_t len, uint32_t& idxMin, uint32_t& idxMax){
 	idxMin = 0;
 	idxMax = 0;
 	
@@ -488,7 +535,8 @@ inline void histogram(const Ts * src, uint32_t len, Tb * bins, uint32_t numBins,
 	}
 }
 
-TEM uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str){
+template <class T>
+uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str){
 	uint32_t r=0;
 	T max = src[0];
 	for(uint32_t i=str; i<len; i+=str){
@@ -498,7 +546,8 @@ TEM uint32_t indexOfMax(const T * src, uint32_t len, uint32_t str){
 	return r;
 }
 
-TEM uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str){
+template <class T>
+uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str){
 	uint32_t r = 0;
 	double max = normCompare(src[0]);
 	for(uint32_t i=str; i<len; i+=str){
@@ -508,7 +557,8 @@ TEM uint32_t indexOfMaxNorm(const T * src, uint32_t len, uint32_t str){
 	return r;
 }
 
-TEM uint32_t indexOfMin(const T * src, uint32_t len){
+template <class T>
+uint32_t indexOfMin(const T * src, uint32_t len){
 	uint32_t index = 0;
 	T min = src[0];
 
@@ -522,7 +572,8 @@ TEM uint32_t indexOfMin(const T * src, uint32_t len){
 	return index;
 }
 
-TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str){
+template <class T>
+uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str){
 	T prev = src[0];
 	T curr = src[str];
 	
@@ -549,12 +600,14 @@ TEM uint32_t maxima(uint32_t * dst, const T * src, uint32_t len, uint32_t str){
 }
 
 
-TEM inline T mean(const T * src, uint32_t len, uint32_t str){
+template <class T>
+inline T mean(const T * src, uint32_t len, uint32_t str){
 	return arr::sum(src, len, str) / T(len/str);
 }
 
 
-TEM T meanAbsDiff(const T * src, uint32_t len){
+template <class T>
+T meanAbsDiff(const T * src, uint32_t len){
 	T sum = (T)0;
 	T mean = (T)0;
 	
@@ -572,7 +625,8 @@ TEM T meanAbsDiff(const T * src, uint32_t len){
 
 }
 
-TEM T meanWeighted(const T * src, T * weights, uint32_t len){
+template <class T>
+T meanWeighted(const T * src, T * weights, uint32_t len){
 	T mean = (T)0;
 
 	// One loop: faster, but less accurate
@@ -588,7 +642,8 @@ TEM T meanWeighted(const T * src, T * weights, uint32_t len){
 	return mean;
 }
 
-TEM T meanWeightedIndex(const T * weights, uint32_t len){
+template <class T>
+T meanWeightedIndex(const T * weights, uint32_t len){
 	T mean = (T)0;
 	T normFactor = sum(weights, len);
 	if(normFactor == (T)0) return (T)0;
@@ -601,7 +656,8 @@ TEM T meanWeightedIndex(const T * weights, uint32_t len){
 	return mean;
 }
 
-TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
+template <class T>
+void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
 
 	if(numIndices < 3) return;
 
@@ -628,7 +684,7 @@ TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
 	numIndices = newNumIndices;
 }
 
-//TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
+//template <class T> void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
 //
 //	if(numIndices < 3) return;
 //
@@ -665,7 +721,8 @@ TEM void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
 //}
 
 
-TEM uint32_t slopeAbsMax(const T * src, uint32_t len){
+template <class T>
+uint32_t slopeAbsMax(const T * src, uint32_t len){
 	uint32_t index = 0;
 	T prev = *src++;
 	T maxSlope = (T)0;
@@ -682,7 +739,8 @@ TEM uint32_t slopeAbsMax(const T * src, uint32_t len){
 	return index;
 }
 
-TEM uint32_t slopeMax(const T * src, uint32_t len){
+template <class T>
+uint32_t slopeMax(const T * src, uint32_t len){
 	uint32_t index = 0;
 	T prev = *src++;
 	T maxSlope = (T)0;
@@ -699,7 +757,7 @@ TEM uint32_t slopeMax(const T * src, uint32_t len){
 	return index;
 }
 
-//TEM void sort3(T * arr){
+//template <class T> void sort3(T * arr){
 //
 //	T v1 = *arr;
 //	T v2 = arr[1];
@@ -709,7 +767,8 @@ TEM uint32_t slopeMax(const T * src, uint32_t len){
 //
 //}
 
-TEM void sortInsertion(T * arr, uint32_t len){                                              
+template <class T>
+void sortInsertion(T * arr, uint32_t len){
 	for(uint32_t i = 1; i < len; i++){
 		T val = arr[i];
 		uint32_t j = i - 1;
@@ -720,7 +779,8 @@ TEM void sortInsertion(T * arr, uint32_t len){
 	} 
 }
 
-TEM void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices){                                              
+template <class T>
+void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices){
 	for(uint32_t i = 1; i < numIndices; i++)
 	{
 		uint32_t index = indices[i];
@@ -735,7 +795,8 @@ TEM void sortInsertion(const T * src, uint32_t * indices, uint32_t numIndices){
 	} 
 }
 
-TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end){
+template <class T>
+void sortQuick(const T * src, uint32_t * indices, long beg, long end){
 	// must be at least 1 element to sort
 	if(end > beg + 1) {
 		long piv = indices[beg], l = beg + 1, r = end;
@@ -752,11 +813,13 @@ TEM void sortQuick(const T * src, uint32_t * indices, long beg, long end){
 	}
 }
 
-TEM inline T sum(const T * src, uint32_t len, uint32_t str){
+template <class T>
+inline T sum(const T * src, uint32_t len, uint32_t str){
 	T r=T(0); LOOP(len, str){ r += src[i]; } return r;
 }
 
-TEM inline T variance(const T * src, uint32_t len, uint32_t str){
+template <class T>
+inline T variance(const T * src, uint32_t len, uint32_t str){
 	T rec = T(1)/T(len/str);
 	T avg = sum(src, len,str) * rec;
 	T r = T(0);
@@ -768,7 +831,8 @@ TEM inline T variance(const T * src, uint32_t len, uint32_t str){
 	return r * rec;
 }
 
-TEM uint32_t within(const T * src, uint32_t len, T threshold){
+template <class T>
+uint32_t within(const T * src, uint32_t len, T threshold){
 	uint32_t count = 0;
 	LOOP(len, 1){
 		T val = src[i];
@@ -777,7 +841,8 @@ TEM uint32_t within(const T * src, uint32_t len, T threshold){
 	return count;
 }
 
-TEM uint32_t within(const T * src, uint32_t len, T lo, T hi){
+template <class T>
+uint32_t within(const T * src, uint32_t len, T lo, T hi){
 	uint32_t count = 0;
 	LOOP(len, 1){
 		T val = src[i];
@@ -786,11 +851,13 @@ TEM uint32_t within(const T * src, uint32_t len, T lo, T hi){
 	return count;
 }
 
-TEM inline uint32_t zeroCount(const T * src, uint32_t len, uint32_t str){
+template <class T>
+inline uint32_t zeroCount(const T * src, uint32_t len, uint32_t str){
 	uint32_t r=0; LOOP(len,str){ if(src[i] == T(0)) r++; } return r;
 }
 
-TEM void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc){
+template <class T>
+void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc){
 	pzc = 0;
 	nzc = 0;
 	T prev = *src++;
@@ -802,7 +869,8 @@ TEM void zeroCross(const T * src, uint32_t len, uint32_t& nzc, uint32_t& pzc){
 	}
 }
 
-TEM uint32_t zeroCrossMax(const T * src, uint32_t len){
+template <class T>
+uint32_t zeroCrossMax(const T * src, uint32_t len){
 	T prev = *src++;
 	T max = 0;
 	uint32_t ind = 0;
@@ -839,6 +907,5 @@ inline void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t 
 } // gam::
 
 #undef LOOP
-#undef TEM
 
 #endif

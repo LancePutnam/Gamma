@@ -18,8 +18,6 @@
 #include "Gamma/Conversion.h"
 #include "Gamma/Types.h"
 
-#define TEM template <class T>
-
 namespace gam{
 
 
@@ -159,19 +157,19 @@ namespace rnd{
 	
 	/// 'pab' and 'pba' are the probabilities of a given b and b given a.
 	///
-	TEM T& cond(T& v, const T& va, const T& vb, float pab, float pba);
+	template <class T> T& cond(T& v, const T& va, const T& vb, float pab, float pba);
 
 	/// Returns ith element in geometric series
-	TEM T geom(int n, T mul, T start=1, float p=0.5);
+	template <class T> T geom(int n, T mul, T start=1, float p=0.5);
 
 	/// Returns value negated with probability, otherwise the value.
-	TEM T neg(T val, float prob=0.5f);
+	template <class T> T neg(T val, float prob=0.5f);
 
 	/// Returns val1 with probability, otherwise val2.
-	TEM const T& pick(const T& val1, const T& val2, float prob=0.5f);
+	template <class T> const T& pick(const T& val1, const T& val2, float prob=0.5f);
 
 	/// Returns true with a probability of p.
-	TEM bool prob(T& rng, float p=0.5f);
+	template <class T> bool prob(T& rng, float p=0.5f);
 	
 	/// Returns true with a probability of p.
 	bool prob(float p=0.5f);
@@ -185,11 +183,11 @@ namespace rnd{
 
 	#ifndef DOXYGEN_SHOULD_SKIP_THIS
 	#define FUNCS(name)\
-	TEM T name(T bound2, T bound1 = 0);\
-	TEM void name(T * dst, uint32_t len);\
-	TEM void name(T * dst, uint32_t len, T bound2, T bound1 = 0);\
-	TEM void name(T * dst, uint32_t len, T * src, uint32_t srcLen);\
-	TEM float name##_float(T & rng);
+	template <class T> T name(T bound2, T bound1 = 0);\
+	template <class T> void name(T * dst, uint32_t len);\
+	template <class T> void name(T * dst, uint32_t len, T bound2, T bound1 = 0);\
+	template <class T> void name(T * dst, uint32_t len, T * src, uint32_t srcLen);\
+	template <class T> float name##_float(T & rng);
 	//template <class Tv, class Tr> Tv name(Tr & rng);
 
 	FUNCS(add2) FUNCS(add2I) FUNCS(add3) FUNCS(binS) FUNCS(lin) FUNCS(mul2)
@@ -206,31 +204,31 @@ namespace rnd{
 	void pop();					///< Pop RNG state from stack.
 
 	/// Randomly permutes (shuffles) elements in array.
-	TEM void permute(T * arr, uint32_t len);
+	template <class T> void permute(T * arr, uint32_t len);
 
 	/// Returns value in [0, 1) quantized by q divisions.
 	float quan(uint32_t q);
 	
 	/// Returns value in [o, 2*o) quantized by q divisions.
-	TEM T quanOct(uint32_t q, T o);
+	template <class T> T quanOct(uint32_t q, T o);
 
 	/// Seed global PRNG. If seed is 0, then the system time (in seconds) is used.
 	void seed(uint32_t value=0);
 
 	/// Randomly set a certain amount of elements to a value.
-	TEM void set(T * arr, uint32_t len, uint32_t num, T val=1);
+	template <class T> void set(T * arr, uint32_t len, uint32_t num, T val=1);
 
 	/// Zeroes elements according to a probability.
-	TEM void thin(T * arr, uint32_t len, float prob=0.5f);
+	template <class T> void thin(T * arr, uint32_t len, float prob=0.5f);
 	
 	/// Returns uniform random within interval [min, max) excluding 'exc' argument.
-	TEM T uniExc(const T& exc, const T& max, const T& min=T(0));
+	template <class T> T uniExc(const T& exc, const T& max, const T& min=T(0));
 	
 	/// Returns random integer in [0, num) according to weights (a PDF).
 	
 	/// If the weights are not normalized, then the proper weightsSum must
 	/// be passed in.
-	TEM uint32_t weighted(T * weights, uint32_t num, T weightsSum=(T)1);
+	template <class T> uint32_t weighted(T * weights, uint32_t num, T weightsSum=(T)1);
 	
 	static RNGTaus gen(rnd::getSeed());	///< Shared RNG
 }
@@ -274,28 +272,28 @@ inline void RNGTaus::iterate(){
 namespace rnd{
 
 #define R uni_float(rng)
-TEM inline float add2_float(T& rng){ return (R + R) * 0.5f; }
-TEM inline float add3_float(T& rng){ return (R + R + R) * 0.33333333333f; }
-TEM inline float  lin_float(T& rng){ float r = R; float s = R; return r < s ? r : s; }
-TEM inline float mul2_float(T& rng){ return R * R; }
-TEM inline float pow2_float(T& rng){ float r = R; return r * r; }
-TEM inline float pow3_float(T& rng){ float r = R; return r * r * r;	}
+template <class T> inline float add2_float(T& rng){ return (R + R) * 0.5f; }
+template <class T> inline float add3_float(T& rng){ return (R + R + R) * 0.33333333333f; }
+template <class T> inline float  lin_float(T& rng){ float r = R; float s = R; return r < s ? r : s; }
+template <class T> inline float mul2_float(T& rng){ return R * R; }
+template <class T> inline float pow2_float(T& rng){ float r = R; return r * r; }
+template <class T> inline float pow3_float(T& rng){ float r = R; return r * r * r;	}
 
-TEM inline float add2I_float(T & rng){
+template <class T> inline float add2I_float(T & rng){
 	float r = add2_float(rng) + 0.5f; // [0.5, 1.5)
 	return (r < 1.f) ? r : r - 1.f;
 }
 #undef R
 
-TEM inline float uni_float(T& rng){ return uintToUnit<float>(rng()); }
-TEM inline float uniS_float(T& rng){ return uintToUnitS<float>(rng()); }
+template <class T> inline float uni_float(T& rng){ return uintToUnit<float>(rng()); }
+template <class T> inline float uniS_float(T& rng){ return uintToUnitS<float>(rng()); }
 
-TEM inline float binS_float(T & rng){
+template <class T> inline float binS_float(T & rng){
 	uint32_t r = (rng() & MaskSign<float>()) | Expo1<float>();
 	return punUF(r);
 }
 
-TEM inline T & cond(T& v, const T& va, const T& vb, float pab, float pba){
+template <class T> inline T & cond(T& v, const T& va, const T& vb, float pab, float pba){
 	     if(v == va) v = pick(vb, va, pba);
 	else if(v == vb) v = pick(va, vb, pab);
 	return v;
@@ -317,7 +315,7 @@ float gaussian(RNG& rng = rnd::gen){
 	return y1;
 }
 
-TEM inline T geom(int n, T mul, T start, float p){
+template <class T> inline T geom(int n, T mul, T start, float p){
 	for(; n>0; --n){
 		if(prob(p)) break;
 		start *= mul;
@@ -325,9 +323,9 @@ TEM inline T geom(int n, T mul, T start, float p){
 	return start;
 }
 
-TEM inline T neg(T v, float p){ return prob(p) ? -v : v; }
-TEM inline const T & pick(const T & v1, const T & v2, float p){ return prob(p) ? v1 : v2; }
-TEM inline bool prob(T& rng, float p){ return uni_float(rng) < p; }
+template <class T> inline T neg(T v, float p){ return prob(p) ? -v : v; }
+template <class T> inline const T & pick(const T & v1, const T & v2, float p){ return prob(p) ? v1 : v2; }
+template <class T> inline bool prob(T& rng, float p){ return uni_float(rng) < p; }
 inline bool prob(float p){ return prob(gen, p); }
 
 inline bool prob(double p){ return prob((float)p); }
@@ -340,39 +338,39 @@ inline bool prob(char c){
 
 #define LOOP(n) for(uint32_t i=0;i<n;++i)
 
-TEM inline void set(T * arr, uint32_t len, uint32_t num, T val){
+template <class T> inline void set(T * arr, uint32_t len, uint32_t num, T val){
 	LOOP(num){ arr[rnd::uni(len)] = val; }
 }
 
-TEM inline void permute(T * arr, uint32_t len){
+template <class T> inline void permute(T * arr, uint32_t len){
 	LOOP(len-1){ mem::swap(arr[i], arr[rnd::uni(len, i)]); }
 }
 
 inline float quan(uint32_t q){ return uni(q) / (float)q; }
 
-TEM inline T quanOct(uint32_t q, T o){ return quan(q) * o + o; }
+template <class T> inline T quanOct(uint32_t q, T o){ return quan(q) * o + o; }
 
-TEM inline void thin(T * arr, uint32_t len, float p){
+template <class T> inline void thin(T * arr, uint32_t len, float p){
 	LOOP(len){ if(prob(p)) arr[i]=T(0); }
 }
 
-TEM inline T uniExc(const T& exc, const T& max, const T& min){
+template <class T> inline T uniExc(const T& exc, const T& max, const T& min){
 	T r=exc; while(exc==r){ r=uni(max,min); } return r;
 }
 
 #define DEF(rnd_t, fnc)\
-	TEM inline T fnc(T b2, T b1){\
+	template <class T> inline T fnc(T b2, T b1){\
 		return (T)( (rnd_t)b1 + fnc##_##rnd_t(gen) * (rnd_t)(b2-b1) );\
 	}\
-	TEM inline void fnc(T * dst, uint32_t len){\
+	template <class T> inline void fnc(T * dst, uint32_t len){\
 		LOOP(len){ dst[i] = (T) fnc##_##rnd_t (gen); }\
 	}\
-	TEM inline void fnc(T * dst, uint32_t len, T bound2, T bound1){\
+	template <class T> inline void fnc(T * dst, uint32_t len, T bound2, T bound1){\
 		rnd_t b1 = (rnd_t)bound1;\
 		rnd_t df = (rnd_t)bound2 - b1;\
 		LOOP(len){ dst[i] = (T)(b1 + fnc##_##rnd_t(gen) * df); }\
 	}\
-	TEM inline void fnc(T * dst, uint32_t len, T * src, uint32_t srcLen){\
+	template <class T> inline void fnc(T * dst, uint32_t len, T * src, uint32_t srcLen){\
 		LOOP(len){ dst[i] = src[rnd::fnc(srcLen)]; }\
 	}
 	DEF(float, add2) DEF(float, add2I) DEF(float, add3) DEF(float, lin)
@@ -400,7 +398,7 @@ inline void seed(uint32_t value){
 	gen = value ? value : getSeed();
 }
 
-TEM uint32_t weighted(T * weights, uint32_t num, T weightsSum){
+template <class T> uint32_t weighted(T * weights, uint32_t num, T weightsSum){
 	if(0 == num--) return 0;
 	T probSum = weights[0];
 	T rnd = (T)(uni_float(gen) * (float)weightsSum);
@@ -437,7 +435,5 @@ inline float RandomLC::gaussian(){
 
 } // rnd::
 } // gam::
-
-#undef TEM
 
 #endif

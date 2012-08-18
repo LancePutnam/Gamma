@@ -26,10 +26,16 @@ namespace gam{
 /// ending on 'end' over its length in samples.  The last point is exclusive, so
 /// it takes length + 1 samples to reach 'end' inclusively.  For iterations 
 /// exceeding the specified length, the values returned will be unbounded.
+/// \n\n Given any two points, as long as they don’t have the same value, there are
+/// infinitely many exponential segments starting at the first and ending at the second.
+/// One of these is a straight line between the two.   Hence the “variable curvature” of
+/// the Curve object.
+/// \n\n Curve touches both its start and end points while Decay asymptotically approaches zero.
 ///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \ingroup Envelopes 
+/// \ingroup Envelopes
+/// \sa Decay
 template <class Tv=real, class Tp=real>
 class Curve{
 public:
@@ -448,8 +454,9 @@ protected:
 /// value. Because zero is never reached, the decay length determines when the
 /// envelope is -60 dB down from its initial value. This envelope is one of the 
 /// most computationally efficient envelopes requiring only a single multiply
-/// per iteration.
-/// \ingroup Envelopes 
+/// per iteration. \n\n Compare to Curve which touches exactly both start and end points.
+/// \ingroup Envelopes
+/// \sa Curve
 template <class T=real, class Ts=Synced>
 class Decay : public Ts{
 public:
@@ -476,7 +483,7 @@ protected:
 
 
 
-/// Binary gate controlled by threshold comparison
+/// Binary gate controlled by threshold comparison. The gate closes if the (norm of the) input value remains below threshold for at least closingDelay units of time (typically seconds).
 template <class T=real, class Ts=Synced>
 class Gate : public Ts{
 public:
@@ -653,27 +660,30 @@ protected:
 
 // Implementation_______________________________________________________________
 
-#define TEM template <class Tv,class Tp>
 
 //---- Curve
-TEM Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
+template <class Tv,class Tp>
+Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
-TEM Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv start, Tv end){
+template <class Tv,class Tp>
+Curve<Tv,Tp>::Curve(Tp length, Tp curve, Tv start, Tv end){
 	set(length, curve, start, end);
 }
 
-TEM inline bool Curve<Tv,Tp>::done() const {
+template <class Tv,class Tp>
+inline bool Curve<Tv,Tp>::done() const {
 	Tv dv = mB - mB*mMul; // linear apx of derivative
 	if(dv > Tv(0))	return value() >= end();
 	else			return value() <= end();
 }
 
-TEM inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
+template <class Tv,class Tp>
+inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
 
 // dividing by mMul goes back one step
-TEM inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
-
+template <class Tv,class Tp>
+inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
 
 // hack to get proper max floating point value
 namespace{
@@ -683,7 +693,8 @@ namespace{
 	template<> inline float		maxReal<float>(){ return FLT_MAX; }
 }
 
-TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
+template <class Tv,class Tp>
+Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	static const Tp EPS = eps<Tp>();
 
 	if(len == Tp(0)){ // if length is 0, return end value immediately
@@ -727,45 +738,53 @@ TEM Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	return *this;
 }
 
-TEM inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
+template <class Tv,class Tp>
+inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
 
-TEM inline Tv Curve<Tv,Tp>::operator()(){
+template <class Tv,class Tp>
+inline Tv Curve<Tv,Tp>::operator()(){
 	mB *= mMul;
 	return value();
 }
-#undef TEM
 
+    
 
-
-#define TM1 template <class T, class Ts>
-#define TM2 T,Ts
 //---- Decay
 
-TM1 Decay<TM2>::Decay(T decay_, T val)
+template <class T, class Ts>
+Decay<T,Ts>::Decay(T decay_, T val)
 :	mVal(val)
 {
 	Ts::initSynced();
 	decay(decay_);
 }
 
-TM1 inline T Decay<TM2>::operator()(){ T o = mVal; mVal *= mMul; return o; }
+template <class T, class Ts>
+inline T Decay<T,Ts>::operator()(){ T o = mVal; mVal *= mMul; return o; }
 
-TM1 inline void Decay<TM2>::decay(T v){
+template <class T, class Ts>
+inline void Decay<T,Ts>::decay(T v){
 	mDcy = v;
 	mMul = scl::t60(v * Ts::spu());
 }
 
-TM1 inline void Decay<TM2>::reset(){ mVal = 1; }
-TM1 inline void Decay<TM2>::value(T v){ mVal = v; }
+template <class T, class Ts>
+inline void Decay<T,Ts>::reset(){ mVal = 1; }
+    
+template <class T, class Ts>
+inline void Decay<T,Ts>::value(T v){ mVal = v; }
 
-TM1 inline T Decay<TM2>::decay() const { return mDcy; }
-TM1 inline bool Decay<TM2>::done(T thr) const { return mVal < thr; }
-TM1 inline T Decay<TM2>::value() const { return mVal; }
+template <class T, class Ts>
+inline T Decay<T,Ts>::decay() const { return mDcy; }
+    
+template <class T, class Ts>
+inline bool Decay<T,Ts>::done(T thr) const { return mVal < thr; }
+    
+template <class T, class Ts>
+inline T Decay<T,Ts>::value() const { return mVal; }
 
-TM1 void Decay<TM2>::onResync(double r){ decay(mDcy); }
-
-#undef TM1
-#undef TM2
+template <class T, class Ts>
+void Decay<T,Ts>::onResync(double r){ decay(mDcy); }
 
 
 } // gam::

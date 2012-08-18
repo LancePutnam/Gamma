@@ -513,7 +513,7 @@ private:
 
 
 
-/// Low-frequency oscillator (non band-limited).
+/// Low-frequency oscillator capable of generating a large variety of (non band-limited) waveforms.   
 
 /// This object generates various waveform types by mapping the output of a 
 /// an accumulator through mathematical functions.
@@ -801,36 +801,31 @@ protected:
 
 // Implementation_______________________________________________________________
 
-#define TEM template<class Tv, class Ts>
-#define TEMS template<class Ts>
-#define TEMTS template<class St, class Ts>
-
 //---- Accum
-#define TACCUM	Accum<St,Ts>
-
-TEMTS TACCUM::Accum(float f, float p): mFreq(f){
+    
+template<class St, class Ts> Accum<St,Ts>::Accum(float f, float p): mFreq(f){
 	Ts::initSynced();
 	phase(p);
 	//(p >= 1.f) ? phaseMax() : this->phase(p);
 }
 
 // 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
-TEMTS inline uint32_t TACCUM::mapFI(float v) const {
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::mapFI(float v) const {
 	//return scl::unitToUInt(v);
 	//return (uint32_t)(v * 4294967296.);
 	return castIntRound(v * 4294967296.);
 }
 
-TEMTS inline double TACCUM::mapIF(uint32_t v) const {
+template<class St, class Ts> inline double Accum<St,Ts>::mapIF(uint32_t v) const {
 	return v/4294967296.;
 	//return uintToUnit<float>(v); // not enough precision
 }
 
-TEMTS inline uint32_t TACCUM::mapFreq(float v) const {
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::mapFreq(float v) const {
 	return mapFI(v * Ts::ups());
 }
 
-TEMTS void TACCUM::onResync(double r){ //printf("Accum: onSyncChange (%p)\n", this);
+template<class St, class Ts> void Accum<St,Ts>::onResync(double r){ //printf("Accum: onSyncChange (%p)\n", this);
 	uint32_t fprev = mFreqI;
 	freq(mFreq);
 	
@@ -838,55 +833,55 @@ TEMTS void TACCUM::onResync(double r){ //printf("Accum: onSyncChange (%p)\n", th
 	mPhaseI = mPhaseI + fprev - mFreqI;
 }
 
-TEMTS inline void TACCUM::freq(float v){
+template<class St, class Ts> inline void Accum<St,Ts>::freq(float v){
 	mFreq = v;
 	mFreqI= mapFreq(v);
 }
 
-TEMTS inline void TACCUM::freqI(uint32_t v){
+template<class St, class Ts> inline void Accum<St,Ts>::freqI(uint32_t v){
 	mFreqI= v;
 	mFreq = mapIF(v) * Ts::spu();
 }
 
-TEMTS inline void TACCUM::period(float v){ freq(1.f/v); }
-TEMTS inline void TACCUM::phase(float v){ mPhaseI = mapFI(v) - mFreqI; }
-TEMTS inline void TACCUM::phaseAdd(float v){ mTap(mPhaseI, mapFI(v)); }
-TEMTS inline void TACCUM::phaseMax(){ mPhaseI = 0xffffffff; }
+template<class St, class Ts> inline void Accum<St,Ts>::period(float v){ freq(1.f/v); }
+template<class St, class Ts> inline void Accum<St,Ts>::phase(float v){ mPhaseI = mapFI(v) - mFreqI; }
+template<class St, class Ts> inline void Accum<St,Ts>::phaseAdd(float v){ mTap(mPhaseI, mapFI(v)); }
+template<class St, class Ts> inline void Accum<St,Ts>::phaseMax(){ mPhaseI = 0xffffffff; }
 
-TEMTS inline float TACCUM::freq() const { return mFreq; }
-TEMTS inline uint32_t TACCUM::freqI() const { return mFreqI; }
-TEMTS inline float TACCUM::freqUnit() const { return mapIF(mFreqI); }
-TEMTS inline float TACCUM::phase() const { return mapIF(mPhaseI); }
-TEMTS inline uint32_t TACCUM::phaseI() const { return mPhaseI; }
+template<class St, class Ts> inline float Accum<St,Ts>::freq() const { return mFreq; }
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::freqI() const { return mFreqI; }
+template<class St, class Ts> inline float Accum<St,Ts>::freqUnit() const { return mapIF(mFreqI); }
+template<class St, class Ts> inline float Accum<St,Ts>::phase() const { return mapIF(mPhaseI); }
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::phaseI() const { return mPhaseI; }
 
-TEMTS inline uint32_t TACCUM::nextPhase(float frqOffset){
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::nextPhase(float frqOffset){
 	return mTap(mPhaseI, mFreqI + mapFreq(frqOffset));
 }
 
-TEMTS inline uint32_t TACCUM::nextPhase(){ return mTap(mPhaseI, mFreqI); }
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::nextPhase(){ return mTap(mPhaseI, mFreqI); }
 
-TEMTS inline uint32_t TACCUM::operator()(){ return cycle(); }
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::operator()(){ return cycle(); }
 
-TEMTS inline uint32_t TACCUM::cycle(){ return cycles() & 0x80000000; }
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::cycle(){ return cycles() & 0x80000000; }
 
-//TEMTS inline uint32_t TACCUM::cycle(uint32_t mask){
+//template<class St, class Ts> inline uint32_t Accum<St,Ts>::cycle(uint32_t mask){
 //	return cycles() & mask;
 //}
 
-TEMTS inline uint32_t TACCUM::cycles(){
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::cycles(){
 	uint32_t prev = phaseI();
 	nextPhase();
 	return ~phaseI() & prev;
 }
 
-TEMTS inline uint32_t TACCUM::once(){
+template<class St, class Ts> inline uint32_t Accum<St,Ts>::once(){
 	uint32_t prev = phaseI();
 	uint32_t c = cycle();
 	if(c) mPhaseI = prev;
 	return c;
 }
 
-TEMTS inline bool TACCUM::seq(uint32_t pat){
+template<class St, class Ts> inline bool Accum<St,Ts>::seq(uint32_t pat){
 	uint32_t prev = phaseI();
 	nextPhase();
 
@@ -897,50 +892,52 @@ TEMTS inline bool TACCUM::seq(uint32_t pat){
 	return false;
 }
 
-#undef TACCUM
+
 
 
 
 //---- AccumPhase
 
-TEM AccumPhase<Tv, Ts>::AccumPhase(Tv f, Tv p)
+template<class Tv, class Ts>
+AccumPhase<Tv, Ts>::AccumPhase(Tv f, Tv p)
 :	mFreq(f), m2PiUPS(1)
 {
 	Ts::initSynced();
 	this->phase(p);
 }
 
-TEM inline Tv AccumPhase<Tv, Ts>::mapFreq(Tv v) const { return v*m2PiUPS; }
-TEM inline Tv AccumPhase<Tv, Ts>::mapPhase(Tv v) const { return v*Tv(M_2PI); }
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::mapFreq(Tv v) const { return v*m2PiUPS; }
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::mapPhase(Tv v) const { return v*Tv(M_2PI); }
 
-TEM inline Tv AccumPhase<Tv, Ts>::nextPhaseUsing(Tv frq){
+template<class Tv, class Ts>
+inline Tv AccumPhase<Tv, Ts>::nextPhaseUsing(Tv frq){
 	mPhase = scl::wrapPhase(mPhase); // guarantees that result is in [-pi, pi)
 	Tv r = mPhase;
 	mPhase += frq;
 	return r;
 }
 
-TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(){
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::nextPhase(){
 	return nextPhaseUsing(mFreq);
 }
 
-TEM inline Tv AccumPhase<Tv, Ts>::nextPhase(Tv frqMod){
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::nextPhase(Tv frqMod){
 	return nextPhaseUsing(mFreq + mapFreq(frqMod));
 }
 
-TEM inline void AccumPhase<Tv, Ts>::freq(Tv v){ mFreq = mapFreq(v); }
-TEM inline void AccumPhase<Tv, Ts>::period(Tv v){ freq(Tv(1)/v); }
-TEM inline void AccumPhase<Tv, Ts>::phase(Tv v){ mPhase = mapPhase(v); }
-TEM inline void AccumPhase<Tv, Ts>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
+template<class Tv, class Ts> inline void AccumPhase<Tv, Ts>::freq(Tv v){ mFreq = mapFreq(v); }
+template<class Tv, class Ts> inline void AccumPhase<Tv, Ts>::period(Tv v){ freq(Tv(1)/v); }
+template<class Tv, class Ts> inline void AccumPhase<Tv, Ts>::phase(Tv v){ mPhase = mapPhase(v); }
+template<class Tv, class Ts> inline void AccumPhase<Tv, Ts>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
 
-TEM inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq/m2PiUPS; } //mFreq; }
-TEM inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / freq(); }
-TEM inline Tv AccumPhase<Tv, Ts>::phase(){ return mPhase * Tv(M_1_2PI); }
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::freq(){ return mFreq/m2PiUPS; } //mFreq; }
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::period(){ return Tv(1) / freq(); }
+template<class Tv, class Ts> inline Tv AccumPhase<Tv, Ts>::phase(){ return mPhase * Tv(M_1_2PI); }
 
-TEM void AccumPhase<Tv, Ts>::onResync(double r){ Tv f=freq(); recache(); freq(f); }
-TEM void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
+template<class Tv, class Ts> void AccumPhase<Tv, Ts>::onResync(double r){ Tv f=freq(); recache(); freq(f); }
+template<class Tv, class Ts> void AccumPhase<Tv, Ts>::recache(){ m2PiUPS = Tv(Ts::ups() * M_2PI); }
 
-TEM void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
+template<class Tv, class Ts> void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
 //	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreqI, append);
 	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreq, append);
 }
@@ -948,14 +945,14 @@ TEM void AccumPhase<Tv, Ts>::print(const char * append, FILE * fp){
 
 //---- CSine
 
-TEM CSine<Tv, Ts>::CSine(Tv f, Tv a, Tv dcy60, Tv p)
+template<class Tv, class Ts> CSine<Tv, Ts>::CSine(Tv f, Tv a, Tv dcy60, Tv p)
 	: val(a, 0), mAmp(a), mFreq(f), mDcy60(dcy60)
 {
 	Ts::initSynced();
 	this->phase(p);
 }
 
-TEM void CSine<Tv, Ts>::amp(Tv v){
+template<class Tv, class Ts> void CSine<Tv, Ts>::amp(Tv v){
 	if(scl::abs(mAmp) > Tv(0.000001)){
 		Tv factor = v / mAmp;
 		val *= factor;
@@ -965,40 +962,40 @@ TEM void CSine<Tv, Ts>::amp(Tv v){
 	mAmp = v;
 }
 
-TEM void CSine<Tv, Ts>::decay(Tv v){
+template<class Tv, class Ts> void CSine<Tv, Ts>::decay(Tv v){
 	mDcy60 = v;
 	mDcy = v > Tv(0) ? Tv(scl::t60(v * Ts::spu())) : Tv(1);
 	freq(mFreq);
 }
 
-TEM void CSine<Tv, Ts>::freq(Tv v){
+template<class Tv, class Ts> void CSine<Tv, Ts>::freq(Tv v){
 	mFreq = v;
 	Tv phaseInc = v * Ts::ups() * Tv(M_2PI);
 	mInc.fromPolar(mDcy, phaseInc);
 	//printf("%f %f %f %f\n", phaseInc, mDcy, c1, s1);
 }
 
-TEM void CSine<Tv, Ts>::phase(Tv v){
+template<class Tv, class Ts> void CSine<Tv, Ts>::phase(Tv v){
 	// set phase without changing current magnitude
 	val.fromPolar(val.norm(), v*Tv(M_2PI));
 }
 
-TEM void CSine<Tv, Ts>::reset(){ val(mAmp, Tv(0)); }
+template<class Tv, class Ts> void CSine<Tv, Ts>::reset(){ val(mAmp, Tv(0)); }
 
-TEM void CSine<Tv, Ts>::set(Tv frq, Tv phase, Tv amp, Tv dcy60){
+template<class Tv, class Ts> void CSine<Tv, Ts>::set(Tv frq, Tv phase, Tv amp, Tv dcy60){
 	mFreq = frq;
 	decay(dcy60);
 	this->amp(amp);
 	this->phase(phase);
 }
 
-TEM inline Complex<Tv> CSine<Tv, Ts>::operator()(){
+template<class Tv, class Ts> inline Complex<Tv> CSine<Tv, Ts>::operator()(){
 	complex c = val;
 	val *= mInc;
 	return c;
 }
 
-TEM void CSine<Tv, Ts>::onResync(double r){
+template<class Tv, class Ts> void CSine<Tv, Ts>::onResync(double r){
 	decay(mDcy60); // this sets frequency as well
 }
 
@@ -1006,17 +1003,17 @@ TEM void CSine<Tv, Ts>::onResync(double r){
 //---- TableSine
 
 #define TTABLESINE TableSine<St,Ts>
-TEMTS uint32_t TTABLESINE::cTblBits  = 0;	
-TEMTS uint32_t TTABLESINE::cFracBits = 0;
-TEMTS uint32_t TTABLESINE::cOneIndex = 0;
-TEMTS float * TTABLESINE::cTable = 0;
+template<class St, class Ts> uint32_t TTABLESINE::cTblBits  = 0;	
+template<class St, class Ts> uint32_t TTABLESINE::cFracBits = 0;
+template<class St, class Ts> uint32_t TTABLESINE::cOneIndex = 0;
+template<class St, class Ts> float * TTABLESINE::cTable = 0;
 
-TEMTS TTABLESINE::TableSine(float f, float p): Base(f, p){
+template<class St, class Ts> TTABLESINE::TableSine(float f, float p): Base(f, p){
 	// initialize global table ONCE
 	if(0 == cTable){ resize(11); }
 }
 
-TEMTS void TTABLESINE::resize(uint32_t bits){
+template<class St, class Ts> void TTABLESINE::resize(uint32_t bits){
 	if(bits != cTblBits){
 		if(cTable) delete[] cTable;
 
@@ -1037,13 +1034,13 @@ TEMTS void TTABLESINE::resize(uint32_t bits){
 	}
 }
 
-TEMTS inline float TTABLESINE::operator()(float df){ return nextL(df); }
+template<class St, class Ts> inline float TTABLESINE::operator()(float df){ return nextL(df); }
 
-TEMTS inline float TTABLESINE::nextN(float df){	
+template<class St, class Ts> inline float TTABLESINE::nextN(float df){	
 	return tbl::atQ(cTable, cFracBits, nextPhase(df));
 }
 
-TEMTS inline float TTABLESINE::nextL(float df){
+template<class St, class Ts> inline float TTABLESINE::nextL(float df){
 	uint32_t P = nextPhase(df);
 
 	return ipl::linear(
@@ -1065,14 +1062,14 @@ TEMTS inline float TTABLESINE::nextL(float df){
 
 //---- LFO
 #define TLFO LFO<St,Ts>
-TEMTS TLFO::LFO(): Base(){ mod(0.5); }
-TEMTS TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
+template<class St, class Ts> TLFO::LFO(): Base(){ mod(0.5); }
+template<class St, class Ts> TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
-TEMTS inline TLFO& TLFO::set(float f, float p, float m){ this->freq(f); this->phase(p); return mod(m); }
-TEMTS inline TLFO& TLFO::mod(double v){ return modI(castIntRound(v*4294967296.)); }
-TEMTS inline TLFO& TLFO::modI(uint32_t v){ mMod=v; return *this; }
+template<class St, class Ts> inline TLFO& TLFO::set(float f, float p, float m){ this->freq(f); this->phase(p); return mod(m); }
+template<class St, class Ts> inline TLFO& TLFO::mod(double v){ return modI(castIntRound(v*4294967296.)); }
+template<class St, class Ts> inline TLFO& TLFO::modI(uint32_t v){ mMod=v; return *this; }
 
-TEMTS inline float TLFO::line2(){
+template<class St, class Ts> inline float TLFO::line2(){
 	using namespace gam::scl;
 	
 //	// Starts at 1
@@ -1090,9 +1087,9 @@ TEMTS inline float TLFO::line2(){
 	return r;
 }
 
-TEMTS inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
+template<class St, class Ts> inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
-#define DEF(name, exp) TEMTS inline float TLFO::name{ float r = exp; return r; }
+#define DEF(name, exp) template<class St, class Ts> inline float TLFO::name{ float r = exp; return r; }
 //DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
 //DEF(cos(),		up(); r=scl::abs(r*r) )//r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
 DEF(cos(),		up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
@@ -1132,30 +1129,30 @@ DEF(sineP9(),	up(); r = scl::sinP9(r))
 
 //---- Buzz
 
-TEM Buzz<Tv,Ts>::Buzz(Tv f, Tv p, Tv harmonics)
+template<class Tv, class Ts> Buzz<Tv,Ts>::Buzz(Tv f, Tv p, Tv harmonics)
 :	Base(f, p), mAmp(0), mPrev(Tv(0))
 {
 	onResync(1);
 	this->harmonics(harmonics);
 }
 
-TEM inline void Buzz<Tv,Ts>::harmonics(Tv v){
+template<class Tv, class Ts> inline void Buzz<Tv,Ts>::harmonics(Tv v){
 	mN = mNDesired = scl::floor(v);
 	setAmp();
 	mNFrac = v - mN;
 }
 
-TEM inline void Buzz<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
+template<class Tv, class Ts> inline void Buzz<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
 
-TEM inline void Buzz<Tv,Ts>::antialias(){
+template<class Tv, class Ts> inline void Buzz<Tv,Ts>::antialias(){
 	float maxN = scl::floor(maxHarmonics());
 	mN = mNDesired > maxN ? maxN : mNDesired;
 	setAmp();
 }
 
-TEM inline Tv Buzz<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->freq(); }
+template<class Tv, class Ts> inline Tv Buzz<Tv,Ts>::maxHarmonics(){ return mSPU_2 / this->freq(); }
 
-TEM inline void Buzz<Tv,Ts>::setAmp(){
+template<class Tv, class Ts> inline void Buzz<Tv,Ts>::setAmp(){
 	// Normally, the amplitude is 1/(2N), but we will linearly interpolate
 	// based on fractional harmonics to avoid sudden changes in amplitude to
 	// the lower harmonics which is very noticeable.
@@ -1164,7 +1161,7 @@ TEM inline void Buzz<Tv,Ts>::setAmp(){
 }
 
 #define EPS 0.000001
-TEM inline Tv Buzz<Tv, Ts>::operator()(){
+template<class Tv, class Ts> inline Tv Buzz<Tv, Ts>::operator()(){
 	/*        1   / sin((N+0.5)x)    \
 	   f(x) = -- |  ------------- - 1 |
 	          2N  \   sin(0.5x)      /
@@ -1193,7 +1190,7 @@ TEM inline Tv Buzz<Tv, Ts>::operator()(){
 	return result;
 }
 
-TEM inline Tv Buzz<Tv,Ts>::odd(){
+template<class Tv, class Ts> inline Tv Buzz<Tv,Ts>::odd(){
 	/*        1   / sin(2N x) \
 	   f(x) = -- |  ---------  |
 	          2N  \   sin(x)  /
@@ -1219,10 +1216,12 @@ TEM inline Tv Buzz<Tv,Ts>::odd(){
 }
 #undef EPS
 
-TEM inline Tv Buzz<Tv,Ts>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
-TEM inline Tv Buzz<Tv,Ts>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
+template<class Tv, class Ts>
+inline Tv Buzz<Tv,Ts>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
+template<class Tv, class Ts>
+inline Tv Buzz<Tv,Ts>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
 
-TEM void Buzz<Tv,Ts>::onResync(double r){
+template<class Tv, class Ts> void Buzz<Tv,Ts>::onResync(double r){
 	Base::onResync(r);
 	mSPU_2 = Tv(Synced::spu() * 0.5);
 }
@@ -1231,7 +1230,7 @@ TEM void Buzz<Tv,Ts>::onResync(double r){
 
 //---- DSF
 
-TEM DSF<Tv,Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
+template<class Tv, class Ts> DSF<Tv,Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
 	: Base(frq)
 {
 	freq(frq);
@@ -1242,17 +1241,17 @@ TEM DSF<Tv,Ts>::DSF(Tv frq, Tv freqRatioA, Tv ampRatioA, Tv harmonicsA)
 	mBeta = 0.f;
 }
 
-TEM inline void DSF<Tv,Ts>::freq(Tv v){
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::freq(Tv v){
 	Base::freq(v);
 	updateBetaInc();	
 }
 
-TEM inline void DSF<Tv,Ts>::freqRatio(Tv v){
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::freqRatio(Tv v){
 	mFreqRatio = v;
 	updateBetaInc();
 }
 
-TEM inline void DSF<Tv,Ts>::ampRatio(Tv v){
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::ampRatio(Tv v){
 	if(v != mA){
 		// if near 1, nudge away
 		static const Tv epslt = 0.9997;
@@ -1265,32 +1264,32 @@ TEM inline void DSF<Tv,Ts>::ampRatio(Tv v){
 	}
 }
 
-TEM inline void DSF<Tv,Ts>::harmonics(Tv v){
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::harmonics(Tv v){
 	if(v != mN){
 		mN = mNDesired = v;
 		updateAPow();
 	}
 }
 
-TEM inline void DSF<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::harmonicsMax(){ harmonics(maxHarmonics()); }
 
-TEM inline void DSF<Tv,Ts>::antialias(){
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::antialias(){
 	Tv maxN = maxHarmonics();
 	if(mNDesired > maxN)	mN = maxN;
 	else					mN = mNDesired;
 	updateAPow();
 }
 
-TEM inline Tv DSF<Tv,Ts>::ampRatio(){ return mA; }
-TEM inline Tv DSF<Tv,Ts>::freqRatio(){ return mFreqRatio; }
-TEM inline Tv DSF<Tv,Ts>::harmonics(){ return mN; }
+template<class Tv, class Ts> inline Tv DSF<Tv,Ts>::ampRatio(){ return mA; }
+template<class Tv, class Ts> inline Tv DSF<Tv,Ts>::freqRatio(){ return mFreqRatio; }
+template<class Tv, class Ts> inline Tv DSF<Tv,Ts>::harmonics(){ return mN; }
 
-TEM inline Tv DSF<Tv,Ts>::maxHarmonics(){
+template<class Tv, class Ts> inline Tv DSF<Tv,Ts>::maxHarmonics(){
 	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->freq() - Tv(1))/freqRatio() + Tv(1));
 }
 
-TEM inline void DSF<Tv,Ts>::updateAPow(){ mAPow = ::pow(mA, mN); }
-TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio; }
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::updateAPow(){ mAPow = ::pow(mA, mN); }
+template<class Tv, class Ts> inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio; }
 
 // Generalized DSF formula:
 // sum{k=0, N}( a^k sin(T + k B) )
@@ -1301,7 +1300,7 @@ TEM inline void DSF<Tv,Ts>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio
 #define COS scl::cosT8
 //#define SIN sin
 //#define COS cos
-TEM inline Tv DSF<Tv,Ts>::operator()(){
+template<class Tv, class Ts> inline Tv DSF<Tv,Ts>::operator()(){
 	Tv theta = Base::nextPhase();
 	mBeta = scl::wrapPhase(mBeta);
 
@@ -1319,15 +1318,11 @@ TEM inline Tv DSF<Tv,Ts>::operator()(){
 #undef SIN
 #undef COS
 
-TEM void DSF<Tv,Ts>::onResync(double r){
+template<class Tv, class Ts> void DSF<Tv,Ts>::onResync(double r){
 	Base::onResync(r);
 	freq(Base::freq());
 	harmonics(mNDesired);
 }
-
-#undef TEM
-#undef TEMS
-#undef TEMTS
 
 } // gam::
 #endif

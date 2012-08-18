@@ -10,8 +10,6 @@
 #include "Gamma/Noise.h"
 #include "Gamma/Oscillator.h"
 
-#define TEM template<class T>
-
 namespace gam{
 
 ///@defgroup Effects
@@ -388,27 +386,32 @@ private:
 	bool mDoStep;
 };
 
-TEM Quantizer<T>::Quantizer(double freq, T step)
+template<class T>
+Quantizer<T>::Quantizer(double freq, T step)
 :	mPeriod(1./freq)
 {
 	this->step(step);
 }
 
-TEM inline void Quantizer<T>::freq(double v){ period(1./v); }
+template<class T>
+inline void Quantizer<T>::freq(double v){ period(1./v); }
 
-TEM inline void Quantizer<T>::period(double v){
+template<class T>
+inline void Quantizer<T>::period(double v){
 	mPeriod = v;
 	mSamples = v * spu();
 	if(mSamples < 1.) mSamples = 1.;
 }
 
-TEM inline void Quantizer<T>::step(T v){
+template<class T>
+inline void Quantizer<T>::step(T v){
 	mStep = v;
 	mDoStep = mStep > 0.;
 	if(mDoStep) mStepRec = 1./mStep;
 }
 
-TEM inline T Quantizer<T>::operator()(T vi){
+template<class T>
+inline T Quantizer<T>::operator()(T vi){
 	if(++mCount >= mSamples){
 		mCount -= mSamples;
 		mHeld = mDoStep ? scl::round(vi, mStep, mStepRec) : vi;
@@ -416,7 +419,8 @@ TEM inline T Quantizer<T>::operator()(T vi){
 	return mHeld;
 }
 
-TEM void Quantizer<T>::onResync(double r){
+template<class T>
+void Quantizer<T>::onResync(double r){
 	period(mPeriod);
 }
 
@@ -444,5 +448,4 @@ struct Threshold{
 };
 
 } // gam::
-#undef TEM
 #endif

@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include "Gamma/mem.h"
 
-#define TEM template<class T>
-
 namespace gam{
 	
 	
@@ -78,16 +76,19 @@ public:
 	/// the requested number of frames of data. The array must be large enough
 	/// to hold the product of frames and the number of channels.
 	//ULONG read(float * dst, ULONG numFrames);
-	TEM int read(T * dst, int numFrames);
+	template<class T>
+    int read(T * dst, int numFrames);
 	
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
-	TEM int readAll(T * dst);
+	template<class T>
+    int readAll(T * dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 	
 	/// If the number of channels is > 1, memory will be dynamically allocated
 	///	and freed for the deinterleaving.
-	TEM int readAllD(T * dst);
+	template<class T>
+    int readAllD(T * dst);
 	
 	/// Writes interleaved frames from array to file.
 	
@@ -95,7 +96,8 @@ public:
 	/// The file write frames functions write the data in the array pointed to
 	/// by ptr to the file. The array must be large enough to hold the product
 	/// of frames and the number of channels.
-	TEM int write(const T * src, int numFrames);
+	template<class T>
+    int write(const T * src, int numFrames);
 
 	// Sound file properties
 	EncodingType encoding() const;				///< Get encoding type
@@ -134,12 +136,14 @@ inline int SoundFile::samples() const { return frames() * channels(); }
 
 inline const std::string& SoundFile::path() const { return mPath; }
 
-TEM inline int SoundFile::readAll(T * dst){
+template<class T>
+inline int SoundFile::readAll(T * dst){
 	seek(0, SEEK_SET);
 	return read(dst, frames());
 }
 
-TEM int SoundFile::readAllD(T * dst){
+template<class T>
+int SoundFile::readAllD(T * dst){
 	int numChannels = channels();
 
 	if(1 == numChannels) return readAll(dst);
@@ -161,6 +165,5 @@ TEM int SoundFile::readAllD(T * dst){
 
 } // gam::
 
-#undef TEM
 #endif
 

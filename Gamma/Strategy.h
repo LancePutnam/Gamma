@@ -333,7 +333,7 @@ namespace iplSeq{
 //	void reset();										// reset internal state, if any
 namespace phsInc{
 
-	/// Clip (saturate) at boundary
+	/// Play waveform one cycle, then hold at the end. A one-shot.
 	struct Clip{
 		void reset(){}
 	
@@ -354,7 +354,7 @@ namespace phsInc{
 	};
 
 
-	/// Reverse direction at boundary
+	/// Play waveform forward, backwards, forward, etc.  Like Wrap, loops indefinitely.
 	struct Fold{
 		Fold(): dir(0){}
 	
@@ -382,7 +382,7 @@ namespace phsInc{
 	};
 
 
-	/// Wrap according to binary on/off pattern
+	/// Plays and holds waveform according to binary repeating pattern.
 	struct Pat{
 	
 		Pat(){
@@ -432,7 +432,7 @@ namespace phsInc{
 	};
 
 
-	/// Repeat a finite number of times
+	/// Repeat waveform a fixed number of times, then hold at the end.
 	struct Rep{
 		Rep(){ number(1); reset(); }
 		
@@ -468,7 +468,7 @@ namespace phsInc{
 	};
 
 
-	/// Wrap around at boundary
+	/// Loop waveform indefinitely.
 	struct Wrap{
 		void reset(){}
 	
