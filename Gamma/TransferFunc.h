@@ -11,9 +11,10 @@
 namespace gam{
 
 
-/// \brief Transfer function of an arbitrary difference equation
+/// Transfer function of an arbitrary difference equation
     
-///http://en.wikipedia.org/wiki/Transfer_function
+/// http://en.wikipedia.org/wiki/Transfer_function
+///
 class TransferFunc {
 public:
 	typedef std::complex<double> Complex;
