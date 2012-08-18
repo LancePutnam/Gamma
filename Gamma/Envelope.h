@@ -26,10 +26,16 @@ namespace gam{
 /// ending on 'end' over its length in samples.  The last point is exclusive, so
 /// it takes length + 1 samples to reach 'end' inclusively.  For iterations 
 /// exceeding the specified length, the values returned will be unbounded.
+/// \n\n Given any two points, as long as they don’t have the same value, there are
+/// infinitely many exponential segments starting at the first and ending at the second.
+/// One of these is a straight line between the two.   Hence the “variable curvature” of
+/// the Curve object.
+/// \n\n Curve touches both its start and end points while Decay asymptotically approaches zero.
 ///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \ingroup Envelopes 
+/// \ingroup Envelopes
+/// \sa Decay
 template <class Tv=real, class Tp=real>
 class Curve{
 public:
@@ -448,8 +454,9 @@ protected:
 /// value. Because zero is never reached, the decay length determines when the
 /// envelope is -60 dB down from its initial value. This envelope is one of the 
 /// most computationally efficient envelopes requiring only a single multiply
-/// per iteration.
-/// \ingroup Envelopes 
+/// per iteration. \n\n Compare to Curve which touches exactly both start and end points.
+/// \ingroup Envelopes
+/// \sa Curve
 template <class T=real, class Ts=Synced>
 class Decay : public Ts{
 public:
