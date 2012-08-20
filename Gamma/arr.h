@@ -35,9 +35,21 @@ namespace gam{
 namespace arr{
 
 
-// Prototypes of functions that are both defined and used within this file
+// These functions are defined at the top since they are used by other functions
+// defined in this file...
+
+/// Returns dot-product of two arrays
+template <class T> 
+inline T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
+	T r=T(0); LOOP(len, str){ r += src1[i]*src2[i]; } return r;
+}
+
+/// Returns sum of values squared
 template <class T>
-T sumSquares(const T * src, uint32_t len, uint32_t str);
+inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
+	return dot(src,src,len,str);
+}
+
 
 
 
@@ -75,12 +87,6 @@ template <class T>
 void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T threshold);
 
 void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize);
-
-/// Returns dot-product of two arrays
-template <class T>
-inline T dot(const T * src1, const T * src2, uint32_t len, uint32_t str=1){
-	T r=T(0); LOOP(len, str){ r += src1[i]*src2[i]; } return r;
-}
 
 /// Returns dot-product of two arrays of length 4.
 template <class T>
@@ -279,12 +285,6 @@ void sortQuick(const T * src, uint32_t * indices, long beg, long end);
 /// Returns sum of values
 template <class T>
 T sum(const T * src, uint32_t len, uint32_t str=1);
-
-/// Returns sum of values squared
-template <class T>
-inline T sumSquares(const T * src, uint32_t len, uint32_t str=1){
-	return dot(src,src,len,str);
-}
 
 /// Variance (deviation from mean).
 template <class T>

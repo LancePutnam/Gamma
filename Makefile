@@ -27,7 +27,6 @@ SRCS		:= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
-LDFLAGS		+= -L$(EXT_LIB_DIR)
 
 #--------------------------------------------------------------------------
 # Rules
@@ -45,8 +44,7 @@ include Makefile.rules
 EXEC_TARGETS = examples/%.cpp tests/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): $(LIB_PATH) FORCE
-	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
-#	@$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ -lGamma -Lbuild/lib $(LDFLAGS)
+	$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LIB_PATH) $(LDFLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif

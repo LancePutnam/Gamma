@@ -301,7 +301,7 @@ inline void zero(T * arr, uint32_t len, uint32_t str=1){
 }
 
 //template <class T>
-inline void zero(T * arr, unsigned int len){ zero(arr, (uint)len); }
+//inline void zero(T * arr, unsigned int len){ zero(arr, (uint)len); }
 //
 //template <class To0> void zero(To0& o0){ zero(&o0[0], (uint)o0.size()); }
 //
