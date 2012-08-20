@@ -7,6 +7,8 @@
 #include "Gamma/rnd.h"
 #include "Gamma/scl.h"
 
+///@defgroup Noise
+
 namespace gam{
 
 
@@ -15,6 +17,7 @@ namespace gam{
 /// Brownian noise has a power spectrum of 1/f^2.
 /// It is produced by integrating white (uniform) noise.
 /// The output value is clipped within a specified interval.
+/// @ingroup Noise
 template <class RNG = RNGLinCon>
 class NoiseBrown{
 public:
@@ -46,6 +49,7 @@ public:
 
 /// Pink noise has a power spectrum of 1/f. In this implementation, it is
 /// produced by summing together 12 octaves of downsampled white noise.
+/// @ingroup Noise
 template <class RNG = RNGLinCon>
 class NoisePink{
 public:
@@ -76,6 +80,7 @@ private:
 ///
 template <class RNG = RNGLinCon>
 class NoiseWhite{
+/// @ingroup Noise
 public:
 	NoiseWhite(): rng(){}
 	

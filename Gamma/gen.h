@@ -11,19 +11,20 @@
 
 namespace gam{
 
-/// \brief Generator function objects
-  /// A generator is a lightweight object that generates a sequence of elements.
-  /// Generators have a standard interface specified by the Val class. The array
-  /// access operator, [], is overloaded so generators can be treated like
-  /// arrays. A const qualified generator only means that its generating function 
-  /// parameters are held constant; its current value can change.
-  /// A convention used is that generators' current value is the one most recently
-  /// generated. This means one must be careful when initializing a generator so 
-  /// that it generates the first element properly. Usually this means setting its
-  /// value to what would have been the previously generated value. For instance, 
-  /// to get the sequence 0,1,2,... from RAdd1, its value must be initialized to 
-  /// -1. Constructors 'rewind' the generator, so that the initial value argument
-  /// is returned on the next generate call.
+/// Generator function objects
+    
+/// A generator is a lightweight object that generates a sequence of elements.
+/// Generators have a standard interface specified by the Val class. The array
+/// access operator, [], is overloaded so generators can be treated like
+/// arrays. A const qualified generator only means that its generating function
+/// parameters are held constant; its current value can change.
+/// A convention used is that generators' current value is the one most recently
+/// generated. This means one must be careful when initializing a generator so
+/// that it generates the first element properly. Usually this means setting its
+/// value to what would have been the previously generated value. For instance,
+/// to get the sequence 0,1,2,... from RAdd1, its value must be initialized to
+/// -1. Constructors 'rewind' the generator, so that the initial value argument
+/// is returned on the next generate call.
   
 namespace gen{
 
@@ -67,11 +68,11 @@ struct Nyquist : public Val<T>{ INHERIT;
 	T operator()() const { return val = -val; }			///< Generate next value
 };
 
-///\brief Reciprocal sequence generator. \n
+///Reciprocal sequence generator
+
 ///Given a type that can be initialized by passing
 ///the integer 1 to the constructor (let the value be “x”), 
-///it generates the sequence x/1, x/2, x/3, x/4, etc.   
-    
+///it generates the sequence x/1, x/2, x/3, x/4, etc.
 ///http://www.britannica.com/EBchecked/topic/1500010/harmonic-sequence
 template <class T=gam::real>
 struct Recip : public Val<T>{ INHERIT;
@@ -554,9 +555,13 @@ private:
 };
 
 
-/// \brief Triggers after a specified number of iterations and then resets. (Outputs true on every nth sample and false on the rest.)  
+/// Triggers after a specified number of iterations and then resets.
     
-/// Argument "num" determines the length of the sequence.  "val", with a default value of zero can be set by the user to adjust the location of the triggering sample within the sequence.
+    
+/// Outputs true on every nth sample and false on the rest.
+/// Argument "num" determines the length of the sequence.
+/// Argument "val", with a default value of zero can be set by the user
+/// to adjust the location of the triggering sample within the sequence.
 struct Trigger{
 	Trigger(uint32_t num, uint32_t val=0) : val(val), num(num){}
 	
