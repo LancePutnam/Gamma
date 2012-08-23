@@ -484,6 +484,8 @@ protected:
 
 
 /// Binary gate controlled by threshold comparison. The gate closes if the (norm of the) input value remains below threshold for at least closingDelay units of time (typically seconds).
+    
+/// \ingroup Envelopes
 template <class T=real, class Ts=Synced>
 class Gate : public Ts{
 public:
@@ -523,6 +525,8 @@ protected:
 
 
 /// Interpolation envelope segment
+    
+/// \ingroup Envelopes
 template <
 	class Tv=real,
 	template <class> class Si=iplSeq::Linear,
@@ -603,6 +607,8 @@ protected:
 
 
 /// Exponential envelope segment for smoothing out value changes.
+    
+/// \ingroup Envelopes
 template <class T=gam::real, class Ts=Synced>
 class SegExp : public Ts{
 public:
