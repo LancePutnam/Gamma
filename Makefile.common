@@ -221,8 +221,8 @@ else ifeq ($(PLATFORM), windows)
 	CPPFLAGS += -I/local/include/
 	CPPFLAGS += -I`pwd`
 
-	SLIB_EXT = lib
-	DLIB_EXT = dll
+#	SLIB_EXT = lib
+#	DLIB_EXT = dll
 endif
 
 

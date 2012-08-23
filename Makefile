@@ -67,11 +67,11 @@ install: $(LIB_PATH)
 #	@echo 'INSTALL $(DESTDIR)'
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
-	@$(INSTALL) -c -m 644 $(LIB_PATH) $(DESTDIR)/lib
+	@$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib
 ifneq ($(EXT_LIB_COPY_DIR), )
-	@$(INSTALL) -c -m 644 $(EXT_LIB_COPY_DIR)/* $(DESTDIR)/lib
+	@$(INSTALL) -m 644 $(EXT_LIB_COPY_DIR)/* $(DESTDIR)/lib
 endif
-	@$(INSTALL) -c -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
+	@$(INSTALL) -m 644 $(INC_DIR)/*.h $(DESTDIR)/include/$(LIB_NAME)
 #	@$(RANLIB) $(DESTDIR)/lib/$(LIB_FILE)
 
 # Run unit tests
