@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-/// @defgroup Envelopes
+/// \defgroup Envelopes
 /// Everything in Gamma having to do with envelopes.
 
 

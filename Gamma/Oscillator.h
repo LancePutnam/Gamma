@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-///@defgroup Oscillators
+///\defgroup Oscillators
 
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"

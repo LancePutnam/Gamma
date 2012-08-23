@@ -8,7 +8,7 @@
 	Functions/objects for accessing and indexing arrays.
 */
 
-/// @defgroup access Array access
+/// \defgroup access Array access
 
 #include "Gamma/pstdint.h"
 

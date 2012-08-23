@@ -8,7 +8,7 @@
 	Classes for performing audio input/output streaming
 */
 
-/// @defgroup io Audio I/O
+/// \defgroup io Audio I/O
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@ typedef void (* audioCallback)(AudioIOData& io);
 
 /// Audio device abstraction  
     
-/// @ingroup io     
+/// \ingroup io     
 class AudioDevice{
 public:
 
@@ -78,7 +78,7 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 /// Audio buffers are guaranteed to be stored in a contiguous non-interleaved 
 /// format, i.e., frames are tightly packed per channel.
     
-/// @ingroup io     
+/// \ingroup io     
 class AudioIOData {
 public:
 	/// Constructor
@@ -174,7 +174,7 @@ public:
 
 /// Interface for objects which can be registered with an audio IO stream
     
-/// @ingroup io 
+/// \ingroup io 
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}

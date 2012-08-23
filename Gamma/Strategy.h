@@ -5,7 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 
-/// @defgroup ipl Interpolation
+/// \defgroup ipl Interpolation
 
 /// Gamma supports several interpolation strategies.  These can be used, for example,
 /// to make a delay line whose delay amount is a non-integer number of samples.
@@ -21,9 +21,9 @@
 namespace gam{
 namespace ipl{
 
-/// @brief Truncating random-access interpolation strategy
-/// \ingroup ipl
+/// Truncating random-access interpolation strategy
 
+/// \ingroup ipl
 template <class T>
 struct Trunc{
 
@@ -46,7 +46,8 @@ struct Trunc{
 };
 
 
-/// @brief Nearest neighbor random-access interpolation strategy
+/// Nearest neighbor random-access interpolation strategy
+    
 /// \ingroup ipl
 template <class T>
 struct Round{
@@ -76,7 +77,8 @@ struct Round{
 };
 
 
-/// @brief Linear random-access interpolation strategy
+/// Linear random-access interpolation strategy
+    
 /// \ingroup ipl
 template <class T>
 struct Linear{
@@ -109,7 +111,8 @@ struct Linear{
 };
 
 
-/// @brief Cubic random-access interpolation strategy
+/// Cubic random-access interpolation strategy
+    
 /// \ingroup ipl
 template <class T>
 struct Cubic{
@@ -164,7 +167,8 @@ struct Cubic{
 };
 
 
-/// @brief Allpass random-access interpolation strategy
+/// Allpass random-access interpolation strategy
+    
 /// \ingroup ipl
 template <class T>
 struct AllPass{
@@ -202,7 +206,8 @@ struct AllPass{
 };
 
 
-/// @brief Dynamically switchable random-access interpolation strategy
+/// Dynamically switchable random-access interpolation strategy
+    
 /// \ingroup ipl
 template <class T>
 struct Switchable{

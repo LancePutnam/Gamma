@@ -5,7 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 
-/// @defgroup Filters
+/// \defgroup Filters
 /// <A HREF="https://ccrma.stanford.edu/~jos/filters/What_Filter.html">
 /// When you think about it, everything is a filter.</A>
 

@@ -12,12 +12,12 @@
 
 namespace gam{
 
-///@defgroup Effects
+///\defgroup Effects
 
 /// Envelope Follower
 
-///@ingroup Filters    
-///@ingroup Envelopes
+///\ingroup Filters    
+///\ingroup Envelopes
 template <class Tv=real, class Tp=real, class Ts=Synced>
 struct EnvFollow{
 
@@ -42,8 +42,8 @@ struct EnvFollow{
 
 /// 3 biquad filters (of floats) in parallel
     
-/// @ingroup Filters
-/// @ingroup Effects
+/// \ingroup Filters
+/// \ingroup Effects
 struct Biquad3{
 	/// Constructor
 	Biquad3(float f0, float f1, float f2, float q=8, FilterType type=BAND_PASS):
@@ -179,7 +179,7 @@ struct ChebyN{
 
 /// Dual delay-line chorus driven by quadrature sinusoid
 
-/// @ingroup Effects
+/// \ingroup Effects
 template <class T=gam::real>
 struct Chorus{
 	/// @param[in] delay	Delay interval
@@ -235,7 +235,7 @@ struct Chorus{
 
 /// Frequency shifter
     
-/// @ingroup Effects
+/// \ingroup Effects
 template <class T=gam::real>
 struct FreqShift{
 

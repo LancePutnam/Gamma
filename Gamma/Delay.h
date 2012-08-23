@@ -17,7 +17,7 @@
 
 namespace gam{
 
-/// @defgroup Delays
+/// \defgroup Delays
 
 /// Variable length delay-line
 
@@ -25,7 +25,7 @@ namespace gam{
 /// \tparam Tp	parameter type
 /// \tparam Si	interpolation strategy
 /// \tparam Ts	sync type
-/// @ingroup Delays    
+/// \ingroup Delays    
 template <class Tv=gam::real, template<class> class Si=ipl::Linear, class Ts=Synced>
 class Delay : public ArrayPow2<Tv>, Ts{
 public:
@@ -87,7 +87,7 @@ protected:
 
 /// Variable delay-line with multiple read taps
     
-/// @ingroup Delays    
+/// \ingroup Delays    
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
 class Multitap : public Delay<Tv,Si,Ts> {
 public:
@@ -127,7 +127,7 @@ protected:
 
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
-/// @ingroup Delays    
+/// \ingroup Delays    
 template <uint32_t N, class T>
 class DelayShift{
 public:
@@ -167,7 +167,7 @@ protected:
 
 /// One sample delay. Returns last input sample.
 
-/// @ingroup Delays    
+/// \ingroup Delays    
 template<class T=gam::real> 
 class Delay1 : public DelayShift<1,T>{
 public:
@@ -179,7 +179,7 @@ public:
 
 /// Two sample delay. Returns second to last input sample.
     
-/// @ingroup Delays    
+/// \ingroup Delays    
 template<class T=gam::real> 
 class Delay2 : public DelayShift<2,T>{
 public:
@@ -209,8 +209,8 @@ public:
 /// \tparam Ts	sync type
 // H(z) = (ffd + z^-m) / (1 - fbk z^-m)
 // y[n] = ffd x[n] + x[n-m] + fbk y[n-m]
-/// @ingroup Delays    
-/// @ingroup Filters  
+/// \ingroup Delays    
+/// \ingroup Filters  
 template<
 	class Tv=gam::real,
 	template <class> class Si=ipl::Linear,
