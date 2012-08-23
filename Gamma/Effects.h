@@ -345,6 +345,8 @@ protected:
 
 
 /// Plucked string source/filter
+    
+/// \ingroup Oscillators
 struct Pluck{
 	Pluck(double freq=440, double decay=0.99)
 	:	env(0.1), fil(3000, 1, LOW_PASS), comb(1./27.5, 1./freq, 1, decay)
