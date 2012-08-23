@@ -205,9 +205,9 @@ struct AllPass{
 /// @brief Dynamically switchable random-access interpolation strategy
 /// \ingroup ipl
 template <class T>
-struct Any{
+struct Switchable{
 
-	Any(): mType(TRUNC){}
+	Switchable(): mType(TRUNC){}
 	
 	ipl::Type type() const { return mType; }
 	void type(ipl::Type v){ mType=v; }
