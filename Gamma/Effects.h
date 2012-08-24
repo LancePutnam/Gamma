@@ -286,6 +286,8 @@ struct MonoSynth{
 
 
 /// Equal-power 2-channel panner
+    
+/// \ingroup Effects
 template <class T=gam::real>
 class Pan{
 public:
