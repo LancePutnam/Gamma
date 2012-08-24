@@ -172,6 +172,48 @@ template<class T> struct NamedElems<1,T>{ T x; };
 template<class T> struct NamedElems<2,T>{ T x,y; };
 template<class T> struct NamedElems<3,T>{ T x,y,z; };
 template<class T> struct NamedElems<4,T>{ T x,y,z,w; };
+    
+    
+/// Multi-element container
+    
+/// This is a fixed size array to enable better loop unrolling optimizations
+/// by the compiler and to avoid an extra 'size' data member for small-sized
+/// arrays. Elements are not initialized by default for efficiency.
+template <uint32_t N, class T>
+struct Multi : public NamedElems<N,T> {
+        
+    using NamedElems<N,T>::x;
+        
+    typedef Multi M;
+        
+        
+    T * elems(){ return &x; }
+    const T * elems() const { return &x; }
+        
+    /// Set element at index with no bounds checking
+    T& operator[](uint32_t i){ return elems()[i];}
+        
+    /// Get element at index with no bounds checking
+    const T& operator[](uint32_t i) const { return elems()[i]; }
+        
+#define IT for(uint32_t i=0; i<N; ++i)
+        
+    bool operator !=(const M& v){ IT{ if((*this)[i] == v[i]) return false; } return true; }
+    bool operator !=(const T& v){ IT{ if((*this)[i] == v   ) return false; } return true; }
+    M& operator   = (const M& v){ IT{ (*this)[i] = v[i]; } return *this; }
+    M& operator   = (const T& v){ IT{ (*this)[i] = v;    } return *this; }
+    bool operator ==(const M& v){ IT{ if((*this)[i] != v[i]) return false; } return true; }
+    bool operator ==(const T& v){ IT{ if((*this)[i] != v   ) return false; } return true; }
+        
+#undef IT
+        
+    /// Returns size of array
+    static uint32_t size(){ return N; }
+        
+    /// Zeros all elements.
+    void zero(){ memset(elems(), 0, N * sizeof(T)); }
+};
+
 
 
 /// A value in the form: base^expo
