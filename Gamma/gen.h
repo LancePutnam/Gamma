@@ -538,7 +538,7 @@ private:
 
 /// Fixed-sized array with a sequence generator
 template <uint32_t N, class T=gam::real, class G=gen::RAdd1<uint32_t> >
-class Seq: public Vec<N,T>{
+class Seq: public Multi<N,T>{
 public:
 
 	Seq(const T& val){ for(int i=0; i<N; ++i){ this->elems[i]=val; } }
