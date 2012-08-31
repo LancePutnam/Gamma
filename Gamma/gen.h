@@ -295,8 +295,8 @@ protected:
 template <class T=gam::real>
 struct RAdd: public Val<T>{ INHERIT;
 
-	/// @param[in] add	addition amount
-	/// @param[in] val	current value
+	/// \param[in] add	addition amount
+	/// \param[in] val	current value
 	RAdd(const T& add=T(1), const T& val=T(0))
 	: Val<T>(val-add), add(add){}
 	
@@ -426,10 +426,10 @@ public:
 	using C::operator();
 	using C::operator=;
 
-	/// @param[in] frq	unit frequency
-	/// @param[in] amp	amplitude
-	/// @param[in] phs	unit phase
-	/// @param[in] dec	unit decay/grow factor
+	/// \param[in] frq	unit frequency
+	/// \param[in] amp	amplitude
+	/// \param[in] phs	unit phase
+	/// \param[in] dec	unit decay/grow factor
 	CReson(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0), const T& dec=T(1)){
 		set(frq, amp, phs);
 	}

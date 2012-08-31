@@ -96,7 +96,7 @@ public:
 
 	Sync();
 
-	/// @param[in]	spu		samples/unit
+	/// \param[in]	spu		samples/unit
 	Sync(double spu);
 
 	~Sync();

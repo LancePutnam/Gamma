@@ -17,7 +17,7 @@
 
 namespace gam{
 
-/// @defgroup DFT
+/// \defgroup DFT
 
 /// Spectral data types
 enum SpectralType{
@@ -30,7 +30,7 @@ enum SpectralType{
 
 /// Sliding window for analysis
     
-///@ingroup DFT
+///\ingroup DFT
     
 template <class T=gam::real>
 class SlidingWindow{
@@ -80,7 +80,7 @@ private:
 
 /// Base class for DFTs
     
-///@ingroup DFT
+///\ingroup DFT
     
 template <class T=gam::real>
 class DFTBase : public Synced{
@@ -127,16 +127,16 @@ protected:
 
 /// Discrete Fourier transform
 
-///@ingroup DFT
+///\ingroup DFT
 
 class DFT : public DFTBase<float>{
 public:
 	/// Constructor
 
-	/// @param[in]	winSize		Number of samples in window
-	/// @param[in]	padSize		Number of zeros to append to window
-	/// @param[in]	specType	Format of spectrum data
-	/// @param[in]	numAux		Number of auxilliary buffers of size numBins() to create
+	/// \param[in]	winSize		Number of samples in window
+	/// \param[in]	padSize		Number of zeros to append to window
+	/// \param[in]	specType	Format of spectrum data
+	/// \param[in]	numAux		Number of auxilliary buffers of size numBins() to create
 	DFT(
 		uint32_t winSize=1024, uint32_t padSize=0,
 		SpectralType specType=COMPLEX,
@@ -228,17 +228,17 @@ protected:
 /// resolution within each individual spectral frame is still determined by the
 /// window size.
 
-/// @ingroup DFT
+/// \ingroup DFT
     
 class STFT : public DFT {
 public:
 
-	/// @param[in]	winSize		Number of samples to window
-	/// @param[in]	hopSize		Number of samples between successive windows
-	/// @param[in]	padSize		Number of zeros to append to window
-	/// @param[in]	winType		Type of forward transform window
-	/// @param[in]	specType	Format of spectrum data
-	/// @param[in]	numAux		Number of auxiliary buffers to create
+	/// \param[in]	winSize		Number of samples to window
+	/// \param[in]	hopSize		Number of samples between successive windows
+	/// \param[in]	padSize		Number of zeros to append to window
+	/// \param[in]	winType		Type of forward transform window
+	/// \param[in]	specType	Format of spectrum data
+	/// \param[in]	numAux		Number of auxiliary buffers to create
 	STFT(uint32_t winSize=1024, uint32_t hopSize=256, uint32_t padSize=0,
 		WindowType winType = RECTANGLE,
 		SpectralType specType = COMPLEX,
@@ -310,15 +310,15 @@ protected:
 /// within a specified frequency interval. The computational complexity per
 /// sample is O(M), where M is the size, in samples, of the frequency interval.
 
-/// @ingroup DFT
+/// \ingroup DFT
     
 template <class T>
 class SlidingDFT : public DFTBase<T> {
 public:
 
-	/// @param[in] sizeDFT	transform size, in samples
-	/// @param[in] binLo	lower closed endpoint of frequency interval
-	/// @param[in] binHi	upper open endpoint of frequency interval
+	/// \param[in] sizeDFT	transform size, in samples
+	/// \param[in] binLo	lower closed endpoint of frequency interval
+	/// \param[in] binHi	upper open endpoint of frequency interval
 	SlidingDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi);
 	
 	/// Input next sample and perform forward transform

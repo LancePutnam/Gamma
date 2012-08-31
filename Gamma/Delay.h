@@ -17,7 +17,7 @@
 
 namespace gam{
 
-/// @defgroup Delays
+/// \defgroup Delays
 
 /// Variable length delay-line
 
@@ -25,7 +25,7 @@ namespace gam{
 /// \tparam Tp	parameter type
 /// \tparam Si	interpolation strategy
 /// \tparam Ts	sync type
-/// @ingroup Delays    
+/// \ingroup Delays    
 template <class Tv=gam::real, template<class> class Si=ipl::Linear, class Ts=Synced>
 class Delay : public ArrayPow2<Tv>, Ts{
 public:
@@ -33,12 +33,12 @@ public:
 	/// Default constructor. Does not allocate memory.
 	Delay();
 
-	/// @param[in]	delay		Delay length
+	/// \param[in]	delay		Delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float delay);
 
-	/// @param[in]	maxDelay	Maximum delay length
-	/// @param[in]	delay		Delay length
+	/// \param[in]	maxDelay	Maximum delay length
+	/// \param[in]	delay		Delay length
 	/// The size of the delay buffer will be the smallest possible power of two.
 	Delay(float maxDelay, float delay);
 
@@ -87,14 +87,14 @@ protected:
 
 /// Variable delay-line with multiple read taps
     
-/// @ingroup Delays    
+/// \ingroup Delays    
 template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
 class Multitap : public Delay<Tv,Si,Ts> {
 public:
 
-	/// @param[in]	delay		Delay length. The size of the delay line will 
+	/// \param[in]	delay		Delay length. The size of the delay line will 
 	///							be the smallest possible power of two.
-	/// @param[in]	numTaps		Number of reader taps
+	/// \param[in]	numTaps		Number of reader taps
 	Multitap(float delay, uint32_t numTaps)
 	:	Delay<Tv,Si,Ts>(delay)
 	{	taps(numTaps); }
@@ -127,13 +127,13 @@ protected:
 
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
-/// @ingroup Delays    
+/// \ingroup Delays    
 template <uint32_t N, class T>
 class DelayShift{
 public:
 	#define IT for(uint32_t i=0; i<N; ++i)
 
-	/// @param[in] v	Initial value of elements
+	/// \param[in] v	Initial value of elements
 	DelayShift(const T& v=T()){ IT mElems[i]=v; }
 
 	/// Set nth delayed element
@@ -167,28 +167,28 @@ protected:
 
 /// One sample delay. Returns last input sample.
 
-/// @ingroup Delays    
+/// \ingroup Delays    
 template<class T=gam::real> 
 class Delay1 : public DelayShift<1,T>{
 public:
 
-	/// @param[in] v	Initial value of elements
+	/// \param[in] v	Initial value of elements
 	Delay1(const T& v=T()): DelayShift<1,T>(v){}
 };
 
 
 /// Two sample delay. Returns second to last input sample.
     
-/// @ingroup Delays    
+/// \ingroup Delays    
 template<class T=gam::real> 
 class Delay2 : public DelayShift<2,T>{
 public:
 
-	/// @param[in] v	Initial value of elements
+	/// \param[in] v	Initial value of elements
 	Delay2(const T& v=T()): DelayShift<2,T>(v){}
 	
-	/// @param[in] v2	Initial value of 2nd delayed element
-	/// @param[in] v1	Initial value of 1st delayed element
+	/// \param[in] v2	Initial value of 2nd delayed element
+	/// \param[in] v1	Initial value of 1st delayed element
 	Delay2(const T& v2, const T& v1){ (*this)[1]=v2; (*this)[0]=v1; }
 };
 
@@ -209,8 +209,8 @@ public:
 /// \tparam Ts	sync type
 // H(z) = (ffd + z^-m) / (1 - fbk z^-m)
 // y[n] = ffd x[n] + x[n-m] + fbk y[n-m]
-/// @ingroup Delays    
-/// @ingroup Filters  
+/// \ingroup Delays    
+/// \ingroup Filters  
 template<
 	class Tv=gam::real,
 	template <class> class Si=ipl::Linear,
@@ -228,17 +228,17 @@ public:
 	/// Default constructor. Does not allocate memory.
 	Comb();
 
-	/// @param[in]	delay		Delay length. The size of the delay line will 
+	/// \param[in]	delay		Delay length. The size of the delay line will 
 	///							be the smallest possible power of two.
-	/// @param[in]	ffd			Feedforward amount, in [-1, 1]
-	/// @param[in]	fbk			Feedback amount, in (-1, 1)
+	/// \param[in]	ffd			Feedforward amount, in [-1, 1]
+	/// \param[in]	fbk			Feedback amount, in (-1, 1)
 	Comb(float delay, const Tp& ffd = Tp(0), const Tp& fbk = Tp(0));
 	
-	/// @param[in]	maxDelay	Maximum delay length. The size of the delay line 
+	/// \param[in]	maxDelay	Maximum delay length. The size of the delay line 
 	///							will be the smallest possible power of two.
-	/// @param[in]	delay		Delay length
-	/// @param[in]	ffd			Feedforward amount, in [-1, 1]
-	/// @param[in]	fbk			Feedback amount, in (-1, 1)
+	/// \param[in]	delay		Delay length
+	/// \param[in]	ffd			Feedforward amount, in [-1, 1]
+	/// \param[in]	fbk			Feedback amount, in (-1, 1)
 	Comb(float maxDelay, float delay, const Tp& ffd, const Tp& fbk);
 
 	

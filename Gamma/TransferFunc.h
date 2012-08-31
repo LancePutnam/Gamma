@@ -19,7 +19,7 @@ class TransferFunc {
 public:
 	typedef std::complex<double> Complex;
 
-	/// @param[in] gain		overall filter gain
+	/// \param[in] gain		overall filter gain
 	TransferFunc(double gain=1): mGain(gain){}
 
 	/// Add feedforward sample delay

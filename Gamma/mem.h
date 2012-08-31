@@ -47,10 +47,10 @@ void copyFromRing(const T * ring, uint32_t ringSize, uint32_t ringTap, T * dst, 
 
 /// Copies all elements from a ring buffer.
 
-/// @param[in] ring			pointer to source ring buffer
-/// @param[in] ringSize		number of elements in source ring
-/// @param[in] ringTap		ring location to start copy from, usually location of oldest element
-/// @param[in] dst			destination array (size must at least match ring size)
+/// \param[in] ring			pointer to source ring buffer
+/// \param[in] ringSize		number of elements in source ring
+/// \param[in] ringTap		ring location to start copy from, usually location of oldest element
+/// \param[in] dst			destination array (size must at least match ring size)
 template <class T>
 void copyAllFromRing(const T * ring, uint32_t ringSize, uint32_t ringTap, T * dst);
 
@@ -125,10 +125,10 @@ void interleave2(T * dst, const T * src, uint32_t numFrames);
 
 /// Keeps every Nth element; the rest are zeroed.
 
-/// @param[in]	arr		Array to operate on.
-/// @param[in]	len		Number of elements in array.
-/// @param[in]	stride	Spacing between kept elements.
-/// @param[in]	offset	Offset of spacing from start of array.
+/// \param[in]	arr		Array to operate on.
+/// \param[in]	len		Number of elements in array.
+/// \param[in]	stride	Spacing between kept elements.
+/// \param[in]	offset	Offset of spacing from start of array.
 template <class T>
 void keep(T * arr, uint32_t len, uint32_t stride, uint32_t offset=0);
 

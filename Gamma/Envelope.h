@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-/// @defgroup Envelopes
+/// \defgroup Envelopes
 /// Everything in Gamma having to do with envelopes.
 
 
@@ -41,13 +41,13 @@ class Curve{
 public:
 	Curve();
 	
-	/// @param[in] length	length of curve in samples
-	/// @param[in] curve	curvature, c, where 
+	/// \param[in] length	length of curve in samples
+	/// \param[in] curve	curvature, c, where 
 	///						c > 0 approaches slowly (accelerates),
 	///						c < 0 approaches rapidly (decelerates), and
 	///						c = 0 approaches linearly
-	/// @param[in] start	start value
-	/// @param[in] end		end value
+	/// \param[in] start	start value
+	/// \param[in] end		end value
 	Curve(Tp length, Tp curve, Tv start=Tv(1), Tv end=Tv(0));
 
 	bool done() const;				///< Returns whether curve has gone past end value
@@ -60,10 +60,10 @@ public:
 
 	/// Set length and curvature
 	
-	/// @param[in] length	length of curve in samples
-	/// @param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
-	/// @param[in] start	start value
-	/// @param[in] end		end value
+	/// \param[in] length	length of curve in samples
+	/// \param[in] curve	curvature; pos. approaches slowly, neg. approaches rapidly, 0 approaches linearly
+	/// \param[in] start	start value
+	/// \param[in] end		end value
 	Curve& set(Tp length, Tp curve, Tv start=Tv(0), Tv end=Tv(1));
 
 protected:
@@ -238,8 +238,8 @@ public:
 	
 	/// Set total length of envelope by adjusting one segment length
 	
-	/// @param[in] length		desired length
-	/// @param[in] modSegment	segment whose length is modified to match desired length
+	/// \param[in] length		desired length
+	/// \param[in] modSegment	segment whose length is modified to match desired length
 	Env& totalLength(Tp length, int modSegment){
 		mLengths[modSegment] = Tp(0);
 		mLengths[modSegment] = length - totalLength();
@@ -357,10 +357,10 @@ class AD : public Env<2,Tv,Tp,Ts>{
 public:
 	using Env<2,Tv,Tp,Ts>::release;
 
-	/// @param[in] att	Attack length
-	/// @param[in] dec	Decay length
-	/// @param[in] amp	Amplitude
-	/// @param[in] crv	Curvature of all segments
+	/// \param[in] att	Attack length
+	/// \param[in] dec	Decay length
+	/// \param[in] amp	Amplitude
+	/// \param[in] crv	Curvature of all segments
 	AD(Tp att =Tp(0.01), Tp dec =Tp(0.1), Tv amp = Tv(1), Tp crv =Tp(-4))
 	{
 		attack(att).decay(dec);
@@ -404,12 +404,12 @@ class ADSR : public Env<3,Tv,Tp,Ts>{
 public:
 	using Env<3,Tv,Tp,Ts>::release;
 
-	/// @param[in] att	Attack length
-	/// @param[in] dec	Decay length
-	/// @param[in] sus	Sustain level (as factor of amplitude)
-	/// @param[in] rel	Release length
-	/// @param[in] amp	Amplitude
-	/// @param[in] crv	Curvature of all segments
+	/// \param[in] att	Attack length
+	/// \param[in] dec	Decay length
+	/// \param[in] sus	Sustain level (as factor of amplitude)
+	/// \param[in] rel	Release length
+	/// \param[in] amp	Amplitude
+	/// \param[in] crv	Curvature of all segments
 	ADSR(
 		Tp att =Tp(0.01), Tp dec =Tp(0.1), Tv sus =Tv(0.7), Tp rel =Tp(1.),
 		Tv amp =Tv( 1),
@@ -461,8 +461,8 @@ template <class T=real, class Ts=Synced>
 class Decay : public Ts{
 public:
 
-	/// @param[in] decay	Number of units until initial value decays -60 dB
-	/// @param[in] val		Intial value
+	/// \param[in] decay	Number of units until initial value decays -60 dB
+	/// \param[in] val		Intial value
 	Decay(T decay=T(1), T val=T(1));
 
 	T decay() const;		///< Returns -60 dB decay length
@@ -484,12 +484,14 @@ protected:
 
 
 /// Binary gate controlled by threshold comparison. The gate closes if the (norm of the) input value remains below threshold for at least closingDelay units of time (typically seconds).
+    
+/// \ingroup Envelopes
 template <class T=real, class Ts=Synced>
 class Gate : public Ts{
 public:
 
-	/// @param[in] closingDelay		units to wait before closing while under threshold
-	/// @param[in] threshold		threshold below which gate closes
+	/// \param[in] closingDelay		units to wait before closing while under threshold
+	/// \param[in] threshold		threshold below which gate closes
 	Gate(double closingDelay=0, double threshold=0.001)
 	:	mDelay(closingDelay), mRemain(closingDelay), mThresh(threshold), mClosed(0)
 	{}
@@ -523,6 +525,8 @@ protected:
 
 
 /// Interpolation envelope segment
+    
+/// \ingroup Envelopes
 template <
 	class Tv=real,
 	template <class> class Si=iplSeq::Linear,
@@ -532,10 +536,10 @@ template <
 class Seg : public Ts{
 public:
 
-	/// @param[in] len		Length of segment in domain units
-	/// @param[in] start	Start value
-	/// @param[in] end		End value
-	/// @param[in] phase	Start phase along segment, in [0,1)
+	/// \param[in] len		Length of segment in domain units
+	/// \param[in] start	Start value
+	/// \param[in] end		End value
+	/// \param[in] phase	Start phase along segment, in [0,1)
 	Seg(Tp len=0.5, Tv start=1, Tv end=0, Tp phase=0):
 		mFreq((Tp)1/len), mAcc(0, phase), mIpl(start)
 	{
@@ -603,14 +607,16 @@ protected:
 
 
 /// Exponential envelope segment for smoothing out value changes.
+    
+/// \ingroup Envelopes
 template <class T=gam::real, class Ts=Synced>
 class SegExp : public Ts{
 public:
 
-	/// @param[in] len		Length of segment in domain units
-	/// @param[in] crv		Curvature of segment
-	/// @param[in] start	Start value
-	/// @param[in] end		End value
+	/// \param[in] len		Length of segment in domain units
+	/// \param[in] crv		Curvature of segment
+	/// \param[in] start	Start value
+	/// \param[in] end		End value
 	SegExp(T len, T crv=-3, T start=1, T end=0):
 		mLen(len), mCrv(crv), mVal1(start), mVal0(end)
 	{

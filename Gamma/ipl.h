@@ -41,9 +41,9 @@ Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 
 /// Computes FIR coefficients for Waring-Lagrange interpolation.
 
-/// @param[in] h		FIR coefficients; should be of size ('order' + 1).
-///	@param[in] delay	Fractional delay in samples
-///	@param[in] order	As order increases, this converges to sinc interpolation
+/// \param[in] h		FIR coefficients; should be of size ('order' + 1).
+///	\param[in] delay	Fractional delay in samples
+///	\param[in] order	As order increases, this converges to sinc interpolation
 template <class T> void lagrange(T * h, T delay, uint32_t order);
 
 /// Optimized lagrange() for first order.

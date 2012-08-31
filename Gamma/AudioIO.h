@@ -8,7 +8,7 @@
 	Classes for performing audio input/output streaming
 */
 
-/// @defgroup io Audio I/O
+/// \defgroup io Audio I/O
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@ typedef void (* audioCallback)(AudioIOData& io);
 
 /// Audio device abstraction  
     
-/// @ingroup io     
+/// \ingroup io     
 class AudioDevice{
 public:
 
@@ -34,11 +34,11 @@ public:
 	};
 
 
-	/// @param[in] deviceNum	Device enumeration number
+	/// \param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum);
 	
-	/// @param[in] nameKeyword	Keyword to search for in device name
-	/// @param[in] stream		Whether to search for input and/or output devices
+	/// \param[in] nameKeyword	Keyword to search for in device name
+	/// \param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
 	~AudioDevice();
@@ -78,7 +78,7 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 /// Audio buffers are guaranteed to be stored in a contiguous non-interleaved 
 /// format, i.e., frames are tightly packed per channel.
     
-/// @ingroup io     
+/// \ingroup io     
 class AudioIOData {
 public:
 	/// Constructor
@@ -174,7 +174,7 @@ public:
 
 /// Interface for objects which can be registered with an audio IO stream
     
-/// @ingroup io 
+/// \ingroup io 
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}
@@ -188,12 +188,12 @@ public:
 
 	/// Creates AudioIO using default I/O devices.
 
-	/// @param[in] framesPerBuf		Number of sample frames to process per callback
-	/// @param[in] framesPerSec		Frame rate.  Unsupported values will use default rate of device.
-	/// @param[in] callback			Audio processing callback (optional)
-	/// @param[in] userData			Pointer to user data accessible within callback (optional)
-	/// @param[in] outChans			Number of output channels to open
-	/// @param[in] inChans			Number of input channels to open
+	/// \param[in] framesPerBuf		Number of sample frames to process per callback
+	/// \param[in] framesPerSec		Frame rate.  Unsupported values will use default rate of device.
+	/// \param[in] callback			Audio processing callback (optional)
+	/// \param[in] userData			Pointer to user data accessible within callback (optional)
+	/// \param[in] outChans			Number of output channels to open
+	/// \param[in] inChans			Number of input channels to open
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
 	AudioIO(
