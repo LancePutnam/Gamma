@@ -336,9 +336,13 @@ namespace iplSeq{
 //	bool done(uint32_t pos);							// fixed-point tap done reading
 //	T operator()(T v, T max, T min);					// float tap post increment check
 //	void reset();										// reset internal state, if any
+    
+/// \defgroup phsInc Phase Increment
 namespace phsInc{
 
 	/// Play waveform one cycle, then hold at the end. A one-shot.
+    
+    /// \ingroup phsInc
 	struct Clip{
 		void reset(){}
 	
@@ -360,6 +364,8 @@ namespace phsInc{
 
 
 	/// Play waveform forward, backwards, forward, etc.  Like Wrap, loops indefinitely.
+    
+    /// \ingroup phsInc
 	struct Fold{
 		Fold(): dir(0){}
 	
@@ -388,6 +394,8 @@ namespace phsInc{
 
 
 	/// Plays and holds waveform according to binary repeating pattern.
+    
+    /// \ingroup phsInc
 	struct Pat{
 	
 		Pat(){
@@ -438,6 +446,8 @@ namespace phsInc{
 
 
 	/// Repeat waveform a fixed number of times, then hold at the end.
+    
+    /// \ingroup phsInc
 	struct Rep{
 		Rep(){ number(1); reset(); }
 		
@@ -474,6 +484,8 @@ namespace phsInc{
 
 
 	/// Loop waveform indefinitely.
+            
+    /// \ingroup phsInc        
 	struct Wrap{
 		void reset(){}
 	
