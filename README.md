@@ -66,10 +66,5 @@ Make sure to pass in the following flags to the compiler:
 
 2.3 Dependencies
 ----------------------------------------
-Gamma depends on PortAudio v19 and libsndfile for performing audio and sound file i/o, respectively.
-
-They are only required if using certain Gamma functionality:
-
-	PortAudio is required ONLY if you are using AudioIO (AudioIO.h).
-	libsndfile is required ONLY for SoundFile i/o and playback (SoundFile.h, Player.h).
+Gamma depends on PortAudio v19 and libsndfile for performing audio and sound file i/o, respectively. They are required only if using certain Gamma classes. PortAudio is required ONLY if you are using AudioIO (AudioIO.h). libsndfile is required ONLY for SoundFile i/o and playback (SoundFile.h, Player.h).
 
