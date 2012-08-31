@@ -296,9 +296,9 @@ template<class T> void mix2(T& io1, T& io2, T mix);
 
 /// Returns nearest "note" within a pitch class set
 
-/// @param[in] v			the value to match
-/// @param[in] intervals	sequence of base-36 intervals 
-/// @param[in] mod			modulo amount
+/// \param[in] v			the value to match
+/// \param[in] intervals	sequence of base-36 intervals 
+/// \param[in] mod			modulo amount
 ///
 /// The sum of the values in the interval array should be equal to 'mod'.
 template<class T>
@@ -316,9 +316,9 @@ inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups);
 
 /// Returns equal temperament ratio- octave^(pitch/divs)
 
-/// @param[in] pitch	pitch class
-/// @param[in] divs		number of equally tempered divisions in octave
-/// @param[in] octave	base multiplier of (pseudo) octave
+/// \param[in] pitch	pitch class
+/// \param[in] divs		number of equally tempered divisions in octave
+/// \param[in] octave	base multiplier of (pseudo) octave
 template<class T> T ratioET(T pitch, T divs=12, T octave=2);
 
 /// Returns floating point value rounded to nearest integer.
@@ -345,24 +345,24 @@ template<class T> T sinFast(T radians);
 /// 7th order minimax polynomial approximation to sin(pi x).
 
 /// Error is spread evenly across domain.
-/// @param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
+/// \param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
 template<class T> T sinP7(T normal);
 
 /// 9th order minimax polynomial approximation to sin(pi x).
 
 /// Error is spread evenly across domain.
-/// @param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
+/// \param[in] normal	phase, in [-1, 1] (corresponding to [-pi, pi] radians)
 template<class T> T sinP9(T normal);
 
 /// 7th order Taylor series approximation to a sine.
 
-/// @param[in] radians	phase, in [-pi, pi]
+/// \param[in] radians	phase, in [-pi, pi]
 ///
 template<class T> T sinT7(T radians);
 
 /// 9th order Taylor series approximation to a sine.
 
-/// @param[in] radians	phase, in [-pi, pi]
+/// \param[in] radians	phase, in [-pi, pi]
 ///
 template<class T> T sinT9(T radians);
 

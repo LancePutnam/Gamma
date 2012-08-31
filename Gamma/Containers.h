@@ -64,19 +64,19 @@ public:
 
 	/// Constructor that allocates memory, but does not initialize elements
 
-	/// @param[in] size		number of elements to allocate
+	/// \param[in] size		number of elements to allocate
 	///
 	explicit ArrayBase(uint32_t size);
 
-	/// @param[in] size		number of elements to allocate
-	/// @param[in] init		value to initialize all elements to
+	/// \param[in] size		number of elements to allocate
+	/// \param[in] init		value to initialize all elements to
 	ArrayBase(uint32_t size, const T& init);
 
-	/// @param[in] src		external array to reference
-	/// @param[in] size		size of external array
+	/// \param[in] src		external array to reference
+	/// \param[in] size		size of external array
 	ArrayBase(T * src, uint32_t size);
 
-	/// @param[in] src		external array to reference
+	/// \param[in] src		external array to reference
 	explicit ArrayBase(ArrayBase<T,S,A>& src);
 
 	virtual ~ArrayBase();
@@ -97,10 +97,10 @@ public:
 
 	/// Sets linear slice of elements to value
 	
-	/// @param[in] v		value to be copied as new content
-	/// @param[in] end		end index (exclusive)
-	/// @param[in] stride	index stride amount
-	/// @param[in] start	start index (inclusive)
+	/// \param[in] v		value to be copied as new content
+	/// \param[in] end		end index (exclusive)
+	/// \param[in] stride	index stride amount
+	/// \param[in] start	start index (inclusive)
 	ArrayBase& assign(const T& v, uint32_t end, uint32_t stride=1, uint32_t start=0);
 
 
@@ -221,8 +221,8 @@ public:
 
 	typedef Array<T,A> Base; using Base::elems; using Base::size;
 
-	/// @param[in]	size		Number of elements in ring.
-	/// @param[in]	value		Initial value of all elements.
+	/// \param[in]	size		Number of elements in ring.
+	/// \param[in]	value		Initial value of all elements.
 	explicit Ring(uint32_t size=0, const T& value=T());
 
 	/// Returns reference to backmost (oldest) element
@@ -268,8 +268,8 @@ class RingFill : public Ring<T,A> {
 public:
 	typedef Ring<T,A> Base;
 	
-	/// @param[in]	size		Number of elements in ring
-	/// @param[in]	value		Initial value of all elements
+	/// \param[in]	size		Number of elements in ring
+	/// \param[in]	value		Initial value of all elements
 	explicit RingFill(uint32_t size=0, const T& value=T())
 	:	Base(size, value), mFill(0)
 	{}
@@ -305,8 +305,8 @@ protected:
 template <class T, class A=gam::Allocator<T> >
 class DoubleRing : public Ring<T,A>{
 public:
-	/// @param[in]	size		Number of elements in ring.
-	/// @param[in]	value		Initial value of all elements.
+	/// \param[in]	size		Number of elements in ring.
+	/// \param[in]	value		Initial value of all elements.
 	explicit DoubleRing(uint32_t size=0, const T& value=T())
 	:	Ring<T>(size, value), mRead(size)
 	{}
@@ -347,8 +347,8 @@ template <class T, class A=gam::Allocator<T> >
 struct DelayN: public Ring<T,A>{
 	using Ring<T,A>::incPos; using Ring<T,A>::pos;
 
-	/// @param[in]	size		Delay size, greater than 0
-	/// @param[in]	value		Initial value of all elements
+	/// \param[in]	size		Delay size, greater than 0
+	/// \param[in]	value		Initial value of all elements
 	explicit DelayN(uint32_t size, const T& value=T())
 	:	Ring<T,A>(size, value)
 	{}

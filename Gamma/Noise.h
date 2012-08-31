@@ -22,11 +22,11 @@ template <class RNG = RNGLinCon>
 class NoiseBrown{
 public:
 
-	/// @param[in] val		start value
-	/// @param[in] step		accumulation step factor
-	/// @param[in] min		minimum of clipping interval
-	/// @param[in] max		maximum of clipping interval
-	/// @param[in] seed		random number generator seed; 0 generates a random seed
+	/// \param[in] val		start value
+	/// \param[in] step		accumulation step factor
+	/// \param[in] min		minimum of clipping interval
+	/// \param[in] max		maximum of clipping interval
+	/// \param[in] seed		random number generator seed; 0 generates a random seed
 	NoiseBrown(float val=0, float step=0.04, float min=-1, float max=1, uint32_t seed=0) 
 	:	val(val), step(step), min(min), max(max)
 	{	if(seed) rng = seed; }
@@ -55,7 +55,7 @@ class NoisePink{
 public:
 	NoisePink();
 
-	/// @param[in] seed		random number generator seed
+	/// \param[in] seed		random number generator seed
 	NoisePink(uint32_t seed);
 	
 	/// Generate next value
@@ -84,7 +84,7 @@ class NoiseWhite{
 public:
 	NoiseWhite(): rng(){}
 	
-	/// @param[in] seed		random number generator seed
+	/// \param[in] seed		random number generator seed
 	NoiseWhite(uint32_t seed) : rng(seed){}
 
 	/// Generate next value

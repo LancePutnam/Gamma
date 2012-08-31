@@ -48,7 +48,7 @@ struct RNGLinCon : public gen::RMulAdd<uint32_t>{
 
 	RNGLinCon(){ val=rnd::getSeed(); type(0); }
 
-	/// @param[in] seed	Initial seed value
+	/// \param[in] seed	Initial seed value
 	RNGLinCon(uint32_t seed): gen::RMulAdd<uint32_t>(1,0,seed){ type(0); }
 
 	/// Change the type of equation used.
@@ -73,7 +73,7 @@ struct RNGMulLinCon : public gen::RMul<uint32_t>{
 
 	RNGMulLinCon(){ val=rnd::getSeed(); type(0); }
 	
-	/// @param[in] seed	Initial seed value
+	/// \param[in] seed	Initial seed value
 	RNGMulLinCon(uint32_t seed): gen::RMul<uint32_t>(1,seed){ type(0); }
 	
 	/// Change the type of equation used.
@@ -101,7 +101,7 @@ class RNGTaus{
 public:
 	RNGTaus(){ (*this) = rnd::getSeed(); }
 
-	/// @param[in] seed		Initial seed value
+	/// \param[in] seed		Initial seed value
 	RNGTaus(uint32_t seed);
 	
 	uint32_t s1, s2, s3, s4;

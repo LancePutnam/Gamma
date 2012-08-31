@@ -21,7 +21,7 @@ namespace gam{
 template <class Tv=real, class Tp=real, class Ts=Synced>
 struct EnvFollow{
 
-	/// @param[in] freq		Cutoff frequency of smoothing filter
+	/// \param[in] freq		Cutoff frequency of smoothing filter
     
     
 	EnvFollow(Tp freq=10)
@@ -89,9 +89,9 @@ struct Burst{
 /// Sine wave with frequency and amplitude driven by an exponentially decaying envelope.
 template <class T=gam::real>
 struct Chirp{
-	/// @param[in] freq1	start frequency
-	/// @param[in] freq2	end frequency
-	/// @param[in] decay60	units to decay by 60 dB
+	/// \param[in] freq1	start frequency
+	/// \param[in] freq2	end frequency
+	/// \param[in] decay60	units to decay by 60 dB
 	Chirp(T freq1=220, T freq2=0, T decay=0.2):
 		osc(freq1), env(decay), freq1(freq1), freq2(freq2)
 	{}
@@ -182,11 +182,11 @@ struct ChebyN{
 /// \ingroup Effects
 template <class T=gam::real>
 struct Chorus{
-	/// @param[in] delay	Delay interval
-	/// @param[in] depth	Depth of delay-line modulation
-	/// @param[in] freq		Frequency of modulation
-	/// @param[in] ffd		Feedforward amount
-	/// @param[in] fbk		Feedback amount
+	/// \param[in] delay	Delay interval
+	/// \param[in] depth	Depth of delay-line modulation
+	/// \param[in] freq		Frequency of modulation
+	/// \param[in] ffd		Feedforward amount
+	/// \param[in] fbk		Feedback amount
 	Chorus(float delay=0.0021, float depth=0.002, float freq=1, float ffd=0.9, float fbk=0.1):
 		comb1(delay + depth, delay, ffd, fbk),
 		comb2(delay + depth, delay, ffd, fbk),
@@ -239,7 +239,7 @@ struct Chorus{
 template <class T=gam::real>
 struct FreqShift{
 
-	/// @param[in] shift	frequency shift amount
+	/// \param[in] shift	frequency shift amount
 	FreqShift(float shift=1): mod(shift){}
 
 	/// Frequency shift input
@@ -292,7 +292,7 @@ template <class T=gam::real>
 class Pan{
 public:
 
-	/// @param[in] pos	Signed unit position in [-1, 1]
+	/// \param[in] pos	Signed unit position in [-1, 1]
 	Pan(T pos=0){ this->pos(pos); }
 
 	/// Filter sample (mono-to-stereo)
@@ -371,8 +371,8 @@ struct Pluck{
 template <class T=gam::real>
 class Quantizer : public Synced{
 public:
-	/// @param[in] freq		Frequency of sequence quantization
-	/// @param[in] step		Step size of amplitude quantization
+	/// \param[in] freq		Frequency of sequence quantization
+	/// \param[in] step		Step size of amplitude quantization
 	Quantizer(double freq=2000, T step=0);
 
 	void freq(double value);	///< Set freqency of sequence quantization
@@ -437,8 +437,8 @@ void Quantizer<T>::onResync(double r){
 /// a one-pole low-pass filter.
 template <class T=gam::real>
 struct Threshold{
-	/// @param[in] thresh	Comparing threshold
-	/// @param[in] freq		Cutoff frequency of output smoother
+	/// \param[in] thresh	Comparing threshold
+	/// \param[in] freq		Cutoff frequency of output smoother
 	Threshold(T thresh, T freq=10):lpf(freq), thresh(thresh){}
 	
 	/// Returns 0 if less than threshold, 1 otherwise

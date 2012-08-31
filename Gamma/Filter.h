@@ -66,7 +66,7 @@ template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass1 : public Ts {
 public:
 	///
-	/// @param[in]	frq		Center frequency
+	/// \param[in]	frq		Center frequency
 	AllPass1(Tp frq=1000);
 
 	void freq (Tp v);		///< Set cutoff frequency
@@ -108,9 +108,9 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Biquad : public Ts{
 public:
 
-	/// @param[in]	frq		Center frequency
-	/// @param[in]	res		Resonance amount in [1, inf)
-	/// @param[in]	type	Type of filter
+	/// \param[in]	frq		Center frequency
+	/// \param[in]	res		Resonance amount in [1, inf)
+	/// \param[in]	type	Type of filter
 	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
 
 	/// Set input (a) and output (b) coefficients directly
@@ -154,7 +154,7 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class BlockDC : public Ts{
 public:
 
-	/// @param[in] width	Bandwidth of pole
+	/// \param[in] width	Bandwidth of pole
 	BlockDC(Tp width=35): d1(0), mWidth(width){ Ts::initSynced(); }
 
 	/// Filter sample
@@ -187,7 +187,7 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class BlockNyq : public BlockDC<Tv,Tp,Ts>{
 public:
 
-	/// @param[in] width	Bandwidth of pole
+	/// \param[in] width	Bandwidth of pole
 	BlockNyq(Tp width=35): Base(width){}
 
 	/// Filter sample
@@ -277,8 +277,8 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class AllPass2 : public Filter2<Tv,Tp,Ts>{
 public:
 
-	/// @param[in] frq	Center frequency
-	/// @param[in] wid	Bandwidth
+	/// \param[in] frq	Center frequency
+	/// \param[in] wid	Bandwidth
 	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Filter sample
@@ -305,8 +305,8 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Notch : public Filter2<Tv,Tp,Ts>{
 public:
 	
-	/// @param[in] frq	Center frequency
-	/// @param[in] wid	Bandwidth
+	/// \param[in] frq	Center frequency
+	/// \param[in] wid	Bandwidth
 	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Set center frequency
@@ -344,8 +344,8 @@ template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
 class Reson : public Filter2<Tv,Tp,Ts>{
 public:
 
-	/// @param[in] frq	Center frequency
-	/// @param[in] wid	Bandwidth	
+	/// \param[in] frq	Center frequency
+	/// \param[in] wid	Bandwidth	
 	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
 
 	/// Set center frequency
@@ -420,8 +420,8 @@ template <class Tv=double, class Tp=double>
 class Integrator{
 public:
 
-	/// @param[in] leakCoef		Leak coefficient, in [0,1)
-	/// @param[in] v			Initial value
+	/// \param[in] leakCoef		Leak coefficient, in [0,1)
+	/// \param[in] v			Initial value
 	Integrator(const Tp& leakCoef=Tp(1), const Tv& v=Tv(0)){
 		mo[0]=v;
 		leak(leakCoef);
@@ -452,7 +452,7 @@ template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
 
-	/// @param[in] size		Kernel size, greater than 1
+	/// \param[in] size		Kernel size, greater than 1
 	explicit MovingAvg(uint32_t size)
 	:	Base(size), mSum(0), mRSize(0)
 	{	onResize(); }
@@ -491,8 +491,8 @@ class OnePole : public Ts{
 public:
 	OnePole();
 
-	/// @param[in]	freq	Smoothing frequency
-	/// @param[in]	stored	Initial stored value
+	/// \param[in]	freq	Smoothing frequency
+	/// \param[in]	stored	Initial stored value
 	OnePole(Tp freq, const Tv& stored=0);
 
 	const Tp& freq() const { return mFreq; }	///< Get cutoff frequency

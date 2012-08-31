@@ -370,9 +370,9 @@ public:
 
 	/// Record output to sound file in non-real-time
 	
-	/// @param[in] io				audio i/o data (buffers, sample rate, block size, etc.)
-	/// @param[in] soundFilePath	path to sound file
-	/// @param[in] durSec			duration, in seconds, of recording
+	/// \param[in] io				audio i/o data (buffers, sample rate, block size, etc.)
+	/// \param[in] soundFilePath	path to sound file
+	/// \param[in] durSec			duration, in seconds, of recording
 	void recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durSec);
 
 
