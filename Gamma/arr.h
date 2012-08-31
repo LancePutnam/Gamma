@@ -77,12 +77,12 @@ void clip1(float * arr, uint32_t len, uint32_t str=1);
 
 /// Finds elements that are within a threshold of their nearest neighbors.
 
-/// @param[in]  src			Source array of elements
-/// @param[in]  indices		Index array used for iterating the source array.
-/// @param[out] indices		Cluster indices.
-/// @param[in]  numIndices	Number of source indices.
-/// @param[out] numIndices	Number of cluster indices.
-/// @param[in]  threshold	Magnitude threshold of cluster.
+/// \param[in]  src			Source array of elements
+/// \param[in]  indices		Index array used for iterating the source array.
+/// \param[out] indices		Cluster indices.
+/// \param[in]  numIndices	Number of source indices.
+/// \param[out] numIndices	Number of cluster indices.
+/// \param[in]  threshold	Magnitude threshold of cluster.
 template <class T>
 void cluster(const T * src, uint32_t * indices, uint32_t& numIndices, T threshold);
 

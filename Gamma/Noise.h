@@ -7,7 +7,7 @@
 #include "Gamma/rnd.h"
 #include "Gamma/scl.h"
 
-///@defgroup Noise
+///\defgroup Noise
 
 namespace gam{
 
@@ -17,16 +17,16 @@ namespace gam{
 /// Brownian noise has a power spectrum of 1/f^2.
 /// It is produced by integrating white (uniform) noise.
 /// The output value is clipped within a specified interval.
-/// @ingroup Noise
+/// \ingroup Noise
 template <class RNG = RNGLinCon>
 class NoiseBrown{
 public:
 
-	/// @param[in] val		start value
-	/// @param[in] step		accumulation step factor
-	/// @param[in] min		minimum of clipping interval
-	/// @param[in] max		maximum of clipping interval
-	/// @param[in] seed		random number generator seed; 0 generates a random seed
+	/// \param[in] val		start value
+	/// \param[in] step		accumulation step factor
+	/// \param[in] min		minimum of clipping interval
+	/// \param[in] max		maximum of clipping interval
+	/// \param[in] seed		random number generator seed; 0 generates a random seed
 	NoiseBrown(float val=0, float step=0.04, float min=-1, float max=1, uint32_t seed=0) 
 	:	val(val), step(step), min(min), max(max)
 	{	if(seed) rng = seed; }
@@ -49,13 +49,13 @@ public:
 
 /// Pink noise has a power spectrum of 1/f. In this implementation, it is
 /// produced by summing together 12 octaves of downsampled white noise.
-/// @ingroup Noise
+/// \ingroup Noise
 template <class RNG = RNGLinCon>
 class NoisePink{
 public:
 	NoisePink();
 
-	/// @param[in] seed		random number generator seed
+	/// \param[in] seed		random number generator seed
 	NoisePink(uint32_t seed);
 	
 	/// Generate next value
@@ -80,11 +80,11 @@ private:
 ///
 template <class RNG = RNGLinCon>
 class NoiseWhite{
-/// @ingroup Noise
+/// \ingroup Noise
 public:
 	NoiseWhite(): rng(){}
 	
-	/// @param[in] seed		random number generator seed
+	/// \param[in] seed		random number generator seed
 	NoiseWhite(uint32_t seed) : rng(seed){}
 
 	/// Generate next value

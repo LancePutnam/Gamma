@@ -40,8 +40,8 @@ public:
 	{}
 
 
-	/// @param[in] src		Another SamplePlayer to read data from
-	/// @param[in] rate		Playback rate
+	/// \param[in] src		Another SamplePlayer to read data from
+	/// \param[in] rate		Playback rate
 	explicit SamplePlayer(SamplePlayer<T>& src, double rate=1)
 	:	Array<T>(src), 
 		mPos(0), mInc(1), 
@@ -50,9 +50,9 @@ public:
 	{ initSynced(); }
 
 
-	/// @param[in] src		Sample array to reference
-	/// @param[in] smpRate	Sample rate of samples
-	/// @param[in] rate		Playback rate
+	/// \param[in] src		Sample array to reference
+	/// \param[in] smpRate	Sample rate of samples
+	/// \param[in] rate		Playback rate
 	SamplePlayer(Array<T>& src, double smpRate, double rate=1)
 	:	Array<T>(src),
 		mPos(0), mInc(1),
@@ -64,8 +64,8 @@ public:
 	}
 
 
-	/// @param[in] pathToSoundFile		Path to sound file
-	/// @param[in] rate					Playback rate
+	/// \param[in] pathToSoundFile		Path to sound file
+	/// \param[in] rate					Playback rate
 	template<class Char>
 	explicit SamplePlayer(const Char * pathToSoundFile, double rate=1);
 
@@ -93,9 +93,9 @@ public:
 
 	/// Set sample buffer
 	
-	/// @param[in] src		Sample buffer (if multichannel, must be deinterleaved)
-	/// @param[in] smpRate	Sample rate of samples
-	/// @param[in] channels	Number of channels in sample buffer
+	/// \param[in] src		Sample buffer (if multichannel, must be deinterleaved)
+	/// \param[in] smpRate	Sample rate of samples
+	/// \param[in] channels	Number of channels in sample buffer
 	void buffer(Array<T>& src, double smpRate, int channels);
 
 	void free();							///< Free sample buffer (if owner)

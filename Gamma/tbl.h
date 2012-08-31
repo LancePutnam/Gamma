@@ -56,20 +56,20 @@ inline static const char * toString(gam::WindowType v){
 
 /// Add sine wave to array
 
-/// @param[out] dst		destination array
-/// @param[in] len		length of array
-/// @param[in] cycles	number of cycles of sine wave, must be integer for periodic waves
-/// @param[in] amp		amplitude of sine wave
-/// @param[in] phs		phase of sine wave, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] len		length of array
+/// \param[in] cycles	number of cycles of sine wave, must be integer for periodic waves
+/// \param[in] amp		amplitude of sine wave
+/// \param[in] phs		phase of sine wave, in [0,1]
 template <class T>
 void addSine(T * dst, uint32_t len, double cycles=1, double amp=1, double phs=0);
 
 /// Add sine wave to array
 
-/// @param[out] dst		destination array
-/// @param[in] cycles	number of cycles of sine wave, must be integer for periodic waves
-/// @param[in] amp		amplitude of sine wave
-/// @param[in] phs		phase of sine wave, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] cycles	number of cycles of sine wave, must be integer for periodic waves
+/// \param[in] amp		amplitude of sine wave
+/// \param[in] phs		phase of sine wave, in [0,1]
 template <class T, class Alloc, template<class,class> class ArrayType>
 void inline addSine(
 	ArrayType<T,Alloc>& dst,
@@ -81,13 +81,13 @@ void inline addSine(
 
 /// Add harmonic series to array with specified amplitudes
 
-/// @param[out] dst		destination array
-/// @param[in] len		length of destination array
-/// @param[in] amps		amplitudes of harmonic series, size must be numh
-/// @param[in] numh		total number of harmonics
-/// @param[in] hmul		harmonic number multiplication factor
-/// @param[in] hshf		harmonic number shift amount
-/// @param[in] hphs		phase of sine wave, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] len		length of destination array
+/// \param[in] amps		amplitudes of harmonic series, size must be numh
+/// \param[in] numh		total number of harmonics
+/// \param[in] hmul		harmonic number multiplication factor
+/// \param[in] hshf		harmonic number shift amount
+/// \param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class A>
 void inline addSines(
 	T * dst, uint32_t len, const A * amps, int numh,
@@ -100,12 +100,12 @@ void inline addSines(
 
 /// Add harmonic series to array with specified amplitudes
 
-/// @param[out] dst		destination array
-/// @param[in] amps		amplitudes of harmonic series, size must be numh
-/// @param[in] numh		total number of harmonics
-/// @param[in] hmul		harmonic number multiplication factor
-/// @param[in] hshf		harmonic number shift amount
-/// @param[in] hphs		phase of sine wave, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] amps		amplitudes of harmonic series, size must be numh
+/// \param[in] numh		total number of harmonics
+/// \param[in] hmul		harmonic number multiplication factor
+/// \param[in] hshf		harmonic number shift amount
+/// \param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class Alloc, template<class,class> class ArrayType, class A>
 void inline addSines(
 	ArrayType<T,Alloc>& dst, const A * amps, int numh,
@@ -117,12 +117,12 @@ void inline addSines(
 
 /// Add harmonics to array with specified amplitudes and harmonic numbers
 
-/// @param[out] dst		destination array
-/// @param[in] len		length of destination array
-/// @param[in] amps		harmonic amplitudes of series, size must be numh
-/// @param[in] cycs		harmonic numbers of series, size must be numh
-/// @param[in] numh		total number of harmonics
-/// @param[in] hphs		phase of sine wave, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] len		length of destination array
+/// \param[in] amps		harmonic amplitudes of series, size must be numh
+/// \param[in] cycs		harmonic numbers of series, size must be numh
+/// \param[in] numh		total number of harmonics
+/// \param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class A, class C>
 void addSines(
 	T * dst, uint32_t len, const A * amps, const C * cycs, int numh, double hphs=0
@@ -132,11 +132,11 @@ void addSines(
 
 /// Add harmonics to array with specified amplitudes and harmonic numbers
 
-/// @param[out] dst		destination array
-/// @param[in] amps		harmonic amplitudes of series, size must be numh
-/// @param[in] cycs		harmonic numbers of series, size must be numh
-/// @param[in] numh		total number of harmonics
-/// @param[in] hphs		phase of sine wave, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] amps		harmonic amplitudes of series, size must be numh
+/// \param[in] cycs		harmonic numbers of series, size must be numh
+/// \param[in] numh		total number of harmonics
+/// \param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class Alloc, template<class,class> class ArrayType, class A, class C>
 void inline addSines(
 	ArrayType<T,Alloc>& dst, const A * amps, const C * cycs, int numh, double hphs=0)
@@ -148,14 +148,14 @@ void inline addSines(
 /// Add sine waves to array using inverse power law for amplitudes
 
 /// \tparam InvPower	amplitudes will be set to 1 / h^InvPower
-/// @param[out] dst		destination array
-/// @param[in] len		length of destination array
-/// @param[in] numh		total number of harmonics
-/// @param[in] hmul		harmonic number multiplication factor
-/// @param[in] hshf		harmonic number shift amount
-/// @param[in] amp		overall amplitude scaling factor
-/// @param[in] hphs		phase of (sine) harmonics, in [0,1]
-/// @param[in] wphs		phase of composite waveform, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] len		length of destination array
+/// \param[in] numh		total number of harmonics
+/// \param[in] hmul		harmonic number multiplication factor
+/// \param[in] hshf		harmonic number shift amount
+/// \param[in] amp		overall amplitude scaling factor
+/// \param[in] hphs		phase of (sine) harmonics, in [0,1]
+/// \param[in] wphs		phase of composite waveform, in [0,1]
 template <int InvPower, class T>
 void addSinesPow(
 	T * dst, uint32_t len, int numh,
@@ -165,13 +165,13 @@ void addSinesPow(
 /// Add sine waves to array using inverse power law for amplitudes
 
 /// \tparam InvPower	amplitudes will be set to 1 / h^InvPower
-/// @param[out] dst		destination array
-/// @param[in] numh		total number of harmonics
-/// @param[in] hmul		harmonic number multiplication factor
-/// @param[in] hshf		harmonic number shift amount
-/// @param[in] amp		overall amplitude scaling factor
-/// @param[in] hphs		phase of (sine) harmonics, in [0,1]
-/// @param[in] wphs		phase of composite waveform, in [0,1]
+/// \param[out] dst		destination array
+/// \param[in] numh		total number of harmonics
+/// \param[in] hmul		harmonic number multiplication factor
+/// \param[in] hshf		harmonic number shift amount
+/// \param[in] amp		overall amplitude scaling factor
+/// \param[in] hphs		phase of (sine) harmonics, in [0,1]
+/// \param[in] wphs		phase of composite waveform, in [0,1]
 template <int InvPower, class T, class Alloc, template<class,class> class ArrayType>
 inline void addSinesPow(
 	ArrayType<T,Alloc>& dst, int numh,
@@ -185,13 +185,13 @@ inline void addSinesPow(
 
 /// The produced waveforms are not normalized; the fundamental always has a 
 /// unit amplitude.
-/// @param[out] dst		destination array
-/// @param[in] len		length of destination array
-/// @param[in] type		waveform type
-/// @param[in] numh		total number of harmonics
-/// @param[in] amp		amplitude of waveform
-/// @param[in] phs		phase of waveform, in [0,1]
-/// @param[in] hshf		harmonic number shift amount
+/// \param[out] dst		destination array
+/// \param[in] len		length of destination array
+/// \param[in] type		waveform type
+/// \param[in] numh		total number of harmonics
+/// \param[in] amp		amplitude of waveform
+/// \param[in] phs		phase of waveform, in [0,1]
+/// \param[in] hshf		harmonic number shift amount
 template <class T>
 void addWave(
 	T * dst, uint32_t len, gam::WaveformType type,
@@ -202,12 +202,12 @@ void addWave(
 
 /// The produced waveforms are not normalized; the fundamental always has a 
 /// unit amplitude.
-/// @param[out] dst		destination array
-/// @param[in] type		waveform type
-/// @param[in] numh		total number of harmonics
-/// @param[in] amp		amplitude of waveform
-/// @param[in] phs		phase of waveform, in [0,1]
-/// @param[in] hshf		harmonic number shift amount
+/// \param[out] dst		destination array
+/// \param[in] type		waveform type
+/// \param[in] numh		total number of harmonics
+/// \param[in] amp		amplitude of waveform
+/// \param[in] phs		phase of waveform, in [0,1]
+/// \param[in] hshf		harmonic number shift amount
 template <class T, class Alloc, template<class,class> class ArrayType>
 void inline addWave(
 	ArrayType<T,Alloc>& dst, gam::WaveformType type,

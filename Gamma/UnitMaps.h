@@ -30,8 +30,8 @@ public:
 
 	/// Constructor that allocates an internal table
 
-	/// @param[in] size		Number of elements (actual number is power of 2 ceiling)
-	/// @param[in] init		Initial value of elements
+	/// \param[in] size		Number of elements (actual number is power of 2 ceiling)
+	/// \param[in] init		Initial value of elements
 	explicit LookupTable(uint32_t size=2048, const T& init=T(0))
 	:	Base(size, init)
 	{
@@ -106,7 +106,7 @@ public:
 
 	/// Read value using truncating interpolation
 	
-	/// @param[in] phase	phase value in [0,1)
+	/// \param[in] phase	phase value in [0,1)
 	///
 	const T& read(double phase) const {
 		return read(phaseR2I(phase));
@@ -224,11 +224,11 @@ public:
 
 	UnitMapper();
 	
-	/// @param[in] max		upper endpoint of interval
-	/// @param[in] min		lower endpoint of interval
-	/// @param[in] p1		mapping function function parameter
-	/// @param[in] type		mapping function
-	/// @param[in] clip		whether to clip values to interval
+	/// \param[in] max		upper endpoint of interval
+	/// \param[in] min		lower endpoint of interval
+	/// \param[in] p1		mapping function function parameter
+	/// \param[in] type		mapping function
+	/// \param[in] clip		whether to clip values to interval
 	UnitMapper(T max, T min=0., T p1=1., MapType type = MAP_POW, bool clip=true);
 
 

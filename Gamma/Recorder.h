@@ -13,8 +13,8 @@ namespace gam{
 class Recorder {
 public:
 
-	/// @param[in] chans	number of channels
-	/// @param[in] frames	number of (multi-)channel frames
+	/// \param[in] chans	number of channels
+	/// \param[in] frames	number of (multi-)channel frames
 	Recorder(int channels=1, int frames=8192);
 
 
@@ -56,8 +56,8 @@ public:
 
 	/// Resize buffers
 	
-	/// @param[in] chans	number of channels
-	/// @param[in] frames	number of (multi-)channel frames
+	/// \param[in] chans	number of channels
+	/// \param[in] frames	number of (multi-)channel frames
 	void resize(int chans, int frames);
 
 protected:

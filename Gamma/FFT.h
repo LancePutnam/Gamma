@@ -13,7 +13,7 @@ template <class T>
 class CFFT{
 public:
 
-	/// @param[in] size		size of complex input sequence; 
+	/// \param[in] size		size of complex input sequence; 
 	///						most efficient when a product of small primes
 	CFFT(int size=0);
 	
@@ -24,8 +24,8 @@ public:
 
 	/// Perform forward transform in-place
 	
-	/// @param[in,out] buf		input/output buffer
-	/// @param[in] normalize	whether to scale magnitudes by 1/N
+	/// \param[in,out] buf		input/output buffer
+	/// \param[in] normalize	whether to scale magnitudes by 1/N
 	void forward(T * buf, bool normalize=true);
 
 	template <template <class> class ComplexType>
@@ -56,7 +56,7 @@ template <class T>
 class RFFT{
 public:
 
-	/// @param[in] size		size of real input sequence; 
+	/// \param[in] size		size of real input sequence; 
 	///						most efficient when a product of small primes
 	RFFT(int size=0);
 	
@@ -67,20 +67,20 @@ public:
 	
 	/// Perform real-to-complex forward transform in-place
 	
-	/// @param[in,out]	buf			input is real sequence, output is complex sequence
-	/// @param[in]		complexBuf	If true, then 
+	/// \param[in,out]	buf			input is real sequence, output is complex sequence
+	/// \param[in]		complexBuf	If true, then 
 	///									input is  [ *, x0, x1, x2, ..., x(n),   *] and
 	///									output is [r0,  0, r1, i1, ..., r(n/2), 0].
 	///								If false, then 
 	///									input is  [x0, x1, x2, ..., x(n)  ] and
 	///									output is [r0, r1, i1, ..., r(n/2)].
-	/// @param[in]		normalize	whether to scale magnitudes by 1/N
+	/// \param[in]		normalize	whether to scale magnitudes by 1/N
 	void forward(T * buf, bool complexBuf=false, bool normalize=true);
 	
 	/// Perform complex-to-real inverse transform in-place
 
-	/// @param[in,out]	buf			input is complex sequence, output is real sequence
-	/// @param[in]		complexBuf	If true, then 
+	/// \param[in,out]	buf			input is complex sequence, output is real sequence
+	/// \param[in]		complexBuf	If true, then 
 	///									input is  [r0,  0, r1, i1, ..., r(n/2), 0] and
 	///									output is [ *, x0, x1, x2, ..., x(n),   *].
 	///								If false, then 

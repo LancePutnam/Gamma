@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-///@defgroup Oscillators
+///\defgroup Oscillators
 
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"
@@ -30,8 +30,8 @@ template <class Stap=tap::Wrap, class Ts=Synced>
 class Accum : public Ts {
 public:
 
-	/// @param[in] frq		Frequency
-	/// @param[in] phs		Phase in [0, 1)
+	/// \param[in] frq		Frequency
+	/// \param[in] phs		Phase in [0, 1)
 	Accum(float frq=0, float phs=0);
 
 
@@ -107,8 +107,8 @@ private:
 template <class Stap=tap::Wrap, class Ts=Synced>
 class Sweep : public Accum<Stap, Ts> {
 public:
-	/// @param[in] frq		Frequency
-	/// @param[in] phs		Phase in [0,1)
+	/// \param[in] frq		Frequency
+	/// \param[in] phs		Phase in [0,1)
 	Sweep(float frq=440, float phs=0): Base(frq, phs){}
 
 	float operator()(){ Base::cycle(); return Base::phase(); }
@@ -123,8 +123,8 @@ private: typedef Accum<Stap,Ts> Base;
 template <class Tv=gam::real, class Ts=Synced>
 class AccumPhase : public Ts{
 public:
-	/// @param[in]	frq		Frequency
-	/// @param[in]	phs		Phase in [0, 1)
+	/// \param[in]	frq		Frequency
+	/// \param[in]	phs		Phase in [0, 1)
 	AccumPhase(Tv frq=440, Tv phs=0);
 
 	
@@ -181,18 +181,18 @@ public:
 
 	/// Constructor that allocates an internal table
 
-	/// @param[in]	frq			Frequency
-	/// @param[in]	phs			Phase in [0, 1)
-	/// @param[in]	size		Size of table (actual number is power of 2 ceiling)
+	/// \param[in]	frq			Frequency
+	/// \param[in]	phs			Phase in [0, 1)
+	/// \param[in]	size		Size of table (actual number is power of 2 ceiling)
 	Osc(float frq=440, float phs=0, uint32_t size=512)
 	:	Base(frq, phs), ArrayPow2<Tv>(size, Tv())
 	{}
 
 	/// Constructor that references an external table
 
-	/// @param[in]	frq			Frequency
-	/// @param[in]	phs			Phase in [0, 1)
-	/// @param[in]	src			A table to use as a reference
+	/// \param[in]	frq			Frequency
+	/// \param[in]	phs			Phase in [0, 1)
+	/// \param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, ArrayPow2<Tv>& src)
 	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
 	{}
@@ -208,9 +208,9 @@ public:
 	
 	/// Add sine to table
 	
-	/// @param[in] cycles	number of cycles
-	/// @param[in] amp		amplitude
-	/// @param[in] phs		unit phase, [0, 1)
+	/// \param[in] cycles	number of cycles
+	/// \param[in] amp		amplitude
+	/// \param[in] phs		unit phase, [0, 1)
 	Osc& addSine(double cycles, double amp=1, double phs=0){
 		double f = cycles/this->size();
 		for(unsigned i=0; i<this->size(); ++i){
@@ -255,10 +255,10 @@ public:
 
 	typedef Complex<Tv> complex;
 
-	/// @param[in] frq		Frequency
-	/// @param[in] amp		Amplitude
-	/// @param[in] dcy		-60 dB decay length, in units (or negative for no decay)
-	/// @param[in] phs		Phase in [0, 1)
+	/// \param[in] frq		Frequency
+	/// \param[in] amp		Amplitude
+	/// \param[in] dcy		-60 dB decay length, in units (or negative for no decay)
+	/// \param[in] phs		Phase in [0, 1)
 	CSine(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 
 
@@ -299,8 +299,8 @@ protected:
 template<class Tv=gam::real, class Ts=Synced>
 class Sine : public AccumPhase<Tv,Ts> {
 public:
-	/// @param[in]	frq		Frequency
-	/// @param[in]	phs		Phase in [0, 1)
+	/// \param[in]	frq		Frequency
+	/// \param[in]	phs		Phase in [0, 1)
 	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv,Ts>(frq, phs){}
 	
 	/// Generate next sample with a frequency offset
@@ -329,9 +329,9 @@ template <class Tv=double, class Ts=Synced>
 class SineR : public gen::RSin<Tv>, Ts{
 public:
 
-	/// @param[in]	frq		Frequency
-	/// @param[in]	amp		Amplitude
-	/// @param[in]	phs		Phase in [0, 1)
+	/// \param[in]	frq		Frequency
+	/// \param[in]	amp		Amplitude
+	/// \param[in]	phs		Phase in [0, 1)
 	SineR(Tv frq=440, Tv amp=1, Tv phs=0){ set(frq, amp, phs); }
 
 	/// Get frequency
@@ -365,7 +365,7 @@ template <class Tv=double, class Ts=Synced>
 class SineRs : public Array<SineR<Tv, Synced1> >, Ts{
 public:
 
-	/// @param[in]	num		Number of resonators
+	/// \param[in]	num		Number of resonators
 	SineRs(uint32_t num): Base(num){ Ts::initSynced(); }
 
 	/// Generate next sum of all oscillators
@@ -398,10 +398,10 @@ template <class Tv=double, class Ts=Synced>
 class SineD : public gen::RSin2<Tv>, Ts{
 public:
 
-	/// @param[in]	frq		Frequency
-	/// @param[in]	amp		Amplitude
-	/// @param[in]	dcy		T60 decay length
-	/// @param[in]	phs		Phase in [0, 1)
+	/// \param[in]	frq		Frequency
+	/// \param[in]	amp		Amplitude
+	/// \param[in]	dcy		T60 decay length
+	/// \param[in]	phs		Phase in [0, 1)
 	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ set(frq, amp, dcy, phs); }
 
 	/// Get frequency
@@ -441,7 +441,7 @@ template <class Tv=double, class Ts=Synced>
 class SineDs : public Array<SineD<Tv, Synced1> >, Ts{
 public:
 
-	/// @param[in]	num		Number of resonators
+	/// \param[in]	num		Number of resonators
 	SineDs(uint32_t num): Base(num){
 		Ts::initSynced(); 
 		for(uint32_t i=0; i<num; ++i) set(i, 0,0,0);
@@ -481,8 +481,8 @@ template <class Stap=tap::Wrap, class Ts=Synced>
 class TableSine : public Accum<Stap,Ts> {
 public:
 
-	/// @param[in]	frq		Frequency
-	/// @param[in]	phase	Phase in [0, 1)
+	/// \param[in]	frq		Frequency
+	/// \param[in]	phase	Phase in [0, 1)
 	TableSine(float frq=440, float phase=0);
 
 	float operator()(float freqOffset=0);	///< Return next linearly-interpolated sample
@@ -491,7 +491,7 @@ public:
 
 	/// Resize global sine table
 	
-	/// @param[in] bits		set effective table size to be 2^bits
+	/// \param[in] bits		set effective table size to be 2^bits
 	///
 	/// This sets the effective table size with only one quarter the amount of
 	/// memory actually being allocated. For example, if bits=10, the effective 
@@ -525,9 +525,9 @@ public:
 
 	LFO();
 	
-	/// @param[in] frq		Frequency
-	/// @param[in] phase	Phase in [0, 1)
-	/// @param[in] mod		Modifier amount in [0, 1)
+	/// \param[in] frq		Frequency
+	/// \param[in] phase	Phase in [0, 1)
+	/// \param[in] mod		Modifier amount in [0, 1)
 	LFO(float frq, float phase=0, float mod=0.5);
 
 
@@ -593,9 +593,9 @@ template<class Tv=gam::real, class Ts=Synced>
 class Buzz : public AccumPhase<Tv,Ts> {
 public:
 
-	/// @param[in]	frq			Frequency
-	/// @param[in]	phase		Phase in [0, 1)
-	/// @param[in]	harmonics	Number of harmonics
+	/// \param[in]	frq			Frequency
+	/// \param[in]	phase		Phase in [0, 1)
+	/// \param[in]	harmonics	Number of harmonics
 	Buzz(Tv frq=440, Tv phase=0, Tv harmonics=8);
 	virtual ~Buzz(){}
 
@@ -641,8 +641,8 @@ private: typedef Buzz<Tv,Ts> Base;
 public:
 	using Base::freq;
 
-	/// @param[in] frq		Frequency
-	/// @param[in] phs		Phase, in [0, 1)
+	/// \param[in] frq		Frequency
+	/// \param[in] phs		Phase, in [0, 1)
 	Impulse(Tv frq=440, Tv phs=0): Base(frq, phs){ onResync(1); }
 
 	/// Set frequency
@@ -664,13 +664,13 @@ public:
 template <class Tv=gam::real, class Ts=Synced>
 struct Saw : public Impulse<Tv,Ts> {
 
-	/// @param[in] frq		Frequency
-	/// @param[in] phs		Phase, in [0, 1)
+	/// \param[in] frq		Frequency
+	/// \param[in] phs		Phase, in [0, 1)
 	Saw(Tv frq=440, Tv phs=0): Impulse<Tv, Ts>(frq, phs){}
 
 	/// Generate next sample
 	
-	/// @param[in] itg		Integration amount
+	/// \param[in] itg		Integration amount
 	///
 	Tv operator()(Tv intg=0.997){ return Impulse<Tv,Ts>::saw(intg); }
 };
@@ -688,13 +688,13 @@ struct Saw : public Impulse<Tv,Ts> {
 template <class Tv=gam::real, class Ts=Synced>
 struct Square : public Impulse<Tv,Ts> {
 
-	/// @param[in] frq		Frequency
-	/// @param[in] phs		Phase, in [0, 1)
+	/// \param[in] frq		Frequency
+	/// \param[in] phs		Phase, in [0, 1)
 	Square(Tv frq=440, Tv phs=0) : Impulse<Tv,Ts>(frq, phs){}
 
 	/// Generate next sample
 	
-	/// @param[in] itg		Integration amount
+	/// \param[in] itg		Integration amount
 	///
 	Tv operator()(Tv intg=0.997){ return Impulse<Tv,Ts>::square(intg); }
 };
@@ -713,10 +713,10 @@ template<class Tv=gam::real, class Ts=Synced>
 class DSF : public AccumPhase<Tv,Ts> {
 public:
 
-	/// @param[in]	frq			Frequency
-	/// @param[in]	freqRatio	Frequency ratio of partials
-	/// @param[in]	ampRatio	Amplitude ratio of partials
-	/// @param[in]	harmonics	Number of harmonics
+	/// \param[in]	frq			Frequency
+	/// \param[in]	freqRatio	Frequency ratio of partials
+	/// \param[in]	ampRatio	Amplitude ratio of partials
+	/// \param[in]	harmonics	Number of harmonics
 	DSF(Tv frq=440, Tv freqRatio=1, Tv ampRatio=0.5, Tv harmonics=8);
 	
 	Tv operator()();			///< Generate next sample
