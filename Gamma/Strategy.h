@@ -268,10 +268,14 @@ protected:
 // 
 // method		desc
 // ()			return value at fraction
-// push			push new value into interpolation window 
+// push			push new value into interpolation window
+
+/// \defgroup iplSeq Sequence Interpolation
 namespace iplSeq{
 
 	/// Base class for sequence interpolation strategies
+    
+    /// \ingroup iplSeq
 	template <uint32_t N, class T>
 	struct Base{
 		Base(const T& v=0){ set(v); }
@@ -292,6 +296,8 @@ namespace iplSeq{
 	};
 
 	/// Truncating sequence interpolation strategy
+    
+    /// \ingroup iplSeq
 	template <class T>
 	struct Trunc : public Base<1,T>{
 		using Base<1,T>::v;
@@ -300,6 +306,8 @@ namespace iplSeq{
 	};
 	
 	/// Linear sequence interpolation strategy
+    
+    /// \ingroup iplSeq
 	template <class T>
 	struct Linear : public Base<2,T>{
 		using Base<2,T>::v;
@@ -308,6 +316,8 @@ namespace iplSeq{
 	};
 
 	/// Cubic sequence interpolation strategy
+    
+    /// \ingroup iplSeq
 	template <class T>
 	struct Cubic : public Base<4,T>{
 		using Base<4,T>::v;
@@ -318,6 +328,8 @@ namespace iplSeq{
 	};
 
 	/// Cosine sequence interpolation strategy
+    
+    /// \ingroup iplSeq
 	template <class T>
 	struct Cosine : public Base<2,T>{
 		using Base<2,T>::v;
@@ -485,7 +497,7 @@ namespace phsInc{
 
 	/// Loop waveform indefinitely.
             
-    /// \ingroup phsInc        
+    /// \ingroup phsInc
 	struct Wrap{
 		void reset(){}
 	
