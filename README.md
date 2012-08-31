@@ -1,7 +1,7 @@
-Gamma - Generic Synthesis C++ Library
-Version 0.9.5
+# Gamma
+### Generic Synthesis C++ Library
 
-========================================
+
 1. About
 ========================================
 Gamma is a cross-platform, C++ library for doing generic synthesis and 
@@ -12,18 +12,18 @@ It is oriented towards real-time sound and graphics synthesis, but is
 equally useful for non-real-time tasks.
 
 
-========================================
+
 2. Compilation Instructions
 ========================================
 The source code can either be built into a library or directly compiled from source into an application. In the following, the base directory is where this README file is located.
 
 
-----------------------------------------
+
 2.1 Building a Library
 ----------------------------------------
-........................................
-Make (Linux, OS X)
-........................................
+
+### Make (Linux, OS X)
+
 In most cases, simply running
 
 	make
@@ -38,17 +38,20 @@ There are several other rules within Makefile. These are:
 	make examples/y/x.cpp	- builds and runs example source file y/x.cpp
 	make test		- performs unit tests
 
-The rule that builds examples will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples rule follows standard Unix conventions so that, for instance, all the examples can be built and run by typing the command 'make examples/*/*.cpp'.
-Binaries are located in ./build/release or ./build/debug depending on the build configuration. On OS X, the Gamma library will be linked to the pre-compiled dependent libraries in external/lib_osx. On Linux, use apt-get to install the necessary dependent libraries (see 2.3 below).
+The rule that builds examples will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples rule follows standard Unix conventions so that, for instance, all the examples can be built and run by typing the command 
 
-........................................
-Xcode (OS X)
-........................................
-1) Open project/xcode/gamma.xcodeproj
-2) Build libgamma{.a, .dylib}. The library will be in project build folder.
+	make examples/*/*.cpp
+
+Binaries are located in the directory ./build/. On OSX, the Gamma library will be linked to the pre-compiled dependent libraries in external/lib_osx. On Linux, use apt-get to install the necessary dependent libraries (see 2.3 below).
 
 
-----------------------------------------
+### Xcode (OS X)
+
+1. Open project/xcode/gamma.xcodeproj
+2. Build the target 'libgamma{.a, .dylib}'. The library will be in project build folder.
+
+
+
 2.2 Compiling Direct From Source
 ----------------------------------------
 Gamma can easily be compiled directly from source into an existing project.
@@ -60,19 +63,13 @@ Make sure to pass in the following flags to the compiler:
 	-fpeel-loops
 
 
-----------------------------------------
+
 2.3 Dependencies
 ----------------------------------------
-Gamma depends conditionally on the libraries
+Gamma depends on PortAudio v19 and libsndfile for performing audio and sound file i/o, respectively.
 
-	PortAudio v19
-	libsndfile
-
-for performing audio and sound file i/o.
-
-They are only required if using certain Gamma objects:
+They are only required if using certain Gamma functionality:
 
 	PortAudio is required ONLY if you are using AudioIO (AudioIO.h).
 	libsndfile is required ONLY for SoundFile i/o and playback (SoundFile.h, Player.h).
-
 
