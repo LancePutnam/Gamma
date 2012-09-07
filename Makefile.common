@@ -39,7 +39,7 @@ endif
 
 
 # Architecture: '32' or '64'
-ifeq ($(shell which getconf),)
+ifeq ($(shell which getconf 2>/dev/null),)
 	UNAMEM := $(shell uname -m)
 	ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
 		ARCH = 64
