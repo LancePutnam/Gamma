@@ -10,23 +10,26 @@
 
 #include <math.h>
 #include <stdlib.h>				/* labs(long) */
+#include "Gamma/Config.h"
 #include "Gamma/Conversion.h"
 
-// Undefine macros in windows.h
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
 
 // Define some standard C99 functions that Windows is too stubborn to support.
 //#if (defined(WIN32) || defined(WIN64))
-#if defined(WIN64)
+//#if defined(WIN64)
+#if GAM_WINDOWS
+	// Undefine macros in windows.h
+	#ifdef max
+	#undef max
+	#endif
+	#ifdef min
+	#undef min
+	#endif
 	#define nextafterf(x,y)	_nextafterf(x,y)
 	#define nextafter(x,y)	_nextafter(x,y)
 	#define nextafterl(x,y)	_nextafter(x,y)
 #endif
+
 
 namespace gam{
 

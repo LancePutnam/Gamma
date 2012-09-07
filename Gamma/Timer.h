@@ -4,14 +4,18 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include "Gamma/Config.h"
+
 namespace gam{
 
 // We use an 8-byte signed integer to represent time in nanoseconds.  This
 // allows us represent times accurately up to +/- 292.5 years.
 
 // Windows
-#ifdef WIN32
+#if GAM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
+	#include <mmsystem.h>
 	typedef __int64 nsec_t;		///< nanoseconds type
 	
 // Posix (Mac, Linux)
@@ -83,7 +87,7 @@ inline double Timer::elapsedMSec(){ return ((double)elapsed() * 1e-6); }
 // platform specific
 
 // Windows
-#ifdef WIN32
+#ifdef _WIN32
 
 	inline nsec_t timeNow(){
 		return (nsec_t)timeGetTime() * (nsec_t)1e6;

@@ -26,8 +26,13 @@
 */
 /***************************************************/
 
-#define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
-#define GAM_USE_THREADEX	(defined(WIN32) || defined(WIN64))
+//#define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
+//#define GAM_USE_THREADEX	(defined(WIN32) || defined(_WIN32) || defined(WIN64))
+
+#include "Gamma/Config.h"
+
+#define GAM_USE_PTHREAD		(GAM_OSX || GAM_LINUX)
+#define GAM_USE_THREADEX	(GAM_WINDOWS)
 
 #if GAM_USE_PTHREAD
 	#include <pthread.h>
