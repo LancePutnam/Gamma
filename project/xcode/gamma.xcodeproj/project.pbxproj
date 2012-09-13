@@ -143,6 +143,7 @@
 		1609E5A011E5B743001A3853 /* SamplePlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SamplePlayer.h; sourceTree = "<group>"; };
 		160E7B3E0B36792200CE82F3 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../../Gamma/Timer.h; sourceTree = SOURCE_ROOT; };
 		161263A21140691600E55446 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Allocator.h; path = ../Gamma/Allocator.h; sourceTree = "<group>"; };
+		1641525D16020CB700098796 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		164622960E0EEDD80011911A /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = ../../Gamma/Types.h; sourceTree = SOURCE_ROOT; };
 		164BDD0B14CCAE3F0061E1EF /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; name = examples; path = ../../examples; sourceTree = SOURCE_ROOT; };
 		1651C54515227A2F00BBAADC /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Filter.h; sourceTree = "<group>"; };
@@ -300,6 +301,7 @@
 				1686EA810F8DB1F100D0452F /* Access.h */,
 				161263A21140691600E55446 /* Allocator.h */,
 				16F836E10A1E888200F05DF5 /* AudioIO.h */,
+				1641525D16020CB700098796 /* Config.h */,
 				16EDF9B9094F8C2600549AC9 /* Constants.h */,
 				16CCF9C00A9EC1650013D2BF /* Containers.h */,
 				16938ABF0FBD0C4400274B2A /* Conversion.h */,
