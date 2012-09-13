@@ -173,7 +173,15 @@ inline T invSqrt(T v){
 // a different header file.
 #define DEF(T, f)\
 inline T abs(T v){ return f(v); }
-DEF(int, ::abs) DEF(long, labs) DEF(long long, llabs) DEF(float, fabsf) DEF(double, fabs)
+DEF(int, ::abs)
+DEF(long, labs)
+DEF(long long, llabs)
+#ifdef GAM_WINDOWS
+	DEF(float, fabs)
+#else
+	DEF(float, fabsf)
+#endif
+DEF(double, fabs)
 #undef DEF
 
 
