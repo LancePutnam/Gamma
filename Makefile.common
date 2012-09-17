@@ -117,6 +117,17 @@ OBJ_DIR		= $(BUILD_DIR)obj/
 # Location of library installation
 DESTDIR		= $(PREFIX)
 
+# Check for some common shared library directories
+ifneq ($(wildcard /usr/local/),)
+	HAS_USR_LOCAL = 1
+endif
+ifneq ($(wildcard /opt/local/),)
+	HAS_OPT_LOCAL = 1
+endif
+ifneq ($(wildcard /usr/X11/),)
+	HAS_USR_X11 = 1
+endif
+
 # Platform-dependent directory
 PLATFORM_DIR ?=
 
@@ -198,12 +209,16 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Needed to link to libraries installed through MacPorts
-	LDFLAGS  += -L/opt/local/lib/
-	CPPFLAGS += -I/opt/local/include/
+	ifdef HAS_OPT_LOCAL
+		LDFLAGS  += -L/opt/local/lib/
+		CPPFLAGS += -I/opt/local/include/
+	endif
 
-	# Same for homebrew...
-	LDFLAGS  += -L/usr/local/lib/
-	CPPFLAGS += -I/usr/local/include/
+	# Needed to link to libraries installed through homebrew or by user
+	ifdef HAS_USR_LOCAL
+		LDFLAGS  += -L/usr/local/lib/
+		CPPFLAGS += -I/usr/local/include/
+	endif
 
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
