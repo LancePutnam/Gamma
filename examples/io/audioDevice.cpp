@@ -76,6 +76,15 @@ int main(){
 	//io.deviceIn (AudioDevice("Microphone", AudioDevice::INPUT));
 	//io.deviceOut(AudioDevice("Built-in", AudioDevice::OUTPUT));
 
+	if(io.channelsOut() < 2){
+		printf("This example needs at least 2 output channels to start streaming. Exiting...\n");
+		return 0;
+	}
+	if(io.channelsIn() < 1){
+		printf("This example needs at least 1 input channel to start streaming. Exiting...\n");
+		return 0;
+	}
+	
 	// set the global sample rate "subject"
 	Sync::master().spu(io.framesPerSecond());
 	
