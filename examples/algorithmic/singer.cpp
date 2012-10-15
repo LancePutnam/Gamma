@@ -38,7 +38,7 @@ struct VowelFilter{
 };
 
 Accum<> tmr(1./2, 2);
-ValWrap<int> ivowel(Vowel::NUM_PHONEMES);
+unsigned ivowel=0;
 VowelFilter filt;
 LFO<> osc;
 Sine<> vib(5);
@@ -50,11 +50,11 @@ void audioCB(AudioIOData& io){
 		if(tmr()){
 			for(int i=0; i<filt.size(); ++i){
 				filt.set(i,
-					Vowel::freq(Vowel::WOMAN, (Vowel::Phoneme)ivowel(), i),
-					Vowel::amp(Vowel::WOMAN, (Vowel::Phoneme)ivowel(), i)
+					Vowel::freq(Vowel::WOMAN, Vowel::Phoneme(ivowel), i),
+					Vowel::amp(Vowel::WOMAN, Vowel::Phoneme(ivowel), i)
 				);
 			}
-			++ivowel;
+			(++ivowel) %= Vowel::NUM_PHONEMES;
 		}
 
 		osc.freq(330.5 + vib()*3);

@@ -51,8 +51,8 @@ public:
 		double f;
 //		index_t i1 = mIndMap(x, f);
 //		return mIpl(mAcc, *this, i1,f, size()-1);
-		index_t i1 = mIndMap(x, f) + mInterval.min();
-		return mIpl(mAcc, *this, i1,f, mInterval.max(), mInterval.min());
+		index_t i1 = mIndMap(x, f) + mIMin;
+		return mIpl(mAcc, *this, i1,f, mIMax, mIMin);
 
 		//int i2 = i1+1; if(i2==size()) i2=0;
 		//return (*this)[i1]*(1.f-f) + (*this)[i2]*f;
@@ -61,8 +61,14 @@ public:
 
 	/// Set indexing interval for look-up [min, max)
 	LookupTable& endpoints(index_t min, index_t max){
-		mInterval.endpoints(min, max-1); // interpolator max index is inclusive
-		mIndMap.max(max-min, 1.);
+		if(min < max){
+			mIMin = min;
+			mIMax = max-1; // make index inclusive
+		}else{
+			mIMin = max;
+			mIMax = min-1; // make index inclusive
+		}
+		mIndMap.max((mIMax+1)-mIMin, 1.);
 		return *this;
 	}
 
@@ -82,7 +88,7 @@ public:
 
 protected:
 	IndexMap<double> mIndMap;
-	Interval<index_t> mInterval;
+	index_t mIMin, mIMax; // min and max indices, inclusive
 	Sipl<T> mIpl;
 	Sacc mAcc;
 

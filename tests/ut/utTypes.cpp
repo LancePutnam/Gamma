@@ -10,11 +10,6 @@
 	T(MaskSign<double>(), 0x8000000000000000ULL)
 	#undef T
 
-
-	//{ int x=0; printf("%d\n", (x-9) % 8); }
-	//{ unsigned x=0; printf("%ud\n", (x-1)); }
-	//{ ValWrap<int> x(7); x=-1; x++; x+=14; x=(x+1)*8; printf("%f\n", x.fraction()); }
-
 	{	Complexd c(0,0);
 		#define T(x, y) assert(x == y);
 		T(c, Complexd(0,0))
