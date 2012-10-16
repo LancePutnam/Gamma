@@ -261,6 +261,47 @@ protected:
 
 
 
+/// Double buffered ring-buffer
+
+/// This is a two-part buffer consisting of a ring buffer for writing and
+/// a standard (absolute indexed) array for reading.
+template <class T, class A=gam::Allocator<T> >
+class DoubleRing : public Ring<T,A>{
+public:
+	/// @param[in]	size		Number of elements in ring.
+	/// @param[in]	value		Initial value of all elements.
+	explicit DoubleRing(uint32_t size=0, const T& value=T())
+	:	Ring<T>(size, value), mRead(size)
+	{}
+
+	/// Returns reference to the reading buffer
+	const Array<T,A>& readBuf() const { return mRead; }
+
+	/// Copy elements into read buffer unwrapping from ring
+	
+	/// \returns a pointer to the read buffer
+	///
+	T * copyUnwrap(){ Ring<T,A>::copyUnwrap(mRead.elems(), mRead.size()); return mRead.elems(); }
+	
+	/// Copy elements into read buffer "as is" from ring
+	
+	/// \returns a pointer to the read buffer
+	///
+	T * copy(){
+		mem::deepCopy(mRead.elems(), Ring<T,A>::elems(), mRead.size());
+		//for(uint32_t i=0; i<read.size(); ++i) construct(read.elems()+i, (*this)[i]);
+		return mRead.elems();
+	}
+
+	/// Resize buffers
+	void resize(int n){ Ring<T,A>::resize(n); mRead.resize(n); }
+
+protected:	
+	Array<T,A> mRead;
+};
+
+
+
 /// N-sample delay
     
 /// \ingroup Containers
