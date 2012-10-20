@@ -360,15 +360,14 @@ template <class T> inline T uniExc(const T& exc, const T& max, const T& min){
 
 #define DEF(rnd_t, fnc)\
 	template <class T> inline T fnc(T b2, T b1){\
-		return (T)( (rnd_t)b1 + fnc##_##rnd_t(gen) * (rnd_t)(b2-b1) );\
+		return b1 + T(fnc##_##rnd_t(gen) * (b2-b1));\
 	}\
 	template <class T> inline void fnc(T * dst, uint32_t len){\
-		LOOP(len){ dst[i] = (T) fnc##_##rnd_t (gen); }\
+		LOOP(len){ dst[i] = (T) fnc##_##rnd_t(gen); }\
 	}\
-	template <class T> inline void fnc(T * dst, uint32_t len, T bound2, T bound1){\
-		rnd_t b1 = (rnd_t)bound1;\
-		rnd_t df = (rnd_t)bound2 - b1;\
-		LOOP(len){ dst[i] = (T)(b1 + fnc##_##rnd_t(gen) * df); }\
+	template <class T> inline void fnc(T * dst, uint32_t len, T b2, T b1){\
+		T df = b2 - b1;\
+		LOOP(len){ dst[i] = b1 + T(fnc##_##rnd_t(gen) * df); }\
 	}\
 	template <class T> inline void fnc(T * dst, uint32_t len, T * src, uint32_t srcLen){\
 		LOOP(len){ dst[i] = src[rnd::fnc(srcLen)]; }\
