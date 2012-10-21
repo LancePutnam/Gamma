@@ -613,6 +613,9 @@ template <class Tv, class Tp, class Ts>
 inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	mRes = v;
 	mAlpha = mImag / mRes;
+
+	// Note: mB0 is not used in the difference equation since it is assummed to
+	// be equal to 1. It is only used as an intermediate value...
 	mB0 = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of mB0
 	mB1 = Tp(-2) * mReal * mB0;
 	mB2 = (Tp(1) - mAlpha) * mB0;
@@ -622,18 +625,6 @@ inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 
 template <class Tv, class Tp, class Ts>
 inline void Biquad<Tv,Tp,Ts>::set(Tp frq, Tp res){ set(frq, res, mType); }
-
-/*
-void setAllpass(float fr, float R){
-  R= 1.f/R;
-  double cs = -2*cos((2*PI*fr)/sr); 
-  mA1 = cs*R;
-  mA2 = R*R;
-  mB1 = cs/R;
-  mB2 = 1/m_a2;
-  mA0 = 1;
-}
-*/
 
 template <class Tv, class Tp, class Ts>
 inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
@@ -668,7 +659,7 @@ inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 	case ALL_PASS:
 		mA0 = mB2;
 		mA1 = mB1;
-		mA2 = mB0;
+		mA2 = 1;
 		break;
 	default:;
 	};
