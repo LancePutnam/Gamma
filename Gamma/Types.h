@@ -5,9 +5,7 @@
 	See COPYRIGHT file for authors and license information 
 
 	File Description: 
-	Static (fixed size) POD types including complex numbers, quaternions, 
-	2,3,4-vectors, 3x3 matrix, and fixed-size array.
-	
+	Complex numbers and n-vectors.
 */
 
 
@@ -17,25 +15,13 @@
 
 namespace gam{
 
-typedef float			real;	// default real number type
-
-
 template<class T> class Complex;
 template<uint32_t N, class T> class Vec;
 
-typedef Vec<2,float > float2;
-typedef Vec<2,double> double2;
 
-//typedef Polar<float > Polarf;
-//typedef Polar<double> Polard;
-//typedef Complex<float > Complexf;
-//typedef Complex<double> Complexd;
-//typedef Vec2<float> Vec2f;
-//typedef Vec2<double> Vec2d;
-//typedef Vec3<float> Vec3f;
-//typedef Vec3<double> Vec3d;
-//typedef Vec4<float> Vec4f;
-//typedef Vec4<double> Vec4d;
+typedef float real;				///< Default real number type
+typedef Vec<2,float > float2;	///< Vector of 2 floats
+typedef Vec<2,double> double2;	///< Vector of 2 doubles
 
 
 /// Polar number with argument in radians
@@ -172,63 +158,41 @@ template<class T> struct NamedElems<1,T>{ T x; };
 template<class T> struct NamedElems<2,T>{ T x,y; };
 template<class T> struct NamedElems<3,T>{ T x,y,z; };
 template<class T> struct NamedElems<4,T>{ T x,y,z,w; };
-    
-    
-/// Multi-element container
-    
-/// This is a fixed size array to enable better loop unrolling optimizations
-/// by the compiler and to avoid an extra 'size' data member for small-sized
-/// arrays. Elements are not initialized by default for efficiency.
+
+
+/// N-vector or fixed-size array
+
+/// This is fixed in size to enable better loop unrolling optimizations and to 
+/// avoid an extra 'size' data member for small sizes.
 template <uint32_t N, class T>
-struct Multi : public NamedElems<N,T> {
-        
+struct Vec : public NamedElems<N,T> {
+
     using NamedElems<N,T>::x;
-        
-    typedef Multi M;
-        
-        
-    T * elems(){ return &x; }
-    const T * elems() const { return &x; }
-        
-    /// Set element at index with no bounds checking
-    T& operator[](uint32_t i){ return elems()[i];}
-        
-    /// Get element at index with no bounds checking
-    const T& operator[](uint32_t i) const { return elems()[i]; }
-        
-#define IT for(uint32_t i=0; i<N; ++i)
-        
-    bool operator !=(const M& v){ IT{ if((*this)[i] == v[i]) return false; } return true; }
-    bool operator !=(const T& v){ IT{ if((*this)[i] == v   ) return false; } return true; }
-    M& operator   = (const M& v){ IT{ (*this)[i] = v[i]; } return *this; }
-    M& operator   = (const T& v){ IT{ (*this)[i] = v;    } return *this; }
-    bool operator ==(const M& v){ IT{ if((*this)[i] != v[i]) return false; } return true; }
-    bool operator ==(const T& v){ IT{ if((*this)[i] != v   ) return false; } return true; }
-        
-#undef IT
-        
-    /// Returns size of array
-    static uint32_t size(){ return N; }
-        
-    /// Zeros all elements.
-    void zero(){ memset(elems(), 0, N * sizeof(T)); }
-};
 
-
-
-/// Fixed-size vector
-template <uint32_t N, class T>
-struct Vec : public Multi<N,T> {
-
-	typedef Vec<N,T> V;
 
 	Vec(const T& v=T()){ set(v); }
 	Vec(const T& v1, const T& v2){ set(v1,v2); }
 	Vec(const T& v1, const T& v2, const T& v3){ set(v1,v2,v3); }
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1,v2,v3,v4); }
 
+	template <class U>
+	Vec(const U * src){ set(src); }
+
 	template <uint32_t N2, class T2>
 	Vec(const Vec<N2, T2>& v){ set(v); }
+
+
+    /// Returns size of vector
+    static uint32_t size(){ return N; }
+
+    T * elems(){ return &x; }
+    const T * elems() const { return &x; }
+
+    /// Set element at index (no bounds checking)
+    T& operator[](uint32_t i){ return elems()[i];}
+
+    /// Get element at index (no bounds checking)
+    const T& operator[](uint32_t i) const { return elems()[i]; }
 
 	/// Get a vector comprised of indexed elements
 	Vec<2,T> get(int i0, int i1) const {
@@ -242,38 +206,42 @@ struct Vec : public Multi<N,T> {
 	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
 		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
 
+
 	#define IT(n) for(uint32_t i=0; i<n; ++i)
 
-	bool operator !=(const V& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
+	bool operator !=(const Vec& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
 	bool operator !=(const T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
-	V& operator = (const V& v){ IT(N) (*this)[i] = v[i]; return *this; }
-	V& operator = (const T& v){ IT(N) (*this)[i] = v;    return *this; }
-	bool operator ==(const V& v){ IT(N){ if((*this)[i] != v[i]) return false; } return true; }
+	Vec& operator = (const Vec& v){ IT(N) (*this)[i] = v[i]; return *this; }
+	Vec& operator = (const T& v){ IT(N) (*this)[i] = v;    return *this; }
+	bool operator ==(const Vec& v){ IT(N){ if((*this)[i] != v[i]) return false; } return true; }
 	bool operator ==(const T& v){ IT(N){ if((*this)[i] != v   ) return false; } return true; }
-	V  operator * (const V& v) const { V r; IT(N) r[i] = (*this)[i] * v[i]; return r; }
-	V  operator * (const T& v) const { V r; IT(N) r[i] = (*this)[i] * v;    return r; }
-	V& operator *=(const V& v){ IT(N) (*this)[i] *= v[i]; return *this; }
-	V& operator *=(const T& v){ IT(N) (*this)[i] *= v;    return *this; }
-	V  operator / (const V& v) const { V r; IT(N) r[i] = (*this)[i] / v[i]; return r; }
-	V  operator / (const T& v) const { V r; IT(N) r[i] = (*this)[i] / v;    return r; }
-	V& operator /=(const V& v){ IT(N) (*this)[i] /= v[i]; return *this; }
-	V& operator /=(const T& v){ IT(N) (*this)[i] /= v;    return *this; }
-	V  operator - (          ) const { V r; IT(N) r[i] = -(*this)[i]; return r; }
-	V  operator - (const V& v) const { V r; IT(N) r[i] = (*this)[i] - v[i]; return r; }
-	V  operator - (const T& v) const { V r; IT(N) r[i] = (*this)[i] - v;    return r; }
-	V& operator -=(const V& v){ IT(N) (*this)[i] -= v[i]; return *this; }
-	V& operator -=(const T& v){ IT(N) (*this)[i] -= v;    return *this; }
-	V  operator + (const V& v) const { V r; IT(N) r[i] = (*this)[i] + v[i]; return r; }
-	V  operator + (const T& v) const { V r; IT(N) r[i] = (*this)[i] + v;    return r; }
-	V& operator +=(const V& v){ IT(N) (*this)[i] += v[i]; return *this; }
-	V& operator +=(const T& v){ IT(N) (*this)[i] += v;    return *this; }
 
+	Vec  operator * (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] * v[i]; return r; }
+	Vec  operator * (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] * v;    return r; }
+	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
+	Vec& operator *=(const T& v){ IT(N) (*this)[i] *= v;    return *this; }
+	Vec  operator / (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] / v[i]; return r; }
+	Vec  operator / (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] / v;    return r; }
+	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
+	Vec& operator /=(const T& v){ IT(N) (*this)[i] /= v;    return *this; }
+	Vec  operator - (          ) const { Vec r; IT(N) r[i] = -(*this)[i]; return r; }
+	Vec  operator - (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] - v[i]; return r; }
+	Vec  operator - (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] - v;    return r; }
+	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
+	Vec& operator -=(const T& v){ IT(N) (*this)[i] -= v;    return *this; }
+	Vec  operator + (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] + v[i]; return r; }
+	Vec  operator + (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] + v;    return r; }
+	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
+	Vec& operator +=(const T& v){ IT(N) (*this)[i] += v;    return *this; }
 
-	T dot(const V& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
+    /// Zeros all elements
+    void zero(){ memset(elems(), 0, N * sizeof(T)); }
+
+	T dot(const Vec& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
 	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
 	T mag() const { return sqrt(magSqr()); }
 	T magSqr() const { return dot(*this); }
-	Vec sgn() const { return V(*this).normalize(); }
+	Vec normalized() const { return Vec(*this).normalize(); }
 
 	Vec& normalize(){
 		T msqr = magSqr();
@@ -315,7 +283,12 @@ struct Vec : public Multi<N,T> {
 		}
 		return *this;
 	}
-	
+
+	/// Set elements to values from C array
+	template <class U>
+	Vec& set(const U * src){ IT(N){ (*this)[i]=src[i]; } return *this; }
+
+	/// Set to identity, i.e., {1, 0, ..., 0}
 	Vec& setIdentity(){
 		(*this)[0] = T(1);
 		for(uint32_t i=1; i<N; ++i) (*this)[i] = T(0);

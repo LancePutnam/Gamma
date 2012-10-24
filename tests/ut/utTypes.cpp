@@ -28,13 +28,6 @@
 		T(c.sqrt().arg(), 0.1)
 		#undef T
 	}
-
-	{	Multi<3, double> v;
-		v = 0;
-		assert(v == 0);
-		assert(v != 1);
-		v = 1; assert(v == 1);
-	}
 	
 	{	typedef Vec<3,double> Vec3;
 		Vec3 v(0,0,0);
@@ -45,6 +38,6 @@
 		v *= 2;						assert(v == 2);
 		v /= 2;						assert(v == 1);
 		v.set(1,2,3).normalize();	assert(scl::almostEqual(v.mag(),1));
-		v.set(1,2,3);				assert(v.sgn() == v.normalize());
+		v.set(1,2,3);				assert(v.normalized() == v.normalize());
 	}
 }
