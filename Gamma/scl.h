@@ -23,56 +23,10 @@
 	#ifdef min
 	#undef min
 	#endif
+	float nextafterf(float x, float y); // Defined in scl.cpp
 	//#define nextafterf(x,y)	_nextafterf(x,y)
 	#define nextafter(x,y)	_nextafter(x,y)
 	#define nextafterl(x,y)	_nextafter(x,y)
-	/*
-	 * s_nextafterf.c -- float version of s_nextafter.c.
-	 * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
-	 * ====================================================
-	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
-	 *
-	 * Developed at SunPro, a Sun Microsystems, Inc. business.
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice
-	 * is preserved.
-	 * ====================================================
-	 */
-	inline float nextafterf(float x, float y){
-		union{ float f; int32_t i; } ux, uy;
-		ux.f=x;
-		uy.f=y;
-		int32_t hx=ux.i;
-		int32_t hy=uy.i;
-		int32_t ix=ux.i&0x7fffffff;	/* |x| */
-		int32_t iy=uy.i&0x7fffffff;	/* |y| */
-		if((ix>0x7f800000)||(iy>0x7f800000)) return x+y; /* x or y are nan */
-		if(x==y) return y;			/* x=y, return y */
-		if(ix==0){					/* x == 0 */
-			ux.i=(hy&0x80000000)|1;	/* return +-minsubnormal */
-			x = ux.f;
-			float t = x*x;
-			return t==x ? t : x;	/* raise underflow flag */
-		}
-		if(hx>=0) {					/* x > 0 */
-			if(hx>hy)	--hx;		/* x > y, x -= ulp */
-			else		++hx;		/* x < y, x += ulp */
-		} else {					/* x < 0 */
-			if(hy>=0||hx>hy)--hx;	/* x < y, x -= ulp */
-			else			++hx;	/* x > y, x += ulp */
-		}
-		hy = hx&0x7f800000;
-		if(hy>=0x7f800000) return x+x;	/* overflow  */
-		if(hy <0x00800000){			/* underflow */
-			float t = x*x;
-			if(t!=x){				/* raise underflow flag */
-				ux.i = hx;
-				return ux.f;
-			}
-		}
-		ux.i = hx;
-		return ux.f;
-	}
 #endif
 
 
@@ -756,8 +710,7 @@ template<class T> T nearest(T val, const char * intervals, long div){
 	long numWraps = 0;
 	long vm = wrap(vr, numWraps, div, 0L);
 	long min = 0;
-	
-	
+
 	struct F{
 		static int base36To10(char v){
 			v = tolower(v);
@@ -846,7 +799,7 @@ inline T smoothPeak1	(T v, T bw){ return bw/(scl::abs(v)+bw); }
 template<class T>
 inline T smoothSign		(T v, T bw){ return v/(scl::abs(v) + bw); }
 template <class T, class F>
-inline T smoothZero			(T v, T bw, F f){ return bw/(f(v) + bw); }
+inline T smoothZero		(T v, T bw, F f){ return bw/(f(v) + bw); }
 template<class T>
 inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
 
@@ -1275,18 +1228,18 @@ inline float triangleU(uint32_t p){
 }
 
 
-template<class T> inline T bartlett(T n){	return (T)1 - scl::abs(n); }
+template<class T> inline T bartlett(T n){	return T(1) - scl::abs(n); }
 
 template<class T> inline T blackman(T r){
-	return (T)0.42 + (T)0.08 * cos((T)2. * r) - (T)0.5 * cos(r);	// prevents -0s
+	return T(0.42) + T(0.08) * cos(T(2)*r) - T(0.5) * cos(r);	// prevents -0s
 }
 template<class T> inline T blackmanHarris(T r){
-	return (T)0.35875 - (T)0.48829 * cos(r) + (T)0.14128 * cos((T)2. * r) - (T)0.01168 * cos((T)3. * r);
+	return T(0.35875) - T(0.48829) * cos(r) + T(0.14128) * cos(T(2)*r) - T(0.01168) * cos(T(3)*r);
 }
-template<class T> inline T hamming(T r){ return raisedCosine(r, (T)0.53836, (T)0.46164); }
-template<class T> inline T hann(T r){ return raisedCosine(r, (T)0.5, (T)0.5); }
+template<class T> inline T hamming(T r){ return raisedCosine(r, T(0.53836), T(0.46164)); }
+template<class T> inline T hann(T r){ return raisedCosine(r, T(0.5), T(0.5)); }
 template<class T> inline T raisedCosine(T r, T a, T b){ return a - b * cos(r); }
-template<class T> inline T welch(T n){ return (T)1 - n*n; }
+template<class T> inline T welch(T n){ return T(1) - n*n; }
 
 } // scl::
 
