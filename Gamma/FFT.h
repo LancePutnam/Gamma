@@ -26,11 +26,12 @@ public:
 	
 	/// \param[in,out] buf		input/output buffer
 	/// \param[in] normalize	whether to scale magnitudes by 1/N
-	void forward(T * buf, bool normalize=true);
+	/// \param[in] nrmGain		gain to apply if normalizing
+	void forward(T * buf, bool normalize=true, T nrmGain=1.);
 
 	template <template <class> class ComplexType>
-	void forward(ComplexType<T> * buf, bool normalize=true){
-		forward((T*)buf, normalize);
+	void forward(ComplexType<T> * buf, bool normalize=true, T nrmGain=1.){
+		forward((T*)buf, normalize, nrmGain);
 	}
 
 	/// Perform inverse transform in-place
@@ -75,7 +76,8 @@ public:
 	///									input is  [x0, x1, x2, ..., x(n)  ] and
 	///									output is [r0, r1, i1, ..., r(n/2)].
 	/// \param[in]		normalize	whether to scale magnitudes by 1/N
-	void forward(T * buf, bool complexBuf=false, bool normalize=true);
+	/// \param[in]		nrmGain		gain to apply if normalizing
+	void forward(T * buf, bool complexBuf=false, bool normalize=true, T nrmGain=1.);
 	
 	/// Perform complex-to-real inverse transform in-place
 

@@ -42,11 +42,11 @@ CFFT<T>::~CFFT(){
 }
 
 template <class T>
-void CFFT<T>::forward(T * buf, bool normalize){
+void CFFT<T>::forward(T * buf, bool normalize, T nrmGain){
 	fftpack::cfftf(&mImpl->n, buf, mImpl->wsave, mImpl->ifac);
 	
 	if(normalize){
-		T m = T(1)/size();
+		T m = nrmGain/size();
 		for(int i=0; i<size()*2; ++i) buf[i] *= m;
 	}
 }
@@ -103,14 +103,14 @@ RFFT<T>::~RFFT(){
 }
 
 template <class T>
-void RFFT<T>::forward(T * iobuf, bool complexBuf, bool normalize){
+void RFFT<T>::forward(T * iobuf, bool complexBuf, bool normalize, T nrmGain){
 
 	T * buf = complexBuf ? iobuf+1 : iobuf;
 
 	fftpack::rfftf(&mImpl->n, buf, mImpl->wsave, mImpl->ifac);
 
 	if(normalize){
-		const T m = T(1)/size();
+		const T m = nrmGain/size();
 		for(int i=0; i<size(); ++i) buf[i] *= m;
 	}
 
