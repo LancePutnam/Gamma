@@ -98,10 +98,12 @@ Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
 template <class Tf, class Tv>
 inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
-	//f = f * 0.87 - 0.05;	// avoid pole near z = -1
-	return o1 = (y - o1) * f + x;
+	// y[n]	= a x[n] + x[n-1] - a y[n-1]
+	//		= a (x[n] - y[n-1]) + x[n-1]
+	f += 0.618f;
+	float a = (1.f-f)/(1.f+f);
+	return o1 = (y - o1) * a + x;
 }
-
 
 template <class Tf, class Tv>
 inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){	
