@@ -48,7 +48,7 @@ public:
 	void freq(float v);							///< Set natural frequency (1/delay())
 	void ipolType(ipl::Type v){ mIpol.type(v); }///< Set interpolation type
 	void maxDelay(float v);						///< Set maximum delay length
-	void zero();								///< Sets all elements to zero
+	void zero();								///< Sets all delay elements to zero
 
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer

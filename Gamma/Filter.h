@@ -615,7 +615,7 @@ inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	mAlpha = mImag / mRes;
 
 	// Note: mB0 is not used in the difference equation since it is assummed to
-	// be equal to 1. It is only used as an intermediate value...
+	// be equal to 1. It is only used for gain control ...
 	mB0 = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of mB0
 	mB1 = Tp(-2) * mReal * mB0;
 	mB2 = (Tp(1) - mAlpha) * mB0;
@@ -636,9 +636,9 @@ inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 		mA0 = mA1 * Tp(0.5);
 		mA2 = mA0;
 		break;
-	case HIGH_PASS:
-		mA1 = -(Tp(1) + mReal) * mB0;
-		mA0 = -mA1 * Tp(0.5);
+	case HIGH_PASS: // same as low-pass, but with sign flipped on odd a_k
+		mA1 =-(Tp(1) + mReal) * mB0;
+		mA0 =-mA1 * Tp(0.5);
 		mA2 = mA0;
 		break;
 	case BAND_PASS:
