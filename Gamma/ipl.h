@@ -100,8 +100,18 @@ template <class Tf, class Tv>
 inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
 	// y[n]	= a x[n] + x[n-1] - a y[n-1]
 	//		= a (x[n] - y[n-1]) + x[n-1]
-	f += 0.618f;
-	float a = (1.f-f)/(1.f+f);
+
+	//f = 1-f;
+	//f += 0.618f; // keep 'a' near zero
+	//float a = (1.f-f)/(1.f+f);
+
+	// Taylor approximation to above to avoid division
+	//float a = 0.191 - 0.5f*f; // = 0.5 - 0.5*(f + 0.618)
+	//a = a*(1.f+a*(1.f+a*(1.f+a)));
+
+	float a = 0.5f*f - 0.309f; // = 0.5 - 0.5*(1-f + 0.618)
+	a = a*(1.f+a*(1.f+a*(1.f+a)));
+
 	return o1 = (y - o1) * a + x;
 }
 
