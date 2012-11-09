@@ -159,12 +159,16 @@ public:
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
-		i0 += d1*mB1; Tv o0 = i0-d1; d1 = i0; return o0;
+		i0 += d1*mB1;
+		Tv o0 = i0-d1;
+		d1 = i0;
+		return o0;
 	}
 
 	/// Set bandwidth of pole
 	void width(Tp v){
-		mWidth = v; mB1 = poleRadius(v, Ts::ups());
+		mWidth = v;
+		mB1 = poleRadius(v, Ts::ups());
 	}
 
 	void zero(){ d1=0; }
@@ -172,7 +176,8 @@ public:
 	virtual void onResync(double r){ width(mWidth); }
 
 protected:
-	Tv d1; Tp mWidth, mB1;
+	Tv d1;
+	Tp mWidth, mB1;
 };
 
 
@@ -192,7 +197,10 @@ public:
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
-		i0 += d1*mB1; Tv o0 = i0-d1; d1 =-i0; return o0;
+		i0 += d1*mB1;
+		Tv o0 = i0-d1;
+		d1 =-i0;
+		return o0;
 	}
 
 protected:
@@ -380,8 +388,17 @@ protected:
 
 
 
-/// Hilbert transformer, converts real signal into complex
+/// Hilbert transform filter
 
+/// This filter converts a real signal into a complex (analytic) signal.
+/// Corresponding harmonics of the real and imaginary parts of the output are
+/// 90 degrees out of phase.
+/// The analytic signal can be used for frequency shifting or determining the
+/// amplitude envelope of the input signal.
+/// Technically speaking, a Hilbert transform converts a real signal into its
+/// harmonic conjugate. The input and output of the Hilbert transform, comprise
+/// the real and imaginary components of a complex (analytic) signal.
+///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \ingroup Filters
@@ -400,7 +417,7 @@ public:
 	/// Convert input from real to complex
 	Complex<Tv> operator()(const Tv& i){
 		return Complex<Tv>(
-			cf0(cf1(cf2(cf3(cf4(cf5(i)))))),
+			 cf0(cf1(cf2(cf3(cf4(cf5(i)))))),
 			-sf0(sf1(sf2(sf3(sf4(sf5(i))))))
 		);
 	}
