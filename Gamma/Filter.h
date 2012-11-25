@@ -91,15 +91,15 @@ protected:
 
 /// 2-pole/2-zero IIR filter
 
-/// The biquadratic filter contains 2 zeroes and 2 poles in its transfer
-/// function. The zeroes provide a better response near the DC and Nyquist
+/// The biquadratic filter contains 2 zeros and 2 poles in its transfer
+/// function. The zeros provide a better response near the DC and Nyquist
 /// frequencies than an all-pole filter would. Second-order IIRs have a 12 
 /// dB/octave cutoff slope and are normally cascaded (run in series) to obtain
-/// a sharper response. This particular implementation utilizes the Butterworth
-/// design.
+/// a sharper response. This particular implementation utilizes the RBJ 
+/// Sallen-Key/Butterworth design from:
 ///
-/// These filters are adapted from:
 /// http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
+///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Ts	sync type
@@ -113,8 +113,19 @@ public:
 	/// \param[in]	type	Type of filter
 	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
 
-	/// Set input (a) and output (b) coefficients directly
-	void coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2);
+
+	/// Get array of 3 feedforward coefficients
+	Tp * a(){ return mA; }
+	
+	/// Get array of 3 feedback coefficients (first element, b0, is not used)
+	Tp * b(){ return mB; }
+
+	const Tp * a() const { return mA; }
+	const Tp * b() const { return mB; }
+
+	/// Set feedforward (a) and feedback (b) coefficients directly
+	void coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2);
+
 
 	void freq(Tp v);					///< Set center frequency
 	void res(Tp v);						///< Set resonance
@@ -133,9 +144,10 @@ public:
 	virtual void onResync(double r);
 
 protected:
-	Tp mA0, mA1, mA2, mB0, mB1, mB2;	// ffd and fbk coefficients
-	Tv d1, d2;		// inner sample delays
-	Tp mFreq, mRes;	// center frequency, resonance
+	Tp mA[3];			// feedforward coefs
+	Tp mB[3];			// feedback coefs (first element used to scale coefs)
+	Tv d1, d2;			// inner sample delays
+	Tp mFreq, mRes;		// center frequency, resonance
 	FilterType mType;
 	Tp mReal, mImag;	// real, imag components of center frequency
 	Tp mAlpha;
@@ -227,7 +239,7 @@ public:
 	void width(Tp v){
 		mWidth = v;
 		mRad = poleRadius(mWidth, Ts::ups());
-		cd2 = -mRad * mRad;
+		mC[2] = -mRad * mRad;
 		computeCoef1();
 	}
 
@@ -250,11 +262,12 @@ protected:
 		computeCoef1();
 	}
 	
-	void computeCoef1(){ cd1 = Tp(2) * mRad * mCos; }
-	void delay(Tv v){ d2 = d1; d1 = v; }
+	void computeCoef1(){ mC[1] = Tp(2) * mRad * mCos; }
+	void delay(Tv v){ d2=d1; d1=v; }
+	Tp& gain(){ return mC[0]; }
 	
 	Tp mFreq, mWidth;
-	Tp mB0, cd1, cd2;	// coefficients
+	Tp mC[3];			// coefficients
 	Tp mCos, mRad;
 	Tv d2, d1;			// 2- and 1-sample delays
 };
@@ -264,13 +277,12 @@ protected:
 typedef Filter2<Tv,Tp,Ts> Base;\
 using Base::mFreq;\
 using Base::mWidth;\
-using Base::d2;\
-using Base::d1;\
-using Base::mB0;\
-using Base::cd1;\
-using Base::cd2;\
+using Base::gain;\
+using Base::mC;\
 using Base::mRad;\
-using Base::mCos
+using Base::mCos;\
+using Base::d2;\
+using Base::d1
 
 
 /// Second-order all-pass filter
@@ -291,8 +303,8 @@ public:
 
 	/// Filter sample
 	Tv operator()(Tv i0){
-		i0 += d1*cd1 + d2*cd2;
-		Tv o0 = i0*-cd2 - d1*cd1 + d2;
+		i0 += d1*mC[1] + d2*mC[2];
+		Tv o0 = i0*-mC[2] - d1*mC[1] + d2;
 		this->delay(i0);
 		return o0;
 	}
@@ -325,8 +337,8 @@ public:
 
 	/// Filter sample
 	Tv operator()(Tv i0){
-		i0 *= mB0;
-		Tv o0 = i0 - d1*cd1 - d2*cd2;
+		i0 *= gain();
+		Tv o0 = i0 - d1*mC[1] - d2*mC[2];
 		this->delay(i0);
 		return o0;
 	}
@@ -337,7 +349,7 @@ protected:
 	INHERIT_FILTER2;
 
 	// compute constant gain factor
-	void computeGain(){ mB0 = Tp(1) / (Tp(1) + scl::abs(cd1) - cd2); }
+	void computeGain(){ gain() = Tp(1) / (Tp(1) + scl::abs(mC[1]) - mC[2]); }
 };
 
 
@@ -370,8 +382,8 @@ public:
 
 	/// Filter sample
 	Tv operator()(Tv i0){
-		i0 *= mB0;
-		i0 += d1*cd1 + d2*cd2;
+		i0 *= gain();
+		i0 += d1*mC[1] + d2*mC[2];
 		this->delay(i0);
 		return i0; 
 	}
@@ -383,7 +395,7 @@ protected:
 	Tp mSin;
 
 	// compute constant gain factor
-	void computeGain(){ mB0 = (Tp(1) - mRad*mRad) * mSin; }
+	void computeGain(){ gain() = (Tp(1) - mRad*mRad) * mSin; }
 };
 
 
@@ -609,20 +621,16 @@ template <class Tv, class Tp, class Ts>
 void Biquad<Tv,Tp,Ts>::zero(){ d1=d2=(Tv)0; }
 
 template <class Tv, class Tp, class Ts>
-void Biquad<Tv,Tp,Ts>::coef(Tp a0, Tp a1, Tp a2, Tp b0, Tp b1, Tp b2){
-	mA0=a0; mA1=a1; mA2=a2; mB0=b0; mB1=b1; mB2=b2;
+void Biquad<Tv,Tp,Ts>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
+	mA[0]=a0; mA[1]=a1; mA[2]=a2; mB[1]=b1; mB[2]=b2;
 }
 
 template <class Tv, class Tp, class Ts>
 inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
-//	float w = freqA * mFrqToRad;	// radial frequency [0, pi)
-//	mReal = cos(w);
-//	mImag = sin(w);
-
 	mFreq = v;
-	float phs = scl::clip(mFreq * mFrqToRad, 3.11f);
-	mReal = scl::cosT8(phs);
-	mImag = scl::sinT7(phs);
+	float w = scl::clip(mFreq * mFrqToRad, 3.11f);
+	mReal = scl::cosT8(w);
+	mImag = scl::sinT7(w);
 	res(mRes);
 }
 
@@ -631,11 +639,11 @@ inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	mRes = v;
 	mAlpha = mImag / mRes;
 
-	// Note: mB0 is not used in the difference equation since it is assummed to
+	// Note: mB[0] is not used in the difference equation since it is assumed to
 	// be equal to 1. It is only used for gain control ...
-	mB0 = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of mB0
-	mB1 = Tp(-2) * mReal * mB0;
-	mB2 = (Tp(1) - mAlpha) * mB0;
+	mB[0] = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of b0
+	mB[1] = Tp(-2) * mReal * mB[0];
+	mB[2] = (Tp(1) - mAlpha) * mB[0];
 	
 	type(mType);
 }
@@ -649,34 +657,34 @@ inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 	
 	switch(mType){
 	case LOW_PASS:
-		mA1 = (Tp(1) - mReal) * mB0;
-		mA0 = mA1 * Tp(0.5);
-		mA2 = mA0;
+		mA[1] = (Tp(1) - mReal) * mB[0];
+		mA[0] = mA[1] * Tp(0.5);
+		mA[2] = mA[0];
 		break;
 	case HIGH_PASS: // same as low-pass, but with sign flipped on odd a_k
-		mA1 =-(Tp(1) + mReal) * mB0;
-		mA0 =-mA1 * Tp(0.5);
-		mA2 = mA0;
+		mA[1] =-(Tp(1) + mReal) * mB[0];
+		mA[0] =-mA[1] * Tp(0.5);
+		mA[2] = mA[0];
 		break;
 	case BAND_PASS:
-		mA0 = mImag * Tp(0.5) * mB0;
-		mA1 = Tp(0);
-		mA2 = -mA0;
+		mA[0] = mImag * Tp(0.5) * mB[0];
+		mA[1] = Tp(0);
+		mA[2] =-mA[0];
 		break;
 	case BAND_PASS_UNIT:
-        mA0 = mAlpha * mB0;
-        mA1 = Tp(0);
-        mA2 = -mA0;
+        mA[0] = mAlpha * mB[0];
+        mA[1] = Tp(0);
+        mA[2] =-mA[0];
 		break;
 	case BAND_REJECT:
-        mA0 = mB0;	// 1.f * a0
-        mA1 = mB1;
-        mA2 = mB0;	// 1.f * a0
+        mA[0] = mB[0];	// 1.f * a0
+        mA[1] = mB[1];
+        mA[2] = mB[0];	// 1.f * a0
 		break;
 	case ALL_PASS:
-		mA0 = mB2;
-		mA1 = mB1;
-		mA2 = 1;
+		mA[0] = mB[2];
+		mA[1] = mB[1];
+		mA[2] = Tp(1);
 		break;
 	default:;
 	};
@@ -685,16 +693,16 @@ inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 template <class Tv, class Tp, class Ts>
 inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
 	// Direct form II
-	i0 = i0 - d1*mB1 - d2*mB2;
-	Tv o0 = i0*mA0 + d1*mA1 + d2*mA2;
+	i0 = i0 - d1*mB[1] - d2*mB[2];
+	Tv o0 = i0*mA[0] + d1*mA[1] + d2*mA[2];
 	d2 = d1; d1 = i0;
 	return o0;
 }
 
 template <class Tv, class Tp, class Ts>
 inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
-	i0 = i0 - d1*mB1 - d2*mB2;	
-	Tv o0 = (i0 - d2)*mA0;
+	i0 = i0 - d1*mB[1] - d2*mB[2];	
+	Tv o0 = (i0 - d2)*mA[0];
 	d2 = d1; d1 = i0;
 	return o0;
 }
