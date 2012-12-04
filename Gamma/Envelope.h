@@ -22,15 +22,17 @@ namespace gam{
 
 /// Exponential curve with variable curvature
 
-/// This curve will return values in the interval [start, end] starting from 0 and
-/// ending on 'end' over its length in samples.  The last point is exclusive, so
-/// it takes length + 1 samples to reach 'end' inclusively.  For iterations 
-/// exceeding the specified length, the values returned will be unbounded.
-/// \n\n Given any two points, as long as they don’t have the same value, there are
-/// infinitely many exponential segments starting at the first and ending at the second.
-/// One of these is a straight line between the two.   Hence the “variable curvature” of
-/// the Curve object.
-/// \n\n Curve touches both its start and end points while Decay asymptotically approaches zero.
+/// This curve will return values in the interval [start, end] starting from 0
+/// and ending on 'end' over its length in samples.  The last point is
+/// exclusive, so it takes length + 1 samples to reach 'end' inclusively.
+/// For iterations exceeding the specified length, the values returned will be
+/// unbounded. \n\n
+/// Given any two points, as long as they don't have the same value, there are
+/// infinitely many exponential segments starting at the first and ending at the
+/// second. One of these is a straight line between the two. Hence the "variable
+/// curvature" of the Curve object. \n\n
+/// Curve touches both its start and end points while Decay asymptotically
+/// approaches zero.
 ///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
@@ -152,13 +154,19 @@ public:
 
 	/// Generate next value
 	Tv operator()(){
+
+		// Sustain stage:
 		if(sustained()){
 			return mLevels[mStage];
 		}
+
+		// Interpolating along segment:
 		else if(mPos < mLen){
 			++mPos;
 			return mCurve();
 		}
+
+		// Just went past end of current segment and there are more left:
 		else if(mStage < size()){
 			++mStage;
 			if(mLoop && done()) mStage=0;
@@ -166,9 +174,13 @@ public:
 				mPos = 0;
 				setLen(mStage);
 				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[mStage+1]);
-				return (*this)(); // return level of new stage
+
+				// Immediately return start level of new stage
+				return (*this)();
 			}
 		}
+
+		// Envelope is done:
 		return mLevels[mStage];
 	}	
 
