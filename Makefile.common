@@ -198,7 +198,9 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Set system root directory for stdc++ etc.
-	ifeq ($(OSX_VERSION), 10_7)
+	ifeq ($(OSX_VERSION), 10_8)
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
+	else ifeq ($(OSX_VERSION), 10_7)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
 	else ifeq ($(OSX_VERSION), 10_6)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.6.sdk -mmacosx-version-min=10.6
@@ -265,7 +267,8 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
-		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas 
+		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas \
+		-Wuninitialized -Winit-self
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 
