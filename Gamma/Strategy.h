@@ -30,18 +30,28 @@ struct Trunc{
 	ipl::Type type() const { return TRUNC; }
 	void type(ipl::Type v){}
 
-	/// Return element from power-of-2 array
+	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return a.atPhase(phase);
 	}
 
+	/// Return interpolated element from array
+
+	/// \tparam AccessStrategy	access strategy type (\sa access)
+	///
+	/// \param[in] acc			access strategy
+	/// \param[in] src			source array
+	/// \param[in] iInt			integer part of index
+	/// \param[in] iFrac		fractional part of index, in [0, 1)
+	/// \param[in] max			maximum index for accessing
+	/// \param[in] min			minimum index for accessing
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return a[iInt];
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return src[iInt];
 	}
 
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), a,iInt,iFrac, max,min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
 	}
 };
 
@@ -55,24 +65,33 @@ struct Round{
 	ipl::Type type() const { return ROUND; }
 	void type(ipl::Type v){}
 
-	/// Return element from power-of-2 array
-	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
-
+	/// Return interpolated element from power-of-2 array
+	T operator()(const ArrayPow2<T>& src, uint32_t phase) const{
 		// accessing normally truncates, so add half fraction to round
-		return a.atPhase(phase + (a.oneIndex()>>1));
+		return src.atPhase(phase + (src.oneIndex()>>1));
 	}
-	
+
+	/// Return interpolated element from array
+
+	/// \tparam AccessStrategy	access strategy type (\sa access)
+	///
+	/// \param[in] acc			access strategy
+	/// \param[in] src			source array
+	/// \param[in] iInt			integer part of index
+	/// \param[in] iFrac		fractional part of index, in [0, 1)
+	/// \param[in] max			maximum index for accessing
+	/// \param[in] min			minimum index for accessing
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return ipl::nearest(
 			iFrac,
-			a[iInt],
-			a[s.mapP1(iInt+1, max, min)]
+			src[iInt],
+			src[acc.mapP1(iInt+1, max, min)]
 		);
 	}
 
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
 	}
 };
 
@@ -86,7 +105,7 @@ struct Linear{
 	ipl::Type type() const { return LINEAR; }
 	void type(ipl::Type v){}
 
-	/// Return element from power-of-2 array
+	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return ipl::linear(
 			a.fraction(phase),
@@ -95,19 +114,28 @@ struct Linear{
 		);
 	}
 
+	/// Return interpolated element from array
+
+	/// \tparam AccessStrategy	access strategy type (\sa access)
+	///
+	/// \param[in] acc			access strategy
+	/// \param[in] src			source array
+	/// \param[in] iInt			integer part of index
+	/// \param[in] iFrac		fractional part of index, in [0, 1)
+	/// \param[in] max			maximum index for accessing
+	/// \param[in] min			minimum index for accessing
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return ipl::linear(
 			iFrac,
-			a[iInt],
-			a[s.mapP1(iInt+1, max, min)]
+			src[iInt],
+			src[acc.mapP1(iInt+1, max, min)]
 		);
 	}
 
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), a, iInt, iFrac, max, min);
-	}	
-
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	}
 };
 
 
@@ -120,7 +148,7 @@ struct Cubic{
 	ipl::Type type() const { return CUBIC; }
 	void type(ipl::Type v){}
 
-	/// Return element from power-of-2 array
+	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		uint32_t one = a.oneIndex();
 		return ipl::cubic(
@@ -131,22 +159,31 @@ struct Cubic{
 			a.atPhase(phase + (one<<1))
 		);
 	}
-	
+
+	/// Return interpolated element from array
+
+	/// \tparam AccessStrategy	access strategy type (\sa access)
+	///
+	/// \param[in] acc			access strategy
+	/// \param[in] src			source array
+	/// \param[in] iInt			integer part of index
+	/// \param[in] iFrac		fractional part of index, in [0, 1)
+	/// \param[in] max			maximum index for accessing
+	/// \param[in] min			minimum index for accessing
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return ipl::cubic(
 			iFrac,
-			a[s.mapM1(iInt-1, max, min)],
-			a[iInt],
-			a[s.mapP1(iInt+1, max, min)],
-			a[s.map  (iInt+2, max, min)]
+			src[acc.mapM1(iInt-1, max, min)],
+			src[iInt],
+			src[acc.mapP1(iInt+1, max, min)],
+			src[acc.map  (iInt+2, max, min)]
 		);
 	}
 
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
 	}
-
 /*
 	// TODO: is it worth trying to support strided arrays?
 	template <class AccessStrategy>
@@ -178,7 +215,7 @@ struct AllPass{
 	ipl::Type type() const { return ALLPASS; }
 	void type(ipl::Type v){}
 
-	/// Return element from power-of-2 array
+	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return ipl::allpass(
 			a.fraction(phase), 
@@ -187,19 +224,29 @@ struct AllPass{
 			prev
 		);
 	}
-	
+
+	/// Return interpolated element from array
+
+	/// \tparam AccessStrategy	access strategy type (\sa access)
+	///
+	/// \param[in] acc			access strategy
+	/// \param[in] src			source array
+	/// \param[in] iInt			integer part of index
+	/// \param[in] iFrac		fractional part of index, in [0, 1)
+	/// \param[in] max			maximum index for accessing
+	/// \param[in] min			minimum index for accessing
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{		
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return ipl::allpass(
 			iFrac,
-			a[iInt],
-			a[s.mapP1(iInt+1, max, min)],
+			src[iInt],
+			src[acc.mapP1(iInt+1, max, min)],
 			prev
 		);
 	}
 
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
 	}
 	
 	mutable T prev;
@@ -217,7 +264,7 @@ struct Switchable{
 	ipl::Type type() const { return mType; }
 	void type(ipl::Type v){ mType=v; }
 
-	/// Return element from power-of-2 array
+	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{		
 		switch(mType){
 			case ROUND:		return round	(a, phase);

@@ -1,7 +1,7 @@
 {
 	{
 		const int N=4;
-		Array<double> a(N);
+		double a[N];
 		for(int i=0; i<N; ++i) a[i]=i;
 		
 		assert(ipl::linear(0.5, a[0], a[1]) == 0.5);

@@ -52,7 +52,7 @@ public:
 //		index_t i1 = mIndMap(x, f);
 //		return mIpl(mAcc, *this, i1,f, size()-1);
 		index_t i1 = mIndMap(x, f) + mIMin;
-		return mIpl(mAcc, *this, i1,f, mIMax, mIMin);
+		return mIpl(mAcc, elems(), i1,f, mIMax, mIMin);
 
 		//int i2 = i1+1; if(i2==size()) i2=0;
 		//return (*this)[i1]*(1.f-f) + (*this)[i2]*f;

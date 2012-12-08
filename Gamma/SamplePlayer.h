@@ -195,7 +195,7 @@ PRE inline T CLS::read(int channel) const {
 	uint32_t posi = uint32_t(pos());
 	int Nframes= frames();
 	int offset = channel*Nframes;
-	return mIpol(*this, posi+offset, pos()-posi, offset+Nframes-1, offset);
+	return mIpol(elems(), posi+offset, pos()-posi, offset+Nframes-1, offset);
 }
 
 
