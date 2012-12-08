@@ -174,9 +174,13 @@ protected:
 /// \sa Other ways to synthesize sine waves: TableSine, CSine, LFO, Sine, SineR
 /// \sa Functions for building waveforms in tables with additive synthesis: addSine, addSines, addSinesPow, addWave
   
-template <class Tv=gam::real, template<class> class Sipol=ipl::Linear, class Stap=tap::Wrap, class Ts=Synced>
+template<
+	class Tv = gam::real,
+	template<class> class Sipol = ipl::Linear,
+	class Stap = tap::Wrap,
+	class Ts = Synced
+>
 class Osc : public Accum<Stap,Ts>, public ArrayPow2<Tv>{
-
 public:
 
 	/// Constructor that allocates an internal table
