@@ -11,13 +11,13 @@ Accum<> tmr(1./2);
 NoiseWhite<> white;		// 1/f^0 noise
 NoisePink<> pink;		// 1/f^1 noise
 NoiseBrown<> brown;		// 1/f^2 noise
-int type = 0;			// Noise type
+int type = 2;			// Noise type
 
 
 void audioCB(AudioIOData& io){
 
 	while(io()){
-		
+	
 		if(tmr()) (++type)%=3;
 		
 		float s = 0;
