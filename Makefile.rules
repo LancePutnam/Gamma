@@ -2,6 +2,7 @@
 # Common rules for all Makefiles
 #=========================================================================
 
+# Append linker flags set elsewhere
 CPPFLAGS	+= $(LINK_CPPFLAGS)
 LDFLAGS		+= $(LINK_LDFLAGS)
 
@@ -37,11 +38,16 @@ $(OBJ_DIR)%.o:: %.mm
 	@echo CC $< $@
 	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
 
+# Build pre-compiled headers
+$(OBJ_DIR)%.hpp.gch:: %.hpp
+	@echo CXX $< $@
+	$(CXX) -x c++ -c $(CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
+
 -include $(wildcard $(OBJ_DIR)*.dep)
 
 
 # Build static library
-$(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+$(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS) $(PCHS))
 ifneq ($(OBJS),)
 	@echo AR $@
 	@$(RM) $@
@@ -74,7 +80,8 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=$(LINK_LDFLAGS) -l$(LIB_NAME)"> Makefile.link
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=-l$(LIB_NAME) $(LINK_LDFLAGS)"> Makefile.link
+#	@printf "%b(LDFLAGS)\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS :=-l$(LIB_NAME) $(LINK_LDFLAGS) $$"> Makefile.link
 
 
 # Archive repository

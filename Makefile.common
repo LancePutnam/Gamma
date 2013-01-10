@@ -172,7 +172,8 @@ ifeq ($(PLATFORM), linux)
 	endif
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
-	LDFLAGS	+= -lm -lstdc++
+	CPPFLAGS += -I/usr/local/include/ -I/usr/include/
+	LDFLAGS	 += -lm -lstdc++
 	
 	DLIB_FLAGS += -shared
 	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
