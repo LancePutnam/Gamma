@@ -19,6 +19,7 @@ public:
 
 	double spu() const { return 1.; }		///< Returns local samples/unit
 	double ups() const { return 1.; }		///< Returns local units/sample
+	const Sync * sync() const { return syncSingleton(); } 	///< Returns reference to my Sync
 
 	///	Notification that subject's samples/unit has changed.
 
@@ -31,6 +32,8 @@ public:
 
 protected:
 	void initSynced(){ onResync(1); }
+	
+	static Sync * syncSingleton();
 };
 
 
@@ -130,17 +133,13 @@ friend class Synced;
 
 // Implementation_______________________________________________________________
 
-// Sync
+inline Sync * Synced1::syncSingleton(){
+	static Sync * s = new Sync(1.);
+	return s;
+}
 
-inline bool Sync::hasBeenSet() const { return mHasBeenSet; }
-inline double Sync::spu() const { return mSPU; }
-inline double Sync::ups() const { return mUPS; }
-
-
-// Synced
 
 #define SYNCED_INIT mSync(0), mSPU(1), mUPS(1)
-
 inline Synced::Synced()
 :	Node2<Synced>(), SYNCED_INIT
 {
@@ -162,6 +161,7 @@ inline Synced::Synced(const Synced& rhs)
 	Sync& s = rhs.mSync ? *rhs.mSync : Sync::master();
 	sync(s);
 }
+#undef SYNCED_INIT
 
 inline void Synced::initSynced(){ if(sync()) spu(sync()->spu()); }
 inline double Synced::scaleSPU() const { return sync() ? spu() / sync()->spu() : 1; }
@@ -172,6 +172,11 @@ inline double Synced::ups() const { return mUPS; }
 
 inline const Sync * Synced::sync() const { return mSync; }
 
+
+
+inline bool Sync::hasBeenSet() const { return mHasBeenSet; }
+inline double Sync::spu() const { return mSPU; }
+inline double Sync::ups() const { return mUPS; }
 } // gam::
 
 #endif
