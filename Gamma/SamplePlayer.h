@@ -216,9 +216,9 @@ PRE inline void CLS::pos(double v){	mPos = v; }
 
 PRE inline void CLS::phase(double v){ pos(v * frames()); }
 
-PRE inline void CLS::min(double v){	mMin = scl::clip<double>(v, frames()); }	
+PRE inline void CLS::min(double v){	mMin = scl::clip<double>(v, mMax, 0.); }	
 
-PRE inline void CLS::max(double v){ mMax = scl::clip<double>(v, frames()); }
+PRE inline void CLS::max(double v){ mMax = scl::clip<double>(v, frames(), mMin); }
 
 PRE void CLS::free(){ this->freeElements(); }
 
