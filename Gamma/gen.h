@@ -446,6 +446,10 @@ public:
 	/// Set amplitude
 	void amp(const T& v){ (*this).fromPolar(v, this->arg()); }
 	
+	/// Set complex amplitude
+	template <class U>
+	void amp(const Complex<U>& v){ (*this)(v.r, v.i); }
+	
 	/// Set amplitude decay/grow factor after N iterations
 	void decay(const T& target, const T& N=T(1)){
 		// NOTE: this handles negative decays, thought better to leave this to frequency component
