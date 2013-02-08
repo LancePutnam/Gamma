@@ -218,10 +218,13 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Needed to link to libraries installed through homebrew or by user
-	ifdef HAS_USR_LOCAL
+	ifneq ($(wildcard /usr/local/lib),)
 		LDFLAGS  += -L/usr/local/lib/
+	endif
+	ifneq ($(wildcard /usr/local/include),)
 		CPPFLAGS += -I/usr/local/include/
 	endif
+
 
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
