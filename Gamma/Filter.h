@@ -109,7 +109,7 @@ class Biquad : public Ts{
 public:
 
 	/// \param[in]	frq		Center frequency
-	/// \param[in]	res		Resonance amount in [1, inf)
+	/// \param[in]	res		Resonance (Q) amount in [1, inf)
 	/// \param[in]	type	Type of filter
 	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
 
@@ -128,7 +128,7 @@ public:
 
 
 	void freq(Tp v);					///< Set center frequency
-	void res(Tp v);						///< Set resonance
+	void res(Tp v);						///< Set resonance (Q)
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
 	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
 	void type(FilterType type);			///< Set type of filter
@@ -138,7 +138,7 @@ public:
 	Tv nextBP(Tv i0);					///< Optimized for band-pass types
 	
 	Tp freq() const { return mFreq; }	///< Get center frequency
-	Tp res() const { return mRes; }		///< Get resonance
+	Tp res() const { return mRes; }		///< Get resonance (Q)
 	FilterType type() const { return mType; }	///< Get filter type
 	
 	virtual void onResync(double r);
