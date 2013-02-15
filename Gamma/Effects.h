@@ -13,19 +13,22 @@
 namespace gam{
 
 ///\defgroup Effects
+///\defgroup Analysis
+
 
 /// Envelope Follower
 
-///\ingroup Filters    
-///\ingroup Envelopes
+/// This object produces an estimate of the amplitude envelope of a signal
+/// by feeding a full-wave rectification of the signal through a low-pass filter.
+///\ingroup Filters, Envelopes, Analysis
 template <class Tv=real, class Tp=real, class Ts=Synced>
-struct EnvFollow{
+class EnvFollow{
+public:
 
 	/// \param[in] freq		Cutoff frequency of smoothing filter
-    
-    
 	EnvFollow(Tp freq=10)
 	:	lpf(freq){}
+
 
 	/// Filter next sample
 	Tv operator()(Tv i0){ return lpf(scl::abs(i0)); }
@@ -44,7 +47,8 @@ struct EnvFollow{
     
 /// \ingroup Filters
 /// \ingroup Effects
-struct Biquad3{
+class Biquad3{
+public:
 	/// Constructor
 	Biquad3(float f0, float f1, float f2, float q=8, FilterType type=BAND_PASS):
 		bq0(f0,q,type), bq1(f1,q,type), bq2(f2,q,type){}
@@ -60,8 +64,8 @@ struct Biquad3{
 
 
 /// Percussive noise burst consisting of resonant-filtered white noise with a rapidly decaying amplitude
-    
-struct Burst{
+class Burst{
+public:
 	Burst(float frq1=20000, float frq2=4000, float dec=0.1, float res=2) : 
 		freq1(frq1), freq2(frq2), fil(frq1, res, BAND_PASS), env(dec)
 	{}
@@ -88,7 +92,8 @@ struct Burst{
 
 /// Sine wave with frequency and amplitude driven by an exponentially decaying envelope.
 template <class T=gam::real>
-struct Chirp{
+class Chirp{
+public:
 	/// \param[in] freq1	start frequency
 	/// \param[in] freq2	end frequency
 	/// \param[in] decay60	units to decay by 60 dB
@@ -129,8 +134,10 @@ struct Chirp{
 /// This filter applies a Chebyshev polynomial to generate the 2nd through Nth 
 /// cosine harmonics of the input signal which is presumed to be a unity gain 
 /// sinusoid.
+///\ingroup Filters
 template <unsigned N, class T=gam::real> 
-struct ChebyN{
+class ChebyN{
+public:
 	T c[N];			///< Harmonic coefficients
 	
 	ChebyN(const T& fundAmp = T(1)){ zero(); c[0]=fundAmp; }
@@ -179,9 +186,11 @@ struct ChebyN{
 
 /// Dual delay-line chorus driven by quadrature sinusoid
 
+///
 /// \ingroup Effects
 template <class T=gam::real>
-struct Chorus{
+class Chorus{
+public:
 	/// \param[in] delay	Delay interval
 	/// \param[in] depth	Depth of delay-line modulation
 	/// \param[in] freq		Frequency of modulation
@@ -234,11 +243,13 @@ struct Chorus{
 
 
 /// Frequency shifter
-    
-/// \ingroup Effects
-template <class T=gam::real>
-struct FreqShift{
 
+/// This effect shifts all frequencies of an input signal by a constant amount.
+/// It is also known as single-sideband modulation.
+///\ingroup Effects
+template <class T=gam::real>
+class FreqShift{
+public:
 	/// \param[in] shift	frequency shift amount
 	FreqShift(float shift=1): mod(shift){}
 
@@ -256,9 +267,9 @@ struct FreqShift{
 
 
 
-// Saw oscillator with sweepable filter.
-       
-struct MonoSynth{
+/// Saw oscillator with sweepable filter.
+class MonoSynth{
+public:
 	MonoSynth(float freq=440, float dur=0.8, float ctf1=1000, float ctf2=100, float res=3):
 		osc(freq), filter(ctf1, res), env(dur), opEnv(100), ctf1(ctf1), ctf2(ctf2)
 	{}
@@ -286,7 +297,8 @@ struct MonoSynth{
 
 
 /// Equal-power 2-channel panner
-    
+
+///
 /// \ingroup Effects
 template <class T=gam::real>
 class Pan{
@@ -347,9 +359,11 @@ protected:
 
 
 /// Plucked string source/filter
-    
+
+///
 /// \ingroup Oscillators
-struct Pluck{
+class Pluck{
+public:
 	Pluck(double freq=440, double decay=0.99)
 	:	env(0.1), fil(3000, 1, LOW_PASS), comb(1./27.5, 1./freq, 1, decay)
 	{}
@@ -367,7 +381,10 @@ struct Pluck{
 
 
 
-/// Quantizes sequence sampling and element magnitudes.
+/// Downsamples and quantizes amplitudes
+
+/// This effect is also known as a bitcrusher.
+///\ingroup Effects
 template <class T=gam::real>
 class Quantizer : public Synced{
 public:
@@ -435,8 +452,10 @@ void Quantizer<T>::onResync(double r){
 /// This filter compares the input magnitude to a threshold and returns 1 if 
 /// it's greater than the threshold and 0 otherwise.  The output is sent through
 /// a one-pole low-pass filter.
+///\ingroup Analysis
 template <class T=gam::real>
-struct Threshold{
+class Threshold{
+public:
 	/// \param[in] thresh	Comparing threshold
 	/// \param[in] freq		Cutoff frequency of output smoother
 	Threshold(T thresh, T freq=10):lpf(freq), thresh(thresh){}
@@ -449,6 +468,36 @@ struct Threshold{
 	
 	OnePole<T> lpf;	///< Output smoother
 	T thresh;		///< Threshold value
+};
+
+
+
+/// Zero-crossing detector
+
+/// This object determines when a zero crossing occurs. It can distinguish 
+/// between both positive (rising) and negative (falling) zero crossings.
+///\ingroup Analysis
+template<class Tv=gam::real>
+class ZeroCross{
+public:
+
+	ZeroCross(Tv prev = Tv(0)): mPrev(prev){}
+
+	/// Detect zero crossing
+
+	/// \returns 
+	///		 0 if no zero crossing,
+	///		-1 if a negative (falling) zero crossing, and
+	///		 1 if a positive (rising) zero crossing.
+	int operator()(Tv input){
+		int pzc = int((input > Tv(0)) && (mPrev <= Tv(0)));
+		int nzc =-int((input < Tv(0)) && (mPrev >= Tv(0)));
+		mPrev = input;
+		return pzc + nzc;
+	}
+
+private:
+	Tv mPrev;
 };
 
 } // gam::
