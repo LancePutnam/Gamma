@@ -16,6 +16,7 @@
 
 // Define some standard C99 functions that Windows is too stubborn to support.
 #if GAM_WINDOWS
+	#include <float.h> /* _nextafter */
 	// Undefine macros in windows.h
 	#ifdef max
 	#undef max
