@@ -21,7 +21,7 @@ namespace gam{
 /// This is a linear phase accumulator that uses integer (fixed-point) 
 /// arithmetic. The advantage of using fixed-point versus floating-point is that
 /// the phase is wrapped automatically when the integer overflows. As long as
-/// we used unsigned integers, this wrapping behavior is well-defined- all 
+/// we used unsigned integers, this wrapping behavior is well-defined--all 
 /// results of addition are taken modulo the maximum size of the integer.
 /// \tparam Stap	Read tap strategy (tap::Clip, tap::Fold, tap::Rep, or tap::Wrap)
 /// \tparam Ts		Synced type
@@ -75,10 +75,12 @@ public:
 	/// negative, then the bits are scanned (perhaps more intuitively) from the 
 	/// MSB to the LSB.
 	/// The following shows all 4-bit patterns made from hex values:
+	///\verbatim
+	///		hex pattern		hex	pattern		hex pattern		hex pattern
 	///		0	. . . .		4	. / . .		8	/ . . .		c	/ / . .
 	///		1	. . . /		5	. / . /		9	/ . . /		d	/ / . /
 	///		2	. . / .		6	. / / .		a	/ . / .		e	/ / / .
-	///		3	. . / /		7	. / / /		b	/ . / /		f	/ / / /
+	///		3	. . / /		7	. / / /		b	/ . / /		f	/ / / /			\endverbatim
 	bool seq(uint32_t pattern);
 
 	virtual void onResync(double r);
