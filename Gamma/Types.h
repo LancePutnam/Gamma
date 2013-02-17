@@ -75,6 +75,9 @@ struct Complex{
 	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
 
+	template <class U>
+	C& set(const Complex<U>& v){ r=v.r; i=v.i; return *this; }
+
 	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
 	C& operator()(const Polar<T>& p){ return *this = p; }
 	T& operator[](uint32_t i){ return elems[i];}
