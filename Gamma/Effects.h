@@ -42,6 +42,29 @@ public:
 };
 
 
+/// Amplitude modulator
+
+/// Amplitude modulation multiplies two signals together, the product of which
+/// contains the sum and difference frequencies of the inputs.
+/// Unlike ring modulation, amplitude modulation does not suppress the carrier
+/// signal.
+template <class Tp=real>
+class AM{
+public:
+
+	/// Set depth of amplitude modulation
+	void depth(Tp v){ mDepth=v; }
+
+	/// Modulate amplitude of carrier by modulator
+	template <class Tv>
+	Tv operator()(Tv car, Tv mod){
+		return (mDepth*mod)*car + car;
+	}
+
+private:
+	Tp mDepth;
+};
+
 
 /// 3 biquad filters (of floats) in parallel
     
