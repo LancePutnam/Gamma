@@ -12,11 +12,11 @@ namespace gam{
 //
 //			However, if no Synceds are added and notifyObservers() is called we get a crash!
 Sync::Sync()
-:	mSPU(1.), mUPS(1.), mHeadSynced(true, *this), mHasBeenSet(false)
+:	mSPU(1.), mUPS(1.), mHeadObserver(true, *this), mHasBeenSet(false)
 {}
 
 Sync::Sync(double spuA)
-:	mHeadSynced(true, *this)
+:	mHeadObserver(true, *this)
 { spu(spuA); }
 
 Sync::~Sync(){
@@ -28,18 +28,18 @@ Sync::~Sync(){
 //	}
 }
 
-Sync& Sync::operator<< (Synced& synced){ synced.sync(*this); return(*this); }
+Sync& Sync::operator<< (Synced& obs){ obs.sync(*this); return(*this); }
 
-void Sync::addSynced(Synced& synced){
+void Sync::addObserver(Synced& obs){
 	//printf("%p: ", &synced); mHeadSynced.print();
-	if(&synced != &mHeadSynced){
-		synced.nodeInsertR(mHeadSynced);
+	if(&obs != &mHeadObserver){
+		obs.nodeInsertR(mHeadObserver);
 	}
 	//printf("%p: ", &synced); mHeadSynced.print();
 }
 
 void Sync::notifyObservers(double r){
-	Synced * s = mHeadSynced.nodeR;
+	Synced * s = mHeadObserver.nodeR;
 
 	while(s){	//printf("Sync %p: Notifying %p\n", this, s);
 		s->scaleSPU(r);	// this will call onResync()
@@ -66,8 +66,8 @@ void Sync::ups(double val){ spu(1./val); }
 
 Synced& Synced::operator= (const Synced& rhs){
 	if(this != &rhs){
-		if(rhs.mSync){
-			sync(*rhs.mSync);
+		if(rhs.mSubject){
+			sync(*rhs.mSubject);
 		}
 	}
 	return *this;
@@ -81,16 +81,14 @@ void Synced::scaleSPU(double v){
 
 void Synced::scaleUPS(double v){ scaleSPU(1./v); }
 
-void Synced::sync(Sync& src){
-	if(&src != mSync){
-		if(mSync) nodeRemove();
-		src.addSynced(*this);
-		double r = src.spu() / (mSync ? mSync->spu() : 1.);
-		mSync = &src;
+void Synced::sync(Sync& newSubject){
+	if(&newSubject != mSubject){
+		if(mSubject) nodeRemove();
+		newSubject.addObserver(*this);
+		double r = newSubject.spu() / (mSubject ? mSubject->spu() : 1.);
+		mSubject = &newSubject;
 		scaleSPU(r);	// calls onResync()
 	}
 }
 
-
-
-} // end namespace gam
+} // gam::

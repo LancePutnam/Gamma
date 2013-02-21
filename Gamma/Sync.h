@@ -19,7 +19,7 @@ public:
 
 	double spu() const { return 1.; }		///< Returns local samples/unit
 	double ups() const { return 1.; }		///< Returns local units/sample
-	const Sync * sync() const { return syncSingleton(); } 	///< Returns reference to my Sync
+	const Sync * sync() const { return subjectSingleton(); } 	///< Returns reference to my subject
 
 	///	Notification that subject's samples/unit has changed.
 
@@ -33,7 +33,7 @@ public:
 protected:
 	void initSynced(){ onResync(1); }
 	
-	static Sync * syncSingleton();
+	static Sync * subjectSingleton();
 };
 
 
@@ -84,9 +84,9 @@ private:
 	friend class Sync;
 	Synced(bool zeroLinks, Sync& src);
 
-	Sync * mSync;	// Reference to my Sync
-	double mSPU;	// Local samples/unit
-	double mUPS;	// Local units/sample
+	Sync * mSubject;	// My subject
+	double mSPU;		// Local samples/unit
+	double mUPS;		// Local units/sample
 };
 
 
@@ -104,7 +104,7 @@ public:
 
 	~Sync();
 
-	Sync& operator<< (Synced& synced);	///< Attach observer
+	Sync& operator<< (Synced& obs);		///< Attach observer
 	void notifyObservers(double r);		///< Notify observers (\see Synced::onResync)
 	void spu(double v);					///< Set samples/unit and notify observers
 	void ups(double v);					///< Set units/sample and notify observers
@@ -121,11 +121,11 @@ public:
 
 protected:
 	double mSPU, mUPS;
-	Synced mHeadSynced;		// Head of Synced doubly-linked list.
+	Synced mHeadObserver;	// Head of observer doubly-linked list
 	bool mHasBeenSet;
 
 friend class Synced;
-	void addSynced(Synced& synced);
+	void addObserver(Synced& obs);
 };
 
 
@@ -133,13 +133,13 @@ friend class Synced;
 
 // Implementation_______________________________________________________________
 
-inline Sync * Synced1::syncSingleton(){
+inline Sync * Synced1::subjectSingleton(){
 	static Sync * s = new Sync(1.);
 	return s;
 }
 
 
-#define SYNCED_INIT mSync(0), mSPU(1), mUPS(1)
+#define SYNCED_INIT mSubject(0), mSPU(1), mUPS(1)
 inline Synced::Synced()
 :	Node2<Synced>(), SYNCED_INIT
 {
@@ -158,7 +158,7 @@ inline Synced::Synced(const Synced& rhs)
 :	Node2<Synced>(), SYNCED_INIT
 {
 	//printf("Synced::Synced(const Synced&) - %p\n", this);
-	Sync& s = rhs.mSync ? *rhs.mSync : Sync::master();
+	Sync& s = rhs.mSubject ? *rhs.mSubject : Sync::master();
 	sync(s);
 }
 #undef SYNCED_INIT
@@ -170,7 +170,7 @@ inline void Synced::ups(double v){ scaleUPS(v * spu()); }
 inline double Synced::spu() const { return mSPU; }
 inline double Synced::ups() const { return mUPS; }
 
-inline const Sync * Synced::sync() const { return mSync; }
+inline const Sync * Synced::sync() const { return mSubject; }
 
 
 
