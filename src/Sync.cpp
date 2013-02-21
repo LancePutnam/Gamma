@@ -10,7 +10,7 @@ namespace gam{
 // Note:	We can't zero the head node's links because it might be constructed
 //			after nodes have been appended to it!
 //
-//			However, if no Synceds are added and notifySynceds() is called we get a crash!
+//			However, if no Synceds are added and notifyObservers() is called we get a crash!
 Sync::Sync()
 :	mSPU(1.), mUPS(1.), mHeadSynced(true, *this), mHasBeenSet(false)
 {}
@@ -38,7 +38,7 @@ void Sync::addSynced(Synced& synced){
 	//printf("%p: ", &synced); mHeadSynced.print();
 }
 
-void Sync::notifySynceds(double r){
+void Sync::notifyObservers(double r){
 	Synced * s = mHeadSynced.nodeR;
 
 	while(s){	//printf("Sync %p: Notifying %p\n", this, s);
@@ -53,7 +53,7 @@ void Sync::spu(double v){
 		double r = v/mSPU;
 		mSPU = v;
 		mUPS = 1. / v;
-		notifySynceds(r);	// call onResync() of my Synceds
+		notifyObservers(r);	// call onResync() of my Synceds
 	}
 }
 

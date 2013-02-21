@@ -105,7 +105,7 @@ public:
 	~Sync();
 
 	Sync& operator<< (Synced& synced);	///< Attach observer
-	void notifySynceds(double r);		///< Notify observers (\see Synced::onResync)
+	void notifyObservers(double r);		///< Notify observers (\see Synced::onResync)
 	void spu(double v);					///< Set samples/unit and notify observers
 	void ups(double v);					///< Set units/sample and notify observers
 
