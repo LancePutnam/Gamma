@@ -20,7 +20,9 @@ void audioCB(AudioIOData& io){
 
 		float s = src();
 
-		// Here is the feedback delay...
+		// Here is the feedback delay:
+		// We read the oldest sample from the delay line, scale it, and feed
+		// it back into the delay.
 		s += delay(s + delay()*0.7);
 	
 		io.out(0) = io.out(1) = s;
