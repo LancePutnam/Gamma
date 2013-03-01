@@ -28,6 +28,10 @@ $(OBJ_DIR)%.o:: %.cpp
 	@echo CXX $< $@
 	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
 
+$(OBJ_DIR)%.o:: %.cc
+	@echo CXX $< $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
+
 # Build object file from C source
 $(OBJ_DIR)%.o:: %.c
 	@echo CC $< $@
