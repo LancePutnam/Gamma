@@ -486,6 +486,7 @@ void ArrayBase<T,S,A>::source(ArrayBase<T,S,A>& src){
 
 template <class T, class S, class A>
 void ArrayBase<T,S,A>::source(T * src, uint32_t size){
+	if(src == mElems) return; // check for self assignment
 	clear();
 	if(managing(src)){
 		++refCount()[src];
