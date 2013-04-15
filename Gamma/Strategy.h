@@ -342,16 +342,36 @@ namespace iplSeq{
 		T v[N];	///< Value buffer, 0 is newest, N-1 is oldest
 	};
 
+	/// Non-interpolating sequence interpolation strategy
+    
+    /// \ingroup iplSeq
+	template <class T>
+	struct None : public Base<1,T>{
+		using Base<1,T>::v;
+		None(const T& v=0): Base<1,T>(v){}
+		T operator()(float f) const { return v[0]; }
+	};
+
 	/// Truncating sequence interpolation strategy
     
     /// \ingroup iplSeq
 	template <class T>
-	struct Trunc : public Base<1,T>{
-		using Base<1,T>::v;
-		Trunc(const T& v=0): Base<1,T>(v){}
-		T operator()(float f) const { return v[0]; }
+	struct Trunc : public Base<2,T>{
+		using Base<2,T>::v;
+		Trunc(const T& v=0): Base<2,T>(v){}
+		T operator()(float f) const { return v[1]; }
 	};
-	
+
+	/// Round half up sequence interpolation strategy
+    
+    /// \ingroup iplSeq
+	template <class T>
+	struct Round : public Base<2,T>{
+		using Base<2,T>::v;
+		Round(const T& v=0): Base<2,T>(v){}
+		T operator()(float f) const { return ipl::nearest(f, v[1], v[0]); }
+	};
+
 	/// Linear sequence interpolation strategy
     
     /// \ingroup iplSeq
