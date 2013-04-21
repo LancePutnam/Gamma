@@ -4,14 +4,10 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+// Function objects representing algorithms
+/// \defgroup Strategies Strategies
 
-/// \defgroup ipl Interpolation
-
-/// Gamma supports several interpolation strategies.  These can be used, for example,
-/// to make a delay line whose delay amount is a non-integer number of samples.
-/// Julius Smith's <A HREF="https://ccrma.stanford.edu/~jos/pasp/Delay_Line_Interpolation.html">
-/// Delay-Line Interpolation page</A>
-
+// \defgroup ipl Interpolation
 
 #include "Gamma/Access.h"
 #include "Gamma/Containers.h"
@@ -19,11 +15,17 @@
 #include "Gamma/scl.h"
 
 namespace gam{
+
+/// Gamma supports several interpolation strategies.  These can be used, for example,
+/// to make a delay line whose delay amount is a non-integer number of samples.
+/// Julius Smith's <A HREF="https://ccrma.stanford.edu/~jos/pasp/Delay_Line_Interpolation.html">
+/// Delay-Line Interpolation page</A>
+/// \defgroup ipl Random-access Interpolation Strategies
 namespace ipl{
 
 /// Truncating random-access interpolation strategy
 
-/// \ingroup ipl
+/// \ingroup Strategies, ipl
 template <class T>
 struct Trunc{
 
@@ -58,7 +60,7 @@ struct Trunc{
 
 /// Nearest neighbor random-access interpolation strategy
     
-/// \ingroup ipl
+/// \ingroup Strategies, ipl
 template <class T>
 struct Round{
 
@@ -98,7 +100,7 @@ struct Round{
 
 /// Linear random-access interpolation strategy
     
-/// \ingroup ipl
+/// \ingroup Strategies, ipl
 template <class T>
 struct Linear{
 
@@ -141,7 +143,7 @@ struct Linear{
 
 /// Cubic random-access interpolation strategy
     
-/// \ingroup ipl
+/// \ingroup Strategies, ipl
 template <class T>
 struct Cubic{
 
@@ -206,7 +208,7 @@ struct Cubic{
 
 /// Allpass random-access interpolation strategy
     
-/// \ingroup ipl
+/// \ingroup Strategies, ipl
 template <class T>
 struct AllPass{
 
@@ -255,7 +257,7 @@ struct AllPass{
 
 /// Dynamically switchable random-access interpolation strategy
     
-/// \ingroup ipl
+/// \ingroup Strategies, ipl
 template <class T>
 struct Switchable{
 
@@ -317,12 +319,12 @@ protected:
 // ()			return value at fraction
 // push			push new value into interpolation window
 
-/// \defgroup iplSeq Sequence Interpolation
+/// \defgroup iplSeq Sequence Interpolation Strategies
 namespace iplSeq{
 
 	/// Base class for sequence interpolation strategies
     
-    /// \ingroup iplSeq
+    /// \ingroup Strategies, iplSeq
 	template <uint32_t N, class T>
 	struct Base{
 		Base(const T& v=0){ set(v); }
@@ -343,8 +345,8 @@ namespace iplSeq{
 	};
 
 	/// Truncating sequence interpolation strategy
-    
-    /// \ingroup iplSeq
+
+    /// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Trunc : public Base<1,T>{
 		using Base<1,T>::v;
@@ -354,7 +356,7 @@ namespace iplSeq{
 	
 	/// Linear sequence interpolation strategy
     
-    /// \ingroup iplSeq
+    /// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Linear : public Base<2,T>{
 		using Base<2,T>::v;
@@ -364,7 +366,7 @@ namespace iplSeq{
 
 	/// Cubic sequence interpolation strategy
     
-    /// \ingroup iplSeq
+    /// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Cubic : public Base<4,T>{
 		using Base<4,T>::v;
@@ -376,7 +378,7 @@ namespace iplSeq{
 
 	/// Cosine sequence interpolation strategy
     
-    /// \ingroup iplSeq
+    /// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Cosine : public Base<2,T>{
 		using Base<2,T>::v;
@@ -396,13 +398,27 @@ namespace iplSeq{
 //	T operator()(T v, T max, T min);					// float tap post increment check
 //	void reset();										// reset internal state, if any
     
-/// \defgroup phsInc Phase Increment
+/// \defgroup phsInc Phase Increment Strategies
 namespace phsInc{
+
+	/// Loop waveform indefinitely.
+            
+    /// \ingroup Strategies, phsInc
+	struct Loop{
+		void reset(){}
+	
+		uint32_t operator()(uint32_t& pos, uint32_t inc){ return pos+=inc; }
+		bool done(uint32_t pos) const { return false; }
+		
+		template <class T>
+		T operator()(T v, T inc, T max, T min){ return scl::wrap(v+inc, max, min); }
+	};
+
 
 	/// Play waveform one cycle, then hold at the end. A one-shot.
     
-    /// \ingroup phsInc
-	struct Clip{
+    /// \ingroup Strategies, phsInc
+	struct OneShot{
 		void reset(){}
 	
 		uint32_t operator()(uint32_t& pos, uint32_t inc){
@@ -422,11 +438,49 @@ namespace phsInc{
 	};
 
 
+	/// Repeat waveform a fixed number of times, then hold at the end.
+    
+    /// \ingroup Strategies, phsInc
+	struct NShot{
+		NShot(){ number(1); reset(); }
+		
+		void reset(){ mCount=0; }
+
+		uint32_t operator()(uint32_t& pos, uint32_t inc){
+			uint32_t prev = pos;
+			pos += inc;
+			
+			// Check MSB goes from 1 to 0
+			// TODO: works only for positive increments and non-zero mNumber
+			if((~pos & prev) & 0x80000000){
+				if(++mCount >= mNumber) pos = 0xffffffff;
+			}
+			return pos;
+		}
+		
+		bool done(uint32_t pos) const { return (mCount >= mNumber) && (pos == 0xffffffff); }
+		
+		template <class T>
+		T operator()(T v, T inc, T max, T min){
+			v += inc;
+			if(v >= max || v < min) ++mCount;
+			return mCount < mNumber ? scl::wrap(v, max, min) : scl::clip(v, max, min);
+		}
+		
+		// Set number of repetitions
+		NShot& number(uint32_t v){ mNumber=v; return *this; }
+
+	private:
+		uint32_t mNumber;
+		uint32_t mCount;
+	};
+
+
 	/// Play waveform forward, backwards, forward, etc.  Like Wrap, loops indefinitely.
     
-    /// \ingroup phsInc
-	struct Fold{
-		Fold(): dir(0){}
+    /// \ingroup Strategies, phsInc
+	struct PingPong{
+		PingPong(): dir(0){}
 	
 		void reset(){ dir=0; }
 	
@@ -454,10 +508,10 @@ namespace phsInc{
 
 	/// Plays and holds waveform according to binary repeating pattern.
     
-    /// \ingroup phsInc
-	struct Pat{
+    /// \ingroup Strategies, phsInc
+	struct Rhythm{
 	
-		Pat(){
+		Rhythm(){
 			pattern(0,0);
 			reset();
 		}
@@ -481,13 +535,13 @@ namespace phsInc{
 			return pos;
 		}
 		
-		Pat& pattern(uint32_t bits, uint16_t size){
+		Rhythm& pattern(uint32_t bits, uint16_t size){
 			mPattern=bits;
 			mSize=size;
 			return *this;
 		}
 		
-		Pat& pattern(const char* bits){
+		Rhythm& pattern(const char* bits){
 			mSize = strlen(bits);
 			mPattern = 0;
 			for(int i=0; i<mSize; ++i){
@@ -503,62 +557,15 @@ namespace phsInc{
 		uint16_t mSize;
 	};
 
-
-	/// Repeat waveform a fixed number of times, then hold at the end.
-    
-    /// \ingroup phsInc
-	struct Rep{
-		Rep(){ number(1); reset(); }
-		
-		void reset(){ mCount=0; }
-
-		uint32_t operator()(uint32_t& pos, uint32_t inc){
-			uint32_t prev = pos;
-			pos += inc;
-			
-			// Check MSB goes from 1 to 0
-			// TODO: works only for positive increments and non-zero mNumber
-			if((~pos & prev) & 0x80000000){
-				if(++mCount >= mNumber) pos = 0xffffffff;
-			}
-			return pos;
-		}
-		
-		bool done(uint32_t pos) const { return (mCount >= mNumber) && (pos == 0xffffffff); }
-		
-		template <class T>
-		T operator()(T v, T inc, T max, T min){
-			v += inc;
-			if(v >= max || v < min) ++mCount;
-			return mCount < mNumber ? scl::wrap(v, max, min) : scl::clip(v, max, min);
-		}
-		
-		// Set number of repetitions
-		Rep& number(uint32_t v){ mNumber=v; return *this; }
-
-	private:
-		uint32_t mNumber;
-		uint32_t mCount;
-	};
-
-
-	/// Loop waveform indefinitely.
-            
-    /// \ingroup phsInc
-	struct Wrap{
-		void reset(){}
-	
-		uint32_t operator()(uint32_t& pos, uint32_t inc){ return pos+=inc; }
-		bool done(uint32_t pos) const { return false; }
-		
-		template <class T>
-		T operator()(T v, T inc, T max, T min){ return scl::wrap(v+inc, max, min); }
-	};
+	typedef Loop Wrap;
+	typedef OneShot Clip;
+	typedef NShot Rep;
+	typedef PingPong Fold;
+	typedef Rhythm Pat;
 
 } // phsInc::
 
 namespace tap = phsInc;
-
 
 } // gam::
 #endif
