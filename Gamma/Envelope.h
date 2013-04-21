@@ -561,7 +561,11 @@ public:
 	
 	/// Returns whether envelope is done
 	bool done() const { return mAcc.val >= Tp(1); }
-	
+
+	/// Get current value
+	Tv val() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
+
+
 	/// Generate next value
 	Tv operator()(){
 		Tp f = mAcc.val;
@@ -590,20 +594,23 @@ public:
 		mAcc();
 		return v;
 	}
+
 	
 	/// Set frequency of envelope
 	void freq(Tp v){ mFreq = v; mAcc.add = v * Ts::ups(); }
 	
-	/// Set length in domain units.
-	void period(Tp v){ freq((Tp)1/v); }
+	/// Set length, in domain units
+	void length(Tp v){ freq((Tp)1/v); }
+
+	/// Set length, in domain units
+	void period(Tp v){ length(v); }
 
 	/// Set phase along segment
 	void phase(Tp v){ mAcc = v; }
 
 	/// Reset envelope
 	void reset(){ phase((Tp)0); }
-	
-	Tv val() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
+
 	
 	Si<Tv>& ipol(){ return mIpl; }
 	
