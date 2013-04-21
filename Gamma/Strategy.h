@@ -421,6 +421,15 @@ namespace iplSeq{
 /// \defgroup phsInc Phase Increment Strategies
 namespace phsInc{
 
+	// Increment and clip to closed-open interval [min, max)
+	template <class T>
+	T incClip(T v, T inc, T max, T min){
+		T res = v + inc;
+		if(res >= max) return v;
+		if(res <  min) return min;
+		return res;
+	}
+
 	/// Loop waveform indefinitely.
             
     /// \ingroup Strategies, phsInc
@@ -454,7 +463,7 @@ namespace phsInc{
 		bool done(uint32_t pos) const { return pos == 0xffffffff; }
 		
 		template <class T>
-		T operator()(T v, T inc, T max, T min){ return scl::clip(v+inc, max, min); }
+		T operator()(T v, T inc, T max, T min){ return incClip(v,inc,max,min); }
 	};
 
 
@@ -484,7 +493,7 @@ namespace phsInc{
 		T operator()(T v, T inc, T max, T min){
 			v += inc;
 			if(v >= max || v < min) ++mCount;
-			return mCount < mNumber ? scl::wrap(v, max, min) : scl::clip(v, max, min);
+			return mCount < mNumber ? scl::wrap(v, max, min) : incClip(v, inc, max, min);
 		}
 		
 		// Set number of repetitions
