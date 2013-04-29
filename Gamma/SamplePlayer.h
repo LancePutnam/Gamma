@@ -87,6 +87,10 @@ public:
 	void range(double phs, double period);	///< Set interval start phase and period
 	void reset();							///< Reset playback head
 
+
+	/// Whether sample playback has completed (non-looping only)
+	bool done() const;
+
 	double max() const { return mMax; }		///< Get interval max
 	double min() const { return mMin; }		///< Get interval min
 	double period() const;					///< Get total period of sample data
@@ -181,7 +185,7 @@ bool CLS::load(const Char * pathToSoundFile){
 	return false;
 }
 
-PRE void CLS::advance(){
+PRE inline void CLS::advance(){
 	mPos = mPhsInc(pos(), mInc, max(), min()); // update read position, in frames
 }
 
@@ -216,9 +220,9 @@ PRE inline void CLS::pos(double v){	mPos = v; }
 
 PRE inline void CLS::phase(double v){ pos(v * frames()); }
 
-PRE inline void CLS::min(double v){	mMin = scl::clip<double>(v, mMax, 0.); }	
+PRE void CLS::min(double v){	mMin = scl::clip<double>(v, mMax, 0.); }	
 
-PRE inline void CLS::max(double v){ mMax = scl::clip<double>(v, frames(), mMin); }
+PRE void CLS::max(double v){ mMax = scl::clip<double>(v, frames(), mMin); }
 
 PRE void CLS::free(){ this->freeElements(); }
 
@@ -227,15 +231,24 @@ PRE inline void CLS::rate(double v){
 	mInc = v * mSampleRate * ups();
 }
 
-PRE inline void CLS::range(double posn, double period){
+PRE void CLS::range(double posn, double period){
 	phase(posn);
 	min(pos());
 	max(pos() + period * spu());	
 }
 
-PRE inline void CLS::reset(){
+PRE void CLS::reset(){
 	pos(rate()<0 ? max() : min());
 	mPhsInc.reset();
+}
+
+PRE inline bool CLS::done() const{
+	if(rate() >= 0.){
+		return pos() >= (max() - 1);
+	}
+	else{
+		return pos() <= min();
+	}
 }
 
 PRE inline double CLS::period() const { return frames() * ups(); }
