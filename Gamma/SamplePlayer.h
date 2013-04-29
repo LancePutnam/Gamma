@@ -20,9 +20,9 @@ namespace gam{
 ///	The number of frames in the sample should not exceed 2^32. This equates
 ///	to 27 hours at 44.1 kHz.
 ///
-/// \tparam T	value (sample) type
-/// \tparam Si	interpolation strategy
-/// \tparam Sp	phase increment strategy
+/// \tparam T	Value (sample) type
+/// \tparam Si	Interpolation strategy
+/// \tparam Sp	Phase increment strategy
 template<
 	class T = real,
 	template<class> class Si = ipl::Trunc,
@@ -51,7 +51,10 @@ public:
 	explicit SamplePlayer(const Char * pathToSoundFile, double rate=1);
 
 
-	/// Load a sound file into internal buffer
+	/// Load a sound file into internal sample buffer
+	
+	/// \returns whether the sound file loaded properly
+	///
 	template<class Char>
 	bool load(const Char * pathToSoundFile);
 
@@ -68,7 +71,9 @@ public:
 	/// Set sample buffer
 	
 	/// \param[in] src		Sample buffer (if multichannel, must be deinterleaved)
-	/// \param[in] smpRate	Sample rate of samples
+	/// \param[in] smpRate	Sample rate of sample buffer.
+	///						If the sample is a wavetable, then this should be
+	///						its period, in samples.
 	/// \param[in] channels	Number of channels in sample buffer
 	void buffer(Array<T>& src, double smpRate, int channels);
 	
@@ -79,6 +84,8 @@ public:
 	void buffer(SamplePlayer& src);
 
 	void free();							///< Free sample buffer (if owner)
+
+	void freq(double v){ rate(v); }			///< Set frequency if sample buffer is a wavetable
 	void max(double v);						///< Set interval max, in frames
 	void min(double v);						///< Set interval min, in frames
 	void pos(double v);						///< Set current read position, in frames
@@ -91,6 +98,7 @@ public:
 	/// Whether sample playback has completed (non-looping only)
 	bool done() const;
 
+	int channels() const { return mChans; }	///< Get number of channels
 	double max() const { return mMax; }		///< Get interval max
 	double min() const { return mMin; }		///< Get interval min
 	double period() const;					///< Get total period of sample data
@@ -99,7 +107,8 @@ public:
 	double rate() const { return mRate; }	///< Get playback rate
 	double sampleRate() const { return mSampleRate; } ///< Get sample rate of sample buffer
 
-	int channels() const { return mChans; }	///< Get number of channels
+	/// Get whether the sample buffer is valid for playback
+	bool valid() const;
 
 	virtual void onResync(double r){ sampleRate(mSampleRate); }
 
@@ -220,7 +229,7 @@ PRE inline void CLS::pos(double v){	mPos = v; }
 
 PRE inline void CLS::phase(double v){ pos(v * frames()); }
 
-PRE void CLS::min(double v){	mMin = scl::clip<double>(v, mMax, 0.); }	
+PRE void CLS::min(double v){ mMin = scl::clip<double>(v, mMax, 0.); }	
 
 PRE void CLS::max(double v){ mMax = scl::clip<double>(v, frames(), mMin); }
 
@@ -255,6 +264,10 @@ PRE inline double CLS::period() const { return frames() * ups(); }
 
 PRE inline double CLS::posInInterval(double frac) const {
 	return min() + (max() - min()) * frac;
+}
+
+PRE bool CLS::valid() const {
+	return this->mElems && (this->mElems != defaultBuffer());
 }
 
 #undef PRE
