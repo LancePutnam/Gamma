@@ -99,6 +99,7 @@ public:
 	bool done() const;
 
 	int channels() const { return mChans; }	///< Get number of channels
+	double freq() const { return rate(); }	///< Get frequency if sample buffer is a wavetable
 	double max() const { return mMax; }		///< Get interval max
 	double min() const { return mMin; }		///< Get interval min
 	double period() const;					///< Get total period of sample data
