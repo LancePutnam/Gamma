@@ -6,6 +6,19 @@
 	float * tdbuf = buf+1;
 	Sync::master().spu(1);
 
+	{
+		Accum<> g;
+		g.freq(1./4);
+		g.phase(0);
+		assert(g.nextPhase() == 0);
+		assert(g.nextPhase() == 1UL<<30);
+		assert(g.nextPhase() == 1UL<<31);
+
+		g.phaseMax();
+		assert(g() != 0);
+		assert(g() == 0);
+	}
+
 	/*
 	NOTE: Amplitudes of oscillators are multiplied by 2 before being fed to
 	FFT so that magnitudes fall in a more intuitive range. The real-to-complex
@@ -74,7 +87,7 @@
 			assert(p.min() == 0);
 			assert(p.max() == N);
 			assert(p.rate() == 1);
-			assert(p.sampleRate() == SR);
+			assert(p.frameRate() == SR);
 			assert(p.channels() == 1);
 			
 			assert(p.pos() == 0);
@@ -84,7 +97,7 @@
 			
 			for(int i=0; i<N; ++i) p.advance();
 
-			assert(p.pos() == N);			
+			assert(p.pos() == (N-1));			
 			
 			p.reset();
 			assert(p.pos() == 0);
