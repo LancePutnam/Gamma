@@ -341,6 +341,41 @@ public:
 		for(int i=0; i<N+1; ++i) mLevels[i] *= v;
 		return *this;
 	}
+  
+  void tellmeeverything() {
+    std::cout << "Gamma envelope with " << N << " segments: " << std::endl;
+    for (int i = 0; i<N; ++i) {
+      std::cout << "  segment " << i << ": " << 
+        mLevels[i] << " to " << mLevels[i+1] <<
+        " over " << mLengths[i] << " samples with curvature " << mCurves[i] << std::endl;
+    }
+    
+    std::cout << "totalLength: " << totalLength() << std::endl;
+    
+    if (mSustain==N) {
+      std::cout << "No sustain segment." << std::endl; 
+    } else {
+      std::cout << "Sustain segment: " << mSustain;
+      if (released()) {
+        std::cout << " has been released.";
+      } 
+      std::cout  << std::endl;
+    }
+    
+    std::cout << "Currently in segment " << mStage;
+    if (sustained()) {
+      std::cout << " (the sustain segment) ";
+    }
+    std::cout << " at sample " << mPos <<
+      "; value=" << value() << std::endl;
+    if (mLoop) {
+      std::cout << "Envelope is set to loop." << std::endl;
+    }
+    if (done()) {
+      std::cout << "Envelope is now done." << std::endl;
+    }
+
+  }
 
 protected:
 	Curve<Tv,Tp> mCurve;
