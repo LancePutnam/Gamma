@@ -2,19 +2,15 @@
 #define INC_GAM_SCHEDULER_H
 
 #include <stdlib.h> // exit
-#include <string.h> // memcpy
+#include <string.h> // memcpy, size_t
 #include <queue>
 #include <list>
 
 #include "Gamma/Node.h"
+#include "Gamma/Print.h"
 #include "Gamma/Thread.h"
 #include "Gamma/Timer.h"
 #include "Gamma/SoundFile.h"
-
-#ifndef GAM_SCHEDULER_IO_DATA
-	#include "Gamma/AudioIO.h"
-	#define GAM_SCHEDULER_IO_DATA ::gam::AudioIOData
-#endif
 
 namespace gam{
 
@@ -23,6 +19,7 @@ class Scheduler;
 #ifndef GAM_FUNC_MAX_DATA_SIZE
 	#define GAM_FUNC_MAX_DATA_SIZE 64
 #endif
+
 
 /// Deferrable function
 class Func{
@@ -180,7 +177,7 @@ private:
 		mFunc = f;
 		#ifndef NDEBUG
 		if(size > GAM_FUNC_MAX_DATA_SIZE){
-			printf("Func maximum data size exceeded. "
+			fprintf(stderr, "Func maximum data size exceeded. "
 				"Attempt to use %d bytes with maximum size set to %d.\n",
 				size, GAM_FUNC_MAX_DATA_SIZE);
 			exit(-1);
@@ -193,30 +190,102 @@ private:
 
 
 
-// This defines a block-rate processing node in the audio graph
-class Process : public Node3<Process>{
+/// Audio I/O data structure used by real-time scheduling system
+struct SchedulerAudioIOData{
+
+	SchedulerAudioIOData()
+	:	buffersIn(NULL), buffersOut(NULL),
+		framesPerSecond(1), framesPerBuffer(0), channelsIn(0), channelsOut(0),
+		startFrame(0),
+		mUserData(NULL), mUserDataTypeID(0)
+	{}
+
+
+	const float * buffersIn;	///< Non-interleaved input buffers
+	float * buffersOut;			///< Non-interleaved output buffers
+	double framesPerSecond;		///< Frames per second (frame rate)
+	unsigned framesPerBuffer;	///< Frames per buffer (block size)
+	unsigned channelsIn;		///< Number of input channels
+	unsigned channelsOut;		///< Number of output channels
+	unsigned startFrame;		///< Start frame to begin processing
+
+
+	/// Set user data
+	template <class T>
+	void userData(T * user){
+		mUserData = user;
+		mUserDataTypeID = typeID<T>();
+	}
+
+	/// Get user data
+	void * userData() const { return mUserData; }
+
+	/// Get number of seconds in one buffer
+	double secondsPerBuffer() const{
+		return framesPerBuffer / framesPerSecond; }
+
+
+	/// Map external to internal audio I/O data
+
+	/// Use this method to map an external data structure holding audio I/O
+	/// data (buffers, frame rate, block size, number of channels, etc.). This method
+	/// exists primarily to make the Scheduler easy to use in conjunction with
+	/// gam::AudioIOData.
+	///
+	/// \tparam TAudioIOData	A class with the same interface as gam::AudioIOData
+	/// \param[in] externalIO	External audio I/O data
+	template <class TAudioIOData>
+	void mapAudioIOData(TAudioIOData& externalIO);
+
+	/// Unmap audio I/O data (must be matched with a call to mapAudioIOData)
+
+	/// \tparam TAudioIOData	A class with the same interface as gam::AudioIOData
+	///
+	template <class TAudioIOData>
+	TAudioIOData& unmapAudioIOData();
+
+private:
+	template <class T>
+	static size_t typeID(){
+		static int x;
+		return size_t(&x);
+	}
+
+	void * mUserData;			// User data (usually other audio I/O data)
+	size_t mUserDataTypeID;		// Use for safe casting
+};
+
+
+
+// A block-rate processing node in the audio graph
+class ProcessNode : public Node3<ProcessNode>{
 public:
 
-	Process(double delay=0.);
+	ProcessNode(double delay=0.);
 
-	virtual ~Process();
+	virtual ~ProcessNode();
+
+
+	/// Called whenever this node must process audio
+	virtual void onProcessNode(SchedulerAudioIOData& io){}
+
+	/// Called whenever this node is "reset"
+	virtual void onReset(){}
+
 
 	/// Set starting time offset, in seconds
-	Process& dt(double v){ mDelay=v; return *this; }
+	ProcessNode& dt(double v){ mDelay=v; return *this; }
 
 	/// Flag self (and consequently all descendents) for deletion
-	Process& free();
+	ProcessNode& free();
 	
 	/// Set whether processor is active
 	
 	/// If true, then the processor is executed in the synthesis network.
 	/// If false, the processor and its descendents are skipped.
-	Process& active(bool v);
+	ProcessNode& active(bool v);
 
-	Process& reset();
-
-	/// Call processing algorithm, onProcessAudio()
-	Process * update(const Process * top, GAM_SCHEDULER_IO_DATA& io);
+	ProcessNode& reset();
 
 	bool deletable() const { return mDeletable; }
 	bool done() const { return DONE==mStatus; }
@@ -238,14 +307,30 @@ protected:
 	double mDelay;
 	bool mDeletable;
 
-	virtual void onProcess(GAM_SCHEDULER_IO_DATA& io){}
-	virtual void onReset(){}
+	// Call my own processing algorithm, onProcess()
+	ProcessNode * update(const ProcessNode * top, SchedulerAudioIOData& io);
 
-	Process * process(const Process * top, GAM_SCHEDULER_IO_DATA& io, int frameStart=0);
+	// Process all descendents recursively
+	ProcessNode * process(const ProcessNode * top, SchedulerAudioIOData& io, int frameStart=0);
 };
 
 
 
+/// ProcessNode with callback using a gam::AudioIOData-like interface
+template <class TAudioIOData>
+class Process : public ProcessNode{
+public:
+
+	virtual void onProcess(TAudioIOData& io) = 0;
+
+private:
+	void onProcessNode(SchedulerAudioIOData& io){
+		onProcess(io.unmapAudioIOData<TAudioIOData>());
+	}
+};
+
+
+/// A function that can be delayed and/or repeated periodically
 class ControlFunc{
 public:
 	ControlFunc(const Func& f, double dt=0)
@@ -267,15 +352,20 @@ protected:
 
 
 
-class Scheduler : public Process{
+/// Schedules real-time audio processes
+
+/// Before starting the scheduler, you must map your application's audio buffers 
+/// and other information to the scheduler's SchedulerAudioIOData (accessed with 
+/// the io() method).
+class Scheduler : public ProcessNode{
 public:
 
-	typedef std::queue<Process *> FreeList;
+	typedef std::queue<ProcessNode *> FreeList;
 	typedef std::list<ControlFunc> Funcs;
 
 	Scheduler();
-
 	~Scheduler();
+
 
 	/// Test whether the synthesis graph is empty
 	bool empty() const;
@@ -285,7 +375,12 @@ public:
 	/// \returns number of events deleted
 	///
 	int reclaim();
+
+	/// Get internal audio I/O data structure
+	const SchedulerAudioIOData& io() const { return mIO; }
+	SchedulerAudioIOData& io(){ return mIO; }
 	
+
 	/// Add dynamically allocated process as first child of root node
 	template <class AProcess>
 	AProcess& add(){
@@ -332,25 +427,34 @@ public:
 
 	/// Add dynamically allocated process as first child of specified node
 	template <class AProcess>
-	AProcess& add(Process& parent){
+	AProcess& add(ProcessNode& parent){
 		AProcess * v = new AProcess;
 		pushCommand(Command::ADD_FIRST_CHILD, &parent, v);
 		return *v;
 	}
 
 
-	// Add deferred function call
+	/// Add deferred function call
 	ControlFunc& add(const Func& f){
 		mFuncs.push_back(f);
 		return mFuncs.back();
 	}
-	
 
 	/// Execute all audio processes in execution tree
 
 	/// This should be called at the audio block rate. 
 	/// The latency of events will be determined by the block size.
-	void update(GAM_SCHEDULER_IO_DATA& io);
+	void update();
+
+	/// Map external audio I/O and then update
+
+	/// \tparam TAudioIOData	A class with the same interface as gam::AudioIOData
+	///
+	template <class TAudioIOData>
+	void update(TAudioIOData& externalIO){
+		io().mapAudioIOData(externalIO);
+		update();
+	}
 
 	/// Set time period between low-priority actions
 	Scheduler& period(float v);
@@ -361,20 +465,12 @@ public:
 	/// Stop scheduler
 	void stop();
 
-	/// Scheduler audio callback
-	static void audioCB(GAM_SCHEDULER_IO_DATA& io){
-		Scheduler& s = io.user<Scheduler>();
-		s.update(io);
-	}
-
-
 	/// Record output to sound file in non-real-time
-	
-	/// \param[in] io				audio i/o data (buffers, sample rate, block size, etc.)
+
 	/// \param[in] soundFilePath	path to sound file
 	/// \param[in] durSec			duration, in seconds, of recording
-	void recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durSec);
-
+	//void recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durSec);
+	void recordNRT(const char * soundFilePath, double durSec);
 
 //	void print(){
 //		printf("%d events\n", (int)events().size());
@@ -383,6 +479,14 @@ public:
 //			printf("\t"); (*it)->print();
 //		}
 //	}
+
+
+	/// A static audio callback function that updates the Scheduler
+
+	/// \tparam TAudioIOData	A class sharing the same interface as gam::AudioIOData
+	///
+	template <class TAudioIOData>
+	static void audioCB(TAudioIOData& aio);
 
 protected:
 
@@ -395,8 +499,8 @@ protected:
 		
 		//double time;
 		Type type;
-		Process * object;
-		Process * other;
+		ProcessNode * object;
+		ProcessNode * other;
 
 //		struct Compare{
 //			bool operator()(const Command& a, const Command& b){
@@ -404,11 +508,9 @@ protected:
 //			}
 //		};
 	};
-	
-	
+
 //	std::priority_queue<Command, std::vector<Command>, Command::Compare> 
 //		mCommandQueue;
-	
 
 	// LPT:  low-priority thread
 	// HPT: high-priority thread
@@ -418,12 +520,13 @@ protected:
 	Thread mLPThread;		// low-priority thread for garbage collection, etc.
 	float mPeriod;
 	double mTime;			// scheduler's time, in seconds
+	SchedulerAudioIOData mIO;
 	bool mRunning;
 	
 	static void * cLPThreadFunc(void * user);
 
-	void pushCommand(Command::Type c, Process * object, Process * other);
-	void cmdAdd(Process * v);
+	void pushCommand(Command::Type c, ProcessNode * object, ProcessNode * other);
+	void cmdAdd(ProcessNode * v);
 
 	// Execute pending graph manipulation commands from HPT.
 	// This is to be called from the same thread that is executing the
@@ -440,6 +543,53 @@ protected:
 	// Reclaims memory and returns number of events playing
 	bool check();
 };
+
+
+
+
+// IMPLEMENTATION ______________________________________________________________
+
+template <class TAudioIOData>
+void SchedulerAudioIOData::mapAudioIOData(TAudioIOData& externalIO){
+	userData(&externalIO);
+	buffersIn = externalIO.inBuffer();
+	buffersOut = externalIO.outBuffer();
+	framesPerSecond = externalIO.framesPerSecond();
+	framesPerBuffer = externalIO.framesPerBuffer();
+	channelsIn = externalIO.channelsIn();
+	channelsOut = externalIO.channelsOut();
+}
+
+template <class TAudioIOData>
+TAudioIOData& SchedulerAudioIOData::unmapAudioIOData(){
+	if(!mUserData /*|| !audioIODataType<TAudioIOData>(false)*/){
+		gam::err(
+			"member 'userData' is NULL. Did you make a matching call to mapAudioIOData?",
+			"gam::SchedulerAudioIOData::unmapAudioIOData()"
+		);
+	}
+	else if(typeID<TAudioIOData>() != mUserDataTypeID){
+		gam::err(
+			"Type mismatch between member 'userData' and template parameter.",
+			"gam::SchedulerAudioIOData::unmapAudioIOData()"
+		);
+	}
+	TAudioIOData& res = *(TAudioIOData *)mUserData;
+	res.frame(startFrame);
+	return res;
+}
+
+
+template <class TAudioIOData>
+void Scheduler::audioCB(TAudioIOData& aio){
+	if(!aio.user()){
+		gam::err(
+			"AudioIOData user data is NULL. Should be the address of the Scheduler.",
+			"gam::Scheduler::audioCB()");
+	}
+	Scheduler& s = *(Scheduler*)aio.user();
+	s.update(aio);
+}
 
 } //gam::
 

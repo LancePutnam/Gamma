@@ -1,3 +1,4 @@
+#include <string.h> // memset
 #include "Gamma/Scheduler.h"
 
 /*
@@ -25,7 +26,7 @@ Audio thread:
 
 Responsibilities of threads:
 Low-priority thread:
-	Allocate/deallocate Process objects
+	Allocate/deallocate ProcessNode objects
 
 High-priority thread:
 	Add nodes:
@@ -53,7 +54,7 @@ In HPT:
 */
 
 /*
-A Process is a node in a processing tree. Its placement in the tree determines 
+A ProcessNode is a node in a processing tree. Its placement in the tree determines 
 when it is executed in relation to other nodes in the tree.
 
 Consider the processing tree below.
@@ -79,11 +80,11 @@ s.set(synth, &MySynth::freq, 330);
 
 namespace gam{
 
-Process::Process(double delay)
+ProcessNode::ProcessNode(double delay)
 :	mStatus(ACTIVE), mDelay(delay), mDeletable(false)
 {}
 
-Process::~Process(){
+ProcessNode::~ProcessNode(){
 	removeFromParent();
 	
 	// delete children
@@ -101,41 +102,40 @@ Process::~Process(){
 	}
 }
 
-Process& Process::free(){
+ProcessNode& ProcessNode::free(){
 	mStatus = DONE;
 	return *this;
 }
 
-Process& Process::active(bool v){ mStatus = v ? ACTIVE : INACTIVE; return *this; }
+ProcessNode& ProcessNode::active(bool v){ mStatus = v ? ACTIVE : INACTIVE; return *this; }
 
-Process& Process::reset(){ onReset(); return *this; }
+ProcessNode& ProcessNode::reset(){ onReset(); return *this; }
 
-Process * Process::update(const Process * top, GAM_SCHEDULER_IO_DATA& io){
-	double dt = io.secondsPerBuffer();
-	int frame = 0;
+ProcessNode * ProcessNode::update(const ProcessNode * top, SchedulerAudioIOData& io){
+	double dt = io.framesPerBuffer / io.framesPerSecond;
+	unsigned frame = 0;
 	if(mDelay >= dt){
-		mDelay-=dt;
+		mDelay -= dt;
 		return nextBreadth(top);
 	}
 	else if(mDelay > 0){	// 0 < delay <= delta
-		frame = mDelay * io.framesPerSecond();
+		frame = mDelay * io.framesPerSecond;
 		mDelay=0;
-		if(frame >= io.framesPerBuffer()) return nextBreadth(top);
+		if(frame >= io.framesPerBuffer) return nextBreadth(top);
 	}
 	return process(top, io, frame);
 }
 
-void Process::print(){ printf("%p: %g sec, stat=%d\n", this, mDelay, mStatus); }
-
-Process * Process::process(const Process * top, GAM_SCHEDULER_IO_DATA& io, int frameStart){
+ProcessNode * ProcessNode::process(const ProcessNode * top, SchedulerAudioIOData& io, int frameStart){
 	if(active()){
-		io.frame(frameStart);
-		onProcess(io);
+		io.startFrame = frameStart;
+		onProcessNode(io);
 		if(active()) return next(top);
 	}
 	return nextBreadth(top);
 }
 
+void ProcessNode::print(){ printf("%p: %g sec, stat=%d\n", this, mDelay, mStatus); }
 
 
 
@@ -166,7 +166,7 @@ int Scheduler::reclaim(){
 		while(it != mFuncs.end()){
 			const void * funcObj = it->mFunc.obj();
 			if(funcObj == v){
-				printf("Scheduler: reclaiming Process with active functions assigned\n");
+				fprintf(stderr, "gam::Scheduler: reclaiming ProcessNode with active functions assigned\n");
 				//printf("does %p == %p ?\n", (void *)v, funcObj);
 				//it->mObjDel = 1;
 				//while(it->mObjDel != 2){}
@@ -182,20 +182,24 @@ int Scheduler::reclaim(){
 	return r;
 }
 
-void Scheduler::update(GAM_SCHEDULER_IO_DATA& io){
+
+void Scheduler::update(){
+
+	double blockPeriod = io().framesPerBuffer / io().framesPerSecond;
+
 	hpUpdateTree();
-	hpUpdateControlFuncs(io.secondsPerBuffer());
+	hpUpdateControlFuncs(blockPeriod);
 
 	// traverse tree
-	Process * v = this;
+	ProcessNode * v = this;
 	do{
-		v = v->update(this, io);
+		v = v->update(this, io());
 	} while(v);
 	
 	// put nodes marked as 'done' into free list
 	hpUpdateFreeList();
 	
-	mTime += io.secondsPerBuffer();
+	mTime += blockPeriod;
 }
 
 Scheduler& Scheduler::period(float v){
@@ -227,11 +231,11 @@ void Scheduler::stop(){
 }
 
 
-void Scheduler::cmdAdd(Process * v){
+void Scheduler::cmdAdd(ProcessNode * v){
 	pushCommand(Command::ADD_FIRST_CHILD, this, v);
 }
 
-void Scheduler::pushCommand(Command::Type type, Process * object, Process * other){
+void Scheduler::pushCommand(Command::Type type, ProcessNode * object, ProcessNode * other){
 	other->mDeletable=true;
 	Command c = { type, object, other };
 	mAddCommands.push(c);
@@ -261,14 +265,14 @@ void Scheduler::hpUpdateTree(){
 
 	/* TODO:
 	The tree should only contain processes that are active during the 
-	current block. Processes still in the future should be kept in a 
+	current block. ProcessNodes still in the future should be kept in a 
 	separate list and added to the tree when their time comes.
 	In order to avoid scanning the whole list of future events, the events
 	should be sorted according to their activation time. It is probably
 	better to use absolute times rather than delta times so we don't
 	have to perform any arithmetic to update timing status of the events.
 	
-	We should also avoid allocating memory for future Processes until when they
+	We should also avoid allocating memory for future ProcessNodes until when they
 	are actually used. This will also allow us to use memory pools.
 	*/
 
@@ -290,8 +294,8 @@ void Scheduler::hpUpdateTree(){
 
 void Scheduler::hpUpdateFreeList(){
 	
-	Process * p = this;
-	Process * v = p->next(this);
+	ProcessNode * p = this;
+	ProcessNode * v = p->next(this);
 
 	while(v){
 		if(v->done()){
@@ -307,31 +311,32 @@ void Scheduler::hpUpdateFreeList(){
 }
 
 
-void Scheduler::recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durationSec){
-	int numFrames = io.framesPerBuffer();
-	int numChans  = io.channelsOut();
+void Scheduler::recordNRT(const char * soundFilePath, double durationSec){
+	int numFrames = io().framesPerBuffer;
+	int numChans  = io().channelsOut;
 
 	SoundFile sf(soundFilePath);
 	sf	.encoding(SoundFile::FLOAT)
 		.channels(numChans)
-		.frameRate(io.fps())
+		.frameRate(io().framesPerSecond)
 	;
 	if(sf.openWrite()){
 		double  t = 0;
-		double dt = io.secondsPerBuffer();
+		double dt = io().secondsPerBuffer();
 		
 		// create buffer for interleaved samples
 		float * buf = new float[numFrames*numChans];
 		
 		while(t < durationSec){
 
-			io.zeroOut();
-			update(io);
+			//io.zeroOut();
+			memset(io().buffersOut, 0, numChans*numFrames*sizeof(float));
+			update();
 			
 			// interleave channel data
 			for(int j=0; j<numChans; ++j){
 				float * dst = buf + j;
-				const float * src = io.outBuffer(j);
+				const float * src = io().buffersOut + j*numFrames;
 				for(int i=0; i<numFrames; ++i){
 					//printf("%d\n", i*numChans + j);
 					dst[i*numChans] = src[i];
