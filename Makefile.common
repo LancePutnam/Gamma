@@ -48,7 +48,7 @@ ifeq ($(shell which getconf 2>/dev/null),)
 	endif
 else
 	# Set equal to number of bits in a type long int
-	ARCH = $(shell getconf LONG_BIT)
+	ARCH := $(shell getconf LONG_BIT)
 endif
 
 
