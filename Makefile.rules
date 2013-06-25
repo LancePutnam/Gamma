@@ -47,8 +47,15 @@ $(OBJ_DIR)%.hpp.gch:: %.hpp
 	@echo CXX $< $@
 	$(CXX) -x c++ -c $(CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
 
+# Include GCC generated dependency files
 -include $(wildcard $(OBJ_DIR)*.dep)
 
+# Prevent Make from automatically searching its predefined implicit rules
+%.dep: ;
+Makefile.%: ;
+%.inl: ;
+%.h: ;
+%.hpp: ;
 
 # Build static library
 $(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS) $(PCHS))
@@ -71,7 +78,7 @@ endif
 
 
 # Dummy target to force rebuilds
-FORCE:
+FORCE: ;
 
 
 # This creates a particular build folder
