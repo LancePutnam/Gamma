@@ -105,7 +105,13 @@ public:
 	uint32_t sizeDFT() const;	///< Get size of forward transform
 	Sync& syncFreq();			///< Get frequency domain synchronizer
 	
-	void numAux(uint32_t num);	///< Sets number of auxilliary buffers, each of size numBins()
+	/// Set number of real-valued auxilliary buffers
+
+	/// Each buffer allocated will maintain a size equal to the number of bins.
+	/// Memory is guaranteed to be contiguous. This means if you need a 
+	/// complex-valued buffer, you can simply allocate two auxilliary buffers
+	/// and use the address of the first one as the complex-valued buffer.
+	void numAux(uint32_t num);
 
 	virtual void onResync(double r);
 
@@ -149,7 +155,7 @@ public:
 	/// Set format of spectrum data
 	DFT& spectrumType(SpectralType v);
 
-	/// Set whether to use precise (but slower) for converting to polar
+	/// Set whether to use more precise, but slower polar conversion (default = true)
 	DFT& precise(bool whether);
 
 	/// Set size parameters of transform
