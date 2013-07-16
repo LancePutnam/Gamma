@@ -290,8 +290,19 @@ public:
 
 	float unitsHop();
 	
-	/// Returns array of phases if the sample data type is MAG_FREQ
+	/// Returns array of current analysis phases (MAG_FREQ format only)
 	float * phases();
+
+	/// Returns array of current accumulator phases (MAG_FREQ format only)
+	float * accumPhases();
+
+	/// Reset phase accumulators (MAG_FREQ format only)
+
+	/// This resets the values of all phase accumulators to zero. It can be
+	/// used to help eliminate phase smearing artifacts from certain
+	/// transformations like pitch shifting.
+	/// It should be called immediately before doing the inverse transform.
+	STFT& resetPhaseAccums();
 	
 	virtual void print(FILE * fp=stdout, const char * append="\n");	
 
@@ -301,6 +312,7 @@ protected:
 	SlidingWindow<float> mSlide;
 	float * mFwdWin;			// forward transform window
 	float * mPhases;			// copy of current phases (mag-freq mode)
+	float * mAccums;			// phase accumulators (mag-freq mode)
 	WindowType mWinType;		// type of analysis window used
 	float mFwdWinMul, mInvWinMul;
 	bool mWindowInverse;		// whether to window inverse samples
