@@ -13,7 +13,7 @@
 int main(){
 
 	const int N = 32;		// Number of samples per unit of position
-	Sync::master().spu(1);
+	Domain::master().spu(1);
 	DFT dft(N, 0, MAG_PHASE); dft.precise(true);
 
 	#define FREQ_RESP(f, description)\

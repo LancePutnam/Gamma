@@ -11,8 +11,8 @@
 //#include "Gamma/tbl.h"
 
 #include "Gamma/Containers.h"
+#include "Gamma/Domain.h"
 #include "Gamma/Strategy.h"
-#include "Gamma/Sync.h"
 #include "Gamma/Types.h"
 
 namespace gam{
@@ -35,13 +35,17 @@ namespace gam{
 /// interpolation is that they introduce undesirable transients when the delay 
 /// length is dynamically varied.
 ///
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Si	interpolation strategy
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Si	Interpolation strategy
+/// \tparam Td	Domain type
 /// \ingroup Delays    
-template <class Tv=gam::real, template<class> class Si=ipl::Linear, class Ts=Synced>
-class Delay : public ArrayPow2<Tv>, Ts{
+template<
+	class Tv = gam::real,
+	template<class> class Si = ipl::Linear,
+	class Td = DomainObserver
+>
+class Delay : public ArrayPow2<Tv>, Td{
 public:
 
 	/// Default constructor. Does not allocate memory.
@@ -68,8 +72,7 @@ public:
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer
 	Tv read(float ago);							///< Returns element 'ago' units ago
-	void write(const Tv& v);					///< Writes element into buffer. Tap is post-incremented.
-	void writePre(const Tv& v);					///< Writes element into buffer. Tap is pre-incremented.
+	void write(const Tv& v);					///< Writes new element into buffer
 	
 	float delay() const;						///< Get current delay length
 	uint32_t delaySamples() const;				///< Get current delay length in samples
@@ -80,7 +83,7 @@ public:
 	float maxDelay() const;						///< Get maximum delay length units
 
 	virtual void onResize();
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 
 	void print();
 
@@ -105,15 +108,19 @@ protected:
     
 /// \ingroup Delays
 ///
-template <class Tv=gam::real, template <class> class Si=ipl::Linear, class Ts=Synced>
-class Multitap : public Delay<Tv,Si,Ts> {
+template <
+	class Tv = gam::real,
+	template <class> class Si = ipl::Linear,
+	class Td = DomainObserver
+>
+class Multitap : public Delay<Tv,Si,Td> {
 public:
 
 	/// \param[in]	delay		Delay length. The size of the delay line will 
 	///							be the smallest possible power of two.
 	/// \param[in]	numTaps		Number of reader taps
 	Multitap(float delay, uint32_t numTaps)
-	:	Delay<Tv,Si,Ts>(delay)
+	:	Delay<Tv,Si,Td>(delay)
 	{	taps(numTaps); }
 
 	/// Get number of read taps
@@ -189,7 +196,7 @@ protected:
 
 /// \ingroup Delays
 ///  
-template<class T=gam::real> 
+template<class T = gam::real>
 class Delay1 : public DelayShift<1,T>{
 public:
 
@@ -202,7 +209,7 @@ public:
     
 /// \ingroup Delays
 ///
-template<class T=gam::real> 
+template<class T = gam::real>
 class Delay2 : public DelayShift<2,T>{
 public:
 
@@ -226,24 +233,24 @@ public:
 /// other, an Nth order all-pass filter results. Comb filters are stable as
 /// long as |feedback| < 1.
 ///
-/// \tparam Tv	value type
-/// \tparam Si	interpolation strategy
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Si	Interpolation strategy
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain type
 /// \ingroup Delays   
 /// \ingroup Filters
 // H(z) = (ffd + z^-m) / (1 - fbk z^-m)
 // y[n] = ffd x[n] + x[n-m] + fbk y[n-m]
 template<
-	class Tv=gam::real,
-	template <class> class Si=ipl::Linear,
-	class Tp=gam::real,
-	class Ts=Synced
+	class Tv = gam::real,
+	template <class> class Si = ipl::Linear,
+	class Tp = gam::real,
+	class Td = DomainObserver
 >
-class Comb : public Delay<Tv,Si,Ts> {
+class Comb : public Delay<Tv,Si,Td> {
 
 private:
-	typedef Delay<Tv,Si,Ts> Base;
+	typedef Delay<Tv,Si,Td> Base;
 
 public:
 	using Base::operator();
@@ -304,19 +311,19 @@ protected:
 
 // Implementation_______________________________________________________________
 
-#define TM1 template <class Tv, template <class> class Ti, class Ts>
-#define TM2 Tv,Ti,Ts
+#define TM1 template <class Tv, template <class> class Ti, class Td>
+#define TM2 Tv,Ti,Td
 
 #define DELAY_INIT mMaxDelay(0), mDelayFactor(0), mDelayLength(0), mPhase(0), mPhaseInc(0), mDelay(0)
 
 TM1 Delay<TM2>::Delay()
 :	ArrayPow2<Tv>(), DELAY_INIT
-{	Ts::initSynced(); }
+{	Td::refreshDomain(); }
 
 TM1 Delay<TM2>::Delay(float maxDly, float dly)
 :	ArrayPow2<Tv>(), DELAY_INIT
 {
-	Ts::initSynced();
+	Td::refreshDomain();
 	maxDelay(maxDly);
 	zero();
 	delay(dly);
@@ -325,7 +332,7 @@ TM1 Delay<TM2>::Delay(float maxDly, float dly)
 TM1 Delay<TM2>::Delay(float dly)
 :	ArrayPow2<Tv>(), DELAY_INIT
 {	//printf("Delay::Delay(float)\n");
-	Ts::initSynced();
+	Td::refreshDomain();
 	maxDelay(dly);
 	zero();
 	delay(dly);
@@ -335,12 +342,18 @@ TM1 Delay<TM2>::Delay(float dly)
 
 TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", length);
 	mMaxDelay = length;
-	if(Ts::sync() && Ts::sync()->hasBeenSet()){
+	if(Td::domain() && Td::domain()->hasBeenSet()){
 		//printf("Delay::maxDelay(): resize to %d\n", (uint32_t)(mMaxDelay * spu()));
 		
-		// This will trigger onResize() -> onResync(double r) calls ONLY if
+		uint32_t maxDelayInSamples = uint32_t(mMaxDelay * Td::spu());
+
+		// If writing before reading,
+		// we must add 1 to support delays at exactly the max delay length.
+		//maxDelayInSamples += 1;
+
+		// This will trigger onResize() -> onDomainChange(double r) calls ONLY if
 		// the size changes to prevent infinite recursion.
-		this->resize(uint32_t(mMaxDelay * Ts::spu()));
+		this->resize(maxDelayInSamples);
 	}
 }
 
@@ -349,11 +362,14 @@ TM1 void Delay<TM2>::zero(){ this->assign(Tv(0)); }
 TM1 inline Tv Delay<TM2>::operator()() const{ return mIpol(*this, mPhase - mDelay); }
 
 TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
-//	writePre(i0);
-//	return (*this)();
-	Tv o0 = (*this)();	// read delayed element
-	write(i0);			// write input element
-	return o0;
+	// Read, then write.
+	Tv res = (*this)();
+	write(i0);
+	return res;
+
+	// We must write before reading to support delay lengths of zero.
+	/*write(i0);
+	return (*this)();*/
 }
 
 TM1 inline uint32_t Delay<TM2>::delayFToI(float v){
@@ -367,12 +383,12 @@ TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this-
 	mPhaseInc = this->oneIndex();
 	//for(uint32_t i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
 	if(this->isSoleOwner()) zero();
-	onResync(1);
+	onDomainChange(1);
 }
 
-TM1 void Delay<TM2>::onResync(double r){ //printf("Delay::onSyncChange\n");
+TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n");
 	if(this->usingExternalSource()){
-		mMaxDelay = this->size() * Ts::ups();
+		mMaxDelay = this->size() * Td::ups();
 	}
 	else{
 		maxDelay(mMaxDelay);
@@ -386,13 +402,9 @@ TM1 inline Tv Delay<TM2>::read(float ago){ return mIpol(*this, mPhase - delayFTo
 TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1. / maxDelay(); }
 
 TM1 inline void Delay<TM2>::write(const Tv& v){
+	//incPhase();
 	mem::put(this->elems(), this->fracBits(), mPhase, v);
 	incPhase();
-}
-
-TM1 inline void Delay<TM2>::writePre(const Tv& v){
-	incPhase();
-	mem::put(this->elems(), this->fracBits(), mPhase, v);
 }
 
 TM1 inline void Delay<TM2>::delay(float v){
@@ -422,10 +434,10 @@ TM1 inline uint32_t Delay<TM2>::indexBack() const {
 	return this->index(mPhase + this->oneIndex());
 }
 
-TM1 inline float Delay<TM2>::maxDelay() const { return this->size() * Ts::ups(); }
+TM1 inline float Delay<TM2>::maxDelay() const { return this->size() * Td::ups(); }
 
 TM1 void Delay<TM2>::print(){
-	printf("SPU:       %f\n", Ts::spu());
+	printf("SPU:       %f\n", Td::spu());
 	printf("Buffer:    %p\n", this->elems());
 	printf("BufBits:   %d\n", this->log2Size());
 	printf("FracBits:  %d\n", this->fracBits());
@@ -442,16 +454,16 @@ TM1 void Delay<TM2>::print(){
 
 
 
-#define TM1 template<class Tv, template<class> class Si, class Tp, class Ts>
-#define TM2 Tv,Si,Tp,Ts
-TM1 Comb<TM2>::Comb(): Delay<Tv,Si,Ts>(), mFFD(0), mFBK(0){}
+#define TM1 template<class Tv, template<class> class Si, class Tp, class Td>
+#define TM2 Tv,Si,Tp,Td
+TM1 Comb<TM2>::Comb(): Delay<Tv,Si,Td>(), mFFD(0), mFBK(0){}
 
 TM1 Comb<TM2>::Comb(float delay, const Tp& ffd, const Tp& fbk)
-:	Delay<Tv,Si,Ts>(delay), mFFD(ffd), mFBK(fbk)
+:	Delay<Tv,Si,Td>(delay), mFFD(ffd), mFBK(fbk)
 {}
 
 TM1 Comb<TM2>::Comb(float delayMax, float delay, const Tp& ffd, const Tp& fbk)
-:	Delay<Tv,Si,Ts>(delayMax, delay), mFFD(ffd), mFBK(fbk)
+:	Delay<Tv,Si,Td>(delayMax, delay), mFFD(ffd), mFBK(fbk)
 {}
 
 TM1 inline Tv Comb<TM2>::operator()(const Tv& i0){

@@ -42,12 +42,11 @@ void audioCB(AudioIOData & io){
 }
 
 int main(){
-
-	stft.syncHop()  << lfoF1 << lfoF2;
-	stft.syncFreq() << lfoA1 << lfoA2 << bq0 << bq1;
+	stft.domainHop()  << lfoF1 << lfoF2;
+	stft.domainFreq() << lfoA1 << lfoA2 << bq0 << bq1;
 
 	AudioIO io(128, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());		
+	Domain::master().spu(io.framesPerSecond());		
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

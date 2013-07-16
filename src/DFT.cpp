@@ -5,7 +5,7 @@
 #include "Gamma/arr.h"
 #include "Gamma/mem.h"
 #include "Gamma/scl.h"
-#include "Gamma/Sync.h"
+#include "Gamma/Domain.h"
 
 #define CART_TO_POL\
 	if(mPrecise){\
@@ -80,12 +80,12 @@ void DFT::resize(uint32_t newWinSize, uint32_t newPadSize){ //printf("DFT::resiz
 	mSizeWin = newWinSize;
 	mSizeHop = mSizeWin;
 
-	onResync(1);
+	onDomainChange(1);
 }
 
-void DFT::onResync(double r){
-	DFTBase<float>::onResync(r);
-	mSyncHop.ups((double)sizeHop() * ups());
+void DFT::onDomainChange(double r){
+	DFTBase<float>::onDomainChange(r);
+	domainHop().ups((double)sizeHop() * ups());
 	//printf("[%p] hop: %d, ups: %f\n", this, sizeHop(), spu());
 }
 
@@ -292,7 +292,7 @@ STFT& STFT::sizeHop(uint32_t size){
 	mSlide.sizeHop(size);
 	mSizeHop = mSlide.sizeHop();
 	computeInvWinMul();
-	onResync(1);
+	onDomainChange(1);
 	return *this;
 }
 

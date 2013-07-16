@@ -11,12 +11,12 @@
 #include <math.h>
 #include <float.h>
 
-#include "Gamma/Types.h"
 #include "Gamma/gen.h"
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
+#include "Gamma/Domain.h"
 #include "Gamma/Strategy.h"
-#include "Gamma/Sync.h"
+#include "Gamma/Types.h"
 
 namespace gam{
 
@@ -89,8 +89,8 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \ingroup Envelopes 
-template <int N, class Tv=real, class Tp=real, class Ts=Synced>
-class Env : public Ts{
+template <int N, class Tv=real, class Tp=real, class Td=DomainObserver>
+class Env : public Td{
 public:
 
 	Env()
@@ -353,7 +353,7 @@ protected:
 	int mSustain;			// index of sustain point
 	int mLoop;
 
-	void setLen(int i){ mLen=mLengths[i]*Ts::spu(); }
+	void setLen(int i){ mLen=mLengths[i]*Td::spu(); }
 };
 
 
@@ -362,12 +362,12 @@ protected:
 
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Td	domain observer type
 /// \ingroup Envelopes 
-template <class Tv=real, class Tp=real, class Ts=Synced>
-class AD : public Env<2,Tv,Tp,Ts>{
+template <class Tv=real, class Tp=real, class Td=DomainObserver>
+class AD : public Env<2,Tv,Tp,Td>{
 public:
-	using Env<2,Tv,Tp,Ts>::release;
+	using Env<2,Tv,Tp,Td>::release;
 
 	/// \param[in] att	Attack length
 	/// \param[in] dec	Decay length
@@ -409,12 +409,12 @@ protected:
 ///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Td	domain observer type
 /// \ingroup Envelopes 
-template <class Tv=real, class Tp=real, class Ts=Synced>
-class ADSR : public Env<3,Tv,Tp,Ts>{
+template <class Tv=real, class Tp=real, class Td=DomainObserver>
+class ADSR : public Env<3,Tv,Tp,Td>{
 public:
-	using Env<3,Tv,Tp,Ts>::release;
+	using Env<3,Tv,Tp,Td>::release;
 
 	/// \param[in] att	Attack length
 	/// \param[in] dec	Decay length
@@ -469,8 +469,8 @@ protected:
 /// per iteration. \n\n Compare to Curve which touches exactly both start and end points.
 /// \ingroup Envelopes
 /// \sa Curve
-template <class T=real, class Ts=Synced>
-class Decay : public Ts{
+template <class T=real, class Td=DomainObserver>
+class Decay : public Td{
 public:
 
 	/// \param[in] decay	Number of units until initial value decays -60 dB
@@ -490,16 +490,18 @@ public:
 protected:
 	T mVal, mMul, mDcy;
 
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 };
 
 
 
-/// Binary gate controlled by threshold comparison. The gate closes if the (norm of the) input value remains below threshold for at least closingDelay units of time (typically seconds).
-    
+/// Binary gate controlled by threshold comparison
+
+/// The gate closes if the (norm of the) input value remains below threshold for 
+/// at least closingDelay units of time (typically seconds).
 /// \ingroup Envelopes
-template <class T=real, class Ts=Synced>
-class Gate : public Ts{
+template <class T=real, class Td=DomainObserver>
+class Gate : public Td{
 public:
 
 	/// \param[in] closingDelay		units to wait before closing while under threshold
@@ -514,7 +516,7 @@ public:
 	/// Filter value
 	T operator()(const T& v){		
 		if(gam::norm(v) < mThresh){
-			mRemain -= Synced::ups();
+			mRemain -= Td::ups();
 			if(mRemain <= 0) return close();
 		}
 		else{
@@ -543,9 +545,9 @@ template <
 	class Tv=real,
 	template <class> class Si=iplSeq::Linear,
 	class Tp=real,
-	class Ts=Synced
+	class Td=DomainObserver
 >
-class Seg : public Ts{
+class Seg : public Td{
 public:
 
 	/// \param[in] len		Length of segment in domain units
@@ -556,9 +558,10 @@ public:
 		mFreq((Tp)1/len), mAcc(0, phase), mIpl(start)
 	{
 		mIpl.push(end);
-		Ts::initSynced();
+		Td::refreshDomain();
 	}
-	
+
+
 	/// Returns whether envelope is done
 	bool done() const { return mAcc.val >= Tp(1); }
 
@@ -594,10 +597,9 @@ public:
 		mAcc();
 		return v;
 	}
-
 	
 	/// Set frequency of envelope
-	void freq(Tp v){ mFreq = v; mAcc.add = v * Ts::ups(); }
+	void freq(Tp v){ mFreq = v; mAcc.add = v * Td::ups(); }
 	
 	/// Set length, in domain units
 	void length(Tp v){ freq((Tp)1/v); }
@@ -611,15 +613,15 @@ public:
 	/// Reset envelope
 	void reset(){ phase((Tp)0); }
 
-	
+
 	Si<Tv>& ipol(){ return mIpl; }
-	
+
 protected:
 	Tp mFreq;
 	gen::RAdd<Tp> mAcc;
 	Si<Tv> mIpl;
 	
-	virtual void onResync(double r){ freq(mFreq); }
+	virtual void onDomainChange(double r){ freq(mFreq); }
 };
 
 
@@ -628,8 +630,8 @@ protected:
 /// Exponential envelope segment for smoothing out value changes.
     
 /// \ingroup Envelopes
-template <class T=gam::real, class Ts=Synced>
-class SegExp : public Ts{
+template <class T=gam::real, class Td=DomainObserver>
+class SegExp : public Td{
 public:
 
 	/// \param[in] len		Length of segment in domain units
@@ -639,7 +641,7 @@ public:
 	SegExp(T len, T crv=-3, T start=1, T end=0):
 		mLen(len), mCrv(crv), mVal1(start), mVal0(end)
 	{
-		Ts::initSynced();
+		Td::refreshDomain();
 	}
 	
 	/// Returns whether envelope is done
@@ -669,10 +671,10 @@ public:
 	/// Set length and curvature
 	void set(T len, T crv){
 		mLen = len; mCrv = crv;
-		mCurve.set(len * Ts::spu(), crv);
+		mCurve.set(len * Td::spu(), crv);
 	}
 	
-	virtual void onResync(double r){ set(mLen, mCrv); }
+	virtual void onDomainChange(double r){ set(mLen, mCrv); }
 	
 protected:
 	T mLen, mCrv, mVal1, mVal0;
@@ -776,40 +778,40 @@ inline Tv Curve<Tv,Tp>::operator()(){
 
 //---- Decay
 
-template <class T, class Ts>
-Decay<T,Ts>::Decay(T decay_, T val)
+template <class T, class Td>
+Decay<T,Td>::Decay(T decay_, T val)
 :	mVal(val)
 {
-	Ts::initSynced();
+	Td::refreshDomain();
 	decay(decay_);
 }
 
-template <class T, class Ts>
-inline T Decay<T,Ts>::operator()(){ T o = mVal; mVal *= mMul; return o; }
+template <class T, class Td>
+inline T Decay<T,Td>::operator()(){ T o = mVal; mVal *= mMul; return o; }
 
-template <class T, class Ts>
-inline void Decay<T,Ts>::decay(T v){
+template <class T, class Td>
+inline void Decay<T,Td>::decay(T v){
 	mDcy = v;
-	mMul = scl::t60(v * Ts::spu());
+	mMul = scl::t60(v * Td::spu());
 }
 
-template <class T, class Ts>
-inline void Decay<T,Ts>::reset(){ mVal = 1; }
+template <class T, class Td>
+inline void Decay<T,Td>::reset(){ mVal = 1; }
     
-template <class T, class Ts>
-inline void Decay<T,Ts>::value(T v){ mVal = v; }
+template <class T, class Td>
+inline void Decay<T,Td>::value(T v){ mVal = v; }
 
-template <class T, class Ts>
-inline T Decay<T,Ts>::decay() const { return mDcy; }
+template <class T, class Td>
+inline T Decay<T,Td>::decay() const { return mDcy; }
     
-template <class T, class Ts>
-inline bool Decay<T,Ts>::done(T thr) const { return mVal < thr; }
+template <class T, class Td>
+inline bool Decay<T,Td>::done(T thr) const { return mVal < thr; }
     
-template <class T, class Ts>
-inline T Decay<T,Ts>::value() const { return mVal; }
+template <class T, class Td>
+inline T Decay<T,Td>::value() const { return mVal; }
 
-template <class T, class Ts>
-void Decay<T,Ts>::onResync(double r){ decay(mDcy); }
+template <class T, class Td>
+void Decay<T,Td>::onDomainChange(double r){ decay(mDcy); }
 
 
 } // gam::

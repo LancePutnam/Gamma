@@ -101,8 +101,11 @@ inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
 	// y[n]	= a x[n] + x[n-1] - a y[n-1]
 	//		= a (x[n] - y[n-1]) + x[n-1]
 
-	//f = 1-f;
-	//f += 0.618f; // keep 'a' near zero
+	//float a = f; // apx #1
+	//float a = Tf(0.4722)*f - Tf(0.2361); // apx #2
+
+	//f = 1-f;		// convert to sample delay
+	//f += 0.618f;	// keeps 'a' near zero to dampen transients
 	//float a = (1.f-f)/(1.f+f);
 
 	// Taylor approximation to above to avoid division

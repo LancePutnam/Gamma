@@ -9,7 +9,7 @@
 #include "Gamma/scl.h"
 #include "Gamma/SoundFile.h"
 #include "Gamma/Strategy.h"
-#include "Gamma/Sync.h"
+#include "Gamma/Domain.h"
 #include "Gamma/Types.h"
 
 namespace gam{
@@ -28,7 +28,7 @@ template<
 	template<class> class Si = ipl::Trunc,
 	class Sp = phsInc::Clip
 >
-class SamplePlayer: public Synced, public Array<T>{
+class SamplePlayer: public DomainObserver, public Array<T>{
 public:
 	using Array<T>::size;
 	using Array<T>::elems;
@@ -111,7 +111,7 @@ public:
 	/// Get whether the sample buffer is valid for playback
 	bool valid() const;
 
-	virtual void onResync(double r){ frameRate(mFrameRate); }
+	virtual void onDomainChange(double r){ frameRate(mFrameRate); }
 
 protected:	
 	static T * defaultBuffer(){
@@ -154,7 +154,7 @@ PRE CLS::SamplePlayer(SamplePlayer<T>& src, double rate)
 	mPos(0), mInc(1), 
 	mFrameRate(src.frameRate()), mChans(src.channels()), 
 	mRate(rate), mMin(0), mMax(src.size())
-{	initSynced(); }
+{	refreshDomain(); }
 
 PRE CLS::SamplePlayer(Array<T>& src, double smpRate, double rate)
 :	Array<T>(src),
@@ -162,7 +162,7 @@ PRE CLS::SamplePlayer(Array<T>& src, double smpRate, double rate)
 	mFrameRate(smpRate), mChans(1),
 	mRate(rate), mMin(0), mMax(src.size())
 {
-	initSynced();
+	refreshDomain();
 	frameRate(smpRate);
 }
 

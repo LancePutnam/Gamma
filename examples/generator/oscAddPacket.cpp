@@ -23,7 +23,7 @@ void audioCB(AudioIOData& io){
 int main(){
 
 	AudioIO io(256, 44100, audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());
+	Domain::master().spu(io.framesPerSecond());
 
 	float k1 = 0.;					// velocity
 	float k2 = 0.00001;				// dispersion

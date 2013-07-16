@@ -30,7 +30,7 @@ int main(){
 	}
 
 	AudioIO io(256, 44100., audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());
+	Domain::master().spu(io.framesPerSecond());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

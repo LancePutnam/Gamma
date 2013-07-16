@@ -11,7 +11,9 @@
 #include "../Gamma/Types.h"
 #include "../Gamma/UnitMaps.h"
 
+#include "../Gamma/Delay.h"
 #include "../Gamma/Envelope.h"
+#include "../Gamma/Filter.h"
 #include "../Gamma/Oscillator.h"
 #include "../Gamma/SamplePlayer.h"
 
@@ -77,8 +79,10 @@ int main(int argc, char* argv[]){
 	#include "ut/ut_scl.cpp"
 	#include "ut/ut_ipl.cpp"
 	#include "ut/ut_arr.cpp"
-	
+
+	#include "ut/utDelay.cpp"
 	#include "ut/utEnvelope.cpp"
+	#include "ut/utFilter.cpp"
 	#include "ut/utGenerators.cpp"
 
 //	printf("Unit testing succeeded.\n");

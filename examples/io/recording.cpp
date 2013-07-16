@@ -30,7 +30,7 @@ int main(){
 	sf.openWrite();
 
 	AudioIO io(256, 44100, audioCB, 0, 2);
-	Sync::master().spu(io.framesPerSecond());
+	Domain::master().spu(io.framesPerSecond());
 	io.start();
 
 	// Write samples from ring buffer into sound file.

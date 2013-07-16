@@ -50,10 +50,10 @@ void audioCB(AudioIOData& io){
 
 int main(){
 
-	stft.syncHop() << edge;
+	stft.domainHop() << edge;
 
 	AudioIO io(256, 44100, audioCB, NULL, 2);
-	Sync::master().spu(io.framesPerSecond());
+	Domain::master().spu(io.framesPerSecond());
 	io.start();
 	printf("Press 'enter' to quit...\n"); getchar();
 }

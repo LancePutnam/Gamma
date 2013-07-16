@@ -52,7 +52,7 @@ int main(){
 	mem::replace("agct", rep, 4, seq, len);
 
 	AudioIO io(128, 44100, audioCB, 0, 2, 0);
-	Sync::master().spu(io.framesPerSecond());
+	Domain::master().spu(io.framesPerSecond());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;

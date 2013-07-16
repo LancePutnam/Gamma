@@ -8,7 +8,7 @@
 #include "Gamma/mem.h"
 #include "Gamma/scl.h"
 #include "Gamma/tbl.h"
-#include "Gamma/Sync.h"
+#include "Gamma/Domain.h"
 #include "Gamma/Constants.h"
 #include "Gamma/Containers.h"
 #include "Gamma/FFT.h"
@@ -83,7 +83,7 @@ private:
 ///\ingroup DFT
     
 template <class T=gam::real>
-class DFTBase : public Synced{
+class DFTBase : public DomainObserver{
 public:
 	DFTBase();
 	virtual ~DFTBase();
@@ -103,8 +103,8 @@ public:
 	double binFreq() const;		///< Get width of frequency bins
 	uint32_t numBins() const;	///< Get number of frequency bins
 	uint32_t sizeDFT() const;	///< Get size of forward transform
-	Sync& syncFreq();			///< Get frequency domain synchronizer
-	
+	Domain& domainFreq();		///< Get frequency domain
+
 	/// Set number of real-valued auxilliary buffers
 
 	/// Each buffer allocated will maintain a size equal to the number of bins.
@@ -113,7 +113,7 @@ public:
 	/// and use the address of the first one as the complex-valued buffer.
 	void numAux(uint32_t num);
 
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 
 protected:
 	uint32_t mSizeDFT, mNumAux;
@@ -122,7 +122,7 @@ protected:
 		Complex<T> * mBins;
 	};
 	T * mAux;		// aux buffers
-	Sync mSyncFreq;
+	Domain mDomFreq;
 
 	T normForward() const;	// get norm factor for forward transform values
 	T * bufPos(){ return mBuf+1; }
@@ -155,20 +155,20 @@ public:
 	/// Set format of spectrum data
 	DFT& spectrumType(SpectralType v);
 
-	/// Set whether to use more precise, but slower polar conversion (default = true)
+	/// Set whether to use precise (but slower) for converting to polar
 	DFT& precise(bool whether);
 
 	/// Set size parameters of transform
 	void resize(uint32_t windowSize, uint32_t padSize);
 
-	float freqRes() const;				///< Get frequency resolution of analysis
+	float freqRes() const;				///< Get frequency resolution of analysis, \see DFTBase::binFreq
 	float overlap() const;				///< Get transform overlap factor
 	bool overlapping() const;			///< Whether the transform is overlapping
 	uint32_t sizeHop() const;			///< Get size of hop
 	uint32_t sizePad() const;			///< Get size of zero-padding
 	uint32_t sizeWin() const;			///< Get size of window
 
-	Sync& syncHop();					///< Hop rate synchronizer
+	Domain& domainHop();				///< Hop domain
 
 	/// Reads next sample in for a forward transform
 	
@@ -207,7 +207,7 @@ public:
 	void zero();			///< Zeroes internal frequency bins
 	void zeroEnds();		///< Zeroes DC and Nyquist bins
 
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 	virtual void print(FILE * fp=stdout, const char * append="\n");
 	
 protected:
@@ -215,7 +215,7 @@ protected:
 	uint32_t mSizeHop;				// samples between forward transforms (= winSize() for DFT)
 	SpectralType mSpctFormat;		// format of spectrum
 	RFFT<float> mFFT;
-	Sync mSyncHop;
+	Domain mDomHop;
 	
 	// Buffers
 	float * mPadOA;			// Overlap-add buffer (alloc'ed only if zero-padded)
@@ -444,7 +444,7 @@ inline uint32_t SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(
 //---- DFTBase
 
 template<class T>
-DFTBase<T>::DFTBase() : mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0){ initSynced(); }
+DFTBase<T>::DFTBase() : mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0){ refreshDomain(); }
 
 template<class T>
 DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
@@ -465,7 +465,7 @@ template<class T>
 inline uint32_t	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
     
 template<class T>
-inline Sync&	DFTBase<T>::syncFreq(){ return mSyncFreq; }
+inline Domain&	DFTBase<T>::domainFreq(){ return mDomFreq; }
     
 template<class T>
 inline T		DFTBase<T>::normForward() const { return (T)2 / (T)sizeDFT(); }
@@ -476,8 +476,8 @@ void DFTBase<T>::numAux(uint32_t num){
 }
 
 template<class T>
-void DFTBase<T>::onResync(double r){
-	mSyncFreq.ups(binFreq());
+void DFTBase<T>::onDomainChange(double r){
+	domainFreq().ups(binFreq());
 }
 
 
@@ -493,7 +493,7 @@ inline bool DFT::overlapping() const { return sizeHop() < sizeWin(); }
 inline uint32_t DFT::sizeHop() const { return mSizeHop; }
 inline uint32_t DFT::sizePad() const { return mSizeDFT - mSizeWin; }
 inline uint32_t DFT::sizeWin() const { return mSizeWin; }
-inline Sync& DFT::syncHop(){ return mSyncHop; }
+inline Domain& DFT::domainHop(){ return mDomHop; }
 
 inline bool DFT::operator()(float input){
 	bufPos()[mTapW] = input;

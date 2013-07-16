@@ -14,7 +14,7 @@
 
 #include "Gamma/Containers.h"
 //#include "Gamma/Strategy.h"
-#include "Gamma/Sync.h"
+#include "Gamma/Domain.h"
 #include "Gamma/Types.h"
 
 namespace gam{
@@ -58,12 +58,12 @@ inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_
 /// When the center frequency is fs/4, the filter acts as a unit delay.
 /// When the center frequency is 0, the filter acts as a no-op.
 /// When the center frequency is fs/2, the filter acts as an inverter.
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class AllPass1 : public Ts {
+template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class AllPass1 : public Td {
 public:
 	///
 	/// \param[in]	frq		Center frequency
@@ -80,7 +80,7 @@ public:
 	
 	Tp freq();				///< Get current cutoff frequency
 	
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 	
 protected:
 	Tv d1;		// once delayed value
@@ -100,12 +100,12 @@ protected:
 ///
 /// http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
 ///
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class Biquad : public Ts{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class Biquad : public Td{
 public:
 
 	/// \param[in]	frq		Center frequency
@@ -141,7 +141,7 @@ public:
 	Tp res() const { return mRes; }		///< Get resonance (Q)
 	FilterType type() const { return mType; }	///< Get filter type
 	
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 
 protected:
 	Tp mA[3];			// feedforward coefs
@@ -158,16 +158,16 @@ protected:
 
 /// DC frequency blocker
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class BlockDC : public Ts{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class BlockDC : public Td{
 public:
 
 	/// \param[in] width	Bandwidth of pole
-	BlockDC(Tp width=35): d1(0), mWidth(width){ Ts::initSynced(); }
+	BlockDC(Tp width=35): d1(0), mWidth(width){ Td::refreshDomain(); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
@@ -180,12 +180,12 @@ public:
 	/// Set bandwidth of pole
 	void width(Tp v){
 		mWidth = v;
-		mB1 = poleRadius(v, Ts::ups());
+		mB1 = poleRadius(v, Td::ups());
 	}
 
 	void zero(){ d1=0; }
 
-	virtual void onResync(double r){ width(mWidth); }
+	virtual void onDomainChange(double r){ width(mWidth); }
 
 protected:
 	Tv d1;
@@ -196,12 +196,12 @@ protected:
 
 /// Nyquist frequency blocker
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters  
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class BlockNyq : public BlockDC<Tv,Tp,Ts>{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class BlockNyq : public BlockDC<Tv,Tp,Td>{
 public:
 
 	/// \param[in] width	Bandwidth of pole
@@ -216,7 +216,7 @@ public:
 	}
 
 protected:
-	typedef BlockDC<Tv,Tp,Ts> Base;
+	typedef BlockDC<Tv,Tp,Td> Base;
 	using Base::d1; using Base::mB1;
 };
 
@@ -224,12 +224,12 @@ protected:
 
 /// Abstract base class for 2-pole or 2-zero filter
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class Filter2 : public Ts{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class Filter2 : public Td{
 public:
 
 	/// Set frequency
@@ -238,7 +238,7 @@ public:
 	/// Set bandwidth
 	void width(Tp v){
 		mWidth = v;
-		mRad = poleRadius(mWidth, Ts::ups());
+		mRad = poleRadius(mWidth, Td::ups());
 		mC[2] = -mRad * mRad;
 		computeCoef1();
 	}
@@ -246,7 +246,7 @@ public:
 	/// Zero delay elements
 	void zero(){ d2=d1=Tv(0); }
 	
-	virtual void onResync(double r){ freq(mFreq); width(mWidth); }
+	virtual void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 
@@ -256,7 +256,7 @@ protected:
 
 	void freqRef(Tp& v){
 		mFreq = v;		
-		v = scl::clip<Tp>(v * Ts::ups(), 0.5);
+		v = scl::clip<Tp>(v * Td::ups(), 0.5);
 		//mCos = scl::cosP3<Tp>(v);
 		mCos = scl::cosT8<Tp>(v * M_2PI);
 		computeCoef1();
@@ -274,7 +274,7 @@ protected:
 
 
 #define INHERIT_FILTER2 \
-typedef Filter2<Tv,Tp,Ts> Base;\
+typedef Filter2<Tv,Tp,Td> Base;\
 using Base::mFreq;\
 using Base::mWidth;\
 using Base::gain;\
@@ -289,17 +289,17 @@ using Base::d1
 
 /// This all-pass filter shifts phases from 0 to 2 pi from 0 to Nyquist. The
 /// center frequency controls where the phase is shifted by pi.
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class AllPass2 : public Filter2<Tv,Tp,Ts>{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class AllPass2 : public Filter2<Tv,Tp,Td>{
 public:
 
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
-	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
+	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){
@@ -317,17 +317,17 @@ protected:
 
 /// Two-zero notch
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class Notch : public Filter2<Tv,Tp,Ts>{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class Notch : public Filter2<Tv,Tp,Td>{
 public:
 	
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
-	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
+	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
 
 	/// Set center frequency
 	void freq(Tp v){ Base::freq(v); computeGain(); }
@@ -343,7 +343,7 @@ public:
 		return o0;
 	}
 
-	virtual void onResync(double r){ freq(mFreq); width(mWidth); }
+	virtual void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 	INHERIT_FILTER2;
@@ -356,17 +356,17 @@ protected:
 
 /// Two-pole resonator
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template <class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class Reson : public Filter2<Tv,Tp,Ts>{
+template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class Reson : public Filter2<Tv,Tp,Td>{
 public:
 
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth	
-	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ Ts::initSynced(); }
+	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
 
 	/// Set center frequency
 	void freq(Tp v){
@@ -388,7 +388,7 @@ public:
 		return i0; 
 	}
 
-	void onResync(double r){ freq(mFreq); width(mWidth); }
+	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 	INHERIT_FILTER2;
@@ -411,8 +411,8 @@ protected:
 /// harmonic conjugate. The input and output of the Hilbert transform, comprise
 /// the real and imaginary components of a complex (analytic) signal.
 ///
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
 /// \ingroup Filters
 template <class Tv=gam::real, class Tp=gam::real>
 class Hilbert {
@@ -435,15 +435,15 @@ public:
 	}
 
 protected:
-	AllPass1<Tv, Tp, Synced1> cf0,cf1,cf2,cf3,cf4,cf5, sf0,sf1,sf2,sf3,sf4,sf5;
+	AllPass1<Tv, Tp, Domain1> cf0,cf1,cf2,cf3,cf4,cf5, sf0,sf1,sf2,sf3,sf4,sf5;
 };
 
 
 
 /// Leaky integrator
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
 /// \ingroup Filters
 template <class Tv=double, class Tp=double>
 class Integrator{
@@ -511,12 +511,12 @@ protected:
 
 /// One-pole smoothing filter
 
-/// \tparam Tv	value (sample) type
-/// \tparam Tp	parameter type
-/// \tparam Ts	sync type
+/// \tparam Tv	Value (sample) type
+/// \tparam Tp	Parameter type
+/// \tparam Td	Domain observer type
 /// \ingroup Filters
-template<class Tv=gam::real, class Tp=gam::real, class Ts=Synced>
-class OnePole : public Ts{ 
+template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+class OnePole : public Td{ 
 public:
 	OnePole();
 
@@ -540,7 +540,7 @@ public:
 	Tv& stored();						///< Returns stored value
 	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros
 	
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 
 protected:
 	Tp mFreq, mA0, mB1;
@@ -554,79 +554,86 @@ protected:
 
 //---- AllPass1
 
-template <class Tv, class Tp, class Ts>
-AllPass1<Tv,Tp,Ts>::AllPass1(Tp frq)
+template <class Tv, class Tp, class Td>
+AllPass1<Tv,Tp,Td>::AllPass1(Tp frq)
 :	d1(Tv(0)), mFreq(frq)
-{	Ts::initSynced(); }
+{	Td::refreshDomain(); }
 
-template <class Tv, class Tp, class Ts>
-inline void AllPass1<Tv,Tp,Ts>::freq(Tp v){
+template <class Tv, class Tp, class Td>
+inline void AllPass1<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
-	c = tan( freqToRad(v, Ts::ups()) - M_PI_4); // valid ang in [-pi/4, pi/4]
+	c = tan( freqToRad(v, Td::ups()) - M_PI_4); // valid ang in [-pi/4, pi/4]
 }
 
-template <class Tv, class Tp, class Ts>
-inline void AllPass1<Tv,Tp,Ts>::freqF(Tp v){
+template <class Tv, class Tp, class Td>
+inline void AllPass1<Tv,Tp,Td>::freqF(Tp v){
 	mFreq = v;
-	c = freqToRad(v, Ts::ups());
+	c = freqToRad(v, Td::ups());
 	c = Tp(1.27323954474) * c - Tp(1);		// 4/pi * c - 1, linear apx
 	c = c * (Tp(0.76) + Tp(0.24) * c * c);
 }
 
-template <class Tv, class Tp, class Ts> 
-inline Tv AllPass1<Tv,Tp,Ts>::operator()(Tv i0){
+template <class Tv, class Tp, class Td> 
+inline Tv AllPass1<Tv,Tp,Td>::operator()(Tv i0){
+/*
+	// Direct Form I
+	//o0 = i0*c + i1 - o1*c;
+	o0 = (i0 - o1)*c + i1;
+	i1 = i0;
+	o1 = o0;
+*/
 	i0 -= d1 * c;			// o0 = c * (i0 - c * d1) + d1
 	Tv o0 = i0 * c + d1;	//    = c * i0 + (1 - c*c) * d1
 	d1 = i0;
 	return o0;
 }
 
-template <class Tv, class Tp, class Ts>
-inline Tv AllPass1<Tv,Tp,Ts>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
+template <class Tv, class Tp, class Td>
+inline Tv AllPass1<Tv,Tp,Td>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
     
-template <class Tv, class Tp, class Ts>
-inline Tv AllPass1<Tv,Tp,Ts>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
+template <class Tv, class Tp, class Td>
+inline Tv AllPass1<Tv,Tp,Td>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
 
-template <class Tv, class Tp, class Ts>
-inline Tp AllPass1<Tv,Tp,Ts>::freq(){ return mFreq; }
+template <class Tv, class Tp, class Td>
+inline Tp AllPass1<Tv,Tp,Td>::freq(){ return mFreq; }
     
-template <class Tv, class Tp, class Ts>
-void AllPass1<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
+template <class Tv, class Tp, class Td>
+void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 
 
 
 //---- Biquad
-template <class Tv, class Tp, class Ts>
-Biquad<Tv,Tp,Ts>::Biquad(Tp frq, Tp res, FilterType type)
+template <class Tv, class Tp, class Td>
+Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
 :	d1(0), d2(0)
 {
-	Ts::initSynced();
+	Td::refreshDomain();
 	set(frq, res, type);
 }
 
-template <class Tv, class Tp, class Ts>
-void Biquad<Tv,Tp,Ts>::onResync(double r){
-	mFrqToRad = M_2PI * Ts::ups();
+template <class Tv, class Tp, class Td>
+void Biquad<Tv,Tp,Td>::onDomainChange(double r){
+	mFrqToRad = M_2PI * Td::ups();
 	freq(mFreq);
 }
 
-template <class Tv, class Tp, class Ts>
-void Biquad<Tv,Tp,Ts>::set(Tp freqA, Tp resA, FilterType typeA){
+template <class Tv, class Tp, class Td>
+void Biquad<Tv,Tp,Td>::set(Tp freqA, Tp resA, FilterType typeA){
 	mRes = resA;
 	mType = typeA;
 	freq(freqA);
 }
 
-template <class Tv, class Tp, class Ts>
-void Biquad<Tv,Tp,Ts>::zero(){ d1=d2=(Tv)0; }
+template <class Tv, class Tp, class Td>
+void Biquad<Tv,Tp,Td>::zero(){ d1=d2=(Tv)0; }
 
-template <class Tv, class Tp, class Ts>
-void Biquad<Tv,Tp,Ts>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
+template <class Tv, class Tp, class Td>
+void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 	mA[0]=a0; mA[1]=a1; mA[2]=a2; mB[1]=b1; mB[2]=b2;
 }
 
-template <class Tv, class Tp, class Ts>
-inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
 	float w = scl::clip(mFreq * mFrqToRad, 3.11f);
 	mReal = scl::cosT8(w);
@@ -634,8 +641,8 @@ inline void Biquad<Tv,Tp,Ts>::freq(Tp v){
 	res(mRes);
 }
 
-template <class Tv, class Tp, class Ts>
-inline void Biquad<Tv,Tp,Ts>::res(Tp v){
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::res(Tp v){
 	mRes = v;
 	mAlpha = mImag / mRes;
 
@@ -648,11 +655,11 @@ inline void Biquad<Tv,Tp,Ts>::res(Tp v){
 	type(mType);
 }
 
-template <class Tv, class Tp, class Ts>
-inline void Biquad<Tv,Tp,Ts>::set(Tp frq, Tp res){ set(frq, res, mType); }
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::set(Tp frq, Tp res){ set(frq, res, mType); }
 
-template <class Tv, class Tp, class Ts>
-inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 	mType = typeA;
 	
 	switch(mType){
@@ -690,8 +697,8 @@ inline void Biquad<Tv,Tp,Ts>::type(FilterType typeA){
 	};
 }
 
-template <class Tv, class Tp, class Ts>
-inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
+template <class Tv, class Tp, class Td>
+inline Tv Biquad<Tv,Tp,Td>::operator()(Tv i0){
 	// Direct form II
 	i0 = i0 - d1*mB[1] - d2*mB[2];
 	Tv o0 = i0*mA[0] + d1*mA[1] + d2*mA[2];
@@ -699,8 +706,8 @@ inline Tv Biquad<Tv,Tp,Ts>::operator()(Tv i0){
 	return o0;
 }
 
-template <class Tv, class Tp, class Ts>
-inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
+template <class Tv, class Tp, class Td>
+inline Tv Biquad<Tv,Tp,Td>::nextBP(Tv i0){
 	i0 = i0 - d1*mB[1] - d2*mB[2];	
 	Tv o0 = (i0 - d2)*mA[0];
 	d2 = d1; d1 = i0;
@@ -709,24 +716,24 @@ inline Tv Biquad<Tv,Tp,Ts>::nextBP(Tv i0){
 
 
 //---- OnePole
-template <class Tv, class Tp, class Ts>
-OnePole<Tv,Tp,Ts>::OnePole()
+template <class Tv, class Tp, class Td>
+OnePole<Tv,Tp,Td>::OnePole()
 :	mFreq(10), mStored(Tv(0)), o1(Tv(0))
-{	Ts::initSynced(); }
+{	Td::refreshDomain(); }
 
-template <class Tv, class Tp, class Ts>
-OnePole<Tv,Tp,Ts>::OnePole(Tp frq, const Tv& stored)
+template <class Tv, class Tp, class Td>
+OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
 :	mFreq(frq), mStored(stored), o1(stored)
-{	Ts::initSynced(); }
+{	Td::refreshDomain(); }
 
-template <class Tv, class Tp, class Ts>
-void OnePole<Tv,Tp,Ts>::onResync(double r){ freq(mFreq); }
+template <class Tv, class Tp, class Td>
+void OnePole<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 
-template <class Tv, class Tp, class Ts>
-inline void OnePole<Tv,Tp,Ts>::operator  = (const Tv& v){ mStored  = v; }
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::operator  = (const Tv& v){ mStored  = v; }
     
-template <class Tv, class Tp, class Ts>
-inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::operator *= (const Tv& v){ mStored *= v; }
 
 // f = ln(mB1) / -M_2PI * SR  ( @ 44.1 f = ln(c01) * -7018.733)
 // @ 44.1 : 0.9     <=> 739.5
@@ -734,35 +741,35 @@ inline void OnePole<Tv,Tp,Ts>::operator *= (const Tv& v){ mStored *= v; }
 // @ 44.1 : 0.999   <=>   7.022
 // @ 44.1 : 0.9999  <=>   0.702
 // @ 44.1 : 0.99999 <=>   0.0702
-template <class Tv, class Tp, class Ts>
-inline void OnePole<Tv,Tp,Ts>::freq(Tp v){
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;	
 	v = scl::max(v, Tp(0));	// ensure positive freq
 	
 	// freq is half the bandwidth of a pole at 0
-	smooth( poleRadius(Tp(2) * v, Ts::ups()) );
-	//printf("%f, %f, %f\n", Ts::spu(), mB1, v);
+	smooth( poleRadius(Tp(2) * v, Td::ups()) );
+	//printf("%f, %f, %f\n", Td::spu(), mB1, v);
 }
 
-template <class Tv, class Tp, class Ts>
-inline void OnePole<Tv,Tp,Ts>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
 
-template <class Tv, class Tp, class Ts>
-inline const Tv& OnePole<Tv,Tp,Ts>::operator()(){ return (*this)(mStored); }
+template <class Tv, class Tp, class Td>
+inline const Tv& OnePole<Tv,Tp,Td>::operator()(){ return (*this)(mStored); }
     
-template <class Tv, class Tp, class Ts>
-inline const Tv& OnePole<Tv,Tp,Ts>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
+template <class Tv, class Tp, class Td>
+inline const Tv& OnePole<Tv,Tp,Td>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
 
-template <class Tv, class Tp, class Ts>
-inline const Tv& OnePole<Tv,Tp,Ts>::last() const { return o1; }
+template <class Tv, class Tp, class Td>
+inline const Tv& OnePole<Tv,Tp,Td>::last() const { return o1; }
     
-template <class Tv, class Tp, class Ts>
-inline const Tv& OnePole<Tv,Tp,Ts>::stored() const { return mStored; }
+template <class Tv, class Tp, class Td>
+inline const Tv& OnePole<Tv,Tp,Td>::stored() const { return mStored; }
     
-template <class Tv, class Tp, class Ts>
-inline Tv& OnePole<Tv,Tp,Ts>::stored(){ return mStored; }
+template <class Tv, class Tp, class Td>
+inline Tv& OnePole<Tv,Tp,Td>::stored(){ return mStored; }
     
-template <class Tv, class Tp, class Ts>
-inline bool OnePole<Tv,Tp,Ts>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == Tv(0); }
+template <class Tv, class Tp, class Td>
+inline bool OnePole<Tv,Tp,Td>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == Tv(0); }
 } // gam::
 #endif

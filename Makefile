@@ -7,6 +7,7 @@ include Makefile.config
 SRCS = 	arr.cpp\
 	AudioIO.cpp\
 	Conversion.cpp\
+	Domain.cpp\
 	DFT.cpp\
 	FFT_fftpack.cpp\
 	fftpack++1.cpp\
@@ -16,8 +17,7 @@ SRCS = 	arr.cpp\
 	scl.cpp\
 	Recorder.cpp\
 	Scheduler.cpp\
-	SoundFile.cpp\
-	Sync.cpp
+	SoundFile.cpp
 
 #OBJS = $(SRCS:.cpp=.o)
 #OBJS := $(addprefix $(OBJ_DIR), $(OBJS))

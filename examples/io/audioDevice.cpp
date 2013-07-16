@@ -86,7 +86,7 @@ int main(){
 	}
 	
 	// set the global sample rate "subject"
-	Sync::master().spu(io.framesPerSecond());
+	Domain::master().spu(io.framesPerSecond());
 	
 	// start the audio stream
 	io.start();

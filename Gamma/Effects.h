@@ -21,7 +21,7 @@ namespace gam{
 /// This object produces an estimate of the amplitude envelope of a signal
 /// by feeding a full-wave rectification of the signal through a low-pass filter.
 ///\ingroup Filters, Envelopes, Analysis
-template <class Tv=real, class Tp=real, class Ts=Synced>
+template <class Tv=real, class Tp=real, class Td=DomainObserver>
 class EnvFollow{
 public:
 
@@ -38,7 +38,7 @@ public:
 	
 	bool done(Tv eps=0.001) const { return value() < eps; }
 
-	OnePole<Tv,Tp,Ts> lpf;	///< Low-pass filter
+	OnePole<Tv,Tp,Td> lpf;	///< Low-pass filter
 };
 
 
@@ -327,52 +327,69 @@ template <class T=gam::real>
 class Pan{
 public:
 
-	/// \param[in] pos	Signed unit position in [-1, 1]
+	/// \param[in] pos	Position, in [-1, 1]
 	Pan(T pos=0){ this->pos(pos); }
 
-	/// Filter sample (mono-to-stereo)
+	/// Filter sample (mono to stereo)
 	Vec<2,T> operator()(T in){
 		return Vec<2,T>(in*w1, in*w2);
 	}	
 
-	/// Filter sample (mono-to-stereo)
+	/// Filter sample (mono to stereo)
 	template <class V>
 	void operator()(T in, V& out1, V& out2){
 		out1 = in*w1; out2 = in*w2;
 	}
 
-	/// Filter sample (stereo-to-stereo)
+	/// Filter sample (stereo to stereo)
 	template <class V>
 	void operator()(T in1, T in2, V& out1, V& out2){
 		out1 = in1*w1 + in2*w2;
 		out2 = in1*w2 + in2*w1;
 	}
 
-	/// Set position
-//	void pos(T v){
-//		v = scl::clip(v, (T)1, (T)-1);
-//		v = (v+T(1))*M_PI_4;	// put in [0, pi/2]
-//		w1 = cos(v);
-//		w2 = sin(v); 
-//	}
+	/// Set position (constant power law)
 
-	/// Set position using a quadratic approximation.
+	/// This is a constant power pan where the sum of the squares of the two
+	/// channel gains is always 1. A quadratic approximation is used to avoid
+	/// expensive trig function calls. The approximation is good enough for most
+	/// purposes and gives the exact result at positions of -1, 0, 1.
+	///
+	/// \param[in] v	Position, in [-1, 1]
 	void pos(T v){
-		// gives correct result at -1, 0, and 1
 		static const T c0 = 1./sqrt(2);
 		static const T c1 = 0.5 - c0;
 		static const T c2 =-0.5/c1;
 		v = scl::clip(v, T(1), T(-1));
-		//w1 = (T)-0.25 * v * (v + (T)2) + (T)0.75;
 		w1 = c1 * v * (v + c2) + c0;
 		w2 = w1 + v;
+
+		/* // exact formula, for reference
+		v = scl::clip(v, (T)1, (T)-1);
+		v = (v+T(1))*M_PI_4;	// put in [0, pi/2]
+		w1 = cos(v);
+		w2 = sin(v);*/
 	}
 
-	/// Set position using a linear approximation.
+	/// Set position and overall gain
+
+	/// This is identical to pos(), but includes an overall gain.
+	///
+	/// \param[in] v		Position, in [-1, 1]
+	/// \param[in] gain		Overall gain to apply to both channels
+	void pos(T v, T gain){
+		pos(v); w1*=gain; w2*=gain;
+	}
+
+	/// Set position (constant gain law)
+
+	/// This uses a constant gain law where the sum of the channel gains is
+	/// always 1.
+	/// \param[in] v	Position, in [-1, 1]
 	void posL(T v){
 		v = scl::clip(v, T(1), T(-1));
-		w1 = -v * T(0.5) + T(0.5);
-		w2 = w1 + v; 
+		w1 = T(0.5) - v * T(0.5);
+		w2 = w1 + v;
 	}
 
 protected:
@@ -409,7 +426,7 @@ public:
 /// This effect is also known as a bitcrusher.
 ///\ingroup Effects
 template <class T=gam::real>
-class Quantizer : public Synced{
+class Quantizer : public DomainObserver{
 public:
 	/// \param[in] freq		Frequency of sequence quantization
 	/// \param[in] step		Step size of amplitude quantization
@@ -421,7 +438,7 @@ public:
 
 	T operator()(T input);		///< Return next filtered sample
 	
-	virtual void onResync(double r);
+	virtual void onDomainChange(double r);
 
 private:
 	T mHeld;
@@ -464,7 +481,7 @@ inline T Quantizer<T>::operator()(T vi){
 }
 
 template<class T>
-void Quantizer<T>::onResync(double r){
+void Quantizer<T>::onDomainChange(double r){
 	period(mPeriod);
 }
 

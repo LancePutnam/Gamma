@@ -29,7 +29,7 @@ using namespace gam;
 #define RUN_AUDIO_MAIN \
 int main(int argc, char* argv[]){\
 	AudioIO io(256, 44100, audioCB, NULL, 2);\
-	Sync::master().spu(io.framesPerSecond());\
+	Domain::master().spu(io.framesPerSecond());\
 	io.start();\
 	printf("Press 'enter' to quit...\n"); getchar();\
 	return 0;\
