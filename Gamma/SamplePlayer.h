@@ -11,6 +11,7 @@
 #include "Gamma/Strategy.h"
 #include "Gamma/Sync.h"
 #include "Gamma/Types.h"
+#include "Gamma/Print.h"
 
 namespace gam{
 
@@ -172,6 +173,14 @@ CLS::SamplePlayer(const Char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {	
 	if(!load(path)){
+#ifdef USE_WARN
+    char message[10000];
+    sprintf(message, "couldn't load sound file \"%s\"", path);
+    warn(message, "SamplePlayer");
+#else
+    fprintf(stderr, "SamplePlayer: couldn't load sound file \"%s\"\n", path);
+#endif
+    
 		this->source(defaultBuffer(), 1);
 	}
 }
