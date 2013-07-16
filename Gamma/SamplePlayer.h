@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <stdio.h>
 #include "Gamma/Containers.h"
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
@@ -192,7 +193,10 @@ bool CLS::load(const Char * pathToSoundFile){
 		sf.close();
 		return true;
 	}
-	
+
+	fprintf(stderr, 
+		"gam::SamplePlayer: couldn't load sound file \"%s\"\n",
+		pathToSoundFile);
 	return false;
 }
 
