@@ -288,13 +288,13 @@ public:
 	STFT& windowType(WindowType type);
 
 
-	float unitsHop();
+	double unitsHop();
 	
 	/// Returns array of current analysis phases (MAG_FREQ format only)
 	float * phases();
 
 	/// Returns array of current accumulator phases (MAG_FREQ format only)
-	float * accumPhases();
+	double * accumPhases();
 
 	/// Reset phases (MAG_FREQ format only)
 
@@ -311,7 +311,7 @@ protected:
 	SlidingWindow<float> mSlide;
 	float * mFwdWin;			// forward transform window
 	float * mPhases;			// copy of current phases (mag-freq mode)
-	float * mAccums;			// phase accumulators (mag-freq mode)
+	double * mAccums;			// phase accumulators (mag-freq mode)
 	WindowType mWinType;		// type of analysis window used
 	float mFwdWinMul, mInvWinMul;
 	bool mWindowInverse;		// whether to window inverse samples
@@ -467,7 +467,7 @@ template<class T>
 inline T *		DFTBase<T>::aux(uint32_t num){ return mAux + numBins() * num; }
     
 template<class T>
-inline double	DFTBase<T>::binFreq() const { return spu() / (double)sizeDFT(); }
+inline double	DFTBase<T>::binFreq() const { return spu() / sizeDFT(); }
     
 template<class T>
 inline uint32_t	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
@@ -479,7 +479,7 @@ template<class T>
 inline Domain&	DFTBase<T>::domainFreq(){ return mDomFreq; }
     
 template<class T>
-inline T		DFTBase<T>::normForward() const { return (T)2 / (T)sizeDFT(); }
+inline T		DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
 
 template<class T>
 void DFTBase<T>::numAux(uint32_t num){
@@ -545,9 +545,9 @@ inline bool STFT::operator()(float input){
 	return false;
 }
 
-inline float STFT::unitsHop(){ return (float)DFT::sizeHop() * ups(); }
+inline double STFT::unitsHop(){ return DFT::sizeHop() * ups(); }
 inline float * STFT::phases(){ return mPhases; }
-
+inline double * STFT::accumPhases(){ return mAccums; }
 
 
 //---- SlidingDFT

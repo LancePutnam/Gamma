@@ -285,7 +285,7 @@ void STFT::resize(uint32_t winSize, uint32_t padSize){
 
 	mem::deepZero(mBufInv, winSize);
 	resetPhases();
-	
+
 	// re-compute fwd window
 	windowType(mWinType);
 }
@@ -300,7 +300,6 @@ STFT& STFT::sizeHop(uint32_t size){
 }
 
 STFT& STFT::resetPhases(){
-	//mem::deepCopy(mAccums, mPhases, numBins());
 	mem::deepZero(mPhases, numBins());
 	mem::deepZero(mAccums, numBins());
 	return *this;
@@ -321,27 +320,26 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 	
 	// compute frequency estimates?
 	if(MAG_FREQ == mSpctFormat){
-		
-		// Compute frequency estimates:
 
 		// converts phase diff from radians to Hz
-		float factor = 1.f / (M_2PI * unitsHop());
+		double factor = 1. / (M_2PI * unitsHop());
 		
 		// expected phase diff of fundamental due to overlap
-		float expdp1 = float(sizeHop())/sizeWin() * M_2PI;
+		double expdp1 = double(sizeHop())/sizeWin() * M_2PI;
+		double fund = binFreq();
 
-		for(uint32_t i=1; i<numBins()-1; ++i){
-			float ph = bin(i)[1];			// current phase
-			float dp = ph - mPhases[i];		// compute phase diff
-			dp -= i*expdp1;					// subtract expected phase diff due to overlap
-			dp = scl::wrapPhase(dp);		// wrap back into [-pi, pi)
-			mPhases[i] = ph;				// save current phase
-			bin(i)[1] = dp*factor;			// convert phase diff to freq
-		}
-		
-		// compute absolute frequencies by adding respective bin center frequency
-		for(uint32_t i=0; i<numBins(); ++i){
-			bins()[i][1] += binFreq()*i;
+		bin(0)[1] = 0.;
+		bin(numBins()-1)[1] = spu() * 0.5;
+
+		for(uint32_t k=1; k<numBins()-1; ++k){
+			float ph = bin(k)[1];		// current phase
+			double t = ph - mPhases[k];	// compute phase diff
+			mPhases[k] = ph;			// save current phase
+			t -= k*expdp1;				// subtract expected phase diff due to overlap
+			t = scl::wrapPhase(t);		// wrap back into [-pi, pi)
+			t *= factor;				// convert phase diff to freq deviation
+			t += k*fund;				// freq deviation to freq
+			bin(k)[1] = t;
 		}
 	}
 }
@@ -350,21 +348,17 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 void STFT::inverse(float * dst){
 	//printf("STFT::inverse(float *)\n");
 	if(MAG_FREQ == mSpctFormat){
+		double factor = M_2PI * unitsHop();
+		double expdp1 = double(sizeHop())/sizeWin() * M_2PI;
+		double fund = binFreq();
 
-		// convert absolute frequencies to frequency deviations
-		for(uint32_t i=0; i<numBins(); ++i){
-			bins()[i][1] -= binFreq()*i;
-		}
-
-		float factor = (M_2PI * unitsHop());
-		float expdp1 = float(sizeHop())/sizeWin() * M_2PI;
-
-		for(uint32_t i=1; i<numBins()-1; ++i){
-			float t = bins()[i][1];		// freq. deviation
-			t *= factor;				// freq. deviation to phase diff
-			t += expdp1 * i;			// add expected phase diff due to overlap	
-			mAccums[i] += t;			// accumulate phase diff
-			bins()[i][1] = mAccums[i];	// copy accum phase for inverse xfm
+		for(uint32_t k=1; k<numBins()-1; ++k){
+			double t = bin(k)[1];		// freq
+			t -= k*fund;				// freq to freq deviation
+			t *= factor;				// freq deviation to phase diff
+			t += k*expdp1;				// add expected phase diff due to overlap	
+			mAccums[k] += t;			// accumulate phase diff
+			bin(k)[1] = mAccums[k];		// copy accum phase for inverse xfm
 		}
 	}	
 	
