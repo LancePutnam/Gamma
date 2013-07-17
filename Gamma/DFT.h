@@ -296,13 +296,12 @@ public:
 	/// Returns array of current accumulator phases (MAG_FREQ format only)
 	float * accumPhases();
 
-	/// Reset phase accumulators (MAG_FREQ format only)
+	/// Reset phases (MAG_FREQ format only)
 
-	/// This resets the values of all phase accumulators to zero. It can be
-	/// used to help eliminate phase smearing artifacts from certain
-	/// transformations like pitch shifting.
-	/// It should be called immediately before doing the inverse transform.
-	STFT& resetPhaseAccums();
+	/// This resets the phases of all the accumulators used in the inverse
+	/// transform. It can be used to help eliminate phase smearing artifacts 
+	/// from certain transformations, like pitch shifting.
+	STFT& resetPhases();
 	
 	virtual void print(FILE * fp=stdout, const char * append="\n");	
 

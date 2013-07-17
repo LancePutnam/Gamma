@@ -284,8 +284,7 @@ void STFT::resize(uint32_t winSize, uint32_t padSize){
 	mem::resize(mAccums, oldNumBins, numBins());
 
 	mem::deepZero(mBufInv, winSize);
-	mem::deepZero(mPhases, numBins());
-	resetPhaseAccums();
+	resetPhases();
 	
 	// re-compute fwd window
 	windowType(mWinType);
@@ -300,8 +299,9 @@ STFT& STFT::sizeHop(uint32_t size){
 	return *this;
 }
 
-STFT& STFT::resetPhaseAccums(){
+STFT& STFT::resetPhases(){
 	//mem::deepCopy(mAccums, mPhases, numBins());
+	mem::deepZero(mPhases, numBins());
 	mem::deepZero(mAccums, numBins());
 	return *this;
 }
