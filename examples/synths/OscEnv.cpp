@@ -4,15 +4,13 @@
 
 #include "../examples.h"
 
-class OscEnv : public Process {
+class OscEnv : public Process<AudioIOData> {
 public:
 
-	OscEnv(double dt=0)
-	:	Process(dt),
-		mAmp(1), mDur(2)
-		
+	OscEnv(double startTime=0)
+	:	mAmp(1), mDur(2)
 	{
-				
+		dt(startTime);
 		set( 4, 262, 0.3, 0.1 , 0.075, 0.7, 4, mOsc, 0.2);
 		mAmpEnv.levels(0,1,1,0);
 	}

@@ -9,17 +9,18 @@
 #include "../examples.h"
 #include "Gamma/Scheduler.h"
 
-class PluckedString : public Process {
+class PluckedString : public Process<AudioIOData> {
 public:
 
-	PluckedString(double dt=0, float frq=440)
-	:	Process(dt),
-		mAmp(1), mDur(2), delay1(0.4,	0.2),
-		env(0.1), fil(2), delay(1./27.5, 1./frq){
+	PluckedString(double startTime=0, float frq=440)
+	:	mAmp(1), mDur(2), delay1(0.4,	0.2),
+		env(0.1), fil(2), delay(1./27.5, 1./frq)
+	{
+		dt(startTime);
 		decay(1.0);
 		mAmpEnv.curve(4); // make segments lines
 		mAmpEnv.levels(1,1,0);
-}
+	}
 		
 	PluckedString& freq(float v){delay.freq(v); return *this; }
 	PluckedString& amp(float v){ mAmp=v; return *this; }
@@ -39,7 +40,6 @@ public:
 	
 	){
 		return dur(a).freq(b).amp(c).decay(d).pan(e);
-	
 	}
 
 	float operator() (){
@@ -53,7 +53,6 @@ public:
 	}
 	
 	void onProcess(AudioIOData& io){
-
 	
 		while(io()){
 			float s =  (*this)() * mAmpEnv() * mAmp;
@@ -79,7 +78,6 @@ public:
 		}
 		if(mAmpEnv.done() && (mEnvFollow.value() < 0.001)) free();
 	}
-
 
 protected:
 	float mAmp;

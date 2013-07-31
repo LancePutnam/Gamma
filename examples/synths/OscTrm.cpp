@@ -4,13 +4,13 @@
 
 #include "../examples.h"
 
-class OscTrm : public Process {
+class OscTrm : public Process<AudioIOData> {
 public:
 	
-	OscTrm(double dt=0)
-	:	Process(dt),
-	mAmp(1), mDur(2)
+	OscTrm(double startTime=0)
+	:	mAmp(1), mDur(2)
 	{
+		dt(startTime);
 		set(10, 262, 0.5, 0.1,2,0.8, 0.4,4,8,0.5, mOsc, 0.8);
 		mAmpEnv.levels(0,1,1,0);
 	}
@@ -33,13 +33,13 @@ public:
 	
 	
 	OscTrm& set(
-				float a, float b, float c, float d, float e, float f,
-				float g, float h, float i, float j,
-				ArrayPow2<float>& k, float l
-				){
+		float a, float b, float c, float d, float e, float f,
+		float g, float h, float i, float j,
+		ArrayPow2<float>& k, float l
+	){
 		return dur(a).freq(b).amp(c).attack(d).decay(e).sus(f)
-		.trmDepth(g).trm1(h).trm2(i).trmRise(j)
-		.table(k).pan(l);
+			.trmDepth(g).trm1(h).trm2(i).trmRise(j)
+			.table(k).pan(l);
 	}
 	
 	void onProcess(AudioIOData& io){
