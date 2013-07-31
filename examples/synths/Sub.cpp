@@ -5,13 +5,13 @@
 #include "Gamma/Scheduler.h"
 
 
-class Sub : public Process {
+class Sub : public Process<AudioIOData> {
 public:
 
-	Sub(double dt=0)
-	:	Process(dt),
-		mAmp(1), mDur(2)
+	Sub(double startTime=0)
+	:	mAmp(1), mDur(2)
 	{
+		dt(startTime);
 		mAmpEnv.curve(0); // linear segments
 		mAmpEnv.levels(0,1,1,0);
 		hnum(12);
@@ -74,7 +74,6 @@ public:
 		}
 		if(mAmpEnv.done()) free();
 	}
-
 
 protected:
 	float mAmp;

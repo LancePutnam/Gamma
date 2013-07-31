@@ -8,15 +8,12 @@
 #include "../examples.h"
 #include "Gamma/Scheduler.h"
 
-
-
-class SineEnv : public Process {
+class SineEnv : public Process<AudioIOData> {
 public:
 
-	SineEnv(double dt=0)
-	:	Process(dt)
-		
+	SineEnv(double startTime=0)
 	{
+		dt(startTime);
 		set (6.5, 260, 0.3, 1, 2);
 		mAmpEnv.curve(0); // make segments lines
 		mAmpEnv.levels(0,1,1,0);
@@ -54,7 +51,6 @@ public:
 		}
 		if(mAmpEnv.done()) free();
 	}
-
 
 protected:
 	float mAmp;

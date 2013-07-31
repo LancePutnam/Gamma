@@ -79,6 +79,6 @@ test:
 	@$(MAKE) tests/unitTests.cpp
 
 buildtest: test
-	@for v in algorithmic curves effects filter function generator io spectral; do \
+	@for v in algorithmic curves effects filter function generator io spectral synths; do \
 		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done

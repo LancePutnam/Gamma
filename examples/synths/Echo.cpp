@@ -10,7 +10,7 @@
 int globalCounter = 0;
 
 
-struct Echo : public Process{
+struct Echo : public Process<AudioIOData>{
   Echo(): echo(0.4, 0.323, 0, 0.8){}
   //Echo(const Process& p): Process(p), echo(0.4, 0.323, 0, 0.8){}
 	
@@ -27,7 +27,7 @@ struct Echo : public Process{
 
 /// Dual delay-line chorus driven by quadrature sinusoid
 
-struct Chorus1 : public Process {
+struct Chorus1 : public Process<AudioIOData> {
   Chorus1(): chorus(0.0021, 0.001, 1, 0.9, 0.1){}
  // Chorus1(const Process& p): Process(p), chorus(0.0021, 0.001, 1, 0.9, 0.1){}
 	
@@ -43,13 +43,12 @@ struct Chorus1 : public Process {
 };
 	
 
-class SineEnv : public Process {
+class SineEnv : public Process<AudioIOData> {
 public:
 
-	SineEnv(double dt=0)
-	:	Process(dt)
-		
+	SineEnv(double startTime=0)
 	{
+		dt(startTime);
 		set (6.5, 260, 0.3, 1, 2);
 		mAmpEnv.curve(0); // make segments lines
 		mAmpEnv.levels(0,1,1,0);
@@ -115,41 +114,39 @@ const double ti = doh / hs;
 
 int main(){
 
-  Scheduler s;
-  
-  Process & effects = s.add<Process>(); // add effects group
-//  s.add<Echo>(effects); // add Echo to effects
-//  s.add<Chorus1>(effects); // add chorus to effects
+	Scheduler s;
 
-        s.add<Chorus1>(effects); // add chorus to effects
-    s.add<Echo>(effects); // add Echo to effects
+	ProcessNode& effects = s.add<ProcessNode>(); // add effects group
+	//s.add<Echo>(effects); // add Echo to effects
+	//s.add<Chorus1>(effects); // add chorus to effects
 
-    
-    
-  double attack = 0.1;
-  double decay = 0.1;
-  double pan = 0.0; 
-    
-  double clip = 0.05;
-  
-  double q=0.25 - clip;
-  // double e=0.125 - clip;
-  double h=0.5 - clip;
-  //  double w=1.0 - clip;
-  
-  double start = 0.0;
-  double aug = 1.0;
-  double dyn = 0.2;
-  
-  s.add<SineEnv>( start + 0     ).set( aug * q, doh, dyn, attack, decay, -1.0*pan);
-  s.add<SineEnv>( start + (0.5*aug)  ).set( aug * q, me, dyn, attack, decay, -0.8*pan);
-  s.add<SineEnv>( start + (1.0*aug)   ).set( aug * q, sol, dyn, attack, decay, -0.6*pan);
-  s.add<SineEnv>( start + (1.5*aug)  ).set( aug * q, le, dyn, attack, decay, -0.4*pan);
-  s.add<SineEnv>( start + (2.00*aug)  ).set( aug * h+q, ti, dyn, attack, decay, -0.2*pan);
-  
-  
-  AudioIO io(256, 44100., s.audioCB, &s);
-  Sync::master().spu(io.fps());
-  io.start();
-  printf("\nPress 'enter' to quit...\n"); getchar();
+	s.add<Chorus1>(effects); // add chorus to effects
+	s.add<Echo>(effects); // add Echo to effects
+
+	double attack = 0.1;
+	double decay = 0.1;
+	double pan = 0.0; 
+
+	double clip = 0.05;
+
+	double q=0.25 - clip;
+	// double e=0.125 - clip;
+	double h=0.5 - clip;
+	//  double w=1.0 - clip;
+
+	double start = 0.0;
+	double aug = 1.0;
+	double dyn = 0.2;
+
+	s.add<SineEnv>( start + 0     ).set( aug * q, doh, dyn, attack, decay, -1.0*pan);
+	s.add<SineEnv>( start + (0.5*aug)  ).set( aug * q, me, dyn, attack, decay, -0.8*pan);
+	s.add<SineEnv>( start + (1.0*aug)   ).set( aug * q, sol, dyn, attack, decay, -0.6*pan);
+	s.add<SineEnv>( start + (1.5*aug)  ).set( aug * q, le, dyn, attack, decay, -0.4*pan);
+	s.add<SineEnv>( start + (2.00*aug)  ).set( aug * h+q, ti, dyn, attack, decay, -0.2*pan);
+
+
+	AudioIO io(256, 44100., s.audioCB, &s);
+	Sync::master().spu(io.fps());
+	io.start();
+	printf("\nPress 'enter' to quit...\n"); getchar();
 }

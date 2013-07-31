@@ -8,13 +8,13 @@
 #include "../examples.h"
 #include "Gamma/Scheduler.h"
 
-class Vib : public Process {
+class Vib : public Process<AudioIOData> {
 public:
 
-	Vib(double dt=0)
-	:	Process(dt),
-		mAmp(1), mDur(2)
+	Vib(double startTime=0)
+	:	mAmp(1), mDur(2)
 	{
+		dt(startTime);
 		set( 5, 220, 0.5, 0.1, 0.08, 3.5, 5.8, 0.5, 0.005, mOsc, 0.0);
 		mAmpEnv.curve(0); // linear segments
 		mAmpEnv.levels(0,1,1,0);

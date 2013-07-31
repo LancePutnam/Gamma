@@ -4,13 +4,13 @@
 
 #include "../examples.h"
 
-class OscAM : public Process {
+class OscAM : public Process<AudioIOData> {
 public:
 
-	OscAM(double dt=0)
-	:	Process(dt),
-		mAmp(1), mDur(2)
+	OscAM(double startTime=0)
+	:	mAmp(1), mDur(2)
 	{
+		dt(startTime);
 		mAmpEnv.levels(0,1,1,0);
 		mAMEnv.curve(0);
 	}

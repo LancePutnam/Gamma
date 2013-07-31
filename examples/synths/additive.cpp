@@ -10,13 +10,12 @@
 
 
 
-class AddSyn : public Process {
+class AddSyn : public Process<AudioIOData> {
 public:
 
-	 AddSyn(double dt=0)
-	:	Process(dt)
+	AddSyn(double startTime=0)
 	{
-		
+		dt(startTime);
 		set(6.2,155.6,0.01,0.5,0.1,0.1,0.8,0.5,0.001,0.1,0.8,0.6,0.01,0.075,0.9,1,2.001,3,4.00009,5.0002,6,7,8,9);
 		mEnvStri.curve(-4); // make segments lines
 		mEnvStri.levels(0,1,1,0);

@@ -11,14 +11,14 @@
 using namespace std;
 
 
-class FM : public Process {
+class FM : public Process<AudioIOData> {
 public:
 
-	FM(double dt=0)
-	:	Process(dt),
-		mAmp(1), mDur(2),
+	FM(double startTime=0)
+	:	mAmp(1), mDur(2),
 		mCarFrq(440), mCarMul(1), mModMul(1), mModAmt(50)
 	{
+		dt(startTime);
 		set( 5, 262, 0.5, 0.1,0.1, 0.75, 0.01,7,5, 1,1.0007, 0);
 	}
 
