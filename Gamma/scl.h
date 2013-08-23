@@ -529,13 +529,15 @@ float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
 float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
 float triangleU	(uint32_t phase);	///< Returns value of unipolar triangle function.
 
-template<class T> T bartlett(T nphase);				///< Bartlett window. nphase => [-1, 1)
-template<class T> T blackman(T phase);				///< Blackman window function.
-template<class T> T blackmanHarris(T phase);			///< Blackman-Harris window function.
-template<class T> T hamming(T phase);					///< Hamming window function.
-template<class T> T hann(T phase);					///< von Hann window function.
+template<class T> T bartlett(T nphase);								///< Bartlett window. nphase => [-1, 1)
+template<class T> T blackman(T phase);								///< Blackman window function.
+template<class T> T blackmanHarris(T phase);					///< Blackman-Harris window function.
+template<class T> T blackmanNuttall(T phase);					///< Blackman-Nuttall window function.
+template<class T> T flatTop(T phase);									///< Flat-Top window function.
+template<class T> T hamming(T phase);									///< Hamming window function.
+template<class T> T hann(T phase);										///< von Hann window function.
 template<class T> T raisedCosine(T phase, T a, T b);	///< Raised cosine f(x) = a - b cos(x).
-template<class T> T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
+template<class T> T welch(T nphase);									///< Welch window function. nphase => [-1, 1)
 
 
 // internal
@@ -1236,6 +1238,15 @@ template<class T> inline T blackman(T r){
 }
 template<class T> inline T blackmanHarris(T r){
 	return T(0.35875) - T(0.48829) * cos(r) + T(0.14128) * cos(T(2)*r) - T(0.01168) * cos(T(3)*r);
+}
+template<class T> inline T blackmanNuttall(T r){
+	return T(0.3635819) - T(0.4891775) * cos(r) + T(0.1365995) * cos(T(2)*r) - T(0.0106411) * cos(T(3)*r);
+}
+template<class T> inline T nuttall(T r){
+	return T(0.355768) - T(0.487396) * cos(r) + T(0.144232) * cos(T(2)*r) - T(0.012604) * cos(T(3)*r);
+}
+template<class T> inline T flatTop(T r){
+	return T(1.0) - T(1.93) * cos(r) + T(1.29) * cos(T(2)*r) - T(0.388) * cos(T(3)*r) + T(0.028) * cos(T(4)*r);
 }
 template<class T> inline T hamming(T r){ return raisedCosine(r, T(0.53836), T(0.46164)); }
 template<class T> inline T hann(T r){ return raisedCosine(r, T(0.5), T(0.5)); }
