@@ -21,8 +21,11 @@ enum WindowType{
 	BARTLETT,			/**< Bartlett (Triangle) */
 	BLACKMAN,			/**< Blackman */
 	BLACKMAN_HARRIS,	/**< Blackman-Harris */
+  BLACKMAN_NUTTALL,   /**< Blackman-Nuttall */
+  FLATTOP,            /**< Flat-Top */
 	HAMMING,			/**< Hamming */
 	HANN,				/**< von Hann */
+  NUTTALL,            /**< Nuttall */
 	WELCH,				/**< Welch */
 	NYQUIST,			/**< Nyquist */
 	RECTANGLE			/**< Rectangle (no window) */
@@ -286,12 +289,21 @@ void blackman		(T * dst, uint32_t len); ///< Fills array with Blackman window
     
 template<class T>
 void blackmanHarris	(T * dst, uint32_t len); ///< Fills array with Blackman-Harris window
-    
+
+template<class T>
+void blackmanNuttall	(T * dst, uint32_t len); ///< Fills array with Blackman-Nuttall window
+
+template<class T>
+void flatTop		(T * dst, uint32_t len); ///< Fills array with Flat-Top window
+
 template<class T>
 void hamming		(T * dst, uint32_t len); ///< Fills array with Hamming window
     
 template<class T>
 void hann			(T * dst, uint32_t len); ///< Fills array with von Hann window
+
+template<class T>
+void nuttall		(T * dst, uint32_t len); ///< Fills array with Nuttall window
     
 template<class T>
 void welch			(T * dst, uint32_t len); ///< Fills array with Welch window
@@ -543,8 +555,11 @@ void window(T * dst, uint32_t len, WindowType type){
 		case BARTLETT:			bartlett(dst, len);			break;
 		case BLACKMAN:			blackman(dst, len);			break;
 		case BLACKMAN_HARRIS:	blackmanHarris(dst, len);	break;
+		case BLACKMAN_NUTTALL:	blackmanNuttall(dst, len);	break;
+		case FLATTOP:	flatTop(dst, len);	break;
 		case HAMMING:			hamming(dst, len);			break;
 		case HANN:				hann(dst, len);				break;
+		case NUTTALL:	nuttall(dst, len);	break;
 		case WELCH:				welch(dst, len);			break;
 		case NYQUIST:			nyquist(dst, len);			break;
 		default:				rectangle(dst, len);
@@ -573,10 +588,19 @@ template<class T>
 void blackmanHarris(T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::blackmanHarris(phs)) }
     
 template<class T>
+void blackmanNuttall(T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::blackmanNuttall(phs)) }
+    
+template<class T>
+void flatTop      (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::flatTop(phs)) }
+
+template<class T>
 void hamming       (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::hamming(phs)) }
     
 template<class T>
 void hann          (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::hann(phs)) }
+
+template<class T>
+void nuttall      (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::nuttall(phs)) }
     
 template<class T>
 void welch         (T * dst, uint32_t len){ SYM_WIN(2.   ,-1., scl::welch(phs)) }
