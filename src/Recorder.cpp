@@ -1,10 +1,12 @@
-//#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include "Gamma/Recorder.h"
 
 namespace gam{
 
-Recorder::Recorder(int channels, int frames){
+Recorder::Recorder(int channels, int frames)
+:	mIW(0), mIR(0)
+{
 	resize(frames, channels);
 }
 
@@ -33,6 +35,7 @@ int Recorder::write(const float * buf, int numFrames){
 }
 
 int Recorder::read(float *& buf){
+//printf("read\n");
 	if(mIR == mIW) return 0;
 
 	int N = size();
