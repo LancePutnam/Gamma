@@ -5,7 +5,7 @@
 namespace gam{
 
 Recorder::Recorder(int channels, int frames)
-:	mIW(0), mIR(0)
+:	mIW(0), mIR(0), mFill(0)
 {
 	resize(frames, channels);
 }
@@ -36,10 +36,10 @@ int Recorder::write(const float * buf, int numFrames){
 
 int Recorder::read(float *& buf){
 //printf("read\n");
-	if(mIR == mIW) return 0;
+	const int iw = mIW;
+	if(iw == mIR) return 0;
 
 	int N = size();
-	int iw = mIW;
 	int behind = 0;
 
 	/*
@@ -64,7 +64,7 @@ int Recorder::read(float *& buf){
 			mRead[i] = mRing[mIR+i];
 		}
 		
-		int d2 = mIW;
+		int d2 = iw;
 		for(int i=d1; i<d1+d2; ++i){
 			mRead[i] = mRing[i-d1];
 		}
