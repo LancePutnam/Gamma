@@ -22,7 +22,9 @@ else ifeq ($(UNAME), Darwin)
 	# Mac OS X version
 	UNAMER := $(shell uname -r)
 	UNAMER := $(firstword $(subst ., , $(UNAMER)))
-	ifeq ($(UNAMER), 12)
+	ifeq ($(UNAMER), 13)
+		OSX_VERSION = 10_9
+	else ifeq ($(UNAMER), 12)
 		OSX_VERSION = 10_8
 	else ifeq ($(UNAMER), 11)
 		OSX_VERSION = 10_7
@@ -199,7 +201,9 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Set system root directory for stdc++ etc.
-	ifeq ($(OSX_VERSION), 10_8)
+	ifeq ($(OSX_VERSION), 10_9)
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
+	else ifeq ($(OSX_VERSION), 10_8)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
 	else ifeq ($(OSX_VERSION), 10_7)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
