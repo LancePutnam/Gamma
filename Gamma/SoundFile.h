@@ -37,40 +37,46 @@ public:
 		ULAW,		/**< U-Law encoded. */
 		ALAW,		/**< A-Law encoded. */
 	};
-	
+
 	static const char * toString(Format v);
 	static const char * toString(EncodingType v);
 
+
 	/// Creates object given a path.
-	
+
 	/// The sound file info structure will be zero.
 	///
 	SoundFile(const std::string& path="");
-	
+
 	/// Creates object given a path and an other object from which to get its header info.
 	SoundFile(const std::string& path, const SoundFile& src);
-	
-	/// The destructor will automatically close any open files.
+
+	/// The destructor will automatically close the file if it's open
 	~SoundFile();
-	
-	/// Opens sound file for reading.
-	
+
+
+	/// Open sound file for reading
+
 	/// Returns true on success and false otherwise.
 	///
 	bool openRead();
-	
-	/// Opens sound file for writing.
-	
+
+	/// Open sound file for writing
+
 	/// Before calling this method it is necessary to set the number of 
 	/// channels and frame rate. If no EncodingType is set, then PCM_16 is 
 	/// used. The Format of the sound file is derived from the extension.
 	/// \returns true on success and false otherwise.
 	bool openWrite();
-	
-	bool close();		///< Closes sound file.  Files are closed in destructor.
-	
-	/// Reads next chunk of frames from file into array.
-	
+
+	/// Close sound file
+
+	/// \returns whether the sound file was closed successfully.
+	///
+	bool close();
+
+	/// Read next chunk of frames from file into array
+
 	/// From the libsndfile docs:\n
 	/// The file read frames functions fill the array pointed to by ptr with
 	/// the requested number of frames of data. The array must be large enough
@@ -78,20 +84,20 @@ public:
 	//ULONG read(float * dst, ULONG numFrames);
 	template<class T>
     int read(T * dst, int numFrames);
-	
+
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
 	template<class T>
     int readAll(T * dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
-	
+
 	/// If the number of channels is > 1, memory will be dynamically allocated
 	///	and freed for the deinterleaving.
 	template<class T>
     int readAllD(T * dst);
-	
-	/// Writes interleaved frames from array to file.
-	
+
+	/// Write interleaved frames from array to file
+
 	/// From the libsndfile docs:\n
 	/// The file write frames functions write the data in the array pointed to
 	/// by ptr to the file. The array must be large enough to hold the product
@@ -100,6 +106,7 @@ public:
     int write(const T * src, int numFrames);
 
 	// Sound file properties
+	bool opened() const;						///< Returns whether the sound file is open
 	EncodingType encoding() const;				///< Get encoding type
 	Format format() const;						///< Get format
 	double frameRate() const;					///< Get frames/second
@@ -108,7 +115,7 @@ public:
 	int samples() const;						///< Get number of samples ( = frames x channels)
 	const char * extension();					///< Get file extension
 	const std::string& path() const;			///< Get path of sound file
-	
+
 	SoundFile& encoding(EncodingType v);		///< Set encoding type
 	SoundFile& format(Format v);				///< Set format
 	SoundFile& channels(int num);				///< Set number of channels
@@ -117,12 +124,11 @@ public:
 	SoundFile& path(const std::string& path);	///< Set path of sound file
 
 	void seek(int pos, int seekMode);
-	
+
 	void print();			///< Print information about file to stdout.
-	
+
 private:
 	class Impl; Impl * mImpl;
-
 	std::string mPath;
 };
 

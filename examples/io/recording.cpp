@@ -7,9 +7,9 @@
 
 #include "../examples.h"
 
-SoundFile sf("recording.aif");
-Recorder rec(2);
-Sine<> src1(440), src2(441);
+SoundFile sf("recording.wav");	// The sound file of the recording
+Recorder rec(2);				// Create a two-channel recorder
+Sine<> src1(440), src2(441);	// Sine waves to record
 
 void audioCB(AudioIOData& io){
 
@@ -17,8 +17,9 @@ void audioCB(AudioIOData& io){
 		float s1 = src1();
 		float s2 = src2();
 		rec.write(s1, s2);
-		io.sum(s1*0.2, 0);
-		io.sum(s2*0.2, 1);
+
+		io.out(0) = s1*0.2;
+		io.out(1) = s2*0.2;
 	}
 }
 
@@ -40,7 +41,7 @@ int main(){
 		float * buf;
 		int n = rec.read(buf);
 		sf.write(buf, n);
-		//printf("%d\n", n);
+		//printf("consumed %d frames\n", n);
 		sleepSec(0.01);
 	}
 
