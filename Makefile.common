@@ -175,7 +175,8 @@ ifeq ($(PLATFORM), linux)
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
 	CPPFLAGS += -I/usr/local/include/ -I/usr/include/
-	LDFLAGS	 += -lm -lstdc++
+	LDFLAGS	 += -lm
+	LDFLAGS	 += -lstdc++
 	
 	DLIB_FLAGS += -shared
 	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
@@ -202,17 +203,23 @@ else ifeq ($(PLATFORM), macosx)
 
 	# Set system root directory for stdc++ etc.
 	ifeq ($(OSX_VERSION), 10_9)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.9.sdk -mmacosx-version-min=10.9
+		LDFLAGS	+= -lc++
 	else ifeq ($(OSX_VERSION), 10_8)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
+		LDFLAGS	+= -lstdc++
 	else ifeq ($(OSX_VERSION), 10_7)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
+		LDFLAGS	+= -lstdc++
 	else ifeq ($(OSX_VERSION), 10_6)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.6.sdk -mmacosx-version-min=10.6
+		LDFLAGS	+= -lstdc++
 	else ifeq ($(OSX_VERSION), 10_5)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.5.sdk -mmacosx-version-min=10.5
+		LDFLAGS	+= -lstdc++
 	else ifeq ($(OSX_VERSION), 10_4)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
+		LDFLAGS	+= -lstdc++
 	endif
 
 	# Needed to link to libraries installed through MacPorts
@@ -230,7 +237,7 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 
-	LDFLAGS	+= -lm -lstdc++
+	LDFLAGS	+= -lm
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
 
