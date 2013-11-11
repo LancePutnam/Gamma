@@ -18,6 +18,9 @@ namespace gam{
 
 /// Sample buffer player
 
+/// This streams a sequence of frames from a n-channel buffer according to a 
+/// specified playback rate. Minimum and maximum endpoint frames are supported
+/// for playing back a subinterval of the buffer.
 ///	The number of frames in the sample should not exceed 2^32. This equates
 ///	to 27 hours at 44.1 kHz.
 ///
@@ -27,7 +30,7 @@ namespace gam{
 template<
 	class T = real,
 	template<class> class Si = ipl::Trunc,
-	class Sp = phsInc::Clip
+	class Sp = phsInc::OneShot
 >
 class SamplePlayer: public DomainObserver, public Array<T>{
 public:
@@ -87,29 +90,34 @@ public:
 	void free();							///< Free sample buffer (if owner)
 
 	void freq(double v){ rate(v); }			///< Set frequency if sample buffer is a wavetable
-	void max(double v);						///< Set playback interval max frame (open)
-	void min(double v);						///< Set playback interval min frame (closed)
-	void pos(double v);						///< Set current read position, in frames
-	void phase(double v);					///< Set current read position [0, 1)
+	void max(double v);						///< Set playback interval maximum frame (open)
+	void min(double v);						///< Set playback interval minimum frame (closed)
+	void pos(double v);						///< Set playback position, in frames
+	void phase(double v);					///< Set playback position, in [0, 1)
 	void rate(double v);					///< Set playback rate scalar
-	void range(double phs, double period);	///< Set interval start phase and period
+	void range(double phs, double period);	///< Set playback interval start phase and period
 	void reset();							///< Reset playback head
 
+	/// Loop playback head if it's past an endpoint
+	
+	/// This is only applicable for one-shot playback (phsInc::OneShot) and is 
+	/// here to provide run-time switchable looping behavior.
+	void loop();
 
-	/// Whether sample playback has completed (non-looping only)
+	/// Returns whether sample playback has completed (non-looping only)
 	bool done() const;
 
 	int channels() const { return mChans; }	///< Get number of channels
 	double frameRate() const { return mFrameRate; } ///< Get frame rate of sample buffer
 	double freq() const { return rate(); }	///< Get frequency if sample buffer is a wavetable
-	double max() const { return mMax; }		///< Get playback interval max frame (open)
-	double min() const { return mMin; }		///< Get playback interval min frame (closed)
-	double period() const;					///< Get total period of sample data
-	double pos() const { return mPos; }		///< Get current read position, in frames
+	double max() const { return mMax; }		///< Get playback interval maximum frame (open)
+	double min() const { return mMin; }		///< Get playback interval minimum frame (closed)
+	double period() const;					///< Get total period, in seconds, of sample data
+	double pos() const { return mPos; }		///< Get playback position, in frames
 	double posInInterval(double frac) const;///< Get position from fraction within interval
 	double rate() const { return mRate; }	///< Get playback rate
 
-	/// Get whether the sample buffer is valid for playback
+	/// Returns whether the sample buffer is valid for playback
 	bool valid() const;
 
 	virtual void onDomainChange(double r){ frameRate(mFrameRate); }
@@ -258,12 +266,17 @@ PRE void CLS::reset(){
 }
 
 PRE inline bool CLS::done() const{
+	// The trigger points are based on the logic of phsInc::OneShot
 	if(rate() >= 0.){
-		return pos() >= (max() - 1);
+		return pos() >= (max() - rate());
 	}
 	else{
 		return pos() <= min();
 	}
+}
+
+PRE void CLS::loop(){
+	if(done()) mPos = phsInc::Loop()(mPos, mInc, max(), min());
 }
 
 PRE inline double CLS::period() const { return frames() * ups(); }
