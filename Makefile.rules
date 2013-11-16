@@ -4,6 +4,8 @@
 
 # Append linker flags set elsewhere
 CPPFLAGS	+= $(LINK_CPPFLAGS)
+CFLAGS		+= $(LINK_CFLAGS)
+CXXFLAGS	+= $(LINK_CXXFLAGS)
 LDFLAGS		+= $(LINK_LDFLAGS)
 
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
@@ -91,8 +93,10 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=-l$(LIB_NAME) $(LINK_LDFLAGS)"> Makefile.link
-#	@printf "%b(LDFLAGS)\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS :=-l$(LIB_NAME) $(LINK_LDFLAGS) $$"> Makefile.link
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\n\
+	CFLAGS +=$(LINK_CFLAGS)\r\n\
+	CXXFLAGS +=$(LINK_CXXFLAGS)\r\n\
+	LDFLAGS +=-l$(LIB_NAME) $(LINK_LDFLAGS)"> Makefile.link
 
 
 # Archive repository
