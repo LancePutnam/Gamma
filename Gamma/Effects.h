@@ -223,9 +223,10 @@ public:
 		comb1(delay + depth, delay, ffd, fbk),
 		comb2(delay + depth, delay, ffd, fbk),
 		mod(double(freq), double(depth)),
-		delay(delay)
+		mDelay(delay)
 	{}
 
+	Chorus& delay(float v){ mDelay=v; return *this; }
 	Chorus& fbk(float v){ comb1.fbk(v); comb2.fbk(v); return *this; }
 	Chorus& ffd(float v){ comb1.ffd(v); comb2.ffd(v); return *this; }
 	Chorus& freq(float v){ mod.freq(v); return *this; }
@@ -233,7 +234,8 @@ public:
 
 	/// Filter sample (mono-mono)
 	T operator()(const T& v){
-		modulate(); return (comb1(v) + comb2(v)) * 0.5f;
+		modulate();
+		return (comb1(v) + comb2(v)) * 0.5f;
 	}
 	
 	/// Filter sample (mono-stereo)
@@ -250,17 +252,22 @@ public:
 	
 	/// Filter samples (stereo-stereo)
 	void operator()(const T& i1, const T& i2, T& o1, T& o2){
-		modulate(); o1=comb1(i1); o2=comb2(i2);
+		modulate();
+		o1=comb1(i1); o2=comb2(i2);
 	}
 	
 	/// Perform delay modulation step (must manually step comb filters after use!)
 	void modulate(){
-		comb1.delay(delay + mod.val.r); comb2.delay(delay + mod.val.i); mod();
+		comb1.delay(mDelay + mod.val.r);
+		comb2.delay(mDelay + mod.val.i);
+		mod();
 	}
 
 	Comb<T, ipl::Cubic> comb1, comb2;		///< Comb filters
 	CSine<double> mod;						///< Modulator
-	float delay;							///< Delay interval
+
+private:
+	float mDelay; // Delay interval
 };
 
 
