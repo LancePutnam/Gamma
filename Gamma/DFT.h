@@ -31,7 +31,7 @@ enum SpectralType{
 /// Sliding window for analysis
     
 ///\ingroup DFT
-    
+///
 template <class T=gam::real>
 class SlidingWindow{
 public:
@@ -81,7 +81,7 @@ private:
 /// Base class for DFTs
     
 ///\ingroup DFT
-    
+///
 template <class T=gam::real>
 class DFTBase : public DomainObserver{
 public:
@@ -113,6 +113,11 @@ public:
 	/// and use the address of the first one as the complex-valued buffer.
 	void numAux(uint32_t num);
 
+	void zero();				///< Zeroes internal frequency bins
+	void zeroEnds();			///< Zeroes DC and Nyquist bins
+	void zeroAux();				///< Zeroes all auxiliary buffers
+	void zeroAux(uint32_t num);	///< Zeroes an auxiliary buffer
+
 	virtual void onDomainChange(double r);
 
 protected:
@@ -134,7 +139,7 @@ protected:
 /// Discrete Fourier transform
 
 ///\ingroup DFT
-
+///
 class DFT : public DFTBase<float>{
 public:
 	/// Constructor
@@ -204,8 +209,6 @@ public:
 
 	void spctToRect();		// convert spectrum to rectangle format
 	void spctToPolar();		// convert spectrum to polar format
-	void zero();			///< Zeroes internal frequency bins
-	void zeroEnds();		///< Zeroes DC and Nyquist bins
 
 	virtual void onDomainChange(double r);
 	virtual void print(FILE * fp=stdout, const char * append="\n");
@@ -233,9 +236,8 @@ protected:
 /// to obtain better time resolution between successive spectral frames. The 
 /// resolution within each individual spectral frame is still determined by the
 /// window size.
-
+///
 /// \ingroup DFT
-    
 class STFT : public DFT {
 public:
 
@@ -326,9 +328,8 @@ protected:
 /// This transform computes the DFT with a fixed hop size of 1 sample and
 /// within a specified frequency interval. The computational complexity per
 /// sample is O(M), where M is the size, in samples, of the frequency interval.
-
+///
 /// \ingroup DFT
-    
 template <class T>
 class SlidingDFT : public DFTBase<T> {
 public:
@@ -360,13 +361,11 @@ protected:
 
 
 
+
 // Implementation_______________________________________________________________
-
-//---- SlidingWindow
-
 template<class T>
 SlidingWindow<T>::SlidingWindow(uint32_t winSize, uint32_t hopSize)
-	: mBuf(0), mSizeWin(0), mSizeHop(0), mHopCnt(0)
+:	mBuf(0), mSizeWin(0), mSizeHop(0), mHopCnt(0)
 {
 	resize(winSize, hopSize);
 	mem::deepZero(mBuf, sizeWin());
@@ -443,7 +442,7 @@ inline bool SlidingWindow<T>::operator()(T * output, T input){
 }
 
 template<class T>
-inline void SlidingWindow<T>::slide(){
+void SlidingWindow<T>::slide(){
 	mem::deepMove(mBuf, mBuf + sizeHop(), hopStart());
 }
 
@@ -452,10 +451,13 @@ inline uint32_t SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(
 
 
 
-//---- DFTBase
 
 template<class T>
-DFTBase<T>::DFTBase() : mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0){ refreshDomain(); }
+DFTBase<T>::DFTBase()
+:	mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0)
+{
+	refreshDomain();
+}
 
 template<class T>
 DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
@@ -464,10 +466,10 @@ DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
 }
 
 template<class T>
-inline T *		DFTBase<T>::aux(uint32_t num){ return mAux + numBins() * num; }
+inline T * DFTBase<T>::aux(uint32_t num){ return mAux + numBins() * num; }
     
 template<class T>
-inline double	DFTBase<T>::binFreq() const { return spu() / sizeDFT(); }
+inline double DFTBase<T>::binFreq() const { return spu() / sizeDFT(); }
     
 template<class T>
 inline uint32_t	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
@@ -476,15 +478,33 @@ template<class T>
 inline uint32_t	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
     
 template<class T>
-inline Domain&	DFTBase<T>::domainFreq(){ return mDomFreq; }
+inline Domain& DFTBase<T>::domainFreq(){ return mDomFreq; }
     
 template<class T>
-inline T		DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
+inline T DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
 
 template<class T>
 void DFTBase<T>::numAux(uint32_t num){
-	if(mem::resize(mAux, mNumAux * numBins(), num * numBins())) mNumAux = num;
+	if(mem::resize(mAux, mNumAux * numBins(), num * numBins())){
+		mNumAux = num;
+		zeroAux();
+	}
 }
+
+template<class T>
+void DFTBase<T>::zero(){ mem::deepZero(mBuf, sizeDFT() + 2); }
+
+template<class T>
+void DFTBase<T>::zeroEnds(){
+	bins()[0](0,0);
+	bins()[numBins()-1](0,0);
+}
+
+template<class T>
+void DFTBase<T>::zeroAux(){ mem::deepZero(mAux, mNumAux * numBins()); }
+
+template<class T>
+void DFTBase<T>::zeroAux(uint32_t num){ mem::deepZero(aux(num), numBins()); }
 
 template<class T>
 void DFTBase<T>::onDomainChange(double r){
@@ -493,7 +513,6 @@ void DFTBase<T>::onDomainChange(double r){
 
 
 
-//---- DFT
 
 inline DFT& DFT::spectrumType(SpectralType v){ mSpctFormat=v; return *this; }
 inline DFT& DFT::precise(bool w){ mPrecise=w; return *this; }
@@ -526,16 +545,9 @@ inline float DFT::operator()(){
 }
 
 inline bool DFT::inverseOnNext(){ return mTapR == (sizeHop() - 1); }
-inline void DFT::zero(){ mem::deepZero(mBuf, sizeDFT() + 2); }
-inline void DFT::zeroEnds(){ 
-	//bins0()[0]=0; bins0()[numBins()-1]=0; 
-	//bins1()[0]=0; bins1()[numBins()-1]=0;
-	bins()[0](0,0);
-	bins()[numBins()-1](0,0);
-}
 
 
-//---- STFT
+
 
 inline bool STFT::operator()(float input){
 	if(mSlide(bufPos(), input)){
@@ -550,7 +562,7 @@ inline float * STFT::phases(){ return mPhases; }
 inline double * STFT::accumPhases(){ return mAccums; }
 
 
-//---- SlidingDFT
+
 
 template<class T>
 SlidingDFT<T>::SlidingDFT(uint32_t sizeDFT, uint32_t binLo, uint32_t binHi)
@@ -609,8 +621,6 @@ inline void SlidingDFT<T>::forward(T input){
 //template<class T>
 //inline T SlidingDFT<T>::inverse(){}
 
-
-
 /*
 template<class T>
 class Counter{
@@ -633,6 +643,4 @@ protected:
 */
 
 } // gam::
-
 #endif
-
