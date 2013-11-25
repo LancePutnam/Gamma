@@ -45,7 +45,7 @@ template<
 	template<class> class Si = ipl::Linear,
 	class Td = DomainObserver
 >
-class Delay : public ArrayPow2<Tv>, Td{
+class Delay : public ArrayPow2<Tv>, public Td{
 public:
 
 	/// Default constructor. Does not allocate memory.
