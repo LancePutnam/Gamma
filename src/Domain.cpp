@@ -87,4 +87,14 @@ void DomainObserver::domain(Domain& newSubject){
 	}
 }
 
+
+void sampleRate(double samplesPerSecond){
+	Domain::master().spu(samplesPerSecond);
+}
+
+double sampleRate(){
+	return Domain::master().spu();
+}
+
+
 } // gam::

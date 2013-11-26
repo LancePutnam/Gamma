@@ -130,6 +130,12 @@ friend class DomainObserver;
 };
 
 
+/// Set master sample rate
+void sampleRate(double samplesPerSecond);
+
+/// Get master sample rate
+double sampleRate();
+
 
 
 // Implementation_______________________________________________________________
