@@ -76,10 +76,22 @@ struct Complex{
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
 
 	template <class U>
-	C& set(const Complex<U>& v){ r=v.r; i=v.i; return *this; }
+	C& operator = (const Polar<U>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
 
-	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
-	C& operator()(const Polar<T>& p){ return *this = p; }
+	template <class U>
+	C& operator = (const Complex<U>& v){ r=v.r; i=v.i; return *this; }
+
+	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
+
+	template <class U>
+	C& set(const Complex<U>& v){ return *this = v; }
+
+	C& set(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
+
+	template <class U>
+	C& set(const Polar<U>& p){ return *this = p; }
+
+
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
 
@@ -89,9 +101,6 @@ struct Complex{
 	bool operator > (const C& v) const { return normSqr() > v.normSqr(); }	///< Returns true if norm is greater than argument's norm
 	bool operator < (const C& c) const { return normSqr() < c.normSqr(); }	///< Returns true if norm is less than argument's norm
 
-	C& operator = (const Polar<T>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
-	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
-	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
 	C& operator -=(const C& v){ r-=v.r; i-=v.i; return *this; }
 	C& operator -=(const T& v){ r-=v; return *this; }
 	C& operator +=(const C& v){ r+=v.r; i+=v.i; return *this; }
@@ -141,6 +150,11 @@ struct Complex{
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
 	T magSqr() const { return normSqr(); }					///< Returns magnitude squared, |z|^2
 	T phase() const { return arg(); }						///< Returns argument (angle)
+
+
+	// deprecated
+	C& operator()(const T& vr, const T& vi){ return set(vr,vi); }
+	C& operator()(const Polar<T>& p){ return set(p); }
 };
 
 #define TEM template <class T>
