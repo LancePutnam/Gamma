@@ -13,9 +13,11 @@ namespace gam{
 class Recorder {
 public:
 
+	Recorder();
+
 	/// \param[in] chans	number of channels
 	/// \param[in] frames	number of (multi-)channel frames
-	Recorder(int channels=1, int frames=8192);
+	Recorder(int channels, int frames=8192);
 
 
 	/// Get number of recording channels

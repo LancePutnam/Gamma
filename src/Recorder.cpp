@@ -4,8 +4,12 @@
 
 namespace gam{
 
+Recorder::Recorder()
+:	mChans(0), mIW(0), mIR(0)
+{}
+
 Recorder::Recorder(int channels, int frames)
-:	mIW(0), mIR(0)
+:	mChans(0), mIW(0), mIR(0)
 {
 	resize(frames, channels);
 }
