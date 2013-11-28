@@ -104,10 +104,18 @@ public:
 	/// here to provide run-time switchable looping behavior.
 	void loop();
 
+	/// Apply linear fade-in/-out envelope(s) to frame buffer
+
+	/// \param[in] fadeOutFrames	length of fade out, in frames; <2 for no fade
+	/// \param[in] fadeInFrames		length of fade in, in frames; <2 for no fade
+	void fade(int fadeOutFrames=4, int fadeInFrames=2);
+
+
 	/// Returns whether sample playback has completed (non-looping only)
 	bool done() const;
 
 	int channels() const { return mChans; }	///< Get number of channels
+	int frames() const { return size()/channels(); } ///< Get number of frames (samples divided by channels)
 	double frameRate() const { return mFrameRate; } ///< Get frame rate of sample buffer
 	double freq() const { return rate(); }	///< Get frequency if sample buffer is a wavetable
 	double max() const { return mMax; }		///< Get playback interval maximum frame (open)
@@ -119,6 +127,7 @@ public:
 
 	/// Returns whether the sample buffer is valid for playback
 	bool valid() const;
+
 
 	virtual void onDomainChange(double r){ frameRate(mFrameRate); }
 
@@ -142,7 +151,9 @@ protected:
 		rate(mRate);
 	}
 
-	int frames() const { return size()/channels(); }
+	T& sample(int idx, int chan){
+		return (*this)[frames()*chan + idx];
+	}
 };
 
 
@@ -257,7 +268,7 @@ PRE inline void CLS::rate(double v){
 PRE void CLS::range(double posn, double period){
 	phase(posn);
 	min(pos());
-	max(pos() + period * spu());	
+	max(pos() + period * spu());
 }
 
 PRE void CLS::reset(){
@@ -277,6 +288,32 @@ PRE inline bool CLS::done() const{
 
 PRE void CLS::loop(){
 	if(done()) mPos = phsInc::Loop()(mPos, mInc, max(), min());
+}
+
+PRE void CLS::fade(int fadeOutFrames, int fadeInFrames){
+	if(fadeInFrames > 0){
+		double amp;
+		double slope = 1./(fadeInFrames-1);
+		for(int c=0; c<channels(); ++c){
+			amp = 0.;
+			for(int i=0; i<fadeInFrames; ++i){
+				sample(i,c) *= amp;
+				amp += slope;	
+			}
+		}
+	}
+
+	if(fadeOutFrames > 0){
+		double amp;
+		double slope =-1./(fadeOutFrames-1);
+		for(int c=0; c<channels(); ++c){
+			amp = 1;
+			for(int i=frames()-1-fadeOutFrames; i<frames(); ++i){
+				sample(i,c) *= amp;
+				amp += slope;	
+			}
+		}
+	}	
 }
 
 PRE inline double CLS::period() const { return frames() * ups(); }
