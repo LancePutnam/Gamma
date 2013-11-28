@@ -11,7 +11,7 @@ Recorder::Recorder()
 Recorder::Recorder(int channels, int frames)
 :	mChans(0), mIW(0), mIR(0)
 {
-	resize(frames, channels);
+	resize(channels, frames);
 }
 
 int Recorder::write(const float * buf, int numFrames){
@@ -82,7 +82,7 @@ int Recorder::read(float *& buf){
 	return behind/channels();
 }
 
-void Recorder::resize(int frames, int chans){
+void Recorder::resize(int chans, int frames){
 	mChans = chans;
 	mRing.resize(frames*mChans);
 	mRead.resize(frames*mChans);
