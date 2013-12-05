@@ -99,6 +99,7 @@ private:
 /// signal crosses zero over a given number of samples. It can be used to 
 /// distinguish between noise (high ZCR) and tones (low ZCR).
 ///\ingroup Analysis
+template <class Tv=gam::real>
 class ZeroCrossRate{
 public:
 
@@ -111,7 +112,7 @@ public:
 	float rate() const { return mRate; }
 
 	/// Input next sample and return current zero-crossing rate
-	float operator()(float input){
+	Tv operator()(Tv input){
 		if(0 != mDetector(input)){
 			++mCrosses;
 		}
@@ -125,7 +126,7 @@ public:
 	}
 
 private:
-	ZeroCross<float> mDetector;
+	ZeroCross<Tv> mDetector;
 	float mRate;
 	unsigned mWinSize;
 	unsigned mCrosses;
