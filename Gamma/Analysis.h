@@ -11,7 +11,7 @@ namespace gam{
 ///\defgroup Analysis
 
 
-/// Envelope Follower
+/// Envelope follower
 
 /// This object produces an estimate of the amplitude envelope of a signal
 /// by feeding a full-wave rectification of the signal through a low-pass filter.
@@ -89,6 +89,47 @@ public:
 
 private:
 	Tv mPrev;
+};
+
+
+
+/// Computes the zero-crossing rate of an input signal
+
+/// The zero-crossing rate (ZCR) is a measure proportional to how many times a 
+/// signal crosses zero over a given number of samples. It can be used to 
+/// distinguish between noise (high ZCR) and tones (low ZCR).
+///\ingroup Analysis
+class ZeroCrossRate{
+public:
+
+	/// \param[in] winSize		size of analysis window
+	ZeroCrossRate(int winSize=64)
+	:	mRate(0), mWinSize(winSize), mCrosses(0), mCount(0)
+	{}
+
+	/// Get the current zero-crossing rate, in [0, 0.5]
+	float rate() const { return mRate; }
+
+	/// Input next sample and return current zero-crossing rate
+	float operator()(float input){
+		if(0 != mDetector(input)){
+			++mCrosses;
+		}
+		++mCount;
+		if(mCount >= mWinSize){
+			mRate = float(mCrosses) / mWinSize;
+			mCrosses = 0;
+			mCount = 0;
+		}
+		return mRate;
+	}
+
+private:
+	ZeroCross<float> mDetector;
+	float mRate;
+	unsigned mWinSize;
+	unsigned mCrosses;
+	unsigned mCount;
 };
 
 } // gam::
