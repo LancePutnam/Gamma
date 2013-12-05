@@ -160,6 +160,7 @@
 		1686EA820F8DB1F100D0452F /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../../Gamma/File.h; sourceTree = SOURCE_ROOT; };
 		168AAC9D0CD0025D00F36E4B /* libgamma.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libgamma.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		168B78F50B75C59100645F1F /* Sync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Sync.h; path = ../../Gamma/Sync.h; sourceTree = SOURCE_ROOT; };
+		168D491C18511B4B00D00338 /* Analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Analysis.h; sourceTree = "<group>"; };
 		169389570FBCCE4200274B2A /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pstdint.h; path = ../../Gamma/pstdint.h; sourceTree = SOURCE_ROOT; };
 		16938ABF0FBD0C4400274B2A /* Conversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Conversion.h; path = ../../Gamma/Conversion.h; sourceTree = SOURCE_ROOT; };
 		16938AC00FBD0C6700274B2A /* Conversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conversion.cpp; path = ../../src/Conversion.cpp; sourceTree = SOURCE_ROOT; };
@@ -268,6 +269,7 @@
 				16EDF9EB094F8C2600549AC9 /* tbl.h */,
 				1686EA810F8DB1F100D0452F /* Access.h */,
 				161263A21140691600E55446 /* Allocator.h */,
+				168D491C18511B4B00D00338 /* Analysis.h */,
 				16F836E10A1E888200F05DF5 /* AudioIO.h */,
 				1641525D16020CB700098796 /* Config.h */,
 				16EDF9B9094F8C2600549AC9 /* Constants.h */,

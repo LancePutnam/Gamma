@@ -64,6 +64,7 @@
 	#include "Gamma/UnitMaps.h"
 
 	// Composite Objects
+	#include "Gamma/Analysis.h"
 	#include "Gamma/Effects.h"
 
 #endif
