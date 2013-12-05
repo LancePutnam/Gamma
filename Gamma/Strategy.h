@@ -137,6 +137,7 @@ struct Linear{
 
 	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+		// TODO: wrapping access maybe not correct for one-shot playback
 	}
 };
 
