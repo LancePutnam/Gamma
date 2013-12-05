@@ -2,20 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <complex>
+#define GAMMA_H_INC_ALL
 #include "../Gamma/Gamma.h"
-#include "../Gamma/FFT.h"
-#include "../Gamma/Access.h"
-#include "../Gamma/Conversion.h"
-#include "../Gamma/File.h"
-#include "../Gamma/Strategy.h"
-#include "../Gamma/Types.h"
-#include "../Gamma/UnitMaps.h"
-
-#include "../Gamma/Delay.h"
-#include "../Gamma/Envelope.h"
-#include "../Gamma/Filter.h"
-#include "../Gamma/Oscillator.h"
-#include "../Gamma/SamplePlayer.h"
 
 using namespace gam;
 
