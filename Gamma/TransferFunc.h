@@ -30,7 +30,7 @@ public:
 
 		// H(z) = c z^d
 		Complex response(Complex z){
-			return c * std::pow(z,d);
+			return c * std::pow(z,-d);
 		}
 		
 		/// \param[in] f	frequency, in radians
@@ -79,7 +79,7 @@ public:
 		f *= M_2PI;
 		for(unsigned i=0; i<mx.size(); ++i) X += mx[i].response(f);
 		for(unsigned i=0; i<my.size(); ++i) Y -= my[i].response(f);
-		return X/Y * mGain; // H(z) = Y(z)/X(z)
+		return (X/Y) * mGain; // H(z) = Y(z)/X(z)
 	}
 
 	/// Returns frequency response at coordinate on z-plane
@@ -87,7 +87,7 @@ public:
 		Complex X(0,0), Y(1,0);
 		for(unsigned i=0; i<mx.size(); ++i) X += mx[i].response(z);
 		for(unsigned i=0; i<my.size(); ++i) Y -= my[i].response(z);
-		return X/Y * mGain; // H(z) = Y(z)/X(z)
+		return (X/Y) * mGain; // H(z) = Y(z)/X(z)
 	}
 
 protected:
