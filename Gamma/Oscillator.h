@@ -51,6 +51,7 @@ public:
 	float freq() const;				///< Get frequency
 	uint32_t freqI() const;			///< Get fixed-point frequency
 	float freqUnit() const;			///< Get frequency in [0, 1)
+	float period() const;			///< Get period
 	float phase() const;			///< Get phase in [0, 1)
 	uint32_t phaseI() const;		///< Get fixed-point phase
 
@@ -900,6 +901,7 @@ template<class St, class Td> inline void Accum<St,Td>::phaseMax(){ mPhaseI = 0xf
 template<class St, class Td> inline float Accum<St,Td>::freq() const { return mFreq; }
 template<class St, class Td> inline uint32_t Accum<St,Td>::freqI() const { return mFreqI; }
 template<class St, class Td> inline float Accum<St,Td>::freqUnit() const { return mapIF(mFreqI); }
+template<class St, class Td> inline float Accum<St,Td>::period() const { return 1.f/freq(); }
 template<class St, class Td> inline float Accum<St,Td>::phase() const { return mapIF(mPhaseI); }
 template<class St, class Td> inline uint32_t Accum<St,Td>::phaseI() const { return mPhaseI; }
 
