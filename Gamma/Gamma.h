@@ -45,12 +45,13 @@
 	#include "Gamma/Conversion.h"
 	#include "Gamma/File.h"
 	#include "Gamma/Print.h"
-	#include "Gamma/Timer.h"
+	#include "Gamma/TransferFunc.h"
 
 	// Generators/Filters
 	#include "Gamma/Access.h"
 	#include "Gamma/Delay.h"
 	#include "Gamma/DFT.h"
+	#include "Gamma/Domain.h"
 	#include "Gamma/Envelope.h"
 	#include "Gamma/FFT.h"
 	#include "Gamma/Filter.h"
@@ -60,12 +61,15 @@
 	#include "Gamma/SamplePlayer.h"
 	#include "Gamma/Recorder.h"
 	#include "Gamma/SoundFile.h"
-	#include "Gamma/Sync.h"
 	#include "Gamma/UnitMaps.h"
 
 	// Composite Objects
 	#include "Gamma/Analysis.h"
 	#include "Gamma/Effects.h"
+
+	// Scheduling/Timing
+	#include "Gamma/Scheduler.h"
+	#include "Gamma/Timer.h"
 
 #endif
 
