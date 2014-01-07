@@ -102,16 +102,16 @@ float clipMag(float value, float max, float min){
 
 double freq(const char * note){
 
-	char c = *note++;
-	if(within(c, 'a', 'g')){
+	char c = tolower(*note++);
+	if(within(c, 'a','g')){
 		c -= 97;
 
-		static char r[7] = {9,11,0,2,4,5,7};
+		static char r[] = {9,11,0,2,4,5,7};
 		char result = r[(unsigned)c];
 		
 		c = *note++;
-		     if(c == '+'){ result++; c = *note; }
-		else if(c == '-'){ result--; c = *note; }
+		     if(c == '+' || c == '#'){ result++; c = *note; }
+		else if(c == '-' || c == 'b'){ result--; c = *note; }
 		else if(c == ' '){ c = *note; }
 		
 		return ::pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		

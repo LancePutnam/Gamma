@@ -252,10 +252,11 @@ template<class T> T foldOnce(T value, T hi=T(1), T lo=T(0));
 
 /// Returns frequency in Hz from a 12-TET note string.
 
-/// Notes are specified by a letter in [a, g], followed optionally by one of
-/// '+', '-', ' ', to specify a sharp, flat or natural, and finally an integer
-/// in [0,9] representing the octave number.  For example, middle C is specified
-/// as "c5" or "c 5" and the A sharp below that as "a+4".
+/// Notes are specified by a letter in [A, G] or [a, g], followed by an 
+/// accidental '+' or '#' for a sharp, '-' or 'b' for a flat, or ' ' or nothing 
+/// for a natural, and finally an integer in [0, 9] representing the octave 
+/// number. For example, middle C is specified as "c5" or "c 5" and the A sharp 
+/// below that as "a+4" or a#4.
 double freq(const char * note);
 
 /// Convert linear value to log2 in range [0, 1]
