@@ -106,15 +106,21 @@ double freq(const char * note){
 	if(within(c, 'a','g')){
 		c -= 97;
 
+		// get pitch class
 		static char r[] = {9,11,0,2,4,5,7};
 		char result = r[(unsigned)c];
-		
+
 		c = *note++;
-		     if(c == '+' || c == '#'){ result++; c = *note; }
-		else if(c == '-' || c == 'b'){ result--; c = *note; }
+
+		// apply accidental, if any
+		     if(c == '+' || c == '#'){ ++result; c = *note; }
+		else if(c == '-' || c == 'b'){ --result; c = *note; }
 		else if(c == ' '){ c = *note; }
-		
-		return ::pow(2., (double)(result + (c-48)*12) / 12.) * 8.1757989157741;		
+
+		// add octave
+		result += (c-48)*12;
+
+		return ::pow(2., double(result-9)/12.) * 27.5;
 	}
 	return 0.;
 }
