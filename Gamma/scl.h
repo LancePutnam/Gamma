@@ -43,26 +43,38 @@ template<class T> double normCompare(const T& v);
 /// Scalar rank functions for numerical types
 namespace scl{
 
-
-template<int N, class T, template<class> class F> struct NewtonIterator{
+template<int N, class T, template<class> class F>
+struct NewtonIterator{
 	NewtonIterator(T& v, T v0){
 		F<T>(v,v0);
 		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
 	}
 };
-template<class T, template<class> class F> struct NewtonIterator<0,T,F>{ NewtonIterator(T& v, T v0){} };
 
-template<class T> struct NewtonSqrtMap{ NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); } };
-template<int N, class T> struct SqrtNewton
-:	public NewtonIterator<N,T, NewtonSqrtMap>{
-	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0){}
+template<class T, template<class> class F>
+struct NewtonIterator<0,T,F>{
+	NewtonIterator(T& v, T v0){}
+};
+
+template<class T> struct NewtonSqrtMap{
+	NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); }
+};
+
+template<int N, class T>
+struct SqrtNewton : public NewtonIterator<N,T, NewtonSqrtMap> {
+	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0)
+	{}
 };
 
 
-template<class T> struct NewtonInvSqrtMap{ NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; } };
-template<int N, class T> struct InvSqrtNewton
-:	public NewtonIterator<N,T, NewtonInvSqrtMap>{
-	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0){}
+template<class T> struct NewtonInvSqrtMap{
+	NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; }
+};
+
+template<int N, class T>
+struct InvSqrtNewton : public NewtonIterator<N,T, NewtonInvSqrtMap>{
+	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0)
+	{}
 };
 
 template<class T> const Twiddle<T> invSqrtMagic();
@@ -149,18 +161,6 @@ DEF(int) DEF(unsigned)
 DEF(short) DEF(unsigned short)
 DEF(char) DEF(unsigned char)
 #undef DEF
-
-
-// Returns absolute value.
-//template<class T> T abs(T value);
-
-/// Tests whether two values are close in value
-
-/// 'maxULP' (maximum units in the last place) is the maximum difference allowed
-/// between the values punned as integers.
-/// Code taken from Bruce Dawson, "Comparing floating point numbers."
-bool almostEqual(float a, float b, int maxULP=10);
-bool almostEqual(double a, double b, int maxUlps=10);
 
 /// Fast approximation to atan2().
 
@@ -250,15 +250,6 @@ template<class T> T fold(T v, long& numFolds, T hi=T(1), T lo=T(0));
 /// Returns value folded into [lo, hi] one time.
 template<class T> T foldOnce(T value, T hi=T(1), T lo=T(0));
 
-/// Returns frequency in Hz from a 12-TET note string.
-
-/// Notes are specified by a letter in [A, G] or [a, g], followed by an 
-/// accidental '+' or '#' for a sharp, '-' or 'b' for a flat, or ' ' or nothing 
-/// for a natural, and finally an integer in [0, 9] representing the octave 
-/// number. For example, middle C is specified as "c5" or "c 5" and the A sharp 
-/// below that as "a+4" or a#4.
-double freq(const char * note);
-
 /// Convert linear value to log2 in range [0, 1]
 template<class T> T linLog2(T v, T recMin);
 
@@ -306,16 +297,6 @@ template<class T> T mapSinUU(T v);
 /// Mixes two values together (1 = thru, 0.5 = mono, 0 = swap).
 template<class T> void mix2(T& io1, T& io2, T mix);
 
-/// Returns nearest "note" within a pitch class set
-
-/// \param[in] v			the note number to match
-/// \param[in] intervals	sequence of base-36 intervals 
-/// \param[in] mod			modulo amount
-///
-/// The sum of the values in the interval array should be equal to 'mod'.
-template<class T>
-T nearest(T v, const char * intervals="2212221", long mod=12);
-
 /// Returns the next representable floating-point or integer value following x in the direction of y
 template<class T> T nextAfter(T x, T y);
 
@@ -325,13 +306,6 @@ template<class T> T pow4(T v);			///< Returns value to the 4th power
 
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
-
-/// Returns equal temperament ratio- octave^(pitch/divs)
-
-/// \param[in] pitch	pitch class
-/// \param[in] divs		number of equally tempered divisions in octave
-/// \param[in] octave	base multiplier of (pseudo) octave
-double ratioET(double pitch, double divs=12, double octave=2);
 
 /// Returns floating point value rounded to nearest integer.
 template<class T> T round(T v);
@@ -461,21 +435,22 @@ template<class T> T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only w
 
 
 
-//
-// Analysis
-//
+
+//---- ANALYSIS
+
+/// Tests whether two values are close in value
+
+/// 'maxULP' (maximum units in the last place) is the maximum difference allowed
+/// between the values punned as integers.
+/// Code taken from Bruce Dawson, "Comparing floating point numbers."
+bool almostEqual(float a, float b, int maxULP=10);
+bool almostEqual(double a, double b, int maxUlps=10);
 
 /// Returns whether or not an integer value is even.
 template<class T> bool even(T v);
 
-// Returns maximum of two values.
-//template<class T> T max(T v1, T v2);
-
 /// Returns maximum of three values.
 template<class T> T max(T v1, T v2, T v3);
-
-// Returns minimum of two values.
-//template<class T> T min(T v1, T v2);
 
 /// Returns minimum of three values.
 template<class T> T min(T v1, T v2, T v3);
@@ -501,7 +476,7 @@ bool zeroCrossP(float prev, float now);
 
 
 
-//---- Waveform generators
+//---- WAVEFORM GENERATORS
 
 /// Returns value quantized to multiples of 2^q
 uint32_t quantizePow2(uint32_t value, uint32_t q);
@@ -541,6 +516,39 @@ template<class T> T raisedCosine(T phase, T a, T b);	///< Raised cosine f(x) = a
 template<class T> T welch(T nphase);									///< Welch window function. nphase => [-1, 1)
 
 
+
+//---- NOTE-BASED FUNCTIONS
+
+/// Returns frequency in Hz from a 12-TET note string.
+
+/// Notes are specified by a letter in [A, G] or [a, g], followed by an 
+/// accidental '+' or '#' for a sharp, '-' or 'b' for a flat, or ' ' or nothing 
+/// for a natural, and finally an integer in [0, 9] representing the octave 
+/// number. For example, middle C is specified as "c5" or "c 5" and the A sharp 
+/// below that as "a+4" or a#4.
+double freq(const char * note);
+
+/// Returns nearest note number within a pitch class set
+
+/// \param[in] v			the note number to match
+/// \param[in] intervals	sequence of base-36 intervals 
+/// \param[in] mod			modulo amount
+///
+/// The sum of the values in the interval array should be equal to 'mod'.
+double nearest(double v, const char * intervals="2212221", long mod=12);
+
+/// Returns equal temperament ratio- octave^(pitch/divs)
+
+/// \param[in] pitch	pitch class
+/// \param[in] divs		number of equally tempered divisions in octave
+/// \param[in] octave	base multiplier of (pseudo) octave
+double ratioET(double pitch, double divs=12, double octave=2);
+
+
+
+
+// Implementation ______________________________________________________________
+
 // internal
 namespace{
 
@@ -560,14 +568,10 @@ namespace{
 	template<class T> T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
 }
 
-
-// Implementation_______________________________________________________________
-
 //#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
 //GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
 ////template<class T> inline T abs(T v){ return v < T(0) ? -v : v; } // only allow specializations
 //#undef GEN
-
 
 template<class T> T atan2Fast(T y, T x){
 
@@ -707,35 +711,6 @@ template<class T> inline void mix2(T& io1, T& io2, T mix){
 	io2 = t2;
 	//io1 = io1 * mix + io2 * ((T)1 - mix);
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
-}
-
-template<class T> T nearest(T val, const char * intervals, long div){
-	long vr = castIntRound(val);
-	long numWraps = 0;
-	long vm = wrap(vr, numWraps, div, 0L);
-	long min = 0;
-
-	struct F{
-		static int base36To10(char v){
-			v = tolower(v);
-			if(v>='0' && v<='9') return v - '0';
-			if(v>='a' && v<='z') return v - 'a' + 10;
-			return 0;	// non-alphanumeric
-		}
-	};
-
-	while(*intervals){
-		long dia = F::base36To10(*intervals++);
-		long max = min + dia;
-		if(vm < max){	// are we within current interval?
-			if(vm < (min + dia*0.5))	vm = min;
-			else						vm = max;
-			break;
-		}
-		min = max;
-	}
-
-	return T(vm + numWraps * div);
 }
 
 template<class T>
