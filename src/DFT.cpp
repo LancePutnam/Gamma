@@ -79,6 +79,8 @@ void DFT::resize(uint32_t newWinSize, uint32_t newPadSize){ //printf("DFT::resiz
 	mSizeDFT = newDFTSize;
 	mSizeWin = newWinSize;
 	mSizeHop = mSizeWin;
+	
+	mTapW = mTapR = 0;
 
 	onDomainChange(1);
 }

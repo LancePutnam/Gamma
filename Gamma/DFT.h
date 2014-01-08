@@ -365,7 +365,7 @@ protected:
 // Implementation_______________________________________________________________
 template<class T>
 SlidingWindow<T>::SlidingWindow(uint32_t winSize, uint32_t hopSize)
-:	mBuf(0), mSizeWin(0), mSizeHop(0), mHopCnt(0)
+:	mBuf(0), mSizeWin(0), mSizeHop(0), mTapW(0), mHopCnt(0)
 {
 	resize(winSize, hopSize);
 	mem::deepZero(mBuf, sizeWin());
@@ -373,20 +373,23 @@ SlidingWindow<T>::SlidingWindow(uint32_t winSize, uint32_t hopSize)
 
 template<class T>
 SlidingWindow<T>::~SlidingWindow(){
-	if(mBuf){ free(mBuf); mBuf = 0; }
+	mem::free(mBuf);
 }
 
 template<class T>
 void SlidingWindow<T>::resize(uint32_t winSize, uint32_t hopSize){
 	sizeWin(winSize);
 	sizeHop(hopSize);
-	//mTapW = hopStart();	// for single-buffer slide mode
-	mTapW = 0;				// for single-buffer rotate mode
 }
 
 template<class T>
 void SlidingWindow<T>::sizeWin(uint32_t size){
-	if(mem::resize(mBuf, sizeWin(), size)) mSizeWin = size;
+	if(mem::resize(mBuf, sizeWin(), size)){
+		mSizeWin = size;
+		//mTapW = hopStart();	// for single-buffer slide mode
+		mTapW = 0;				// for single-buffer rotate mode
+		sizeHop(mSizeHop);		// ensures hop size <= win size
+	}
 }
 
 template<class T>
