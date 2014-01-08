@@ -57,8 +57,8 @@ struct RNGLinCon : public gen::RMulAdd<uint32_t>{
 	/// 1 - BCPL\n
 	void type(int v){
 		switch(v){
-		case 1:	mul = 2147001325; add =  715136305; break; // BCPL
-		default:mul =    1664525; add = 1013904223;        // Knuth
+		case 1:	mul = 2147001325UL; add =  715136305UL; break; // BCPL
+		default:mul =    1664525UL; add = 1013904223UL;        // Knuth
 		}
 	}
 };
@@ -84,10 +84,10 @@ struct RNGMulLinCon : public gen::RMul<uint32_t>{
 	/// 3 - Marsaglia, Super-Duper\n
 	void type(int v){
 		switch(v){
-		default:mul = 2891336453; break; // L'Ecuyer M8
-		case 1: mul =   29943829; break; // L'Ecuyer M16
-		case 2: mul =   32310901; break; // L'Ecuyer M32
-		case 3: mul =      69069; break; // Super-duper
+		default:mul = 2891336453UL; break; // L'Ecuyer M8
+		case 1: mul =   29943829UL; break; // L'Ecuyer M16
+		case 2: mul =   32310901UL; break; // L'Ecuyer M32
+		case 3: mul =      69069UL; break; // Super-duper
 		}
 	}
 };
