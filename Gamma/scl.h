@@ -446,8 +446,8 @@ template<class T> T welch(T nphase);									///< Welch window function. nphase 
 /// Notes are specified by a letter in [A, G] or [a, g], followed by an 
 /// accidental '+' or '#' for a sharp, '-' or 'b' for a flat, or ' ' or nothing 
 /// for a natural, and finally an integer in [0, 9] representing the octave 
-/// number. For example, middle C is specified as "c5" or "c 5" and the A sharp 
-/// below that as "a+4" or a#4.
+/// number. For example, middle C is specified as "c4" or "c 4" and the A sharp 
+/// below that as "a+3" or a#3.
 double freq(const char * note);
 
 /// Returns nearest note number within a pitch class set
