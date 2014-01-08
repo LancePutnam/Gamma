@@ -72,5 +72,25 @@
 	for(int i=0; i<N; ++i){
 		assert(F::aeq(ar2[i+1], in[i].r));
 	}
+}
+
+
+{
+	STFT stft(256, 256/4, 0);
+
+	float s = 0;
+	for(int i=0; i<48; ++i){
+		stft(1.);
+		s = stft();
+	}
+
+	stft.resize(128, 0);
+	stft.sizeHop(128/4);
+
+	for(int i=0; i<48; ++i){
+		stft(1.);
+		s = stft();
+	}	
 
 }
+

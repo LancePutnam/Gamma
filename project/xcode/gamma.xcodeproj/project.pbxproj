@@ -37,6 +37,8 @@
 		161263A41140691600E55446 /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 161263A21140691600E55446 /* Allocator.h */; };
 		163459CC16D6418E00F89A99 /* Domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 163459CB16D6418E00F89A99 /* Domain.cpp */; };
 		164F33B810508E77009FAD10 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16827D5810013FEE001088E7 /* File.cpp */; };
+		1665447F187D6CCE00DCF468 /* unitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1665447E187D6CCE00DCF468 /* unitTests.cpp */; };
+		16654480187D6D2B00DCF468 /* DFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D15CA309F0219B001AE497 /* DFT.cpp */; };
 		16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
 		16692FB0126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
 		16692FB1126FC9A300C1F4E9 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16692FAE126FC9A300C1F4E9 /* Recorder.cpp */; };
@@ -91,7 +93,6 @@
 		1695E74A1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
 		1695E74B1295AE1400F6F3C0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7431295AE1400F6F3C0 /* libportaudio.a */; };
 		1695E74C1295AE1400F6F3C0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1695E7441295AE1400F6F3C0 /* libsndfile.a */; };
-		16AEEF3D16DCCA1F00489390 /* unitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AEEF3C16DCCA1E00489390 /* unitTests.cpp */; };
 		16BC61B80FFC896A00AF1B29 /* arr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9B5094F8C2600549AC9 /* arr.cpp */; };
 		16BC61B90FFC896A00AF1B29 /* scl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16EDF9C8094F8C2600549AC9 /* scl.cpp */; };
 		16C967550FFDD9A3008072A9 /* Conversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16938AC00FBD0C6700274B2A /* Conversion.cpp */; };
@@ -151,6 +152,7 @@
 		165B1DCD1501961500ED79EB /* Scheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scheduler.h; sourceTree = "<group>"; };
 		165B1DCE1501963100ED79EB /* Scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scheduler.cpp; sourceTree = "<group>"; };
 		165DA46B15213D960063FABF /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thread.h; sourceTree = "<group>"; };
+		1665447E187D6CCE00DCF468 /* unitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = unitTests.cpp; path = ../../tests/unitTests.cpp; sourceTree = SOURCE_ROOT; };
 		16692FAD126FC53100C1F4E9 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
 		16692FAE126FC9A300C1F4E9 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
 		167479501158052400A1556D /* Print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Print.h; sourceTree = "<group>"; };
@@ -166,7 +168,6 @@
 		16938AC00FBD0C6700274B2A /* Conversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conversion.cpp; path = ../../src/Conversion.cpp; sourceTree = SOURCE_ROOT; };
 		1695E7431295AE1400F6F3C0 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = ../../external/lib_osx/libportaudio.a; sourceTree = SOURCE_ROOT; };
 		1695E7441295AE1400F6F3C0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../external/lib_osx/libsndfile.a; sourceTree = SOURCE_ROOT; };
-		16AEEF3C16DCCA1E00489390 /* unitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = unitTests.cpp; path = ../../tests/unitTests.cpp; sourceTree = SOURCE_ROOT; };
 		16BC61C00FFC896A00AF1B29 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16BEA8BE12AF724900654E30 /* fftpack++.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "fftpack++.inc"; sourceTree = "<group>"; };
 		16CCF9C00A9EC1650013D2BF /* Containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Containers.h; path = ../../Gamma/Containers.h; sourceTree = SOURCE_ROOT; };
@@ -333,7 +334,7 @@
 			isa = PBXGroup;
 			children = (
 				7EB463D70825DC5D002E1A73 /* source */,
-				16AEEF3C16DCCA1E00489390 /* unitTests.cpp */,
+				1665447E187D6CCE00DCF468 /* unitTests.cpp */,
 				16FEC1D41684951500CFE6EE /* tests */,
 				164BDD0B14CCAE3F0061E1EF /* examples */,
 				16D24F640A9BA72E00415E9E /* Libs */,
@@ -572,7 +573,8 @@
 				16E3D2DA115C3B1A009165E6 /* fftpack++2.cpp in Sources */,
 				16692FAF126FC9A300C1F4E9 /* Recorder.cpp in Sources */,
 				163459CC16D6418E00F89A99 /* Domain.cpp in Sources */,
-				16AEEF3D16DCCA1F00489390 /* unitTests.cpp in Sources */,
+				1665447F187D6CCE00DCF468 /* unitTests.cpp in Sources */,
+				16654480187D6D2B00DCF468 /* DFT.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
