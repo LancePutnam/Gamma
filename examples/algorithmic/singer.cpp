@@ -24,7 +24,7 @@ struct VowelFilter{
 	
 	void set(int i, float freq, float amp){
 		filters[i].type(BAND_PASS);
-		filters[i].res(1./0.02);
+		filters[i].res(1./0.08);
 		params.stored()[i*2+0] = freq;
 		params.stored()[i*2+1] = amp;
 	}
