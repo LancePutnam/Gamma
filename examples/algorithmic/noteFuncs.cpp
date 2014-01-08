@@ -44,8 +44,11 @@ int main(){
 	
 	/* 
 	We can use scl::nearest to get the closest note number within a specified
-	pitch class set given as a sequence of half-step intervals. This is useful
-	for mapping arbitrary number sequences onto notes in a musical scale.
+	pitch class set. This is useful for mapping arbitrary values onto notes in a
+	musical scale.
+	The first argument is the note number to match, the second is a string
+	containing the scale's half-step intervals, and the third argument specifies
+	the modulus or divisions per octave (default is 12).
 	*/
 	
 	// Major scale
@@ -62,7 +65,9 @@ int main(){
 	
 	/*
 	scl::ratioET computes frequency ratios within a specified 
-	equal-temperament tuning system.
+	equal-temperament tuning system. The first argument is the note number, the
+	second is the number of divisions per octave (default is 12) and the third
+	is the base multiplier of the octave (default is 2).
 	*/
 	
 	// Ratio of 1 semitone in 12-TET
@@ -76,8 +81,11 @@ int main(){
 	
 	// Ratio of 1 semitone in 7-TET
 	printf("1 semitone in 7-TET:  %g\n", scl::ratioET(1, 7));
-	
-	
+
+	// Ratio of 1 semitone in Bohlen-Pierce scale
+	printf("1 semitone in Bohlen-Pierce scale: %g\n", scl::ratioET(1, 13, 3));
+
+
 	/*
 	The functions above can be combined in order to get specific frequency
 	values of notes in a scale.
