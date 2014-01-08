@@ -43,98 +43,6 @@ template<class T> double normCompare(const T& v);
 /// Scalar rank functions for numerical types
 namespace scl{
 
-template<int N, class T, template<class> class F>
-struct NewtonIterator{
-	NewtonIterator(T& v, T v0){
-		F<T>(v,v0);
-		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
-	}
-};
-
-template<class T, template<class> class F>
-struct NewtonIterator<0,T,F>{
-	NewtonIterator(T& v, T v0){}
-};
-
-template<class T> struct NewtonSqrtMap{
-	NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); }
-};
-
-template<int N, class T>
-struct SqrtNewton : public NewtonIterator<N,T, NewtonSqrtMap> {
-	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0)
-	{}
-};
-
-
-template<class T> struct NewtonInvSqrtMap{
-	NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; }
-};
-
-template<int N, class T>
-struct InvSqrtNewton : public NewtonIterator<N,T, NewtonInvSqrtMap>{
-	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0)
-	{}
-};
-
-template<class T> const Twiddle<T> invSqrtMagic();
-template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(uint32_t(0x5f3759df)); }
-template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(uint64_t(0x5fe6ec85e7de30daULL)); }
-
-
-/// Approximate square root using a quick log base-2 method.
-inline float sqrtLog2(float v){
-	Twiddle<float> u(v);
-	u.u=(1<<29) + (u.u>>1) - (1<<22);
-	return u.f;
-}
-
-/// Approximate square root using a quick log base-2 method.
-inline double sqrtLog2(double v){
-	Twiddle<double> u(v);
-	u.u=((uint64_t(1))<<61) + (u.u>>1) - ((uint64_t(1))<<51);
-	return u.f;
-}
-
-/// Approximate square root using Newton's method.
-template<int N, class T> void sqrtNewton(T& v, T v0){ SqrtNewton<N,T>(v,v0); }
-
-/// Approximate square root using log base-2 and Newton methods.
-
-/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
-/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
-/// are applied to improve the result.
-template<uint32_t N, class T>
-inline T sqrt(T v){
-	T r=sqrtLog2(v);
-	sqrtNewton<N>(r,v);
-	return r;
-}
-
-/// Approximate inverse square root using Newton's method.
-template<int N, class T> void invSqrtNewton(T& v, T v0){ InvSqrtNewton<N,T>(v,v0); }
-
-/// Approximate inverse square root using a quick log base-2 method.
-template <class T>
-inline T invSqrtLog2(T v){
-	Twiddle<T> u(v);
-	u.u = invSqrtMagic<T>().u - (u.u>>1);
-	return u.f;
-}
-
-/// Approximate inverse square root using log base-2 and Newton methods.
-
-/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
-/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
-/// are applied to improve the result.
-template<uint32_t N, class T>
-inline T invSqrt(T v){
-	T r=invSqrtLog2(v);
-	invSqrtNewton<N>(r, v*T(0.5));
-	return r;
-}
-
-
 // Define overloaded versions of certain basic functions for primitive types.
 // Custom types, such as vectors, can define their own specialized versions in
 // a different header file.
@@ -400,6 +308,20 @@ template <class T, class F> T smoothZero(T v, T bw, F f);
 /// The graph of this function resembles a resonant peak. The function uses the
 /// square of the value for evaluation.
 template<class T> T smoothZero(T v, T bw);
+
+/// Approximate square root using log base-2 and Newton methods.
+
+/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
+/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
+/// are applied to improve the result.
+template<uint32_t N, class T> T sqrt(T v);
+
+/// Approximate inverse square root using log base-2 and Newton methods.
+
+/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
+/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
+/// are applied to improve the result.
+template<uint32_t N, class T> T invSqrt(T v);
 
 /// Truncates floating point value at decimal.
 template<class T> T trunc(T value);
@@ -782,6 +704,83 @@ template <class T, class F>
 inline T smoothZero		(T v, T bw, F f){ return bw/(f(v) + bw); }
 template<class T>
 inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
+
+
+template<int N, class T, template<class> class F>
+struct NewtonIterator{
+	NewtonIterator(T& v, T v0){
+		F<T>(v,v0);
+		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
+	}
+};
+
+template<class T, template<class> class F>
+struct NewtonIterator<0,T,F>{
+	NewtonIterator(T& v, T v0){}
+};
+
+template<class T> struct NewtonSqrtMap{
+	NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); }
+};
+
+template<int N, class T>
+struct SqrtNewton : public NewtonIterator<N,T, NewtonSqrtMap> {
+	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0)
+	{}
+};
+
+
+template<class T> struct NewtonInvSqrtMap{
+	NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; }
+};
+
+template<int N, class T>
+struct InvSqrtNewton : public NewtonIterator<N,T, NewtonInvSqrtMap>{
+	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0)
+	{}
+};
+
+template<class T> const Twiddle<T> invSqrtMagic();
+template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(uint32_t(0x5f3759df)); }
+template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(uint64_t(0x5fe6ec85e7de30daULL)); }
+
+inline float sqrtLog2(float v){
+	Twiddle<float> u(v);
+	u.u=(1<<29) + (u.u>>1) - (1<<22);
+	return u.f;
+}
+
+inline double sqrtLog2(double v){
+	Twiddle<double> u(v);
+	u.u=((uint64_t(1))<<61) + (u.u>>1) - ((uint64_t(1))<<51);
+	return u.f;
+}
+
+template<int N, class T> void sqrtNewton(T& v, T v0){ SqrtNewton<N,T>(v,v0); }
+
+template<uint32_t N, class T>
+inline T sqrt(T v){
+	T r=sqrtLog2(v);
+	sqrtNewton<N>(r,v);
+	return r;
+}
+
+template<int N, class T> void invSqrtNewton(T& v, T v0){ InvSqrtNewton<N,T>(v,v0); }
+
+template <class T>
+inline T invSqrtLog2(T v){
+	Twiddle<T> u(v);
+	u.u = invSqrtMagic<T>().u - (u.u>>1);
+	return u.f;
+}
+
+template<uint32_t N, class T>
+inline T invSqrt(T v){
+	T r=invSqrtLog2(v);
+	invSqrtNewton<N>(r, v*T(0.5));
+	return r;
+}
+
 
 template<class T>
 inline T taylorFactor3(T vv, T c1, T c2, T c3){
