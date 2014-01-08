@@ -308,7 +308,7 @@ template<class T> void mix2(T& io1, T& io2, T mix);
 
 /// Returns nearest "note" within a pitch class set
 
-/// \param[in] v			the value to match
+/// \param[in] v			the note number to match
 /// \param[in] intervals	sequence of base-36 intervals 
 /// \param[in] mod			modulo amount
 ///
@@ -331,7 +331,7 @@ inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups);
 /// \param[in] pitch	pitch class
 /// \param[in] divs		number of equally tempered divisions in octave
 /// \param[in] octave	base multiplier of (pseudo) octave
-template<class T> T ratioET(T pitch, T divs=12, T octave=2);
+double ratioET(double pitch, double divs=12, double octave=2);
 
 /// Returns floating point value rounded to nearest integer.
 template<class T> T round(T v);
@@ -750,8 +750,9 @@ inline long double nextAfter(long double x, long double y){ return nextafterl(x,
 template<class T> inline T pow2 (T v){ return v*v; }
 template<class T> inline T pow3 (T v){ return v*v*v; }
 template<class T> inline T pow4 (T v){ return pow2(pow2(v)); }
-template<class T> inline T ratioET(T pc, T divs, T ival){
-	return T(::pow(double(ival), double(pc) / double(divs)));
+
+inline double ratioET(double pc, double divs, double ival){
+	return ::pow(ival, pc/divs);
 }
 
 //template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
