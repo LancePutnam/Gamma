@@ -15,7 +15,6 @@
 
 namespace gam{
 
-
 /// Sample buffer player
 
 /// This streams a sequence of frames from a n-channel buffer according to a 
@@ -51,16 +50,14 @@ public:
 
 	/// \param[in] pathToSoundFile		Path to sound file
 	/// \param[in] rate					Playback rate
-	template<class Char>
-	explicit SamplePlayer(const Char * pathToSoundFile, double rate=1);
+	explicit SamplePlayer(const char * pathToSoundFile, double rate=1);
 
 
 	/// Load a sound file into internal sample buffer
 	
 	/// \returns whether the sound file loaded properly
 	///
-	template<class Char>
-	bool load(const Char * pathToSoundFile);
+	bool load(const char * pathToSoundFile);
 
 
 	/// Increment read tap
@@ -186,9 +183,8 @@ PRE CLS::SamplePlayer(Array<T>& src, double smpRate, double rate)
 	frameRate(smpRate);
 }
 
-PRE
-template<class Char>
-CLS::SamplePlayer(const Char * path, double rate)
+
+PRE CLS::SamplePlayer(const char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {	
 	if(!load(path)){
@@ -196,9 +192,7 @@ CLS::SamplePlayer(const Char * path, double rate)
 	}
 }
 
-PRE
-template<class Char>
-bool CLS::load(const Char * pathToSoundFile){
+PRE bool CLS::load(const char * pathToSoundFile){
 	SoundFile sf(pathToSoundFile);
 	
 	if(sf.openRead()){
@@ -216,8 +210,10 @@ bool CLS::load(const Char * pathToSoundFile){
 	fprintf(stderr, 
 		"gam::SamplePlayer: couldn't load sound file \"%s\"\n",
 		pathToSoundFile);
+
 	return false;
 }
+
 
 PRE inline void CLS::advance(){
 	mPos = mPhsInc(pos(), mInc, max(), min()); // update read position, in frames

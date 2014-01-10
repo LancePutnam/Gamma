@@ -5,7 +5,6 @@
 include Makefile.config
 
 SRCS = 	arr.cpp\
-	AudioIO.cpp\
 	Conversion.cpp\
 	Domain.cpp\
 	DFT.cpp\
@@ -16,8 +15,15 @@ SRCS = 	arr.cpp\
 	Print.cpp\
 	scl.cpp\
 	Recorder.cpp\
-	Scheduler.cpp\
-	SoundFile.cpp
+	Scheduler.cpp
+
+ifneq ($(NO_AUDIO_IO), 1)
+	SRCS += AudioIO.cpp
+endif
+
+ifneq ($(NO_SOUNDFILE), 1)
+	SRCS += SoundFile.cpp
+endif
 
 #OBJS = $(SRCS:.cpp=.o)
 #OBJS := $(addprefix $(OBJ_DIR), $(OBJS))
