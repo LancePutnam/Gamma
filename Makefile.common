@@ -266,7 +266,8 @@ endif
 
 # Append optimization flags
 ifeq ($(BUILD_CONFIG), Release)
-	CFLAGS += -O3 -fpeel-loops
+	CFLAGS += -O3
+	#CFLAGS += -fpeel-loops # not supported by clang
 else
 	CFLAGS += -g -O0 -fno-inline
 endif
