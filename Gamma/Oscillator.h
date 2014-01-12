@@ -714,9 +714,9 @@ struct Saw : public Impulse<Tv,Td> {
 
 	/// Generate next sample
 	
-	/// \param[in] itg		Integration amount
+	/// \param[in] itg		Leaky integration factor
 	///
-	Tv operator()(Tv intg=0.997){ return Impulse<Tv,Td>::saw(intg); }
+	Tv operator()(Tv itg=0.997){ return Impulse<Tv,Td>::saw(itg); }
 };
 
 
@@ -741,9 +741,9 @@ struct Square : public Impulse<Tv,Td> {
 
 	/// Generate next sample
 	
-	/// \param[in] itg		Integration amount
+	/// \param[in] itg		Leaky integration factor
 	///
-	Tv operator()(Tv intg=0.997){ return Impulse<Tv,Td>::square(intg); }
+	Tv operator()(Tv itg=0.997){ return Impulse<Tv,Td>::square(itg); }
 };
 
 

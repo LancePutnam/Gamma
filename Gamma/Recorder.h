@@ -15,7 +15,7 @@ public:
 
 	Recorder();
 
-	/// \param[in] chans	number of channels
+	/// \param[in] channels	number of channels
 	/// \param[in] frames	number of (multi-)channel frames
 	Recorder(int channels, int frames=8192);
 
