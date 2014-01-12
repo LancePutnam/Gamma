@@ -88,3 +88,33 @@ buildtest: test
 	@for v in algorithmic curves effects filter function generator io spectral synths; do \
 		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done
+
+
+# Create/view API documentation
+doc/html/index.html: doc/Doxyfile Gamma/*.h
+	@if [ `which doxygen` ]; then \
+		pushd doc && doxygen Doxyfile && popd;\
+	elif [ `which /Applications/Doxygen.app/Contents/Resources/doxygen` ]; then \
+		pushd doc && /Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile && popd;\
+	else \
+		echo "Error: doxygen not found.";\
+		echo "doxygen is required to create the documentation.";\
+		printf "Please install it using ";\
+		if [ `which apt-get` ]; then printf "\"sudo apt-get install doxygen\"";\
+		elif [ `which port` ]; then printf "\"sudo port install doxygen\"";\
+		elif [ `which brew` ]; then printf "\"brew install doxygen\"";\
+		else printf "a package manager, e.g., apt-get (Linux), MacPorts or Homebrew (Mac OSX),";\
+		fi;\
+		printf " and try again. You can also create the documentation manually \
+by downloading doxygen from www.doxygen.org and running it on the file $<.\n";\
+		exit 127;\
+	fi
+
+docs: doc/html/index.html
+ifeq ($(PLATFORM), linux)
+	@xdg-open $<
+else ifeq ($(PLATFORM), macosx)
+	@open $<
+endif
+
+
