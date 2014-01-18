@@ -95,9 +95,9 @@ buildtest: test
 # Create/view API documentation
 doc/html/index.html: doc/Doxyfile Gamma/*.h
 	@if [ `which doxygen` ]; then \
-		pushd doc && doxygen Doxyfile && popd;\
+		cd doc && doxygen Doxyfile && cd ..;\
 	elif [ `which /Applications/Doxygen.app/Contents/Resources/doxygen` ]; then \
-		pushd doc && /Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile && popd;\
+		cd doc && /Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile && cd ..;\
 	else \
 		echo "Error: doxygen not found.";\
 		echo "doxygen is required to create the documentation.";\
@@ -114,7 +114,7 @@ by downloading doxygen from www.doxygen.org and running it on the file $<.\n";\
 
 docs: doc/html/index.html
 ifeq ($(PLATFORM), linux)
-	@xdg-open $<
+	@xdg-open $< &
 else ifeq ($(PLATFORM), macosx)
 	@open $<
 endif
