@@ -32,7 +32,7 @@ endif
 SRCS		:= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
+CPPFLAGS	:= $(addprefix -I, $(INC_DIRS)) $(CPPFLAGS)
 
 #--------------------------------------------------------------------------
 # Rules
@@ -60,7 +60,9 @@ endif
 clean:
 	$(call RemoveDir, $(OBJ_DIR))
 	$(call RemoveDir, $(BIN_DIR))
-
+	$(call RemoveDir, $(BUILD_DIR)lib/)
+	$(call RemoveDir, $(BUILD_DIR)include/)
+	$(call RemoveDir, $(BUILD_DIR))
 
 # Clean and rebuild library
 rebuild: clean $(LIB_PATH)
