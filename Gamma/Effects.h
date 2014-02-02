@@ -94,7 +94,7 @@ public:
 	/// \param[in] freq2	end frequency
 	/// \param[in] decay60	length after which envelope decays by 60 dB
 	Chirp(T freq1=220, T freq2=0, T decay60=0.2):
-		osc(freq1), env(decay), freq1(freq1), freq2(freq2)
+		osc(freq1), env(decay60), freq1(freq1), freq2(freq2)
 	{}
 	
 	/// Generate next sample
