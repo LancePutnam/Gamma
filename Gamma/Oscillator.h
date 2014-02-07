@@ -853,7 +853,9 @@ protected:
 
 //---- Accum
     
-template<class St, class Td> Accum<St,Td>::Accum(float f, float p): mFreq(f){
+template<class St, class Td> Accum<St,Td>::Accum(float f, float p)
+:	mFreq(f), mFreqI(0)
+{
 	Td::refreshDomain();
 	phase(p);
 	//(p >= 1.f) ? phaseMax() : this->phase(p);
