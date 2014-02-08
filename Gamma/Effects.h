@@ -17,13 +17,19 @@ namespace gam{
 
 /// Amplitude modulator
 
-/// Amplitude modulation multiplies two signals together, the product of which
-/// contains the sum and difference frequencies of the inputs.
-/// Unlike ring modulation, amplitude modulation does not suppress the carrier
-/// signal.
+/// Amplitude modulation is based on the operation (M x d + 1) x C where
+/// M is the modulator, C is the carrier, and d is the modulation depth. The
+/// resulting signal contains the carrier signal plus the sums and differences
+/// of all frequencies of the carrier and modulator.
+/// Ring modulation is given by the operation M x C and thus, unlike amplitude
+/// modulation, does not pass the carrier signal.
 template <class Tp=real>
 class AM{
 public:
+
+	/// \param[in] modDepth		modulation depth
+	AM(Tp modDepth = Tp(1))
+	:	mDepth(modDepth){}
 
 	/// Set depth of amplitude modulation
 	void depth(Tp v){ mDepth=v; }
