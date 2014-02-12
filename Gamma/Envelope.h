@@ -450,7 +450,7 @@ public:
 	ADSR& release(Tp len){ return setLen(2,len); }
 	
 	/// Set amplitude
-	ADSR& amp(Tv v){ return this->maxLevel(v); }
+	ADSR& amp(Tv v){ this->maxLevel(v); return *this; }
 	
 protected:
 	ADSR& setLen(int i, Tp v){
