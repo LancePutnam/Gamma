@@ -23,6 +23,8 @@ namespace gam{
 /// the phase is wrapped automatically when the integer overflows. As long as
 /// we used unsigned integers, this wrapping behavior is well-defined--all 
 /// results of addition are taken modulo the maximum size of the integer.
+/// The frequency resolution is SR/2^32. For SR=44100 Hz, this equates to
+/// a frequency resolution of ~10^-5 Hz which has a period of ~27 hours.
 ///
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
