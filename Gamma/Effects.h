@@ -205,6 +205,7 @@ public:
 		mDelay(delay)
 	{}
 
+	Chorus& maxDelay(float v){ comb1.maxDelay(v); comb2.maxDelay(v); return *this; }
 	Chorus& delay(float v){ mDelay=v; return *this; }
 	Chorus& fbk(float v){ comb1.fbk(v); comb2.fbk(v); return *this; }
 	Chorus& ffd(float v){ comb1.ffd(v); comb2.ffd(v); return *this; }
