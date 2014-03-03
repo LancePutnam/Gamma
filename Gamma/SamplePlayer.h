@@ -275,7 +275,7 @@ PRE void CLS::reset(){
 PRE inline bool CLS::done() const{
 	// The trigger points are based on the logic of phsInc::OneShot
 	if(rate() >= 0.){
-		return pos() >= (max() - rate());
+		return pos() >= (max() - mInc);
 	}
 	else{
 		return pos() <= min();
