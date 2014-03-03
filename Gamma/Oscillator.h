@@ -125,7 +125,7 @@ private: typedef Accum<Sp,Td> Base;
 };
 
     
-/// Floating-point phase accumulator with output in [-pi, pi).
+/// Floating-point phase accumulator with output in [-A, A)
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
@@ -133,9 +133,10 @@ private: typedef Accum<Sp,Td> Base;
 template <class Tv = gam::real, class Td = DomainObserver>
 class AccumPhase : public Td{
 public:
-	/// \param[in]	frq		Frequency
-	/// \param[in]	phs		Phase in [0, 1)
-	AccumPhase(Tv frq=440, Tv phs=0);
+	/// \param[in] frq		Frequency
+	/// \param[in] phs		Phase in [0, 1)
+	/// \param[in] amp		Amplitude
+	AccumPhase(Tv frq=440, Tv phs=0, Tv amp=M_PI);
 
 	
 	/// Generate next sample. Stored phase is post-incremented.
@@ -148,17 +149,19 @@ public:
 	void period(Tv v);		///< Set period length
 	void phase(Tv v);		///< Set phase from [0, 1) of one period
 	void phaseAdd(Tv v);	///< Add value to unit phase
+	void amp(Tv v);			///< Set amplitude
 	
-	Tv freq();				///< Get frequency
-	Tv period();			///< Get period
-	Tv phase();				///< Get normalized phase in [0, 1)
+	Tv freq() const;		///< Get frequency
+	Tv period() const;		///< Get period
+	Tv phase() const ;		///< Get normalized phase in [0, 1)
+	Tv amp() const;			///< Get amplitude
 	
 	virtual void onDomainChange(double r);
-	void print(const char * append = "\n", FILE * fp = stdout);
+	void print(FILE * fp = stdout, const char * append = "\n");
 	
 protected:
-	Tv mFreq, mPhase;
-	Tv m2PiUPS;
+	Tv mInc, mPhase, mAmp;
+	Tv mFreqToInc;
 	void recache();
 	Tv mapFreq(Tv v) const;
 	Tv mapPhase(Tv v) const;
@@ -323,15 +326,15 @@ class Sine : public AccumPhase<Tv,Td> {
 public:
 	/// \param[in]	frq		Frequency
 	/// \param[in]	phs		Phase in [0, 1)
-	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv,Td>(frq, phs){}
-	
+	Sine(Tv frq=440, Tv phs=0) : AccumPhase<Tv,Td>(frq, phs, Tv(1)){}
+
 	/// Generate next sample with a frequency offset
 	Tv operator()(Tv frqOffset = Tv(0)){
-		// TODO: phase accum in [-1, 1] to avoid multiply?
-		return scl::sinP9(this->nextPhase(frqOffset) * M_1_PI);
-		//return scl::sinP7(this->nextPhase(frqOffset) * M_1_PI);
-		//return scl::sinT7(this->nextPhase(frqOffset));
-		//return scl::sinFast(this->nextPhase(frqOffset));
+		//return ::sin(this->nextPhase(frqOffset)/*M_PI*/); // 260%
+		//return scl::sinT7(this->nextPhase(frqOffset)/*M_PI*/); // 140%
+		return scl::sinP9(this->nextPhase(frqOffset)); // 110%
+		//return scl::sinP7(this->nextPhase(frqOffset)); // 100%
+		//return scl::sinFast(this->nextPhase(frqOffset)/*M_PI*/); // 95%
 	}
 };
 
@@ -954,47 +957,59 @@ template<class St, class Td> inline bool Accum<St,Td>::seq(uint32_t pat){
 //---- AccumPhase
 
 template<class Tv, class Td>
-AccumPhase<Tv, Td>::AccumPhase(Tv f, Tv p)
-:	mFreq(f), m2PiUPS(1)
+AccumPhase<Tv, Td>::AccumPhase(Tv f, Tv p, Tv a)
+:	mInc(f), mAmp(a), mFreqToInc(1)
 {
 	Td::refreshDomain();
 	this->phase(p);
 }
 
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapFreq(Tv v) const { return v*m2PiUPS; }
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapPhase(Tv v) const { return v*Tv(M_2PI); }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapFreq(Tv v) const { return v*mFreqToInc; }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapPhase(Tv v) const { return v*Tv(2)*mAmp; }
 
 template<class Tv, class Td>
-inline Tv AccumPhase<Tv, Td>::nextPhaseUsing(Tv frq){
-	mPhase = scl::wrapPhase(mPhase); // guarantees that result is in [-pi, pi)
+inline Tv AccumPhase<Tv, Td>::nextPhaseUsing(Tv inc){
+	mPhase = scl::wrap(mPhase, mAmp,-mAmp); // guarantees that result is in [-A, A)
 	Tv r = mPhase;
-	mPhase += frq;
+	mPhase += inc;
 	return r;
 }
 
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::nextPhase(){
-	return nextPhaseUsing(mFreq);
+	return nextPhaseUsing(mInc);
 }
 
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::nextPhase(Tv frqMod){
-	return nextPhaseUsing(mFreq + mapFreq(frqMod));
+	return nextPhaseUsing(mInc + mapFreq(frqMod));
 }
 
-template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freq(Tv v){ mFreq = mapFreq(v); }
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freq(Tv v){ mInc = mapFreq(v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::period(Tv v){ freq(Tv(1)/v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phase(Tv v){ mPhase = mapPhase(v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::amp(Tv v){
+	Tv f = freq();
+	mAmp=v;
+	recache();
+	freq(f);
+}
 
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freq(){ return mFreq/m2PiUPS; } //mFreq; }
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::period(){ return Tv(1) / freq(); }
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase(){ return mPhase * Tv(M_1_2PI); }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freq() const { return mInc/mFreqToInc; } //mFreq; }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::period() const { return Tv(1)/freq(); }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase() const { return mPhase/(Tv(2)*mAmp); }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::amp() const { return mAmp; }
 
-template<class Tv, class Td> void AccumPhase<Tv, Td>::onDomainChange(double r){ Tv f=freq(); recache(); freq(f); }
-template<class Tv, class Td> void AccumPhase<Tv, Td>::recache(){ m2PiUPS = Tv(Td::ups() * M_2PI); }
+template<class Tv, class Td> void AccumPhase<Tv, Td>::onDomainChange(double r){
+	Tv f=freq();
+	recache();
+	freq(f);
+}
+template<class Tv, class Td> void AccumPhase<Tv, Td>::recache(){
+	mFreqToInc = Tv(Td::ups() * Tv(2)*mAmp);
+}
 
-template<class Tv, class Td> void AccumPhase<Tv, Td>::print(const char * append, FILE * fp){
-//	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreqI, append);
-	fprintf(fp, "%f %f %f%s", freq(), phase(), mFreq, append);
+template<class Tv, class Td> void AccumPhase<Tv, Td>::print(FILE * fp, const char * append){
+	fprintf(fp, "%f %f %f%s", freq(), phase(), mInc, append);
 }
 
 
