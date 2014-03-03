@@ -829,10 +829,10 @@ template<class T> inline T cosT8(T r){
 
 
 template<class T> inline T sinFast(T r){
-    const T B = 4 / M_PI, C = -4 / (M_PI*M_PI);
-    T y = B * r + C * r * scl::abs(r);
-	const T P = 0.225; // const float Q = 0.775;
-	return P * (y * scl::abs(y) - y) + y;   // Q * y + P * y * abs(y)
+	const T B = 4 / M_PI, C = -4 / (M_PI*M_PI);
+	T y = r * (B + C * scl::abs(r));
+	const T P = 0.225; const T Q = 0.775;
+	return y * (Q + P * scl::abs(y));
 }
 
 template<class T> inline T sinP7(T n){
