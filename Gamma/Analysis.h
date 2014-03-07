@@ -108,8 +108,14 @@ public:
 	:	mRate(0), mWinSize(winSize), mCrosses(0), mCount(0)
 	{}
 
+	/// Set window size, in samples
+	ZeroCrossRate& winSize(unsigned n){ mWinSize=n; return *this; }
+
 	/// Get the current zero-crossing rate, in [0, 0.5]
 	float rate() const { return mRate; }
+	
+	/// Get window size
+	unsigned winSize() const { return mWinSize; }
 
 	/// Input next sample and return current zero-crossing rate
 	Tv operator()(Tv input){
