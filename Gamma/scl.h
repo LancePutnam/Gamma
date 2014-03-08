@@ -827,12 +827,10 @@ template<class T> inline T cosT8(T r){
 	}
 }
 
-
-template<class T> inline T sinFast(T r){
-	const T B = 4 / M_PI, C = -4 / (M_PI*M_PI);
-	T y = r * (B + C * scl::abs(r));
-	const T P = 0.225; const T Q = 0.775;
-	return y * (Q + P * scl::abs(y));
+// Input is in [-2, 2] corresponding to [-pi, pi]
+template<class T> inline T sinFast(T x){
+	T y = x * (T(2) - gam::scl::abs(x));
+	return y * (T(0.775) + T(0.225) * gam::scl::abs(y));
 }
 
 template<class T> inline T sinP7(T n){
