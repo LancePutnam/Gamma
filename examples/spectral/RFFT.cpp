@@ -1,19 +1,23 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Transform / RFFT
-	Description:	Demonstration of real-to-complex fast Fourier transform
+	Example: Spectral / RFFT
+
+	This demonstrates how to do a real-to-complex fast Fourier transform using 
+	the RFFT class.
 */
 
-#include "../examples.h"
-
+#include "Gamma/FFT.h"
+#include "Gamma/Types.h"
+#include "Gamma/Print.h"
+using namespace gam;
 
 int main(){
 
-	const int N = 32;		// Number of position domain samples
-	RFFT<float> fft(N);		//
-	float sig[N];			// Time/position domain signal
-	float buf[N];			// Transform buffer
+	const int N = 32;	// Transform size
+	float sig[N];		// Time-/position-domain signal
+	float buf[N];		// Transform buffer
+	RFFT<float> fft(N);	// Real-to-complex FFT
 	
 	// Create signal
 	for(int i=0; i<N; ++i){
@@ -22,13 +26,13 @@ int main(){
 		sig[i]+= i&1?-1:1;
 	}
 	
-	// Copy signal to transform buffer
+	// CFFT operates in-place, so we copy our input signal to another buffer
 	for(int i=0; i<N; ++i) buf[i] = sig[i];
 
-	// Perform real-to-complex forward transform
+	// Perform real-to-complex forward transform (time/position to frequency)
 	fft.forward(buf);
 
-	// Print out frequency domain samples
+	// Print out frequency-domain samples
 	int numBins = N/2 + 1;
 
 	for(int i=0; i<numBins; ++i){
@@ -44,7 +48,7 @@ int main(){
 		printf("\n");
 	}
 
-	// Perform complex-to-real inverse transform
+	// Perform complex-to-real inverse transform (frequency to time/position)
 	fft.inverse(buf);
 
 	// Print out original signal versus forward/inverse transformed signal

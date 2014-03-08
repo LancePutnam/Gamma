@@ -1,49 +1,68 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Transform / STFT
-	Description:	Using frequency domain oscillators to filter a time domain
-					signal.
+	Example: Spectral / Spectral Oscillators
+	
+	This demonstrates how to use oscillators running across the frequency domain
+	to create time-varying filtering patterns.
 */
 
-#include "../examples.h"
-
+#include "Gamma/AudioIO.h"
+#include "Gamma/DFT.h"
+#include "Gamma/Noise.h"
+#include "Gamma/Oscillator.h"
 using namespace gam;
 
 NoisePink<> src;
-//Sine<float> src(440);
-LFO<> lfoA1(1./1000., 0, 0.2), lfoA2(1./800., 0, 0.2), lfoF1(1./1.3), lfoF2(1./1.61);
-Biquad<> bq0(1./400., 10, BAND_PASS);
-Biquad<> bq1(1./400., 10, BAND_PASS);
 
-uint32_t hopSize = 512;
-STFT stft(hopSize * 4, hopSize, 0, HANN, MAG_PHASE);
+// STFT(winSize, hopSize, padSize, winType, spectralFormat)
+STFT stft(2048, 2048/4, 0, HANN, COMPLEX);
+
+// Spectral magnitude oscillators
+LFO<> oscMag1, oscMag2;
+
+// LFOs used to vary the starting phase of the magnitude oscillators
+LFO<> modPhase1, modPhase2;
+
 
 void audioCB(AudioIOData & io){
 
 	while(io()){
-		float smp = src() * 0.5f;
+		float s = src() * 0.5f;
 		
-		if( stft(smp) ){
+		if(stft(s)){
 
-			lfoA1.phase(lfoF1.upU());
-			lfoA2.phase(lfoF2.downU());
+			// Set periods of phase modulators, in seconds
+			modPhase1.period(1.33);
+			modPhase2.period(1.61);
+			
+			// Set periods of magnitude oscillators, in Hz
+			oscMag1.period(1000);
+			oscMag2.period( 800);
+
+			// Modulate phases according to raised-cosine wave
+			oscMag1.phase(modPhase1.hann());
+			oscMag2.phase(modPhase2.hann());
 			
 			for(unsigned i=0; i<stft.numBins(); ++i){
 			
-				stft.bin(i)[0] *= lfoA1.triU() - lfoA2.triU();
-				//f0 *= lfoA1.impulse();
-				//f0 = bq0(s0);
-				//f1 = bq1(s1);
+				// Compute the gain to apply to this bin
+				float m  = oscMag1.triU() - oscMag2.triU();
+			
+				stft.bin(i) *= m;
 			}	
 		}
+
 		io.out(0) = io.out(1) = stft();
 	}
 }
 
 int main(){
-	stft.domainHop()  << lfoF1 << lfoF2;
-	stft.domainFreq() << lfoA1 << lfoA2 << bq0 << bq1;
+	// Attach the phase modulation LFOs to the hop-rate domain
+	stft.domainHop() << modPhase1 << modPhase2;
+
+	// Attach objects to frequency domain
+	stft.domainFreq() << oscMag1 << oscMag2;
 
 	AudioIO io(128, 44100., audioCB, NULL, 2);
 	Domain::master().spu(io.framesPerSecond());		

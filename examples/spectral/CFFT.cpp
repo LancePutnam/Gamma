@@ -1,19 +1,23 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Transform / CFFT
-	Description:	Demonstration of complex fast Fourier transform
+	Example: Spectral / CFFT
+	
+	This demonstrates how to do a complex fast Fourier transform using the
+	CFFT class.
 */
 
-#include "../examples.h"
-
+#include "Gamma/FFT.h"
+#include "Gamma/Types.h"
+#include "Gamma/Print.h"
+using namespace gam;
 
 int main(){
 
-	const int N = 16;			// Number of position domain samples
-	CFFT<float> fft(N);			//
-	Complex<float> sig[N];		// Time/position domain signal
-	Complex<float> buf[N];		// Transform buffer
+	const int N = 16;		// Transform size
+	Complex<float> sig[N];	// Time-/position-domain signal
+	Complex<float> buf[N];	// Transform buffer
+	CFFT<float> fft(N);		// Complex FFT
 
 	// Create signal
 	for(int i=0; i<N; ++i){
@@ -23,13 +27,13 @@ int main(){
 		sig[i]+= Polar<float>(2*p);
 	}
 	
-	// Copy signal to transform buffer
+	// CFFT operates in-place, so we copy our input signal to another buffer
 	for(int i=0; i<N; ++i) buf[i] = sig[i];
 
-	// Perform forward transform
+	// Perform forward transform (time/position to frequency)
 	fft.forward(buf);
 
-	// Print out frequency domain samples
+	// Print out frequency-domain samples
 	for(int i=0; i<N; ++i){
 		Complex<float> c = buf[i];
 		
@@ -40,7 +44,7 @@ int main(){
 		printf("\n");
 	}
 
-	// Perform complex-to-real inverse transform
+	// Perform inverse transform (frequency to time/position)
 	fft.inverse(buf);
 
 	// Print out original signal versus forward/inverse transformed signal
