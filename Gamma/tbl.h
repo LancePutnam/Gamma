@@ -21,11 +21,11 @@ enum WindowType{
 	BARTLETT,			/**< Bartlett (Triangle) */
 	BLACKMAN,			/**< Blackman */
 	BLACKMAN_HARRIS,	/**< Blackman-Harris */
-  BLACKMAN_NUTTALL,   /**< Blackman-Nuttall */
-  FLATTOP,            /**< Flat-Top */
+	BLACKMAN_NUTTALL,   /**< Blackman-Nuttall */
+	FLATTOP,            /**< Flat-Top */
 	HAMMING,			/**< Hamming */
 	HANN,				/**< von Hann */
-  NUTTALL,            /**< Nuttall */
+	NUTTALL,            /**< Nuttall */
 	WELCH,				/**< Welch */
 	NYQUIST,			/**< Nyquist */
 	RECTANGLE			/**< Rectangle (no window) */
@@ -556,10 +556,10 @@ void window(T * dst, uint32_t len, WindowType type){
 		case BLACKMAN:			blackman(dst, len);			break;
 		case BLACKMAN_HARRIS:	blackmanHarris(dst, len);	break;
 		case BLACKMAN_NUTTALL:	blackmanNuttall(dst, len);	break;
-		case FLATTOP:	flatTop(dst, len);	break;
+		case FLATTOP:			flatTop(dst, len);			break;
 		case HAMMING:			hamming(dst, len);			break;
 		case HANN:				hann(dst, len);				break;
-		case NUTTALL:	nuttall(dst, len);	break;
+		case NUTTALL:			nuttall(dst, len);			break;
 		case WELCH:				welch(dst, len);			break;
 		case NYQUIST:			nyquist(dst, len);			break;
 		default:				rectangle(dst, len);
