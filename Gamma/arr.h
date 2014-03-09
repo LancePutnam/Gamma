@@ -96,13 +96,6 @@ T dot4(const T * src1, const T * src2);
 template <class T>
 void extrema(const T * src, uint32_t len, uint32_t& indexMin, uint32_t& indexMax);
 
-/// Perform linear least squares fitting of array.
-
-/// The independent axis is the array indices, i.  The best fit line
-/// equation is y = inter + slope * i.
-template <class T1, class T2, class T3>
-void fitLine(const T1 * src, uint32_t len, T2& slope, T3& inter);
-
 /// Compute histogram of 'src'.
 
 /// Values in 'src' are tallied and placed in 'bins', where the index of the
@@ -132,6 +125,14 @@ uint32_t indexOfMin(const T * src, uint32_t len);
 /// Indices must be sorted from low to high.
 ///
 void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t maxNumIndices);
+
+/// Perform linear least squares fitting of array.
+
+/// This computes the linear equation 'y = slope * x + inter' that best fits the
+/// array values in a least squares sense. Here, the independent variable, x, is
+// the array index and the dependent variable, y, is the array element value.
+template <class T1, class T2, class T3>
+void lineFit(const T1 * src, uint32_t len, T2& slope, T3& inter);
 
 /// Mapping from linear range [-1, 1] to normalized dB range [-1, 1].
 void linToDB(float * arr, uint32_t len, float minDB);
@@ -474,31 +475,6 @@ void extrema(const T * src, uint32_t len, uint32_t& idxMin, uint32_t& idxMax){
 }
 
 /*
-	slope = cov(x, y) / var(x)
-	inter = x_mean - slope * y_mean
-*/
-
-template <class T, class T2, class T3>
-inline void fitLine(const T * src, uint32_t len, T2& slope, T3& inter){
-	T lenT  = T(len);
-	T meanX = (lenT - T(1)) * T(0.5);	// mean of independent variables (the indices)
-	T meanY = sum(src, len) / lenT;		// mean of dependent variables
-	T sumSqrs = meanX*(meanX+T(1))*(meanX*T(2./6) + T(1./6));
-	T varX  = T(2)*sumSqrs; // variance of x
-
-	T cov  = T(0);	// covariance
-	T dx   =-meanX;	// current distance from point to center along x
-
- 	LOOP(len, 1){
-		cov += dx++ * (*src++ - meanY);
- 	}
-
-	slope = cov / varX;
-	inter = meanY - slope * meanX;
-}
-
-
-/*
 
 Histogram using multiplicity characteristic of a multiset
 
@@ -570,6 +546,29 @@ uint32_t indexOfMin(const T * src, uint32_t len){
 		}
 	}
 	return index;
+}
+
+/*
+	slope = cov(x, y) / var(x)
+	inter = x_mean - slope * y_mean
+*/
+template <class T, class T2, class T3>
+void lineFit(const T * src, uint32_t len, T2& slope, T3& inter){
+	T lenT  = T(len);
+	T meanX = (lenT - T(1)) * T(0.5);	// mean of independent variables (the indices)
+	T meanY = sum(src, len) / lenT;		// mean of dependent variables
+	T sumSqrs = meanX*(meanX+T(1))*(meanX*T(2./6) + T(1./6));
+	T varX  = T(2)*sumSqrs; // variance of x
+
+	T cov  = T(0);	// covariance
+	T dx   =-meanX;	// current distance from point to center along x
+
+	LOOP(len, 1){
+		cov += dx++ * (*src++ - meanY);
+	}
+
+	slope = cov / varX;
+	inter = meanY - slope * meanX;
 }
 
 template <class T>
