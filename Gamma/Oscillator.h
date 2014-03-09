@@ -504,55 +504,6 @@ private:
 
 
 
-/// Lookup table sine oscillator
-
-/// This oscillator looks up values in a table containing the sine function
-/// in [0, pi/2]. Doing a non-interpolating table lookup is very fast and
-/// stable compared to other methods. The downsides are that the waveform is
-/// generally not as spectrally pure and additional memory needs to be allocated
-/// to store the lookup table (although it's relatively small and only allocated
-/// once).
-///
-/// \tparam Tv	Value (sample) type
-/// \tparam Td	Domain type
-/// \ingroup Oscillators 
-/// \sa Osc, CSine, LFO, Sine, SineR
-template <class Sp = phsInc::Loop, class Td = DomainObserver>
-class TableSine : public Accum<Sp,Td> {
-public:
-
-	/// \param[in]	frq		Frequency
-	/// \param[in]	phase	Phase in [0, 1)
-	TableSine(float frq=440, float phase=0);
-
-	float operator()(float freqOffset=0);	///< Return next linearly-interpolated sample
-	float nextN(float freqOffset=0);		///< Return next non-interpolated sample
-	float nextL(float freqOffset=0);		///< Return next linearly-interpolated sample
-
-	/// Resize global sine table
-	
-	/// \param[in] bits		set effective table size to be 2^bits
-	///
-	/// This sets the effective table size with only one quarter the amount of
-	/// memory actually being allocated. For example, if bits=10, the effective 
-	/// table size is 2^10 = 1024, but the amount of allocated memory is only
-	/// 1024/4 = 256. This call is not thread safe.
-	static void resize(uint32_t bits);
-
-protected:
-//	static ArrayPow2<float> cTable; // can't use because need 2**N+1 table
-	static float * cTable;		// Reference to my sample table. Must be 1<<bits.
-	static uint32_t cTblBits;
-	static uint32_t cFracBits;	// # of bits in fractional part of accumulator
-	static uint32_t cOneIndex;
-private:
-	typedef Accum<Sp,Td> Base;
-	ACCUM_INHERIT
-};
-
-
-
-
 /// Low-frequency oscillator
 
 /// This object generates various waveform types by mapping the output of a 
@@ -1069,64 +1020,6 @@ template<class Tv, class Td> void CSine<Tv, Td>::onDomainChange(double r){
 	decay(mDcy60); // this sets frequency as well
 }
 
-
-//---- TableSine
-
-#define TTABLESINE TableSine<St,Td>
-template<class St, class Td> uint32_t TTABLESINE::cTblBits  = 0;	
-template<class St, class Td> uint32_t TTABLESINE::cFracBits = 0;
-template<class St, class Td> uint32_t TTABLESINE::cOneIndex = 0;
-template<class St, class Td> float * TTABLESINE::cTable = 0;
-
-template<class St, class Td> TTABLESINE::TableSine(float f, float p): Base(f, p){
-	// initialize global table ONCE
-	if(0 == cTable){ resize(11); }
-}
-
-template<class St, class Td> void TTABLESINE::resize(uint32_t bits){
-	if(bits != cTblBits){
-		if(cTable) delete[] cTable;
-
-		cTblBits = bits;
-		cFracBits = 32UL - cTblBits;
-		cOneIndex = 1<<cFracBits;
-		uint32_t size = 1<<(cTblBits-2);
-		cTable = new float[size + 1];
-		tbl::sinusoid(cTable, size, 0, 0.25);
-		cTable[size] = 1;
-
-		/*cTblBits = bits;
-		cFracBits = 32UL - cTblBits;
-		cOneIndex = 1<<cFracBits;
-		uint32_t size = 1<<(cTblBits);
-		cTable = new float[size ];
-		tbl::sinusoid(cTable, size, 0, 1);*/
-	}
-}
-
-template<class St, class Td> inline float TTABLESINE::operator()(float df){ return nextL(df); }
-
-template<class St, class Td> inline float TTABLESINE::nextN(float df){	
-	return tbl::atQ(cTable, cFracBits, nextPhase(df));
-}
-
-template<class St, class Td> inline float TTABLESINE::nextL(float df){
-	uint32_t P = nextPhase(df);
-
-	return ipl::linear(
-		gam::fraction(cTblBits, P),
-		tbl::atQ(cTable, cFracBits, P),
-		tbl::atQ(cTable, cFracBits, P + cOneIndex)
-	);
-
-	/*return ipl::linear(
-		gam::fraction(cTblBits, P),
-		cTable[P>>cFracBits],
-		cTable[(P+cOneIndex)>>cFracBits]
-	);*/
-}
-
-#undef TTABLESINE
 
 
 
