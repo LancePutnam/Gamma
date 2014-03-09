@@ -166,7 +166,13 @@ public:
 	/// Set size parameters of transform
 	void resize(uint32_t windowSize, uint32_t padSize);
 
-	float freqRes() const;				///< Get frequency resolution of analysis, \see DFTBase::binFreq
+	/// Get frequency resolution of analysis.
+	
+	/// This returns the sample rate over the window size.
+	/// \see DFTBase::binFreq for getting the frequency spacing between bins
+	/// which is equal to the sample rate over the DFT size.
+	float freqRes() const;
+	
 	float overlap() const;				///< Get transform overlap factor
 	bool overlapping() const;			///< Whether the transform is overlapping
 	uint32_t sizeHop() const;			///< Get size of hop
