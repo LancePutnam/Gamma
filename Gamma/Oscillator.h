@@ -368,7 +368,8 @@ public:
 	/// Set amplitude and phase
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, p); }
 
-	void freq(const Tv& v){ Base::freq(v*Td::ups()); }
+	/// Set frequency
+	void freq(Tv v){ Base::freq(v*Td::ups()); }
 
 	/// Set all control parameters
 	void set(Tv frq, Tv amp, Tv phs=0){ Base::set(frq*Td::ups(), phs, amp); }
@@ -384,9 +385,7 @@ private:
 
 /// Multiple SineRs
 
-/// For efficiency reasons, this object does not keep its frequencies synchronized
-/// with the sample rate. If the sample rate changes, each oscillator must be
-/// manually re-set.
+/// This is a dynamically-sized bank of SineR objects.
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
@@ -396,23 +395,32 @@ template <class Tv = double, class Td = DomainObserver>
 class SineRs : public Array<SineR<Tv, Domain1> >, Td{
 public:
 
+	SineRs(){}
+
 	/// \param[in]	num		Number of resonators
-	SineRs(uint32_t num): Base(num){ Td::refreshDomain(); }
+	SineRs(unsigned num): Base(num){ Td::refreshDomain(); }
 
 	/// Generate next sum of all oscillators
 	Tv operator()(){
-		Tv r= Tv(0);
-		for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j]();
+		Tv r = Tv(0);
+		for(unsigned i=0; i<this->size(); ++i) r += (*this)[i]();
 		return r;
 	}
 
 	/// Get last output of oscillator i
-	Tv last(uint32_t i) const { return (*this)[i].val; }
+	Tv last(unsigned i) const { return (*this)[i].val; }
 
 	/// Set all control parameters of oscillator i
-	void set(uint32_t i, Tv frq, Tv amp=1, Tv phs=0){
-		(*this)[i].set(frq*Td::ups(), amp, phs); }
+	void set(unsigned i, Tv frq, Tv amp=1, Tv phs=0){
+		(*this)[i].set(frq*Td::ups(), amp, phs);
+	}
 
+
+	virtual void onDomainChange(double ratio){
+		for(unsigned i=0; i<this->size(); ++i){
+			(*this)[i].onDomainChange(ratio);
+		}
+	}
 private:
 	typedef Array<SineR<Tv, Domain1> > Base;
 };
@@ -434,9 +442,11 @@ public:
 
 	/// \param[in]	frq		Frequency
 	/// \param[in]	amp		Amplitude
-	/// \param[in]	dcy		T60 decay length
+	/// \param[in]	dcy		T60 decay length (negative == no decay)
 	/// \param[in]	phs		Phase in [0, 1)
-	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0){ set(frq, amp, dcy, phs); }
+	SineD(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0)
+	{ set(frq, amp, dcy, phs); }
+
 
 	/// Get frequency
 	Tv freq() const { return Base::freq() * Td::spu(); }
@@ -445,8 +455,18 @@ public:
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, Base::decay(), p); }
 	
 	/// Set all control parameters
+
+	/// \param[in]	frq		Frequency
+	/// \param[in]	amp		Amplitude
+	/// \param[in]	dcy		T60 decay length (negative == no decay)
+	/// \param[in]	phs		Phase in [0, 1)
 	void set(Tv frq, Tv amp, Tv dcy, Tv phs=0){
-		Base::set(frq*Td::ups(), phs, dcy > Tv(0) ? (Tv)scl::radius60(dcy, Td::ups()) : Tv(1), amp);
+		Base::set(
+			frq * Td::ups(),
+			phs,
+			dcy > Tv(0) ? Tv(scl::radius60(dcy, Td::ups())) : Tv(1),
+			amp
+		);
 	}
 
 	virtual void onDomainChange(double ratio){
@@ -466,9 +486,7 @@ private:
 
 /// Multiple SineDs
 
-/// For efficiency reasons, this object does not keep its frequencies synchronized
-/// with the sample rate. If the sample rate changes, each oscillator must be
-/// manually re-set.
+/// This is a dynamically-sized bank of SineD objects.
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
@@ -478,26 +496,42 @@ template <class Tv = double, class Td = DomainObserver>
 class SineDs : public Array<SineD<Tv, Domain1> >, Td{
 public:
 
+	SineDs(){}
+
 	/// \param[in]	num		Number of resonators
-	SineDs(uint32_t num): Base(num){
+	SineDs(unsigned num): Base(num){
 		Td::refreshDomain(); 
-		for(uint32_t i=0; i<num; ++i) set(i, 0,0,0);
+		for(unsigned i=0; i<num; ++i) set(i, 0,0,0);
 	}
+
 
 	/// Generate next sum of all oscillators
 	Tv operator()(){
 		Tv r=Tv(0);
-		for(uint32_t j=0; j<this->size(); ++j) r+=(*this)[j]();
+		for(unsigned j=0; j<this->size(); ++j) r+=(*this)[j]();
 		return r;
 	}
 
 	/// Get last output of oscillator i
-	Tv last(uint32_t i) const { return (*this)[i].val; }
+	Tv last(unsigned i) const { return (*this)[i].val; }
 
 	/// Set all control parameters of oscillator i
-	void set(uint32_t i, Tv frq, Tv amp, Tv dcy, Tv phs=0){
-		(*this)[i].set(frq*Td::ups(), amp, dcy*Td::spu(), phs); }
 
+	/// \param[in] i		index of oscillator
+	/// \param[in] frq		Frequency
+	/// \param[in] amp		Amplitude
+	/// \param[in] dcy		T60 decay length (negative == no decay)
+	/// \param[in] phs		Phase in [0, 1)
+	void set(unsigned i, Tv frq, Tv amp, Tv dcy, Tv phs=0){
+		(*this)[i].set(frq*Td::ups(), amp, dcy*Td::spu(), phs);
+	}
+
+
+	virtual void onDomainChange(double ratio){
+		for(unsigned i=0; i<this->size(); ++i){
+			(*this)[i].onDomainChange(ratio);
+		}
+	}
 private:
 	typedef Array<SineD<Tv, Domain1> > Base;
 };
