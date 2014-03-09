@@ -343,11 +343,11 @@ public:
 /// Sine oscillator based on an efficient recursion equation.
 
 /// This oscillator is based on a recursion equation requiring only one
-/// multiply and add per sample computation. While calculation is fast, frequency
-/// and phase updates are rather expensive and 64-bit precision is required 
-/// to prevent growing or decaying in amplitude over time.  This generator is 
-/// ideal in situations where a stationary sinusoid is all that is required, 
-/// e.g. a grain or modulator.
+/// multiply and add per sample computation. While computation time and quality
+/// are near ideal, parameter updates are expensive and 64-bit precision is
+/// required to prevent growing or decaying in amplitude over time.  This
+/// generator is ideal in situations where a stationary sinusoid is all that is
+/// required, e.g. a grain or modulator.
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type

@@ -151,7 +151,7 @@ struct RSin : public Val<T>{ INHERIT;
 
 	/// Set parameters from unit freq, phase, and amplitude.
 	RSin& set(const T& frq, const T& phs, const T& amp=T(1)){
-//		printf("%g %g %g\n", frq, phs, amp);
+		//printf("%g %g %g\n", frq, phs, amp);
 		mFreq = frq;
 		mAmp = amp;
 		mPhase = phs;
@@ -160,49 +160,44 @@ struct RSin : public Val<T>{ INHERIT;
 		mul  = 2 * cos(f);
 		val2 = sin(p - f * T(2))*amp;
 		val  = sin(p - f       )*amp;
-//		printf("%g %g %g\n", freq(), phase(), this->amp());
+		//printf("%g %g %g\n", freq(), phase(), this->amp());
 		return *this;
 	}
 
-// Note: these methods compute parameters directly from coefficients, but is buggy...
-//	/// Get amplitude
-//	T amp() const {	T a,p; ampPhase(a,p); return a; }
-//	
-//	/// Get amplitude and unit phase
-//	void ampPhase(T& a, T& p) const {
-//		p = phase();
-//
-//		const T eps = 1e-8;
-//		if(p > eps && p < (1-eps) && scl::abs(p-0.5) > eps)
-//			a = val /sin(p * M_2PI);
-//		else
-//			a = val2/sin((p - freq())*M_2PI);
-//		return;
-//	}
-//
-//	/// Get unit frequency
-//	T freq() const { return acos(mul*0.5) * M_1_2PI; }
-//
-//	/// Get unit phase
-//	T phase() const {
-//		if(val == val2) return 0;
-//		T f = freq()*M_2PI;
-//		T y = val * sin(f);
-//		T x = val * cos(f) - val2;
-//		T r = atan2(y, x) * M_1_2PI;
-//		if(r < 0) r += 1;
-//		return r;
-//	}
-//
-//	/// Set amplitude
-//	RSin& amp(const T& v){ return set(freq(), phase(), v); }
-//	
-//	/// Set unit frequency
-//	RSin& freq(const T& v){	T a,p; ampPhase(a,p); return set(v,a,p); }
-//
-//	/// Set unit phase
-//	RSin& phase(const T& v){ return set(freq(), v, amp()); }
+/*	Note: these methods compute parameters directly from coefs, but are buggy...
+	
+	/// Get amplitude and unit phase
+	void ampPhase(T& a, T& p) const {
+		p = phase();
 
+		const T eps = 1e-8;
+		if(p > eps && p < (1-eps) && scl::abs(p-0.5) > eps)
+			a = val /sin(p * M_2PI);
+		else
+			a = val2/sin((p - freq())*M_2PI);
+		return;
+	}
+
+	/// Get unit frequency
+	T freq() const { return acos(mul*0.5) * M_1_2PI; }
+
+	/// Get amplitude
+	T amp() const {	T a,p; ampPhase(a,p); return a; }
+
+	/// Get unit phase
+	T phase() const {
+		if(val == val2) return 0;
+		T f = freq()*M_2PI;
+		T y = val * sin(f);
+		T x = val * cos(f) - val2;
+		T r = atan2(y, x) * M_1_2PI;
+		if(r < 0) r += 1;
+		return r;
+	}
+	
+	/// Set unit frequency
+	RSin& freq(const T& v){	T a,p; ampPhase(a,p); return set(v,a,p); }
+*/
 	mutable T val2;
 	T mul;			///< Multiplication factor
 
