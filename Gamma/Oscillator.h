@@ -994,7 +994,7 @@ template<class Tv, class Td> inline void AccumPhase<Tv, Td>::amp(Tv v){
 	freq(f);
 }
 
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freq() const { return mInc/mFreqToInc; } //mFreq; }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freq() const { return mInc/mFreqToInc; }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::period() const { return Tv(1)/freq(); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase() const { return mPhase/(Tv(2)*mAmp); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::amp() const { return mAmp; }
@@ -1359,7 +1359,7 @@ template<class Tv, class Td> inline Tv DSF<Tv,Td>::maxHarmonics(){
 }
 
 template<class Tv, class Td> inline void DSF<Tv,Td>::updateAPow(){ mAPow = ::pow(mA, mN); }
-template<class Tv, class Td> inline void DSF<Tv,Td>::updateBetaInc(){ mBetaInc = this->mFreq * mFreqRatio; }
+template<class Tv, class Td> inline void DSF<Tv,Td>::updateBetaInc(){ mBetaInc = this->mInc * mFreqRatio; }
 
 // Generalized DSF formula:
 // sum{k=0, N}( a^k sin(T + k B) )
