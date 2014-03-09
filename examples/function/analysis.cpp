@@ -46,7 +46,7 @@ int main(){
 	printf("Extrema:           [%f, %f]\n", table[min], table[max]);
 
 	float slope, inter;
-	arr::fitLine(table, size, slope, inter);
+	arr::lineFit(table, size, slope, inter);
 	printf("Linear fit:        inter = %f, slope = %f\n", inter, slope);
 
 	featureI = arr::indexOfMax(table, size);

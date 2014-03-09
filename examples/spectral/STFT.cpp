@@ -18,7 +18,7 @@ STFT stft(
 	0,			// Pad size; number of zero-valued samples appended to window
 	HANN,		// Window type: BARTLETT, BLACKMAN, BLACKMAN_HARRIS,
 				//		HAMMING, HANN, WELCH, NYQUIST, or RECTANGLE
-	COMPLEX,	// Format of frequency samples:
+	COMPLEX		// Format of frequency samples:
 				//		COMPLEX, MAG_PHASE, or MAG_FREQ
 );
 
