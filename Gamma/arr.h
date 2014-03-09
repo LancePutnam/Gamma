@@ -683,43 +683,6 @@ void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
 	numIndices = newNumIndices;
 }
 
-//template <class T> void minimaRemove(const T * src, uint32_t * indices, uint32_t & numIndices){
-//
-//	if(numIndices < 3) return;
-//
-//	uint32_t * newIndices = indices + 1;	// first index is never a minima
-//	uint32_t newNumIndices = 2;			// always keep first and last indices
-//
-//	T prev = src[*indices++];
-//	T curr = src[*indices++];
-//
-//	numIndices -= 2;
-//
-//	for(uint32_t i=0; i<numIndices; i++){
-//		uint32_t index = *indices++;
-//		T next = src[index];
-//
-//		if(curr < prev && curr < next){		// it's a minima
-//			if(++i == numIndices) break;
-//			index = *indices++;
-//			*newIndices++ = index;
-//			newNumIndices++;			
-//			prev = next;
-//			curr = src[index];
-//		}
-//		else{
-//			*newIndices++ = index;
-//			newNumIndices++;
-//			prev = curr;
-//			curr = next;
-//		}
-//	}
-//
-//	*newIndices = *--indices;		// add last index
-//	numIndices = newNumIndices;
-//}
-
-
 template <class T>
 uint32_t slopeAbsMax(const T * src, uint32_t len){
 	uint32_t index = 0;
