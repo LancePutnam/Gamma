@@ -130,7 +130,7 @@ void indicesComplement(uint32_t * indices, uint32_t numIndices, uint32_t maxNumI
 
 /// This computes the linear equation 'y = slope * x + inter' that best fits the
 /// array values in a least squares sense. Here, the independent variable, x, is
-// the array index and the dependent variable, y, is the array element value.
+/// the array index and the dependent variable, y, is the array element value.
 template <class T1, class T2, class T3>
 void lineFit(const T1 * src, uint32_t len, T2& slope, T3& inter);
 
