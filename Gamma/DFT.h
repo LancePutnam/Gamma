@@ -88,6 +88,7 @@ public:
 	DFTBase();
 	virtual ~DFTBase();
 
+
 	/// Get pointer to an auxiliary buffer
 	T * aux(uint32_t num);
 	
@@ -102,16 +103,37 @@ public:
 	
 	double binFreq() const;		///< Get width of frequency bins
 	uint32_t numBins() const;	///< Get number of frequency bins
-	uint32_t sizeDFT() const;	///< Get size of forward transform
+	uint32_t sizeDFT() const;	///< Get size of transform, in samples
 	Domain& domainFreq();		///< Get frequency domain
 
-	/// Set number of real-valued auxilliary buffers
+
+	/// Set number of real-valued auxiliary buffers
 
 	/// Each buffer allocated will maintain a size equal to the number of bins.
 	/// Memory is guaranteed to be contiguous. This means if you need a 
-	/// complex-valued buffer, you can simply allocate two auxilliary buffers
+	/// complex-valued buffer, you can simply allocate two auxiliary buffers
 	/// and use the address of the first one as the complex-valued buffer.
 	void numAux(uint32_t num);
+
+	/// Copy one component of the bins to an auxiliary buffer
+
+	/// This method performs a deinterleaving copy of one component of the bins,
+	/// such as magnitude or phase, into an auxiliary buffer.
+	/// \param[in] binComp		bin component;
+	///								0 for real/mag or
+	///								1 for imag/phase/freq
+	/// \param[in] auxNum		auxiliary buffer number
+	void copyBinsToAux(unsigned binComp, unsigned auxNum);
+
+	/// Copy an auxiliary buffer to one component of the bins
+
+	/// This method performs an interleaving copy of an auxiliary buffer to one 
+	/// component of the bins, such as magnitude or phase.
+	/// \param[in] auxNum		auxiliary buffer number
+	/// \param[in] binComp		bin component;
+	///								0 for real/mag or
+	///								1 for imag/phase/freq
+	void copyAuxToBins(unsigned auxNum, unsigned binComp);
 
 	void zero();				///< Zeroes internal frequency bins
 	void zeroEnds();			///< Zeroes DC and Nyquist bins
@@ -147,7 +169,7 @@ public:
 	/// \param[in]	winSize		Number of samples in window
 	/// \param[in]	padSize		Number of zeros to append to window
 	/// \param[in]	specType	Format of spectrum data
-	/// \param[in]	numAux		Number of auxilliary buffers of size numBins() to create
+	/// \param[in]	numAux		Number of auxiliary buffers of size numBins() to create
 	DFT(
 		uint32_t winSize=1024, uint32_t padSize=0,
 		SpectralType specType=COMPLEX,
@@ -498,6 +520,20 @@ void DFTBase<T>::numAux(uint32_t num){
 		mNumAux = num;
 		zeroAux();
 	}
+}
+
+template<class T>
+void DFTBase<T>::copyBinsToAux(unsigned binComp, unsigned auxNum){
+	T * auxBuf = aux(auxNum);
+	for(unsigned k=0; k<numBins(); ++k)
+		auxBuf[k] = bin(k)[binComp];
+}
+
+template<class T>
+void DFTBase<T>::copyAuxToBins(unsigned auxNum, unsigned binComp){
+	T * auxBuf = aux(auxNum);
+	for(unsigned k=0; k<numBins(); ++k)
+		bin(k)[binComp] = auxBuf[k];
 }
 
 template<class T>
