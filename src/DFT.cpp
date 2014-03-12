@@ -301,9 +301,34 @@ STFT& STFT::sizeHop(uint32_t size){
 	return *this;
 }
 
+
+// The principle here is to configure things so that after the phase
+// accumulation step, the synthesis bin phases equal the analysis bin phases.
+// To do this, we first zero the phase accumulators and then compute new
+// instantaneous frequencies which after conversion yield a phase increment
+// equal to the analysis bin phase.
 STFT& STFT::resetPhases(){
-	mem::deepZero(mPhases, numBins());
 	mem::deepZero(mAccums, numBins());
+
+	// hopRate / 2pi: converts phase diff from radians to Hz
+	double factor = 1. / (M_2PI * unitsHop());
+
+	// 2pi / overlap: expected phase diff of fundamental due to overlap
+	double expdp1 = double(sizeHop())/sizeWin() * M_2PI;
+	double fund = binFreq();
+
+	bin(0)[1] = 0.;
+	bin(numBins()-1)[1] = spu() * 0.5;
+
+	for(uint32_t k=1; k<numBins()-1; ++k){
+		double t = mPhases[k];		// the phase diff is simply the analysis phase
+		t -= k*expdp1;				// subtract expected phase diff due to overlap
+		t = scl::wrapPhase(t);		// wrap back into [-pi, pi)
+		t *= factor;				// convert phase diff to freq deviation
+		t += k*fund;				// freq deviation to freq
+		bin(k)[1] = t;
+	}
+
 	return *this;
 }
 
@@ -323,10 +348,10 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 	// compute frequency estimates?
 	if(MAG_FREQ == mSpctFormat){
 
-		// converts phase diff from radians to Hz
+		// hopRate / 2pi: converts phase diff from radians to Hz
 		double factor = 1. / (M_2PI * unitsHop());
 		
-		// expected phase diff of fundamental due to overlap
+		// 2pi / overlap: expected phase diff of fundamental due to overlap
 		double expdp1 = double(sizeHop())/sizeWin() * M_2PI;
 		double fund = binFreq();
 
@@ -350,7 +375,10 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 void STFT::inverse(float * dst){
 	//printf("STFT::inverse(float *)\n");
 	if(MAG_FREQ == mSpctFormat){
+		// 2pi / hopRate: converts Hz to phase diff in radians
 		double factor = M_2PI * unitsHop();
+
+		// 2pi / overlap: expected phase diff of fundamental due to overlap
 		double expdp1 = double(sizeHop())/sizeWin() * M_2PI;
 		double fund = binFreq();
 
@@ -358,14 +386,14 @@ void STFT::inverse(float * dst){
 			double t = bin(k)[1];		// freq
 			t -= k*fund;				// freq to freq deviation
 			t *= factor;				// freq deviation to phase diff
-			t += k*expdp1;				// add expected phase diff due to overlap	
+			t += k*expdp1;				// add expected phase diff due to overlap
 			mAccums[k] += t;			// accumulate phase diff
 			bin(k)[1] = mAccums[k];		// copy accum phase for inverse xfm
 		}
-	}	
-	
+	}
+
 	DFT::inverse(0);	// result goes into bufPos()
-	
+
 	// undo zero-phase windowing rotation?
 	if(mRotateForward) mem::rotateHalf(bufPos(), sizeWin());
 
@@ -375,13 +403,13 @@ void STFT::inverse(float * dst){
 	}
 
 	if(overlapping()){	//inverse windows overlap?
-	
+
 		// scale inverse so overlap-add is normalized
 		//slice(mBuf, sizeWin()) *= mInvWinMul;
 		for(unsigned i=0; i<sizeWin(); ++i){
 			bufPos()[i] *= mInvWinMul;
 		}
-	
+
 		// shift old output left while adding new output
 		arr::add(mBufInv, bufPos(), mBufInv + sizeHop(), sizeWin() - sizeHop());
 	}
