@@ -18,8 +18,8 @@ int main(){
 
 	#define FREQ_RESP(f, description)\
 		printf("\n%s:\n", description);\
-			for(uint32_t i=0; i<dft.sizeWin(); ++i){ float v=i?0:1; v=f; dft(v); }\
-		for(uint32_t i=0; i<dft.numBins(); ++i){\
+			for(unsigned i=0; i<dft.sizeWin(); ++i){ float v=i?0:1; v=f; dft(v); }\
+		for(unsigned i=0; i<dft.numBins(); ++i){\
 			float m = dft.bin(i)[0] * N;\
 			float p = dft.bin(i)[1] * M_1_PI;\
 			printf("% 6.3f %6.3f ", m, p);\
