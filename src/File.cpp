@@ -4,9 +4,14 @@ namespace gam{
 
 File::File(const char * path, const char * mode, bool open_)
 :	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
-{	if(open_) open(); }
+{
+	if(open_) open();
+}
 
-File::~File(){ close(); freeContent(); }
+File::~File(){
+	close();
+	freeContent();
+}
 
 void File::allocContent(int n){
 	if(mContent) freeContent();
@@ -14,9 +19,16 @@ void File::allocContent(int n){
 	mContent[n] = '\0';
 }
 
-void File::close(){ if(opened()){ fclose(mFP); mFP=0; } }
+void File::close(){
+	if(opened()){
+		fclose(mFP);
+		mFP=0;
+	}
+}
 
-void File::freeContent(){ delete[] mContent; }
+void File::freeContent(){
+	delete[] mContent;
+}
 
 void File::getSize(){
 	int r=0;
@@ -48,9 +60,9 @@ char * File::readAll(){
 	return mContent;
 }
 
-uint32_t File::write(const char * path, const void * v, int size, int items){
+unsigned File::write(const char * path, const void * v, int size, int items){
 	File f(path, "w");
-	uint32_t r = 0;
+	unsigned r = 0;
 	if(f.open()){
 		r = f.write(v, size, items);
 		f.close();
@@ -59,6 +71,8 @@ uint32_t File::write(const char * path, const void * v, int size, int items){
 }
 
 
-bool File::exists(const char * path){ File f(path, "r"); return f.open(); }
+bool File::exists(const char * path){
+	return File(path, "r").open();
+}
 
 } // gam::
