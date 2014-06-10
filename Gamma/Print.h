@@ -8,10 +8,8 @@
 	Printing functions
 */
 
-#include <string>
 #include <stdio.h>
 #include "Gamma/Constants.h"
-#include "Gamma/Types.h"
 #include "Gamma/scl.h"
 
 namespace gam{
@@ -20,7 +18,8 @@ namespace gam{
 char intensityToASCII(float v);
 
 /// Prints 2D pixel array
-template<class T> void print2D(T* pix, unsigned nx, unsigned ny, FILE * fp=stdout);
+template<class T>
+void print2D(T* pix, unsigned nx, unsigned ny, FILE * fp=stdout);
 
 // Binary printing methods
 void printBinary(uint32_t value, const char * zero="0", const char * one="1", int msb=32);
@@ -60,12 +59,15 @@ inline char intensityToASCII(float v){
 	return map[int(N*scl::clip(v,0.9999999f))];
 }
 
-template<class T> void print2D(T* pix, unsigned nx, unsigned ny, FILE * fp){
+template<class T>
+void print2D(T* pix, unsigned nx, unsigned ny, FILE * fp){
 	for(unsigned j=0; j<nx; ++j){
-	for(unsigned i=0; i<ny; ++i){
-		float v = pix[j*nx + i];
-		fprintf(fp, "%c ", intensityToASCII(v));
-	} printf("\n"); }
+		for(unsigned i=0; i<ny; ++i){
+			float v = pix[j*nx + i];
+			fprintf(fp, "%c ", intensityToASCII(v));
+		}
+		fprintf(fp, "\n");
+	}
 }
 
 } // gam::
