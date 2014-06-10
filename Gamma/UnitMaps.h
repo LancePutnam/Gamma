@@ -32,7 +32,7 @@ public:
 
 	/// \param[in] size		Number of elements (actual number is power of 2 ceiling)
 	/// \param[in] init		Initial value of elements
-	explicit LookupTable(uint32_t size=2048, const T& init=T(0))
+	explicit LookupTable(unsigned size=2048, const T& init=T(0))
 	:	Base(size, init)
 	{
 		endpoints(0, size);
@@ -76,13 +76,13 @@ public:
 	/// Sums generator stream with table elements
 	template <class Gen>
 	LookupTable& operator+=(Gen& g){
-		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
+		for(unsigned i=0; i<size(); ++i) (*this)[i] += g();
 		return *this;
 	}
 
 	template <class Gen>
 	LookupTable& operator+=(const Gen& g){
-		for(uint32_t i=0; i<size(); ++i) (*this)[i] += g();
+		for(unsigned i=0; i<size(); ++i) (*this)[i] += g();
 		return *this;
 	}
 
