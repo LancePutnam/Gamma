@@ -5,13 +5,12 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <stdio.h>
-#include "Gamma/Containers.h"
+#include "Gamma/Containers.h"	// Array
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
 #include "Gamma/SoundFile.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Domain.h"
-#include "Gamma/Types.h"
 
 namespace gam{
 
