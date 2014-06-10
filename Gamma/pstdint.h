@@ -194,7 +194,7 @@
 /*
  *  Small hack to avoid include order problems on OSX
  */
-#if defined (__APPLE__) || defined (OSX) || defined (__linux__) || defined (WIN32) || defined (__WINDOWS_MM__)
+#if defined (__APPLE__) || defined (OSX) || defined (__linux__) || defined (WIN32) || defined (__WINDOWS_MM__) || (defined(_MSC_VER) && _MSC_VER >= 1600)
 #include <stdint.h>
 #endif
 
