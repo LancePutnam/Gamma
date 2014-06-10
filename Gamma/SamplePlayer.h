@@ -225,7 +225,7 @@ PRE inline T CLS::operator()(int channel){
 }
 
 PRE inline T CLS::read(int channel) const {
-	uint32_t posi = uint32_t(pos());
+	int posi = int(pos());
 	int Nframes= frames();
 	int offset = channel*Nframes;
 	return mIpol(elems(), posi+offset, pos()-posi, offset+Nframes-1, offset);
