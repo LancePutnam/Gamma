@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <string.h>
+//#include <stdio.h> // printf
+#include <string.h> // memcpy
 #include "Gamma/Recorder.h"
 
 namespace gam{
