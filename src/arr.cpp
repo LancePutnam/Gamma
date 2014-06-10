@@ -1,24 +1,19 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
- 
-#include <string.h>
+
 #include <math.h>
-#include <stdio.h>
-
-#include "Gamma/Constants.h"
+//#include <stdio.h>
 #include "Gamma/arr.h"
-#include "Gamma/ipl.h"
-#include "Gamma/mem.h"
-#include "Gamma/tbl.h"
+#include "Gamma/Constants.h"
 
-#define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
+#define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
 
 namespace gam{
 namespace arr{
 
-void linToDB(float * arr, uint32_t len, float minDB){
+void linToDB(float * arr, unsigned len, float minDB){
 	float normFactor = 20.f / minDB;
-	
+
 	LOOP(len,1){
 		uint32_t * arrI = (uint32_t *)arr;
 		uint32_t sign = (*arrI) & MaskSign<float>();
@@ -40,7 +35,7 @@ void linToDB(float * arr, uint32_t len, float minDB){
 //inline T scl::linToDB(T v){ return (T)log10(v) * (T)20; }
 //inline T scl::dBToLin(T v){ return pow(10., v * 0.05); }
 
-void clip1(float * arr, uint32_t len, uint32_t str){
+void clip1(float * arr, unsigned len, unsigned str){
 	//uint32_t * arrUI = (uint32_t *)arr;
 	LOOP(len, str){
 		uint32_t val = punFU(arr[i]);
@@ -52,7 +47,7 @@ void clip1(float * arr, uint32_t len, uint32_t str){
 	}
 }
 
-void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
+void compact(float * dst, const float * src, unsigned len, unsigned chunkSize){
 
 	if(chunkSize < 2){
 		mem::deepCopy(dst, src, len);
@@ -62,8 +57,8 @@ void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 		chunkSize = len;
 	}
 
-//	for(uint32_t i=0; i<len; i+=chunkSize){
-//		uint32_t min, max;
+//	for(unsigned i=0; i<len; i+=chunkSize){
+//		unsigned min, max;
 //		extrema(src, chunkSize, &min, &max);
 //		
 //		if(min < max){
@@ -77,19 +72,17 @@ void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 //
 //		src += chunkSize;
 //	}
-	for(uint32_t i=0; i<len; i+=chunkSize){
-		uint32_t max;
-		max = indexOfMaxNorm(src, chunkSize);
-
+	for(unsigned i=0; i<len; i+=chunkSize){
+		unsigned max = indexOfMaxNorm(src, chunkSize);
 		*dst++ = src[max];
 		src += chunkSize;
 	}
 }
 
 
-//uint32_t zeroCross(const float * src, uint32_t len, float prevVal){
+//unsigned zeroCross(const float * src, unsigned len, float prevVal){
 //	
-//	uint32_t count = 0;
+//	unsigned count = 0;
 //	uint32_t * srcI = (uint32_t *)src;
 //	uint32_t prev = *(uint32_t *)(&prevVal);
 //
@@ -105,22 +98,22 @@ void compact(float * dst, const float * src, uint32_t len, uint32_t chunkSize){
 //	return count;
 //}
 
-uint32_t zeroCross(const float * src, uint32_t len, float prevVal){
-	uint32_t count = 0;
+unsigned zeroCross(const float * src, unsigned len, float prevVal){
+	unsigned count = 0;
 	float prev = prevVal;
 	LOOP(len,1){
 		float curr = *src++;
-		if((curr > 0.f && prev <= 0.f) || (curr < 0.f && prev >= 0.f)) count++;
+		count += unsigned((curr > 0.f && prev <= 0.f) || (curr < 0.f && prev >= 0.f));
 		prev = curr;
 	}
 	return count;
 }
 
-uint32_t zeroCrossFirst(const float * src, uint32_t len){
+unsigned zeroCrossFirst(const float * src, unsigned len){
 	uint32_t * srcI = (uint32_t *)src;
 	uint32_t prev = *srcI++;
 
-	for(uint32_t i=0; i<len-1; ++i){
+	for(unsigned i=0; i<len-1; ++i){
 		uint32_t now = *srcI++;
 		if((now ^ prev)>>31){
 			return i-1;
@@ -130,9 +123,9 @@ uint32_t zeroCrossFirst(const float * src, uint32_t len){
 	return 0;
 }
 
-uint32_t zeroCrossN(const float * src, uint32_t len, float prevVal){
+unsigned zeroCrossN(const float * src, unsigned len, float prevVal){
 	
-	uint32_t count = 0;
+	unsigned count = 0;
 	uint32_t * srcI = (uint32_t *)src;
 	uint32_t prev = Twiddle<float>(prevVal).u;
 
