@@ -3,19 +3,16 @@
 
 #include "Gamma/DFT.h"
 #include "Gamma/arr.h"
-#include "Gamma/mem.h"
-#include "Gamma/scl.h"
-#include "Gamma/Domain.h"
 
 #define CART_TO_POL\
 	if(mPrecise){\
-		for(uint32_t i=1; i<numBins()-1; ++i){\
+		for(unsigned i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			c(c.mag(), c.phase());\
 		}\
 	}\
 	else{\
-		for(uint32_t i=1; i<numBins()-1; ++i){\
+		for(unsigned i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			float m = c.normSqr();\
 			float p = scl::atan2Fast(c.i,c.r);\
@@ -25,13 +22,13 @@
 
 #define POL_TO_CART\
 	if(mPrecise){\
-		for(uint32_t i=1; i<numBins()-1; ++i){\
+		for(unsigned i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			c(c[0]*cos(c[1]), c[0]*sin(c[1]));\
 		}\
 	}\
 	else{\
-		for(uint32_t i=1; i<numBins()-1; ++i){\
+		for(unsigned i=1; i<numBins()-1; ++i){\
 			Complex<float> &c = bins()[i];\
 			float p = scl::wrapPhase(c[1]);\
 			c(c[0]*scl::cosT8(p), c[0]*scl::sinT9(p));\
@@ -40,7 +37,7 @@
 
 namespace gam{
 
-DFT::DFT(uint32_t winSize, uint32_t padSize, SpectralType specT, uint32_t numAuxA)
+DFT::DFT(unsigned winSize, unsigned padSize, SpectralType specT, unsigned numAuxA)
 :	mSizeWin(0), mSizeHop(0),
 	mFFT(0),
 	mPadOA(0), mTapW(0), mTapR(0), mPrecise(false)
@@ -57,14 +54,14 @@ DFT::~DFT(){
 	mem::free(mPadOA);
 }
 
-void DFT::resize(uint32_t newWinSize, uint32_t newPadSize){ //printf("DFT::resize()\n");
+void DFT::resize(unsigned newWinSize, unsigned newPadSize){ //printf("DFT::resize()\n");
 
 	if(0 == newWinSize && 0 == newPadSize) return;
 
-	uint32_t oldDFTSize = sizeDFT();
-	uint32_t newDFTSize = newWinSize + newPadSize;
-	uint32_t oldFrqSize = oldDFTSize+2;		// 2 extra for DC/Nyquist imaginary
-	uint32_t newFrqSize = newDFTSize+2;		// "
+	unsigned oldDFTSize = sizeDFT();
+	unsigned newDFTSize = newWinSize + newPadSize;
+	unsigned oldFrqSize = oldDFTSize+2;		// 2 extra for DC/Nyquist imaginary
+	unsigned newFrqSize = newDFTSize+2;		// "
 
 	if(mem::resize(mBuf, oldFrqSize, newFrqSize)){
 		mBufInv = bufPos();
@@ -214,7 +211,7 @@ void DFT::print(FILE * f, const char * a){
 
 //---- STFT
 
-STFT::STFT(uint32_t winSize, uint32_t hopSize, uint32_t padSize, WindowType winType, SpectralType specType, uint32_t numAuxA)
+STFT::STFT(unsigned winSize, unsigned hopSize, unsigned padSize, WindowType winType, SpectralType specType, unsigned numAuxA)
 :	DFT(0, 0, specType, numAuxA),
 	mSlide(winSize, hopSize), mFwdWin(0), mPhases(0), mAccums(0),
 	mWinType(winType),
@@ -237,7 +234,7 @@ void STFT::computeInvWinMul(){
 	// compute sum of overlapping elements of forward window
 	if(overlapping()){
 		float sum = 0.f;
-		for(uint32_t i=0; i<sizeWin(); i+=sizeHop()){
+		for(unsigned i=0; i<sizeWin(); i+=sizeHop()){
 			float invWin =  mWindowInverse ? scl::bartlett(2*i/(float)sizeWin() - 1.f) : 1.f;
 			sum += mFwdWin[i] * invWin;
 		}
@@ -268,10 +265,10 @@ STFT& STFT::windowType(WindowType v){
 }
 
 
-void STFT::resize(uint32_t winSize, uint32_t padSize){
+void STFT::resize(unsigned winSize, unsigned padSize){
 	float * tmp = mBufInv;
-	uint32_t oldWinSize = sizeWin();
-	uint32_t oldNumBins = numBins();
+	unsigned oldWinSize = sizeWin();
+	unsigned oldNumBins = numBins();
 	
 	// resize DFT buffers
 	DFT::resize(winSize, padSize);
@@ -293,7 +290,7 @@ void STFT::resize(uint32_t winSize, uint32_t padSize){
 }
 
 
-STFT& STFT::sizeHop(uint32_t size){
+STFT& STFT::sizeHop(unsigned size){
 	mSlide.sizeHop(size);
 	mSizeHop = mSlide.sizeHop();
 	computeInvWinMul();
@@ -320,7 +317,7 @@ STFT& STFT::resetPhases(){
 	bin(0)[1] = 0.;
 	bin(numBins()-1)[1] = spu() * 0.5;
 
-	for(uint32_t k=1; k<numBins()-1; ++k){
+	for(unsigned k=1; k<numBins()-1; ++k){
 		double t = mPhases[k];		// the phase diff is simply the analysis phase
 		t -= k*expdp1;				// subtract expected phase diff due to overlap
 		t = scl::wrapPhase(t);		// wrap back into [-pi, pi)
@@ -358,7 +355,7 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 		bin(0)[1] = 0.;
 		bin(numBins()-1)[1] = spu() * 0.5;
 
-		for(uint32_t k=1; k<numBins()-1; ++k){
+		for(unsigned k=1; k<numBins()-1; ++k){
 			float ph = bin(k)[1];		// current phase
 			double t = ph - mPhases[k];	// compute phase diff
 			mPhases[k] = ph;			// save current phase
@@ -382,7 +379,7 @@ void STFT::inverse(float * dst){
 		double expdp1 = double(sizeHop())/sizeWin() * M_2PI;
 		double fund = binFreq();
 
-		for(uint32_t k=1; k<numBins()-1; ++k){
+		for(unsigned k=1; k<numBins()-1; ++k){
 			double t = bin(k)[1];		// freq
 			t -= k*fund;				// freq to freq deviation
 			t *= factor;				// freq deviation to phase diff
@@ -415,7 +412,7 @@ void STFT::inverse(float * dst){
 	}
 
 	// copy remaining non-overlapped portion of new output
-	uint32_t sizeOverlap = sizeWin() - sizeHop();
+	unsigned sizeOverlap = sizeWin() - sizeHop();
 	mem::deepCopy(mBufInv + sizeOverlap, bufPos() + sizeOverlap, sizeHop());
 
 	// copy output if external buffer provided
