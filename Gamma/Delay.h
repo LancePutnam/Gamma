@@ -4,12 +4,9 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-//#include "Gamma/arr.h"
 #include "Gamma/ipl.h"
-#include "Gamma/mem.h"
 #include "Gamma/scl.h"
-//#include "Gamma/tbl.h"
-
+#include "Gamma/tbl.h"
 #include "Gamma/Containers.h"
 #include "Gamma/Domain.h"
 #include "Gamma/Strategy.h"
@@ -119,28 +116,28 @@ public:
 	/// \param[in]	delay		Delay length. The size of the delay line will 
 	///							be the smallest possible power of two.
 	/// \param[in]	numTaps		Number of reader taps
-	Multitap(float delay, uint32_t numTaps)
+	Multitap(float delay, unsigned numTaps)
 	:	Delay<Tv,Si,Td>(delay)
 	{	taps(numTaps); }
 
 	/// Get number of read taps
-	uint32_t taps() const { return mDelays.size(); }	
+	unsigned taps() const { return mDelays.size(); }	
 
 	/// Read sample from tap
-	Tv read(uint32_t tap) const {
+	Tv read(unsigned tap) const {
 		return mIpol(*this, this->mPhase - mDelays[tap]);
 	}
 
 	/// Set delay length
-	void delay(float length, uint32_t tap){
+	void delay(float length, unsigned tap){
 		mDelays[tap] = this->delayFToI(length);
 	}
 
 	/// Set number of read taps
-	void taps(uint32_t numTaps){ mDelays.resize(numTaps); }
+	void taps(unsigned numTaps){ mDelays.resize(numTaps); }
 
 protected:
-	std::vector<uint32_t> mDelays;
+	std::vector<unsigned> mDelays;
 };
 
 
@@ -155,19 +152,19 @@ protected:
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
 /// \ingroup Delays    
-template <uint32_t N, class T>
+template <unsigned N, class T>
 class DelayShift{
 public:
-	#define IT for(uint32_t i=0; i<N; ++i)
+	#define IT for(unsigned i=0; i<N; ++i)
 
 	/// \param[in] v	Initial value of elements
 	DelayShift(const T& v=T()){ IT mElems[i]=v; }
 
 	/// Set nth delayed element
-	T& operator[](uint32_t i){ return mElems[i]; }
+	T& operator[](unsigned i){ return mElems[i]; }
 	
 	/// Get nth delayed element
-	const T& operator[](uint32_t i) const { return mElems[i]; }
+	const T& operator[](unsigned i) const { return mElems[i]; }
 
 	/// Get elements
 	T * elems(){ return mElems; }
@@ -177,13 +174,13 @@ public:
 	/// Input element and return Nth delayed element
 	T operator()(const T& v) const {
 		const T r = mElems[N-1];
-		for(uint32_t i=N-1; i>0; --i) mElems[i] = mElems[i-1];
+		for(unsigned i=N-1; i>0; --i) mElems[i] = mElems[i-1];
 		mElems[0]=v;
 		return r;
 	}
 
 	/// Get size of delay
-	static uint32_t size(){ return N; }
+	static unsigned size(){ return N; }
 
 	#undef IT
 
@@ -343,9 +340,9 @@ TM1 Delay<TM2>::Delay(float dly)
 TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", length);
 	mMaxDelay = length;
 	if(Td::domain() && Td::domain()->hasBeenSet()){
-		//printf("Delay::maxDelay(): resize to %d\n", (uint32_t)(mMaxDelay * spu()));
+		//printf("Delay::maxDelay(): resize to %d\n", (unsigned)(mMaxDelay * spu()));
 		
-		uint32_t maxDelayInSamples = uint32_t(mMaxDelay * Td::spu());
+		unsigned maxDelayInSamples = unsigned(mMaxDelay * Td::spu());
 
 		// If writing before reading,
 		// we must add 1 to support delays at exactly the max delay length.
@@ -403,7 +400,7 @@ TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1. / maxDelay(); }
 
 TM1 inline void Delay<TM2>::write(const Tv& v){
 	//incPhase();
-	mem::put(this->elems(), this->fracBits(), mPhase, v);
+	tbl::put(this->elems(), this->fracBits(), mPhase, v);
 	incPhase();
 }
 
