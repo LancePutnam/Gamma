@@ -16,7 +16,6 @@
 #include "Gamma/scl.h"
 #include "Gamma/Domain.h"
 #include "Gamma/Strategy.h"
-#include "Gamma/Types.h"
 
 namespace gam{
 
@@ -211,7 +210,7 @@ public:
 	/// Reset envelope to starting point
 	void reset(){
 		// this forces a stage increment upon first iteration
-		mPos = 0xFFFFFFFF;
+		mPos = 0;//0xFFFFFFFF;
 		mLen = 0;
 		mStage = -1;
 		mSustain = scl::abs(mSustain);
@@ -344,13 +343,13 @@ public:
 
 protected:
 	Curve<Tv,Tp> mCurve;
-	Tp mLengths[N];			// segment lengths, in samples
-	Tp mCurves[N];			// segment curvatures
-	Tv mLevels[N+1];		// break-point levels
+	Tp mLengths[N];		// segment lengths, in samples
+	Tp mCurves[N];		// segment curvatures
+	Tv mLevels[N+1];	// break-point levels
 
-	uint32_t mPos, mLen;	// position in and length of current segment, in samples
-	int mStage;				// the current curve segment
-	int mSustain;			// index of sustain point
+	int mPos, mLen;		// position in and length of current segment, in samples
+	int mStage;			// the current curve segment
+	int mSustain;		// index of sustain point
 	int mLoop;
 
 	void setLen(int i){ mLen=mLengths[i]*Td::spu(); }
