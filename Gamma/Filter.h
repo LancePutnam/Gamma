@@ -482,7 +482,7 @@ class MovingAvg : public DelayN<Tv>{
 public:
 
 	/// \param[in] size		Kernel size, greater than 1
-	explicit MovingAvg(uint32_t size)
+	explicit MovingAvg(unsigned size)
 	:	Base(size), mSum(0), mRSize(0)
 	{	onResize(); }
 
