@@ -8,8 +8,6 @@
 	Interpolation functions.
 */
 
-#include "Gamma/Constants.h"
-
 namespace gam{
 
 /// Interpolation functions.
@@ -44,7 +42,7 @@ Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 /// \param[in] h		FIR coefficients; should be of size ('order' + 1).
 ///	\param[in] delay	Fractional delay in samples
 ///	\param[in] order	As order increases, this converges to sinc interpolation
-template <class T> void lagrange(T * h, T delay, uint32_t order);
+template <class T> void lagrange(T * h, T delay, unsigned order);
 
 /// Optimized lagrange() for first order.
 template <class T> void lagrange1(T * h, T delay);
@@ -81,7 +79,7 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
-template <class T> void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T frac);
+template <class T> void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac);
 
 /// Nearest neighbor interpolation
 template <class Tf, class Tv>
@@ -101,16 +99,16 @@ inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
 	// y[n]	= a x[n] + x[n-1] - a y[n-1]
 	//		= a (x[n] - y[n-1]) + x[n-1]
 
-	//float a = f; // apx #1
-	//float a = Tf(0.4722)*f - Tf(0.2361); // apx #2
+	//Tf a = f; // apx #1
+	//Tf a = Tf(0.4722)*f - Tf(0.2361); // apx #2
 
-	//f = 1-f;		// convert to sample delay
-	//f += 0.618f;	// keeps 'a' near zero to dampen transients
-	//float a = (1.f-f)/(1.f+f);
+	//f = 1-f;			// convert to sample delay
+	//f += Tf(0.618);	// keeps 'a' near zero to dampen transients
+	//Tf a = (Tf(1)-f)/(Tf(1)+f);
 
 	// Taylor approximation to above to avoid division
-	float a = 0.5f*f - 0.309f; // = 0.5 - 0.5*(1-f + 0.618)
-	a = a*(1.f+a*(1.f+a*(1.f+a)));
+	Tf a = Tf(0.5)*f - Tf(0.309); // = 0.5 - 0.5*(1-f + 0.618)
+	a = a*(Tf(1) + a*(Tf(1) + a*(Tf(1) + a)));
 
 	return o1 = (y - o1) * a + x;
 }
@@ -143,16 +141,16 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 }
 
 template <class T>
-void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, uint32_t len, T f){
-	for(uint32_t i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
+void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, unsigned len, T f){
+	for(unsigned i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
 }
 
 
-template <class T> void lagrange(T * a, T delay, uint32_t order){
-	for(uint32_t i=0; i<=order; ++i){
+template <class T> void lagrange(T * a, T delay, unsigned order){
+	for(unsigned i=0; i<=order; ++i){
 		T coef = T(1);
 		T i_f = T(i); 
-		for(uint32_t j=0; j<=order; ++j){
+		for(unsigned j=0; j<=order; ++j){
 			if(j != i){
 				T j_f = (T)j;
 				coef *= (delay - j_f) / (i_f - j_f);
@@ -210,8 +208,8 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 }
 
 template <class T>
-void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T f){
-	for(uint32_t i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
+void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T f){
+	for(unsigned i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
 }
 
 
