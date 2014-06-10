@@ -326,15 +326,15 @@ namespace iplSeq{
 	/// Base class for sequence interpolation strategies
     
     /// \ingroup Strategies, iplSeq
-	template <uint32_t N, class T>
+	template <unsigned N, class T>
 	struct Base{
 		Base(const T& v=0){ set(v); }
 	
 		/// Push a new value onto sequence
-		void push(T va){ for(uint32_t i=N-1; i>0; --i) v[i]=v[i-1]; v[0]=va; }
+		void push(T va){ for(unsigned i=N-1; i>0; --i) v[i]=v[i-1]; v[0]=va; }
 		
 		/// Set sequence history to value
-		void set(T va){ for(uint32_t i=0; i<N; ++i) v[i]=va; }	
+		void set(T va){ for(unsigned i=0; i<N; ++i) v[i]=va; }	
 		
 		/// Get current sequence value
 		T val() const { return v[0]; }
