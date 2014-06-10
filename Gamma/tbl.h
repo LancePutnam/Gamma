@@ -315,6 +315,24 @@ template<class T>
 void nyquist		(T * dst, uint32_t len, uint32_t str=1); ///< Fills array with Nyquist window
 
 
+
+/// Get value from a power-of-two array.
+
+///	'src':		waveform \n
+///	'fbits':	number of bits in fractional part of phase \n
+///	'phase':	fixed-point phase of lookup (full period is [0, 2^32))
+template <class T>
+T at(const T * src, uint32_t fbits, uint32_t phase);
+
+/// Set value in a power-of-two array.
+
+///	'dst':		waveform \n
+///	'fbits':	number of bits in fractional part of phase \n
+///	'phase':	fixed-point phase of lookup (full period is [0, 2^32))	
+template <class T>
+void put(T * dst, uint32_t fbits, uint32_t phase, T value);
+
+
 // Return value from a table with the first half of a dq-symmetric 
 // waveform.  The table size must be a power of two.
 //
@@ -617,6 +635,16 @@ void nyquist(T * dst, uint32_t len, uint32_t str){
 		dst[(i+0)*str] = T( 1);
 		dst[(i+1)*str] = T(-1);
 	}
+}
+
+template <class T>
+inline T at(const T * src, uint32_t fbits, uint32_t phase){
+	return src[phase >> fbits];
+}
+
+template <class T>
+inline void put(T * dst, uint32_t fbits, uint32_t phase, T value){
+	dst[phase >> fbits] = value;
 }
 
 inline float atH(const float * src, uint32_t bits, uint32_t phs){
