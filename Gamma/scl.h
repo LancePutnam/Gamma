@@ -314,14 +314,14 @@ template<class T> T smoothZero(T v, T bw);
 /// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
 /// log base-2 approximation is performed. For N>0, N-1 Newton iterations
 /// are applied to improve the result.
-template<uint32_t N, class T> T sqrt(T v);
+template<unsigned N, class T> T sqrt(T v);
 
 /// Approximate inverse square root using log base-2 and Newton methods.
 
 /// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
 /// log base-2 approximation is performed. For N>0, N-1 Newton iterations
 /// are applied to improve the result.
-template<uint32_t N, class T> T invSqrt(T v);
+template<unsigned N, class T> T invSqrt(T v);
 
 /// Truncates floating point value at decimal.
 template<class T> T trunc(T value);
@@ -706,7 +706,7 @@ template<class T>
 inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
 
 
-template<int N, class T, template<class> class F>
+template<unsigned N, class T, template<class> class F>
 struct NewtonIterator{
 	NewtonIterator(T& v, T v0){
 		F<T>(v,v0);
@@ -723,7 +723,7 @@ template<class T> struct NewtonSqrtMap{
 	NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); }
 };
 
-template<int N, class T>
+template<unsigned N, class T>
 struct SqrtNewton : public NewtonIterator<N,T, NewtonSqrtMap> {
 	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0)
 	{}
@@ -734,7 +734,7 @@ template<class T> struct NewtonInvSqrtMap{
 	NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; }
 };
 
-template<int N, class T>
+template<unsigned N, class T>
 struct InvSqrtNewton : public NewtonIterator<N,T, NewtonInvSqrtMap>{
 	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0)
 	{}
@@ -756,16 +756,20 @@ inline double sqrtLog2(double v){
 	return u.f;
 }
 
-template<int N, class T> void sqrtNewton(T& v, T v0){ SqrtNewton<N,T>(v,v0); }
+template<unsigned N, class T> void sqrtNewton(T& v, T v0){
+	SqrtNewton<N,T>(v,v0);
+}
 
-template<uint32_t N, class T>
+template<unsigned N, class T>
 inline T sqrt(T v){
 	T r=sqrtLog2(v);
 	sqrtNewton<N>(r,v);
 	return r;
 }
 
-template<int N, class T> void invSqrtNewton(T& v, T v0){ InvSqrtNewton<N,T>(v,v0); }
+template<unsigned N, class T> void invSqrtNewton(T& v, T v0){
+	InvSqrtNewton<N,T>(v,v0);
+}
 
 template <class T>
 inline T invSqrtLog2(T v){
@@ -774,7 +778,7 @@ inline T invSqrtLog2(T v){
 	return u.f;
 }
 
-template<uint32_t N, class T>
+template<unsigned N, class T>
 inline T invSqrt(T v){
 	T r=invSqrtLog2(v);
 	invSqrtNewton<N>(r, v*T(0.5));
@@ -963,12 +967,12 @@ template<class T> inline T wrap(T v, T hi, T lo){
 	if(!(v < hi)){
 		T diff = hi - lo;
 		v -= diff;
-		if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
+		if(!(v < hi)) v -= diff * (T)(unsigned)((v - lo)/diff);
 	}
 	else if(v < lo){
 		T diff = hi - lo;
 		v += diff;	// this might give diff if range is too large, so check at end of block...
-		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+		if(v < lo) v += diff * (T)(unsigned)(((lo - v)/diff) + 1);
 		if(v==diff) return nextAfter(v, lo);
 	}
 	return v;
