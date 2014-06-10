@@ -37,6 +37,7 @@
 #if GAM_USE_PTHREAD
 	#include <pthread.h>
 #elif GAM_USE_THREADEX
+	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
 	#include <process.h>
 #endif
