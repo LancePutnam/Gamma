@@ -125,13 +125,18 @@ public:
 
 	/// Read sample from tap
 	Tv read(unsigned tap) const {
-		return mIpol(*this, this->mPhase - mDelays[tap]);
+		return this->mIpol(*this, this->mPhase - mDelays[tap]);
 	}
 
 	/// Set delay length
 	void delay(float length, unsigned tap){
 		mDelays[tap] = this->delayFToI(length);
 	}
+	
+	/// Set a tap's delay length as a frequency
+	void freq(float v, unsigned tap){
+        	delay(1.f/length, tap);
+    	}
 
 	/// Set number of read taps
 	void taps(unsigned numTaps){ mDelays.resize(numTaps); }
