@@ -1052,7 +1052,7 @@ template<class T> inline bool odd(T v){ return v & T(1); }
 
 template<class T> inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
-inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
+inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -int32_t(v)); }
 
 template<class T> inline bool within(T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 
@@ -1173,7 +1173,7 @@ inline float stairU(uint32_t p, uint32_t w){
 // Amp precision:	25 bits
 inline float triangle(uint32_t p){
 	uint32_t dir = p >> 31;
-	p = ((p^(-dir)) + dir);
+	p = ((p^(-int32_t(dir))) + dir);
 	p = (p >> 8) | Expo2<float>();
 	return 3.f - punUF(p);
 }

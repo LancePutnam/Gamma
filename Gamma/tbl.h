@@ -656,7 +656,7 @@ inline float atH(const float * src, uint32_t bits, uint32_t phs){
 inline float atQ(const float * src, uint32_t fbits, uint32_t phs){
 	uint32_t sign = phs & MaskSign<float>();
 	uint32_t dir = (phs >> 30) & 1; // 0 = fwd or 1 = bwd
-	Twiddle<float> v(src[(((phs^-dir) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
+	Twiddle<float> v(src[(((phs^-int32_t(dir)) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
 	v.i |= sign;	// sign bit
 	return v.f;
 }

@@ -516,7 +516,7 @@ namespace phsInc{
 	
 		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
-			pos += dir ? -inc : inc;
+			pos += dir ? -int32_t(inc) : inc;
 			if(~pos & prev & 0x80000000) dir^=1;
 			return pos;
 		}
