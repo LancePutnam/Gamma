@@ -101,7 +101,7 @@ int main(){
 	s.add<Sub>(24).set(5, 120, 0.8, 1.0, 1.0, 0,  50,  50,1.0,  20,2000,0.5, 20,0.5);
 	s.add<Sub>(30).set(5,   0, 0.8, 1.0, 1.0, 1, 100, 100,1.0, 100,5000,0.5, 20,0.5);
 
-	AudioIO io(256, 44100., s.audioCB, &s);
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
 	Sync::master().spu(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

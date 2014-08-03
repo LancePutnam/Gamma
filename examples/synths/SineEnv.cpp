@@ -130,7 +130,7 @@ int main(){
 	s.add<SineEnv>( 62.5).set(1.5,  60, 0.3, 1, 2);
 	s.add<SineEnv>( 60.0).set(3.5, 230, 0.3, 1, 2);
 	
-	AudioIO io(256, 44100., s.audioCB, &s);
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
 	Sync::master().spu(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

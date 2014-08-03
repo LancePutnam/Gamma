@@ -92,7 +92,7 @@ int main(){
 	
 	s.add<OscTrm>(50).set(10, 262, 0.5, 0.1,2,0.8, 0.8,4,8,0.5, tbSin, 0.8); 
 	
-	AudioIO io(256, 44100., s.audioCB, &s);
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
 	Sync::master().spu(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

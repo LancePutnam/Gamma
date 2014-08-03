@@ -111,7 +111,7 @@ int main(){
 	s.add<OscEnv>(32).set(10, 265, 0.1, 0.15, 0.3  , 0.5, 0, tb__4, 0.7);
 
 
-	AudioIO io(256, 44100., s.audioCB, &s);
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
 	Sync::master().spu(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();

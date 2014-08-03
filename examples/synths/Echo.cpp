@@ -145,7 +145,7 @@ int main(){
 	s.add<SineEnv>( start + (2.00*aug)  ).set( aug * h+q, ti, dyn, attack, decay, -0.2*pan);
 
 
-	AudioIO io(256, 44100., s.audioCB, &s);
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
 	Sync::master().spu(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
