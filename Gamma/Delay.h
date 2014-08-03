@@ -135,7 +135,7 @@ public:
 	
 	/// Set a tap's delay length as a frequency
 	void freq(float v, unsigned tap){
-        	delay(1.f/length, tap);
+        	delay(1.f/v, tap);
     	}
 
 	/// Set number of read taps
