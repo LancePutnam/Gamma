@@ -57,7 +57,7 @@ public:
 	/// same subject. Otherwise, attach as observer of Domain::master().
 	DomainObserver(const DomainObserver& rhs);
 
-	virtual ~DomainObserver(){}
+	virtual ~DomainObserver();
 
 	double scaleSPU() const;		///< Get ratio of my SPU to my domain's SPU
 	double spu() const;				///< Get local samples/unit
@@ -83,7 +83,6 @@ protected:
 
 private:
 	friend class Domain;
-	DomainObserver(bool zeroLinks, Domain& src);
 
 	Domain * mSubject;	// Pointer to my subject
 	double mSPU;		// Local samples/unit
@@ -115,14 +114,11 @@ public:
 	double ups() const;					///< Returns units/sample, i.e. sample interval
 
 	/// Master domain. By default, all observers will be attached to this.
-	static Domain& master(){
-		static Domain * s = new Domain;
-		return *s;
-	}
+	static Domain& master();
 
 protected:
 	double mSPU, mUPS;
-	DomainObserver mHeadObserver;		// Head of observer doubly-linked list
+	DomainObserver * mHeadObserver;	// Head of observer doubly-linked list
 	bool mHasBeenSet;
 
 friend class DomainObserver;
@@ -139,30 +135,6 @@ double sampleRate();
 
 
 // Implementation_______________________________________________________________
-
-#define DOM_OBS_INIT mSubject(0), mSPU(1), mUPS(1)
-inline DomainObserver::DomainObserver()
-:	Node2<DomainObserver>(), DOM_OBS_INIT
-{
-	//printf("Synced::Synced() - %p\n", this);
-	domain(Domain::master());
-}
-
-// This ctor is used to create the head observer in the subject
-inline DomainObserver::DomainObserver(bool zeroLinks, Domain& src)
-:	Node2<DomainObserver>(zeroLinks), DOM_OBS_INIT
-{
-	domain(src);
-}
-
-inline DomainObserver::DomainObserver(const DomainObserver& rhs)
-:	Node2<DomainObserver>(), DOM_OBS_INIT
-{
-	//printf("DomainObserver::DomainObserver(const DomainObserver&) - %p\n", this);
-	Domain& s = rhs.mSubject ? *rhs.mSubject : Domain::master();
-	domain(s);
-}
-#undef DOM_OBS_INIT
 
 inline void DomainObserver::refreshDomain(){ if(domain()) spu(domain()->spu()); }
 inline double DomainObserver::scaleSPU() const { return domain() ? spu() / domain()->spu() : 1; }
