@@ -5,22 +5,21 @@
 
 namespace gam{
 
-#define DOM_OBS_INIT mSubject(0), mSPU(1), mUPS(1)
+
 DomainObserver::DomainObserver()
-:	Node2<DomainObserver>(), DOM_OBS_INIT
+:	mSubject(0)
 {
-	//printf("Synced::Synced() - %p\n", this);
+	//printf("DomainObserver::DomainObserver() - %p\n", this);
 	domain(Domain::master());
 }
 
 DomainObserver::DomainObserver(const DomainObserver& rhs)
-:	Node2<DomainObserver>(), DOM_OBS_INIT
+:	mSubject(0)
 {
 	//printf("DomainObserver::DomainObserver(const DomainObserver&) - %p\n", this);
 	Domain& s = rhs.mSubject ? *rhs.mSubject : Domain::master();
 	domain(s);
 }
-#undef DOM_OBS_INIT
 
 DomainObserver::~DomainObserver(){
 	if(mSubject && mSubject->mHeadObserver == this){
@@ -42,23 +41,13 @@ DomainObserver& DomainObserver::operator= (const DomainObserver& rhs){
 	return *this;
 }
 
-void DomainObserver::scaleSPU(double v){
-	mSPU *= v;
-	mUPS = 1. / mSPU;
-	onDomainChange(v);
-}
-
-void DomainObserver::scaleUPS(double v){
-	scaleSPU(1./v);
-}
-
 void DomainObserver::domain(Domain& newSubject){
 	if(&newSubject != mSubject){
 		if(mSubject) nodeRemove();
 		newSubject.attach(*this);
 		double r = newSubject.spu() / (mSubject ? mSubject->spu() : 1.);
 		mSubject = &newSubject;
-		scaleSPU(r);	// calls onDomainChange()
+		onDomainChange(r);
 	}
 }
 
@@ -104,7 +93,7 @@ void Domain::notifyObservers(double r){
 	DomainObserver * s = mHeadObserver;
 
 	while(s){	//printf("Domain %p: Notifying %p\n", this, s);
-		s->scaleSPU(r);	// this will call onDomainChange()
+		s->onDomainChange(r);
 		s = s->nodeR;
 	}
 }
