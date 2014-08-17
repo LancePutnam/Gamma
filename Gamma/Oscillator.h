@@ -92,12 +92,11 @@ public:
 //protected:
 private:
 	float mFreq;		// Current frequency
+	double mFreqToInt;
 	uint32_t mPhaseI;	// Current fixed-point phase in [0, 2^32)
 	uint32_t mFreqI;	// Current fixed-point frequency
 	Sp mSp;
 
-	uint32_t mapFI(float v) const;	// convert unit floating-point to fixed-point integer
-	double mapIF(uint32_t v) const;	// convert fixed-point integer to unit floating-point
 	uint32_t mapFreq(float v) const;
 };
 
@@ -841,33 +840,43 @@ protected:
 
 // Implementation_______________________________________________________________
 
+namespace{
+
+	// Convert unit floating-point to fixed-point integer.
+	// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
+	inline uint32_t mapFI(float v){
+		//return scl::unitToUInt(v);
+		//return (uint32_t)(v * 4294967296.);
+		return castIntRound(v * 4294967296.);
+	}
+
+	// Convert fixed-point integer to unit floating-point.
+	inline double mapIF(uint32_t v){
+		return v/4294967296.;
+		//return uintToUnit<float>(v); // not enough precision
+	}
+
+};
+
+
 //---- Accum
     
 template<class St, class Td> Accum<St,Td>::Accum(float f, float p)
-:	mFreq(f), mFreqI(0)
+:	mFreq(f), mFreqToInt(4294967296.), mFreqI(0)
 {
 	Td::refreshDomain();
 	phase(p);
 	//(p >= 1.f) ? phaseMax() : this->phase(p);
 }
 
-// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
-template<class St, class Td> inline uint32_t Accum<St,Td>::mapFI(float v) const {
-	//return scl::unitToUInt(v);
-	//return (uint32_t)(v * 4294967296.);
-	return castIntRound(v * 4294967296.);
-}
-
-template<class St, class Td> inline double Accum<St,Td>::mapIF(uint32_t v) const {
-	return v/4294967296.;
-	//return uintToUnit<float>(v); // not enough precision
-}
-
 template<class St, class Td> inline uint32_t Accum<St,Td>::mapFreq(float v) const {
-	return mapFI(v * Td::ups());
+	//return mapFI(v * Td::ups());
+	return castIntRound(v * mFreqToInt);
 }
 
 template<class St, class Td> void Accum<St,Td>::onDomainChange(double r){ //printf("Accum: onDomainChange (%p)\n", this);
+	mFreqToInt = 4294967296. / Td::spu();
+
 	uint32_t fprev = mFreqI;
 	freq(mFreq);
 	
