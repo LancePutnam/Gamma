@@ -26,7 +26,7 @@ namespace gam{
 /// \tparam Si	Interpolation strategy
 /// \tparam Sp	Phase increment strategy
 template<
-	class T = real,
+	class T = float,
 	template<class> class Si = ipl::Trunc,
 	class Sp = phsInc::OneShot
 >
