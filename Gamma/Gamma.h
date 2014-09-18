@@ -20,7 +20,7 @@
 	equally useful for non-real-time tasks.
 */
 
-#define GAMMA_VERSION 0.9.6
+#define GAMMA_VERSION 0.9.7
 //#define GAMMA_H_INC_ALL
 
 // Core Functions
