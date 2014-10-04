@@ -539,8 +539,8 @@ template <unsigned N, class T=gam::real, class G=gen::RAdd1<unsigned> >
 class Seq: public Vec<N,T>{
 public:
 
-	Seq(const T& val){ set(val); }
-	Seq(const T * vals){ set(vals); }
+	Seq(const T& val){ this->set(val); }
+	Seq(const T * vals){ this->set(vals); }
 
 	/// Generate next array element
 	T operator()(){ return (*this)[((unsigned)mTap())%N]; }
