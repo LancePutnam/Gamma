@@ -98,7 +98,8 @@ public:
 	
 	/// This is only applicable for one-shot playback (phsInc::OneShot) and is 
 	/// here to provide run-time switchable looping behavior.
-	void loop();
+	/// \returns whether the playback head was looped
+	bool loop();
 
 	/// Apply linear fade-in/-out envelope(s) to frame buffer
 
@@ -281,8 +282,12 @@ PRE inline bool CLS::done() const{
 	}
 }
 
-PRE void CLS::loop(){
-	if(done()) mPos = phsInc::Loop()(mPos, mInc, max(), min());
+PRE bool CLS::loop(){
+	if(done()){
+		mPos = phsInc::Loop()(mPos, mInc, max(), min());
+		return true;
+	}
+	return false;
 }
 
 PRE void CLS::fade(int fadeOutFrames, int fadeInFrames){
