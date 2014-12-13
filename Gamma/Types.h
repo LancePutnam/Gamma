@@ -43,7 +43,8 @@ struct Polar{
 
 /// Complex number
 template <class T=gam::real>
-struct Complex{
+class Complex{
+public:
 
 	typedef Complex<T> C;
 
@@ -179,7 +180,8 @@ template<class T> struct NamedElems<4,T>{ T x,y,z,w; };
 /// This is fixed in size to enable better loop unrolling optimizations and to 
 /// avoid an extra 'size' data member for small sizes.
 template <unsigned N, class T>
-struct Vec : public NamedElems<N,T> {
+class Vec : public NamedElems<N,T> {
+public:
 
     using NamedElems<N,T>::x;
 
