@@ -59,7 +59,8 @@ public:
 
 
 	void delay(float v);						///< Set delay length
-	void delaySamples(uint32_t);				///< Set delay length in samples
+	void delaySamples(uint32_t v);				///< Set delay length in samples
+	void delaySamplesR(float v);				///< Set delay length in samples (real-valued)
 	void delayUnit(float u);					///< Set delay as (0, 1) of buffer size
 	void freq(float v);							///< Set natural frequency (1/delay())
 	void ipolType(ipl::Type v){ mIpol.type(v); }///< Set interpolation type
@@ -73,6 +74,7 @@ public:
 	
 	float delay() const;						///< Get current delay length
 	uint32_t delaySamples() const;				///< Get current delay length in samples
+	float delaySamplesR() const;				///< Get current delay length in samples (real-valued)
 	float delayUnit() const;					///< Get unit delay (relative to max delay)
 	uint32_t delayIndex(uint32_t delay) const;	///< Get index of delayed element	
 	float freq() const { return 1.f/delay(); }	///< Get frequency of delay line
@@ -418,7 +420,15 @@ TM1 inline float Delay<TM2>::delay() const { return mDelayLength; }
 
 TM1 inline void Delay<TM2>::delaySamples(uint32_t v){ mDelay = v << this->fracBits(); }
 
+TM1 inline void Delay<TM2>::delaySamplesR(float v){
+	delay(v * Td::ups());
+}
+
 TM1 inline uint32_t Delay<TM2>::delaySamples() const { return mDelay >> this->fracBits(); }
+
+TM1 inline float Delay<TM2>::delaySamplesR() const {
+	return mDelayLength * Td::spu();
+}
 
 TM1 inline void Delay<TM2>::delayUnit(float v){ mDelay = unitToUInt(v); }
 
