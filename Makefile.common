@@ -22,21 +22,7 @@ else ifeq ($(UNAME), Darwin)
 	# Mac OS X version
 	UNAMER := $(shell uname -r)
 	UNAMER := $(firstword $(subst ., , $(UNAMER)))
-	ifeq ($(UNAMER), 14)
-		OSX_VERSION = 10_10
-	else ifeq ($(UNAMER), 13)
-		OSX_VERSION = 10_9
-	else ifeq ($(UNAMER), 12)
-		OSX_VERSION = 10_8
-	else ifeq ($(UNAMER), 11)
-		OSX_VERSION = 10_7
-	else ifeq ($(UNAMER), 10)
-		OSX_VERSION = 10_6
-	else ifeq ($(UNAMER), 9)
-		OSX_VERSION = 10_5
-	else ifeq ($(UNAMER), 8)
-		OSX_VERSION = 10_4
-	endif
+	OSX_VERSION = $(shell echo $(UNAMER)-4 | bc)
 else
 	PLATFORM = windows
 endif
@@ -204,20 +190,10 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Set system root directory for stdc++ etc.
-	ifeq ($(OSX_VERSION), 10_10)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.10.sdk -mmacosx-version-min=10.10
-	else ifeq ($(OSX_VERSION), 10_9)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.9.sdk -mmacosx-version-min=10.9
-	else ifeq ($(OSX_VERSION), 10_8)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
-	else ifeq ($(OSX_VERSION), 10_7)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
-	else ifeq ($(OSX_VERSION), 10_6)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.6.sdk -mmacosx-version-min=10.6
-	else ifeq ($(OSX_VERSION), 10_5)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.5.sdk -mmacosx-version-min=10.5
-	else ifeq ($(OSX_VERSION), 10_4)
+	ifeq ($(OSX_VERSION), 4)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
+	else
+		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.$(OSX_VERSION).sdk -mmacosx-version-min=10.$(OSX_VERSION)
 	endif
 
 	# Needed to link to libraries installed through MacPorts
