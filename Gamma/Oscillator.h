@@ -218,7 +218,9 @@ public:
 
 	/// Generate next sample
 	Tv operator()(){
-		this->nextPhase(); return val();
+		Tv r = val();
+		this->nextPhase();
+		return r;
 	}
 
 	/// Get current value
