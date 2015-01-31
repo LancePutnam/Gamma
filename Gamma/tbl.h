@@ -4,13 +4,12 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdlib.h>
+#include <math.h>
 #include "Gamma/arr.h"
 #include "Gamma/mem.h"
 #include "Gamma/scl.h"
 #include "Gamma/Constants.h"
-
-#define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
+#include "Gamma/Types.h"
 
 /// Main namespace
 namespace gam{
@@ -373,6 +372,8 @@ float phaseIncFactor(double framesPerSec);
 
 // Implementation_______________________________________________________________
 
+#define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
+
 template<class T>
 void cosine(T * dst, unsigned len){
 	double inc = M_2PI / (double)len;
@@ -386,7 +387,7 @@ void cosine(T * dst, unsigned len){
 
 	len -= 1;
 	LOOP(len, 1){
-		T val = T(cos(phs));
+		T val = T(::cos(phs));
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -406,7 +407,7 @@ void sine(T * dst, unsigned len){
 	
 	--len;
 	LOOP(len, 1){
-		T val = sin(phs);
+		T val = ::sin(phs);
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -418,7 +419,7 @@ template<class T>
 void sinusoid(T * dst, unsigned len, double phase, double periods){
 	double inc = M_2PI * periods / len;
 	for(unsigned i=0; i<len; ++i){
-		*dst++ = sin(inc * i + phase);
+		*dst++ = ::sin(inc * i + phase);
 	}
 }
 
@@ -435,7 +436,7 @@ void multiImpulse(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		LOOP(hLen+1, 1){
-			*dst1++ += (T)(cos(phs));
+			*dst1++ += T(::cos(phs));
 			phs += phaseInc;
 		}
 	}
@@ -462,7 +463,7 @@ void multiSaw(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<hLen; ++j){
-			*dst1++ += (T)(amp * sin(phs));
+			*dst1++ += T(amp * ::sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -493,7 +494,7 @@ void multiSquare(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<=qLen; ++j){
-			*dst1++ += (T)(amp * sin(phs));
+			*dst1++ += T(amp * ::sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -529,7 +530,7 @@ void multiTriangle(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<=qLen; ++j){
-			*dst1++ += (T)(amp * sin(phs));
+			*dst1++ += T(amp * ::sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -588,10 +589,10 @@ void window(T * dst, unsigned len, WindowType type){
 	double inc = period / (double)(len);\
 	double phs = phs0;\
 	T * dst2 = dst + len - 1;\
-	*dst++ = (T)eqn;\
+	*dst++ = T(eqn);\
 	LOOP(len>>1, 1){\
 		phs += inc;\
-		T val = (T)eqn;\
+		T val = T(eqn);\
 		*dst++  = val;\
 		*dst2-- = val;\
 	}
@@ -636,6 +637,8 @@ void nyquist(T * dst, unsigned len, unsigned str){
 		dst[(i+1)*str] = T(-1);
 	}
 }
+
+#undef LOOP
 
 template <class T>
 inline T at(const T * src, uint32_t fbits, uint32_t phase){
@@ -691,12 +694,33 @@ template<> inline double normConstant<PARABOLIC	>(){ return 2/ M_PI; }
 template<> inline double normConstant<SQUARE	>(){ return 4/ M_PI; }
 template<> inline double normConstant<SAW		>(){ return 2/ M_PI; }
 
+namespace{
+	// This enables support for complex-valued tables
+	template<class T>
+	T getSin(double p);
+
+	template<class T>
+	T getSin(double p){
+		return T(::sin(p));
+	}
+
+	template<>
+	Complex<float> getSin<Complex<float> >(double p){
+		return Complex<float>(::cos(p), ::sin(p));
+	}
+
+	template<>
+	Complex<double> getSin<Complex<double> >(double p){
+		return Complex<double>(::cos(p), ::sin(p));
+	}
+};
+
 template <class T>
 void addSine(T * dst, unsigned len, double cycles, double amp, double phs){
 	double f = cycles/len;
 	for(unsigned i=0; i<len; ++i){
 		double p = (f*i + phs)*M_2PI;
-		dst[i] += sin(p) * amp;
+		dst[i] += getSin<T>(p) * amp;
 	}
 }
 
@@ -724,7 +748,7 @@ void addSinesPow(
 		double P = (hphs + h*wphs) * M_2PI;
 		
 		for(unsigned i=0; i<len; ++i){
-			dst[i] += A*sin(inch*i + P);
+			dst[i] += A*getSin<T>(inch*i + P);
 		}
 	}
 }
@@ -756,7 +780,5 @@ void addWave(
 
 
 } // gam::
-
-#undef LOOP
 
 #endif
