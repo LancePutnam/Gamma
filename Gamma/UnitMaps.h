@@ -97,10 +97,13 @@ protected:
 
 
 
-// Fixed-size power of 2 table supporting fixed point lookup
+/// Fixed-size power of 2 table supporting fixed point lookup
 
-// This table minimizes memory usage and table look-up speed at the expense
-// of having a fixed size that is a power of two.
+/// This table minimizes memory usage and table look-up speed at the expense
+/// of having a fixed size that is a power of two.
+///
+/// \tparam B	log2 size of table (size == 2^B)
+/// \tparam T	element type
 template <uint32_t B, class T>
 class TablePow2{
 public:
@@ -144,10 +147,15 @@ protected:
 
 
 
-// Complex sinusoid table
-// B is the log2 size of each table
-// D is the number of tables
-// The effective table size is (2^B)^D
+/// Complex sinusoid lookup table
+
+/// This retrieves a complex sinusoid e^it given a phase t. D tables each with a
+/// size of 2^B are used to compute the value. D-1 tables are used for recursive
+/// interpolation. This makes the lookup equivalent to a non-interpolating
+/// lookup in a table of size (2^B)^D.
+///
+/// \tparam B	log2 size of each table (size == 2^B)
+/// \tparam D	the number of tables
 template <unsigned B=10, unsigned D=2, class TComplex=Complex<double> >
 class CSinTable{
 public:
