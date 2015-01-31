@@ -452,7 +452,10 @@ public:
 
 	/// Set amplitude and phase
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, Base::decay(), p); }
-	
+
+	/// Set frequency
+	void freq(Tv v){ Base::freq(v*Td::ups()); }
+
 	/// Set all control parameters
 
 	/// \param[in]	frq		Frequency
