@@ -578,7 +578,7 @@ public:
 	float down();		///< Downward ramp (1 to -1)
 	float even3();		///< Even harmonic sine-like wave (3rd order)
 	float even5();		///< Even harmonic sine-like wave (5th order)
-	float imp();		///< Impulse (occurs at beginning of cycle)
+	float imp();		///< Impulse train with aliasing reduction
 	float line2();		///< 2-segment line. mod changes wave from down to tri to up
 	float para();		///< Parabolic wave (triangle wave with all harmonics)
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
@@ -592,6 +592,7 @@ public:
 	float cosU();		///< Unipolar cosine based on 3rd order polynomial
 	float downU();		///< Unipolar downward ramp
 	float hann();		///< Hann window
+	float impU();		///< Unipolar impulse train
 	float line2U();		///< Unipolar line2
 	float paraU();		///< Unipolar parabolic wave
 	float pulseU();		///< Unipolar pulse
@@ -1107,7 +1108,7 @@ DEF(cos(),		up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
 DEF(down(),		scl::rampDown(nextPhase()))
 DEF(even3(),	up(); static const float c=-1.50f*sqrtf(3.f); r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); static const float c=-1.25f*::powf(5.f,0.25f); r *= (1.f-scl::pow4(r))*c;)
-DEF(imp(),		scl::pulseU(nextPhase(), this->freqI()) )
+DEF(imp(),		scl::pulse(nextPhase(), this->freqI()) )
 DEF(para(),		paraU()*1.5f - 0.5f)
 DEF(pulse(),	scl::pulse(nextPhase(), mMod))
 DEF(sinPara(),	scl::sinPara(nextPhase()))
@@ -1119,6 +1120,7 @@ DEF(up2(),		scl::rampUp2(nextPhase(), mMod))
 DEF(cosU(),		tri(); r = scl::mapSinSU(r))
 DEF(downU(),	scl::rampDownU(nextPhase()))
 DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
+DEF(impU(),		scl::pulseU(nextPhase(), this->freqI()) )
 DEF(paraU(),	up(); r*=r;)
 DEF(pulseU(),	scl::pulseU(nextPhase(), mMod))
 DEF(sqrU(),		scl::squareU(nextPhase()))
