@@ -172,7 +172,10 @@ public:
 			if(!done()){
 				mPos = 0;
 				setLen(mStage);
-				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[mStage+1]);
+				int nextStage = mStage+1;
+				// If looping, ensure we wrap back around to first level
+				if(mLoop && (nextStage==size())) nextStage = 0;
+				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[nextStage]);
 
 				// Immediately return start level of new stage
 				return (*this)();
@@ -199,6 +202,11 @@ public:
 
 
 	/// Set whether envelope loops
+
+	/// Note that when this is activated the last segment moves from the second
+	/// to last level to the first level. Thus, the very last level is ignored.
+	/// This is done to avoid clicking due to mismatched levels when the
+	/// envelope wraps around.
 	Env& loop(bool v){ mLoop=v; return *this; }
 
 	/// Sets the point at which the envelope holds its value until released
