@@ -27,11 +27,8 @@ enum FilterType{
 	BAND_PASS,			/**< Band-pass */
 	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
 	BAND_REJECT,		/**< Band-reject */
-	ALL_PASS			/**< All-pass */
-//	COMB_FBK_EVEN,
-//	COMB_FBK_ODD,
-//	COMB_FFD_EVEN,
-//	COMB_FFD_ODD
+	ALL_PASS,			/**< All-pass */
+	PEAKING				/**< Peaking */
 };
 
 
@@ -111,7 +108,7 @@ public:
 	/// \param[in]	frq		Center frequency
 	/// \param[in]	res		Resonance (Q) amount in [1, inf)
 	/// \param[in]	type	Type of filter
-	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
+	Biquad(Tp frq = Tp(1000), Tp res = Tp(0.707), FilterType type = LOW_PASS);
 
 
 	/// Get array of 3 feedforward coefficients
@@ -129,6 +126,7 @@ public:
 
 	void freq(Tp v);					///< Set center frequency
 	void res(Tp v);						///< Set resonance (Q)
+	void level(Tp v);					///< Set level (PEAKING type only)
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
 	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
 	void type(FilterType type);			///< Set type of filter
@@ -137,9 +135,9 @@ public:
 	Tv operator()(Tv i0);				///< Filter next sample
 	Tv nextBP(Tv i0);					///< Optimized for band-pass types
 	
-	Tp freq() const { return mFreq; }	///< Get center frequency
-	Tp res() const { return mRes; }		///< Get resonance (Q)
-	FilterType type() const { return mType; }	///< Get filter type
+	Tp freq() const;					///< Get center frequency
+	Tp res() const;						///< Get resonance (Q)
+	FilterType type() const;			///< Get filter type
 	
 	virtual void onDomainChange(double r);
 
@@ -147,11 +145,14 @@ protected:
 	Tp mA[3];			// feedforward coefs
 	Tp mB[3];			// feedback coefs (first element used to scale coefs)
 	Tv d1, d2;			// inner sample delays
-	Tp mFreq, mRes;		// center frequency, resonance
+	Tp mFreq, mResRecip;// center frequency, 1/resonance
+	Tp mLevel;			// amplitude level (for peaking)
 	FilterType mType;
 	Tp mReal, mImag;	// real, imag components of center frequency
 	Tp mAlpha;
 	Tp mFrqToRad;
+
+	void resRecip(Tp v);
 };
 
 
@@ -605,7 +606,7 @@ void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 //---- Biquad
 template <class Tv, class Tp, class Td>
 Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
-:	d1(0), d2(0)
+:	d1(0), d2(0), mLevel(1)
 {
 	Td::refreshDomain();
 	set(frq, res, type);
@@ -618,14 +619,26 @@ void Biquad<Tv,Tp,Td>::onDomainChange(double r){
 }
 
 template <class Tv, class Tp, class Td>
+Tp Biquad<Tv,Tp,Td>::freq() const { return mFreq; }
+
+template <class Tv, class Tp, class Td>
+Tp Biquad<Tv,Tp,Td>::res() const { return Tp(0.5)/(mResRecip*mLevel); }
+
+template <class Tv, class Tp, class Td>
+FilterType Biquad<Tv,Tp,Td>::type() const { return mType; }
+
+template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::set(Tp freqA, Tp resA, FilterType typeA){
-	mRes = resA;
+	mResRecip = Tp(0.5)/(resA*mLevel);
 	mType = typeA;
 	freq(freqA);
 }
 
 template <class Tv, class Tp, class Td>
-void Biquad<Tv,Tp,Td>::zero(){ d1=d2=(Tv)0; }
+inline void Biquad<Tv,Tp,Td>::set(Tp frq, Tp res){ set(frq, res, mType); }
+
+template <class Tv, class Tp, class Td>
+void Biquad<Tv,Tp,Td>::zero(){ d1=d2=Tv(0); }
 
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
@@ -633,30 +646,56 @@ void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 }
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::freq(Tp v){
-	mFreq = v;
-	float w = scl::clip(mFreq * mFrqToRad, 3.11f);
-	mReal = scl::cosT8(w);
-	mImag = scl::sinT7(w);
-	res(mRes);
+inline void Biquad<Tv,Tp,Td>::level(Tp v){
+	mResRecip *= mLevel;
+	mLevel=v;
+	resRecip(mResRecip);
 }
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::res(Tp v){
-	mRes = v;
-	mAlpha = mImag / mRes;
+inline void Biquad<Tv,Tp,Td>::freq(Tp v){
+	mFreq = v;
+	float w = scl::clip(mFreq * mFrqToRad, 3.13f);
+	mReal = scl::cosT8(w);
+	mImag = scl::sinT7(w);
+	resRecip(mResRecip);
+}
 
-	// Note: mB[0] is not used in the difference equation since it is assumed to
-	// be equal to 1. It is only used for gain control ...
+/*
+// Bandwidth, in octaves
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::width(Tp v){
+  alpha = sin(w0)/(2*Q)                                       (case: Q)
+		= sin(w0)*sinh( ln(2)/2 * BW * w0/sin(w0) )           (case: BW)
+        = sin(w0)/2 * sqrt( (A + 1/A)*(1/S - 1) + 2 )         (case: S)
+
+        FYI: The relationship between bandwidth and Q is
+             1/Q = 2*sinh(ln(2)/2*BW*w0/sin(w0))     (digital filter w BLT)
+        or   1/Q = 2*sinh(ln(2)/2*BW)             (analog filter prototype)
+
+	Tp oneOverQ = 2*sinh(0.34657359028 * v * mFreq*mFrqToRad / mImag);
+	qRecip(oneOverQ);
+}
+*/
+
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::resRecip(Tp v){
+	mResRecip = v;
+	mAlpha = mImag * mResRecip;
+
+	// Note: mB[0] is assumed to be equal to 1 in the difference equation. 
+	// For this reason, we divide all other coefficients by mB[0].
 	mB[0] = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of b0
 	mB[1] = Tp(-2) * mReal * mB[0];
 	mB[2] = (Tp(1) - mAlpha) * mB[0];
-	
+
 	type(mType);
 }
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::set(Tp frq, Tp res){ set(frq, res, mType); }
+inline void Biquad<Tv,Tp,Td>::res(Tp v){
+	resRecip(Tp(0.5)/(v*mLevel));
+}
 
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
@@ -668,9 +707,9 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[0] = mA[1] * Tp(0.5);
 		mA[2] = mA[0];
 		break;
-	case HIGH_PASS: // same as low-pass, but with sign flipped on odd a_k
-		mA[1] =-(Tp(1) + mReal) * mB[0];
-		mA[0] =-mA[1] * Tp(0.5);
+	case HIGH_PASS: // low-pass with odd k a_k and freq flipped
+		mA[1] = (Tp(-1) - mReal) * mB[0];
+		mA[0] = mA[1] * Tp(-0.5);
 		mA[2] = mA[0];
 		break;
 	case BAND_PASS:
@@ -684,14 +723,21 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
         mA[2] =-mA[0];
 		break;
 	case BAND_REJECT:
-        mA[0] = mB[0];	// 1.f * a0
+        mA[0] = mB[0];
         mA[1] = mB[1];
-        mA[2] = mB[0];	// 1.f * a0
+        mA[2] = mB[0];
 		break;
 	case ALL_PASS:
 		mA[0] = mB[2];
 		mA[1] = mB[1];
 		mA[2] = Tp(1);
+		break;
+	case PEAKING:{
+		Tp alpha_A_b0 = mAlpha * mLevel * mB[0];
+		mA[0] = mB[0] + alpha_A_b0;
+		mA[1] = mB[1];
+		mA[2] = mB[0] - alpha_A_b0;
+		}
 		break;
 	default:;
 	};
