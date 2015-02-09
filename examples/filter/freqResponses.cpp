@@ -70,7 +70,7 @@ int main(){
 	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad band-reject at 1/4 band")
 
 	bq.type(PEAKING);
-	bq.res(2);
+	bq.res(0.7);
 	bq.level(0.25);
 	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad peaking at 1/4 band")
 	bq.level(1.25);
