@@ -65,7 +65,6 @@ public:
 	void freq(float v);							///< Set natural frequency (1/delay())
 	void ipolType(ipl::Type v){ mIpol.type(v); }///< Set interpolation type
 	void maxDelay(float v);						///< Set maximum delay length
-	void zero();								///< Sets all delay elements to zero
 
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer
@@ -329,7 +328,7 @@ TM1 Delay<TM2>::Delay(float maxDly, float dly)
 {
 	Td::refreshDomain();
 	maxDelay(maxDly);
-	zero();
+	this->zero();
 	delay(dly);
 }
 
@@ -338,7 +337,7 @@ TM1 Delay<TM2>::Delay(float dly)
 {	//printf("Delay::Delay(float)\n");
 	Td::refreshDomain();
 	maxDelay(dly);
-	zero();
+	this->zero();
 	delay(dly);
 }
 
@@ -360,8 +359,6 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 		this->resize(maxDelayInSamples);
 	}
 }
-
-TM1 void Delay<TM2>::zero(){ this->assign(Tv(0)); }
 
 TM1 inline Tv Delay<TM2>::operator()() const{ return mIpol(*this, mPhase - mDelay); }
 
@@ -386,7 +383,7 @@ TM1 inline void Delay<TM2>::incPhase(){ mPhase += mPhaseInc; }
 TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this->size());
 	mPhaseInc = this->oneIndex();
 	//for(uint32_t i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
-	if(this->isSoleOwner()) zero();
+	if(this->isSoleOwner()) this->zero();
 	onDomainChange(1);
 }
 

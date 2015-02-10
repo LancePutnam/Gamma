@@ -245,9 +245,6 @@ public:
 		return *this;
 	}
 
-	/// Zero table elements
-	void zero(){ this->assign(Tv(0)); }
-
 	/// Get reference to table
 	ArrayPow2<Tv>& table(){ return *this; }
 

@@ -493,8 +493,6 @@ public:
 		mSum += i0 - Base::operator()(i0);
 		return mSum * mRSize;
 	}
-	
-	void zero(){ this->assign(Tv(0)); }
 
 	virtual void onResize(){
 		mRSize = 1./Base::size();

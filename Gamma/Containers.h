@@ -114,6 +114,9 @@ public:
 	/// \param[in] start	start index (inclusive)
 	ArrayBase& assign(const T& v, uint32_t end, uint32_t stride=1, uint32_t start=0);
 
+	/// Sets all elements to zero
+	ArrayBase& zero();
+
 
 	T * elems();					///< Get writable pointer to elements	
 	const T * elems() const;		///< Get read-only pointer to elements
@@ -399,6 +402,11 @@ ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
 ){
 	for(uint32_t i=start; i<end; i+=stride) A::construct(mElems+i, v);
 	return *this;
+}
+
+template <class T, class S, class A>
+ArrayBase<T,S,A>& ArrayBase<T,S,A>::zero(){
+	return assign(T(0));
 }
 
 template <class T, class S, class A>
