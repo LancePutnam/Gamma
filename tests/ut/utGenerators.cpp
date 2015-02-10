@@ -71,7 +71,11 @@
 	}
 
 	{
-		{ SamplePlayer<> p; }
+		{
+			SamplePlayer<> p;
+			assert(!p.valid());
+		}
+
 		{ SamplePlayer<> p; SamplePlayer<> q(p); }
 		{ Array<float> a; SamplePlayer<> p(a, 1); }
 		//{ SamplePlayer<> p("path/to/soundfile.wav"); }

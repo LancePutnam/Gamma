@@ -122,18 +122,10 @@ public:
 	double posInInterval(double frac) const;///< Get position from fraction within interval
 	double rate() const { return mRate; }	///< Get playback rate
 
-	/// Returns whether the sample buffer is valid for playback
-	bool valid() const;
-
 
 	virtual void onDomainChange(double r){ frameRate(mFrameRate); }
 
-protected:	
-	static T * defaultBuffer(){
-		static T v(0);
-		return &v;
-	}
-
+protected:
 	Si<T> mIpol;
 	Sp mPhsInc;
 
@@ -159,7 +151,7 @@ protected:
 #define CLS SamplePlayer<T,Si,Sp>
 
 PRE CLS::SamplePlayer()
-:	Array<T>(defaultBuffer(), 1),
+:	Array<T>(defaultArray<T>(), 1),
 	mPos(0), mInc(0),
 	mFrameRate(1), mChans(1),
 	mRate(1), mMin(0), mMax(1)
@@ -188,7 +180,7 @@ PRE CLS::SamplePlayer(const char * path, double rate)
 :	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
 {	
 	if(!load(path)){
-		this->source(defaultBuffer(), 1);
+		this->source(defaultArray<T>(), 1);
 	}
 }
 
@@ -320,10 +312,6 @@ PRE inline double CLS::period() const { return frames() * ups(); }
 
 PRE inline double CLS::posInInterval(double frac) const {
 	return min() + (max() - min()) * frac;
-}
-
-PRE bool CLS::valid() const {
-	return this->mElems && (this->mElems != defaultBuffer());
 }
 
 #undef PRE

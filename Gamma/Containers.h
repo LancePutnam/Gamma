@@ -22,6 +22,17 @@
 namespace gam{
 
 
+/// A single element array
+
+/// This array can be referenced by default to avoid a potential null pointer
+/// dereference.
+template<class T>
+T * defaultArray(){
+	static T v(0);
+	return &v;
+}
+
+
 ///Size functor for ArrayPow2
     
 ///\ingroup Containers
@@ -121,6 +132,9 @@ public:
 	bool isSoleOwner() const;
 	
 	bool usingExternalSource() const;
+
+	/// Returns whether internal memory pointer is valid
+	bool valid() const;
 	
 	/// Resizes number of elements in array
 	
@@ -435,6 +449,11 @@ bool ArrayBase<T,S,A>::isSoleOwner() const {
 template <class T, class S, class A>
 bool ArrayBase<T,S,A>::usingExternalSource() const {
 	return elems() && !managing((T*)elems());
+}
+
+template <class T, class S, class A>
+bool ArrayBase<T,S,A>::valid() const {
+	return elems() && (elems() != defaultArray<T>());
 }
 
 template <class T, class S, class A>

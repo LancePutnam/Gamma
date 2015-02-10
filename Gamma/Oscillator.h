@@ -197,12 +197,17 @@ template<
 class Osc : public Accum<Sp,Td>, public ArrayPow2<Tv>{
 public:
 
+	/// Default constructor does not allocate table memory
+	Osc()
+	:	ArrayPow2<Tv>(defaultArray<Tv>(), 1)
+	{}
+
 	/// Constructor that allocates an internal table
 
 	/// \param[in]	frq			Frequency
 	/// \param[in]	phs			Phase in [0, 1)
 	/// \param[in]	size		Size of table (actual number is power of 2 ceiling)
-	Osc(float frq=440, float phs=0, uint32_t size=512)
+	Osc(float frq, float phs=0, uint32_t size=512)
 	:	Base(frq, phs), ArrayPow2<Tv>(size, Tv())
 	{}
 
@@ -246,7 +251,6 @@ public:
 	/// Get reference to table
 	ArrayPow2<Tv>& table(){ return *this; }
 
-//	using ArrayPow2<Tv>::elems; using ArrayPow2<Tv>::size;
 protected:
 	Si<Tv> mIpol;
 private:
