@@ -320,11 +320,12 @@ protected:
 
 
 /// N-sample delay
-    
+
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 struct DelayN: public Ring<T,A>{
-	using Ring<T,A>::incPos; using Ring<T,A>::pos;
+
+	DelayN(){}
 
 	/// \param[in]	size		Delay size, greater than 0
 	/// \param[in]	value		Initial value of all elements
@@ -334,9 +335,9 @@ struct DelayN: public Ring<T,A>{
 
 	/// Write new element and return oldest
 	T operator()(const T& input){
-		incPos();				// inc write pos
-		T dly = (*this)[pos()];	// read oldest element
-		(*this)[pos()] = input;	// write new element
+		this->incPos();					// inc write pos
+		T dly = (*this)[this->pos()];	// read oldest element
+		(*this)[this->pos()] = input;	// write new element
 		return dly;				//	... write pos left at last written element
 	}
 };

@@ -386,7 +386,7 @@ public:
 		i0 *= gain();
 		i0 += d1*mC[1] + d2*mC[2];
 		this->delay(i0);
-		return i0; 
+		return i0;
 	}
 
 	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
@@ -481,6 +481,10 @@ protected:
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
+
+	MovingAvg()
+	:	mSum(0), mRSize(0)
+	{}
 
 	/// \param[in] size		Kernel size, greater than 1
 	explicit MovingAvg(unsigned size)
