@@ -7,7 +7,7 @@
 
 #include "../examples.h"
 
-Accum<> tmr(10);			// timer to switch between LFO types
+Accum<> tmr(10);
 
 void audioCB(AudioIOData& io){
 

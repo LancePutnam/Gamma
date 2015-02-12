@@ -28,7 +28,7 @@ struct Combs4{
 	Comb<T, ipl::Linear> c1, c2, c3, c4;
 };
 
-Accum<> tmr(16, 2);
+Accum<> tmr(16);
 LFO<> lfoD(2.51);
 Chirp<> src(100., 1, 0.1);
 Chorus<> chr(0.5, 0.3, 0.01, 1, 0.7);

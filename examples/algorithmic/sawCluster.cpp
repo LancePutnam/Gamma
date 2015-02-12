@@ -9,7 +9,7 @@
 #include "../examples.h"
 
 // Sounds a bit like...
-Accum<> tmr(0.5, 2);
+Accum<> tmr(0.5, 0.999);
 Seg<> env0(2);
 LFO<> osc0(440), osc1(330.04), osc2(180.04), osc3(90.03);
 Sine<> mod0(0.63,0.5), mod1(0.71,0.75), mod2(0.87,1), mod3(1,1);

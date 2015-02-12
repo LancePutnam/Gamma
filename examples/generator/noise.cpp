@@ -11,11 +11,11 @@
 
 #include "../examples.h"
 
-NoiseWhite<> white;		// 1/f^0 noise
-NoisePink<> pink;		// 1/f^1 noise
-NoiseBrown<> brown;		// 1/f^2 noise
-int type = 2;			// Noise type
-Accum<> tmr(1./2);		// Timer for switching noise
+NoiseWhite<> white;			// 1/f^0 noise
+NoisePink<> pink;			// 1/f^1 noise
+NoiseBrown<> brown;			// 1/f^2 noise
+int type = 2;				// Noise type
+Accum<> tmr(1./2,0.999);	// Timer for switching noise
 
 void audioCB(AudioIOData& io){
 

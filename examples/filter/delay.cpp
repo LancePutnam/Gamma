@@ -9,7 +9,7 @@
 
 // Delay args: max delay, initial delay
 Delay<float, ipl::Trunc> delay(0.4,	0.2);
-Accum<> tmr(1);
+Accum<> tmr(1, 0.999);
 Burst burst(2e4,2e3, 0.1);
 
 void audioCB(AudioIOData& io){

@@ -11,7 +11,7 @@ LFO<> mod(0.2, 0.5);
 NoiseWhite<> src;
 Biquad<> filt(10, 4);
 
-Accum<> tmr(0.2);			// Timer to switch between filter types
+Accum<> tmr(0.2,0.999);		// Timer to switch between filter types
 int cnt=0;					// Counter for filter type
 
 void audioCB(AudioIOData& io){

@@ -10,7 +10,7 @@
 Accum<> tmr(0.4);			// timer to switch between LFO types
 LFO<> osc(220, 0, 0.25);	// source (220 hz, 0 phase, 0.25 mod)
 LFO<> mod(0.5);				// modulator of source's modifier parameter
-int waveform=-1;
+int waveform=0;
 
 void audioCB(AudioIOData& io){
 

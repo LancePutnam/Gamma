@@ -37,7 +37,7 @@ struct VowelFilter{
 	float amps[N];
 };
 
-Accum<> tmr(1./2, 2);
+Accum<> tmr(1./2, 0.999);
 unsigned ivowel=0;
 VowelFilter filt;
 LFO<> osc;

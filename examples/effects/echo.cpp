@@ -9,7 +9,7 @@
 #include "../examples.h"
 
 Delay<> delay(0.2);				// 200 ms delay
-Accum<> tmr(1./4);
+Accum<> tmr(1./4, 0.999);
 SineD<> src(1000, 0.1, 0.1);	// short sine plink
 
 void audioCB(AudioIOData& io){

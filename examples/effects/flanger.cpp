@@ -34,7 +34,7 @@ struct Flanger{
 };
 
 
-Accum<> tmr(0.2);		// Switch between flanging types
+Accum<> tmr(0.2, 0.999);// Switch between flanging types
 LFO<> src(110);			// A rich source
 Flanger flanger;		// Flanger unit
 int flangeType=0;		// Flanging type

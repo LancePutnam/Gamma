@@ -57,12 +57,9 @@ public:
 	float phase() const;			///< Get phase in [0, 1)
 	uint32_t phaseI() const;		///< Get fixed-point phase
 
-	/// Returns 0x80000000 on phase wrap, 0 otherwise
-	
-	/// The return value can be used as a bool.  It's an integer because it
-	/// saves a conditional check converting to a bool.
-	uint32_t cycle();
-	uint32_t operator()();			///< Alias of cycle()
+	/// Returns true on phase wrap, false otherwise
+	bool cycle();
+	bool operator()();				///< Alias of cycle()
 
 	uint32_t nextPhase();			///< Increment phase and return updated phase
 	uint32_t nextPhase(float freqOffset);
@@ -110,17 +107,20 @@ private:
 
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
-///\ingroup Oscillators 
+///\ingroup Oscillators
 template <class Sp = phsInc::Loop, class Td = DomainObserver>
 class Sweep : public Accum<Sp, Td> {
 public:
 	/// \param[in] frq		Frequency
 	/// \param[in] phs		Phase in [0,1)
-	Sweep(float frq=440, float phs=0): Base(frq, phs){}
+	Sweep(float frq=440, float phs=0)
+	:	Accum<Sp, Td>(frq, phs){}
 
-	float operator()(){ Base::cycle(); return Base::phase(); }
-
-private: typedef Accum<Sp,Td> Base;
+	float operator()(){
+		float r = this->phase();
+		this->nextPhase();
+		return r;
+	}
 };
 
     
@@ -208,7 +208,7 @@ public:
 	/// \param[in]	phs			Phase in [0, 1)
 	/// \param[in]	size		Size of table (actual number is power of 2 ceiling)
 	Osc(float frq, float phs=0, uint32_t size=512)
-	:	Base(frq, phs), ArrayPow2<Tv>(size, Tv())
+	:	Accum<Sp,Td>(frq, phs), ArrayPow2<Tv>(size, Tv())
 	{}
 
 	/// Constructor that references an external table
@@ -217,7 +217,7 @@ public:
 	/// \param[in]	phs			Phase in [0, 1)
 	/// \param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, ArrayPow2<Tv>& src)
-	:	Base(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
+	:	Accum<Sp,Td>(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
 	{}
 
 
@@ -229,7 +229,7 @@ public:
 	}
 
 	/// Get current value
-	Tv val() const { return mIpol(*this, phaseI()); }
+	Tv val() const { return mIpol(table(), this->phaseI()); }
 	
 	/// Add sine to table
 	
@@ -247,12 +247,10 @@ public:
 
 	/// Get reference to table
 	ArrayPow2<Tv>& table(){ return *this; }
+	const ArrayPow2<Tv>& table() const { return *this; }
 
 protected:
 	Si<Tv> mIpol;
-private:
-	ACCUM_INHERIT
-	typedef Accum<Sp,Td> Base;
 };
 
 
@@ -801,62 +799,60 @@ protected:
 
 namespace{
 
-	// Convert unit floating-point to fixed-point integer.
-	// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
-	inline uint32_t mapFI(float v){
-		//return scl::unitToUInt(v);
-		//return (uint32_t)(v * 4294967296.);
-		return castIntRound(v * 4294967296.);
-	}
+// Convert unit floating-point to fixed-point integer.
+// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
+inline uint32_t mapFI(float v){
+	//return scl::unitToUInt(v);
+	//return (uint32_t)(v * 4294967296.);
+	return castIntRound(v * 4294967296.);
+}
 
-	// Convert fixed-point integer to unit floating-point.
-	inline double mapIF(uint32_t v){
-		return v/4294967296.;
-		//return uintToUnit<float>(v); // not enough precision
-	}
+// Convert fixed-point integer to unit floating-point.
+inline double mapIF(uint32_t v){
+	return v/4294967296.;
+	//return uintToUnit<float>(v); // not enough precision
+}
 
 };
 
 
 //---- Accum
-    
-template<class St, class Td> Accum<St,Td>::Accum(float f, float p)
+template<class St, class Td>
+Accum<St,Td>::Accum(float f, float p)
 :	mFreq(f), mFreqToInt(4294967296.), mFreqI(0)
 {
 	Td::refreshDomain();
 	phase(p);
-	//(p >= 1.f) ? phaseMax() : this->phase(p);
 }
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::mapFreq(float v) const {
+template<class St, class Td>
+inline uint32_t Accum<St,Td>::mapFreq(float v) const {
 	//return mapFI(v * Td::ups());
 	return castIntRound(v * mFreqToInt);
 }
 
-template<class St, class Td> void Accum<St,Td>::onDomainChange(double r){ //printf("Accum: onDomainChange (%p)\n", this);
+template<class St, class Td>
+void Accum<St,Td>::onDomainChange(double r){ //printf("Accum: onDomainChange (%p)\n", this);
 	mFreqToInt = 4294967296. / Td::spu();
-
-	uint32_t fprev = mFreqI;
 	freq(mFreq);
-	
-	// ensure phase will be correct value upon next increment
-	mPhaseI = mPhaseI + fprev - mFreqI;
 }
 
-template<class St, class Td> inline void Accum<St,Td>::freq(float v){
+template<class St, class Td>
+inline void Accum<St,Td>::freq(float v){
 	mFreq = v;
 	mFreqI= mapFreq(v);
 }
 
-template<class St, class Td> inline void Accum<St,Td>::freqI(uint32_t v){
+template<class St, class Td>
+inline void Accum<St,Td>::freqI(uint32_t v){
 	mFreqI= v;
 	mFreq = mapIF(v) * Td::spu();
 }
 
 template<class St, class Td> inline void Accum<St,Td>::period(float v){ freq(1.f/v); }
-template<class St, class Td> inline void Accum<St,Td>::phase(float v){ mPhaseI = mapFI(v) - mFreqI; }
+template<class St, class Td> inline void Accum<St,Td>::phase(float v){ mPhaseI = mapFI(v); }
 template<class St, class Td> inline void Accum<St,Td>::phaseAdd(float v){ mSp(mPhaseI, mapFI(v)); }
-template<class St, class Td> inline void Accum<St,Td>::phaseMax(){ mPhaseI = 0xffffffff; }
+template<class St, class Td> void Accum<St,Td>::phaseMax(){ mPhaseI = 0xffffffff; }
 
 template<class St, class Td> inline float Accum<St,Td>::freq() const { return mFreq; }
 template<class St, class Td> inline uint32_t Accum<St,Td>::freqI() const { return mFreqI; }
@@ -866,14 +862,20 @@ template<class St, class Td> inline float Accum<St,Td>::phase() const { return m
 template<class St, class Td> inline uint32_t Accum<St,Td>::phaseI() const { return mPhaseI; }
 
 template<class St, class Td> inline uint32_t Accum<St,Td>::nextPhase(float frqOffset){
-	return mSp(mPhaseI, mFreqI + mapFreq(frqOffset));
+	uint32_t p = mPhaseI;
+	mSp(mPhaseI, mFreqI + mapFreq(frqOffset)); // apply phase inc strategy
+	return p;
 }
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::nextPhase(){ return mSp(mPhaseI, mFreqI); }
+template<class St, class Td> inline uint32_t Accum<St,Td>::nextPhase(){
+	uint32_t p = mPhaseI;
+	mSp(mPhaseI, mFreqI); // apply phase inc strategy
+	return p;
+}
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::operator()(){ return cycle(); }
+template<class St, class Td> inline bool Accum<St,Td>::operator()(){ return cycle(); }
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::cycle(){ return cycles() & 0x80000000; }
+template<class St, class Td> inline bool Accum<St,Td>::cycle(){ return bool(cycles() & 0x80000000); }
 
 //template<class St, class Td> inline uint32_t Accum<St,Td>::cycle(uint32_t mask){
 //	return cycles() & mask;
