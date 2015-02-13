@@ -85,7 +85,7 @@ void DFT::resize(unsigned newWinSize, unsigned newPadSize){ //printf("DFT::resiz
 void DFT::onDomainChange(double r){
 	DFTBase<float>::onDomainChange(r);
 	domainHop().ups((double)sizeHop() * ups());
-	//printf("[%p] hop: %d, ups: %f\n", this, sizeHop(), spu());
+	//printf("[%p] hop: %d, spu: %f\n", this, sizeHop(), spu());
 }
 
 void DFT::forward(const float * src){ //printf("DFT::forward(const float *)\n");
