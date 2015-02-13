@@ -107,7 +107,7 @@ void Domain::notifyObservers(double r){
 	}
 }
 
-void Domain::spu(double v){
+void Domain::spu(double v){ //printf("[%p] Domain::spu(%g)\n", this, v);
 	mHasBeenSet = true;
 	if(v != mSPU){
 		double r = v/mSPU;
@@ -118,6 +118,28 @@ void Domain::spu(double v){
 }
 
 void Domain::ups(double val){ spu(1./val); }
+
+void Domain::print(FILE * fp) const {
+	fprintf(fp, "Domain %p:\n\tspu = %f, ups = %f\n", this, spu(), ups());
+
+	DomainObserver * o = mHeadObserver;
+	unsigned numObs = 0;
+	while(o){
+		++numObs;
+		o = o->nodeR;
+	}
+	
+	fprintf(fp, "\t %u observers%s", numObs, numObs ? ": " : "\n");
+
+	if(numObs){
+		o = mHeadObserver;
+		while(o){
+			fprintf(fp, "%p ", o);
+			o = o->nodeR;
+		}
+		fprintf(fp, "\n");
+	}
+}
 
 /*static*/ Domain& Domain::master(){
 	static Domain * s = new Domain;

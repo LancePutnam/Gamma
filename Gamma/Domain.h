@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <stdio.h>
 #include "Gamma/Node.h"
 
 namespace gam{
@@ -114,6 +115,8 @@ public:
 	bool hasBeenSet() const;			///< Returns true if spu has been set at least once
 	double spu() const;					///< Returns samples/unit, i.e. sample rate
 	double ups() const;					///< Returns units/sample, i.e. sample interval
+
+	void print(FILE * fp = stdout) const;
 
 	/// Master domain. By default, all observers will be attached to this.
 	static Domain& master();
