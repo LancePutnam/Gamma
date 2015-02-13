@@ -44,14 +44,12 @@ DomainObserver& DomainObserver::operator= (const DomainObserver& rhs){
 void DomainObserver::domain(Domain& newSubject){
 	if(&newSubject != mSubject){
 		if(mSubject){
-			// Are we the only observer?
-			if(!linked() && mSubject->mHeadObserver == this){
-				mSubject->mHeadObserver = NULL;
+			// If head of list, then set head to right node
+			if(mSubject->mHeadObserver == this){
+				mSubject->mHeadObserver = this->nodeR;
 			}
-			// Otherwise, just remove from (subject's) list
-			else{
-				nodeRemove();
-			}
+
+			nodeRemove();
 		}
 		newSubject.attach(*this);
 		double r = newSubject.spu() / (mSubject ? mSubject->spu() : 1.);
