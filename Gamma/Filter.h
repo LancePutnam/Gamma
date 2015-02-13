@@ -206,14 +206,20 @@ class BlockNyq : public BlockDC<Tv,Tp,Td>{
 public:
 
 	/// \param[in] width	Bandwidth of pole
-	BlockNyq(Tp width=35): Base(width){}
+	BlockNyq(Tp bwidth=35){ width(bwidth); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
 		i0 += d1*mB1;
-		Tv o0 = i0-d1;
-		d1 =-i0;
+		Tv o0 = i0+d1;
+		d1 = i0;
 		return o0;
+	}
+
+	/// Set bandwidth of pole
+	void width(Tp v){
+		Base::width(v);
+		mB1 = -mB1;
 	}
 
 protected:
