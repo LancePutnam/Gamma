@@ -72,6 +72,8 @@ int main(int argc, char* argv[]){
 	#include "ut/ut_ipl.cpp"
 	#include "ut/ut_arr.cpp"
 
+	#include "ut/utDomain.cpp"
+
 	#include "ut/utDelay.cpp"
 	#include "ut/utEnvelope.cpp"
 	#include "ut/utFilter.cpp"
