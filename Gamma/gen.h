@@ -524,10 +524,16 @@ struct OnOff{
 };
 
 
-struct OneOff{
+/// Returns true once, then false until reset
+class OneOff{
+public:
 	OneOff(bool v=true): mVal(v) {}
+
+	/// Get next value
 	bool operator()(){ bool r=mVal; mVal=false; return r; }
-	void set(){ mVal=true; }
+
+	/// Reset trigger
+	void reset(){ mVal=true; }
 
 private:
 	bool mVal;
