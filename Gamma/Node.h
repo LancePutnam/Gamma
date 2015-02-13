@@ -211,7 +211,7 @@ void Node2<T>::nodeRemove(){
 
 template <class T>
 bool Node2<T>::linked() const {
-	return nodeL && nodeR;
+	return nodeL || nodeR;
 }
 
 template <class T>
