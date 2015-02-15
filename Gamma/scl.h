@@ -158,10 +158,20 @@ template<class T> T fold(T v, long& numFolds, T hi=T(1), T lo=T(0));
 /// Returns value folded into [lo, hi] one time.
 template<class T> T foldOnce(T value, T hi=T(1), T lo=T(0));
 
-/// Convert linear value to log2 in range [0, 1]
-template<class T> T linLog2(T v, T recMin);
+/// Returns base-2 log linearly mapped to [0, 1]
 
-/// Returns base 2 logarithm of value.
+/// This function applies a log2 mapping and then normalizes the result to the
+/// interval [0, 1]. Since the log(0) = -inf, the result of the log is clipped
+/// below -1/recMin. The equation used is\n
+///
+/// v -> (log2(|v|) recMin) + 1
+///
+/// \param[in] v		input value
+/// \param[in] recMin	negative of reciprocal of minimum log value
+/// \returns log base-2 linearly mapped to [0, 1]
+template<class T> T linLog2(T v, T recMin = T(1./16));
+
+/// Returns base-2 logarithm of value.
 
 /// If the value is not an exact power of two, the logarithm of the next
 /// highest power of two will taken.
@@ -169,7 +179,7 @@ template<class T> T linLog2(T v, T recMin);
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
 uint32_t log2(uint32_t v);
 
-/// Fast base 2 logarithm.  For value <= 0, behavior is undefined.
+/// Fast base-2 logarithm. For value <= 0, behavior is undefined.
 float log2Fast(float v);
 
 /// Maps value from [-1,1] to [depth, 1].
