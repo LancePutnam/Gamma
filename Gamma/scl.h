@@ -1082,9 +1082,6 @@ inline uint32_t quantizePow2(uint32_t v, uint32_t q){
 }
 
 
-// Freq precision:	32 bits
-// Amp precision:	24 bits
-// Width precision:	32 bits
 inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
 	uint32_t saw1 = ((p-w) >> 9) | Expo1<float>();
@@ -1097,32 +1094,24 @@ inline float pulseU(uint32_t p, uint32_t w){
 }
 
 // [1, 0.5, 0, -0.5]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampDown(uint32_t p){
 	p = (p >> 9) | Expo2<float>();
 	return 3.f - punUF(p);
 }
 
 // [1, 0.75, 0.5, 0.25]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampDownU(uint32_t p){
 	p = (p >> 9) | ExpoNeg1<float>();
 	return punUF(p) + 2.f;
 }
 
 // [-1, -0.5, 0, 0.5]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampUp(uint32_t p){
 	p = (p >> 9) | Expo2<float>();
 	return punUF(p) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampUpU(uint32_t p){
 	p = (p >> 9) | Expo1<float>();
 	return punUF(p) - 1.f;
@@ -1147,8 +1136,6 @@ inline float sinPara(uint32_t p){
 }
 
 // [1, 1,-1,-1]
-// Freq precision:	31 bits
-// Amp precision:	NA
 inline float square(uint32_t p){
 	// use MSB to set sign of 1.f
 	p = (p & MaskSign<float>()) | Expo1<float>();
@@ -1178,38 +1165,48 @@ inline float stairU(uint32_t p, uint32_t w){
 	return ((p & MaskSign<float>()) ? 0.5f : 0.f) + (((p+w) & MaskSign<float>()) ? 0.5f : 0.f);
 }
 
-// [ 1, 0,-1, 0]
-// Freq precision:	31 bits
-// Amp precision:	25 bits
+// Triangle follows sequence [ 1, 0,-1, 0]
+
+//* abs on ramp down
+inline float triangle(uint32_t p){
+	p = (p >> 9) | Expo4<float>(); // [4, 8]
+	return abs(gam::punUF(p) - 6.f) - 1.f;
+}
+//*/
+
+/* Fancy phase reversal using xor
 inline float triangle(uint32_t p){
 	uint32_t dir = p >> 31;
 	p = ((p^(-int32_t(dir))) + dir);
 	p = (p >> 8) | Expo2<float>();
 	return 3.f - punUF(p);
-}
+}//*/
 
-//inline float triangle(uint32_t p){
-//	p = (p >> 9) | Expo4<float>(); // [4, 8]
-//	return abs(gam::punUF(p) - 6.f) - 1.f;
-//}
+/* 2x trapezoid minus square
+inline float triangle(uint32_t p){
+	uint32_t dir = p & MaskSign<float>();
+	dir |= Expo2<float>(); // +/- 2
+	p = (p << 1 >> 9) | dir;
+	dir |= 0x400000;	// make it +/-3
+	return punUF(dir) - punUF(p);
+}//*/
 
-// Just another triangle wave algorithm
-//inline float triangle(uint32_t p){
-//	uint32_t dir = p & MaskSign<float>();
-//	dir |= 0x40000000;
-//	p = (p << 1 >> 9) | dir;
-//	dir |= 0x400000;	// make it +/-3
-//	return punUF(dir) - punUF(p);
-//}
+/* (2x ramp down) x (square)
+inline float triangle(uint32_t p){
+	//return rampDown(p<<1) * square(p);
+	uint32_t r2 = Expo1<float>() | (p >> 8); // [1,2] 2x
+	uint32_t sq = (p & MaskSign<float>()) | Expo2<float>();
+	return (1.5f - punUF(r2)) * punUF(sq);
+}//*/
 
-// and another...
-//inline float triangle(uint32_t p){
-//	return rampDown(p<<1) * square(p);
-//}
+/* Difference of parabolic waves
+inline float triangle(uint32_t p){
+	float a = rampDown(p);
+	float b = rampDown(p + (1<<31));
+	return a*a - b*b;
+}//*/
 
 // [1, 0.5, 0, 0.5]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float triangleU(uint32_t p){
 	union{ float f; uint32_t i; } u;
 	u.i = (p >> 9) | Expo2<float>();
