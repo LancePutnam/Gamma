@@ -1087,8 +1087,11 @@ DEF(patU(),		scl::rampUpU(nextPhase() & mMod))
 
 DEF(patU(uint32_t mul), scl::rampUpU((nextPhase() & mMod) * mul))
 
-DEF(sineT9(),	up(); r = scl::sinT9(r * M_PI))
-DEF(sineP9(),	up(); r = scl::sinP9(r))
+/* The input domain for these is [-1,1] corresponding to [-pi,pi], but that will
+give us an upside-down sine. We therefore use a downward ramp to flip the wave
+on the time axis.*/
+DEF(sineT9(),	down(); r = scl::sinT9(r * M_PI))
+DEF(sineP9(),	down(); r = scl::sinP9(r))
 
 #undef DEF
 
