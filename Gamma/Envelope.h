@@ -575,14 +575,6 @@ public:
 	/// Get current value
 	Tv val() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
 
-
-	/// Generate next value
-	Tv operator()(){
-		Tp f = mAcc.val;
-		if(done()) return mIpl.val();
-		mAcc();
-		return mIpl(scl::min(f, Tp(1)));
-	}
 	
 	/// Set new end value.  Start value is set to current value.
 	void operator= (Tv v){
@@ -591,25 +583,34 @@ public:
 		reset();
 	}
 
+	/// Generate next value
+	Tv operator()(){
+		if(done()) return mIpl.val();
+		Tp f = mAcc.val;
+		mAcc();
+		return mIpl(f);
+	}
+
 	/// Generates a new end point from a generator when the segment end is reached
 	
-	/// This is useful for creating pitched noise from a random number generator.
-	///
-	template <class G>
-	Tv operator()(G& g){
+	/// This can be used to upsample and interpolate a lower-rate signal,
+	/// e.g., creating pitched noise from a random number generator.
+	template <class Gen>
+	Tv operator()(Gen& g){
+		if(done()){
+			mIpl.push(g());
+			mAcc.val = mAcc.val - Tp(1); // wrap phase
+		}
 		Tp f = mAcc.val;
-		Tv v;
-		if(f >= Tp(1)){	v = mIpl.val(); (*this) = g(); }
-		else{			v = val(); }
 		mAcc();
-		return v;
+		return mIpl(f);
 	}
 	
 	/// Set frequency of envelope
 	void freq(Tp v){ mFreq = v; mAcc.add = v * Td::ups(); }
 	
 	/// Set length, in domain units
-	void length(Tp v){ freq((Tp)1/v); }
+	void length(Tp v){ freq(Tp(1)/v); }
 
 	/// Set length, in domain units
 	void period(Tp v){ length(v); }
@@ -618,7 +619,7 @@ public:
 	void phase(Tp v){ mAcc = v; }
 
 	/// Reset envelope
-	void reset(){ phase((Tp)0); }
+	void reset(){ phase(Tp(0)); }
 
 
 	Si<Tv>& ipol(){ return mIpl; }
@@ -712,9 +713,6 @@ inline bool Curve<Tv,Tp>::done() const {
 	else			return value() <= end();
 }
 
-template <class Tv,class Tp>
-inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
-
 // dividing by mMul goes back one step
 template <class Tv,class Tp>
 inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
@@ -771,6 +769,9 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	mA+= start;
 	return *this;
 }
+
+template <class Tv,class Tp>
+inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
 
 template <class Tv,class Tp>
 inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
