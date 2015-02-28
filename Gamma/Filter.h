@@ -11,9 +11,7 @@
 
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
-
 #include "Gamma/Containers.h"
-//#include "Gamma/Strategy.h"
 #include "Gamma/Domain.h"
 #include "Gamma/Types.h"
 
@@ -33,9 +31,13 @@ enum FilterType{
 
 
 
+/// Returns pole radius given a unit bandwidth
+template <class T>
+inline T poleRadius(T bw){ return ::exp(-M_PI * bw); }
+
 /// Returns pole radius given a bandwidth and sampling interval
 template <class T>
-inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
+inline T poleRadius(T bw, double ups){ return poleRadius(bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
 
 /// Convert domain frequency to radians clipped to interval [0, pi).
@@ -518,8 +520,11 @@ protected:
 
 
 
-/// One-pole smoothing filter
+/// One-pole filter
 
+/// This filter uses a single pole at either DC or Nyquist to create a low-pass
+/// or high-pass response, respectively.
+///
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
@@ -535,8 +540,7 @@ public:
 
 	const Tp& freq() const { return mFreq; }	///< Get cutoff frequency
 
-	void operator  = (const Tv& val);	///< Stores input value for operator()
-	void operator *= (const Tv& val);	///< Multiplies stored value by value
+	void type(FilterType type);			///< Set type of filter (gam::LOW_PASS or gam::HIGH_PASS)
 	void freq(Tp val);					///< Set cutoff frequency (-3 dB bandwidth of pole)
 	void smooth(Tp val);				///< Set smoothing coefficient directly
 	void zero(){ o1=0; }				///< Zero internal delay
@@ -544,14 +548,20 @@ public:
 
 	const Tv& operator()();				///< Returns filtered output using stored value
 	const Tv& operator()(const Tv& input);		///< Returns filtered output from input value
+
+	void operator  = (const Tv& val);	///< Stores input value for operator()
+	void operator *= (const Tv& val);	///< Multiplies stored value by value
+
 	const Tv& last() const;				///< Returns last output
 	const Tv& stored() const;			///< Returns stored value
 	Tv& stored();						///< Returns stored value
+
 	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros
 	
 	virtual void onDomainChange(double r);
 
 protected:
+	FilterType mType;
 	Tp mFreq, mA0, mB1;
 	Tv mStored, o1;
 };
@@ -772,37 +782,56 @@ inline Tv Biquad<Tv,Tp,Td>::nextBP(Tv i0){
 //---- OnePole
 template <class Tv, class Tp, class Td>
 OnePole<Tv,Tp,Td>::OnePole()
-:	mFreq(10), mStored(Tv(0)), o1(Tv(0))
+:	mType(LOW_PASS), mFreq(10), mStored(Tv(0)), o1(Tv(0))
 {	Td::refreshDomain(); }
 
 template <class Tv, class Tp, class Td>
 OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
-:	mFreq(frq), mStored(stored), o1(stored)
+:	mType(LOW_PASS), mFreq(frq), mStored(stored), o1(stored)
 {	Td::refreshDomain(); }
 
 template <class Tv, class Tp, class Td>
 void OnePole<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 
 template <class Tv, class Tp, class Td>
-inline void OnePole<Tv,Tp,Td>::operator  = (const Tv& v){ mStored  = v; }
-    
-template <class Tv, class Tp, class Td>
-inline void OnePole<Tv,Tp,Td>::operator *= (const Tv& v){ mStored *= v; }
+inline void OnePole<Tv,Tp,Td>::type(FilterType v){
+	mType = v;
+	freq(mFreq);
+}
 
-// f = ln(mB1) / -M_2PI * SR  ( @ 44.1 f = ln(c01) * -7018.733)
-// @ 44.1 : 0.9     <=> 739.5
-// @ 44.1 : 0.99    <=>  70.54
-// @ 44.1 : 0.999   <=>   7.022
-// @ 44.1 : 0.9999  <=>   0.702
-// @ 44.1 : 0.99999 <=>   0.0702
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::freq(Tp v){
-	mFreq = v;	
-	v = scl::max(v, Tp(0));	// ensure positive freq
-	
-	// freq is half the bandwidth of a pole at 0
-	smooth( poleRadius(Tp(2) * v, Td::ups()) );
-	//printf("%f, %f, %f\n", Td::spu(), mB1, v);
+	mFreq = v;
+
+	Tp f = v * Td::ups();
+	f = scl::clip(f, Tp(0.5));
+
+	//Tv re = 1 - f*f*(24 - 32*f); // cubic apx.
+	Tv re = scl::sinFast(Tp(1) - Tp(4)*f);
+	//Tv re = cos(2*M_PI * f);
+
+	// |H(w)| = |a0| / sqrt(1 + b1^2 + 2 b1 cos w)
+
+	switch(mType){
+	default:{ // low-pass
+		// cutoff based on pole at DC (inaccurate with large bandwidth)
+		//mB1 = poleRadius(Tp(2) * v * Td::ups());
+		// b1 found by setting |H(w)| = 0.707
+		Tv p1 = re - Tv(2);
+		mB1 = -(p1 + sqrt(p1*p1 - Tv(1)));
+		mA0 = Tp(1) - mB1;
+		}
+		break;
+	case HIGH_PASS:{
+		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
+		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
+		// b1 found by setting |H(w)| = 0.707
+		Tv p1 = -re - Tv(2);
+		mB1 = (p1 + sqrt(p1*p1 - Tv(1)));
+		mA0 = Tp(1) + mB1;
+		}
+		break;
+	}
 }
 
 template <class Tv, class Tp, class Td>
@@ -813,6 +842,12 @@ inline const Tv& OnePole<Tv,Tp,Td>::operator()(){ return (*this)(mStored); }
     
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
+
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::operator  = (const Tv& v){ mStored  = v; }
+
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::operator *= (const Tv& v){ mStored *= v; }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::last() const { return o1; }

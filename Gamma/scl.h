@@ -243,8 +243,8 @@ template<class T> T roundAway(T v, T step);
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
-//
-template<class T> T sinFast(T radians);
+// Input is in [-2, 2] corresponding to [-pi, pi]
+template<class T> T sinFast(T x);
 
 /// 7th order minimax polynomial approximation to sin(pi x).
 

@@ -22,7 +22,7 @@ int main(){
 		for(unsigned i=0; i<dft.numBins(); ++i){\
 			float m = dft.bin(i)[0] * N;\
 			float p = dft.bin(i)[1] * M_1_PI;\
-			printf("% 6.3f %6.3f ", m, p);\
+			printf("[%2u] % 6.3f %6.3f ", i, m, p);\
 			printPlot(m*0.7, 32);\
 			printPlot(p, 32);\
 			printf("\n");\
@@ -78,9 +78,15 @@ int main(){
 
 	FREQ_RESP(hilbert(v).i, "Hilbert filter (90 degree phase shift)")
 
-	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole at 1/8 band")
-	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole at 1/4 band")
-	onePole.zero(); onePole.freq(3./8*0.5); FREQ_RESP(onePole(v), "One-pole at 3/8 band")
+	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole LP at 1/8 band")
+	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole LP at 1/4 band")
+	onePole.zero(); onePole.freq(1./2*0.5); FREQ_RESP(onePole(v), "One-pole LP at 1/2 band")
+
+	onePole.type(gam::HIGH_PASS);
+	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole HP at 1/8 band")
+	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole HP at 1/4 band")
+	onePole.zero(); onePole.freq(1./2*0.5); FREQ_RESP(onePole(v), "One-pole HP at 1/2 band")
+	onePole.zero(); onePole.freq(3./4*0.5); FREQ_RESP(onePole(v), "One-pole HP at 3/4 band")
 
 	notch.zero(); notch.freq(1./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 1/4 band")
 	notch.zero(); notch.freq(2./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 1/2 band")
