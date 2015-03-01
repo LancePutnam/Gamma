@@ -806,9 +806,9 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 	Tp f = v * Td::ups();
 	f = scl::clip(f, Tp(0.5));
 
-	//Tv re = 1 - f*f*(24 - 32*f); // cubic apx.
-	Tv re = scl::sinFast(Tp(1) - Tp(4)*f);
-	//Tv re = cos(2*M_PI * f);
+	//Tp re = 1 - f*f*(24 - 32*f); // cubic apx.
+	Tp re = scl::sinFast(Tp(1) - Tp(4)*f);
+	//Tp re = cos(2*M_PI * f);
 
 	// |H(w)| = |a0| / sqrt(1 + b1^2 + 2 b1 cos w)
 
@@ -817,8 +817,8 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at DC (inaccurate with large bandwidth)
 		//mB1 = poleRadius(Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tv p1 = re - Tv(2);
-		mB1 = -(p1 + sqrt(p1*p1 - Tv(1)));
+		Tp p1 = re - Tp(2);
+		mB1 = -(p1 + ::sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) - mB1;
 		}
 		break;
@@ -826,8 +826,8 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
 		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tv p1 = -re - Tv(2);
-		mB1 = (p1 + sqrt(p1*p1 - Tv(1)));
+		Tp p1 = -re - Tp(2);
+		mB1 = (p1 + ::sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;
 		}
 		break;
