@@ -40,6 +40,8 @@ public:
 
 	void freq(float v);				///< Set frequency
 	void freqI(uint32_t v);			///< Set fixed-point frequency
+	void freqAdd(float v);			///< Add value to frequency for 1 sample
+	void freqMul(float v);			///< Multiply frequency by value for 1 sample
 	void phase(float v);			///< Set phase from [0, 1) of one period
 	void phaseMax();				///< Set phase to maximum value
 	void phaseAdd(float v);			///< Add value to phase [0, 1)
@@ -848,6 +850,9 @@ inline void Accum<St,Td>::freqI(uint32_t v){
 	mFreqI= v;
 	mFreq = mapIF(v) * Td::spu();
 }
+
+template<class St, class Td> inline void Accum<St,Td>::freqAdd(float v){ phaseAdd(v*Td::ups()); }
+template<class St, class Td> inline void Accum<St,Td>::freqMul(float v){ freqAdd((v-1.f)*freq()); }
 
 template<class St, class Td> inline void Accum<St,Td>::period(float v){ freq(1.f/v); }
 template<class St, class Td> inline void Accum<St,Td>::phase(float v){ mPhaseI = mapFI(v); }
