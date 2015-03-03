@@ -93,14 +93,23 @@ public:
 	T * aux(unsigned num);
 	
 	/// Get pointer to bin data
-	Complex<T> * bins() const { return mBins; }
+	Complex<T> * bins(){ return mBins; }
+	const Complex<T> * bins() const { return mBins; }
 	
 	/// Get reference to bin value
 	Complex<T>& bin(unsigned k){ return mBins[k]; }
 	
 	/// Get read-only reference to bin value
 	const Complex<T>& bin(unsigned k) const { return mBins[k]; }
-	
+
+	/// Get pointer to time-/position-domain buffer
+
+	/// Since the forward and inverse transforms operate in-place, the contents
+	/// of this buffer will only be valid before a forward transform or after
+	/// an inverse transform.
+	T * buffer(){ return bufPos(); }
+	const T * buffer() const { return bufPos(); }
+
 	double binFreq() const;		///< Get width of frequency bins
 	unsigned numBins() const;	///< Get number of frequency bins
 	unsigned sizeDFT() const;	///< Get size of transform, in samples
@@ -227,7 +236,7 @@ public:
 	/// array must have room for at least sizeDFT() number of elements. If 'dst'
 	/// equals 0, then the resynthesized samples are not copied, but instead
 	/// held in the internal transform buffer.
-	virtual void inverse(float * dst);
+	virtual void inverse(float * dst=0);
 	
 	/// Returns true if next call to inverse() will perform the inverse transform.
 	
@@ -298,7 +307,7 @@ public:
 	void forward(const float * src);
 	
 	/// Get inverse transform using current spectral frame
-	virtual void inverse(float * dst);
+	virtual void inverse(float * dst=0);
 
 
 	/// Set window and zero-padding size, in samples
@@ -337,7 +346,7 @@ public:
 
 protected:
 	void computeInvWinMul();	// compute inverse normalization factor (due to overlap-add)
-	
+
 	SlidingWindow<float> mSlide;
 	float * mFwdWin;			// forward transform window
 	float * mPhases;			// copy of current phases (mag-freq mode)
