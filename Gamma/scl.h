@@ -1118,15 +1118,15 @@ inline float rampUpU(uint32_t p){
 }
 
 inline float rampUp2(uint32_t p, uint32_t w){
-	uint32_t saw1 = ( p    >> 9) | Expo1<float>();
-	uint32_t saw2 = ((p+w) >> 9) | Expo1<float>();
-	return punUF(saw1) + punUF(saw2) - 3.f;
+	uint32_t saw1 = (p    )>>10;
+	uint32_t saw2 = (p + w)>>10;
+	return punUF(Expo2<float>() | (saw1 + saw2)) - 3.f;
 }
 
 inline float rampUp2U(uint32_t p, uint32_t w){
-	uint32_t saw1 = ( p    >> 9) | Expo1_2<float>();
-	uint32_t saw2 = ((p+w) >> 9) | Expo1_2<float>();
-	return punUF(saw1) + punUF(saw2) - 1.f;
+	uint32_t saw1 = (p    )>>10;
+	uint32_t saw2 = (p + w)>>10;
+	return punUF(Expo1<float>() | (saw1 + saw2)) - 1.f;
 }
 
 inline float sinPara(uint32_t p){
