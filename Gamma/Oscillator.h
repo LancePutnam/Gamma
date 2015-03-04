@@ -373,6 +373,9 @@ public:
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v*Td::ups()); }
 
+	/// Set period
+	void period(Tv v){ Base::freq(Td::ups()/v); }
+
 	/// Set all control parameters
 	void set(Tv frq, Tv amp, Tv phs=0){ Base::set(frq*Td::ups(), phs, amp); }
 
@@ -458,6 +461,9 @@ public:
 
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v*Td::ups()); }
+
+	/// Set period
+	void period(Tv v){ Base::freq(Td::ups()/v); }
 
 	/// Set all control parameters
 
