@@ -17,7 +17,7 @@ namespace gam{
 /// by feeding a full-wave rectification of the signal through a low-pass filter.
 ///\ingroup Filters, Envelopes, Analysis
 template <class Tv=real, class Tp=real, class Td=DomainObserver>
-class EnvFollow{
+class EnvFollow : public Td {
 public:
 
 	/// \param[in] freq		Cutoff frequency of smoothing filter
@@ -32,7 +32,7 @@ public:
 	Tv value() const { return lpf.last(); }
 
 	/// Set relaxation length of filter
-	void relax(Tp v){ lpf.freq(1.f/v); }
+	void relax(Tp v){ lpf.smooth(poleRadius(2./v, Td::ups())); }
 
 	/// Checks if current estimate is less than a threshold
 	bool done(Tv eps=0.001) const { return value() < eps; }
