@@ -30,7 +30,11 @@ public:
 
 	/// Returns current amplitude estimate
 	Tv value() const { return lpf.last(); }
-	
+
+	/// Set relaxation length of filter
+	void relax(Tp v){ lpf.freq(1.f/v); }
+
+	/// Checks if current estimate is less than a threshold
 	bool done(Tv eps=0.001) const { return value() < eps; }
 
 	OnePole<Tv,Tp,Td> lpf;	///< Low-pass filter
