@@ -107,11 +107,11 @@ public:
 template <class RNG = RNGLinCon>
 class NoiseViolet{
 public:
-	NoiseViolet(): mPrev(1.f){}
+	NoiseViolet(): mPrev(1.5f){}
 	
 	/// \param[in] seed		random number generator seed
 	NoiseViolet(uint32_t seed)
-	:	rng(seed), mPrev(1.f){}
+	:	rng(seed), mPrev(1.5f){}
 
 	/// Generate next value
 	float operator()(){
@@ -122,7 +122,7 @@ public:
 	}
 
 	/// Set seed of RNG
-	void seed(uint32_t v){ rng = v; mPrev = 1.f; }
+	void seed(uint32_t v){ rng = v; mPrev = 1.5f; }
 	
 	RNG rng;
 
