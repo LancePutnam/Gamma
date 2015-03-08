@@ -12,11 +12,11 @@
 namespace gam{
 
 
-/// Brownian noise
+/// Brown noise
 
-/// Brownian noise has a power spectrum of 1/f^2.
-/// It is produced by integrating white (uniform) noise.
-/// The output value is clipped within a specified interval.
+/// Brown noise has a power spectrum of 1/f^2. This corresponds to an amplitude
+/// spectrum with a -6 dB/octave slope. Here it is produced by integrating
+/// white noise. The output value is clipped within a specified interval.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
 class NoiseBrown{
@@ -47,8 +47,10 @@ public:
 
 /// Pink Noise
 
-/// Pink noise has a power spectrum of 1/f. In this implementation, it is
-/// produced by summing together 12 octaves of downsampled white noise.
+/// Pink noise has a power spectrum of 1/f. This corresponds to an amplitude
+/// spectrum with a -3 dB/octave slope.
+/// In this implementation, it is produced by summing together 12 octaves of
+/// downsampled white noise.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
 class NoisePink{
@@ -77,10 +79,9 @@ private:
 /// White noise
 
 /// White noise has a uniform power spectrum.
-///
+/// \ingroup Noise
 template <class RNG = RNGLinCon>
 class NoiseWhite{
-/// \ingroup Noise
 public:
 	NoiseWhite(): rng(){}
 	
@@ -88,15 +89,46 @@ public:
 	NoiseWhite(uint32_t seed) : rng(seed){}
 
 	/// Generate next value
-	float operator()() const { return rnd::uniS_float(rng); }
-	float operator[](uint32_t i) const { return (*this)(); }
+	float operator()(){ return rnd::uniS_float(rng); }
 
 	/// Set seed of RNG
 	void seed(uint32_t v){ rng = v; }
 	
-	mutable RNG rng;
+	RNG rng;
 };
 
+
+/// Violet noise
+
+/// Violet noise has a power spectrum of f^2. This corresponds to an amplitude
+/// spectrum with a +6 dB/octave slope. Here it is produced by differentiating
+/// white noise.
+/// \ingroup Noise
+template <class RNG = RNGLinCon>
+class NoiseViolet{
+public:
+	NoiseViolet(): mPrev(1.f){}
+	
+	/// \param[in] seed		random number generator seed
+	NoiseViolet(uint32_t seed)
+	:	rng(seed), mPrev(1.f){}
+
+	/// Generate next value
+	float operator()(){
+		float curr = punUF(Expo1<float>() | (rng()>>9)); // in [1,2)
+		float diff = curr - mPrev;
+		mPrev = curr;
+		return diff;
+	}
+
+	/// Set seed of RNG
+	void seed(uint32_t v){ rng = v; mPrev = 1.f; }
+	
+	RNG rng;
+
+private:
+	float mPrev;
+};
 
 
 
