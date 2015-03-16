@@ -645,23 +645,25 @@ public:
 	void antialias();			///< Adjust number of harmonics to prevent aliasing
 	void harmonics(Tv num);		///< Set number of harmonics
 	void harmonicsMax();		///< Set number of harmonics to fill Nyquist range
+	void normalize(bool v);		///< Whether to normalize amplitude
 
 	Tv operator()();			///< Returns next sample of all harmonic impulse
 	Tv odd();					///< Returns next sample of odd harmonic impulse
 	Tv saw(Tv intg=0.997);		///< Returns next sample of saw waveform
 	Tv square(Tv intg=0.997);	///< Returns next sample of square waveform
 	
-	Tv maxHarmonics();			///< Get number of harmonics below Nyquist based on current settings
+	Tv maxHarmonics() const;	///< Get number of harmonics below Nyquist based on current settings
 
 	virtual void onDomainChange(double r);
 
 protected:
 	Tv mAmp;			// amplitude normalization factor
-	Tv mN;				// # harmonics
+	Tv mN;				// actual number of harmonics
 	Tv mNDesired;		// desired number of harmonics
 	Tv mNFrac;		
-	Tv mSPU_2;			// cached locals
+	Tv mSPU_2;			// cached local
 	Tv mPrev;			// previous output for integration
+	bool mNormalize;
 	void setAmp();
 private: typedef AccumPhase<Tv,Td> Base;
 };
@@ -780,10 +782,10 @@ public:
 	void harmonics(Tv v);		///< Set number of harmonics
 	void harmonicsMax();		///< Set number of harmonics to fill Nyquist range
 
-	Tv ampRatio();				///< Get amplitude ratio
-	Tv freqRatio();				///< Get frequency ratio
-	Tv harmonics();				///< Get current number of harmonics
-	Tv maxHarmonics();			///< Get maximum number of harmonics for current settings
+	Tv ampRatio() const;		///< Get amplitude ratio
+	Tv freqRatio() const;		///< Get frequency ratio
+	Tv harmonics() const;		///< Get current number of harmonics
+	Tv maxHarmonics() const;	///< Get maximum number of harmonics for current settings
 	
 	virtual void onDomainChange(double r);
 
@@ -1112,7 +1114,7 @@ DEF(sineP9(),	down(); r = scl::sinP9(r))
 //---- Buzz
 
 template<class Tv, class Td> Buzz<Tv,Td>::Buzz(Tv f, Tv p, Tv harmonics)
-:	Base(f, p), mAmp(0), mPrev(Tv(0))
+:	Base(f, p), mAmp(0), mPrev(Tv(0)), mNormalize(true)
 {
 	onDomainChange(1);
 	this->harmonics(harmonics);
@@ -1124,7 +1126,9 @@ template<class Tv, class Td> inline void Buzz<Tv,Td>::harmonics(Tv v){
 	mNFrac = v - mN;
 }
 
-template<class Tv, class Td> inline void Buzz<Tv,Td>::harmonicsMax(){ harmonics(maxHarmonics()); }
+template<class Tv, class Td> inline void Buzz<Tv,Td>::harmonicsMax(){
+	harmonics(maxHarmonics());
+}
 
 template<class Tv, class Td> inline void Buzz<Tv,Td>::antialias(){
 	float maxN = scl::floor(maxHarmonics());
@@ -1132,14 +1136,26 @@ template<class Tv, class Td> inline void Buzz<Tv,Td>::antialias(){
 	setAmp();
 }
 
-template<class Tv, class Td> inline Tv Buzz<Tv,Td>::maxHarmonics(){ return mSPU_2 / this->freq(); }
+template<class Tv, class Td> void Buzz<Tv,Td>::normalize(bool v){
+	mNormalize = v;
+	setAmp();
+}
+
+template<class Tv, class Td> inline Tv Buzz<Tv,Td>::maxHarmonics() const {
+	return mSPU_2 / this->freq();
+}
 
 template<class Tv, class Td> inline void Buzz<Tv,Td>::setAmp(){
-	// Normally, the amplitude is 1/(2N), but we will linearly interpolate
-	// based on fractional harmonics to avoid sudden changes in amplitude to
-	// the lower harmonics which is very noticeable.
-	mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN+mNFrac)) : 0;
-	//mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN)) : 0;
+
+	if(mNormalize){
+		// Normally, the amplitude is 1/(2N), but we will linearly interpolate
+		// based on fractional harmonics to avoid sudden changes in amplitude to
+		// the lower harmonics which is very noticeable.
+		mAmp = (mN != Tv(0)) ? (Tv(0.5) / (mN+mNFrac)) : 0;
+	}
+	else{
+		mAmp = Tv(0.5);
+	}
 }
 
 #define EPS 0.000001
@@ -1200,6 +1216,7 @@ template<class Tv, class Td> inline Tv Buzz<Tv,Td>::odd(){
 
 template<class Tv, class Td>
 inline Tv Buzz<Tv,Td>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
+
 template<class Tv, class Td>
 inline Tv Buzz<Tv,Td>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
 
@@ -1253,7 +1270,9 @@ template<class Tv, class Td> inline void DSF<Tv,Td>::harmonics(Tv v){
 	}
 }
 
-template<class Tv, class Td> inline void DSF<Tv,Td>::harmonicsMax(){ harmonics(maxHarmonics()); }
+template<class Tv, class Td> inline void DSF<Tv,Td>::harmonicsMax(){
+	harmonics(maxHarmonics());
+}
 
 template<class Tv, class Td> inline void DSF<Tv,Td>::antialias(){
 	Tv maxN = maxHarmonics();
@@ -1262,16 +1281,27 @@ template<class Tv, class Td> inline void DSF<Tv,Td>::antialias(){
 	updateAPow();
 }
 
-template<class Tv, class Td> inline Tv DSF<Tv,Td>::ampRatio(){ return mA; }
-template<class Tv, class Td> inline Tv DSF<Tv,Td>::freqRatio(){ return mFreqRatio; }
-template<class Tv, class Td> inline Tv DSF<Tv,Td>::harmonics(){ return mN; }
+template<class Tv, class Td> inline Tv DSF<Tv,Td>::ampRatio() const {
+	return mA;
+}
+template<class Tv, class Td> inline Tv DSF<Tv,Td>::freqRatio() const {
+	return mFreqRatio;
+}
+template<class Tv, class Td> inline Tv DSF<Tv,Td>::harmonics() const {
+	return mN;
+}
 
-template<class Tv, class Td> inline Tv DSF<Tv,Td>::maxHarmonics(){
+template<class Tv, class Td> inline Tv DSF<Tv,Td>::maxHarmonics() const {
 	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->freq() - Tv(1))/freqRatio() + Tv(1));
 }
 
-template<class Tv, class Td> inline void DSF<Tv,Td>::updateAPow(){ mAPow = ::pow(mA, mN); }
-template<class Tv, class Td> inline void DSF<Tv,Td>::updateBetaInc(){ mBetaInc = this->mInc * mFreqRatio; }
+template<class Tv, class Td> inline void DSF<Tv,Td>::updateAPow(){
+	mAPow = ::pow(mA, mN);
+}
+
+template<class Tv, class Td> inline void DSF<Tv,Td>::updateBetaInc(){
+	mBetaInc = this->mInc * mFreqRatio;
+}
 
 // Generalized DSF formula:
 // sum{k=0, N}( a^k sin(T + k B) )

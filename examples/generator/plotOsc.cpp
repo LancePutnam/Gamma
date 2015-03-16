@@ -41,6 +41,7 @@ int main(){
 	PLOT(Buzz<>, g.period(N); g.harmonics(2), operator(), "period=N, harmonics=2")
 	PLOT(Buzz<>, g.period(N); g.harmonics(4), operator(), "period=N, harmonics=4")
 	PLOT(Buzz<>, g.period(N); g.harmonics(8), operator(), "period=N, harmonics=8")
+	PLOT(Buzz<>, g.period(N); g.harmonics(8); g.normalize(false), operator(), "period=N, harmonics=8, normalize=false")
 
 	PLOT(LFO<>, g.period(N/2);, cos, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, tri, "period=N/2")
