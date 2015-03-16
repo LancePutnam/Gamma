@@ -153,6 +153,7 @@ public:
 	void amp(Tv v);			///< Set amplitude
 	
 	Tv freq() const;		///< Get frequency
+	Tv freqUnit() const;	///< Get frequency in [0, 1)
 	Tv period() const;		///< Get period
 	Tv phase() const ;		///< Get normalized phase in [0, 1)
 	Tv amp() const;			///< Get amplitude
@@ -649,8 +650,8 @@ public:
 
 	Tv operator()();			///< Returns next sample of all harmonic impulse
 	Tv odd();					///< Returns next sample of odd harmonic impulse
-	Tv saw(Tv intg=0.997);		///< Returns next sample of saw waveform
-	Tv square(Tv intg=0.997);	///< Returns next sample of square waveform
+	Tv saw(Tv intg=0.999);		///< Returns next sample of saw waveform
+	Tv square(Tv intg=0.999);	///< Returns next sample of square waveform
 	
 	Tv maxHarmonics() const;	///< Get number of harmonics below Nyquist based on current settings
 
@@ -693,6 +694,8 @@ public:
 	virtual void onDomainChange(double r){
 		Base::onDomainChange(r); freq(AccumPhase<Tv,Td>::freq()); }
 
+	using Buzz<Tv,Td>::freq; // needed for getter
+
 private: typedef Buzz<Tv,Td> Base;
 };
 
@@ -720,7 +723,7 @@ struct Saw : public Impulse<Tv,Td> {
 	
 	/// \param[in] itg		Leaky integration factor
 	///
-	Tv operator()(Tv itg=0.997){ return Impulse<Tv,Td>::saw(itg); }
+	Tv operator()(Tv itg=0.999){ return Impulse<Tv,Td>::saw(itg); }
 };
 
 
@@ -747,7 +750,7 @@ struct Square : public Impulse<Tv,Td> {
 	
 	/// \param[in] itg		Leaky integration factor
 	///
-	Tv operator()(Tv itg=0.997){ return Impulse<Tv,Td>::square(itg); }
+	Tv operator()(Tv itg=0.999){ return Impulse<Tv,Td>::square(itg); }
 };
 
 
@@ -932,8 +935,13 @@ AccumPhase<Tv, Td>::AccumPhase(Tv f, Tv p, Tv a)
 	this->phase(p);
 }
 
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapFreq(Tv v) const { return v*mFreqToInc; }
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapPhase(Tv v) const { return v*Tv(2)*mAmp; }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapFreq(Tv v) const {
+	return v*mFreqToInc;
+}
+
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapPhase(Tv v) const {
+	return v*Tv(2)*mAmp;
+}
 
 template<class Tv, class Td>
 inline Tv AccumPhase<Tv, Td>::nextPhaseUsing(Tv inc){
@@ -963,6 +971,7 @@ template<class Tv, class Td> inline void AccumPhase<Tv, Td>::amp(Tv v){
 }
 
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freq() const { return mInc/mFreqToInc; }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freqUnit() const { return freq()*this->ups(); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::period() const { return Tv(1)/freq(); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase() const { return mPhase/(Tv(2)*mAmp); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::amp() const { return mAmp; }
@@ -1170,12 +1179,12 @@ template<class Tv, class Td> inline Tv Buzz<Tv, Td>::operator()(){
 	*/
 	Tv theta = this->nextPhase();
 	Tv result;
-	Tv denom = scl::sinT9(theta * Tv(0.5));
+	Tv denom = scl::sinT7(theta * Tv(0.5));
 
 	// denominator goes to zero when theta is an integer multiple of 2 pi
 	if(scl::abs(denom) < Tv(EPS)){
 		result = Tv(2) * mN * mAmp;
-		//printf("Impulse::(): oops\n");
+		//printf("Buzz::operator(): oops\n");
 	}
 	else{
 		Tv nphase = scl::wrapPhase(theta * (mN + Tv(0.5)));
@@ -1210,7 +1219,7 @@ template<class Tv, class Td> inline Tv Buzz<Tv,Td>::odd(){
 		if( theta > M_PI ) theta -= M_2PI;
 		Tv A = n2 / (n2 + n2frac);
 		result = (theta > -M_PI_2 && theta < M_PI_2) ? A : -A;
-		//printf("Impulse::odd(): oops\n");
+		//printf("Buzz::odd(): oops\n");
 	}
 	else result = scl::sinT7(scl::wrapPhase(n2 * theta)) / (denom * (n2 + n2frac));
 	
@@ -1219,10 +1228,10 @@ template<class Tv, class Td> inline Tv Buzz<Tv,Td>::odd(){
 #undef EPS
 
 template<class Tv, class Td>
-inline Tv Buzz<Tv,Td>::saw(Tv i){ return mPrev=(*this)()*0.125 + i*mPrev; }
+inline Tv Buzz<Tv,Td>::saw(Tv b){ return mPrev=(*this)() + b*mPrev; }
 
 template<class Tv, class Td>
-inline Tv Buzz<Tv,Td>::square(Tv i){ return mPrev=odd()*0.125 + i*mPrev; }
+inline Tv Buzz<Tv,Td>::square(Tv b){ return mPrev=odd() + b*mPrev; }
 
 template<class Tv, class Td> void Buzz<Tv,Td>::onDomainChange(double r){
 	Base::onDomainChange(r);
