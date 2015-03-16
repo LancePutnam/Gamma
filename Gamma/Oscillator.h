@@ -1121,9 +1121,10 @@ template<class Tv, class Td> Buzz<Tv,Td>::Buzz(Tv f, Tv p, Tv harmonics)
 }
 
 template<class Tv, class Td> inline void Buzz<Tv,Td>::harmonics(Tv v){
-	mN = mNDesired = scl::floor(v);
-	setAmp();
+	mNDesired = v;
+	mN = scl::floor(v);
 	mNFrac = v - mN;
+	setAmp();
 }
 
 template<class Tv, class Td> inline void Buzz<Tv,Td>::harmonicsMax(){
@@ -1131,8 +1132,11 @@ template<class Tv, class Td> inline void Buzz<Tv,Td>::harmonicsMax(){
 }
 
 template<class Tv, class Td> inline void Buzz<Tv,Td>::antialias(){
-	float maxN = scl::floor(maxHarmonics());
-	mN = mNDesired > maxN ? maxN : mNDesired;
+	Tv newN = maxHarmonics();
+	newN = mNDesired > newN ? newN : mNDesired;
+
+	mN = scl::floor(newN);
+	mNFrac = newN - mN;
 	setAmp();
 }
 
