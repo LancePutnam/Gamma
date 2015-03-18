@@ -31,8 +31,8 @@ public:
 	/// Returns current amplitude estimate
 	Tv value() const { return lpf.last(); }
 
-	/// Set relaxation length of filter
-	void relax(Tp v){ lpf.smooth(poleRadius(2./v, Td::ups())); }
+	/// Set lag length of filter
+	EnvFollow& lag(Tp v){ lpf.lag(v); return *this; }
 
 	/// Checks if current estimate is less than a threshold
 	bool done(Tv eps=0.001) const { return value() < eps; }

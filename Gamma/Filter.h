@@ -26,7 +26,8 @@ enum FilterType{
 	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
 	BAND_REJECT,		/**< Band-reject */
 	ALL_PASS,			/**< All-pass */
-	PEAKING				/**< Peaking */
+	PEAKING,			/**< Peaking */
+	SMOOTHING			/**< Smoothing */
 };
 
 
@@ -542,6 +543,14 @@ public:
 
 	void type(FilterType type);			///< Set type of filter (gam::LOW_PASS or gam::HIGH_PASS)
 	void freq(Tp val);					///< Set cutoff frequency (-3 dB bandwidth of pole)
+
+	/// Set lag length of low-pass response (AKA tau)
+
+	/// \param[in] length	Length of lag
+	/// \param[in] thresh	Value to which a downward unit step reaches after
+	///						the lag length. Must be greater than 0.
+	void lag(Tp length, Tp thresh=Tp(0.001));
+
 	void smooth(Tp val);				///< Set smoothing coefficient directly
 	void zero(){ o1=0; }				///< Zero internal delay
 	void reset(const Tv& v){ o1=v; mStored=v; }
@@ -799,16 +808,19 @@ inline void OnePole<Tv,Tp,Td>::type(FilterType v){
 	freq(mFreq);
 }
 
+namespace{
+	template<class T>
+	inline T getReal(T freq){
+		freq = scl::clip(freq, T(0.5));
+		//return cos(2*M_PI * freq);
+		//return 1 - freq*freq*(24 - 32*freq); // cubic apx.
+		return scl::sinFast(T(1) - T(4)*freq);
+	}
+}
+
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
-
-	Tp f = v * Td::ups();
-	f = scl::clip(f, Tp(0.5));
-
-	//Tp re = 1 - f*f*(24 - 32*f); // cubic apx.
-	Tp re = scl::sinFast(Tp(1) - Tp(4)*f);
-	//Tp re = cos(2*M_PI * f);
 
 	// |H(w)| = |a0| / sqrt(1 + b1^2 + 2 b1 cos w)
 
@@ -817,6 +829,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at DC (inaccurate with large bandwidth)
 		//mB1 = poleRadius(Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
+		Tp re = getReal(v * Td::ups());
 		Tp p1 = re - Tp(2);
 		mB1 = -(p1 + ::sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) - mB1;
@@ -826,12 +839,27 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
 		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
+		Tp re = getReal(v * Td::ups());
 		Tp p1 = -re - Tp(2);
 		mB1 = (p1 + ::sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;
 		}
 		break;
+	case SMOOTHING:
+		lag(1./mFreq);
+		break;
 	}
+
+	//printf("In OnePole::freq: mB1 = %g, mA0 = %g, f = %g, re = %g\n", mB1, mA0, f, re);
+}
+
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::lag(Tp length, Tp thresh){
+	mType = SMOOTHING;
+	// Since b^(length f_s) = thresh,
+	// 	b = thresh ^ (1 / (length fs))
+	mB1 = ::pow(thresh, Tp(this->ups()/length));
+	mA0 = Tp(1) - mB1;
 }
 
 template <class Tv, class Tp, class Td>
