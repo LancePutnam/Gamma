@@ -243,7 +243,10 @@ template<class T> T roundAway(T v, T step);
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
-// Input is in [-2, 2] corresponding to [-pi, pi]
+/// Fast sine function approximation
+
+/// \param[in] x	angle in [-2, 2] corresponding to [-pi, pi]
+///
 template<class T> T sinFast(T x);
 
 /// 7th order minimax polynomial approximation to sin(pi x).
@@ -418,6 +421,12 @@ float rampDown	(uint32_t phase);	///< Returns value of bipolar downward ramp fun
 float rampUp	(uint32_t phase);	///< Returns value of bipolar upward ramp function.
 float square	(uint32_t phase);	///< Returns value of bipolar square function.
 float triangle	(uint32_t phase);	///< Returns value of bipolar triangle function.
+
+/// Returns value of fast sine function approximation
+float sinFast	(uint32_t phase);
+
+/// Returns value of sine-like function constructed from parabolic sections
+float sinPara	(uint32_t phase);
 
 /// Returns value of bipolar pulse function (rampDown() + rampUp()).
 float pulse		(uint32_t phase, uint32_t width);
@@ -1127,6 +1136,10 @@ inline float rampUp2U(uint32_t p, uint32_t w){
 	uint32_t saw1 = (p    )>>10;
 	uint32_t saw2 = (p + w)>>10;
 	return punUF(Expo1<float>() | (saw1 + saw2)) - 1.f;
+}
+
+inline float sinFast(uint32_t p){
+	return sinFast(6.f - punUF(Expo4<float>() | p>>9));
 }
 
 inline float sinPara(uint32_t p){
