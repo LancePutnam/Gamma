@@ -360,7 +360,9 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 	}
 }
 
-TM1 inline Tv Delay<TM2>::operator()() const{ return mIpol(*this, mPhase - mDelay); }
+TM1 inline Tv Delay<TM2>::operator()() const {
+	return mIpol(*this, mPhase - mDelay);
+}
 
 TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
 	// Read, then write.
@@ -394,13 +396,17 @@ TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n
 	else{
 		maxDelay(mMaxDelay);
 	}
+
+	float currDelay = delay();
 	refreshDelayFactor();
-	delay(mDelayLength);
+	delay(currDelay);
 }
 
-TM1 inline Tv Delay<TM2>::read(float ago){ return mIpol(*this, mPhase - delayFToI(ago)); }
+TM1 inline Tv Delay<TM2>::read(float ago){
+	return mIpol(*this, mPhase - delayFToI(ago));
+}
 
-TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1. / maxDelay(); }
+TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1./maxDelay(); }
 
 TM1 inline void Delay<TM2>::write(const Tv& v){
 	//incPhase();
@@ -413,23 +419,30 @@ TM1 inline void Delay<TM2>::delay(float v){
 	mDelay = delayFToI(v);
 }
 
-TM1 inline float Delay<TM2>::delay() const { return mDelayLength; }
+TM1 float Delay<TM2>::delay() const { return mDelayLength; }
 
-TM1 inline void Delay<TM2>::delaySamples(uint32_t v){ mDelay = v << this->fracBits(); }
+TM1 inline void Delay<TM2>::delaySamples(uint32_t v){
+	mDelay = v << this->fracBits();
+	mDelayLength = v * Td::ups();
+}
 
 TM1 inline void Delay<TM2>::delaySamplesR(float v){
 	delay(v * Td::ups());
 }
 
-TM1 inline uint32_t Delay<TM2>::delaySamples() const { return mDelay >> this->fracBits(); }
-
-TM1 inline float Delay<TM2>::delaySamplesR() const {
-	return mDelayLength * Td::spu();
+TM1 uint32_t Delay<TM2>::delaySamples() const {
+	return mDelay >> this->fracBits();
 }
 
-TM1 inline void Delay<TM2>::delayUnit(float v){ mDelay = unitToUInt(v); }
+TM1 float Delay<TM2>::delaySamplesR() const {
+	return delay() * Td::spu();
+}
 
-TM1 inline float Delay<TM2>::delayUnit() const {
+TM1 inline void Delay<TM2>::delayUnit(float v){
+	mDelay = unitToUInt(v);
+}
+
+TM1 float Delay<TM2>::delayUnit() const {
 	return uintToUnit<float>(mDelay);
 }
 
@@ -443,7 +456,7 @@ TM1 inline uint32_t Delay<TM2>::indexBack() const {
 	return this->index(mPhase + this->oneIndex());
 }
 
-TM1 inline float Delay<TM2>::maxDelay() const { return this->size() * Td::ups(); }
+TM1 float Delay<TM2>::maxDelay() const { return this->size() * Td::ups(); }
 
 TM1 void Delay<TM2>::print(){
 	printf("SPU:       %f\n", Td::spu());
