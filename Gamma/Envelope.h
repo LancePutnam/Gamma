@@ -284,6 +284,26 @@ public:
 		return *this;
 	}
 
+	/// Set segment curve amounts
+	template <class V>
+	Env& curves(const V* vals, int len){
+		int n = len < size() ? len : size();
+		for(int i=0; i<n; ++i) mCurves[i] = vals[i];
+		return *this;
+	}
+
+	/// Set curvature of first two segments
+	Env& curves(Tp ca, Tp cb){
+		Tp c[]={ca,cb}; return curves(c,2); }
+
+	/// Set curvature of first three segments
+	Env& curves(Tp ca, Tp cb, Tp cc){
+		Tp c[]={ca,cb,cc}; return curves(c,3); }
+
+	/// Set curvature of first four segments
+	Env& curves(Tp ca, Tp cb, Tp cc, Tp cd){
+		Tp c[]={ca,cb,cc,cd}; return curves(c,4); }
+
 
 	/// Set length and curvature of a segment
 	Env& segment(int i, Tp len, Tp crv){
