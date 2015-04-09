@@ -33,7 +33,6 @@ namespace gam{
 /// length is dynamically varied.
 ///
 /// \tparam Tv	Value (sample) type
-/// \tparam Tp	Parameter type
 /// \tparam Si	Interpolation strategy
 /// \tparam Td	Domain type
 /// \ingroup Delays    
