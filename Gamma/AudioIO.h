@@ -178,7 +178,7 @@ public:
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}
-	virtual void onAudioCB(AudioIOData& io) = 0;	///< Callback
+	virtual void onAudio(AudioIOData& io) = 0; ///< Callback
 };
 
 
