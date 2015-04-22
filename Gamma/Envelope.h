@@ -510,9 +510,9 @@ public:
 
 	T operator()();			///< Generate next sample
 	
-	void decay(T val);		///< Set number of units for curve to decay -60 dB
-	void reset();			///< Set current value to 1
-	void value(T val);		///< Set current value
+	void decay(T v);		///< Set number of units for curve to decay -60 dB
+	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
+	void value(T v);		///< Set current value
 	
 protected:
 	T mVal, mMul, mDcy;
@@ -815,7 +815,11 @@ Decay<T,Td>::Decay(T decay_, T val)
 }
 
 template <class T, class Td>
-inline T Decay<T,Td>::operator()(){ T o = mVal; mVal *= mMul; return o; }
+inline T Decay<T,Td>::operator()(){
+	T o = mVal;
+	mVal *= mMul;
+	return o;
+}
 
 template <class T, class Td>
 inline void Decay<T,Td>::decay(T v){
@@ -824,7 +828,7 @@ inline void Decay<T,Td>::decay(T v){
 }
 
 template <class T, class Td>
-inline void Decay<T,Td>::reset(){ mVal = 1; }
+inline void Decay<T,Td>::reset(T amp){ mVal = amp; }
     
 template <class T, class Td>
 inline void Decay<T,Td>::value(T v){ mVal = v; }
