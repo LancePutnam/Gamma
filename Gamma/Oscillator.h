@@ -147,6 +147,8 @@ public:
 	Tv nextPhase(Tv frqOffset);
 
 	void freq(Tv v);		///< Set frequency
+	void freqAdd(Tv v);		///< Add value to frequency for 1 sample
+	void freqMul(Tv v);		///< Multiply frequency by value for 1 sample
 	void period(Tv v);		///< Set period length
 	void phase(Tv v);		///< Set phase from [0, 1) of one period
 	void phaseAdd(Tv v);	///< Add value to unit phase
@@ -960,6 +962,8 @@ template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::nextPhase(Tv frqMod){
 }
 
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freq(Tv v){ mInc = mapFreq(v); }
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqAdd(Tv v){ nextPhaseUsing(mapFreq(v)); }
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqMul(Tv v){ nextPhaseUsing(mapFreq(v*mInc)); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::period(Tv v){ freq(Tv(1)/v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phase(Tv v){ mPhase = mapPhase(v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
