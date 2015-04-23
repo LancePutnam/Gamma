@@ -840,9 +840,10 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
 		Tp re = getReal(v * Td::ups());
-		Tp p1 = -re - Tp(2);
+		Tp p1 = -re - Tp(2); // -re flips cutoff
 		mB1 = (p1 + ::sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;
+		//printf("%g\n", mB1);
 		}
 		break;
 	case SMOOTHING:
@@ -850,7 +851,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		break;
 	}
 
-	//printf("In OnePole::freq: mB1 = %g, mA0 = %g, f = %g, re = %g\n", mB1, mA0, f, re);
+	//printf("In OnePole::freq: mB1 = %g, mA0 = %g\n", mB1, mA0);
 }
 
 template <class Tv, class Tp, class Td>
