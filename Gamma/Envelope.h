@@ -92,39 +92,14 @@ template <int N, class Tv=real, class Tp=real, class Td=DomainObserver>
 class Env : public Td{
 public:
 
-	Env()
-	:	mSustain(N), mLoop(0){
-		for(int i=0; i<N; ++i){
-			mLengths[i]= 1e-8;
-			mCurves[i] =-4;
-			mLevels[i] = 1e-8;
-		}	mLevels[N] = 1e-8;
-		reset();
-	}
+	Env();
 
-	Env(Tp lvl1, Tp len1, Tp lvl2)
-	:	mSustain(N), mLoop(0){
-		levels(lvl1,lvl2);
-		lengths()[0] = len1;
-		curve(-4);
-		reset();
-	}
+	Env(Tp lvl1, Tp len1, Tp lvl2);
 
-	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
-	:	mSustain(N), mLoop(0){
-		levels(lvl1,lvl2,lvl3);
-		lengths(len1,len2);
-		curve(-4);
-		reset();
-	}
+	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3);
 
-	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4)
-	:	mSustain(N), mLoop(0){
-		levels(lvl1,lvl2,lvl3,lvl4);
-		lengths(len1,len2,len3);
-		curve(-4);
-		reset();
-	}
+	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4);
+
 
 	/// Get the number of segments
 	int size() const { return N; }
@@ -152,53 +127,10 @@ public:
 
 
 	/// Generate next value
-	Tv operator()(){
-
-		// Sustain stage:
-		if(sustained()){
-			return mLevels[mStage];
-		}
-
-		// Interpolating along segment:
-		else if(mPos < mLen){
-			++mPos;
-			return mCurve();
-		}
-
-		// Just went past end of current segment and there are more left:
-		else if(mStage < size()){
-			++mStage;
-			if(mLoop && done()) mStage=0;
-			if(!done()){
-				mPos = 0;
-				setLen(mStage);
-				int nextStage = mStage+1;
-				// If looping, ensure we wrap back around to first level
-				if(mLoop && (nextStage==size())) nextStage = 0;
-				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[nextStage]);
-
-				// Immediately return start level of new stage
-				return (*this)();
-			}
-		}
-
-		// Envelope is done:
-		return mLevels[mStage];
-	}	
+	Tv operator()();
 
 	/// Release the envelope
-	void release(){
-		mSustain = -scl::abs(mSustain);
-
-		// begin release portion immediately starting at current level
-		Tv curVal = value();
-		mStage = -mSustain;
-		if(!done()){
-			mPos = 0;
-			setLen(mStage);
-			mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
-		}
-	}
+	void release();
 
 
 	/// Set whether envelope loops
@@ -216,13 +148,10 @@ public:
 	Env& sustainDisable(){ return sustainPoint(N); }
 
 	/// Reset envelope to starting point
-	void reset(){
-		// this forces a stage increment upon first iteration
-		mPos = 0;//0xFFFFFFFF;
-		mLen = 0;
-		mStage = -1;
-		mSustain = scl::abs(mSustain);
-	}
+	void reset();
+
+	/// Reset envelope to starting point setting first level to current level
+	void resetSoft();
 
 	
 	/// Get segment lengths array
@@ -249,30 +178,16 @@ public:
 	Env& lengths(Tp a, Tp b, Tp c, Tp d, Tp e){ Tp v[]={a,b,c,d,e}; return lengths(v,5); }
 
 	/// Get total length of all envelope segments
-	Tp totalLength() const {
-		Tp sum=Tp(0);
-		for(int i=0;i<size();++i) sum += mLengths[i];
-		return sum;
-	}
+	Tp totalLength() const;
 	
 	/// Set total length of envelope by adjusting one segment length
 	
 	/// \param[in] length		desired length
 	/// \param[in] modSegment	segment whose length is modified to match desired length
-	Env& totalLength(Tp length, int modSegment){
-		mLengths[modSegment] = Tp(0);
-		mLengths[modSegment] = length - totalLength();
-		return *this;
-	}
+	Env& totalLength(Tp length, int modSegment);
 
 	/// Set total length of envelope by scaling all segment lengths
-	Env& totalLength(Tp length){
-		Tp mul = length / totalLength();
-		for(int i=0; i<size(); ++i){
-			lengths()[i] *= mul;
-		}
-		return *this;
-	}
+	Env& totalLength(Tp length);
 
 
 	/// Get segment curvature array
@@ -359,15 +274,8 @@ public:
 	/// Set first five break-point levels
 	Env& levels(Tv a, Tv b, Tv c, Tv d, Tv e){ Tv v[]={a,b,c,d,e}; return levels(v,5); }
 
-
-	Env& maxLevel(Tv v){
-		using namespace gam::scl;
-		Tv mx(0);
-		for(int i=0; i<N+1; ++i) mx = max(abs(mLevels[i]), mx);
-		v = v/mx;
-		for(int i=0; i<N+1; ++i) mLevels[i] *= v;
-		return *this;
-	}
+	/// Set maximum level
+	Env& maxLevel(Tv v);
 
 protected:
 	Curve<Tv,Tp> mCurve;
@@ -715,10 +623,9 @@ protected:
 
 // Implementation_______________________________________________________________
 
-
-//---- Curve
 template <class Tv,class Tp>
-Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
+Curve<Tv,Tp>::Curve()
+:	mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
 template <class Tv,class Tp>
@@ -735,7 +642,10 @@ inline bool Curve<Tv,Tp>::done() const {
 
 // dividing by mMul goes back one step
 template <class Tv,class Tp>
-inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
+Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){
+	mB = (mA-start) / mMul;
+	return *this;
+}
 
 // hack to get proper max floating point value
 namespace{
@@ -791,10 +701,15 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 }
 
 template <class Tv,class Tp>
-inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
+inline Tv Curve<Tv,Tp>::value() const {
+	return mA - mB;
+}
 
 template <class Tv,class Tp>
-inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
+inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){
+	mB = mA-v;
+	return *this;
+}
 
 template <class Tv,class Tp>
 inline Tv Curve<Tv,Tp>::operator()(){
@@ -802,9 +717,150 @@ inline Tv Curve<Tv,Tp>::operator()(){
 	return value();
 }
 
-    
 
-//---- Decay
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env()
+:	mSustain(N), mLoop(0){
+	for(int i=0; i<N; ++i){
+		mLengths[i]= 1e-8;
+		mCurves[i] =-4;
+		mLevels[i] = 1e-8;
+	}	mLevels[N] = 1e-8;
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2)
+:	mSustain(N), mLoop(0)
+{
+	levels(lvl1,lvl2);
+	lengths()[0] = len1;
+	curve(-4);
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
+:	mSustain(N), mLoop(0)
+{
+	levels(lvl1,lvl2,lvl3);
+	lengths(len1,len2);
+	curve(-4);
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4)
+:	mSustain(N), mLoop(0)
+{
+	levels(lvl1,lvl2,lvl3,lvl4);
+	lengths(len1,len2,len3);
+	curve(-4);
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+inline Tv Env<N,Tv,Tp,Td>::operator()(){
+
+	// Sustain stage:
+	if(sustained()){
+		return mLevels[mStage];
+	}
+
+	// Interpolating along segment:
+	else if(mPos < mLen){
+		++mPos;
+		return mCurve();
+	}
+
+	// Just went past end of current segment and there are more left:
+	else if(mStage < size()){
+		++mStage;
+		if(mLoop && done()) mStage=0;
+		if(!done()){
+			mPos = 0;
+			setLen(mStage);
+			int nextStage = mStage+1;
+			// If looping, ensure we wrap back around to first level
+			if(mLoop && (nextStage==size())) nextStage = 0;
+			mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[nextStage]);
+
+			// Immediately return start level of new stage
+			return (*this)();
+		}
+	}
+
+	// Envelope is done:
+	return mLevels[mStage];
+}	
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::release(){
+	mSustain = -scl::abs(mSustain);
+
+	// begin release portion immediately starting at current level
+	Tv curVal = value();
+	mStage = -mSustain;
+	if(!done()){
+		mPos = 0;
+		setLen(mStage);
+		mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
+	}
+}
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::reset(){
+	// this forces a stage increment upon first iteration
+	mPos = 0;//0xFFFFFFFF;
+	mLen = 0;
+	mStage = -1;
+	mSustain = scl::abs(mSustain);
+}
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::resetSoft(){
+	Tv curVal = value();
+	mPos = 0;
+	mStage = 0;
+	setLen(mStage);
+	mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
+	mSustain = scl::abs(mSustain);
+}
+
+template <int N,class Tv,class Tp,class Td>
+Tp Env<N,Tv,Tp,Td>::totalLength() const {
+	Tp sum=Tp(0);
+	for(int i=0;i<size();++i) sum += mLengths[i];
+	return sum;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::totalLength(Tp length, int modSegment){
+	mLengths[modSegment] = Tp(0);
+	mLengths[modSegment] = length - totalLength();
+	return *this;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::totalLength(Tp length){
+	Tp mul = length / totalLength();
+	for(int i=0; i<size(); ++i){
+		lengths()[i] *= mul;
+	}
+	return *this;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::maxLevel(Tv v){
+	Tv mx(0);
+	for(int i=0; i<N+1; ++i) mx = scl::max(abs(mLevels[i]), mx);
+	v = v/mx;
+	for(int i=0; i<N+1; ++i) mLevels[i] *= v;
+	return *this;
+}
+
+
 
 template <class T, class Td>
 Decay<T,Td>::Decay(T decay_, T val)
