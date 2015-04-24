@@ -854,7 +854,7 @@ Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::totalLength(Tp length){
 template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::maxLevel(Tv v){
 	Tv mx(0);
-	for(int i=0; i<N+1; ++i) mx = scl::max(abs(mLevels[i]), mx);
+	for(int i=0; i<N+1; ++i) mx = scl::max(scl::abs(mLevels[i]), mx);
 	v = v/mx;
 	for(int i=0; i<N+1; ++i) mLevels[i] *= v;
 	return *this;
