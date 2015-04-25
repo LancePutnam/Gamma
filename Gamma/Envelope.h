@@ -432,8 +432,12 @@ protected:
 
 /// Binary gate controlled by threshold comparison
 
-/// The gate closes if the (norm of the) input value remains below threshold for 
-/// at least closingDelay units of time (typically seconds).
+/// The gate returns 1 if the input magnitude is above a specified threshold,
+/// otherwise it returns 0. A closing delay can also be specified to determine
+/// the window of time the input must be below the threshold before the gate
+/// closes. This is equivalent to what is known in electronics as a comparator
+/// with hysteresis.
+///
 /// \ingroup Envelopes
 template <class T=real, class Td=DomainObserver>
 class Gate : public Td{
