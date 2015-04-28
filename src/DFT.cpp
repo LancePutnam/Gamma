@@ -48,8 +48,7 @@ DFT::DFT(unsigned winSize, unsigned padSize, SpectralType specT, unsigned numAux
 	numAux(numAuxA);
 }
 
-DFT::~DFT(){
-	//printf("~DFT\n");
+DFT::~DFT(){ //printf("~DFT\n");
 	if(mBufInv != bufPos()) mem::free(mBufInv);
 	mem::free(mPadOA);
 }
@@ -65,7 +64,7 @@ void DFT::resize(unsigned newWinSize, unsigned newPadSize){ //printf("DFT::resiz
 
 	if(mem::resize(mBuf, oldFrqSize, newFrqSize)){
 		mBufInv = bufPos();
-		if(mAux) mem::resize(mAux, oldFrqSize, newFrqSize);
+		if(mNumAux) mem::resize(mAux, oldFrqSize*mNumAux, newFrqSize*mNumAux);
 		mFFT.resize(newDFTSize);
 		mem::deepZero(mBuf, newFrqSize);
 	}
