@@ -283,7 +283,8 @@ void STFT::resize(unsigned winSize, unsigned padSize){
 	mem::resize(mAccums, oldNumBins, numBins());
 
 	mem::deepZero(mBufInv, winSize);
-	resetPhases();
+	mem::deepZero(mPhases, numBins());
+	mem::deepZero(mAccums, numBins());
 
 	// re-compute fwd window
 	windowType(mWinType);
