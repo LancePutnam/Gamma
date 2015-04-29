@@ -62,8 +62,8 @@ public:
 	void delaySamplesR(float v);				///< Set delay length in samples (real-valued)
 	void delayUnit(float u);					///< Set delay as (0, 1) of buffer size
 	void freq(float v);							///< Set natural frequency (1/delay())
-	void ipolType(ipl::Type v){ mIpol.type(v); }///< Set interpolation type
-	void maxDelay(float v);						///< Set maximum delay length
+	void ipolType(ipl::Type v){mIpol.type(v);}	///< Set interpolation type
+	void maxDelay(float v, bool setDelay=true);	///< Set maximum delay length
 
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer
@@ -326,7 +326,7 @@ TM1 Delay<TM2>::Delay(float maxDly, float dly)
 :	ArrayPow2<Tv>(), DELAY_INIT
 {
 	Td::refreshDomain();
-	maxDelay(maxDly);
+	maxDelay(maxDly, false);
 	this->zero();
 	delay(dly);
 }
@@ -335,14 +335,15 @@ TM1 Delay<TM2>::Delay(float dly)
 :	ArrayPow2<Tv>(), DELAY_INIT
 {	//printf("Delay::Delay(float)\n");
 	Td::refreshDomain();
-	maxDelay(dly);
+	maxDelay(dly, false);
 	this->zero();
 	delay(dly);
 }
 
 #undef DELAY_INIT
 
-TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", length);
+TM1 void Delay<TM2>::maxDelay(float length, bool setDelay){
+	//printf("Delay::maxDelay(%f)\n", length);
 	mMaxDelay = length;
 	if(Td::domain() && Td::domain()->hasBeenSet()){
 		//printf("Delay::maxDelay(): resize to %d\n", (unsigned)(mMaxDelay * spu()));
@@ -357,6 +358,7 @@ TM1 void Delay<TM2>::maxDelay(float length){ //printf("Delay::maxDelay(%f)\n", l
 		// the size changes to prevent infinite recursion.
 		this->resize(maxDelayInSamples);
 	}
+	if(setDelay) delay(length);
 }
 
 TM1 inline Tv Delay<TM2>::operator()() const {
@@ -393,7 +395,7 @@ TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n
 		mMaxDelay = this->size() * Td::ups();
 	}
 	else{
-		maxDelay(mMaxDelay);
+		maxDelay(mMaxDelay, false);
 	}
 
 	float currDelay = delay();
