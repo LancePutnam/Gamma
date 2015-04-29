@@ -4,32 +4,32 @@
 #include "Gamma/DFT.h"
 #include "Gamma/arr.h"
 
-#define CART_TO_POL\
+#define CART_TO_POL(bins)\
 	if(mPrecise){\
 		for(unsigned i=1; i<numBins()-1; ++i){\
-			Complex<float> &c = bins()[i];\
+			Complex<float> &c = bins[i];\
 			c(c.mag(), c.phase());\
 		}\
 	}\
 	else{\
 		for(unsigned i=1; i<numBins()-1; ++i){\
-			Complex<float> &c = bins()[i];\
+			Complex<float> &c = bins[i];\
 			float m = c.normSqr();\
 			float p = scl::atan2Fast(c.i,c.r);\
 			c(scl::sqrt<1>(m), p);\
 		}\
 	}
 
-#define POL_TO_CART\
+#define POL_TO_CART(bins)\
 	if(mPrecise){\
 		for(unsigned i=1; i<numBins()-1; ++i){\
-			Complex<float> &c = bins()[i];\
+			Complex<float> &c = bins[i];\
 			c(c[0]*cos(c[1]), c[0]*sin(c[1]));\
 		}\
 	}\
 	else{\
 		for(unsigned i=1; i<numBins()-1; ++i){\
-			Complex<float> &c = bins()[i];\
+			Complex<float> &c = bins[i];\
 			float p = scl::wrapPhase(c[1]);\
 			c(c[0]*scl::cosT8(p), c[0]*scl::sinT9(p));\
 		}\
@@ -49,7 +49,6 @@ DFT::DFT(unsigned winSize, unsigned padSize, SpectralType specT, unsigned numAux
 }
 
 DFT::~DFT(){ //printf("~DFT\n");
-	if(mBufInv != bufPos()) mem::free(mBufInv);
 	mem::free(mPadOA);
 }
 
@@ -62,11 +61,11 @@ void DFT::resize(unsigned newWinSize, unsigned newPadSize){ //printf("DFT::resiz
 	unsigned oldFrqSize = oldDFTSize+2;		// 2 extra for DC/Nyquist imaginary
 	unsigned newFrqSize = newDFTSize+2;		// "
 
-	if(mem::resize(mBuf, oldFrqSize, newFrqSize)){
-		mBufInv = bufPos();
+	if(mem::resize(mBuf, oldFrqSize*2, newFrqSize*2)){
+		mBufInv = bufInvPos();
 		if(mNumAux) mem::resize(mAux, oldFrqSize*mNumAux, newFrqSize*mNumAux);
 		mFFT.resize(newDFTSize);
-		mem::deepZero(mBuf, newFrqSize);
+		mem::deepZero(mBuf, newFrqSize*2);
 	}
 	
 	mem::resize(mPadOA, sizePad(), newPadSize);
@@ -89,28 +88,16 @@ void DFT::onDomainChange(double r){
 
 void DFT::forward(const float * src){ //printf("DFT::forward(const float *)\n");
 
-	if(src != bufPos()) mem::deepCopy(bufPos(), src, sizeWin());
-	mem::deepZero(bufPos() + sizeWin(), sizePad());	// zero pad
+	if(src != bufFwdPos()) mem::deepCopy(bufFwdPos(), src, sizeWin());
+	mem::deepZero(bufFwdPos() + sizeWin(), sizePad());	// zero pad
 
 	mFFT.forward(mBuf, true, true); // complex buffer and normalize
-
-//	// do a mem move rather than offsetting input buffer pointer...
-//	if(src != mBuf) mem::deepCopy(mBuf, src, sizeWin());
-//	mem::deepZero(mBuf + sizeWin(), sizePad());	// zero pad
-//	//... do zero-phase window (rotate buffer 180)
-//
-//	mFFT.forward(mBuf);
-//	
-//	// re-arrange DC and Nyquist bins
-//	mem::deepMove(mBuf+2, mBuf+1, sizeDFT()-1);
-//	mBuf[1] = 0.f;
-//	mBuf[numBins()*2-1] = 0.f;
 
 	switch(mSpctFormat){
 	case COMPLEX: break;
 	case MAG_PHASE:
 	case MAG_FREQ:
-		CART_TO_POL
+		CART_TO_POL(mBins)
 		break;
 	default:;
 	}
@@ -118,60 +105,49 @@ void DFT::forward(const float * src){ //printf("DFT::forward(const float *)\n");
 
 void DFT::inverse(float * dst){
 	//printf("DFT::inverse(float *)\n");
-	
+
+	// operate on copy of bins
+	if(MAG_FREQ != mSpctFormat){
+		mem::deepCopy(bufInvFrq(), bufFwdFrq(), sizeDFT()+2);
+	}
+
 	switch(mSpctFormat){
 	case COMPLEX: break;
 	case MAG_PHASE:
 	case MAG_FREQ:
-		POL_TO_CART
+		{	Complex<float> * bins = mBins+numBins();
+			POL_TO_CART(bins)
+		}
 		break;
-	}	
+	}
 
-	mFFT.inverse(mBuf, true);
+	mFFT.inverse(bufInvFrq(), true);
 
 	// overlap-add inverse window with prev spill
 	if(sizePad() > 0){
-		arr::add(bufPos(), mPadOA, scl::min(sizePad(), sizeWin()));	// add prev spill
-	
-		if(sizePad() <= sizeWin()){	// no spill overlap
-			mem::deepCopy(mPadOA, bufPos() + sizeWin(), sizePad());	// save current spill
+		// add spill from previous transform
+		arr::add(bufInvPos(), mPadOA, scl::min(sizePad(), sizeWin()));
+
+		// no spill overlap
+		if(sizePad() <= sizeWin()){
+			// copy current spill into overlap-add buffer
+			mem::deepCopy(mPadOA, bufInvPos() + sizeWin(), sizePad());
 		}
-		else{						// spill overlaps
+
+		// spill overlaps
+		else{
 			// add and save current spill to previous
-			arr::add(mPadOA, bufPos() + sizeWin(), mPadOA + sizeWin(), sizePad() - sizeWin());
-			mem::deepCopy(mPadOA + sizePad() - sizeWin(), bufPos() + sizePad(), sizeWin());
+			arr::add(mPadOA, bufInvPos() + sizeWin(), mPadOA + sizeWin(), sizePad() - sizeWin());
+			mem::deepCopy(mPadOA + sizePad() - sizeWin(), bufInvPos() + sizePad(), sizeWin());
 		}
 	}
 
-	if(dst) mem::deepCopy(dst, bufPos(), sizeWin());
-
-//	// arrange/scale bins for inverse xfm
-//	// TODO: can we avoid this move by pointer offsetting?
-//	mem::deepMove(mBuf+1, mBuf+2, sizeDFT()-1);
-//	//slice(mBuf+1, sizeDFT()-2) *= 0.5f;
-//
-//	mFFT.inverse(mBuf);
-//	
-//	// o.a. inverse window with prev spill
-//	if(sizePad() > 0){
-//		arr::add(mBuf, mPadOA, scl::min(sizePad(), sizeWin()));	// add prev spill
-//	
-//		if(sizePad() <= sizeWin()){	// no spill overlap
-//			mem::deepCopy(mPadOA, mBuf + sizeWin(), sizePad());	// save current spill
-//		}
-//		else{						// spill overlaps
-//			// add and save current spill to previous
-//			arr::add(mPadOA, mBuf + sizeWin(), mPadOA + sizeWin(), sizePad() - sizeWin());
-//			mem::deepCopy(mPadOA + sizePad() - sizeWin(), mBuf + sizePad(), sizeWin());
-//		}
-//	}
-//
-//	if(dst) mem::deepCopy(dst, mBuf, sizeWin());
+	if(dst) mem::deepCopy(dst, bufInvPos(), sizeWin());
 }
 
 void DFT::spctToRect(){
 	switch(mSpctFormat){
-	case MAG_PHASE: POL_TO_CART break;
+	case MAG_PHASE: POL_TO_CART(mBins) break;
 	default:;
 	}
 	mSpctFormat = COMPLEX;
@@ -179,7 +155,7 @@ void DFT::spctToRect(){
 
 void DFT::spctToPolar(){
 	switch(mSpctFormat){
-	case COMPLEX:	CART_TO_POL break;
+	case COMPLEX:	CART_TO_POL(mBins) break;
 	default:;
 	}
 	mSpctFormat = MAG_PHASE;
@@ -222,6 +198,7 @@ STFT::STFT(unsigned winSize, unsigned hopSize, unsigned padSize, WindowType winT
 }
 
 STFT::~STFT(){ //printf("~STFT\n");
+	mem::free(mBufInv);
 	mem::free(mFwdWin);
 	mem::free(mPhases);
 	mem::free(mAccums);
@@ -332,15 +309,15 @@ STFT& STFT::resetPhases(){
 // input is sizeWin
 void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 
-	if(src != bufPos()) mem::deepCopy(bufPos(), src, sizeWin());
+	if(src != bufFwdPos()) mem::deepCopy(bufFwdPos(), src, sizeWin());
 
 	// apply forward window
-	arr::mul(bufPos(), mFwdWin, sizeWin());
+	arr::mul(bufFwdPos(), mFwdWin, sizeWin());
 	
 	// do zero-phase windowing rotation?
-	if(mRotateForward) mem::rotateHalf(bufPos(), sizeWin());
+	if(mRotateForward) mem::rotateHalf(bufFwdPos(), sizeWin());
 
-	DFT::forward(bufPos());
+	DFT::forward(bufFwdPos());
 	
 	// compute frequency estimates?
 	if(MAG_FREQ == mSpctFormat){
@@ -385,35 +362,39 @@ void STFT::inverse(float * dst){
 			t *= factor;				// freq deviation to phase diff
 			t += k*expdp1;				// add expected phase diff due to overlap
 			mAccums[k] += t;			// accumulate phase diff
-			bin(k)[1] = mAccums[k];		// copy accum phase for inverse xfm
+			//bin(k)[1] = mAccums[k];		// copy accum phase for inverse xfm
+			bufInvFrq()[2*k] = bin(k)[0];
+			bufInvFrq()[2*k+1] = mAccums[k];
 		}
+
+		bufInvFrq()[0] = bin(0)[0];
+		bufInvFrq()[2*(numBins()-1)] = bin(numBins()-1)[0];
 	}
 
-	DFT::inverse(0);	// result goes into bufPos()
+	DFT::inverse();	// result goes into bufInvPos()
 
 	// undo zero-phase windowing rotation?
-	if(mRotateForward) mem::rotateHalf(bufPos(), sizeWin());
+	if(mRotateForward) mem::rotateHalf(bufInvPos(), sizeWin());
 
 	// apply secondary window to smooth ends?
 	if(mWindowInverse){
-		arr::mulBartlett(bufPos(), sizeWin());
+		arr::mulBartlett(bufInvPos(), sizeWin());
 	}
 
 	if(overlapping()){	//inverse windows overlap?
 
 		// scale inverse so overlap-add is normalized
-		//slice(mBuf, sizeWin()) *= mInvWinMul;
 		for(unsigned i=0; i<sizeWin(); ++i){
-			bufPos()[i] *= mInvWinMul;
+			bufInvPos()[i] *= mInvWinMul;
 		}
 
 		// shift old output left while adding new output
-		arr::add(mBufInv, bufPos(), mBufInv + sizeHop(), sizeWin() - sizeHop());
+		arr::add(mBufInv, bufInvPos(), mBufInv + sizeHop(), sizeWin() - sizeHop());
 	}
 
 	// copy remaining non-overlapped portion of new output
 	unsigned sizeOverlap = sizeWin() - sizeHop();
-	mem::deepCopy(mBufInv + sizeOverlap, bufPos() + sizeOverlap, sizeHop());
+	mem::deepCopy(mBufInv + sizeOverlap, bufInvPos() + sizeOverlap, sizeHop());
 
 	// copy output if external buffer provided
 	if(dst) mem::deepCopy(dst, mBufInv, sizeWin());	

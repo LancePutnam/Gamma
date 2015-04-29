@@ -102,13 +102,9 @@ public:
 	/// Get read-only reference to bin value
 	const Complex<T>& bin(unsigned k) const { return mBins[k]; }
 
-	/// Get pointer to time-/position-domain buffer
-
-	/// Since the forward and inverse transforms operate in-place, the contents
-	/// of this buffer will only be valid before a forward transform or after
-	/// an inverse transform.
-	T * buffer(){ return bufPos(); }
-	const T * buffer() const { return bufPos(); }
+	/// Get pointer to inverse transform buffer
+	T * bufferInverse(){ return bufInvPos(); }
+	const T * bufferInverse() const { return bufInvPos(); }
 
 	double binFreq() const;		///< Get width of frequency bins
 	unsigned numBins() const;	///< Get number of frequency bins
@@ -161,8 +157,10 @@ protected:
 	Domain mDomFreq;
 
 	T normForward() const;	// get norm factor for forward transform values
-	T * bufPos(){ return mBuf+1; }
-	T * bufFrq(){ return mBuf; }
+	T * bufFwdPos(){ return mBuf+1; }
+	T * bufFwdFrq(){ return mBuf; }
+	T * bufInvPos(){ return mBuf+mSizeDFT+3; }
+	T * bufInvFrq(){ return mBuf+mSizeDFT+2; }
 };
 
 
@@ -512,16 +510,16 @@ template<class T>
 inline double DFTBase<T>::binFreq() const { return spu() / sizeDFT(); }
     
 template<class T>
-inline unsigned	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
+unsigned	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
     
 template<class T>
-inline unsigned	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
+unsigned	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
     
 template<class T>
-inline Domain& DFTBase<T>::domainFreq(){ return mDomFreq; }
+Domain& DFTBase<T>::domainFreq(){ return mDomFreq; }
     
 template<class T>
-inline T DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
+T DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
 
 template<class T>
 void DFTBase<T>::numAux(unsigned num){
@@ -580,10 +578,10 @@ inline unsigned DFT::sizeWin() const { return mSizeWin; }
 inline Domain& DFT::domainHop(){ return mDomHop; }
 
 inline bool DFT::operator()(float input){
-	bufPos()[mTapW] = input;
+	bufFwdPos()[mTapW] = input;
 
 	if(++mTapW >= sizeHop()){
-		forward(bufPos());
+		forward(bufFwdPos());
 		mTapW = 0;
 		return true;
 	}
@@ -592,7 +590,7 @@ inline bool DFT::operator()(float input){
 
 inline float DFT::operator()(){
 	if(++mTapR >= sizeHop()){
-		inverse(0);	// this is a virtual method
+		inverse();	// this is a virtual method
 		mTapR = 0;
 	}
 	return mBufInv[mTapR];
@@ -604,8 +602,8 @@ inline bool DFT::inverseOnNext(){ return mTapR == (sizeHop() - 1); }
 
 
 inline bool STFT::operator()(float input){
-	if(mSlide(bufPos(), input)){
-		forward(bufPos());
+	if(mSlide(bufFwdPos(), input)){
+		forward(bufFwdPos());
 		return true;
 	}
 	return false;
