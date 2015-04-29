@@ -88,10 +88,10 @@ void DFT::onDomainChange(double r){
 
 void DFT::forward(const float * src){ //printf("DFT::forward(const float *)\n");
 
-	if(src != bufFwdPos()) mem::deepCopy(bufFwdPos(), src, sizeWin());
+	if(src) mem::deepCopy(bufFwdPos(), src, sizeWin());
 	mem::deepZero(bufFwdPos() + sizeWin(), sizePad());	// zero pad
 
-	mFFT.forward(mBuf, true, true); // complex buffer and normalize
+	mFFT.forward(bufFwdFrq(), true, true); // complex buffer and normalize
 
 	switch(mSpctFormat){
 	case COMPLEX: break;
@@ -309,7 +309,7 @@ STFT& STFT::resetPhases(){
 // input is sizeWin
 void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 
-	if(src != bufFwdPos()) mem::deepCopy(bufFwdPos(), src, sizeWin());
+	if(src) mem::deepCopy(bufFwdPos(), src, sizeWin());
 
 	// apply forward window
 	arr::mul(bufFwdPos(), mFwdWin, sizeWin());
@@ -317,7 +317,7 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 	// do zero-phase windowing rotation?
 	if(mRotateForward) mem::rotateHalf(bufFwdPos(), sizeWin());
 
-	DFT::forward(bufFwdPos());
+	DFT::forward();
 	
 	// compute frequency estimates?
 	if(MAG_FREQ == mSpctFormat){

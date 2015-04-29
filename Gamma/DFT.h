@@ -224,16 +224,17 @@ public:
 
 	/// Performs forward transform on a window of samples
 	
-	/// 'src' must have at least sizeWin() number of elements.
-	///
-	void forward(const float * src);	
+	/// 'src' must have at least sizeWin() number of elements. If 'src' is 0,
+	/// then the transform is performed on the internal forward transform
+	/// buffer.
+	void forward(const float * src=0);	
 
 	/// Performs inverse transform on internal spectrum
 	
 	///	The resynthesized samples are copied into 'dst'.  The destination
 	/// array must have room for at least sizeDFT() number of elements. If 'dst'
 	/// equals 0, then the resynthesized samples are not copied, but instead
-	/// held in the internal transform buffer.
+	/// held in the internal inverse transform buffer.
 	virtual void inverse(float * dst=0);
 	
 	/// Returns true if next call to inverse() will perform the inverse transform.
@@ -302,7 +303,7 @@ public:
 	bool operator()(float input);
 
 	/// Perform forward transform of an array of samples
-	void forward(const float * src);
+	void forward(const float * src=0);
 	
 	/// Get inverse transform using current spectral frame
 	virtual void inverse(float * dst=0);
@@ -581,7 +582,7 @@ inline bool DFT::operator()(float input){
 	bufFwdPos()[mTapW] = input;
 
 	if(++mTapW >= sizeHop()){
-		forward(bufFwdPos());
+		forward();
 		mTapW = 0;
 		return true;
 	}
@@ -603,7 +604,7 @@ inline bool DFT::inverseOnNext(){ return mTapR == (sizeHop() - 1); }
 
 inline bool STFT::operator()(float input){
 	if(mSlide(bufFwdPos(), input)){
-		forward(bufFwdPos());
+		forward();
 		return true;
 	}
 	return false;
