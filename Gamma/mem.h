@@ -220,6 +220,10 @@ void rotateLeft(unsigned order, T * arr, unsigned len);
 template <class T>
 void rotateRight1(T * arr, unsigned len, unsigned str=1);
 
+/// Rotate elements right by 'order' elements.
+template <class T>
+void rotateRight(unsigned order, T * arr, unsigned len);
+
 /// Copies elements from 'src' to fractionally strided locations in 'dst'. 
 
 /// The destination indices are rounded up.
@@ -517,6 +521,11 @@ void rotateLeft(unsigned order, T * arr, unsigned len){
 template <class T>
 inline void rotateLeft1(T * arr, unsigned len, unsigned str){
 	LOOP(len-str, str){	swap(arr[i], arr[i+str]); }
+}
+
+template <class T>
+void rotateRight(unsigned order, T * arr, unsigned len){
+	rotateLeft(len - order, arr, len);
 }
 
 template <class T>
