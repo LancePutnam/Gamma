@@ -315,7 +315,7 @@ void STFT::forward(const float * src){ //printf("STFT::forward(float *)\n");
 	arr::mul(bufFwdPos(), mFwdWin, sizeWin());
 	
 	// do zero-phase windowing rotation?
-	if(mRotateForward) mem::rotateHalf(bufFwdPos(), sizeWin());
+	if(mRotateForward) mem::rotateLeft(sizeWin()/2, bufFwdPos(), sizeDFT());
 
 	DFT::forward();
 	
@@ -374,7 +374,7 @@ void STFT::inverse(float * dst){
 	DFT::inverse();	// result goes into bufInvPos()
 
 	// undo zero-phase windowing rotation?
-	if(mRotateForward) mem::rotateHalf(bufInvPos(), sizeWin());
+	if(mRotateForward) mem::rotateRight(sizeWin()/2, bufInvPos(), sizeDFT());
 
 	// apply secondary window to smooth ends?
 	if(mWindowInverse){
