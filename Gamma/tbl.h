@@ -158,10 +158,11 @@ void inline addSines(
 /// \param[in] amp		overall amplitude scaling factor
 /// \param[in] hphs		phase of (sine) harmonics, in [0,1]
 /// \param[in] wphs		phase of composite waveform, in [0,1]
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <int InvPower, class T>
 void addSinesPow(
 	T * dst, unsigned len, int numh,
-	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
+	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0, double cycles=1
 );
 
 /// Add sine waves to array using inverse power law for amplitudes
@@ -174,12 +175,13 @@ void addSinesPow(
 /// \param[in] amp		overall amplitude scaling factor
 /// \param[in] hphs		phase of (sine) harmonics, in [0,1]
 /// \param[in] wphs		phase of composite waveform, in [0,1]
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <int InvPower, class T, class Alloc, template<class,class> class ArrayType>
 inline void addSinesPow(
 	ArrayType<T,Alloc>& dst, int numh,
-	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
+	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0, double cycles=1
 ){
-	addSinesPow<InvPower>(&dst[0], dst.size(), numh,hmul,hshf,amp,hphs,wphs);
+	addSinesPow<InvPower>(&dst[0], dst.size(), numh,hmul,hshf,amp,hphs,wphs,cycles);
 }
 
 
@@ -194,10 +196,11 @@ inline void addSinesPow(
 /// \param[in] amp		amplitude of waveform
 /// \param[in] phs		phase of waveform, in [0,1]
 /// \param[in] hshf		harmonic number shift amount
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <class T>
 void addWave(
 	T * dst, unsigned len, gam::WaveformType type,
-	int numh=32, double amp=1, double phs=0, double hshf=1
+	int numh=32, double amp=1, double phs=0, double hshf=1, double cycles=1
 );
 
 /// Add predefined waveform to array
@@ -210,12 +213,13 @@ void addWave(
 /// \param[in] amp		amplitude of waveform
 /// \param[in] phs		phase of waveform, in [0,1]
 /// \param[in] hshf		harmonic number shift amount
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <class T, class Alloc, template<class,class> class ArrayType>
 void inline addWave(
 	ArrayType<T,Alloc>& dst, gam::WaveformType type,
-	int numh=32, double amp=1, double phs=0, double hshf=1
+	int numh=32, double amp=1, double phs=0, double hshf=1, double cycles=1
 ){
-	addWave(&dst[0],dst.size(), type,numh,amp,phs,hshf);
+	addWave(&dst[0],dst.size(), type,numh,amp,phs,hshf,cycles);
 }
 
 
@@ -727,16 +731,15 @@ void addSine(T * dst, unsigned len, double cycles, double amp, double phs){
 template <int InvPower, class T>
 void addSinesPow(
 	T * dst, unsigned len, int numh,
-	double hmul, double hshf, double amp, double hphs, double wphs
+	double hmul, double hshf, double amp, double hphs, double wphs, double cycles
 ){
-	const double inc1 = M_2PI / len;
+	const double inc1 = (M_2PI / len) * cycles;
 
 	for(int j=0; j<numh; ++j){
 		const double h = j*hmul + hshf;
-		if(InvPower && 0==h) continue;
-		const double inch = inc1 * h;
-		double A = amp;
-		
+		if(InvPower && 0==h) continue; // don't bother with DC component
+
+		double A = amp;		
 		switch(InvPower){
 		case 0: break;
 		case 1: A /= h; break;
@@ -744,9 +747,10 @@ void addSinesPow(
 		case 3: A /= h*h*h; break;
 		default:A *= ::pow(h, -InvPower);
 		}
-		
-		double P = (hphs + h*wphs) * M_2PI;
-		
+
+		const double P = (hphs + h*wphs) * M_2PI;
+		const double inch = inc1 * h;
+
 		for(unsigned i=0; i<len; ++i){
 			dst[i] += A*getSin<T>(inch*i + P);
 		}
@@ -757,7 +761,7 @@ void addSinesPow(
 template <class T>
 void addWave(
 	T * dst, unsigned len, WaveformType type,
-	int numh, double amp, double phs, double hshf
+	int numh, double amp, double phs, double hshf, double cycles
 ){
 //	static const double ctri = normConstant<TRIANGLE>();
 //	static const double csaw = normConstant<SAW>();
@@ -765,15 +769,15 @@ void addWave(
 	static const double ctri = 1;
 	static const double csaw = 1;
 	static const double csqr = 1;
-	
+
 	switch(type){
-	case SINE:		addSine(dst,len, hshf,amp,phs); break;
-	case COSINE:	addSine(dst,len, hshf,amp,phs+0.25); break;
-	case TRIANGLE:	addSinesPow<2>(dst,len, numh,2,hshf,amp*ctri,0.25,phs-0.25); break;
-	case PARABOLIC:	addSinesPow<2>(dst,len, numh,1,hshf,amp*csaw,0.25,phs); break;
-	case SQUARE:	addSinesPow<1>(dst,len, numh,2,hshf,amp*csqr,0.00,phs); break;
-	case SAW:		addSinesPow<1>(dst,len, numh,1,hshf,amp*csaw,0.00,phs); break;
-	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp     ,0.25,phs); break;
+	case SINE:		addSine(dst,len, hshf*cycles,amp,phs); break;
+	case COSINE:	addSine(dst,len, hshf*cycles,amp,phs+0.25); break;
+	case TRIANGLE:	addSinesPow<2>(dst,len, numh,2,hshf,amp*ctri,0.25,phs-0.25,cycles); break;
+	case PARABOLIC:	addSinesPow<2>(dst,len, numh,1,hshf,amp*csaw,0.25,phs,cycles); break;
+	case SQUARE:	addSinesPow<1>(dst,len, numh,2,hshf,amp*csqr,0.00,phs,cycles); break;
+	case SAW:		addSinesPow<1>(dst,len, numh,1,hshf,amp*csaw,0.00,phs,cycles); break;
+	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp     ,0.25,phs,cycles); break;
 	default:;
 	}
 }
