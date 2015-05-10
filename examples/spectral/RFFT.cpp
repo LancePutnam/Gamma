@@ -1,10 +1,13 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example: Spectral / RFFT
+Example:	Fast Fourier Transform
+Author:		Lance Putnam, 2012
 
-	This demonstrates how to do a real-to-complex fast Fourier transform using 
-	the RFFT class.
+Description:
+This demonstrates how to do a real-to-complex fast Fourier transform using the
+RFFT class. Note that if you are interested in doing Fourier transforms on
+real-time audio streams, see the DFT and STFT classes.
 */
 
 #include "Gamma/FFT.h"

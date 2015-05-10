@@ -2,7 +2,7 @@
 
 */
 
-#include "../examples.h"
+#include "examples.h"
 
 class OscAM : public Process<AudioIOData> {
 public:
@@ -97,7 +97,7 @@ int main(){
 	s.add<OscAM>(15).set(5, 262, 0.5, 0.1,0.08,0.8, 0.2,0.8,1.0, 2.0001/10., tbDin);
 
 	AudioIO io(256, 44100., Scheduler::audioCB, &s);
-	Sync::master().spu(io.fps());
+	gam::sampleRate(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

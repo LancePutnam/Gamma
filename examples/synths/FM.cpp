@@ -5,8 +5,7 @@
 	Description:	
 */
 
-#include "../examples.h"
-#include "Gamma/Scheduler.h"
+#include "examples.h"
 #include <iostream>
 using namespace std;
 
@@ -113,7 +112,7 @@ int main(){
 	s.add<FM>(30).set(0.3,100, 0.5, 0.001,0.25, 0.8, 5,5,5, 1, 1.48, 0);
 
 	AudioIO io(256, 44100., Scheduler::audioCB, &s);
-	Sync::master().spu(io.fps());
+	gam::sampleRate(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

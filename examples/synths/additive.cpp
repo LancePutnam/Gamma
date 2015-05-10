@@ -5,10 +5,7 @@
 	Description:	
 */
 
-#include "../examples.h"
-#include "Gamma/Scheduler.h"
-
-
+#include "examples.h"
 
 class AddSyn : public Process<AudioIOData> {
 public:
@@ -257,7 +254,7 @@ int main(){
 
 	
 	AudioIO io(256, 44100., Scheduler::audioCB, &s);
-	Sync::master().spu(io.fps());
+	gam::sampleRate(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

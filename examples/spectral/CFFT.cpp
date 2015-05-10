@@ -1,10 +1,12 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example: Spectral / CFFT
-	
-	This demonstrates how to do a complex fast Fourier transform using the
-	CFFT class.
+Example:	Complex to complex Fourier Transform
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates how to do a complex fast Fourier transform using the CFFT
+class.
 */
 
 #include "Gamma/FFT.h"

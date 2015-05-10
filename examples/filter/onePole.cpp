@@ -1,31 +1,50 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Filter / One-pole filtering
-	Description:	This demonstrates the effect of a one-pole low-pass filter
-					on a noise source. One-pole filters are very effective
-					at controlling the brightness of sounds as they have an
-					adjustable cutoff frequency and gentle slope.
+Example:	One-pole Filter
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates the effect of a one-pole low-pass filter on a noise source.
+One-pole filters are very effective at controlling the "tone" of sounds as they 
+have an adjustable cutoff frequency and gentle slope.
 */
 
-#include "../examples.h"
+#include "../AudioApp.h"
+#include "Gamma/Filter.h"
+#include "Gamma/Noise.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-LFO<> mod(1./8, 0.5);
-NoiseWhite<> src;
-OnePole<> filt(10);
+class MyApp : public AudioApp{
+public:
 
-void audioCB(AudioIOData& io){
+	LFO<> mod;
+	NoiseWhite<> src;
+	OnePole<> onePole;
 
-	while(io()){
-		
-		float cutoff = scl::pow3(mod.triU()) * 10000;
-		
-		filt.freq(cutoff);
-		
-		float s = filt(src());
-			
-		io.out(0) = io.out(1) = s * 0.2f;
+	MyApp(){
+		mod.period(8);
+		mod.phase(0.5);
 	}
-}
 
-RUN_AUDIO_MAIN
+	void onAudio(AudioIOData& io){
+
+		while(io()){
+
+			float cutoff = scl::pow3(mod.triU()) * 10000;
+
+			// Set one-pole cutoff frequency
+			onePole.freq(cutoff);
+
+			// Filter sample
+			float s = onePole(src());
+
+			io.out(0) = io.out(1) = s * 0.2f;
+		}
+	}
+};
+
+int main(){
+	MyApp().start();
+}

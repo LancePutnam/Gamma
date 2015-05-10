@@ -5,8 +5,7 @@
 	Description:	
 */
 
-#include "../examples.h"
-#include "Gamma/Scheduler.h"
+#include "examples.h"
 
 class Vib : public Process<AudioIOData> {
 public:
@@ -130,7 +129,7 @@ int main(){
 	s.add<Vib>(25).set(10, 220, 0.3, 0.1, 0.08, 1.0, 100, 0.0, 0.30, tbSin, 0.8);
 
 	AudioIO io(256, 44100., Scheduler::audioCB, &s);
-	Sync::master().spu(io.fps());
+	gam::sampleRate(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }
