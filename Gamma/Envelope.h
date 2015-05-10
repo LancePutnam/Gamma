@@ -801,6 +801,9 @@ inline Tv Env<N,Tv,Tp,Td>::operator()(){
 
 template <int N,class Tv,class Tp,class Td>
 void Env<N,Tv,Tp,Td>::release(){
+
+	if(released()) return;
+
 	mSustain = -scl::abs(mSustain);
 
 	// begin release portion immediately starting at current level
