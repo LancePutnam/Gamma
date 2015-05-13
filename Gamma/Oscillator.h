@@ -462,6 +462,9 @@ public:
 	/// Set amplitude and phase
 	void ampPhase(Tv a=1, Tv p=0){ set(freq(), a, Base::decay(), p); }
 
+	/// Set decay length
+	void decay(Tv v){ Base::decay(decayFactor(v)); }
+
 	/// Set frequency
 	void freq(Tv v){ Base::freq(v*Td::ups()); }
 
@@ -478,7 +481,7 @@ public:
 		Base::set(
 			frq * Td::ups(),
 			phs,
-			dcy > Tv(0) ? Tv(scl::radius60(dcy, Td::ups())) : Tv(1),
+			decayFactor(dcy),
 			amp
 		);
 	}
@@ -494,6 +497,9 @@ public:
 
 private:
 	typedef gen::RSin2<Tv> Base;
+	Tv decayFactor(Tv length){
+		return length > Tv(0) ? Tv(scl::radius60(length, Td::ups())) : Tv(1);
+	}
 };
 
 
