@@ -1186,14 +1186,14 @@ DEF(sineP9(),	down(); r = scl::sinP9(r))
 
 template <class Sp, class Td>
 DWO<Sp,Td>::DWO()
-:	//mPrev(0)
+//:	mPrev(0)
 {
 	mod(0.5);
 }
 
 template<class Sp, class Td>
 DWO<Sp,Td>::DWO(float f, float p, float m)
-:	//mPrev(0)
+//:	mPrev(0)
 {
 	freq(f);
 	this->phase(p);
