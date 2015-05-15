@@ -625,6 +625,51 @@ private:
 
 
 
+/// Differenced wave oscillator
+
+/// This oscillator uses a difference between two waveforms to reduce aliasing.
+/// Computation time is higher than that of an LFO unit generator, however,
+/// the output exhibits far less aliasing at high frequencies.
+template <class Sp = phsInc::Loop, class Td = DomainObserver>
+class DWO : public Accum<Sp,Td>{
+public:
+
+	DWO();
+	
+	/// \param[in] frq		Frequency
+	/// \param[in] phase	Phase in [0, 1)
+	/// \param[in] mod		Modifier amount in [0, 1)
+	DWO(float frq, float phase=0, float mod=0.5);
+
+
+	DWO& mod(double n);		///< Set modifier from unit value
+	DWO& modI(uint32_t v);	///< Set modifier from integer
+
+	/// Get modifier value
+	uint32_t modI() const { return mMod; }
+	double mod() const { return mMod / 4294967296.; }
+
+	/// Set frequency
+	void freq(float v);
+
+	float up();				///< Upward saw
+	float down();			///< Downward saw
+	float sqr();			///< Square
+	float tri();			///< Triangle
+	float pulse();			///< Pulse
+
+	virtual void onDomainChange(double r);
+
+private:
+	typedef Accum<Sp,Td> Base;
+	uint32_t mMod;			// Modifier parameter
+	float mGain;
+	//float mPrev;
+	//float diff(float v);
+};
+
+
+
 /// Sum of cosine waves
 
 /// This produces a finite sum of harmonic, equi-amplitude cosine waves that 
@@ -1058,9 +1103,18 @@ template<class Tv, class Td> void CSine<Tv, Td>::onDomainChange(double r){
 template<class St, class Td> TLFO::LFO(): Base(){ mod(0.5); }
 template<class St, class Td> TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
-template<class St, class Td> inline TLFO& TLFO::set(float f, float p, float m){ this->freq(f); this->phase(p); return mod(m); }
-template<class St, class Td> inline TLFO& TLFO::mod(double v){ return modI(castIntRound(v*4294967296.)); }
-template<class St, class Td> inline TLFO& TLFO::modI(uint32_t v){ mMod=v; return *this; }
+template<class St, class Td> inline TLFO& TLFO::set(float f, float p, float m){
+	this->freq(f);
+	this->phase(p);
+	return mod(m);
+}
+template<class St, class Td> inline TLFO& TLFO::mod(double v){
+	return modI(castIntRound(v*4294967296.));
+}
+template<class St, class Td> inline TLFO& TLFO::modI(uint32_t v){
+	mMod=v;
+	return *this;
+}
 
 template<class St, class Td> inline float TLFO::line2(){
 	using namespace gam::scl;
@@ -1120,8 +1174,135 @@ DEF(sineT9(),	down(); r = scl::sinT9(r * M_PI))
 DEF(sineP9(),	down(); r = scl::sinP9(r))
 
 #undef DEF
-
 #undef TLFO
+
+
+
+template <class Sp, class Td>
+DWO<Sp,Td>::DWO()
+:	//mPrev(0)
+{
+	mod(0.5);
+}
+
+template<class Sp, class Td>
+DWO<Sp,Td>::DWO(float f, float p, float m)
+:	//mPrev(0)
+{
+	freq(f);
+	this->phase(p);
+	mod(m);
+}
+
+template<class Sp, class Td>
+inline DWO<Sp,Td>& DWO<Sp,Td>::mod(double v){
+	return modI(castIntRound(v*4294967296.));
+}
+template<class Sp, class Td>
+inline DWO<Sp,Td>& DWO<Sp,Td>::modI(uint32_t v){
+	mMod=v;
+	return *this;
+}
+
+template <class Sp, class Td>
+inline void DWO<Sp,Td>::freq(float v){
+	Base::freq(v);
+	float freq1 = this->freqUnit();
+	// Very low freq will produce quantization noise
+	if(freq1 < 1e-5) freq1 = 1e-5;
+	mGain = 0.25/freq1;
+}
+
+/* Ideally we would use a differencing filter, however, it has a serious shortcoming. Any sudden changes in phase (or frequency) will lead a large amplitude impulse in the output which becomes worse the lower the frequency. A related problem is what to initialize the filter's previous input sample to. Instead of a filter, we use an analytic approach which subtracts two phase-shifted waveforms.
+*/
+namespace{
+	inline float para01(uint32_t p){
+		float s = scl::rampUp(p);
+		return s*s;
+	}
+	inline float triangle02(uint32_t p){
+		p = (p >> 9) | Expo4<float>(); // [4, 8)
+		return scl::abs(punUF(p) - 6.f);
+	}
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::up(){
+	/*
+	float s = para01(this->nextPhase());
+	return diff(s);//*/
+	//*
+	uint32_t p = this->nextPhase();
+	float s = para01(p);
+	float t = para01(p + this->freqI());
+	return (t - s)*mGain;//*/
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::down(){
+	/*float s = para01(this->nextPhase());
+	return diff(-s);*/
+	uint32_t p = this->nextPhase();
+	float s = para01(p);
+	float t = para01(p + this->freqI());
+	return (s - t)*mGain;
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::sqr(){
+	/*
+	float s = triangle02(this->nextPhase());
+	return diff(s);//*/
+	//*
+	uint32_t p = this->nextPhase();
+	float s = triangle02(p);
+	float t = triangle02(p + this->freqI());
+	return (t - s)*mGain;//*/
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::tri(){
+	/*
+	float s = scl::sinPara(this->nextPhase())*0.5f;
+	return diff(s);//*/
+	//*
+	uint32_t p = this->nextPhase();
+	float s = scl::sinPara(p);
+	float t = scl::sinPara(p + this->freqI());
+	return (t - s)*0.5f*mGain;//*/
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::pulse(){
+	/*
+	uint32_t p = this->nextPhase();
+	float s1 = para01(p);
+	float s2 = para01(p + mMod);
+	return diff((s1 - s2)*0.5f);//*/
+	//*
+	uint32_t p = this->nextPhase();
+	float s1 = para01(p);
+	float s2 = para01(p + mMod);
+	float s  = s1 - s2;
+	uint32_t q = p + this->freqI();
+	float t1 = para01(q);
+	float t2 = para01(q + mMod);
+	float t  = t1 - t2;
+	return (t - s)*0.5f*mGain;//*/
+}
+
+/*template <class Sp, class Td>
+inline float DWO<Sp,Td>::diff(float v){
+	float res = (v - mPrev)*mGain;
+	mPrev = v;
+	return res;
+}*/
+
+template<class Sp, class Td>
+void DWO<Sp,Td>::onDomainChange(double r){
+	Base::onDomainChange(r);
+	freq(Base::freq());
+}
 
 
 //---- Buzz
