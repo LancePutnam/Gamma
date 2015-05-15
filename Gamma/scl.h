@@ -493,21 +493,14 @@ double ratioET(double pitch, double divs=12, double octave=2);
 
 // internal
 namespace{
-
 	inline uint32_t deBruijn(uint32_t v){
-
 		static const unsigned char deBruijnBitPosition[32] = {
 			 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8,
 			31, 27, 13, 23, 21, 19, 16,  7, 26, 12, 18,  6, 11,  5, 10,  9
 		};
-
 		// Note: this is basically a hash function
 		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
-
-	template<class T> T taylorFactor3(T vv, T c1, T c2, T c3);
-	template<class T> T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
-	template<class T> T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
 }
 
 //#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
@@ -807,35 +800,27 @@ inline T invSqrt(T v){
 }
 
 
-template<class T>
-inline T taylorFactor3(T vv, T c1, T c2, T c3){
-	return c1 * vv * (c2 - vv * (c3 - vv));
+// sin/cos Taylor polynomial coefs
+namespace{ static const double
+	t73 = 42.,
+	t72 = 840.,
+	t71 = 1.9841269841e-04,
+	t84 = 56.,
+	t83 = 1680.,
+	t82 = 20160.,
+	t81 = 2.4801587302e-05,
+	t94 = 72.,
+	t93 = 3024.,
+	t92 = 60480.,
+	t91 = 2.7557319224e-06,
+	ta5 = 90.,
+	ta4 = 5040.,
+	ta3 = 151200.,
+	ta2 = 1814400.,
+	ta1 = 2.7557319224e-07;
 }
-template<class T>
-inline T taylorFactor4(T vv, T c1, T c2, T c3, T c4){
-	return c1 * vv * (c2 - vv * (c3 - vv * (c4 - vv)));
-}
-template<class T>
-inline T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5){
-	return c1 * vv * (c2 - vv * (c3 - vv * (c4 - vv * (c5 - vv))));
-}
-
-
-template<class T> inline T cosP3(T n){
-	return T(1) - T(32) * n * n * (T(0.75) - n);
-}
-
-
-#define t84 56.
-#define t83 1680.
-#define t82 20160.
-#define t81 2.4801587302e-05
-#define t73 42.
-#define t72 840.
-#define t71 1.9841269841e-04
 
 template<class T> inline T cosT8(T r){
-
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		float rr = r*r;
 		return (T)1 - rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
@@ -852,36 +837,7 @@ template<class T> inline T cosT8(T r){
 	}
 }
 
-// Input is in [-2, 2] corresponding to [-pi, pi]
-template<class T> inline T sinFast(T x){
-	T y = x * (T(2) - gam::scl::abs(x));
-	return y * (T(0.775) + T(0.225) * gam::scl::abs(y));
-}
-
-template<class T> inline T sinP7(T n){
-	T nn = n*n;
-	return n * (T(3.138982) + nn * (T(-5.133625) + nn * (T(2.428288) - nn * T(0.433645))));
-}
-
-template<class T> inline T sinP9(T n){
-	T nn = n*n;
-	return n * (T(3.1415191) + nn * (T(-5.1662729) + nn * (T(2.5422065) + nn * (T(-0.5811243) + nn * T(0.0636716)))));
-}
-
 template<class T> inline T sinT7(T r){
-
-//	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
-//		return r * ((T)1 - taylorFactor3<T>(r*r, t71, t72, t73));
-//	}
-//	else if(r > (T)0){
-//		r -= (T)M_PI_2;
-//		return (T)1 - taylorFactor4<T>(r*r, t81, t82, t83, t84);
-//	}
-//	else{
-//		r += (T)M_PI_2;
-//		return (T)-1 + taylorFactor4<T>(r*r, t81, t82, t83, t84);
-//	}
-
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		T rr = r*r;
 		return r * ((T)1 - (T)t71 * rr * ((T)t72 - rr * ((T)t73 - rr)));
@@ -897,23 +853,6 @@ template<class T> inline T sinT7(T r){
 		return (T)-1 + rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
 	}
 }
-#undef t84
-#undef t83
-#undef t82
-#undef t81
-#undef t73
-#undef t72
-#undef t71
-
-#define ta5 90.
-#define ta4 5040.
-#define ta3 151200.
-#define ta2 1814400.
-#define ta1 2.7557319224e-07
-#define t94 72.
-#define t93 3024.
-#define t92 60480.
-#define t91 2.7557319224e-06
 
 template<class T> inline T sinT9(T r){
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
@@ -931,15 +870,27 @@ template<class T> inline T sinT9(T r){
 		return (T)-1 + rr * (T)ta1 * ((T)ta2 - rr * ((T)ta3 - rr * ((T)ta4 - rr * ((T)ta5 - rr))));
 	}
 }
-#undef ta5
-#undef ta4
-#undef ta3
-#undef ta2
-#undef ta1
-#undef t94
-#undef t93
-#undef t92
-#undef t91
+
+// Input is in [-2, 2] corresponding to [-pi, pi]
+template<class T> inline T sinFast(T x){
+	T y = x * (T(2) - gam::scl::abs(x));
+	return y * (T(0.775) + T(0.225) * gam::scl::abs(y));
+}
+
+template<class T> inline T cosP3(T n){
+	return T(1) - T(32) * n * n * (T(0.75) - n);
+}
+
+template<class T> inline T sinP7(T n){
+	T nn = n*n;
+	return n * (T(3.138982) + nn * (T(-5.133625) + nn * (T(2.428288) - nn * T(0.433645))));
+}
+
+template<class T> inline T sinP9(T n){
+	T nn = n*n;
+	return n * (T(3.1415191) + nn * (T(-5.1662729) + nn * (T(2.5422065) + nn * (T(-0.5811243) + nn * T(0.0636716)))));
+}
+
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
