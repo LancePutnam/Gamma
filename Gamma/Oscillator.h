@@ -46,7 +46,10 @@ public:
 	void phaseMax();				///< Set phase to maximum value
 	void phaseAdd(float v);			///< Add value to phase [0, 1)
 	void period(float v);			///< Set period length
+
 	void reset(){ mPhaseI=0; mSp.reset(); }	///< Reset phase accumulator
+	void finish(){ phaseMax(); }	///< Set phase to end (maximum value)
+
 	Sp& phsInc(){ return mSp; }		///< Get phase increment strategy
 
 	/// Returns true if tap is done

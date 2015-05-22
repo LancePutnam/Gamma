@@ -153,6 +153,9 @@ public:
 	/// Reset envelope to starting point setting first level to current level
 	void resetSoft();
 
+	/// Jump to end of envelope
+	void finish();
+
 	
 	/// Get segment lengths array
 	Tp * lengths(){ return mLengths; }
@@ -419,9 +422,12 @@ public:
 	T operator()();			///< Generate next sample
 	
 	void decay(T v);		///< Set number of units for curve to decay -60 dB
-	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
+
 	void value(T v);		///< Set current value
-	
+
+	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
+	void finish(T amp=T(0.001)); ///< Jump to end of envelope
+
 protected:
 	T mVal, mMul, mDcy;
 
@@ -836,6 +842,13 @@ void Env<N,Tv,Tp,Td>::resetSoft(){
 }
 
 template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::finish(){
+	mStage = size();
+	mPos = mLen;
+	mSustain = scl::abs(mSustain);
+}
+
+template <int N,class Tv,class Tp,class Td>
 Tp Env<N,Tv,Tp,Td>::totalLength() const {
 	Tp sum=Tp(0);
 	for(int i=0;i<size();++i) sum += mLengths[i];
@@ -885,25 +898,28 @@ inline T Decay<T,Td>::operator()(){
 }
 
 template <class T, class Td>
-inline void Decay<T,Td>::decay(T v){
+void Decay<T,Td>::decay(T v){
 	mDcy = v;
 	mMul = scl::t60(v * Td::spu());
 }
 
 template <class T, class Td>
-inline void Decay<T,Td>::reset(T amp){ mVal = amp; }
-    
-template <class T, class Td>
-inline void Decay<T,Td>::value(T v){ mVal = v; }
+void Decay<T,Td>::reset(T amp){ mVal = amp; }
 
 template <class T, class Td>
-inline T Decay<T,Td>::decay() const { return mDcy; }
-    
+void Decay<T,Td>::finish(T amp){ mVal = amp; }
+
+template <class T, class Td>
+void Decay<T,Td>::value(T v){ mVal = v; }
+
+template <class T, class Td>
+T Decay<T,Td>::decay() const { return mDcy; }
+
 template <class T, class Td>
 inline bool Decay<T,Td>::done(T thr) const { return mVal < thr; }
-    
+
 template <class T, class Td>
-inline T Decay<T,Td>::value() const { return mVal; }
+T Decay<T,Td>::value() const { return mVal; }
 
 template <class T, class Td>
 void Decay<T,Td>::onDomainChange(double r){ decay(mDcy); }

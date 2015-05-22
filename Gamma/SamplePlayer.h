@@ -92,7 +92,9 @@ public:
 	void phase(double v);					///< Set playback position, in [0, 1)
 	void rate(double v);					///< Set playback rate scalar
 	void range(double phs, double period);	///< Set playback interval start phase and period
+
 	void reset();							///< Reset playback head
+	void finish();							///< Set playback head to end
 
 	/// Loop playback head if it's past an endpoint
 	
@@ -262,6 +264,10 @@ PRE void CLS::range(double posn, double period){
 PRE void CLS::reset(){
 	pos(rate()<0 ? max() : min());
 	mPhsInc.reset();
+}
+
+PRE void CLS::finish(){
+	pos(rate()<0 ? min() : max());
 }
 
 PRE inline bool CLS::done() const{
