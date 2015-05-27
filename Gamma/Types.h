@@ -19,6 +19,10 @@ template<unsigned N, class T> class Vec;
 typedef float real;				///< Default real number type
 typedef Vec<2,float > float2;	///< Vector of 2 floats
 typedef Vec<2,double> double2;	///< Vector of 2 doubles
+typedef Vec<3,float > float3;	///< Vector of 3 floats
+typedef Vec<3,double> double3;	///< Vector of 3 doubles
+typedef Vec<4,float > float4;	///< Vector of 4 floats
+typedef Vec<4,double> double4;	///< Vector of 4 doubles
 
 
 /// Polar number with argument in radians
