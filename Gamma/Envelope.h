@@ -735,8 +735,9 @@ Env<N,Tv,Tp,Td>::Env()
 	for(int i=0; i<N; ++i){
 		mLengths[i]= 1e-8;
 		mCurves[i] =-4;
-		mLevels[i] = 1e-8;
-	}	mLevels[N] = 1e-8;
+		mLevels[i] = Tv();
+	}
+	mLevels[N] = Tv();
 	reset();
 }
 
