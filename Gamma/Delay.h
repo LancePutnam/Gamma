@@ -319,11 +319,11 @@ protected:
 #define DELAY_INIT mMaxDelay(0), mDelayFactor(0), mDelayLength(0), mPhase(0), mPhaseInc(0), mDelay(0)
 
 TM1 Delay<TM2>::Delay()
-:	ArrayPow2<Tv>(), DELAY_INIT
+:	DELAY_INIT
 {	Td::refreshDomain(); }
 
 TM1 Delay<TM2>::Delay(float maxDly, float dly)
-:	ArrayPow2<Tv>(), DELAY_INIT
+:	DELAY_INIT
 {
 	Td::refreshDomain();
 	maxDelay(maxDly, false);
@@ -332,7 +332,7 @@ TM1 Delay<TM2>::Delay(float maxDly, float dly)
 }
 
 TM1 Delay<TM2>::Delay(float dly)
-:	ArrayPow2<Tv>(), DELAY_INIT
+:	DELAY_INIT
 {	//printf("Delay::Delay(float)\n");
 	Td::refreshDomain();
 	maxDelay(dly, false);
@@ -479,7 +479,9 @@ TM1 void Delay<TM2>::print(){
 
 #define TM1 template<class Tv, template<class> class Si, class Tp, class Td>
 #define TM2 Tv,Si,Tp,Td
-TM1 Comb<TM2>::Comb(): Delay<Tv,Si,Td>(), mFFD(0), mFBK(0){}
+TM1 Comb<TM2>::Comb()
+:	mFFD(0), mFBK(0)
+{}
 
 TM1 Comb<TM2>::Comb(float delay, const Tp& ffd, const Tp& fbk)
 :	Delay<Tv,Si,Td>(delay), mFFD(ffd), mFBK(fbk)

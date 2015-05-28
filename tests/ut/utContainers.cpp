@@ -30,7 +30,8 @@
 		typedef int t;
 		typedef Array<t> array_t;
 		array_t * a = new array_t(N, 123);
-		array_t * b = new array_t(*a);
+		array_t * b = new array_t;
+		b->source(*a);
 
 		for(unsigned i=0; i<a->size(); ++i) assert((*a)[i] == 123);
 		assert(a->elems() == b->elems());

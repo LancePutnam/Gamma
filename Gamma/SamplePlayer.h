@@ -161,20 +161,17 @@ PRE CLS::SamplePlayer()
 
 
 PRE CLS::SamplePlayer(SamplePlayer<T>& src, double rate)
-:	Array<T>(src), 
-	mPos(0), mInc(1), 
-	mFrameRate(src.frameRate()), mChans(src.channels()), 
-	mRate(rate), mMin(0), mMax(src.size())
-{	refreshDomain(); }
+:	mPos(0), mInc(1), mRate(rate)
+{
+	buffer(src);
+	refreshDomain();
+}
 
 PRE CLS::SamplePlayer(Array<T>& src, double smpRate, double rate)
-:	Array<T>(src),
-	mPos(0), mInc(1),
-	mFrameRate(smpRate), mChans(1),
-	mRate(rate), mMin(0), mMax(src.size())
+:	mPos(0), mInc(1), mRate(rate)
 {
+	buffer(src, smpRate, 1);
 	refreshDomain();
-	frameRate(smpRate);
 }
 
 

@@ -70,9 +70,6 @@ template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
 
-	/// Default constructor that does not allocate memory
-	ArrayBase();
-
 	/// Constructor that allocates memory, but does not initialize elements
 
 	/// \param[in] size		number of elements to allocate
@@ -87,8 +84,12 @@ public:
 	/// \param[in] size		size of external array
 	ArrayBase(T * src, uint32_t size);
 
-	/// \param[in] src		external array to reference
-	explicit ArrayBase(ArrayBase<T,S,A>& src);
+	/// Default constructor that does not allocate memory
+	ArrayBase();
+
+	/// \param[in] src		array to copy
+	explicit ArrayBase(const ArrayBase<T,S,A>& src);
+
 
 	virtual ~ArrayBase();
 
@@ -184,11 +185,11 @@ class Array : public ArrayBase<T, SizeArray, A>{
 public:
 	typedef ArrayBase<T, SizeArray, A> Base;
 
-	Array(): Base(){}
 	explicit Array(uint32_t size): Base(size){}
 	Array(uint32_t size, const T& init): Base(size, init){}
 	Array(T * src, uint32_t size): Base(src, size){}
-	Array(Array& src): Base(src){}
+	Array(): Base(){}
+	explicit Array(const Array& src): Base(src){}
 
 	virtual ~Array(){}
 
@@ -205,10 +206,10 @@ class ArrayPow2 : public ArrayBase<T, SizeArrayPow2, A>{
 public:
 	typedef ArrayBase<T, SizeArrayPow2, A> Base;
 
-	ArrayPow2(): Base(){}
 	explicit ArrayPow2(uint32_t size): Base(size){}
 	ArrayPow2(uint32_t size, const T& initial): Base(size, initial){}
 	ArrayPow2(T * src, uint32_t size): Base(src, size){}
+	ArrayPow2(): Base(){}
 	explicit ArrayPow2(const ArrayPow2& src): Base(src){}
 
 	virtual ~ArrayPow2(){}
@@ -356,7 +357,13 @@ struct DelayN: public Ring<T,A>{
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase()
-:	ARRAYBASE_INIT{}
+:	ARRAYBASE_INIT
+{}
+
+template <class T, class S, class A>
+ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
+:	ARRAYBASE_INIT
+{	resize(src.size()); assign(src); }
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(uint32_t sz)
@@ -372,11 +379,6 @@ template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t sz)
 :	ARRAYBASE_INIT
 {	source(src, sz); }
-
-template <class T, class S, class A>
-ArrayBase<T,S,A>::ArrayBase(ArrayBase<T,S,A>& src)
-:	ARRAYBASE_INIT
-{	source(src); }
 
 #undef ARRAYBASE_INIT
 
