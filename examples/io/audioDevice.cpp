@@ -5,7 +5,8 @@
 	Description:	How to start an audio stream and send line-input to output.
 */
 
-#include "../examples.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/AudioIO.h"
 
 // A user defined class that can be accessed from the audio callback
 struct UserData{
@@ -14,7 +15,7 @@ struct UserData{
 
 
 // create a callback for generating a block of samples
-void audioCB(AudioIOData& io){
+void audioCB(gam::AudioIOData& io){
 
 	UserData& user = *(UserData *)io.user();
 	float ampL = user.ampL;
@@ -47,14 +48,14 @@ void audioCB(AudioIOData& io){
 int main(){
 
 	// check if we have any audio devices
-	if(AudioDevice::numDevices() == 0){
+	if(gam::AudioDevice::numDevices() == 0){
 		printf("Error: No audio devices detected. Exiting...\n");
 		exit(EXIT_FAILURE);
 	}
 
 	// list all detected audio devices
 	printf("Audio devices found:\n");
-	AudioDevice::printAll();
+	gam::AudioDevice::printAll();
 	printf("\n");
 
 	// set parameters of audio stream
@@ -65,7 +66,7 @@ int main(){
 	UserData user = {-0.5, 0.5};	// external data to be passed into callback
 	
 	// create an audio i/o object using default input and output devices
-	AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
+	gam::AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
 
 	// we can also set the input and output devices explicitly
 	// use device 0 for input and output
@@ -86,7 +87,7 @@ int main(){
 	}
 	
 	// set the global sample rate "subject"
-	Domain::master().spu(io.framesPerSecond());
+	//gam::sampleRate(io.framesPerSecond());
 	
 	// start the audio stream
 	io.start();

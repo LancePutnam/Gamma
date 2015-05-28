@@ -7,9 +7,12 @@
 					form of 2D additive synthesis complex oscillators.
 */
 
-#include "../examples.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/Print.h"
+#include "Gamma/Oscillator.h"
 
 int main(){
+	using namespace gam;
 
 	const int NP=256;				// Number of points in curve
 	const int N1=31, N2=N1*N1;		// Size of graph

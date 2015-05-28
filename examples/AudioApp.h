@@ -33,9 +33,11 @@ public:
 
 	AudioIO& audioIO(){ return mAudioIO; }
 
-	void start(){
+	void start(bool block=true){
 		mAudioIO.start();
-		printf("Press 'enter' to quit...\n"); getchar();
+		if(block){		
+			printf("Press 'enter' to quit...\n"); getchar();
+		}
 	}
 
 private:

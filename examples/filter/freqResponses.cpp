@@ -8,9 +8,11 @@
 					phases.
 */
 
-#include "../examples.h"
+#define GAMMA_H_INC_ALL
+#include "Gamma/Gamma.h"
 
 int main(){
+	using namespace gam;
 
 	const int N = 32;		// Number of samples per unit of position
 	Domain::master().spu(1);

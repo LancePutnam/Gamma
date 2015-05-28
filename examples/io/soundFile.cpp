@@ -5,11 +5,11 @@
 	Description:	Writing and reading a sound file.
 */
 
-
-
-#include "../examples.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/SoundFile.h"
 
 int main(){
+	using namespace gam;
 
 	const char * path = "test.aiff";
 	SoundFile sf(path);

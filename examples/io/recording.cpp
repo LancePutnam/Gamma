@@ -1,50 +1,69 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		IO / Recording
-	Description:	This demonstrates how to record live audio to a sound file.
+Example:	Real-time Recording
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates how to record audio to a sound file in real-time.
 */
+#include "../AudioApp.h"
+#include "Gamma/Oscillator.h"
+#include "Gamma/SoundFile.h"
+#include "Gamma/Recorder.h"
+#include "Gamma/Timer.h"
+using namespace gam;
 
-#include "../examples.h"
+class MyApp : public AudioApp{
+public:
 
-SoundFile sf("recording.wav");	// The sound file of the recording
-Recorder rec(2);				// Create a two-channel recorder
-Sine<> src1(440), src2(441);	// Sine waves to record
+	gam::SoundFile sf;		// The sound file of the recording
+	gam::Recorder rec;		// Create a recorder
+	gam::Sine<> src1, src2;	// Sine waves to record
 
-void audioCB(AudioIOData& io){
+	MyApp(){
+		sf.channels(2);
+		sf.frameRate(44100);
+		sf.path("recording.wav");
+		sf.openWrite();
 
-	while(io()){		
-		float s1 = src1();
-		float s2 = src2();
-		rec.write(s1, s2);
+		rec.resize(
+			2,		// number of channels
+			8192	// size of buffer, in frames
+		);
 
-		io.out(0) = s1*0.2;
-		io.out(1) = s2*0.2;
+		src1.freq(440);
+		src2.freq(441);
+
+		start(false);
+
+		// Write samples from ring buffer into sound file.
+		// This will typically be done in a separate lower-priority thread, 
+		// definitely not here...
+		int i=200;
+		while(--i){
+			float * buf;
+			int n = rec.read(buf);
+			sf.write(buf, n);
+			//printf("consumed %d frames\n", n);
+			gam::sleepSec(0.01);
+		}
 	}
-}
 
+	void onAudio(gam::AudioIOData& io){
+		while(io()){
+			float s1 = src1()*0.25;
+			float s2 = src2()*0.25;
+			rec.write(s1, s2);
+
+			io.out(0) = s1;
+			io.out(1) = s2;
+		}
+	}
+
+};
 
 int main(){
-
-	sf.channels(2);
-	sf.frameRate(44100);
-	sf.openWrite();
-
-	AudioIO io(256, 44100, audioCB, 0, 2);
-	Domain::master().spu(io.framesPerSecond());
-	io.start();
-
-	// Write samples from ring buffer into sound file.
-	// This will typically be done in a separate lower-priority thread, not main.
-	int i=200;
-	while(--i){
-		float * buf;
-		int n = rec.read(buf);
-		sf.write(buf, n);
-		//printf("consumed %d frames\n", n);
-		sleepSec(0.01);
-	}
-
-	//printf("\nPress 'enter' to quit...\n"); getchar();
-	return 0;
+	MyApp();
 }
+
