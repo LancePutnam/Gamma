@@ -28,6 +28,13 @@ namespace gam{
 
 namespace gen{
 
+/// Generates the default value of its associated type
+template <class T=gam::real>
+struct Default{
+	T operator()() const { return T(); }					///< Generate next value
+};
+
+
 /// Single value generator
 template <class T=gam::real>
 struct Val{
@@ -60,12 +67,14 @@ struct Impulse : public Val<T>{ INHERIT;
 	T operator()() const {T t=val; val=0; return t;}	///< Generate next value
 };
 
+
 /// Generates a Nyquist signal, i.e., -1, 1, -1, 1, …
 template<class T=gam::real>
 struct Nyquist : public Val<T>{ INHERIT;
 	Nyquist(const T& val=T(1)): Val<T>(-val){}			///< Constructor
 	T operator()() const { return val = -val; }			///< Generate next value
 };
+
 
 ///Reciprocal sequence generator
 
