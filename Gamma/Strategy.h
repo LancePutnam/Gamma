@@ -388,7 +388,7 @@ namespace iplSeq{
 			mDiff = v[0] - v[1];
 		}
 
-		T operator()(float f) const { return f*mDiff + v[1]; }
+		T operator()(float f) const { return mDiff*f + v[1]; }
 
 	private:
 		T mDiff;
