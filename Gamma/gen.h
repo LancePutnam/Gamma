@@ -356,8 +356,13 @@ template <class T=gam::real>
 struct RMulAdd: public Val<T>{ INHERIT;
 	/// Constructor
 	RMulAdd(const T& mul=T(1), const T& add=T(0), const T& val=T(0))
-	:	Val<T>((val-add)/mul), mul(mul), add(add){}		///< Constructor
+	:	Val<T>((val-add)/mul), mul(mul), add(add){}
+
 	T operator()() const { return val=val*mul+add; }	///< Generate next value
+
+	/// Go back one step
+	const T& recede() const { return val = (val-add)/mul; }
+
 	T mul;												///< Multiplication amount
 	T add;												///< Addition amount
 };
