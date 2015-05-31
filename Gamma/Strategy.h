@@ -381,8 +381,17 @@ namespace iplSeq{
 	template <class T>
 	struct Linear : public Base<2,T>{
 		using Base<2,T>::v;
-		Linear(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return ipl::linear(f, v[1], v[0]); }
+		Linear(const T& v=0): Base<2,T>(v), mDiff(T(0)){}
+
+		void push(T va){
+			Base<2,T>::push(va);
+			mDiff = v[0] - v[1];
+		}
+
+		T operator()(float f) const { return f*mDiff + v[1]; }
+
+	private:
+		T mDiff;
 	};
 
 	/// Cubic sequence interpolation strategy
