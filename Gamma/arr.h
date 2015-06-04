@@ -161,7 +161,7 @@ T meanAbsDiff(const T * src, unsigned len);
 /// Weights must be positive.
 ///
 template <class T>
-T meanWeighted(const T * src, T * weights, unsigned len);
+T meanWeighted(const T * src, const T * weights, unsigned len);
 
 /// Returns weighted mean in [0, len) of indices of weights.
 
@@ -624,8 +624,8 @@ T meanAbsDiff(const T * src, unsigned len){
 }
 
 template <class T>
-T meanWeighted(const T * src, T * weights, unsigned len){
-	T mean = (T)0;
+T meanWeighted(const T * src, const T * weights, unsigned len){
+	T mean = T(0);
 
 	// One loop: faster, but less accurate
 //	LOOP(len,
@@ -635,17 +635,17 @@ T meanWeighted(const T * src, T * weights, unsigned len){
 //	return mean /= normFactor;
 
 	// Two loops: slower, but avoids overflow
-	T normFactor = (T)1 / sum(weights, len);
+	T normFactor = T(1) / sum(weights, len);
 	LOOP(len,1){ mean += *src++ * *weights++ * normFactor; }
 	return mean;
 }
 
 template <class T>
 T meanWeightedIndex(const T * weights, unsigned len){
-	T mean = (T)0;
+	T mean = T(0);
 	T normFactor = sum(weights, len);
-	if(normFactor == (T)0) return (T)0;
-	normFactor = (T)1 / normFactor;
+	if(normFactor == T(0)) return T(0);
+	normFactor = T(1) / normFactor;
 	T weightFactor = normFactor;
 	LOOP(len,1){
 		mean += *weights++ * weightFactor;
