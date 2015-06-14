@@ -31,13 +31,14 @@ namespace gen{
 /// Generates the default value of its associated type
 template <class T=gam::real>
 struct Default{
+	typedef T value_type;
 	T operator()() const { return T(); }					///< Generate next value
 };
 
 
 /// Single value generator
 template <class T=gam::real>
-struct Val{
+struct Val : public Default<T>{
 	Val(): val(T(0)){}										///< Constructor
 	Val(const T& v): val(v){}								///< Constructor
 	Val& operator = (const T& v){ val=v; return *this; }	///< Set value

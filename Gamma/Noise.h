@@ -21,6 +21,7 @@ namespace gam{
 template <class RNG = RNGLinCon>
 class NoiseBrown{
 public:
+	typedef float value_type;
 
 	/// \param[in] val		start value
 	/// \param[in] step		accumulation step factor
@@ -55,6 +56,8 @@ public:
 template <class RNG = RNGLinCon>
 class NoisePink{
 public:
+	typedef float value_type;
+
 	NoisePink();
 
 	/// \param[in] seed		random number generator seed
@@ -83,6 +86,8 @@ private:
 template <class RNG = RNGLinCon>
 class NoiseWhite{
 public:
+	typedef float value_type;
+
 	NoiseWhite(): rng(){}
 	
 	/// \param[in] seed		random number generator seed
@@ -107,6 +112,8 @@ public:
 template <class RNG = RNGLinCon>
 class NoiseViolet{
 public:
+	typedef float value_type;
+
 	NoiseViolet(): mPrev(1.5f){}
 	
 	/// \param[in] seed		random number generator seed
