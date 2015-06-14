@@ -863,6 +863,63 @@ protected:
 
 
 
+/// Upsamples and interpolates a signal
+
+/// This interpolates between the samples of a lower-rate signal. Use cases
+/// include a sample-and-hold and a low-frequency noise generator.
+///
+/// \tparam Gen	Signal generator
+/// \tparam Si	Sequence interpolation strategy
+/// \tparam Sp	Phase increment strategy
+/// \tparam Td	Domain type
+/// \ingroup Oscillators
+template <
+	class Gen = gen::Default<>,
+	template <typename> class Si = iplSeq::Linear,
+	class Sp = phsInc::Loop,
+	class Td = DomainObserver
+>
+class Upsample : public Accum<Sp,Td>{
+public:
+
+	typedef typename Gen::value_type value_type;
+
+	/// \param[in] frq		Frequency of lower-rate signal
+	Upsample(float frq=440)
+	:	Accum<Sp,Td>(frq)
+	{
+		this->finish();
+		mIpl.push(0);
+	}
+
+	// Upsample an external generator
+	template <class SampleGen>
+	value_type operator()(SampleGen& gen){
+		if(this->cycle()){
+			mIpl.push(gen());
+		}
+		return mIpl(this->phase());
+	}
+
+	// Sample and interpolate a signal
+	value_type operator()(value_type in){
+		return (*this)(gen::Val<value_type>(in));
+	}
+
+	// Upsample internal generator
+	value_type operator()(){
+		return (*this)(mGen);
+	}
+
+	/// Get internal generator
+	Gen& gen(){ return mGen; }
+
+private:
+	Gen mGen;
+	Si<value_type> mIpl;
+};
+
+
 
 // Implementation_______________________________________________________________
 
