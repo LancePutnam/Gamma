@@ -646,7 +646,7 @@ T meanWeightedIndex(const T * weights, unsigned len){
 	T normFactor = sum(weights, len);
 	if(normFactor == T(0)) return T(0);
 	normFactor = T(1) / normFactor;
-	T weightFactor = normFactor;
+	T weightFactor = T(0);
 	LOOP(len,1){
 		mean += *weights++ * weightFactor;
 		weightFactor += normFactor;
