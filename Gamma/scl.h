@@ -244,6 +244,9 @@ template<class T> T roundAway(T v, T step);
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
+/// Returns sign of a number
+template<class T> int sgn(T v);
+
 /// Fast sine function approximation
 
 /// \param[in] x	angle in [-2, 2] corresponding to [-pi, pi]
@@ -693,6 +696,9 @@ inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //	//val = fastFloor(val * step + u.f) * stepRec;
 //	return float(long(val * stepRec + u.f)) * step;
 //}
+
+template<class T>
+inline int sgn(T v){ return (T(0) < v) - (v < T(0)); }
 
 template<class T>
 inline T smoothNeg		(T v, T bw){ return T(0.5) - smoothSign(v, bw)*T(0.5); }
