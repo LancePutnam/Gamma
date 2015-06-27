@@ -22,6 +22,10 @@ public:
 	Accum<> tmr;	// Timer for randomizing parameters
 	SineD<> osc;	// Damped sinusoid
 
+	MyApp(){
+		tmr.finish();
+	}
+
 	void onAudio(AudioIOData& io){
 
 		// Set period of timer, in seconds
