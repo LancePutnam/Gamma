@@ -428,10 +428,10 @@ public:
 	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
 	void finish(T amp=T(0.001)); ///< Jump to end of envelope
 
+	virtual void onDomainChange(double r);
+
 protected:
 	T mVal, mMul, mDcy;
-
-	virtual void onDomainChange(double r);
 };
 
 
@@ -562,12 +562,12 @@ public:
 
 	Si<Tv>& ipol(){ return mIpl; }
 
+	virtual void onDomainChange(double r){ freq(mFreq); }
+
 protected:
 	Tp mFreq;
 	gen::RAdd<Tp> mAcc;
 	Si<Tv> mIpl;
-	
-	virtual void onDomainChange(double r){ freq(mFreq); }
 };
 
 
