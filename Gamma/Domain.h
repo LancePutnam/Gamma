@@ -16,8 +16,6 @@ class Domain;
 class Domain1{
 public:
 
-	virtual ~Domain1(){}
-
 	double spu() const {return 1.;}	///< Get samples/unit
 	double ups() const {return 1.;}	///< Get units/sample
 	const Domain1 * domain() const	///< Get pointer to my subject domain (myself)
@@ -29,13 +27,10 @@ public:
 
 	/// Any instance state that depends on the samples/unit ratio should be 
 	/// updated here. The ratio of the new to the old samples/unit is passed in.
-	virtual void onDomainChange(double ratioSPU){}
-	
+	void onDomainChange(double ratioSPU){}
+
 	void spu(double val){}			///< Set samples/unit
 	void ups(double val){}			///< Set units/sample
-
-protected:
-	void refreshDomain(){ onDomainChange(1); }
 };
 
 
@@ -77,14 +72,6 @@ public:
 	void domain(Domain& src);
 
 	DomainObserver& operator= (const DomainObserver& rhs);
-
-protected:
-	/// Forces call to onDomainChange
-	
-	/// This should be called from the constructor(s) of derived classes
-	/// since base classes cannot correctly call a virtual function in their
-	/// constructor.
-	void refreshDomain();
 
 private:
 	friend class Domain;
@@ -141,7 +128,6 @@ double sampleRate();
 
 // Implementation_______________________________________________________________
 
-inline void DomainObserver::refreshDomain(){ onDomainChange(1); }
 inline double DomainObserver::spu() const { return domain()->spu(); }
 inline double DomainObserver::ups() const { return domain()->ups(); }
 inline const Domain * DomainObserver::domain() const { return mSubject; }

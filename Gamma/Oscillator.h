@@ -409,7 +409,7 @@ public:
 	SineRs(){}
 
 	/// \param[in]	num		Number of resonators
-	SineRs(unsigned num): Base(num){ Td::refreshDomain(); }
+	SineRs(unsigned num): Base(num){ onDomainChange(1); }
 
 	/// Generate next sum of all oscillators
 	Tv operator()(){
@@ -523,7 +523,7 @@ public:
 
 	/// \param[in]	num		Number of resonators
 	SineDs(unsigned num): Base(num){
-		Td::refreshDomain(); 
+		onDomainChange(1);
 		for(unsigned i=0; i<num; ++i) set(i, 0,0,0);
 	}
 
@@ -947,7 +947,7 @@ template<class St, class Td>
 Accum<St,Td>::Accum(float f, float p)
 :	mFreq(f), mFreqToInt(4294967296.), mFreqI(0)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	phase(p);
 }
 
@@ -1044,7 +1044,7 @@ template<class Tv, class Td>
 AccumPhase<Tv, Td>::AccumPhase(Tv f, Tv p, Tv a)
 :	mInc(f), mAmp(a), mFreqToInc(1)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	this->phase(p);
 }
 
@@ -1110,7 +1110,7 @@ template<class Tv, class Td> void AccumPhase<Tv, Td>::print(FILE * fp, const cha
 template<class Tv, class Td> CSine<Tv, Td>::CSine(Tv f, Tv a, Tv dcy60, Tv p)
 	: val(a, 0), mAmp(a), mFreq(f), mDcy60(dcy60)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	this->phase(p);
 }
 

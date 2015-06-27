@@ -503,7 +503,7 @@ public:
 		mFreq((Tp)1/len), mAcc(0, phase), mIpl(start)
 	{
 		mIpl.push(end);
-		Td::refreshDomain();
+		onDomainChange(1);
 	}
 
 
@@ -587,7 +587,7 @@ public:
 	SegExp(T len, T crv=-3, T start=1, T end=0):
 		mLen(len), mCrv(crv), mVal1(start), mVal0(end)
 	{
-		Td::refreshDomain();
+		onDomainChange(1);
 	}
 	
 	/// Returns whether envelope is done
@@ -887,7 +887,7 @@ template <class T, class Td>
 Decay<T,Td>::Decay(T decay_, T val)
 :	mVal(val)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	decay(decay_);
 }
 

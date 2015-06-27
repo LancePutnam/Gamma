@@ -320,12 +320,14 @@ protected:
 
 TM1 Delay<TM2>::Delay()
 :	DELAY_INIT
-{	Td::refreshDomain(); }
+{
+	onDomainChange(1);
+}
 
 TM1 Delay<TM2>::Delay(float maxDly, float dly)
 :	DELAY_INIT
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	maxDelay(maxDly, false);
 	this->zero();
 	delay(dly);
@@ -334,7 +336,7 @@ TM1 Delay<TM2>::Delay(float maxDly, float dly)
 TM1 Delay<TM2>::Delay(float dly)
 :	DELAY_INIT
 {	//printf("Delay::Delay(float)\n");
-	Td::refreshDomain();
+	onDomainChange(1);
 	maxDelay(dly, false);
 	this->zero();
 	delay(dly);

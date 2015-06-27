@@ -171,7 +171,7 @@ class BlockDC : public Td{
 public:
 
 	/// \param[in] width	Bandwidth of pole
-	BlockDC(Tp width=35): d1(0), mWidth(width){ Td::refreshDomain(); }
+	BlockDC(Tp width=35): d1(0), mWidth(width){ onDomainChange(1); }
 
 	/// Filter sample
 	Tv operator()(Tv i0){		
@@ -309,7 +309,7 @@ public:
 
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
-	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
+	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){}
 
 	/// Filter sample
 	Tv operator()(Tv i0){
@@ -337,7 +337,7 @@ public:
 	
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
-	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
+	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ onDomainChange(1); }
 
 	/// Set center frequency
 	void freq(Tp v){ Base::freq(v); computeGain(); }
@@ -376,7 +376,7 @@ public:
 
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth	
-	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
+	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ onDomainChange(1); }
 
 	/// Set center frequency
 	void freq(Tp v){
@@ -585,7 +585,9 @@ protected:
 template <class Tv, class Tp, class Td>
 AllPass1<Tv,Tp,Td>::AllPass1(Tp frq)
 :	d1(Tv(0)), mFreq(frq)
-{	Td::refreshDomain(); }
+{
+	onDomainChange(1);
+}
 
 template <class Tv, class Tp, class Td>
 inline void AllPass1<Tv,Tp,Td>::freq(Tp v){
@@ -635,7 +637,7 @@ template <class Tv, class Tp, class Td>
 Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
 :	d1(0), d2(0), mLevel(1)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	set(frq, res, type);
 }
 
@@ -792,12 +794,16 @@ inline Tv Biquad<Tv,Tp,Td>::nextBP(Tv i0){
 template <class Tv, class Tp, class Td>
 OnePole<Tv,Tp,Td>::OnePole()
 :	mType(LOW_PASS), mFreq(10), mStored(Tv(0)), o1(Tv(0))
-{	Td::refreshDomain(); }
+{
+	onDomainChange(1);
+}
 
 template <class Tv, class Tp, class Td>
 OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
 :	mType(LOW_PASS), mFreq(frq), mStored(stored), o1(stored)
-{	Td::refreshDomain(); }
+{
+	onDomainChange(1);
+}
 
 template <class Tv, class Tp, class Td>
 void OnePole<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }

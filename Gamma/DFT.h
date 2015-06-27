@@ -495,7 +495,7 @@ template<class T>
 DFTBase<T>::DFTBase()
 :	mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0)
 {
-	refreshDomain();
+	onDomainChange(1);
 }
 
 template<class T>
