@@ -428,7 +428,7 @@ public:
 	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
 	void finish(T amp=T(0.001)); ///< Jump to end of envelope
 
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 
 protected:
 	T mVal, mMul, mDcy;
@@ -562,7 +562,7 @@ public:
 
 	Si<Tv>& ipol(){ return mIpl; }
 
-	virtual void onDomainChange(double r){ freq(mFreq); }
+	void onDomainChange(double r){ freq(mFreq); }
 
 protected:
 	Tp mFreq;
@@ -620,7 +620,7 @@ public:
 		mCurve.set(len * Td::spu(), crv);
 	}
 	
-	virtual void onDomainChange(double r){ set(mLen, mCrv); }
+	void onDomainChange(double r){ set(mLen, mCrv); }
 	
 protected:
 	T mLen, mCrv, mVal1, mVal0;

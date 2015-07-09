@@ -125,7 +125,7 @@ public:
 	double rate() const { return mRate; }	///< Get playback rate
 
 
-	virtual void onDomainChange(double r){ frameRate(mFrameRate); }
+	void onDomainChange(double r){ frameRate(mFrameRate); }
 
 protected:
 	Si<T> mIpol;

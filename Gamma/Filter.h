@@ -80,7 +80,7 @@ public:
 	
 	Tp freq();				///< Get current cutoff frequency
 	
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 	
 protected:
 	Tv d1;		// once delayed value
@@ -142,7 +142,7 @@ public:
 	Tp res() const;						///< Get resonance (Q)
 	FilterType type() const;			///< Get filter type
 	
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 
 protected:
 	Tp mA[3];			// feedforward coefs
@@ -189,7 +189,7 @@ public:
 
 	void zero(){ d1=0; }
 
-	virtual void onDomainChange(double r){ width(mWidth); }
+	void onDomainChange(double r){ width(mWidth); }
 
 protected:
 	Tv d1;
@@ -256,7 +256,7 @@ public:
 	/// Zero delay elements
 	void zero(){ d2=d1=Tv(0); }
 	
-	virtual void onDomainChange(double r){ freq(mFreq); width(mWidth); }
+	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 
@@ -353,7 +353,7 @@ public:
 		return o0;
 	}
 
-	virtual void onDomainChange(double r){ freq(mFreq); width(mWidth); }
+	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 	INHERIT_FILTER2;
@@ -567,7 +567,7 @@ public:
 
 	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros
 	
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 
 protected:
 	FilterType mType;
