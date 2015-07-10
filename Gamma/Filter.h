@@ -321,7 +321,7 @@ public:
 	/// Filter sample
 	Tv operator()(Tv in){
 		Tv  t = in + d1*mC[1] + d2*mC[2];
-		Tv o0 = d1*-mC[1] - t*mC[2] + d2;
+		Tv o0 = d2 - d1*mC[1] -  t*mC[2];
 		this->delay(t);
 		return o0;
 	}
