@@ -24,9 +24,9 @@ int main(){
 		for(unsigned i=0; i<dft.numBins(); ++i){\
 			float m = dft.bin(i)[0] * N;\
 			float p = dft.bin(i)[1] * M_1_PI;\
-			printf("[%2u] % 6.3f %6.3f ", i, m, p);\
-			printPlot(m*0.7, 32);\
-			printPlot(p, 32);\
+			printf("[%2u] % 6.3f %6.3f  ", i, m, p);\
+			printPlot(m*0.7, 30, true, false);\
+			printPlot(p, 30);\
 			printf("\n");\
 		}
 
@@ -98,7 +98,7 @@ int main(){
 	reson.zero(); reson.freq(2./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 1/2 band")
 	reson.zero(); reson.freq(3./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 3/4 band")
 	
-	printf("%d\n", delay.size());
+	//printf("%d\n", delay.size());
 	delay.zero(); delay.delay(1); FREQ_RESP(delay(v), "Delay of 1 sample")
 	delay.zero(); delay.delay(2); FREQ_RESP(delay(v), "Delay of 2 samples")
 	
