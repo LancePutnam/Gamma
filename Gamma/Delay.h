@@ -67,7 +67,7 @@ public:
 
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer
-	Tv read(float ago);							///< Returns element 'ago' units ago
+	Tv read(float ago) const;					///< Returns element 'ago' units ago
 	void write(const Tv& v);					///< Writes new element into buffer
 	
 	float delay() const;						///< Get current delay length
@@ -96,7 +96,7 @@ protected:
 
 	void incPhase();				// increment phase
 	void refreshDelayFactor();
-	uint32_t delayFToI(float v);	// convert f.p. delay to fixed-point
+	uint32_t delayFToI(float v) const; // convert f.p. delay to fixed-point
 };
 
 
@@ -378,7 +378,7 @@ TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
 	return (*this)();*/
 }
 
-TM1 inline uint32_t Delay<TM2>::delayFToI(float v){
+TM1 inline uint32_t Delay<TM2>::delayFToI(float v) const {
 	return castIntRound((v * mDelayFactor) * 4294967296.);
 	//return scl::unitToUInt(v * mDelayFactor);
 }
@@ -405,7 +405,7 @@ TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n
 	delay(currDelay);
 }
 
-TM1 inline Tv Delay<TM2>::read(float ago){
+TM1 inline Tv Delay<TM2>::read(float ago) const {
 	return mIpol(*this, mPhase - delayFToI(ago));
 }
 
