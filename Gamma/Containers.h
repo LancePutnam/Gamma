@@ -270,15 +270,13 @@ public:
 	T& read(uint32_t ago){ return (*this)[indexPrev(ago)]; }
 	const T& read(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
 
-	/// Copies elements to another array
+	/// Copies elements out of ring to another array
 
 	/// \param[out] dst		array to copy elements to
 	/// \param[ in] len		number of elements to copy
-	/// \param[ in] delay	how many elements ago to begin copy
-	void copy(T * dst, uint32_t len, uint32_t delay) const;
-	
-	/// Copy elements starting from last in into dst unwrapping from ring
-	void copyUnwrap(T * dst, uint32_t len) const;
+	/// \param[ in] delay	how many elements ago to begin copy;
+	///						if delay<0, then delay -> size() + delay
+	void read(T * dst, uint32_t len, int32_t delay=-1) const;
 	
 	uint32_t pos() const;			///< Return absolute index of frontmost (newest) element
 	bool reachedEnd() const;		///< Returns whether the last element written was at the end of the array
@@ -322,7 +320,10 @@ public:
 	
 	/// \returns a pointer to the read buffer
 	///
-	T * copyUnwrap(){ Ring<T,A>::copyUnwrap(mRead.elems(), mRead.size()); return mRead.elems(); }
+	T * read(){
+		Ring<T,A>::read(mRead.elems(), mRead.size());
+		return mRead.elems();
+	}
 	
 	/// Copy elements into read buffer "as is" from ring
 	
@@ -588,21 +589,21 @@ inline void Ring<T,A>::operator()(const T& v){
 }
 
 template<class T, class A>
-void Ring<T,A>::copy(T * dst, uint32_t len, uint32_t delay) const{
+void Ring<T,A>::read(T * dst, uint32_t len, int32_t delay) const{
+
+	if(delay < 0) delay += int32_t(size());
+
 	// pos() points to most recently written slot
-	//uint32_t tap = (pos() - delay) % size();
-	uint32_t tap = (uint32_t)scl::wrap((int32_t)pos() - (int32_t)delay, (int32_t)size());
+	//uint32_t begin = (pos() - delay) % size();
+	uint32_t begin = (uint32_t)scl::wrap(int32_t(pos()) - delay, int32_t(size()));
 
 	// this ensures that we don't copy across the ring tap boundary
 	// we add one to maxLen because of a fence post anomaly
-	uint32_t maxLen = (tap < pos() ? (pos() - tap) : (pos() + (size() - tap))) + 1;
+	uint32_t maxLen = (begin < pos() ? (pos() - begin) : (pos() + (size() - begin))) + 1;
 	len = scl::min(len, maxLen);
 	
-	mem::copyFromRing(elems(), size(), tap, dst, len);
+	mem::copyFromRing(elems(), size(), begin, dst, len);
 }
-
-template<class T, class A>
-void Ring<T,A>::copyUnwrap(T * dst, uint32_t len) const { copy(dst, len, size() - 1); }
 
 template<class T, class A>
 inline uint32_t Ring<T,A>::indexBack() const {
