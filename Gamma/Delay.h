@@ -69,7 +69,16 @@ public:
 	Tv operator()() const;						///< Reads delayed element from buffer
 	Tv read(float ago) const;					///< Returns element 'ago' units ago
 	void write(const Tv& v);					///< Writes new element into buffer
-	
+
+	/// Copy delay elements to another array
+
+	/// \param[out] dst		array to copy element to
+	/// \param[ in] len		number of elements to copy
+	/// \param[ in] end		copy begins at (len+end) elements ago and
+	///							ends end elements ago
+	template <class V>
+	void read(V * dst, unsigned len, unsigned end=0) const;
+
 	float delay() const;						///< Get current delay length
 	uint32_t delaySamples() const;				///< Get current delay length in samples
 	float delaySamplesR() const;				///< Get current delay length in samples (real-valued)
@@ -407,6 +416,16 @@ TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n
 
 TM1 inline Tv Delay<TM2>::read(float ago) const {
 	return mIpol(*this, mPhase - delayFToI(ago));
+}
+
+TM1
+template <class V>
+void Delay<TM2>::read(V * dst, unsigned len, unsigned end) const {
+	unsigned mask = this->size()-1;
+	unsigned begin = this->index(mPhase) - (end + len);
+	for(unsigned i=0; i<len; ++i){
+		dst[i] = (*this)[(begin+i)&mask];
+	}
 }
 
 TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1./maxDelay(); }
