@@ -21,7 +21,6 @@
 
 namespace gam{
 
-
 /// A single element array
 
 /// This array can be referenced by default to avoid a potential null pointer
@@ -33,16 +32,25 @@ T * defaultArray(){
 }
 
 
-///Size functor for ArrayPow2
+/// Size functor for ArrayPow2
     
 ///\ingroup Containers
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
-	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
-	void operator()(uint32_t v){ mBitsI = scl::log2(convert(v)); mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/ }
-	static uint32_t convert(uint32_t v){ v=scl::ceilPow2(v); return v!=1 ? v : 2; }	// should return 0,2,4,8,16,...
-	uint32_t mBitsI;	// integer portion # bits
-	uint32_t mBitsF;	// fraction portion # bits
+
+	uint32_t operator()() const {
+		return (1<<mBitsI) & 0xfffffffe /*avoids 1*/;
+	}
+	void operator()(uint32_t v){
+		mBitsI = scl::log2(convert(v));
+		mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/
+	}
+	static uint32_t convert(uint32_t v){
+		v=scl::ceilPow2(v);
+		return v!=1 ? v : 2; // should return 0,2,4,8,16,...
+	}
+	uint32_t mBitsI; // integer portion # bits
+	uint32_t mBitsF; // fraction portion # bits
 };
 
 
@@ -63,9 +71,11 @@ struct SizeArray{
 /// When the array is resized, if the elements are class-types, then their
 /// default constructors are called and if the elements are non-class-types,
 /// then they are left uninitialized.
-    
+///
+/// \tparam T	array element type
+/// \tparam S	size functor (\see SizeArrayPow2, SizeArray)
+/// \tparam A	memory allocator
 /// \ingroup Containers
-    
 template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
@@ -231,7 +241,12 @@ private: ArrayPow2& operator=(const ArrayPow2& v);
 
 
 /// Ring buffer
-    
+
+/// This is a circular buffer that permits sequential writing and reading of
+/// elements in an array up to some number of past elements.
+///
+/// \tparam T	array element type
+/// \tparam A	memory allocator
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class Ring : public Array<T,A> {
@@ -255,7 +270,11 @@ public:
 	T& read(uint32_t ago){ return (*this)[indexPrev(ago)]; }
 	const T& read(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
 
-	/// Copies len elements starting from element pos() - delay into dst.
+	/// Copies elements to another array
+
+	/// \param[out] dst		array to copy elements to
+	/// \param[ in] len		number of elements to copy
+	/// \param[ in] delay	how many elements ago to begin copy
 	void copy(T * dst, uint32_t len, uint32_t delay) const;
 	
 	/// Copy elements starting from last in into dst unwrapping from ring
@@ -283,6 +302,10 @@ protected:
 
 /// This is a two-part buffer consisting of a ring buffer for writing and
 /// a standard (absolute indexed) array for reading.
+///
+/// \tparam T	array element type
+/// \tparam A	memory allocator
+/// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class DoubleRing : public Ring<T,A>{
 public:
@@ -320,8 +343,12 @@ protected:
 
 
 
-/// N-sample delay
+/// N-element delay
 
+/// Specialized Ring that provides a simple N-element delay.
+///
+/// \tparam T	array element type
+/// \tparam A	memory allocator
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 struct DelayN: public Ring<T,A>{
@@ -345,13 +372,9 @@ struct DelayN: public Ring<T,A>{
 
 
 
-
-
-
 // Implementation_______________________________________________________________
 
-
-// ArrayBase
+//---- ArrayBase
 
 #define ARRAYBASE_INIT mElems(0), mSize(0)
 
@@ -526,7 +549,8 @@ void ArrayBase<T,S,A>::source(T * src, uint32_t size){
 	onResize();
 }
 
-// ArrayPow2
+
+//---- ArrayPow2
 
 template<class T, class A>
 inline uint32_t ArrayPow2<T,A>::oneIndex() const { return 1<<fracBits(); }
@@ -550,7 +574,6 @@ template<class T, class A>
 inline float ArrayPow2<T,A>::fraction(uint32_t phase) const{
 	return gam::fraction(log2Size(), phase);
 }
-
 
 
 //---- Ring
