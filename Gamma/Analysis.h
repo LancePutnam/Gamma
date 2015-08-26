@@ -108,7 +108,7 @@ class ZeroCrossRate{
 public:
 
 	/// \param[in] winSize		size of analysis window
-	ZeroCrossRate(int winSize=64)
+	ZeroCrossRate(int winSize=256)
 	:	mRate(0), mWinSize(winSize), mCrosses(0), mCount(0)
 	{}
 
@@ -117,6 +117,7 @@ public:
 
 	/// Get the current zero-crossing rate, in [0, 0.5]
 	float rate() const { return mRate; }
+	float value() const { return mRate; }
 	
 	/// Get window size
 	unsigned winSize() const { return mWinSize; }
