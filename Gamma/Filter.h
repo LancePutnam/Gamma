@@ -861,7 +861,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		}
 		break;
 	case SMOOTHING:
-		lag(1./mFreq);
+		lag(Tp(1)/mFreq);
 		break;
 	}
 
@@ -871,6 +871,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::lag(Tp length, Tp thresh){
 	mType = SMOOTHING;
+	mFreq = Tp(1)/length;
 	// Since b^(length f_s) = thresh,
 	// 	b = thresh ^ (1 / (length fs))
 	mB1 = ::pow(thresh, Tp(this->ups()/length));
