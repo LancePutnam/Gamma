@@ -36,7 +36,7 @@ public:
 		env.decay(0.4);			// Set longer (400 ms) decay
 		tmr.freq(120./60.*4.);	// Set timer frequency to 120 BPM
 		tmr.phaseMax();			// Ensures timer triggers on first sample
-		modCutoff.period(40);	// Set period of cutoff modulation
+		modCutoff.period(30);	// Set period of cutoff modulation
 		modCutoff.phase(0.5);	// Start half-way through cycle
 		freq.lag(0.1);			// Lag time of portamento effect
 		step=0;
@@ -64,7 +64,7 @@ public:
 			// Get next envelope value
 			float e = env();
 			// Map envelope value to cutoff frequency
-			lpf.freq(e * (modCutoff.triU()*4000 + 1000) + 40);
+			lpf.freq(e * (modCutoff.paraU()*6000 + 500) + 40);
 			// Generate next saw sample
 			float s = saw() * 0.3;
 			// Filter saw sample
