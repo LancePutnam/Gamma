@@ -30,8 +30,8 @@ public:
 
 	MyApp(){
 		play.load("../../sounds/count.wav");
-		pathx.period(4);
-		pathy.period(5);
+		pathx.period(30.13 / 3);
+		pathy.period(30.13 / 5);
 
 		for(int i=0; i<2; ++i){
 			unsigned d = i*2;
@@ -49,7 +49,7 @@ public:
 	void onAudio(AudioIOData& io){
 
 		// The second parameter is the diameter of the room
-		dist.dist(2, 8);
+		dist.dist(2, 32);
 
 		while(io()){
 
@@ -57,8 +57,8 @@ public:
 			float s = play(); play.loop();
 
 			// Position of source w.r.t. origin
-			float x = pathx.cos()*4;
-			float y = pathy.cos()*4;
+			float x = pathx.cos()*16;
+			float y = pathy.cos()*16;
 
 			// Set distances from source to destinations (ears)
 			// The ears are set to be 20 cm apart---the average for a human head
