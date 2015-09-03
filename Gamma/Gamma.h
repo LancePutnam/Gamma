@@ -59,6 +59,7 @@
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
 	#include "Gamma/SamplePlayer.h"
+	#include "Gamma/Spatial.h"
 	#include "Gamma/Recorder.h"
 	#include "Gamma/SoundFile.h"
 	#include "Gamma/UnitMaps.h"
