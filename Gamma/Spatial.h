@@ -626,5 +626,9 @@ float Dist<TARG>::inverse(float dist) const {
 	*/
 }
 
+#undef TDEC
+#undef TARG
+
 } // gam::
 #endif
+
