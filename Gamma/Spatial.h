@@ -296,16 +296,12 @@ private:
 template <int Ndest=2, class T = gam::real>
 class Dist{
 public:
-	Dist(float maxDelay=0.2, float near=0.1, float far=10)
-	:	mDelay(1), mNear(near), mFar(far), mInvSpeedOfSound(1./343.2)
-	{
-		for(int i=0; i<Ndest; ++i){
-			mDist[i] = 1e8;
-			mAmp[i] = 0;
-			mDly[i] = 0.001;
-		}
-		setRollOff();
-	}
+
+	/// \param[in] maxDelay		maximum delay interval
+	/// \param[in] near			near clipping distance
+	/// \param[in] far			far clipping distance
+	Dist(float maxDelay=0.2, float near=0.1, float far=10);
+
 
 	/// Set near clipping distance
 	Dist& near(float v){ mNear=v; setRollOff(); return *this; }
@@ -320,38 +316,20 @@ public:
 	float speedOfSound() const { return 1./mInvSpeedOfSound; }
 
 	/// Set distance from source to a destination, in meters
-	Dist& dist(int dest, float d){
-		mDist[dest]= d;
-		mAmp[dest] = inverse(d);
-		mDly[dest] = d * mInvSpeedOfSound;
-		mLPF[dest].freq(22000 * mAmp[dest]);
-		return *this;
-	}
+	Dist& dist(int dest, float d);
 
 	/// Set distance vector from source to a destination, in meters
-	Dist& dist(int dest, float x, float y, float z=0){
-		float d = sqrt(x*x+y*y+z*z);
-		return dist(dest, d);
-	}
+	Dist& dist(int dest, float x, float y, float z=0);
 
 	/// Set distances from source to destinations, in meters
 	template <typename V>
-	Dist& dist(const Vec<Ndest,V>& d){
-		for(unsigned i=0; i<Ndest; ++i) dist(i, d[i]);
-		return *this;
-	}
+	Dist& dist(const Vec<Ndest,V>& d);
 
 	/// Get distances from source to destinations, in meters
 	const Vec<Ndest,float>& dist() const { return mDist; }
 
 	/// Filter source sound
-	Vec<Ndest, T> operator()(T in){
-		mDelay.write(in);
-		Vec<Ndest, T> res;
-		for(int i=0; i<Ndest; ++i)
-			res[i] = mLPF[i](mDelay.read(mDly[i])) * mAmp[i];
-		return res;
-	}
+	Vec<Ndest, T> operator()(T in);
 
 	/// Get delay line
 	const Delay<T>& delayLine() const { return mDelay; }
@@ -367,19 +345,8 @@ private:
 	float mAmp[Ndest];
 	OnePole<T> mLPF[Ndest];
 
-	void setRollOff(){
-		mRollOff = (mNear/0.25 - mNear) / (mFar - mNear);
-	}
-
-	float inverse(float dist) const {
-		if(dist <= mNear) return 1.f;
-		return mNear / (mNear + mRollOff * (dist - mNear));
-		/*
-		n / [n + r (d - n)]
-		n / [n + r d - r n]
-		1 / [1 - r + r/n d]  or  (n/r) / (n/r - n + d)
-		*/
-	}
+	void setRollOff();
+	float inverse(float dist) const;
 };
 
 
@@ -596,6 +563,68 @@ void ReverbMS<TARG>::print() const {
 
 #undef TDEC
 #undef TARG
+
+#define TDEC int Ndest, class T
+#define TARG Ndest, T
+
+template<TDEC>
+Dist<TARG>::Dist(float maxDelay, float near, float far)
+:	mDelay(1), mNear(near), mFar(far), mInvSpeedOfSound(1./343.2)
+{
+	for(int i=0; i<Ndest; ++i){
+		mDist[i] = 1e8;
+		mAmp[i] = 0;
+		mDly[i] = 0.001;
+	}
+	setRollOff();
+}
+
+template<TDEC>
+Dist<TARG>& Dist<TARG>::dist(int dest, float d){
+	mDist[dest]= d;
+	mAmp[dest] = inverse(d);
+	mDly[dest] = d * mInvSpeedOfSound;
+	mLPF[dest].freq(22000 * mAmp[dest]);
+	return *this;
+}
+
+template<TDEC>
+Dist<TARG>& Dist<TARG>::dist(int dest, float x, float y, float z){
+	float d = sqrt(x*x+y*y+z*z);
+	return dist(dest, d);
+}
+
+template<TDEC>
+template <typename V>
+Dist<TARG>& Dist<TARG>::dist(const Vec<Ndest,V>& d){
+	for(unsigned i=0; i<Ndest; ++i) dist(i, d[i]);
+	return *this;
+}
+
+template<TDEC>
+inline Vec<Ndest, T> Dist<TARG>::operator()(T in){
+	mDelay.write(in);
+	Vec<Ndest, T> res;
+	for(int i=0; i<Ndest; ++i)
+		res[i] = mLPF[i](mDelay.read(mDly[i])) * mAmp[i];
+	return res;
+}
+
+template<TDEC>
+void Dist<TARG>::setRollOff(){
+	mRollOff = (mNear/0.25 - mNear) / (mFar - mNear);
+}
+
+template<TDEC>
+float Dist<TARG>::inverse(float dist) const {
+	if(dist <= mNear) return 1.f;
+	return mNear / (mNear + mRollOff * (dist - mNear));
+	/*
+	n / [n + r (d - n)]
+	n / [n + r d - r n]
+	1 / [1 - r + r/n d]  or  (n/r) / (n/r - n + d)
+	*/
+}
 
 } // gam::
 #endif
