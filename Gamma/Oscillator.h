@@ -660,10 +660,12 @@ public:
 
 	/// Set frequency
 	void freq(float v);
+	void period(float v){ freq(1.f/v); }
 
 	float up();				///< Upward saw
 	float down();			///< Downward saw
 	float sqr();			///< Square
+	float para();			///< Parabolic
 	float tri();			///< Triangle
 	float pulse();			///< Pulse
 
@@ -1289,7 +1291,7 @@ namespace{
 		return s*s;
 	}
 	inline float triangle02(uint32_t p){
-		p = (p >> 9) | Expo4<float>(); // [4, 8)
+		p = Expo4<float>() | (p >> 9); // [4, 8)
 		return scl::abs(punUF(p) - 6.f);
 	}
 }
@@ -1326,6 +1328,17 @@ inline float DWO<Sp,Td>::sqr(){
 	float s = triangle02(p);
 	float t = triangle02(p + this->freqI());
 	return (t - s)*mGain;//*/
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::para(){
+	static const float c = (M_PI*M_PI*M_PI/12.)*0.5;
+	uint32_t p = this->nextPhase();
+	float s = scl::rampUp(p);
+	s = s*s*s - s;
+	float t = scl::rampUp(p + this->freqI());
+	t = t*t*t - t;
+	return (t - s)*c*mGain;
 }
 
 template <class Sp, class Td>
