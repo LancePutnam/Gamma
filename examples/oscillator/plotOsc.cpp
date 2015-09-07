@@ -60,5 +60,11 @@ int main(){
 	PLOT(LFO<>, g.period(N/2);, upU, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, sqrU, "period=N/2")
 	PLOT(LFO<>, g.period(N/2); g.mod(0.25), pulseU, "period=N/2, pulse width=0.25")
+
+	PLOT(DWO<>, g.period(N/2);, up, "period=N/2")
+	PLOT(DWO<>, g.period(N/2);, sqr, "period=N/2")
+	PLOT(DWO<>, g.period(N/2);, para, "period=N/2")
+	PLOT(DWO<>, g.period(N/2);, tri, "period=N/2")
+
 }
 
