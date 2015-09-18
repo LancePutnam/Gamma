@@ -25,7 +25,7 @@ public:
 		// STFT(winSize, hopSize, padSize, winType, sampType, auxBufs)
 	:	stft(4096, 4096/4, 0, gam::HAMMING, gam::MAG_FREQ, 3)
 	{
-		play.load("../../ljp/media/smpDrums.wav");
+		play.load("../../sounds/count.wav");
 	}
 
 	void onAudio(AudioIOData& io){
