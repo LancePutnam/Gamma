@@ -127,44 +127,30 @@ inline bool Thread::join(){
 
 #elif GAM_USE_THREADEX
 
+namespace{
+struct ThreadExFunctor{
+	Thread::Function func;
+	void * userData;
+
+	static unsigned __stdcall call(void * user){
+		ThreadExFunctor *pF
+			= reinterpret_cast<ThreadExFunctor*>(user);
+		(*(pF->func))(pF->userData);
+		delete pF;
+		return 0;
+	}
+};
+}
+
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
-	
-//	struct F{
-//		Thread::Function func;
-//		void * user;
-//
-//		static unsigned _stdcall * call(void * user){
-//			F& f = *(F*)user;
-//			f.func(f.userData);
-//			return 0;
-//		}
-//	} f = { func, user };
-//	
-//	unsigned thread_id;
-//	mHandle = _beginthreadex(NULL, 0, F::call, &f, 0, &thread_id);
-//	if(mHandle) return true;
-//	return false;
 
-
-	struct F{
-		Thread::Function func;
-		void * userData;
-
-		static unsigned _stdcall call(void * user){
-			F *pF = reinterpret_cast<F*>(user);
-			(*(pF->func))(pF->userData);
-			delete pF;
-			return 0;
-		}
-	};
-
-	struct F* f = new F;
+	struct ThreadExFunctor* f = new ThreadExFunctor;
 	f->func = func;
 	f->userData = user;
 
 	unsigned thread_id;
-	mHandle = _beginthreadex(NULL, 0, F::call, f, 0, &thread_id);
+	mHandle = _beginthreadex(NULL, 0, ThreadExFunctor::call, f, 0, &thread_id);
 	if(mHandle) return true;
 	return false;
 }
