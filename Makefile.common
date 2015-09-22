@@ -2,7 +2,7 @@
 # Standard Make variable definitions
 #
 # These are the common variable definitions used across different projects.
-# This will usually be included at the top of a separate project specific 
+# This will usually be included at the top of a separate project specific
 # Makefile using 'include Makefile.common'.
 ###########################################################################
 #==========================================================================
@@ -20,9 +20,8 @@ else ifeq ($(UNAME), Darwin)
 	PLATFORM = macosx
 
 	# Mac OS X version
-	UNAMER := $(shell uname -r)
-	UNAMER := $(firstword $(subst ., , $(UNAMER)))
-	OSX_VERSION = $(shell echo $(UNAMER)-4 | bc)
+	OSX_VERSION := $(shell sw_vers -productVersion)
+	OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 else
 	PLATFORM = windows
 endif
@@ -165,7 +164,7 @@ ifeq ($(PLATFORM), linux)
 	CPPFLAGS += -I/usr/local/include/ -I/usr/include/
 	LDFLAGS	 += -lm
 	LDFLAGS	 += -lstdc++
-	
+
 	DLIB_FLAGS += -shared
 	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
 
@@ -217,7 +216,7 @@ else ifeq ($(PLATFORM), macosx)
 
 	DLIB_FLAGS += -dynamiclib
 	DLIB_FLAGS += -current_version $(DLIB_MAJ).$(DLIB_MIN) -compatibility_version $(DLIB_MAJ).$(DLIB_MIN)
-	
+
 # Windows:
 else ifeq ($(PLATFORM), windows)
 
@@ -285,7 +284,7 @@ endif
 #--------------------------------------------------------------------------
 RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
 
-define RemoveBuildDir 
+define RemoveBuildDir
        $(call RemoveDir, $(BUILD_DIR)include/)
        $(call RemoveDir, $(BUILD_DIR)lib/)
        $(call RemoveDir, $(BIN_DIR))
