@@ -189,11 +189,8 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Set system root directory for stdc++ etc.
-	ifeq ($(OSX_VERSION), 4)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
-	else
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.$(OSX_VERSION).sdk -mmacosx-version-min=10.$(OSX_VERSION)
-	endif
+	OSX_SDK := $(lastword $(shell ls $(OSX_SDK_PATH)))
+	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK) -mmacosx-version-min=10.$(OSX_VERSION)
 
 	# Needed to link to libraries installed through MacPorts
 	ifdef HAS_OPT_LOCAL
