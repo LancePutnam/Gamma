@@ -201,6 +201,9 @@ public:
 	template <unsigned N2, class T2>
 	Vec(const Vec<N2, T2>& v){ set(v); }
 
+	template <class Tv, class Ts>
+	Vec(const Vec<N-1, Tv>& v, Ts s){ set(v,s);}
+
 
     /// Returns size of vector
     static unsigned size(){ return N; }
@@ -271,6 +274,9 @@ public:
 
 	template <unsigned N2, class T2>
 	Vec& set(const Vec<N2, T2>& v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
+
+	template <class Tv, class Ts>
+	Vec& set(const Vec<N-1, Tv>& v, Ts s){ (*this)[N-1]=s; return set(v); }
 
 	/// Set all elements to the same value
 	Vec& set(const T& v){ return (*this = v); }
