@@ -35,7 +35,7 @@ public:
 
 	/// \param[in] frq		Frequency
 	/// \param[in] phs		Phase in [0, 1)
-	Accum(float frq=0, float phs=0);
+	Accum(float frq=440, float phs=0);
 
 
 	void freq(float v);				///< Set frequency
