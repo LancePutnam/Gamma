@@ -159,6 +159,7 @@ public:
 	
 	/// Get segment lengths array
 	Tp * lengths(){ return mLengths; }
+	const Tp * lengths() const { return mLengths; }
 
 	/// Set break-point values
 	template <class V>
@@ -195,6 +196,7 @@ public:
 
 	/// Get segment curvature array
 	Tp * curves(){ return mCurves; }
+	const Tp * curves() const { return mCurves; }
 	
 	/// Set curvature of all segments
 	Env& curve(Tp v){
@@ -256,6 +258,7 @@ public:
 
 	/// Get break-point levels array
 	Tv * levels(){ return mLevels; }
+	const Tv * levels() const { return mLevels; }
 
 	/// Set break-point values
 	template <class V>
@@ -326,7 +329,17 @@ public:
 
 	/// Set amplitude
 	AD& amp(Tv v){ this->levels()[1]=v; return *this; }
-	
+
+
+	/// Get attack length
+	Tp attack() const { return this->lengths()[0]; }
+
+	/// Get decay length
+	Tp decay() const { return this->lengths()[1]; }
+
+	/// Get amplitude
+	Tv amp() const { return this->levels()[1]; }
+
 protected:
 	AD& setLen(int i, Tp v){
 		this->lengths()[i] = v; return *this;
@@ -389,7 +402,23 @@ public:
 	
 	/// Set amplitude
 	ADSR& amp(Tv v){ this->maxLevel(v); return *this; }
-	
+
+
+	/// Get attack length
+	Tp attack() const { return this->lengths()[0]; }
+
+	/// Get decay length
+	Tp decay() const { return this->lengths()[1]; }
+
+	/// Get sustain level
+	Tv sustain() const { return this->levels()[2] / this->levels()[1]; }
+
+	/// Get release length
+	Tp release() const { return this->lengths()[2]; }
+
+	/// Get amplitude
+	Tv amp() const { return this->levels()[1]; }
+
 protected:
 	ADSR& setLen(int i, Tp v){
 		this->lengths()[i] = v; return *this;
