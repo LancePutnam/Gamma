@@ -79,11 +79,21 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
-template <class T> void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac);
+/// Linear interpolation between two arrays
+template <class T>
+void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac);
 
 /// Nearest neighbor interpolation
 template <class Tf, class Tv>
 Tv nearest(Tf frac, const Tv& x, const Tv& y);
+
+/// Trapezoidal interpolation
+template <class Tf, class Tv>
+Tv trapz(Tf frac, Tv a, Tv b);
+
+/// Trapezoidal interpolation; fraction in [0,2] to save a multiply
+template <class Tf, class Tv>
+Tv trapz2(Tf frac02, Tv a, Tv b);
 
 /// Quadratic interpolation
 template <class Tf, class Tv>
@@ -225,6 +235,21 @@ template <class T> inline T parabolic(T xm1, T x, T xp1){
 	return T(-0.5) * numer / denom;
 }
 
+
+template <class Tf, class Tv>
+inline Tv trapz(Tf frac, Tv a, Tv b){
+	return trapz2(frac*Tf(2), a,b);
+}
+
+template <class Tf, class Tv>
+inline Tv trapz2(Tf frac02, Tv a, Tv b){
+	if(frac02 < Tf(1)){
+		return a + b*frac02;
+	}
+	else{
+		return a*(Tf(2)-frac02) + b;
+	}
+}
 
 template <class Tf, class Tv>
 inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
