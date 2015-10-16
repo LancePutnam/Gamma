@@ -123,6 +123,14 @@ inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 template <class T>
 inline T ampTodB(const T& amp){ return 20*::log(amp); }
 
+/// Returns an equal-loudness amplitude for a given frequency, in Hz.
+
+/// The curve used is an A-weighting curve which approximates a 40-phon equal
+/// loudness Fletcher-Munson contour.
+/// \param[in] freq		frequency, in Hz
+/// \param[in] maxAmp	maximum amplitude to clamp return value to
+double eqLoudAmp(double freq, double maxAmp=4.);
+
 /// Returns weights for linear fade.
 template<class T> void fadeLin(T& weight1, T& weight2, T fade);
 
@@ -330,14 +338,14 @@ template<class T> T smoothZero(T v, T bw);
 /// Approximate square root using log base-2 and Newton methods.
 
 /// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
-/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
+/// log base-2 approximation is performed. For N>0, N Newton iterations
 /// are applied to improve the result.
 template<unsigned N, class T> T sqrt(T v);
 
 /// Approximate inverse square root using log base-2 and Newton methods.
 
 /// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
-/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
+/// log base-2 approximation is performed. For N>0, N Newton iterations
 /// are applied to improve the result.
 template<unsigned N, class T> T invSqrt(T v);
 

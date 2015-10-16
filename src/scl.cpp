@@ -99,6 +99,16 @@ float clipMag(float value, float max, float min){
 	return v.f;
 }
 
+double eqLoudAmp(double freq, double maxAmp){
+	double ff = freq*freq;
+	double c1 =    20.6; c1*=c1;
+	double c2 =   107.7; c2*=c2;
+	double c3 =	  737.9; c3*=c3;
+	double c4 = 12200.0; c4*=c4;
+	double n  = 1.258925411794167; // 10^(1/10); 2 dB offset to A-weight
+	double A = ((ff + c1) * (::sqrt((ff+c2)*(ff+c3))) * (ff + c4)) / (n*ff*ff*c4);
+	return A < maxAmp ? A : maxAmp;
+}
 
 double freq(const char * note){
 
