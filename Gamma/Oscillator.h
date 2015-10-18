@@ -52,8 +52,8 @@ public:
 
 	Sp& phsInc(){ return mSp; }		///< Get phase increment strategy
 
-	/// Returns true if tap is done
-	bool done() const { return mSp.done(phaseI()); }
+	bool done() const;				///< Returns true if done cycling
+	bool cycled() const;			///< Returns whether phase cycled on last iteration
 
 	float freq() const;				///< Get frequency
 	uint32_t freqI() const;			///< Get fixed-point frequency
@@ -62,14 +62,14 @@ public:
 	float phase() const;			///< Get phase in [0, 1)
 	uint32_t phaseI() const;		///< Get fixed-point phase
 
-	/// Returns true on phase wrap, false otherwise
-	bool cycle();
-	bool operator()();				///< Alias of cycle()
+	/// Iterates accumulator; \returns true on phase wrap, false otherwise
+	bool operator()();
 
 	uint32_t nextPhase();			///< Increment phase and return updated phase
 	uint32_t nextPhase(float freqOffset);
 	uint32_t cycles();				///< Get 1 to 0 transitions of all accumulator bits
-	uint32_t once();
+	bool cycle();
+	bool once();
 
 	/// Returns sequence of 32 triggers based on a pattern of bits
 
@@ -947,87 +947,98 @@ inline double mapIF(uint32_t v){
 
 
 //---- Accum
-template<class St, class Td>
-Accum<St,Td>::Accum(float f, float p)
+template<class Sp, class Td>
+Accum<Sp,Td>::Accum(float f, float p)
 :	mFreq(f), mFreqToInt(4294967296.), mFreqI(0)
 {
 	onDomainChange(1);
 	phase(p);
 }
 
-template<class St, class Td>
-inline uint32_t Accum<St,Td>::mapFreq(float v) const {
+template<class Sp, class Td>
+inline uint32_t Accum<Sp,Td>::mapFreq(float v) const {
 	//return mapFI(v * Td::ups());
 	return castIntRound(v * mFreqToInt);
 }
 
-template<class St, class Td>
-void Accum<St,Td>::onDomainChange(double r){ //printf("Accum: onDomainChange (%p)\n", this);
+template<class Sp, class Td>
+void Accum<Sp,Td>::onDomainChange(double r){ //printf("Accum: onDomainChange (%p)\n", this);
 	mFreqToInt = 4294967296. / Td::spu();
 	freq(mFreq);
 }
 
-template<class St, class Td>
-inline void Accum<St,Td>::freq(float v){
+template<class Sp, class Td>
+inline void Accum<Sp,Td>::freq(float v){
 	mFreq = v;
 	mFreqI= mapFreq(v);
 }
 
-template<class St, class Td>
-inline void Accum<St,Td>::freqI(uint32_t v){
+template<class Sp, class Td>
+inline void Accum<Sp,Td>::freqI(uint32_t v){
 	mFreqI= v;
 	mFreq = mapIF(v) * Td::spu();
 }
 
-template<class St, class Td> inline void Accum<St,Td>::freqAdd(float v){ phaseAdd(v*Td::ups()); }
-template<class St, class Td> inline void Accum<St,Td>::freqMul(float v){ freqAdd((v-1.f)*freq()); }
+template<class Sp, class Td> inline void Accum<Sp,Td>::freqAdd(float v){ phaseAdd(v*Td::ups()); }
+template<class Sp, class Td> inline void Accum<Sp,Td>::freqMul(float v){ freqAdd((v-1.f)*freq()); }
 
-template<class St, class Td> inline void Accum<St,Td>::period(float v){ freq(1.f/v); }
-template<class St, class Td> inline void Accum<St,Td>::phase(float v){ mPhaseI = mapFI(v); }
-template<class St, class Td> inline void Accum<St,Td>::phaseAdd(float v){ mSp(mPhaseI, mapFI(v)); }
-template<class St, class Td> void Accum<St,Td>::phaseMax(){ mPhaseI = 0xffffffff; }
+template<class Sp, class Td> inline void Accum<Sp,Td>::period(float v){ freq(1.f/v); }
+template<class Sp, class Td> inline void Accum<Sp,Td>::phase(float v){ mPhaseI = mapFI(v); }
+template<class Sp, class Td> inline void Accum<Sp,Td>::phaseAdd(float v){ mSp(mPhaseI, mapFI(v)); }
+template<class Sp, class Td> void Accum<Sp,Td>::phaseMax(){ mPhaseI = 0xffffffff; }
 
-template<class St, class Td> inline float Accum<St,Td>::freq() const { return mFreq; }
-template<class St, class Td> inline uint32_t Accum<St,Td>::freqI() const { return mFreqI; }
-template<class St, class Td> inline float Accum<St,Td>::freqUnit() const { return mapIF(mFreqI); }
-template<class St, class Td> inline float Accum<St,Td>::period() const { return 1.f/freq(); }
-template<class St, class Td> inline float Accum<St,Td>::phase() const { return mapIF(mPhaseI); }
-template<class St, class Td> inline uint32_t Accum<St,Td>::phaseI() const { return mPhaseI; }
+template<class Sp, class Td>
+inline bool Accum<Sp,Td>::done() const { return mSp.done(phaseI()); }
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::nextPhase(float frqOffset){
+template<class Sp, class Td>
+inline bool Accum<Sp,Td>::cycled() const {
+	uint32_t prev = phaseI();
+	Sp temp = mSp;
+	temp(prev, ~freqI());
+	return (~phaseI() & prev) & 0x80000000;
+}
+
+template<class Sp, class Td> inline float Accum<Sp,Td>::freq() const { return mFreq; }
+template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::freqI() const { return mFreqI; }
+template<class Sp, class Td> inline float Accum<Sp,Td>::freqUnit() const { return mapIF(mFreqI); }
+template<class Sp, class Td> inline float Accum<Sp,Td>::period() const { return 1.f/freq(); }
+template<class Sp, class Td> inline float Accum<Sp,Td>::phase() const { return mapIF(mPhaseI); }
+template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::phaseI() const { return mPhaseI; }
+
+template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(float frqOffset){
 	uint32_t p = mPhaseI;
 	mSp(mPhaseI, mFreqI + mapFreq(frqOffset)); // apply phase inc strategy
 	return p;
 }
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::nextPhase(){
+template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(){
 	uint32_t p = mPhaseI;
 	mSp(mPhaseI, mFreqI); // apply phase inc strategy
 	return p;
 }
 
-template<class St, class Td> inline bool Accum<St,Td>::operator()(){ return cycle(); }
+template<class Sp, class Td> inline bool Accum<Sp,Td>::operator()(){ return cycle(); }
 
-template<class St, class Td> inline bool Accum<St,Td>::cycle(){ return bool(cycles() & 0x80000000); }
+template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return bool(cycles() & 0x80000000); }
 
-//template<class St, class Td> inline uint32_t Accum<St,Td>::cycle(uint32_t mask){
+//template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::cycle(uint32_t mask){
 //	return cycles() & mask;
 //}
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::cycles(){
+template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::cycles(){
 	uint32_t prev = phaseI();
 	nextPhase();
 	return ~phaseI() & prev;
 }
 
-template<class St, class Td> inline uint32_t Accum<St,Td>::once(){
+template<class Sp, class Td> inline bool Accum<Sp,Td>::once(){
 	uint32_t prev = phaseI();
-	uint32_t c = cycle();
+	bool c = cycle();
 	if(c) mPhaseI = prev;
 	return c;
 }
 
-template<class St, class Td> inline bool Accum<St,Td>::seq(uint32_t pat){
+template<class Sp, class Td> inline bool Accum<Sp,Td>::seq(uint32_t pat){
 	uint32_t prev = phaseI();
 	nextPhase();
 
@@ -1169,24 +1180,24 @@ template<class Tv, class Td> void CSine<Tv, Td>::onDomainChange(double r){
 
 
 //---- LFO
-#define TLFO LFO<St,Td>
-template<class St, class Td> TLFO::LFO(): Base(){ mod(0.5); }
-template<class St, class Td> TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
+#define TLFO LFO<Sp,Td>
+template<class Sp, class Td> TLFO::LFO(): Base(){ mod(0.5); }
+template<class Sp, class Td> TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
 
-template<class St, class Td> inline TLFO& TLFO::set(float f, float p, float m){
+template<class Sp, class Td> inline TLFO& TLFO::set(float f, float p, float m){
 	this->freq(f);
 	this->phase(p);
 	return mod(m);
 }
-template<class St, class Td> inline TLFO& TLFO::mod(double v){
+template<class Sp, class Td> inline TLFO& TLFO::mod(double v){
 	return modI(castIntRound(v*4294967296.));
 }
-template<class St, class Td> inline TLFO& TLFO::modI(uint32_t v){
+template<class Sp, class Td> inline TLFO& TLFO::modI(uint32_t v){
 	mMod=v;
 	return *this;
 }
 
-template<class St, class Td> inline float TLFO::line2(){
+template<class Sp, class Td> inline float TLFO::line2(){
 	using namespace gam::scl;
 	
 //	// Starts at 1
@@ -1204,9 +1215,9 @@ template<class St, class Td> inline float TLFO::line2(){
 	return r;
 }
 
-template<class St, class Td> inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
+template<class Sp, class Td> inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
-#define DEF(name, exp) template<class St, class Td> inline float TLFO::name{ float r = exp; return r; }
+#define DEF(name, exp) template<class Sp, class Td> inline float TLFO::name{ float r = exp; return r; }
 //DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
 //DEF(cos(),		up(); r=scl::abs(r*r) )//r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
 DEF(cos(),		up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
