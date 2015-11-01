@@ -1068,7 +1068,7 @@ inline float pulse(uint32_t p, uint32_t w){
 }
 
 inline float pulseU(uint32_t p, uint32_t w){	
-	return p > w ? 0.f : 1.f;
+	return p < w ? 1.f : 0.f;
 }
 
 // [1, 0.5, 0, -0.5]
