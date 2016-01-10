@@ -1088,8 +1088,12 @@ template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::nextPhase(Tv frqMod){
 }
 
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freq(Tv v){ mInc = mapFreq(v); }
-template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqAdd(Tv v){ nextPhaseUsing(mapFreq(v)); }
-template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqMul(Tv v){ nextPhaseUsing(mapFreq(v*mInc)); }
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqAdd(Tv v){
+	nextPhaseUsing(mapFreq(v));
+}
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqMul(Tv v){
+	nextPhaseUsing((v-Tv(1))*mInc);
+}
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::period(Tv v){ freq(Tv(1)/v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phase(Tv v){ mPhase = mapPhase(v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
