@@ -267,6 +267,9 @@ public:
 	/// Filter next sample
 	Tv operator()(Tv in);
 
+	/// Get sum of comb delay taps
+	Tv read(std::initializer_list<unsigned> delays) const;
+
 
 	/// Get decay length
 	float decay() const { return mDecay; }
@@ -544,6 +547,15 @@ inline Tv ReverbMS<TARG>::operator()(Tv in){
 		res += mCombs[i](in);
 	}
 
+	return res;
+}
+
+template<TDEC>
+inline Tv ReverbMS<TARG>::read(std::initializer_list<unsigned> delays) const {
+	Tv res = Tv(0);
+	for(unsigned i=0; i<mCombs.size(); ++i){
+		res += mCombs[i].read(delays.begin()[i]);
+	}
 	return res;
 }
 
