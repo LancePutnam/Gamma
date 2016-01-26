@@ -23,14 +23,17 @@ namespace gam{
 
 namespace rnd{
 	namespace{
-		static bool initSeed = false;
 		static uint32_t mSeedPush[4];
-		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
 	}
 	
 	/// Get a random seed
 	static uint32_t getSeed(){
-		if(!initSeed){ seedGen.val = time(NULL); initSeed = true; } 
+		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
+		static bool initSeed = true;
+		if(initSeed){
+			seedGen.val = time(NULL);
+			initSeed = false;
+		} 
 		return seedGen();
 	}
 
