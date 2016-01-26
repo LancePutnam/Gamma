@@ -21,11 +21,7 @@
 namespace gam{
 
 
-namespace rnd{
-	namespace{
-		static uint32_t mSeedPush[4];
-	}
-	
+namespace rnd{	
 	/// Get a random seed
 	static uint32_t getSeed(){
 		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
@@ -36,7 +32,6 @@ namespace rnd{
 		} 
 		return seedGen();
 	}
-
 } // rnd::
 
 
@@ -47,8 +42,8 @@ namespace rnd{
 /// random; the most extreme case being the LSB which at best flips between 0 and 1.
 /// This generator also exhibits poor dimensional distribution, therefore it is
 /// best to have a different generator for each dimension, rather than sharing one.
-struct RNGLinCon : public gen::RMulAdd<uint32_t>{
-
+class RNGLinCon : public gen::RMulAdd<uint32_t>{
+public:
 	RNGLinCon(){ val=rnd::getSeed(); type(0); }
 
 	/// \param[in] seed	Initial seed value
@@ -72,8 +67,8 @@ struct RNGLinCon : public gen::RMulAdd<uint32_t>{
 
 ///	This generator is a faster LCG requiring only a single integer multiply.
 ///
-struct RNGMulLinCon : public gen::RMul<uint32_t>{
-
+class RNGMulLinCon : public gen::RMul<uint32_t>{
+public:
 	RNGMulLinCon(){ val=rnd::getSeed(); type(0); }
 	
 	/// \param[in] seed	Initial seed value
@@ -386,6 +381,10 @@ template <class T> inline T uniExc(const T& exc, const T& max, const T& min){
 #undef DEF
 
 #undef LOOP
+
+namespace{
+	static uint32_t mSeedPush[4];
+}
 
 inline void push(uint32_t seedA){
 	mSeedPush[0] = gen.s1;
