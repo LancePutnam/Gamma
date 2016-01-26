@@ -88,10 +88,10 @@ class NoiseWhite{
 public:
 	typedef float value_type;
 
-	NoiseWhite(): rng(){}
+	NoiseWhite(){}
 	
 	/// \param[in] seed		random number generator seed
-	NoiseWhite(uint32_t seed) : rng(seed){}
+	NoiseWhite(uint32_t seed): rng(seed){}
 
 	/// Generate next value
 	float operator()(){ return rnd::uniS_float(rng); }
@@ -142,7 +142,7 @@ private:
 // Implementation_______________________________________________________________
 
 template<class T>
-NoisePink<T>::NoisePink(): rng(){ init(); }
+NoisePink<T>::NoisePink(){ init(); }
     
 template<class T>
 NoisePink<T>::NoisePink(uint32_t seed): rng(seed){ init(); }
