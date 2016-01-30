@@ -22,7 +22,8 @@ namespace ipl{
 /// Interpolation types
 enum Type{
 	TRUNC=0,	/**< Truncating interpolation */
-	ROUND,		/**< Rounding interpolation */
+	ROUND,		/**< Nearest neighbor interpolation */
+	MEAN2,		/**< Mean of two nearest neighbors */
 	LINEAR,		/**< Linear interpolation */
 	CUBIC,		/**< Cubic interpolation */
 	ALLPASS		/**< Allpass interpolation */
