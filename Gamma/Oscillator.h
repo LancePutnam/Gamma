@@ -287,7 +287,7 @@ public:
 
 	/// \param[in] frq		Frequency
 	/// \param[in] amp		Amplitude
-	/// \param[in] dcy		-60 dB decay length, in units (or negative for no decay)
+	/// \param[in] dcy		-60 dB decay length (negative for no decay)
 	/// \param[in] phs		Phase in [0, 1)
 	CSine(Tv frq=440, Tv amp=1, Tv dcy=-1, Tv phs=0);
 
@@ -296,11 +296,11 @@ public:
 
 	complex operator()();		///< Generate next sample
 
-	void amp(Tv val);			///< Set amplitude
-	void decay(Tv val);			///< Set -60 dB decay length, in units (or negative for no decay)
-	void freq(Tv val);			///< Set frequency
-	void freq(const complex& val){ mInc=val; }
-	void phase(Tv radians);		///< Set phase
+	void amp(Tv v);				///< Set amplitude
+	void decay(Tv v);			///< Set -60 dB decay length (negative for no decay)
+	void freq(Tv v);			///< Set frequency
+	void freq(complex v){ mInc=v; }
+	void phase(Tv v);			///< Set unit phase, in [0,1]
 	void reset();				///< Reset amplitude and set phase to 0
 	void set(Tv frq, Tv phs, Tv amp, Tv dcy);
 
