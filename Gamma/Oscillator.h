@@ -580,7 +580,7 @@ public:
 	/// \param[in] frq		Frequency
 	/// \param[in] phase	Phase in [0, 1)
 	/// \param[in] mod		Modifier amount in [0, 1)
-	LFO(float frq, float phase=0, float mod=0.5);
+	LFO(double frq, double phase=0, double mod=0.5);
 
 
 	/// Set frequency, phase and modifier amount
@@ -1186,7 +1186,7 @@ template<class Tv, class Td> void CSine<Tv, Td>::onDomainChange(double r){
 //---- LFO
 #define TLFO LFO<Sp,Td>
 template<class Sp, class Td> TLFO::LFO(): Base(){ mod(0.5); }
-template<class Sp, class Td> TLFO::LFO(float f, float p, float m): Base(f, p){ mod(m); }
+template<class Sp, class Td> TLFO::LFO(double f, double p, double m): Base(f, p){ mod(m); }
 
 template<class Sp, class Td> inline TLFO& TLFO::set(float f, float p, float m){
 	this->freq(f);
