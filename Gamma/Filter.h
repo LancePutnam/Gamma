@@ -457,6 +457,12 @@ public:
 			-sf0(sf1(sf2(sf3(sf4(sf5(in))))))
 		);
 	}
+	
+	void zero()
+	{
+		cf0.zero(); cf1.zero(); cf2.zero(); cf3.zero(); cf4.zero(); cf5.zero();
+		sf0.zero(); sf1.zero(); sf2.zero(); sf3.zero(); sf4.zero(); sf5.zero();
+	}
 
 protected:
 	AllPass1<Tv, Tp, Domain1> cf0,cf1,cf2,cf3,cf4,cf5, sf0,sf1,sf2,sf3,sf4,sf5;
