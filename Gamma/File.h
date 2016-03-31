@@ -9,7 +9,6 @@
 */
 
 #include <stdio.h>
-#include "Gamma/pstdint.h"
 
 namespace gam{
 
@@ -28,10 +27,11 @@ public:
 	void mode(const char * v){ mMode=v; }
 
 	/// Write memory elements to file
-	uint32_t write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
+	unsigned write(const void * v, int size, int items=1){
+		return fwrite(v, size, items, mFP); }
 
 	/// Quick and dirty write memory to file
-	static uint32_t write(const char * path, const void * v, int size, int items=1);
+	static unsigned write(const char * path, const void * v, int size, int items=1);
 
 	/// Returns character string of file contents (read mode only)
 	char * readAll();

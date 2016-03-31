@@ -2,23 +2,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <complex>
+#define GAMMA_H_INC_ALL
 #include "../Gamma/Gamma.h"
-#include "../Gamma/FFT.h"
-#include "../Gamma/Access.h"
-#include "../Gamma/Conversion.h"
-#include "../Gamma/File.h"
-#include "../Gamma/Strategy.h"
-#include "../Gamma/Types.h"
-#include "../Gamma/UnitMaps.h"
-
-#include "../Gamma/Delay.h"
-#include "../Gamma/Envelope.h"
-#include "../Gamma/Filter.h"
-#include "../Gamma/Oscillator.h"
-#include "../Gamma/SamplePlayer.h"
 
 using namespace gam;
 
+// #defined in Windef.h!
+#ifdef near
+#undef near
+#endif
 inline bool near(double a, double b, double eps=1e-6){
 	return scl::abs(a-b) < eps;
 }
@@ -79,6 +71,8 @@ int main(int argc, char* argv[]){
 	#include "ut/ut_scl.cpp"
 	#include "ut/ut_ipl.cpp"
 	#include "ut/ut_arr.cpp"
+
+	#include "ut/utDomain.cpp"
 
 	#include "ut/utDelay.cpp"
 	#include "ut/utEnvelope.cpp"

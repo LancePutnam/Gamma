@@ -11,9 +11,7 @@
 
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
-
 #include "Gamma/Containers.h"
-//#include "Gamma/Strategy.h"
 #include "Gamma/Domain.h"
 #include "Gamma/Types.h"
 
@@ -27,18 +25,20 @@ enum FilterType{
 	BAND_PASS,			/**< Band-pass */
 	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
 	BAND_REJECT,		/**< Band-reject */
-	ALL_PASS			/**< All-pass */
-//	COMB_FBK_EVEN,
-//	COMB_FBK_ODD,
-//	COMB_FFD_EVEN,
-//	COMB_FFD_ODD
+	ALL_PASS,			/**< All-pass */
+	PEAKING,			/**< Peaking */
+	SMOOTHING			/**< Smoothing */
 };
 
 
 
+/// Returns pole radius given a unit bandwidth
+template <class T>
+inline T poleRadius(T bw){ return ::exp(-M_PI * bw); }
+
 /// Returns pole radius given a bandwidth and sampling interval
 template <class T>
-inline T poleRadius(T bw, double ups){ return ::exp(-M_PI * bw * ups); }
+inline T poleRadius(T bw, double ups){ return poleRadius(bw * ups); }
 //return (T)1 - (M_2PI * bw * ups); // linear apx for fn < ~0.02
 
 /// Convert domain frequency to radians clipped to interval [0, pi).
@@ -67,20 +67,20 @@ class AllPass1 : public Td {
 public:
 	///
 	/// \param[in]	frq		Center frequency
-	AllPass1(Tp frq=1000);
+	AllPass1(Tp frq = Tp(1000));
 
 	void freq (Tp v);		///< Set cutoff frequency
 	void freqF(Tp v);		///< Faster, but slightly less accurate than freq()	
 	void zero(){ d1=Tv(0); }
 	
-	Tv operator()(Tv input);///< Filters sample
+	Tv operator()(Tv in);	///< Filters sample
 	
-	Tv high(Tv input);		///< High-pass filters sample
-	Tv low (Tv input);		///< Low-pass filters sample
+	Tv high(Tv in);			///< High-pass filters sample
+	Tv low (Tv in);			///< Low-pass filters sample
 	
 	Tp freq();				///< Get current cutoff frequency
 	
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 	
 protected:
 	Tv d1;		// once delayed value
@@ -111,7 +111,7 @@ public:
 	/// \param[in]	frq		Center frequency
 	/// \param[in]	res		Resonance (Q) amount in [1, inf)
 	/// \param[in]	type	Type of filter
-	Biquad(Tp frq = Tp(1000), Tp res = Tp(1), FilterType type = LOW_PASS);
+	Biquad(Tp frq = Tp(1000), Tp res = Tp(0.707), FilterType type = LOW_PASS);
 
 
 	/// Get array of 3 feedforward coefficients
@@ -129,29 +129,33 @@ public:
 
 	void freq(Tp v);					///< Set center frequency
 	void res(Tp v);						///< Set resonance (Q)
+	void level(Tp v);					///< Set level (PEAKING type only)
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
 	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
 	void type(FilterType type);			///< Set type of filter
 	void zero();						///< Zero internal delays
 
-	Tv operator()(Tv i0);				///< Filter next sample
-	Tv nextBP(Tv i0);					///< Optimized for band-pass types
+	Tv operator()(Tv in);				///< Filter next sample
+	Tv nextBP(Tv in);					///< Optimized for band-pass types
 	
-	Tp freq() const { return mFreq; }	///< Get center frequency
-	Tp res() const { return mRes; }		///< Get resonance (Q)
-	FilterType type() const { return mType; }	///< Get filter type
+	Tp freq() const;					///< Get center frequency
+	Tp res() const;						///< Get resonance (Q)
+	FilterType type() const;			///< Get filter type
 	
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 
 protected:
 	Tp mA[3];			// feedforward coefs
 	Tp mB[3];			// feedback coefs (first element used to scale coefs)
 	Tv d1, d2;			// inner sample delays
-	Tp mFreq, mRes;		// center frequency, resonance
+	Tp mFreq, mResRecip;// center frequency, 1/resonance
+	Tp mLevel;			// amplitude level (for peaking)
 	FilterType mType;
 	Tp mReal, mImag;	// real, imag components of center frequency
 	Tp mAlpha;
 	Tp mFrqToRad;
+
+	void resRecip(Tp v);
 };
 
 
@@ -166,14 +170,18 @@ template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class BlockDC : public Td{
 public:
 
-	/// \param[in] width	Bandwidth of pole
-	BlockDC(Tp width=35): d1(0), mWidth(width){ Td::refreshDomain(); }
+	/// \param[in] bwidth	Bandwidth of pole
+	BlockDC(Tp bwidth = Tp(35))
+	:	d1(0), mWidth(bwidth)
+	{
+		onDomainChange(1);
+	}
 
 	/// Filter sample
-	Tv operator()(Tv i0){		
-		i0 += d1*mB1;
-		Tv o0 = i0-d1;
-		d1 = i0;
+	Tv operator()(Tv in){
+		Tv t = in + d1*mB1;
+		Tv o0 = t - d1;
+		d1 = t;
 		return o0;
 	}
 
@@ -185,7 +193,7 @@ public:
 
 	void zero(){ d1=0; }
 
-	virtual void onDomainChange(double r){ width(mWidth); }
+	void onDomainChange(double r){ width(mWidth); }
 
 protected:
 	Tv d1;
@@ -204,15 +212,23 @@ template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class BlockNyq : public BlockDC<Tv,Tp,Td>{
 public:
 
-	/// \param[in] width	Bandwidth of pole
-	BlockNyq(Tp width=35): Base(width){}
+	/// \param[in] bwidth	Bandwidth of pole
+	BlockNyq(Tp bwidth = Tp(35)){
+		width(bwidth);
+	}
 
 	/// Filter sample
-	Tv operator()(Tv i0){		
-		i0 += d1*mB1;
-		Tv o0 = i0-d1;
-		d1 =-i0;
+	Tv operator()(Tv in){
+		Tv t = in + d1*mB1;
+		Tv o0 = t + d1;
+		d1 = t;
 		return o0;
+	}
+
+	/// Set bandwidth of pole
+	void width(Tp v){
+		Base::width(v);
+		mB1 = -mB1;
 	}
 
 protected:
@@ -246,7 +262,7 @@ public:
 	/// Zero delay elements
 	void zero(){ d2=d1=Tv(0); }
 	
-	virtual void onDomainChange(double r){ freq(mFreq); width(mWidth); }
+	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 
@@ -299,13 +315,14 @@ public:
 
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
-	AllPass2(Tp frq=1000, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
+	AllPass2(Tp frq = Tp(1000), Tp wid = Tp(100))
+	:	Base(frq, wid){}
 
 	/// Filter sample
-	Tv operator()(Tv i0){
-		i0 += d1*mC[1] + d2*mC[2];
-		Tv o0 = i0*-mC[2] - d1*mC[1] + d2;
-		this->delay(i0);
+	Tv operator()(Tv in){
+		Tv  t = in + d1*mC[1] + d2*mC[2];
+		Tv o0 = d2 - d1*mC[1] -  t*mC[2];
+		this->delay(t);
 		return o0;
 	}
 
@@ -327,7 +344,11 @@ public:
 	
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
-	Notch(Tp frq=1000, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
+	Notch(Tp frq = Tp(1000), Tp wid = Tp(100))
+	:	Base(frq, wid)
+	{
+		onDomainChange(1);
+	}
 
 	/// Set center frequency
 	void freq(Tp v){ Base::freq(v); computeGain(); }
@@ -336,14 +357,14 @@ public:
 	void width(Tp v){ Base::width(v); computeGain(); }
 
 	/// Filter sample
-	Tv operator()(Tv i0){
-		i0 *= gain();
-		Tv o0 = i0 - d1*mC[1] - d2*mC[2];
-		this->delay(i0);
+	Tv operator()(Tv in){
+		Tv t = in * gain();
+		Tv o0 = t - d1*mC[1] - d2*mC[2];
+		this->delay(t);
 		return o0;
 	}
 
-	virtual void onDomainChange(double r){ freq(mFreq); width(mWidth); }
+	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
 
 protected:
 	INHERIT_FILTER2;
@@ -366,7 +387,11 @@ public:
 
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth	
-	Reson(Tp frq=440, Tp wid=100): Base(frq, wid){ Td::refreshDomain(); }
+	Reson(Tp frq = Tp(1000), Tp wid = Tp(100))
+	:	Base(frq, wid)
+	{
+		onDomainChange(1);
+	}
 
 	/// Set center frequency
 	void freq(Tp v){
@@ -381,11 +406,10 @@ public:
 	void set(Tp frq, Tp wid){ Base::width(wid); freq(frq); }
 
 	/// Filter sample
-	Tv operator()(Tv i0){
-		i0 *= gain();
-		i0 += d1*mC[1] + d2*mC[2];
-		this->delay(i0);
-		return i0; 
+	Tv operator()(Tv in){
+		Tv t = in * gain() + d1*mC[1] + d2*mC[2];
+		this->delay(t);
+		return t;
 	}
 
 	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
@@ -427,11 +451,17 @@ public:
 	#undef SR
 
 	/// Convert input from real to complex
-	Complex<Tv> operator()(const Tv& i){
+	Complex<Tv> operator()(Tv in){
 		return Complex<Tv>(
-			 cf0(cf1(cf2(cf3(cf4(cf5(i)))))),
-			-sf0(sf1(sf2(sf3(sf4(sf5(i))))))
+			 cf0(cf1(cf2(cf3(cf4(cf5(in)))))),
+			-sf0(sf1(sf2(sf3(sf4(sf5(in))))))
 		);
+	}
+	
+	void zero()
+	{
+		cf0.zero(); cf1.zero(); cf2.zero(); cf3.zero(); cf4.zero(); cf5.zero();
+		sf0.zero(); sf1.zero(); sf2.zero(); sf3.zero(); sf4.zero(); sf5.zero();
 	}
 
 protected:
@@ -450,16 +480,18 @@ class Integrator{
 public:
 
 	/// \param[in] leakCoef		Leak coefficient, in [0,1)
-	/// \param[in] v			Initial value
-	Integrator(const Tp& leakCoef=Tp(1), const Tv& v=Tv(0)){
-		mo[0]=v;
+	/// \param[in] initVal		Initial value
+	Integrator(Tp leakCoef = Tp(1), Tv initVal = Tv(0)){
+		mo[0] = initVal;
 		leak(leakCoef);
 	}
 
 	/// Filter input value
-	Tv operator()(const Tv& i0) const { return mo[0]=mo[0]*mb[0] + i0; }
+	Tv operator()(Tv in) const {
+		return mo[0] = mo[0]*mb[0] + in;
+	}
 	
-	Integrator& leak(const Tp& v){ mb[0]=v; return *this; }
+	Integrator& leak(Tp v){ mb[0]=v; return *this; }
 	Integrator& zero(){ mo[0]=Tv(0); return *this; }
 
 protected:
@@ -481,19 +513,21 @@ template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
 
+	MovingAvg()
+	:	mSum(0), mRSize(0)
+	{}
+
 	/// \param[in] size		Kernel size, greater than 1
-	explicit MovingAvg(uint32_t size)
+	explicit MovingAvg(unsigned size)
 	:	Base(size), mSum(0), mRSize(0)
 	{	onResize(); }
 
 	MovingAvg& operator=(const Tv& v){ DelayN<Tv>::operator=(v); return *this; }
 	
-	Tv operator()(const Tv& i0){
-		mSum += i0 - Base::operator()(i0);
+	Tv operator()(Tv in){
+		mSum += in - Base::operator()(in);
 		return mSum * mRSize;
 	}
-	
-	void zero(){ this->assign(Tv(0)); }
 
 	virtual void onResize(){
 		mRSize = 1./Base::size();
@@ -509,8 +543,11 @@ protected:
 
 
 
-/// One-pole smoothing filter
+/// One-pole filter
 
+/// This filter uses a single pole at either DC or Nyquist to create a low-pass
+/// or high-pass response, respectively.
+///
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
@@ -518,31 +555,43 @@ protected:
 template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class OnePole : public Td{ 
 public:
-	OnePole();
 
 	/// \param[in]	freq	Smoothing frequency
 	/// \param[in]	stored	Initial stored value
-	OnePole(Tp freq, const Tv& stored=0);
+	OnePole(Tp freq = Tp(1000), const Tv& stored = Tv(0));
 
 	const Tp& freq() const { return mFreq; }	///< Get cutoff frequency
 
-	void operator  = (const Tv& val);	///< Stores input value for operator()
-	void operator *= (const Tv& val);	///< Multiplies stored value by value
+	void type(FilterType type);			///< Set type of filter (gam::LOW_PASS or gam::HIGH_PASS)
 	void freq(Tp val);					///< Set cutoff frequency (-3 dB bandwidth of pole)
+
+	/// Set lag length of low-pass response (AKA tau)
+
+	/// \param[in] length	Length of lag
+	/// \param[in] thresh	Value to which a downward unit step reaches after
+	///						the lag length. Must be greater than 0.
+	void lag(Tp length, Tp thresh=Tp(0.001));
+
 	void smooth(Tp val);				///< Set smoothing coefficient directly
 	void zero(){ o1=0; }				///< Zero internal delay
-	void reset(const Tv& v){ o1=v; mStored=v; }
+	void reset(Tv v = Tv(0)){ o1=mStored=v; }
 
 	const Tv& operator()();				///< Returns filtered output using stored value
-	const Tv& operator()(const Tv& input);		///< Returns filtered output from input value
+	const Tv& operator()(Tv in);		///< Returns filtered output from input value
+
+	void operator  = (Tv val);			///< Stores input value for operator()
+	void operator *= (Tv val);			///< Multiplies stored value by value
+
 	const Tv& last() const;				///< Returns last output
 	const Tv& stored() const;			///< Returns stored value
 	Tv& stored();						///< Returns stored value
+
 	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros
 	
-	virtual void onDomainChange(double r);
+	void onDomainChange(double r);
 
 protected:
+	FilterType mType;
 	Tp mFreq, mA0, mB1;
 	Tv mStored, o1;
 };
@@ -557,7 +606,9 @@ protected:
 template <class Tv, class Tp, class Td>
 AllPass1<Tv,Tp,Td>::AllPass1(Tp frq)
 :	d1(Tv(0)), mFreq(frq)
-{	Td::refreshDomain(); }
+{
+	onDomainChange(1);
+}
 
 template <class Tv, class Tp, class Td>
 inline void AllPass1<Tv,Tp,Td>::freq(Tp v){
@@ -605,9 +656,9 @@ void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 //---- Biquad
 template <class Tv, class Tp, class Td>
 Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
-:	d1(0), d2(0)
+:	d1(0), d2(0), mLevel(1)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	set(frq, res, type);
 }
 
@@ -618,14 +669,26 @@ void Biquad<Tv,Tp,Td>::onDomainChange(double r){
 }
 
 template <class Tv, class Tp, class Td>
+Tp Biquad<Tv,Tp,Td>::freq() const { return mFreq; }
+
+template <class Tv, class Tp, class Td>
+Tp Biquad<Tv,Tp,Td>::res() const { return Tp(0.5)/(mResRecip*mLevel); }
+
+template <class Tv, class Tp, class Td>
+FilterType Biquad<Tv,Tp,Td>::type() const { return mType; }
+
+template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::set(Tp freqA, Tp resA, FilterType typeA){
-	mRes = resA;
+	mResRecip = Tp(0.5)/(resA*mLevel);
 	mType = typeA;
 	freq(freqA);
 }
 
 template <class Tv, class Tp, class Td>
-void Biquad<Tv,Tp,Td>::zero(){ d1=d2=(Tv)0; }
+inline void Biquad<Tv,Tp,Td>::set(Tp frq, Tp res){ set(frq, res, mType); }
+
+template <class Tv, class Tp, class Td>
+void Biquad<Tv,Tp,Td>::zero(){ d1=d2=Tv(0); }
 
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
@@ -633,30 +696,56 @@ void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 }
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::freq(Tp v){
-	mFreq = v;
-	float w = scl::clip(mFreq * mFrqToRad, 3.11f);
-	mReal = scl::cosT8(w);
-	mImag = scl::sinT7(w);
-	res(mRes);
+inline void Biquad<Tv,Tp,Td>::level(Tp v){
+	mResRecip *= mLevel;
+	mLevel=v;
+	resRecip(mResRecip);
 }
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::res(Tp v){
-	mRes = v;
-	mAlpha = mImag / mRes;
+inline void Biquad<Tv,Tp,Td>::freq(Tp v){
+	mFreq = v;
+	float w = scl::clip(mFreq * mFrqToRad, 3.13f);
+	mReal = scl::cosT8(w);
+	mImag = scl::sinT7(w);
+	resRecip(mResRecip);
+}
 
-	// Note: mB[0] is not used in the difference equation since it is assumed to
-	// be equal to 1. It is only used for gain control ...
+/*
+// Bandwidth, in octaves
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::width(Tp v){
+  alpha = sin(w0)/(2*Q)                                       (case: Q)
+		= sin(w0)*sinh( ln(2)/2 * BW * w0/sin(w0) )           (case: BW)
+        = sin(w0)/2 * sqrt( (A + 1/A)*(1/S - 1) + 2 )         (case: S)
+
+        FYI: The relationship between bandwidth and Q is
+             1/Q = 2*sinh(ln(2)/2*BW*w0/sin(w0))     (digital filter w BLT)
+        or   1/Q = 2*sinh(ln(2)/2*BW)             (analog filter prototype)
+
+	Tp oneOverQ = 2*sinh(0.34657359028 * v * mFreq*mFrqToRad / mImag);
+	qRecip(oneOverQ);
+}
+*/
+
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::resRecip(Tp v){
+	mResRecip = v;
+	mAlpha = mImag * mResRecip;
+
+	// Note: mB[0] is assumed to be equal to 1 in the difference equation. 
+	// For this reason, we divide all other coefficients by mB[0].
 	mB[0] = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of b0
 	mB[1] = Tp(-2) * mReal * mB[0];
 	mB[2] = (Tp(1) - mAlpha) * mB[0];
-	
+
 	type(mType);
 }
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::set(Tp frq, Tp res){ set(frq, res, mType); }
+inline void Biquad<Tv,Tp,Td>::res(Tp v){
+	resRecip(Tp(0.5)/(v*mLevel));
+}
 
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
@@ -668,9 +757,9 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[0] = mA[1] * Tp(0.5);
 		mA[2] = mA[0];
 		break;
-	case HIGH_PASS: // same as low-pass, but with sign flipped on odd a_k
-		mA[1] =-(Tp(1) + mReal) * mB[0];
-		mA[0] =-mA[1] * Tp(0.5);
+	case HIGH_PASS: // low-pass with odd k a_k and freq flipped
+		mA[1] = (Tp(-1) - mReal) * mB[0];
+		mA[0] = mA[1] * Tp(-0.5);
 		mA[2] = mA[0];
 		break;
 	case BAND_PASS:
@@ -684,14 +773,21 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
         mA[2] =-mA[0];
 		break;
 	case BAND_REJECT:
-        mA[0] = mB[0];	// 1.f * a0
+        mA[0] = mB[0];
         mA[1] = mB[1];
-        mA[2] = mB[0];	// 1.f * a0
+        mA[2] = mB[0];
 		break;
 	case ALL_PASS:
 		mA[0] = mB[2];
 		mA[1] = mB[1];
 		mA[2] = Tp(1);
+		break;
+	case PEAKING:{
+		Tp alpha_A_b0 = mAlpha * mLevel * mB[0];
+		mA[0] = mB[0] + alpha_A_b0;
+		mA[1] = mB[1];
+		mA[2] = mB[0] - alpha_A_b0;
+		}
 		break;
 	default:;
 	};
@@ -717,38 +813,75 @@ inline Tv Biquad<Tv,Tp,Td>::nextBP(Tv i0){
 
 //---- OnePole
 template <class Tv, class Tp, class Td>
-OnePole<Tv,Tp,Td>::OnePole()
-:	mFreq(10), mStored(Tv(0)), o1(Tv(0))
-{	Td::refreshDomain(); }
-
-template <class Tv, class Tp, class Td>
 OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
-:	mFreq(frq), mStored(stored), o1(stored)
-{	Td::refreshDomain(); }
+:	mType(LOW_PASS), mFreq(frq), mStored(stored), o1(stored)
+{
+	onDomainChange(1);
+}
 
 template <class Tv, class Tp, class Td>
 void OnePole<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 
 template <class Tv, class Tp, class Td>
-inline void OnePole<Tv,Tp,Td>::operator  = (const Tv& v){ mStored  = v; }
-    
-template <class Tv, class Tp, class Td>
-inline void OnePole<Tv,Tp,Td>::operator *= (const Tv& v){ mStored *= v; }
+inline void OnePole<Tv,Tp,Td>::type(FilterType v){
+	mType = v;
+	freq(mFreq);
+}
 
-// f = ln(mB1) / -M_2PI * SR  ( @ 44.1 f = ln(c01) * -7018.733)
-// @ 44.1 : 0.9     <=> 739.5
-// @ 44.1 : 0.99    <=>  70.54
-// @ 44.1 : 0.999   <=>   7.022
-// @ 44.1 : 0.9999  <=>   0.702
-// @ 44.1 : 0.99999 <=>   0.0702
+namespace{
+	template<class T>
+	inline T getReal(T freq){
+		freq = scl::clip(freq, T(0.5));
+		//return cos(2*M_PI * freq);
+		//return 1 - freq*freq*(24 - 32*freq); // cubic apx.
+		return scl::sinFast(T(1) - T(4)*freq);
+	}
+}
+
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::freq(Tp v){
-	mFreq = v;	
-	v = scl::max(v, Tp(0));	// ensure positive freq
-	
-	// freq is half the bandwidth of a pole at 0
-	smooth( poleRadius(Tp(2) * v, Td::ups()) );
-	//printf("%f, %f, %f\n", Td::spu(), mB1, v);
+	mFreq = v;
+
+	// |H(w)| = |a0| / sqrt(1 + b1^2 + 2 b1 cos w)
+
+	switch(mType){
+	default:{ // low-pass
+		// cutoff based on pole at DC (inaccurate with large bandwidth)
+		//mB1 = poleRadius(Tp(2) * v * Td::ups());
+		// b1 found by setting |H(w)| = 0.707
+		Tp re = getReal(v * Td::ups());
+		Tp p1 = re - Tp(2);
+		mB1 = -(p1 + ::sqrt(p1*p1 - Tp(1)));
+		mA0 = Tp(1) - mB1;
+		}
+		break;
+	case HIGH_PASS:{
+		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
+		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
+		// b1 found by setting |H(w)| = 0.707
+		Tp re = getReal(v * Td::ups());
+		Tp p1 = -re - Tp(2); // -re flips cutoff
+		mB1 = (p1 + ::sqrt(p1*p1 - Tp(1)));
+		mA0 = Tp(1) + mB1;
+		//printf("%g\n", mB1);
+		}
+		break;
+	case SMOOTHING:
+		lag(Tp(1)/mFreq);
+		break;
+	}
+
+	//printf("In OnePole::freq: mB1 = %g, mA0 = %g\n", mB1, mA0);
+}
+
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::lag(Tp length, Tp thresh){
+	mType = SMOOTHING;
+	mFreq = Tp(1)/length;
+	// Since b^(length f_s) = thresh,
+	// 	b = thresh ^ (1 / (length fs))
+	mB1 = ::pow(thresh, Tp(this->ups()/length));
+	mA0 = Tp(1) - mB1;
 }
 
 template <class Tv, class Tp, class Td>
@@ -758,7 +891,16 @@ template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(){ return (*this)(mStored); }
     
 template <class Tv, class Tp, class Td>
-inline const Tv& OnePole<Tv,Tp,Td>::operator()(const Tv& i0){ o1 = o1*mB1 + i0*mA0; return o1; }
+inline const Tv& OnePole<Tv,Tp,Td>::operator()(Tv in){
+	o1 = o1*mB1 + in*mA0;
+	return o1;
+}
+
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::operator  = (Tv v){ mStored  = v; }
+
+template <class Tv, class Tp, class Td>
+inline void OnePole<Tv,Tp,Td>::operator *= (Tv v){ mStored *= v; }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::last() const { return o1; }
@@ -770,6 +912,8 @@ template <class Tv, class Tp, class Td>
 inline Tv& OnePole<Tv,Tp,Td>::stored(){ return mStored; }
     
 template <class Tv, class Tp, class Td>
-inline bool OnePole<Tv,Tp,Td>::zeroing(Tv eps) const { return scl::abs(o1) < eps && mStored == Tv(0); }
+inline bool OnePole<Tv,Tp,Td>::zeroing(Tv eps) const {
+	return scl::abs(o1) < eps && mStored == Tv(0);
+}
 } // gam::
 #endif

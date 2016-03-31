@@ -16,24 +16,24 @@ using namespace gam::gen;
 
 int main(){
 
-	const uint32_t size = 32;
+	const unsigned size = 32;
 	float table[size];
-	//uint32_t indices[size];
+	//unsigned indices[size];
 
-	for(uint32_t i=0; i<size; ++i){
+	for(unsigned i=0; i<size; ++i){
 		float phs = float(i)/size;
 		table[i] = scl::abs(cos(2 * 2*M_PI*phs) * exp(-phs));
 	}
 	
 	// print out function
-	for(uint32_t i=0; i<size; i++){
+	for(unsigned i=0; i<size; i++){
 		printf("[%4d]\t% 7.4f ", i, table[i]);
 		printPlot(table[i]);
 		printf("\n");
 	}
 
 
-	uint32_t featureI;
+	unsigned featureI;
 	float featureF;
 	
 	printf("\n");
@@ -41,18 +41,18 @@ int main(){
 	featureF = arr::dot(table, table, size);
 	printf("Dot Product:       %f\n", featureF);
 
-	uint32_t min, max;
+	unsigned min, max;
 	arr::extrema(table, size, min, max);
 	printf("Extrema:           [%f, %f]\n", table[min], table[max]);
 
 	float slope, inter;
-	arr::fitLine(table, size, slope, inter);
+	arr::lineFit(table, size, slope, inter);
 	printf("Linear fit:        inter = %f, slope = %f\n", inter, slope);
 
 	featureI = arr::indexOfMax(table, size);
 	printf("Max:               [%2d] %f\n", featureI, table[featureI]);
 
-	uint32_t peaks[size>>1];
+	unsigned peaks[size>>1];
 	featureI = arr::maxima(peaks, table, size);
 	printf("Maxima (%d):\n", featureI);
 	for(unsigned long i=0; i<featureI; i++) printf("\t[%2d] %f\n", peaks[i], table[peaks[i]]);
@@ -89,7 +89,7 @@ int main(){
 /*
 	printf("\nCluster:\n");
 	arr::lineSlope1(indices, size);
-	uint32_t numIndices = size;
+	unsigned numIndices = size;
 	arr::cluster(table, indices, numIndices, 0.1f);
 	mem::print(table, indices, numIndices, "% f");
 

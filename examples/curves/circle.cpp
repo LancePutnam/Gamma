@@ -5,9 +5,11 @@
 	Description:	Draws a circle using complex multiplication.
 */
 
-#include "../examples.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/Print.h"
 
 int main(){
+	using namespace gam;
 
 	const int NP=256;				// Number of points in curve
 	const int N1=31, N2=N1*N1;		// Size of graph

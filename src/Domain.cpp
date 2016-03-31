@@ -5,17 +5,70 @@
 
 namespace gam{
 
-// Note:	We can't zero the head node's links because it might be constructed
-//			after nodes have been appended to it!
-//
-//			However, if no observers are added and notifyObservers() is called we get a crash!
+
+DomainObserver::DomainObserver()
+:	mSubject(0)
+{
+	//printf("DomainObserver::DomainObserver() - %p\n", this);
+	domain(Domain::master());
+}
+
+DomainObserver::DomainObserver(const DomainObserver& rhs)
+:	mSubject(0)
+{
+	//printf("DomainObserver::DomainObserver(const DomainObserver&) - %p\n", this);
+	Domain& s = rhs.mSubject ? *rhs.mSubject : Domain::master();
+	domain(s);
+}
+
+DomainObserver::~DomainObserver(){
+	if(mSubject && mSubject->mHeadObserver == this){
+		if(nodeR){
+			mSubject->mHeadObserver = nodeR;
+		}
+		else{
+			mSubject->mHeadObserver = NULL;
+		}
+	}
+}
+
+DomainObserver& DomainObserver::operator= (const DomainObserver& rhs){
+	if(this != &rhs){
+		if(rhs.mSubject){
+			domain(*rhs.mSubject);
+		}
+	}
+	return *this;
+}
+
+void DomainObserver::domain(Domain& newSubject){
+	if(&newSubject != mSubject){
+		if(mSubject){
+			// If head of list, then set head to right node
+			if(mSubject->mHeadObserver == this){
+				mSubject->mHeadObserver = this->nodeR;
+			}
+
+			nodeRemove();
+		}
+		newSubject.attach(*this);
+		double r = newSubject.spu() / (mSubject ? mSubject->spu() : 1.);
+		mSubject = &newSubject;
+		onDomainChange(r);
+	}
+}
+
+
+
 Domain::Domain()
-:	mSPU(1.), mUPS(1.), mHeadObserver(true, *this), mHasBeenSet(false)
+:	mSPU(1.), mUPS(1.), mHeadObserver(NULL), mHasBeenSet(false)
 {}
 
 Domain::Domain(double spuA)
-:	mHeadObserver(true, *this)
-{ spu(spuA); }
+:	mHeadObserver(NULL)
+{
+	spu(spuA);
+}
 
 Domain::~Domain(){
 //	DomainObserver * s = mHeadObserver.nodeR;
@@ -26,26 +79,33 @@ Domain::~Domain(){
 //	}
 }
 
-Domain& Domain::operator<< (DomainObserver& obs){ obs.domain(*this); return(*this); }
+Domain& Domain::operator<< (DomainObserver& obs){
+	obs.domain(*this);
+	return *this;
+}
 
 void Domain::attach(DomainObserver& obs){
-	//printf("%p: ", &synced); mHeadSynced.print();
-	if(&obs != &mHeadObserver){
-		obs.nodeInsertR(mHeadObserver);
+	if(mHeadObserver){
+		// insert new observer onto front of list
+		obs.nodeInsertL(*mHeadObserver);
 	}
-	//printf("%p: ", &synced); mHeadSynced.print();
+	
+	// The head observer is always the most recently attached
+	mHeadObserver = &obs;
+
+	//printf("%p: ", &obs); mHeadObserver->print();
 }
 
 void Domain::notifyObservers(double r){
-	DomainObserver * s = mHeadObserver.nodeR;
+	DomainObserver * s = mHeadObserver;
 
 	while(s){	//printf("Domain %p: Notifying %p\n", this, s);
-		s->scaleSPU(r);	// this will call onDomainChange()
+		s->onDomainChange(r);
 		s = s->nodeR;
 	}
 }
 
-void Domain::spu(double v){
+void Domain::spu(double v){ //printf("[%p] Domain::spu(%g)\n", this, v);
 	mHasBeenSet = true;
 	if(v != mSPU){
 		double r = v/mSPU;
@@ -57,34 +117,40 @@ void Domain::spu(double v){
 
 void Domain::ups(double val){ spu(1./val); }
 
+void Domain::print(FILE * fp) const {
+	fprintf(fp, "Domain %p:\n\tspu = %f, ups = %f\n", this, spu(), ups());
 
+	DomainObserver * o = mHeadObserver;
+	unsigned numObs = 0;
+	while(o){
+		++numObs;
+		o = o->nodeR;
+	}
+	
+	fprintf(fp, "\t %u observers%s", numObs, numObs ? ": " : "\n");
 
-
-DomainObserver& DomainObserver::operator= (const DomainObserver& rhs){
-	if(this != &rhs){
-		if(rhs.mSubject){
-			domain(*rhs.mSubject);
+	if(numObs){
+		o = mHeadObserver;
+		while(o){
+			fprintf(fp, "%p ", o);
+			o = o->nodeR;
 		}
-	}
-	return *this;
-}
-
-void DomainObserver::scaleSPU(double v){
-	mSPU *= v;
-	mUPS = 1. / mSPU;
-	onDomainChange(v);
-}
-
-void DomainObserver::scaleUPS(double v){ scaleSPU(1./v); }
-
-void DomainObserver::domain(Domain& newSubject){
-	if(&newSubject != mSubject){
-		if(mSubject) nodeRemove();
-		newSubject.attach(*this);
-		double r = newSubject.spu() / (mSubject ? mSubject->spu() : 1.);
-		mSubject = &newSubject;
-		scaleSPU(r);	// calls onDomainChange()
+		fprintf(fp, "\n");
 	}
 }
+
+/*static*/ Domain& Domain::master(){
+	static Domain * s = new Domain;
+	return *s;
+}
+
+/*static*/ void sampleRate(double samplesPerSecond){
+	Domain::master().spu(samplesPerSecond);
+}
+
+/*static*/ double sampleRate(){
+	return Domain::master().spu();
+}
+
 
 } // gam::

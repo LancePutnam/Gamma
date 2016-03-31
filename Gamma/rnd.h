@@ -21,19 +21,17 @@
 namespace gam{
 
 
-namespace rnd{
-	namespace{
-		static bool initSeed = false;
-		static uint32_t mSeedPush[4];
-		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
-	}
-	
+namespace rnd{	
 	/// Get a random seed
 	static uint32_t getSeed(){
-		if(!initSeed){ seedGen.val = time(NULL); initSeed = true; } 
+		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
+		static bool initSeed = true;
+		if(initSeed){
+			seedGen.val = time(NULL);
+			initSeed = false;
+		} 
 		return seedGen();
 	}
-
 } // rnd::
 
 
@@ -44,8 +42,8 @@ namespace rnd{
 /// random; the most extreme case being the LSB which at best flips between 0 and 1.
 /// This generator also exhibits poor dimensional distribution, therefore it is
 /// best to have a different generator for each dimension, rather than sharing one.
-struct RNGLinCon : public gen::RMulAdd<uint32_t>{
-
+class RNGLinCon : public gen::RMulAdd<uint32_t>{
+public:
 	RNGLinCon(){ val=rnd::getSeed(); type(0); }
 
 	/// \param[in] seed	Initial seed value
@@ -54,11 +52,11 @@ struct RNGLinCon : public gen::RMulAdd<uint32_t>{
 	/// Change the type of equation used.
 	
 	/// 0 - Knuth, Numerical Recipes in C\n
-	/// 1 - BCPL
+	/// 1 - BCPL\n
 	void type(int v){
 		switch(v){
-		case 1:	mul = 2147001325; add =  715136305; break; // BCPL
-		default:mul =    1664525; add = 1013904223;        // Knuth, Numerical Recipes in C
+		case 1:	mul = 2147001325UL; add =  715136305UL; break; // BCPL
+		default:mul =    1664525UL; add = 1013904223UL;        // Knuth
 		}
 	}
 };
@@ -69,8 +67,8 @@ struct RNGLinCon : public gen::RMulAdd<uint32_t>{
 
 ///	This generator is a faster LCG requiring only a single integer multiply.
 ///
-struct RNGMulLinCon : public gen::RMul<uint32_t>{
-
+class RNGMulLinCon : public gen::RMul<uint32_t>{
+public:
 	RNGMulLinCon(){ val=rnd::getSeed(); type(0); }
 	
 	/// \param[in] seed	Initial seed value
@@ -78,11 +76,16 @@ struct RNGMulLinCon : public gen::RMul<uint32_t>{
 	
 	/// Change the type of equation used.
 
-	/// 0 - Marsaglia, Super-Duper\n
-	///
+	/// 0 - L'Ecuyer M8  (optimal generator for <=  8 dimensions)\n
+	/// 1 - L'Ecuyer M16 (optimal generator for <= 16 dimensions)\n
+	/// 2 - L'Ecuyer M32 (optimal generator for <= 32 dimensions)\n
+	/// 3 - Marsaglia, Super-Duper\n
 	void type(int v){
 		switch(v){
-		default: mul = 69069;	// Super-duper
+		default:mul = 2891336453UL; break; // L'Ecuyer M8
+		case 1: mul =   29943829UL; break; // L'Ecuyer M16
+		case 2: mul =   32310901UL; break; // L'Ecuyer M32
+		case 3: mul =      69069UL; break; // Super-duper
 		}
 	}
 };
@@ -378,6 +381,10 @@ template <class T> inline T uniExc(const T& exc, const T& max, const T& min){
 #undef DEF
 
 #undef LOOP
+
+namespace{
+	static uint32_t mSeedPush[4];
+}
 
 inline void push(uint32_t seedA){
 	mSeedPush[0] = gen.s1;

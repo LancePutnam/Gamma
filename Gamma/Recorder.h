@@ -4,7 +4,6 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdlib.h>
 #include <vector>
 
 namespace gam{
@@ -13,9 +12,11 @@ namespace gam{
 class Recorder {
 public:
 
-	/// \param[in] chans	number of channels
+	Recorder();
+
+	/// \param[in] channels	number of channels
 	/// \param[in] frames	number of (multi-)channel frames
-	Recorder(int channels=1, int frames=8192);
+	Recorder(int channels, int frames=8192);
 
 
 	/// Get number of recording channels
@@ -32,10 +33,13 @@ public:
 		mRing[mIW+chan] = v;
 	}
 
+	// Advance write tap by one frame
+	void advance(){ if((mIW+=channels()) >= (int)mRing.size()) mIW=0; }
+
 	/// Write sample into ring buffer and advance write tap
 	void write(float v, int chan=0){
 		overwrite(v,chan);
-		if((mIW+=channels()) >= (int)mRing.size()) mIW=0;		
+		advance();
 	}
 
 	/// Write samples into ring buffer and advance write tap
@@ -43,10 +47,16 @@ public:
 	void write(float v1, float v2, int chan=0){
 		overwrite(v1,chan);
 		overwrite(v2,chan+1);
-		if((mIW+=channels()) >= (int)mRing.size()) mIW=0;		
+		advance();	
 	}
-	
-	/// Empty buffer of most recent samples written from audio thread.
+
+	/// Write a block of frames to ring buffer (from audio thread)
+
+	/// \param[in] src			a block of channel-interleaved frames
+	/// \param[in] numFrames	number of frames to write
+	int write(const float * src, int numFrames);
+
+	/// Empty buffer of most recently written samples
 
 	/// Returns number of frames copied to buffer. If the number of 
 	/// frames returned is 0, then no samples were read and 'buf'

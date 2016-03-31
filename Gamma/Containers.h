@@ -21,17 +21,36 @@
 
 namespace gam{
 
+/// A single element array
 
-///Size functor for ArrayPow2
+/// This array can be referenced by default to avoid a potential null pointer
+/// dereference.
+template<class T>
+T * defaultArray(){
+	static T v(0);
+	return &v;
+}
+
+
+/// Size functor for ArrayPow2
     
 ///\ingroup Containers
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
-	uint32_t operator()() const { return (1<<mBitsI) & 0xfffffffe/*avoids 1*/; }
-	void operator()(uint32_t v){ mBitsI = scl::log2(convert(v)); mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/ }
-	static uint32_t convert(uint32_t v){ v=scl::ceilPow2(v); return v!=1 ? v : 2; }	// should return 0,2,4,8,16,...
-	uint32_t mBitsI;	// integer portion # bits
-	uint32_t mBitsF;	// fraction portion # bits
+
+	uint32_t operator()() const {
+		return (1<<mBitsI) & 0xfffffffe /*avoids 1*/;
+	}
+	void operator()(uint32_t v){
+		mBitsI = scl::log2(convert(v));
+		mBitsF = 32U - mBitsI; /*printf("%d %d\n", mBitsI, mBitsF);*/
+	}
+	static uint32_t convert(uint32_t v){
+		v=scl::ceilPow2(v);
+		return v!=1 ? v : 2; // should return 0,2,4,8,16,...
+	}
+	uint32_t mBitsI; // integer portion # bits
+	uint32_t mBitsF; // fraction portion # bits
 };
 
 
@@ -52,15 +71,14 @@ struct SizeArray{
 /// When the array is resized, if the elements are class-types, then their
 /// default constructors are called and if the elements are non-class-types,
 /// then they are left uninitialized.
-    
+///
+/// \tparam T	array element type
+/// \tparam S	size functor (\see SizeArrayPow2, SizeArray)
+/// \tparam A	memory allocator
 /// \ingroup Containers
-    
 template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
-
-	/// Default constructor that does not allocate memory
-	ArrayBase();
 
 	/// Constructor that allocates memory, but does not initialize elements
 
@@ -76,8 +94,12 @@ public:
 	/// \param[in] size		size of external array
 	ArrayBase(T * src, uint32_t size);
 
-	/// \param[in] src		external array to reference
-	explicit ArrayBase(ArrayBase<T,S,A>& src);
+	/// Default constructor that does not allocate memory
+	ArrayBase();
+
+	/// \param[in] src		array to copy
+	explicit ArrayBase(const ArrayBase<T,S,A>& src);
+
 
 	virtual ~ArrayBase();
 
@@ -103,6 +125,9 @@ public:
 	/// \param[in] start	start index (inclusive)
 	ArrayBase& assign(const T& v, uint32_t end, uint32_t stride=1, uint32_t start=0);
 
+	/// Sets all elements to zero
+	ArrayBase& zero();
+
 
 	T * elems();					///< Get writable pointer to elements	
 	const T * elems() const;		///< Get read-only pointer to elements
@@ -121,6 +146,9 @@ public:
 	bool isSoleOwner() const;
 	
 	bool usingExternalSource() const;
+
+	/// Returns whether internal memory pointer is valid
+	bool valid() const;
 	
 	/// Resizes number of elements in array
 	
@@ -167,11 +195,11 @@ class Array : public ArrayBase<T, SizeArray, A>{
 public:
 	typedef ArrayBase<T, SizeArray, A> Base;
 
-	Array(): Base(){}
 	explicit Array(uint32_t size): Base(size){}
 	Array(uint32_t size, const T& init): Base(size, init){}
 	Array(T * src, uint32_t size): Base(src, size){}
-	Array(Array& src): Base(src){}
+	Array(): Base(){}
+	explicit Array(const Array& src): Base(src){}
 
 	virtual ~Array(){}
 
@@ -188,10 +216,10 @@ class ArrayPow2 : public ArrayBase<T, SizeArrayPow2, A>{
 public:
 	typedef ArrayBase<T, SizeArrayPow2, A> Base;
 
-	ArrayPow2(): Base(){}
 	explicit ArrayPow2(uint32_t size): Base(size){}
 	ArrayPow2(uint32_t size, const T& initial): Base(size, initial){}
 	ArrayPow2(T * src, uint32_t size): Base(src, size){}
+	ArrayPow2(): Base(){}
 	explicit ArrayPow2(const ArrayPow2& src): Base(src){}
 
 	virtual ~ArrayPow2(){}
@@ -213,7 +241,12 @@ private: ArrayPow2& operator=(const ArrayPow2& v);
 
 
 /// Ring buffer
-    
+
+/// This is a circular buffer that permits sequential writing and reading of
+/// elements in an array up to some number of past elements.
+///
+/// \tparam T	array element type
+/// \tparam A	memory allocator
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class Ring : public Array<T,A> {
@@ -237,11 +270,13 @@ public:
 	T& read(uint32_t ago){ return (*this)[indexPrev(ago)]; }
 	const T& read(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
 
-	/// Copies len elements starting from element pos() - delay into dst.
-	void copy(T * dst, uint32_t len, uint32_t delay) const;
-	
-	/// Copy elements starting from last in into dst unwrapping from ring
-	void copyUnwrap(T * dst, uint32_t len) const;
+	/// Copies elements out of ring to another array
+
+	/// \param[out] dst		array to copy elements to
+	/// \param[ in] len		number of elements to copy
+	/// \param[ in] delay	how many elements ago to begin copy;
+	///						if delay<0, then delay -> size() + delay
+	void read(T * dst, uint32_t len, int32_t delay=-1) const;
 	
 	uint32_t pos() const;			///< Return absolute index of frontmost (newest) element
 	bool reachedEnd() const;		///< Returns whether the last element written was at the end of the array
@@ -265,6 +300,10 @@ protected:
 
 /// This is a two-part buffer consisting of a ring buffer for writing and
 /// a standard (absolute indexed) array for reading.
+///
+/// \tparam T	array element type
+/// \tparam A	memory allocator
+/// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class DoubleRing : public Ring<T,A>{
 public:
@@ -281,7 +320,10 @@ public:
 	
 	/// \returns a pointer to the read buffer
 	///
-	T * copyUnwrap(){ Ring<T,A>::copyUnwrap(mRead.elems(), mRead.size()); return mRead.elems(); }
+	T * read(){
+		Ring<T,A>::read(mRead.elems(), mRead.size());
+		return mRead.elems();
+	}
 	
 	/// Copy elements into read buffer "as is" from ring
 	
@@ -302,12 +344,17 @@ protected:
 
 
 
-/// N-sample delay
-    
+/// N-element delay
+
+/// Specialized Ring that provides a simple N-element delay.
+///
+/// \tparam T	array element type
+/// \tparam A	memory allocator
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 struct DelayN: public Ring<T,A>{
-	using Ring<T,A>::incPos; using Ring<T,A>::pos;
+
+	DelayN(){}
 
 	/// \param[in]	size		Delay size, greater than 0
 	/// \param[in]	value		Initial value of all elements
@@ -317,28 +364,30 @@ struct DelayN: public Ring<T,A>{
 
 	/// Write new element and return oldest
 	T operator()(const T& input){
-		incPos();				// inc write pos
-		T dly = (*this)[pos()];	// read oldest element
-		(*this)[pos()] = input;	// write new element
+		this->incPos();					// inc write pos
+		T dly = (*this)[this->pos()];	// read oldest element
+		(*this)[this->pos()] = input;	// write new element
 		return dly;				//	... write pos left at last written element
 	}
 };
 
 
 
-
-
-
 // Implementation_______________________________________________________________
 
-
-// ArrayBase
+//---- ArrayBase
 
 #define ARRAYBASE_INIT mElems(0), mSize(0)
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase()
-:	ARRAYBASE_INIT{}
+:	ARRAYBASE_INIT
+{}
+
+template <class T, class S, class A>
+ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
+:	ARRAYBASE_INIT
+{	resize(src.size()); assign(src); }
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(uint32_t sz)
@@ -354,11 +403,6 @@ template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t sz)
 :	ARRAYBASE_INIT
 {	source(src, sz); }
-
-template <class T, class S, class A>
-ArrayBase<T,S,A>::ArrayBase(ArrayBase<T,S,A>& src)
-:	ARRAYBASE_INIT
-{	source(src); }
 
 #undef ARRAYBASE_INIT
 
@@ -385,6 +429,11 @@ ArrayBase<T,S,A>& ArrayBase<T,S,A>::assign(
 ){
 	for(uint32_t i=start; i<end; i+=stride) A::construct(mElems+i, v);
 	return *this;
+}
+
+template <class T, class S, class A>
+ArrayBase<T,S,A>& ArrayBase<T,S,A>::zero(){
+	return assign(T(0));
 }
 
 template <class T, class S, class A>
@@ -435,6 +484,11 @@ bool ArrayBase<T,S,A>::isSoleOwner() const {
 template <class T, class S, class A>
 bool ArrayBase<T,S,A>::usingExternalSource() const {
 	return elems() && !managing((T*)elems());
+}
+
+template <class T, class S, class A>
+bool ArrayBase<T,S,A>::valid() const {
+	return elems() && (elems() != defaultArray<T>());
 }
 
 template <class T, class S, class A>
@@ -496,7 +550,8 @@ void ArrayBase<T,S,A>::source(T * src, uint32_t size){
 	onResize();
 }
 
-// ArrayPow2
+
+//---- ArrayPow2
 
 template<class T, class A>
 inline uint32_t ArrayPow2<T,A>::oneIndex() const { return 1<<fracBits(); }
@@ -522,7 +577,6 @@ inline float ArrayPow2<T,A>::fraction(uint32_t phase) const{
 }
 
 
-
 //---- Ring
 
 template<class T, class A>
@@ -535,21 +589,21 @@ inline void Ring<T,A>::operator()(const T& v){
 }
 
 template<class T, class A>
-void Ring<T,A>::copy(T * dst, uint32_t len, uint32_t delay) const{
+void Ring<T,A>::read(T * dst, uint32_t len, int32_t delay) const{
+
+	if(delay < 0) delay += int32_t(size());
+
 	// pos() points to most recently written slot
-	//uint32_t tap = (pos() - delay) % size();
-	uint32_t tap = (uint32_t)scl::wrap((int32_t)pos() - (int32_t)delay, (int32_t)size());
+	//uint32_t begin = (pos() - delay) % size();
+	uint32_t begin = (uint32_t)scl::wrap(int32_t(pos()) - delay, int32_t(size()));
 
 	// this ensures that we don't copy across the ring tap boundary
 	// we add one to maxLen because of a fence post anomaly
-	uint32_t maxLen = (tap < pos() ? (pos() - tap) : (pos() + (size() - tap))) + 1;
+	uint32_t maxLen = (begin < pos() ? (pos() - begin) : (pos() + (size() - begin))) + 1;
 	len = scl::min(len, maxLen);
 	
-	mem::copyFromRing(elems(), size(), tap, dst, len);
+	mem::copyFromRing(elems(), size(), begin, dst, len);
 }
-
-template<class T, class A>
-void Ring<T,A>::copyUnwrap(T * dst, uint32_t len) const { copy(dst, len, size() - 1); }
 
 template<class T, class A>
 inline uint32_t Ring<T,A>::indexBack() const {

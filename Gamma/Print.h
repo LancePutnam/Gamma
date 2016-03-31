@@ -8,10 +8,8 @@
 	Printing functions
 */
 
-#include <string>
 #include <stdio.h>
 #include "Gamma/Constants.h"
-#include "Gamma/Types.h"
 #include "Gamma/scl.h"
 
 namespace gam{
@@ -20,7 +18,8 @@ namespace gam{
 char intensityToASCII(float v);
 
 /// Prints 2D pixel array
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
+template<class T>
+void print2D(T* pix, unsigned nx, unsigned ny, FILE * fp=stdout);
 
 // Binary printing methods
 void printBinary(uint32_t value, const char * zero="0", const char * one="1", int msb=32);
@@ -29,7 +28,7 @@ void printBinary(float value, const char * zero="0", const char * one="1", int m
 void printBinary(const void * value32, const char * zero="0", const char * one="1", int msb=32);
 
 /// Prints array as hexidecimal values.
-void printHexArray(const float * table, uint32_t len, uint32_t valuesPerLine);
+void printHexArray(const float * table, unsigned len, unsigned valuesPerLine);
 
 /// Print signed unit value on a horizontal plot.
 
@@ -38,7 +37,7 @@ void printHexArray(const float * table, uint32_t len, uint32_t valuesPerLine);
 /// \param[in]	spaces	Print extra filling spaces to the right
 /// \param[in]	sign	Whether plot is signed
 /// \param[in]	point	The print character for points
-void printPlot(float value, uint32_t width=50, bool spaces=true, bool sign=true, const char * point="o");
+void printPlot(float value, unsigned width=50, bool spaces=true, bool sign=true, const char * point="o");
 
 /// Prints error messge to stderr and optionally calls exit()
 void err(const char * msg, const char * src="", bool exits=true);
@@ -60,12 +59,15 @@ inline char intensityToASCII(float v){
 	return map[int(N*scl::clip(v,0.9999999f))];
 }
 
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
-	for(int j=0; j<nx; ++j){
-	for(int i=0; i<ny; ++i){
-		float v = pix[j*nx + i];
-		fprintf(fp, "%c ", intensityToASCII(v));
-	} printf("\n"); }
+template<class T>
+void print2D(T* pix, unsigned nx, unsigned ny, FILE * fp){
+	for(unsigned j=0; j<nx; ++j){
+		for(unsigned i=0; i<ny; ++i){
+			float v = pix[j*nx + i];
+			fprintf(fp, "%c ", intensityToASCII(v));
+		}
+		fprintf(fp, "\n");
+	}
 }
 
 } // gam::

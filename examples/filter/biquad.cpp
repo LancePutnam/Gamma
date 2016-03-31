@@ -1,42 +1,64 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Filter / Biquad
-	Description:	Filtering with a multimode biquad filter
+Example:	Biquad Filter
+Author:		Lance Putnam, 2012
+
+Description:
+This shows how to use a Biquad to perform filtering with various frequency
+responses.
 */
 
-#include "../examples.h"
+#include "../AudioApp.h"
+#include "Gamma/Filter.h"
+#include "Gamma/Noise.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-LFO<> mod(0.2, 0.5);
-NoiseWhite<> src;
-Biquad<> filt(10, 4);
+class MyApp : public AudioApp{
+public:
+	NoiseWhite<> src;	// Source to filter
+	Biquad<> bq;		// Biquad filter
+	LFO<> mod;			// Modulator on cutoff frequency
+	Accum<> tmr;		// Timer to switch between filter types
+	int cnt;			// Counter for filter type
 
-Accum<> tmr(0.2);			// Timer to switch between filter types
-int cnt=0;					// Counter for filter type
-
-void audioCB(AudioIOData& io){
-
-	while(io()){
-		
-		if(tmr()){
-			switch(cnt){
-				case 0: filt.type(LOW_PASS); printf("Low-pass\n"); break;
-				case 1: filt.type(HIGH_PASS); printf("High-pass\n"); break;
-				case 2: filt.type(BAND_PASS); printf("Band-pass\n"); break;
-				case 3: filt.type(BAND_REJECT); printf("Band-reject\n"); break;
-			}
-			++cnt %= 4;
-		}
-		
-		float cutoff = scl::pow3(mod.triU()) * 10000;
-
-		filt.res(4);
-		filt.freq(cutoff);
-		
-		float s = filt(src());
-	
-		io.out(0) = io.out(1) = s * 0.1f;
+	MyApp(){
+		bq.res(4);		// Set resonance of filter
+		bq.level(2);	// Set peak level (PEAKING type only)
+		mod.period(5);
+		tmr.period(5);
+		tmr.phaseMax();
+		cnt=0;
 	}
-}
 
-RUN_AUDIO_MAIN
+	void onAudio(AudioIOData& io){
+
+		while(io()){
+			if(tmr()){
+				switch(cnt){
+					case 0: bq.type(LOW_PASS); printf("Low-pass\n"); break;
+					case 1: bq.type(HIGH_PASS); printf("High-pass\n"); break;
+					case 2: bq.type(BAND_PASS); printf("Band-pass\n"); break;
+					case 3: bq.type(BAND_REJECT); printf("Band-reject\n"); break;
+					case 4: bq.type(PEAKING); printf("Peaking\n"); break;
+				}
+				++cnt %= 5;
+			}
+			
+			float cutoff = scl::pow3(mod.triU()) * 10000;
+
+			// Set cutoff frequency of filter
+			bq.freq(cutoff);
+
+			// Filter source
+			float s = bq(src());
+		
+			io.out(0) = io.out(1) = s * 0.1;
+		}
+	}
+};
+
+int main(){
+	MyApp().start();
+}

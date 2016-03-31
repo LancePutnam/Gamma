@@ -590,7 +590,7 @@ void AudioIO::processAudio(){
 	std::vector<AudioCallback *>::iterator iter = mAudioCallbacks.begin(); 
 	while(iter != mAudioCallbacks.end()){
 		frame(0); 
-		(*iter++)->onAudioCB(*this); 
+		(*iter++)->onAudio(*this);
 	}
 }
 

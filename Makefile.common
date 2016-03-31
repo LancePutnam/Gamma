@@ -2,7 +2,7 @@
 # Standard Make variable definitions
 #
 # These are the common variable definitions used across different projects.
-# This will usually be included at the top of a separate project specific 
+# This will usually be included at the top of a separate project specific
 # Makefile using 'include Makefile.common'.
 ###########################################################################
 #==========================================================================
@@ -20,19 +20,8 @@ else ifeq ($(UNAME), Darwin)
 	PLATFORM = macosx
 
 	# Mac OS X version
-	UNAMER := $(shell uname -r)
-	UNAMER := $(firstword $(subst ., , $(UNAMER)))
-	ifeq ($(UNAMER), 12)
-		OSX_VERSION = 10_8
-	else ifeq ($(UNAMER), 11)
-		OSX_VERSION = 10_7
-	else ifeq ($(UNAMER), 10)
-		OSX_VERSION = 10_6
-	else ifeq ($(UNAMER), 9)
-		OSX_VERSION = 10_5
-	else ifeq ($(UNAMER), 8)
-		OSX_VERSION = 10_4
-	endif
+	OSX_VERSION := $(shell sw_vers -productVersion)
+	OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 else
 	PLATFORM = windows
 endif
@@ -173,8 +162,9 @@ ifeq ($(PLATFORM), linux)
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
 	CPPFLAGS += -I/usr/local/include/ -I/usr/include/
-	LDFLAGS	 += -lm -lstdc++
-	
+	LDFLAGS	 += -lm
+	LDFLAGS	 += -lstdc++
+
 	DLIB_FLAGS += -shared
 	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
 
@@ -199,17 +189,8 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Set system root directory for stdc++ etc.
-	ifeq ($(OSX_VERSION), 10_8)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
-	else ifeq ($(OSX_VERSION), 10_7)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
-	else ifeq ($(OSX_VERSION), 10_6)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.6.sdk -mmacosx-version-min=10.6
-	else ifeq ($(OSX_VERSION), 10_5)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.5.sdk -mmacosx-version-min=10.5
-	else ifeq ($(OSX_VERSION), 10_4)
-		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
-	endif
+	OSX_SDK := $(lastword $(shell ls $(OSX_SDK_PATH)))
+	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK) -mmacosx-version-min=10.$(OSX_VERSION)
 
 	# Needed to link to libraries installed through MacPorts
 	ifdef HAS_OPT_LOCAL
@@ -225,14 +206,14 @@ else ifeq ($(PLATFORM), macosx)
 		CPPFLAGS += -I/usr/local/include/
 	endif
 
-
-	LDFLAGS	+= -lm -lstdc++
+	LDFLAGS	+= -lm
+	LDFLAGS	+= -lstdc++
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
 
 	DLIB_FLAGS += -dynamiclib
 	DLIB_FLAGS += -current_version $(DLIB_MAJ).$(DLIB_MIN) -compatibility_version $(DLIB_MAJ).$(DLIB_MIN)
-	
+
 # Windows:
 else ifeq ($(PLATFORM), windows)
 
@@ -261,7 +242,8 @@ endif
 
 # Append optimization flags
 ifeq ($(BUILD_CONFIG), Release)
-	CFLAGS += -O3 -fpeel-loops
+	CFLAGS += -O3
+	#CFLAGS += -fpeel-loops # not supported by clang
 else
 	CFLAGS += -g -O0 -fno-inline
 endif
@@ -299,7 +281,7 @@ endif
 #--------------------------------------------------------------------------
 RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
 
-define RemoveBuildDir 
+define RemoveBuildDir
        $(call RemoveDir, $(BUILD_DIR)include/)
        $(call RemoveDir, $(BUILD_DIR)lib/)
        $(call RemoveDir, $(BIN_DIR))

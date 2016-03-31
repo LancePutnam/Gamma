@@ -6,8 +6,7 @@
 					delay-line.
 */
 
-#include "../examples.h"
-#include "Gamma/Scheduler.h"
+#include "examples.h"
 
 class PluckedString : public Process<AudioIOData> {
 public:
@@ -99,8 +98,8 @@ int main(){
 	PluckedString &thirdPluck = s.add<PluckedString>( 6.5).set(6.5, 329,  0.7, .0001, 1);
 	s.add(Func(thirdPluck, &PluckedString::freq, 440)).dt(8);
 	
-	AudioIO io(256, 44100., s.audioCB, &s);
-	Sync::master().spu(io.fps());
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
+	gam::sampleRate(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

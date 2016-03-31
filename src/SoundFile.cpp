@@ -55,13 +55,15 @@ the caller has to set the samplerate, channels and format fields to valid
 values. All other fields of the structure are filled in by the library.
 */
 
+	bool opened() const { return 0 != fp; }
+
 	bool openRead(const std::string& path){
 		if(formatMinor() != SF_FORMAT_RAW) mInfo.format = 0;
 		fp = sf_open(path.c_str(), SFM_READ, &mInfo);
 
 		//printf("%s\n", path.c_str());
 		//printInfo();
-		return 0 != fp;
+		return opened();
 	}
 
 	bool openWrite(const std::string& path){
@@ -77,7 +79,7 @@ values. All other fields of the structure are filled in by the library.
 		fp = sf_open(path.c_str(), SFM_WRITE, &mInfo);
 
 		if(fp) sf_command(fp, SFC_SET_CLIPPING, NULL, SF_TRUE);
-		return 0 != fp;
+		return opened();
 	}
 
 
@@ -154,6 +156,8 @@ SoundFile::~SoundFile(){
 	close();
 	delete mImpl;
 }
+
+bool SoundFile::opened() const { return mImpl->opened(); }
 
 bool SoundFile::close(){ return mImpl->close(); }
 

@@ -72,5 +72,38 @@
 	for(int i=0; i<N; ++i){
 		assert(F::aeq(ar2[i+1], in[i].r));
 	}
-
 }
+
+
+{
+	for(int j=0; j<3; ++j){
+		const int N = 32;
+		SpectralType specType[] = {COMPLEX, MAG_PHASE, MAG_FREQ};
+
+		STFT stft(N, N/4, 0, HANN, specType[j]);
+
+		// configure to produce most precise output
+		stft.inverseWindowing(false);
+		stft.precise(true);
+
+		float t=0; // output
+
+		for(int i=0; i<N*4; ++i){
+			float p = float(i)/N * 2*M_PI;
+			float s = cos(p);
+			if(stft(s)){
+				//printf("\n");
+			}
+
+			// output should match input after N-1 samples
+			if(i>=N){
+				//printf("[%3d] %f %f\n", i, s,t);
+				assert(near(s,t, 2e-6));
+			}
+
+			t = stft();
+			//printf("[%3d] ", i); printPlot(t); printf("\n");
+		}
+	}
+}
+

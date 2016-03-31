@@ -5,8 +5,8 @@ namespace gam{
 
 
 template <class T>
-struct CFFT<T>::Impl{
-
+class CFFT<T>::Impl{
+public:
 	Impl(int sz): n(0), wsave(0){
 		resize(sz);
 	}
@@ -66,8 +66,8 @@ int CFFT<T>::size() const{ return mImpl->n; }
 
 
 template <class T>
-struct RFFT<T>::Impl{
-
+class RFFT<T>::Impl{
+public:
 	Impl(int sz): n(0), wsave(0){
 		resize(sz);
 	}

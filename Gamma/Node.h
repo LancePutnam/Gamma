@@ -23,14 +23,18 @@ public:
 	void nodeInsertL(T& node);	///< Insert myself to left of node
 	void nodeInsertR(T& node);	///< Insert myself to right of node
 	void nodeRemove();			///< Remove myself from linked list
-	
+
+	/// Returns leftmost link
 	const Node2<T>& leftmost() const {
 		Node2<T> * t = nodeL;
 		Node2<T> * n = nodeL;
 		while(t){ n = t; t = t->nodeL; }
 		return n ? *n : *this;
 	}
-	
+
+	/// Returns whether node is linked to other nodes
+	bool linked() const;
+
 	void print(const char * append = "\n", FILE * fp = stdout) const;
 	void printAll(const char * append = "\n", FILE * fp = stdout) const;
 };
@@ -205,7 +209,10 @@ void Node2<T>::nodeRemove(){
 	nodeR = 0;
 }
 
-
+template <class T>
+bool Node2<T>::linked() const {
+	return nodeL || nodeR;
+}
 
 template <class T>
 void Node2<T>::print(const char * append, FILE * fp) const {

@@ -59,7 +59,7 @@ struct Trunc{
 
 
 /// Nearest neighbor random-access interpolation strategy
-    
+
 /// \ingroup Strategies, ipl
 template <class T>
 struct Round{
@@ -98,8 +98,45 @@ struct Round{
 };
 
 
+/// Sum of two nearest neighbors random-access interpolation strategy
+
+/// This is equivalent to truncating interpolation with a 1-zero low-pass
+/// filter.
+/// \ingroup Strategies, ipl
+template <class T>
+struct Mean2{
+
+	ipl::Type type() const { return MEAN2; }
+	void type(ipl::Type v){}
+
+	/// Return interpolated element from power-of-2 array
+	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+		return (a.atPhase(phase) + a.atPhase(phase + a.oneIndex()))*0.5;
+	}
+
+	/// Return interpolated element from array
+
+	/// \tparam AccessStrategy	access strategy type (\sa access)
+	///
+	/// \param[in] acc			access strategy
+	/// \param[in] src			source array
+	/// \param[in] iInt			integer part of index
+	/// \param[in] iFrac		fractional part of index, in [0, 1)
+	/// \param[in] max			maximum index for accessing
+	/// \param[in] min			minimum index for accessing
+	template <class AccessStrategy>
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (src[iInt] + src[acc.mapP1(iInt+1, max, min)])*0.5;
+	}
+
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	}
+};
+
+
 /// Linear random-access interpolation strategy
-    
+
 /// \ingroup Strategies, ipl
 template <class T>
 struct Linear{
@@ -137,12 +174,13 @@ struct Linear{
 
 	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
 		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+		// TODO: wrapping access maybe not correct for one-shot playback
 	}
 };
 
 
 /// Cubic random-access interpolation strategy
-    
+
 /// \ingroup Strategies, ipl
 template <class T>
 struct Cubic{
@@ -207,7 +245,7 @@ struct Cubic{
 
 
 /// Allpass random-access interpolation strategy
-    
+
 /// \ingroup Strategies, ipl
 template <class T>
 struct AllPass{
@@ -256,7 +294,7 @@ struct AllPass{
 
 
 /// Dynamically switchable random-access interpolation strategy
-    
+
 /// \ingroup Strategies, ipl
 template <class T>
 struct Switchable{
@@ -323,17 +361,17 @@ protected:
 namespace iplSeq{
 
 	/// Base class for sequence interpolation strategies
-    
-    /// \ingroup Strategies, iplSeq
-	template <uint32_t N, class T>
+
+	/// \ingroup Strategies, iplSeq
+	template <unsigned N, class T>
 	struct Base{
 		Base(const T& v=0){ set(v); }
 	
 		/// Push a new value onto sequence
-		void push(T va){ for(uint32_t i=N-1; i>0; --i) v[i]=v[i-1]; v[0]=va; }
+		void push(T va){ for(unsigned i=N-1; i>0; --i) v[i]=v[i-1]; v[0]=va; }
 		
 		/// Set sequence history to value
-		void set(T va){ for(uint32_t i=0; i<N; ++i) v[i]=va; }	
+		void set(T va){ for(unsigned i=0; i<N; ++i) v[i]=va; }	
 		
 		/// Get current sequence value
 		T val() const { return v[0]; }
@@ -345,8 +383,8 @@ namespace iplSeq{
 	};
 
 	/// Non-interpolating sequence interpolation strategy
-    
-    /// \ingroup iplSeq
+
+	/// \ingroup iplSeq
 	template <class T>
 	struct None : public Base<1,T>{
 		using Base<1,T>::v;
@@ -355,8 +393,8 @@ namespace iplSeq{
 	};
 
 	/// Truncating sequence interpolation strategy
-    
-    /// \ingroup iplSeq
+
+	/// \ingroup iplSeq
 	template <class T>
 	struct Trunc : public Base<2,T>{
 		using Base<2,T>::v;
@@ -365,8 +403,8 @@ namespace iplSeq{
 	};
 
 	/// Round half up sequence interpolation strategy
-    
-    /// \ingroup iplSeq
+
+	/// \ingroup iplSeq
 	template <class T>
 	struct Round : public Base<2,T>{
 		using Base<2,T>::v;
@@ -375,17 +413,26 @@ namespace iplSeq{
 	};
 
 	/// Linear sequence interpolation strategy
-    
-    /// \ingroup Strategies, iplSeq
+
+	/// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Linear : public Base<2,T>{
 		using Base<2,T>::v;
-		Linear(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return ipl::linear(f, v[1], v[0]); }
+		Linear(const T& v=0): Base<2,T>(v), mDiff(T(0)){}
+
+		void push(T va){
+			Base<2,T>::push(va);
+			mDiff = v[0] - v[1];
+		}
+
+		T operator()(float f) const { return mDiff*f + v[1]; }
+
+	private:
+		T mDiff;
 	};
 
 	/// Cubic sequence interpolation strategy
-    
+
     /// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Cubic : public Base<4,T>{
@@ -398,7 +445,7 @@ namespace iplSeq{
 
 	/// Cosine sequence interpolation strategy
     
-    /// \ingroup Strategies, iplSeq
+	/// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Cosine : public Base<2,T>{
 		using Base<2,T>::v;
@@ -417,7 +464,7 @@ namespace iplSeq{
 //	bool done(uint32_t pos);							// fixed-point tap done reading
 //	T operator()(T v, T max, T min);					// float tap post increment check
 //	void reset();										// reset internal state, if any
-    
+
 /// \defgroup phsInc Phase Increment Strategies
 namespace phsInc{
 
@@ -431,8 +478,8 @@ namespace phsInc{
 	}
 
 	/// Loop waveform indefinitely.
-            
-    /// \ingroup Strategies, phsInc
+
+	/// \ingroup Strategies, phsInc
 	struct Loop{
 		void reset(){}
 	
@@ -445,8 +492,8 @@ namespace phsInc{
 
 
 	/// Play waveform one cycle, then hold at the end. A one-shot.
-    
-    /// \ingroup Strategies, phsInc
+
+	/// \ingroup Strategies, phsInc
 	struct OneShot{
 		void reset(){}
 	
@@ -468,8 +515,8 @@ namespace phsInc{
 
 
 	/// Repeat waveform a fixed number of times, then hold at the end.
-    
-    /// \ingroup Strategies, phsInc
+
+	/// \ingroup Strategies, phsInc
 	struct NShot{
 		NShot(){ number(1); reset(); }
 		
@@ -506,8 +553,8 @@ namespace phsInc{
 
 
 	/// Play waveform forward, backwards, forward, etc.  Like Wrap, loops indefinitely.
-    
-    /// \ingroup Strategies, phsInc
+
+	/// \ingroup Strategies, phsInc
 	struct PingPong{
 		PingPong(): dir(0){}
 	
@@ -515,7 +562,7 @@ namespace phsInc{
 	
 		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = pos;
-			pos += dir ? -inc : inc;
+			pos += dir ? -int32_t(inc) : inc;
 			if(~pos & prev & 0x80000000) dir^=1;
 			return pos;
 		}
@@ -536,8 +583,8 @@ namespace phsInc{
 
 
 	/// Plays and holds waveform according to binary repeating pattern.
-    
-    /// \ingroup Strategies, phsInc
+
+	/// \ingroup Strategies, phsInc
 	struct Rhythm{
 	
 		Rhythm(){

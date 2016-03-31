@@ -96,12 +96,12 @@ int main(int argc, char* argv[]){
 		LOOP printf("%d ", rnd::weighted(weights, 4));
 
 	printf("\n\nPDFs:\n");
-	const uint32_t len = 8192 * 8;
-	const uint32_t numBins = 16;
+	const unsigned len = 8192 * 8;
+	const unsigned numBins = 16;
 	float samples[len];
 	float interval[2] = {-1.f, 1.f};
 	float normFactor = 1.f;
-	uint32_t bins[numBins];
+	unsigned bins[numBins];
 	
 	#define HIST(fnc)\
 		printf("\n%s\n", #fnc);\

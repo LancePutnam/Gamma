@@ -16,7 +16,6 @@
 #include "Gamma/scl.h"
 #include "Gamma/Domain.h"
 #include "Gamma/Strategy.h"
-#include "Gamma/Types.h"
 
 namespace gam{
 
@@ -93,39 +92,14 @@ template <int N, class Tv=real, class Tp=real, class Td=DomainObserver>
 class Env : public Td{
 public:
 
-	Env()
-	:	mSustain(N), mLoop(0){
-		for(int i=0; i<N; ++i){
-			mLengths[i]= 1e-8;
-			mCurves[i] =-4;
-			mLevels[i] = 1e-8;
-		}	mLevels[N] = 1e-8;
-		reset();
-	}
+	Env();
 
-	Env(Tp lvl1, Tp len1, Tp lvl2)
-	:	mSustain(N), mLoop(0){
-		levels(lvl1,lvl2);
-		lengths()[0] = len1;
-		curve(-4);
-		reset();
-	}
+	Env(Tp lvl1, Tp len1, Tp lvl2);
 
-	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
-	:	mSustain(N), mLoop(0){
-		levels(lvl1,lvl2,lvl3);
-		lengths(len1,len2);
-		curve(-4);
-		reset();
-	}
+	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3);
 
-	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4)
-	:	mSustain(N), mLoop(0){
-		levels(lvl1,lvl2,lvl3,lvl4);
-		lengths(len1,len2,len3);
-		curve(-4);
-		reset();
-	}
+	Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4);
+
 
 	/// Get the number of segments
 	int size() const { return N; }
@@ -153,53 +127,18 @@ public:
 
 
 	/// Generate next value
-	Tv operator()(){
-
-		// Sustain stage:
-		if(sustained()){
-			return mLevels[mStage];
-		}
-
-		// Interpolating along segment:
-		else if(mPos < mLen){
-			++mPos;
-			return mCurve();
-		}
-
-		// Just went past end of current segment and there are more left:
-		else if(mStage < size()){
-			++mStage;
-			if(mLoop && done()) mStage=0;
-			if(!done()){
-				mPos = 0;
-				setLen(mStage);
-				mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[mStage+1]);
-
-				// Immediately return start level of new stage
-				return (*this)();
-			}
-		}
-
-		// Envelope is done:
-		return mLevels[mStage];
-	}	
+	Tv operator()();
 
 	/// Release the envelope
-	void release(){
-		mSustain = -scl::abs(mSustain);
-
-		// begin release portion immediately starting at current level
-		Tv curVal = value();
-		mStage = -mSustain;
-		if(!done()){
-			mPos = 0;
-			setLen(mStage);
-			mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
-		}
-	}
+	void release();
 
 
 	/// Set whether envelope loops
+
+	/// Note that when this is activated the last segment moves from the second
+	/// to last level to the first level. Thus, the very last level is ignored.
+	/// This is done to avoid clicking due to mismatched levels when the
+	/// envelope wraps around.
 	Env& loop(bool v){ mLoop=v; return *this; }
 
 	/// Sets the point at which the envelope holds its value until released
@@ -209,17 +148,18 @@ public:
 	Env& sustainDisable(){ return sustainPoint(N); }
 
 	/// Reset envelope to starting point
-	void reset(){
-		// this forces a stage increment upon first iteration
-		mPos = 0xFFFFFFFF;
-		mLen = 0;
-		mStage = -1;
-		mSustain = scl::abs(mSustain);
-	}
+	void reset();
+
+	/// Reset envelope to starting point setting first level to current level
+	void resetSoft();
+
+	/// Jump to end of envelope
+	void finish();
 
 	
 	/// Get segment lengths array
 	Tp * lengths(){ return mLengths; }
+	const Tp * lengths() const { return mLengths; }
 
 	/// Set break-point values
 	template <class V>
@@ -242,40 +182,47 @@ public:
 	Env& lengths(Tp a, Tp b, Tp c, Tp d, Tp e){ Tp v[]={a,b,c,d,e}; return lengths(v,5); }
 
 	/// Get total length of all envelope segments
-	Tp totalLength() const {
-		Tp sum=Tp(0);
-		for(int i=0;i<size();++i) sum += mLengths[i];
-		return sum;
-	}
+	Tp totalLength() const;
 	
 	/// Set total length of envelope by adjusting one segment length
 	
 	/// \param[in] length		desired length
 	/// \param[in] modSegment	segment whose length is modified to match desired length
-	Env& totalLength(Tp length, int modSegment){
-		mLengths[modSegment] = Tp(0);
-		mLengths[modSegment] = length - totalLength();
-		return *this;
-	}
+	Env& totalLength(Tp length, int modSegment);
 
 	/// Set total length of envelope by scaling all segment lengths
-	Env& totalLength(Tp length){
-		Tp mul = length / totalLength();
-		for(int i=0; i<size(); ++i){
-			lengths()[i] *= mul;
-		}
-		return *this;
-	}
+	Env& totalLength(Tp length);
 
 
 	/// Get segment curvature array
 	Tp * curves(){ return mCurves; }
+	const Tp * curves() const { return mCurves; }
 	
 	/// Set curvature of all segments
 	Env& curve(Tp v){
 		for(int i=0; i<N; ++i) curves()[i]=v;
 		return *this;
 	}
+
+	/// Set segment curve amounts
+	template <class V>
+	Env& curves(const V* vals, int len){
+		int n = len < size() ? len : size();
+		for(int i=0; i<n; ++i) mCurves[i] = vals[i];
+		return *this;
+	}
+
+	/// Set curvature of first two segments
+	Env& curves(Tp ca, Tp cb){
+		Tp c[]={ca,cb}; return curves(c,2); }
+
+	/// Set curvature of first three segments
+	Env& curves(Tp ca, Tp cb, Tp cc){
+		Tp c[]={ca,cb,cc}; return curves(c,3); }
+
+	/// Set curvature of first four segments
+	Env& curves(Tp ca, Tp cb, Tp cc, Tp cd){
+		Tp c[]={ca,cb,cc,cd}; return curves(c,4); }
 
 
 	/// Set length and curvature of a segment
@@ -311,6 +258,7 @@ public:
 
 	/// Get break-point levels array
 	Tv * levels(){ return mLevels; }
+	const Tv * levels() const { return mLevels; }
 
 	/// Set break-point values
 	template <class V>
@@ -332,25 +280,18 @@ public:
 	/// Set first five break-point levels
 	Env& levels(Tv a, Tv b, Tv c, Tv d, Tv e){ Tv v[]={a,b,c,d,e}; return levels(v,5); }
 
-
-	Env& maxLevel(Tv v){
-		using namespace gam::scl;
-		Tv mx(0);
-		for(int i=0; i<N+1; ++i) mx = max(abs(mLevels[i]), mx);
-		v = v/mx;
-		for(int i=0; i<N+1; ++i) mLevels[i] *= v;
-		return *this;
-	}
+	/// Set maximum level
+	Env& maxLevel(Tv v);
 
 protected:
 	Curve<Tv,Tp> mCurve;
-	Tp mLengths[N];			// segment lengths, in samples
-	Tp mCurves[N];			// segment curvatures
-	Tv mLevels[N+1];		// break-point levels
+	Tp mLengths[N];		// segment lengths, in samples
+	Tp mCurves[N];		// segment curvatures
+	Tv mLevels[N+1];	// break-point levels
 
-	uint32_t mPos, mLen;	// position in and length of current segment, in samples
-	int mStage;				// the current curve segment
-	int mSustain;			// index of sustain point
+	int mPos, mLen;		// position in and length of current segment, in samples
+	int mStage;			// the current curve segment
+	int mSustain;		// index of sustain point
 	int mLoop;
 
 	void setLen(int i){ mLen=mLengths[i]*Td::spu(); }
@@ -388,7 +329,17 @@ public:
 
 	/// Set amplitude
 	AD& amp(Tv v){ this->levels()[1]=v; return *this; }
-	
+
+
+	/// Get attack length
+	Tp attack() const { return this->lengths()[0]; }
+
+	/// Get decay length
+	Tp decay() const { return this->lengths()[1]; }
+
+	/// Get amplitude
+	Tv amp() const { return this->levels()[1]; }
+
 protected:
 	AD& setLen(int i, Tp v){
 		this->lengths()[i] = v; return *this;
@@ -450,8 +401,24 @@ public:
 	ADSR& release(Tp len){ return setLen(2,len); }
 	
 	/// Set amplitude
-	ADSR& amp(Tv v){ return this->maxLevel(v); }
-	
+	ADSR& amp(Tv v){ this->maxLevel(v); return *this; }
+
+
+	/// Get attack length
+	Tp attack() const { return this->lengths()[0]; }
+
+	/// Get decay length
+	Tp decay() const { return this->lengths()[1]; }
+
+	/// Get sustain level
+	Tv sustain() const { return this->levels()[2] / this->levels()[1]; }
+
+	/// Get release length
+	Tp release() const { return this->lengths()[2]; }
+
+	/// Get amplitude
+	Tv amp() const { return this->levels()[1]; }
+
 protected:
 	ADSR& setLen(int i, Tp v){
 		this->lengths()[i] = v; return *this;
@@ -483,22 +450,29 @@ public:
 
 	T operator()();			///< Generate next sample
 	
-	void decay(T val);		///< Set number of units for curve to decay -60 dB
-	void reset();			///< Set current value to 1
-	void value(T val);		///< Set current value
-	
+	void decay(T v);		///< Set number of units for curve to decay -60 dB
+
+	void value(T v);		///< Set current value
+
+	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
+	void finish(T amp=T(0.001)); ///< Jump to end of envelope
+
+	void onDomainChange(double r);
+
 protected:
 	T mVal, mMul, mDcy;
-
-	virtual void onDomainChange(double r);
 };
 
 
 
 /// Binary gate controlled by threshold comparison
 
-/// The gate closes if the (norm of the) input value remains below threshold for 
-/// at least closingDelay units of time (typically seconds).
+/// The gate returns 1 if the input magnitude is above a specified threshold,
+/// otherwise it returns 0. A closing delay can also be specified to determine
+/// the window of time the input must be below the threshold before the gate
+/// closes. This is equivalent to what is known in electronics as a comparator
+/// with hysteresis.
+///
 /// \ingroup Envelopes
 template <class T=real, class Td=DomainObserver>
 class Gate : public Td{
@@ -558,7 +532,7 @@ public:
 		mFreq((Tp)1/len), mAcc(0, phase), mIpl(start)
 	{
 		mIpl.push(end);
-		Td::refreshDomain();
+		onDomainChange(1);
 	}
 
 
@@ -568,14 +542,6 @@ public:
 	/// Get current value
 	Tv val() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
 
-
-	/// Generate next value
-	Tv operator()(){
-		Tp f = mAcc.val;
-		if(done()) return mIpl.val();
-		mAcc();
-		return mIpl(scl::min(f, Tp(1)));
-	}
 	
 	/// Set new end value.  Start value is set to current value.
 	void operator= (Tv v){
@@ -584,25 +550,34 @@ public:
 		reset();
 	}
 
+	/// Generate next value
+	Tv operator()(){
+		if(done()) return mIpl.val();
+		Tp f = mAcc.val;
+		mAcc();
+		return mIpl(f);
+	}
+
 	/// Generates a new end point from a generator when the segment end is reached
 	
-	/// This is useful for creating pitched noise from a random number generator.
-	///
-	template <class G>
-	Tv operator()(G& g){
+	/// This can be used to upsample and interpolate a lower-rate signal,
+	/// e.g., creating pitched noise from a random number generator.
+	template <class Gen>
+	Tv operator()(Gen& g){
+		if(done()){
+			mIpl.push(g());
+			mAcc.val = mAcc.val - Tp(1); // wrap phase
+		}
 		Tp f = mAcc.val;
-		Tv v;
-		if(f >= Tp(1)){	v = mIpl.val(); (*this) = g(); }
-		else{			v = val(); }
 		mAcc();
-		return v;
+		return mIpl(f);
 	}
 	
 	/// Set frequency of envelope
 	void freq(Tp v){ mFreq = v; mAcc.add = v * Td::ups(); }
 	
 	/// Set length, in domain units
-	void length(Tp v){ freq((Tp)1/v); }
+	void length(Tp v){ freq(Tp(1)/v); }
 
 	/// Set length, in domain units
 	void period(Tp v){ length(v); }
@@ -611,17 +586,17 @@ public:
 	void phase(Tp v){ mAcc = v; }
 
 	/// Reset envelope
-	void reset(){ phase((Tp)0); }
+	void reset(){ phase(Tp(0)); }
 
 
 	Si<Tv>& ipol(){ return mIpl; }
+
+	void onDomainChange(double r){ freq(mFreq); }
 
 protected:
 	Tp mFreq;
 	gen::RAdd<Tp> mAcc;
 	Si<Tv> mIpl;
-	
-	virtual void onDomainChange(double r){ freq(mFreq); }
 };
 
 
@@ -641,7 +616,7 @@ public:
 	SegExp(T len, T crv=-3, T start=1, T end=0):
 		mLen(len), mCrv(crv), mVal1(start), mVal0(end)
 	{
-		Td::refreshDomain();
+		onDomainChange(1);
 	}
 	
 	/// Returns whether envelope is done
@@ -674,7 +649,7 @@ public:
 		mCurve.set(len * Td::spu(), crv);
 	}
 	
-	virtual void onDomainChange(double r){ set(mLen, mCrv); }
+	void onDomainChange(double r){ set(mLen, mCrv); }
 	
 protected:
 	T mLen, mCrv, mVal1, mVal0;
@@ -687,10 +662,9 @@ protected:
 
 // Implementation_______________________________________________________________
 
-
-//---- Curve
 template <class Tv,class Tp>
-Curve<Tv,Tp>::Curve(): mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
+Curve<Tv,Tp>::Curve()
+:	mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
 template <class Tv,class Tp>
@@ -705,12 +679,12 @@ inline bool Curve<Tv,Tp>::done() const {
 	else			return value() <= end();
 }
 
-template <class Tv,class Tp>
-inline Tv Curve<Tv,Tp>::value() const { return mA - mB; }
-
 // dividing by mMul goes back one step
 template <class Tv,class Tp>
-inline Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){ mB = (mA-start) / mMul; return *this; }
+Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){
+	mB = (mA-start) / mMul;
+	return *this;
+}
 
 // hack to get proper max floating point value
 namespace{
@@ -766,7 +740,15 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 }
 
 template <class Tv,class Tp>
-inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){ mB = mA-v; return *this; }
+inline Tv Curve<Tv,Tp>::value() const {
+	return mA - mB;
+}
+
+template <class Tv,class Tp>
+inline Curve<Tv,Tp>& Curve<Tv,Tp>::value(const Tv& v){
+	mB = mA-v;
+	return *this;
+}
 
 template <class Tv,class Tp>
 inline Tv Curve<Tv,Tp>::operator()(){
@@ -774,41 +756,200 @@ inline Tv Curve<Tv,Tp>::operator()(){
 	return value();
 }
 
-    
 
-//---- Decay
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env()
+:	mSustain(N), mLoop(0){
+	for(int i=0; i<N; ++i){
+		mLengths[i]= 1e-8;
+		mCurves[i] =-4;
+		mLevels[i] = Tv();
+	}
+	mLevels[N] = Tv();
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2)
+:	mSustain(N), mLoop(0)
+{
+	levels(lvl1,lvl2);
+	lengths()[0] = len1;
+	curve(-4);
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
+:	mSustain(N), mLoop(0)
+{
+	levels(lvl1,lvl2,lvl3);
+	lengths(len1,len2);
+	curve(-4);
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4)
+:	mSustain(N), mLoop(0)
+{
+	levels(lvl1,lvl2,lvl3,lvl4);
+	lengths(len1,len2,len3);
+	curve(-4);
+	reset();
+}
+
+template <int N,class Tv,class Tp,class Td>
+inline Tv Env<N,Tv,Tp,Td>::operator()(){
+
+	// Sustain stage:
+	if(sustained()){
+		return mLevels[mStage];
+	}
+
+	// Interpolating along segment:
+	else if(mPos < mLen){
+		++mPos;
+		return mCurve();
+	}
+
+	// Just went past end of current segment and there are more left:
+	else if(mStage < size()){
+		++mStage;
+		if(mLoop && done()) mStage=0;
+		if(!done()){
+			mPos = 0;
+			setLen(mStage);
+			int nextStage = mStage+1;
+			// If looping, ensure we wrap back around to first level
+			if(mLoop && (nextStage==size())) nextStage = 0;
+			mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[nextStage]);
+
+			// Immediately return start level of new stage
+			return (*this)();
+		}
+	}
+
+	// Envelope is done:
+	return mLevels[mStage];
+}	
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::release(){
+
+	if(released()) return;
+
+	mSustain = -scl::abs(mSustain);
+
+	// begin release portion immediately starting at current level
+	Tv curVal = value();
+	mStage = -mSustain;
+	if(!done()){
+		mPos = 0;
+		setLen(mStage);
+		mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
+	}
+}
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::reset(){
+	// this forces a stage increment upon first iteration
+	mPos = 0;//0xFFFFFFFF;
+	mLen = 0;
+	mStage = -1;
+	mSustain = scl::abs(mSustain);
+}
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::resetSoft(){
+	Tv curVal = value();
+	mPos = 0;
+	mStage = 0;
+	setLen(mStage);
+	mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
+	mSustain = scl::abs(mSustain);
+}
+
+template <int N,class Tv,class Tp,class Td>
+void Env<N,Tv,Tp,Td>::finish(){
+	mStage = size();
+	mPos = mLen;
+	mSustain = scl::abs(mSustain);
+}
+
+template <int N,class Tv,class Tp,class Td>
+Tp Env<N,Tv,Tp,Td>::totalLength() const {
+	Tp sum=Tp(0);
+	for(int i=0;i<size();++i) sum += mLengths[i];
+	return sum;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::totalLength(Tp length, int modSegment){
+	mLengths[modSegment] = Tp(0);
+	mLengths[modSegment] = length - totalLength();
+	return *this;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::totalLength(Tp length){
+	Tp mul = length / totalLength();
+	for(int i=0; i<size(); ++i){
+		lengths()[i] *= mul;
+	}
+	return *this;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::maxLevel(Tv v){
+	Tv mx(0);
+	for(int i=0; i<N+1; ++i) mx = scl::max(scl::abs(mLevels[i]), mx);
+	v = v/mx;
+	for(int i=0; i<N+1; ++i) mLevels[i] *= v;
+	return *this;
+}
+
+
 
 template <class T, class Td>
 Decay<T,Td>::Decay(T decay_, T val)
 :	mVal(val)
 {
-	Td::refreshDomain();
+	onDomainChange(1);
 	decay(decay_);
 }
 
 template <class T, class Td>
-inline T Decay<T,Td>::operator()(){ T o = mVal; mVal *= mMul; return o; }
+inline T Decay<T,Td>::operator()(){
+	T o = mVal;
+	mVal *= mMul;
+	return o;
+}
 
 template <class T, class Td>
-inline void Decay<T,Td>::decay(T v){
+void Decay<T,Td>::decay(T v){
 	mDcy = v;
 	mMul = scl::t60(v * Td::spu());
 }
 
 template <class T, class Td>
-inline void Decay<T,Td>::reset(){ mVal = 1; }
-    
-template <class T, class Td>
-inline void Decay<T,Td>::value(T v){ mVal = v; }
+void Decay<T,Td>::reset(T amp){ mVal = amp; }
 
 template <class T, class Td>
-inline T Decay<T,Td>::decay() const { return mDcy; }
-    
+void Decay<T,Td>::finish(T amp){ mVal = amp; }
+
+template <class T, class Td>
+void Decay<T,Td>::value(T v){ mVal = v; }
+
+template <class T, class Td>
+T Decay<T,Td>::decay() const { return mDcy; }
+
 template <class T, class Td>
 inline bool Decay<T,Td>::done(T thr) const { return mVal < thr; }
-    
+
 template <class T, class Td>
-inline T Decay<T,Td>::value() const { return mVal; }
+T Decay<T,Td>::value() const { return mVal; }
 
 template <class T, class Td>
 void Decay<T,Td>::onDomainChange(double r){ decay(mDcy); }

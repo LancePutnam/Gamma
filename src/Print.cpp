@@ -32,16 +32,16 @@ void printBinary(const void * value32, const char * zero, const char * one, int 
 }
 #undef LOOP_BITS
 
-void printHexArray(const float * a, uint32_t len, uint32_t valuesPerLine){
+void printHexArray(const float * a, unsigned len,unsigned valuesPerLine){
 	printf("{");
-	for(uint32_t i=0; i<len; ++i){
+	for(unsigned i=0; i<len; ++i){
 		if((i % valuesPerLine) == 0) printf("\n\t");
 		Twiddle<float> t(a[i]);
 		printf("0x%08x%s", t.u, i == len-1 ? "\n};" : ",");
 	}
 }
 
-void printPlot(float value, uint32_t width, bool spaces, bool sign, const char * point){
+void printPlot(float value, unsigned width, bool spaces, bool sign, const char * point){
 
 	float min, max;
 	if(sign)	{ min=-1; max=1; }
@@ -68,9 +68,9 @@ void printPlot(float value, uint32_t width, bool spaces, bool sign, const char *
 		else			printf(" ");
 	}
 	
-//	uint32_t pos = castIntRound((value + 1.f) * 0.5f * (float)(width));
-//	uint32_t mid = width >> 1;
-//	uint32_t i=0;
+//	unsigned pos = castIntRound((value + 1.f) * 0.5f * (float)(width));
+//	unsigned mid = width >> 1;
+//	unsigned i=0;
 //
 //	if(pos < mid){	// [-1, 0)
 //		for(; i<pos; ++i) printf(" ");

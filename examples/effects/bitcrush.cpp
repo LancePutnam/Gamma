@@ -1,39 +1,66 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Effect / Bitcrush
-	Description:	This demonstrates a bitcrushing effect which adds a lo-fi,
-					crunchy element to a sound. It is a combination of sample
-					rate and bit reduction (quantization) of the input.
+Example:	Bitcrushing
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates a bitcrushing effect which adds a lo-fi, crunchy element to a
+sound. It is a combination of sample rate and bit reduction (quantization) of
+the input.
 */
 
-#include "../examples.h"
+#include "../AudioApp.h"
+#include "Gamma/Effects.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-SineDs<> src(3);			// Modal strike
-Accum<> tmr(1);
-LFO<> modSR(1./ 8, 0.0);	// Sample rate reduction modulator
-LFO<> modQn(1./32, 0.5);	// Quantization modulator
-Quantizer<> qnt;			// The bitcrush effect
+class MyApp : public AudioApp{
+public:
 
-void audioCB(AudioIOData& io){
+	SineDs<> src;			// Modal strike
+	Accum<> tmr;			// Timer for strike
+	LFO<> modSR;			// Sample rate reduction modulator
+	LFO<> modQn;			// Quantization modulator
+	Quantizer<> qnt;		// The bitcrush effect
 
-	while(io()){
-
-		if(tmr()){
-			src.set(0,  220, 1, 2.0);
-			src.set(1,  347, 1, 1.2);
-			src.set(2, 1237, 1, 0.2);
-			tmr.freq(rnd::uni(2., 1.));
-		}
-
-		qnt.freq(modSR.triU()*4000 + 1400);
-		qnt.step(modQn.paraU()*0.25);
-
-		float s = src() * 0.2;
-		s = qnt(s);
-
-		io.out(0) = io.out(1) = s;
+	MyApp(){
+		src.resize(3);
+		tmr.period(1);
+		tmr.phaseMax();
+		modSR.period(23);
+		modQn.period(32);
 	}
+
+	void onAudio(AudioIOData& io){
+
+		while(io()){
+
+			if(tmr()){
+				src.set(0,  220, 1, 2.0);
+				src.set(1,  347, 1, 1.2);
+				src.set(2, 1237, 1, 0.2);
+				tmr.freq(rnd::uni(2., 1.));
+			}
+
+			// Produce modal strike
+			float s = src();
+
+			// Set sample rate quantization
+			qnt.freq(modSR.triU()*4000 + 1400);
+
+			// Set amplitude quantization
+			qnt.step(modQn.paraU()*0.5);
+
+			// Apply the bitcrush
+			s = qnt(s);
+
+			io.out(0) = io.out(1) = s * 0.2;
+		}
+	}
+};
+
+int main(){
+	MyApp().start();
 }
 
-RUN_AUDIO_MAIN

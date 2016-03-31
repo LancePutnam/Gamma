@@ -20,7 +20,7 @@
 	equally useful for non-real-time tasks.
 */
 
-#define GAMMA_VERSION 0.9.6
+#define GAMMA_VERSION 0.9.7
 //#define GAMMA_H_INC_ALL
 
 // Core Functions
@@ -45,12 +45,13 @@
 	#include "Gamma/Conversion.h"
 	#include "Gamma/File.h"
 	#include "Gamma/Print.h"
-	#include "Gamma/Timer.h"
+	#include "Gamma/TransferFunc.h"
 
 	// Generators/Filters
 	#include "Gamma/Access.h"
 	#include "Gamma/Delay.h"
 	#include "Gamma/DFT.h"
+	#include "Gamma/Domain.h"
 	#include "Gamma/Envelope.h"
 	#include "Gamma/FFT.h"
 	#include "Gamma/Filter.h"
@@ -58,13 +59,18 @@
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
 	#include "Gamma/SamplePlayer.h"
+	#include "Gamma/Spatial.h"
 	#include "Gamma/Recorder.h"
 	#include "Gamma/SoundFile.h"
-	#include "Gamma/Sync.h"
 	#include "Gamma/UnitMaps.h"
 
 	// Composite Objects
+	#include "Gamma/Analysis.h"
 	#include "Gamma/Effects.h"
+
+	// Scheduling/Timing
+	#include "Gamma/Scheduler.h"
+	#include "Gamma/Timer.h"
 
 #endif
 

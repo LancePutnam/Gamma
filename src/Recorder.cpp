@@ -1,37 +1,49 @@
-#include <stdio.h>
+//#include <stdio.h> // printf
+#include <string.h> // memcpy
 #include "Gamma/Recorder.h"
 
 namespace gam{
 
-Recorder::Recorder(int channels, int frames){
-	resize(frames, channels);
+Recorder::Recorder()
+:	mChans(0), mIW(0), mIR(0)
+{}
+
+Recorder::Recorder(int channels, int frames)
+:	mChans(0), mIW(0), mIR(0)
+{
+	resize(channels, frames);
 }
 
-//int write(const float * buf, int numFrames){
-//
-//	if(numFrames > frames()) numFrames = frames();
-//
-//	int Nr = mRing.size();
-//	int Nw = numFrames * channels();
-//	
-//	if((mIW+Nw) > Nr){
-//		memcpy(&mRing[mIW], buf, Nr-mIW);
-//		memcpy(&mRing[  0], buf + Nr-mIW, mIW+Nw - Nr);
-//		mIW += Nw;
-//		mIW -= mRing.size();
-//	}
-//	else{
-//		memcpy(&mRing[mIW], buf, Nw);
-//		mIW += Nw;
-//	}
-//	return numFrames;
-//}
+int Recorder::write(const float * buf, int numFrames){
+
+	if(numFrames > frames()) numFrames = frames();
+
+	int Nr = mRing.size();
+	int Nw = numFrames * channels();
+	
+	if((mIW+Nw) > Nr){ // need to write across array boundary
+		int N0 = Nr - mIW;
+		int N1 = mIW + Nw - Nr;
+		memcpy(&mRing[mIW], buf, N0);
+		memcpy(&mRing[  0], buf + N0, N1);
+		mIW = N1;
+	}
+	else{
+		int newIW = mIW + Nw;		
+		memcpy(&mRing[mIW], buf, Nw);		
+		if(newIW < Nr)	mIW = newIW;
+		else			mIW = 0;
+	}
+
+	return numFrames;
+}
 
 int Recorder::read(float *& buf){
-	if(mIR == mIW) return 0;
+//printf("read\n");
+	const int iw = mIW;
+	if(iw == mIR) return 0;
 
 	int N = size();
-	int iw = mIW;
 	int behind = 0;
 
 	/*
@@ -56,7 +68,7 @@ int Recorder::read(float *& buf){
 			mRead[i] = mRing[mIR+i];
 		}
 		
-		int d2 = mIW;
+		int d2 = iw;
 		for(int i=d1; i<d1+d2; ++i){
 			mRead[i] = mRing[i-d1];
 		}
@@ -70,7 +82,7 @@ int Recorder::read(float *& buf){
 	return behind/channels();
 }
 
-void Recorder::resize(int frames, int chans){
+void Recorder::resize(int chans, int frames){
 	mChans = chans;
 	mRing.resize(frames*mChans);
 	mRead.resize(frames*mChans);

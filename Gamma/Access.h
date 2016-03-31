@@ -10,14 +10,12 @@
 
 /// \defgroup access Array access
 
-#include "Gamma/pstdint.h"
-
 namespace gam{
 
-typedef int32_t index_t;
+typedef int index_t;
 
 /// Returns last index of an arithmetic iteration starting from 0
-inline uint32_t indexLast(uint32_t len, uint32_t str){ return ((len-1)/str)*str; }
+inline unsigned indexLast(unsigned len, unsigned str){ return ((len-1)/str)*str; }
 
 /// Maps a position in [-1, 1] to an index in [0, n). No boundary operations are performed.
 inline index_t posToInd(float v, index_t n){ return n * (v*0.49999f + 0.5f); }
@@ -86,8 +84,8 @@ private:
 
 
 
-#define L1 for(int32_t i=0;i<count();++i)
-#define L2 int32_t n=minCount(v); for(int32_t i=0;i<n;++i)
+#define L1 for(int i=0;i<count();++i)
+#define L2 int n=minCount(v); for(int i=0;i<n;++i)
 
 
 /// Uniformly strided section of an array
@@ -105,15 +103,15 @@ public:
 	/// \param[in] count_	how many elements to iterate over
 	/// \param[in] stride_	stride increment through array
 	/// \param[in] offset_	absolute offset into array, -1 is last, -2 penultimate, etc.
-	Slice(T * src, int32_t count_, int32_t stride_=1, int32_t offset_=0)
+	Slice(T * src, int count_, int stride_=1, int offset_=0)
 	:	A(src), C(count_), S(stride_)
 	{	offset(offset_);	}
 
 	/// Returns new sub-slice
-	Slice operator()(int32_t cnt, int32_t str=1, int32_t off=0) const { return Slice(A, cnt,str,off); }
+	Slice operator()(int cnt, int str=1, int off=0) const { return Slice(A, cnt,str,off); }
 	
 	/// Returns ith count element
-	T& operator[](int32_t i) const { return B[i*S]; }
+	T& operator[](int i) const { return B[i*S]; }
 
 	template <class Gen>
 	const Slice& operator  = (const Gen& v) const { L1{ (*this)[i] =v(); } return *this; }
@@ -198,19 +196,19 @@ public:
 	/// Returns sum of elements in slice
 	T sum() const { T r=T(0); L1{ r+=(*this)[i]; } return r; }
 
-	int32_t count() const { return C; }
-	int32_t offset() const { return B-A; }
-	int32_t stride() const { return S; }
-	int32_t N() const { return (S>0?S:-S)*C; }
+	int count() const { return C; }
+	int offset() const { return B-A; }
+	int stride() const { return S; }
+	int N() const { return (S>0?S:-S)*C; }
 
-	Slice& count(int32_t v){ C=v; return *this; }
-	Slice& offset(int32_t v){ B=A+(v<0 ? N()+v : v); return *this; }
-	Slice& stride(int32_t v){ S=v; return *this; }
+	Slice& count(int v){ C=v; return *this; }
+	Slice& offset(int v){ B=A+(v<0 ? N()+v : v); return *this; }
+	Slice& stride(int v){ S=v; return *this; }
 
 protected:
 	T * A, * B;		// absolute, relative pointers
-	int32_t C,S;	// count, stride
-	int32_t minCount(const Slice& o) const { return count()<o.count() ? count() : o.count(); }
+	int C,S;	// count, stride
+	int minCount(const Slice& o) const { return count()<o.count() ? count() : o.count(); }
 };
 
 #undef L1
@@ -218,7 +216,9 @@ protected:
 
 /// Slice object function
 template <class T>
-Slice<T> slice(T * src, int32_t cnt, int32_t str=1, int32_t off=0){ return Slice<T>(src,cnt,str,off); }
+Slice<T> slice(T * src, int cnt, int str=1, int off=0){
+	return Slice<T>(src,cnt,str,off);
+}
 
 
 /*

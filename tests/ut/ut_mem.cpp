@@ -12,7 +12,7 @@
 {
 	using namespace gam::gen;
 
-	const uint32_t N=8;
+	const unsigned N=8;
 	int A[N], T[N];
 	
 	#define ASSERT(A, a,b,c,d,e,f,g,h) assert(A[0]==a && A[1]==b && A[2]==c && A[3]==d && A[4]==e && A[5]==f && A[6]==g && A[7]==h);

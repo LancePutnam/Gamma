@@ -5,7 +5,6 @@
 include Makefile.config
 
 SRCS = 	arr.cpp\
-	AudioIO.cpp\
 	Conversion.cpp\
 	Domain.cpp\
 	DFT.cpp\
@@ -16,8 +15,15 @@ SRCS = 	arr.cpp\
 	Print.cpp\
 	scl.cpp\
 	Recorder.cpp\
-	Scheduler.cpp\
-	SoundFile.cpp
+	Scheduler.cpp
+
+ifneq ($(NO_AUDIO_IO), 1)
+	SRCS += AudioIO.cpp
+endif
+
+ifneq ($(NO_SOUNDFILE), 1)
+	SRCS += SoundFile.cpp
+endif
 
 #OBJS = $(SRCS:.cpp=.o)
 #OBJS := $(addprefix $(OBJ_DIR), $(OBJS))
@@ -26,7 +32,7 @@ SRCS = 	arr.cpp\
 SRCS		:= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
+CPPFLAGS	:= $(addprefix -I, $(INC_DIRS)) $(CPPFLAGS)
 
 #--------------------------------------------------------------------------
 # Rules
@@ -44,7 +50,7 @@ include Makefile.rules
 EXEC_TARGETS = examples/%.cpp tests/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): $(LIB_PATH) FORCE
-	$(CXX) $(CFLAGS) -o $(BIN_DIR)$(*F) $@ $(LIB_PATH) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LIB_PATH) $(LDFLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
@@ -54,7 +60,9 @@ endif
 clean:
 	$(call RemoveDir, $(OBJ_DIR))
 	$(call RemoveDir, $(BIN_DIR))
-
+	$(call RemoveDir, $(BUILD_DIR)lib/)
+	$(call RemoveDir, $(BUILD_DIR)include/)
+	$(call RemoveDir, $(BUILD_DIR))
 
 # Clean and rebuild library
 rebuild: clean $(LIB_PATH)
@@ -79,6 +87,36 @@ test:
 	@$(MAKE) tests/unitTests.cpp
 
 buildtest: test
-	@for v in algorithmic curves effects filter function generator io spectral synths; do \
+	@for v in algorithmic analysis curves effects filter function io oscillator source spatial spectral synthesis synths techniques; do \
 		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done
+
+
+# Create/view API documentation
+doc/html/index.html: doc/Doxyfile Gamma/*.h
+	@if [ `which doxygen` ]; then \
+		cd doc && doxygen Doxyfile && cd ..;\
+	elif [ `which /Applications/Doxygen.app/Contents/Resources/doxygen` ]; then \
+		cd doc && /Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile && cd ..;\
+	else \
+		echo "Error: doxygen not found.";\
+		echo "doxygen is required to create the documentation.";\
+		printf "Please install it using ";\
+		if [ `which apt-get` ]; then printf "\"sudo apt-get install doxygen\"";\
+		elif [ `which port` ]; then printf "\"sudo port install doxygen\"";\
+		elif [ `which brew` ]; then printf "\"brew install doxygen\"";\
+		else printf "a package manager, e.g., apt-get (Linux), MacPorts or Homebrew (Mac OSX),";\
+		fi;\
+		printf " and try again. You can also create the documentation manually \
+by downloading doxygen from www.doxygen.org and running it on the file $<.\n";\
+		exit 127;\
+	fi
+
+docs: doc/html/index.html
+ifeq ($(PLATFORM), linux)
+	@xdg-open $< &
+else ifeq ($(PLATFORM), macosx)
+	@open $<
+endif
+
+

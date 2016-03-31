@@ -4,13 +4,12 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdlib.h>
+#include <math.h>
 #include "Gamma/arr.h"
 #include "Gamma/mem.h"
 #include "Gamma/scl.h"
 #include "Gamma/Constants.h"
-
-#define LOOP(n,s) for(uint32_t i=0; i<n; i+=s)
+#include "Gamma/Types.h"
 
 /// Main namespace
 namespace gam{
@@ -21,8 +20,11 @@ enum WindowType{
 	BARTLETT,			/**< Bartlett (Triangle) */
 	BLACKMAN,			/**< Blackman */
 	BLACKMAN_HARRIS,	/**< Blackman-Harris */
+	BLACKMAN_NUTTALL,   /**< Blackman-Nuttall */
+	FLATTOP,            /**< Flat-Top */
 	HAMMING,			/**< Hamming */
 	HANN,				/**< von Hann */
+	NUTTALL,            /**< Nuttall */
 	WELCH,				/**< Welch */
 	NYQUIST,			/**< Nyquist */
 	RECTANGLE			/**< Rectangle (no window) */
@@ -62,7 +64,7 @@ inline static const char * toString(gam::WindowType v){
 /// \param[in] amp		amplitude of sine wave
 /// \param[in] phs		phase of sine wave, in [0,1]
 template <class T>
-void addSine(T * dst, uint32_t len, double cycles=1, double amp=1, double phs=0);
+void addSine(T * dst, unsigned len, double cycles=1, double amp=1, double phs=0);
 
 /// Add sine wave to array
 
@@ -90,7 +92,7 @@ void inline addSine(
 /// \param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class A>
 void inline addSines(
-	T * dst, uint32_t len, const A * amps, int numh,
+	T * dst, unsigned len, const A * amps, int numh,
 	double hmul=1, double hshf=1, double hphs=0
 ){
 	for(int i=0; i<numh; ++i){
@@ -125,7 +127,7 @@ void inline addSines(
 /// \param[in] hphs		phase of sine wave, in [0,1]
 template <class T, class A, class C>
 void addSines(
-	T * dst, uint32_t len, const A * amps, const C * cycs, int numh, double hphs=0
+	T * dst, unsigned len, const A * amps, const C * cycs, int numh, double hphs=0
 ){
 	for(int i=0; i<numh; ++i) addSine(dst,len,cycs[i],amps[i],hphs);
 }
@@ -156,10 +158,11 @@ void inline addSines(
 /// \param[in] amp		overall amplitude scaling factor
 /// \param[in] hphs		phase of (sine) harmonics, in [0,1]
 /// \param[in] wphs		phase of composite waveform, in [0,1]
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <int InvPower, class T>
 void addSinesPow(
-	T * dst, uint32_t len, int numh,
-	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
+	T * dst, unsigned len, int numh,
+	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0, double cycles=1
 );
 
 /// Add sine waves to array using inverse power law for amplitudes
@@ -172,12 +175,13 @@ void addSinesPow(
 /// \param[in] amp		overall amplitude scaling factor
 /// \param[in] hphs		phase of (sine) harmonics, in [0,1]
 /// \param[in] wphs		phase of composite waveform, in [0,1]
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <int InvPower, class T, class Alloc, template<class,class> class ArrayType>
 inline void addSinesPow(
 	ArrayType<T,Alloc>& dst, int numh,
-	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0
+	double hmul=1, double hshf=1, double amp=1, double hphs=0, double wphs=0, double cycles=1
 ){
-	addSinesPow<InvPower>(&dst[0], dst.size(), numh,hmul,hshf,amp,hphs,wphs);
+	addSinesPow<InvPower>(&dst[0], dst.size(), numh,hmul,hshf,amp,hphs,wphs,cycles);
 }
 
 
@@ -192,10 +196,11 @@ inline void addSinesPow(
 /// \param[in] amp		amplitude of waveform
 /// \param[in] phs		phase of waveform, in [0,1]
 /// \param[in] hshf		harmonic number shift amount
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <class T>
 void addWave(
-	T * dst, uint32_t len, gam::WaveformType type,
-	int numh=32, double amp=1, double phs=0, double hshf=1
+	T * dst, unsigned len, gam::WaveformType type,
+	int numh=32, double amp=1, double phs=0, double hshf=1, double cycles=1
 );
 
 /// Add predefined waveform to array
@@ -208,12 +213,13 @@ void addWave(
 /// \param[in] amp		amplitude of waveform
 /// \param[in] phs		phase of waveform, in [0,1]
 /// \param[in] hshf		harmonic number shift amount
+/// \param[in] cycles	number of cycles of wave, must be integer for periodic waves
 template <class T, class Alloc, template<class,class> class ArrayType>
 void inline addWave(
 	ArrayType<T,Alloc>& dst, gam::WaveformType type,
-	int numh=32, double amp=1, double phs=0, double hshf=1
+	int numh=32, double amp=1, double phs=0, double hshf=1, double cycles=1
 ){
-	addWave(&dst[0],dst.size(), type,numh,amp,phs,hshf);
+	addWave(&dst[0],dst.size(), type,numh,amp,phs,hshf,cycles);
 }
 
 
@@ -228,15 +234,15 @@ namespace tbl{
 
 /// Fills array with one period of a cosine wave.
 template<class T>
-void cosine(T * dst, uint32_t len);
+void cosine(T * dst, unsigned len);
 
 /// Fills array with one period of a sine wave.
 template<class T>
-void sine(T * dst, uint32_t len);
+void sine(T * dst, unsigned len);
 
 /// Fills array with arbitrary phase and length sinusoid.
 template<class T>
-void sinusoid(T * dst, uint32_t len, double phase, double periods);
+void sinusoid(T * dst, unsigned len, double phase, double periods);
 
 /// Sums band-limited impulse wave into multi-wavetable array
 
@@ -244,63 +250,90 @@ void sinusoid(T * dst, uint32_t len, double phase, double periods);
 /// The amplitude of the waveform will not be normalized.
 /// The ideal waveform shape is [4, -1, 0, -1, 0, -1, 0, -1 ]
 template<class T>
-void multiImpulse(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi);
+void multiImpulse(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi);
 
 /// Sums band-limited saw wave into multi-wavetable array
 
 /// The waveform includes harmonics in the range [hrmLo, hrmHi].
 /// The ideal waveform shape is [1, 0.75, 0.5, 0.25, 0, -0.25, -0.5, -0.75]
 template<class T>
-void multiSaw(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi);
+void multiSaw(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi);
 
 /// Sums band-limited square wave into multi-wavetable array
 
 /// The waveform includes harmonics in the range [hrmLo, hrmHi].
 ///	The ideal waveform shape is [ 1, 1, 1, 1, -1, -1, -1, -1].
 template<class T>
-void multiSquare(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi);
+void multiSquare(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi);
 
 /// Sums band-limited triangle wave into multi-wavetable array
 	
 /// The waveform includes harmonics in the range [hrmLo, hrmHi].
 ///	The ideal waveform shape is [ 0, 0.5, 1, 0.5, 0, -0.5, -1, -0.5].
 template<class T>
-void multiTriangle(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi);
+void multiTriangle(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi);
 
 /// Create multi-wavetable
 template<class T>
-void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uint32_t, uint32_t, uint32_t));
+void multiWave(T * dst, unsigned len, unsigned order, void (* func)(T *, unsigned, unsigned, unsigned));
 
 /// Returns maximum number of harmonics that will fit in array.
-inline uint32_t maxHarmonics(uint32_t len){ return len>>1; }
+inline unsigned maxHarmonics(unsigned len){ return len>>1; }
 
 /// Fills array with specified window type
 template<class T>
-void window			(T * dst, uint32_t len, WindowType type);
+void window			(T * dst, unsigned len, WindowType type);
 
 template<class T>
-void bartlett		(T * dst, uint32_t len); ///< Fills array with Bartlett window
+void bartlett		(T * dst, unsigned len); ///< Fills array with Bartlett window
     
 template<class T>
-void blackman		(T * dst, uint32_t len); ///< Fills array with Blackman window
+void blackman		(T * dst, unsigned len); ///< Fills array with Blackman window
     
 template<class T>
-void blackmanHarris	(T * dst, uint32_t len); ///< Fills array with Blackman-Harris window
+void blackmanHarris	(T * dst, unsigned len); ///< Fills array with Blackman-Harris window
+
+template<class T>
+void blackmanNuttall(T * dst, unsigned len); ///< Fills array with Blackman-Nuttall window
+
+template<class T>
+void flatTop		(T * dst, unsigned len); ///< Fills array with Flat-Top window
+
+template<class T>
+void hamming		(T * dst, unsigned len); ///< Fills array with Hamming window
     
 template<class T>
-void hamming		(T * dst, uint32_t len); ///< Fills array with Hamming window
+void hann			(T * dst, unsigned len); ///< Fills array with von Hann window
+
+template<class T>
+void nuttall		(T * dst, unsigned len); ///< Fills array with Nuttall window
     
 template<class T>
-void hann			(T * dst, uint32_t len); ///< Fills array with von Hann window
+void welch			(T * dst, unsigned len); ///< Fills array with Welch window
     
 template<class T>
-void welch			(T * dst, uint32_t len); ///< Fills array with Welch window
+void rectangle		(T * dst, unsigned len); ///< Fills array with Rectangle window
     
 template<class T>
-void rectangle		(T * dst, uint32_t len); ///< Fills array with Rectangle window
-    
-template<class T>
-void nyquist		(T * dst, uint32_t len, uint32_t str=1); ///< Fills array with Nyquist window
+void nyquist		(T * dst, unsigned len, unsigned str=1); ///< Fills array with Nyquist window
+
+
+
+/// Get value from a power-of-two array.
+
+///	'src':		waveform \n
+///	'fbits':	number of bits in fractional part of phase \n
+///	'phase':	fixed-point phase of lookup (full period is [0, 2^32))
+template <class T>
+T at(const T * src, uint32_t fbits, uint32_t phase);
+
+/// Set value in a power-of-two array.
+
+///	'dst':		waveform \n
+///	'fbits':	number of bits in fractional part of phase \n
+///	'phase':	fixed-point phase of lookup (full period is [0, 2^32))	
+template <class T>
+void put(T * dst, uint32_t fbits, uint32_t phase, T value);
 
 
 // Return value from a table with the first half of a dq-symmetric 
@@ -343,8 +376,10 @@ float phaseIncFactor(double framesPerSec);
 
 // Implementation_______________________________________________________________
 
+#define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
+
 template<class T>
-void cosine(T * dst, uint32_t len){
+void cosine(T * dst, unsigned len){
 	double inc = M_2PI / (double)len;
 	double phs = inc;
 	len >>= 1;
@@ -356,7 +391,7 @@ void cosine(T * dst, uint32_t len){
 
 	len -= 1;
 	LOOP(len, 1){
-		T val = T(cos(phs));
+		T val = T(::cos(phs));
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -364,7 +399,7 @@ void cosine(T * dst, uint32_t len){
 }
 
 template<class T>
-void sine(T * dst, uint32_t len){
+void sine(T * dst, unsigned len){
 	double inc = M_2PI / (double)len;
 	double phs = inc;
 	len >>= 1;
@@ -376,7 +411,7 @@ void sine(T * dst, uint32_t len){
 	
 	--len;
 	LOOP(len, 1){
-		T val = sin(phs);
+		T val = ::sin(phs);
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -385,27 +420,27 @@ void sine(T * dst, uint32_t len){
 
 // VERY accurate, but not so fast
 template<class T>
-void sinusoid(T * dst, uint32_t len, double phase, double periods){
+void sinusoid(T * dst, unsigned len, double phase, double periods){
 	double inc = M_2PI * periods / len;
-	for(uint32_t i=0; i<len; ++i){
-		*dst++ = sin(inc * i + phase);
+	for(unsigned i=0; i<len; ++i){
+		*dst++ = ::sin(inc * i + phase);
 	}
 }
 
 
 template<class T>
-void multiImpulse(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
+void multiImpulse(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 	double inc = M_2PI / (double)len;
-	uint32_t hLen = len >> 1;
+	unsigned hLen = len >> 1;
 	
-	for(uint32_t k = hrmLo; k <= hrmHi; ++k){
+	for(unsigned k = hrmLo; k <= hrmHi; ++k){
 		double phaseInc = (double)k * inc;
 		double phs = 0.;
 		
 		T * dst1 = dst;
 		
 		LOOP(hLen+1, 1){
-			*dst1++ += (T)(cos(phs));
+			*dst1++ += T(::cos(phs));
 			phs += phaseInc;
 		}
 	}
@@ -415,15 +450,15 @@ void multiImpulse(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 }
 
 template<class T>
-void multiSaw(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
+void multiSaw(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 
 	static const double sawFactor = 2.0 / M_PI;
 	double inc = M_2PI / (double)len;
-	uint32_t hLen = len >> 1;
+	unsigned hLen = len >> 1;
 	
 	dst++;
 	
-	for(uint32_t i = hrmLo; i <= hrmHi; ++i){
+	for(unsigned i = hrmLo; i <= hrmHi; ++i){
 		double h = (double)i;
 		double phaseInc = h * inc;
 		double phs = phaseInc;
@@ -431,8 +466,8 @@ void multiSaw(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 		
 		T * dst1 = dst;
 		
-		for(uint32_t j=1; j<hLen; ++j){
-			*dst1++ += (T)(amp * sin(phs));
+		for(unsigned j=1; j<hLen; ++j){
+			*dst1++ += T(amp * ::sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -442,18 +477,18 @@ void multiSaw(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 }
 
 template<class T>
-void multiSquare(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
+void multiSquare(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 
 	static const double sqrFactor = 4.0 / M_PI;
 	double inc = M_2PI / (double)len;
-	uint32_t qLen = len >> 2;
+	unsigned qLen = len >> 2;
 	
 	dst++;
 	
 	hrmLo |= 1;	// next highest odd if even
 	
 	// Calculate first quadrant
-	for(uint32_t i = hrmLo; i <= hrmHi; i+=2){
+	for(unsigned i = hrmLo; i <= hrmHi; i+=2){
 
 		double h = (double)i;
 		double phaseInc = h * inc;
@@ -462,8 +497,8 @@ void multiSquare(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 		
 		T * dst1 = dst;
 		
-		for(uint32_t j=1; j<=qLen; ++j){
-			*dst1++ += (T)(amp * sin(phs));
+		for(unsigned j=1; j<=qLen; ++j){
+			*dst1++ += T(amp * ::sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -475,11 +510,11 @@ void multiSquare(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 
 
 template<class T>
-void multiTriangle(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
+void multiTriangle(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 
 	static const double triFactor = 8.0 / (M_PI * M_PI);
 	double inc = M_2PI / (double)len;
-	uint32_t qLen = len >> 2;
+	unsigned qLen = len >> 2;
 	
 	dst++;
 	
@@ -488,7 +523,7 @@ void multiTriangle(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 	double factor = hrmLo & 0x2 ? -triFactor : triFactor;
 	
 	// Calculate first quadrant
-	for(uint32_t i = hrmLo; i <= hrmHi; i+=2){
+	for(unsigned i = hrmLo; i <= hrmHi; i+=2){
 
 		double h = (double)i;
 		double phaseInc = h * inc;
@@ -498,8 +533,8 @@ void multiTriangle(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 		
 		T * dst1 = dst;
 		
-		for(uint32_t j=1; j<=qLen; ++j){
-			*dst1++ += (T)(amp * sin(phs));
+		for(unsigned j=1; j<=qLen; ++j){
+			*dst1++ += T(amp * ::sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -516,16 +551,16 @@ void multiTriangle(T * dst, uint32_t len, uint32_t hrmLo, uint32_t hrmHi){
 	9	16	
 */
 template<class T>
-void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uint32_t, uint32_t, uint32_t)){
+void multiWave(T * dst, unsigned len, unsigned order, void (* func)(T *, unsigned, unsigned, unsigned)){
 
 	dst += len * (order - 1);
 
 	func(dst, len, 1, 1);
 	
-	uint32_t hrmLo = 2;
-	uint32_t hrmHi = 2;
+	unsigned hrmLo = 2;
+	unsigned hrmHi = 2;
 
-	for(uint32_t o=0; o<order-1; o++){
+	for(unsigned o=0; o<order-1; o++){
 	
 		T * dstPrev = dst;
 		dst -= len;
@@ -538,13 +573,16 @@ void multiWave(T * dst, uint32_t len, uint32_t order, void (* func)(T *, uint32_
 }
 
 template<class T>
-void window(T * dst, uint32_t len, WindowType type){
+void window(T * dst, unsigned len, WindowType type){
 	switch(type){
 		case BARTLETT:			bartlett(dst, len);			break;
 		case BLACKMAN:			blackman(dst, len);			break;
 		case BLACKMAN_HARRIS:	blackmanHarris(dst, len);	break;
+		case BLACKMAN_NUTTALL:	blackmanNuttall(dst, len);	break;
+		case FLATTOP:			flatTop(dst, len);			break;
 		case HAMMING:			hamming(dst, len);			break;
 		case HANN:				hann(dst, len);				break;
+		case NUTTALL:			nuttall(dst, len);			break;
 		case WELCH:				welch(dst, len);			break;
 		case NYQUIST:			nyquist(dst, len);			break;
 		default:				rectangle(dst, len);
@@ -555,44 +593,65 @@ void window(T * dst, uint32_t len, WindowType type){
 	double inc = period / (double)(len);\
 	double phs = phs0;\
 	T * dst2 = dst + len - 1;\
-	*dst++ = (T)eqn;\
+	*dst++ = T(eqn);\
 	LOOP(len>>1, 1){\
 		phs += inc;\
-		T val = (T)eqn;\
+		T val = T(eqn);\
 		*dst++  = val;\
 		*dst2-- = val;\
 	}
 	
 template<class T>
-void bartlett      (T * dst, uint32_t len){ SYM_WIN(2.   , 0., phs) }
+void bartlett      (T * dst, unsigned len){ SYM_WIN(2.   , 0., phs) }
     
 template<class T>
-void blackman      (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::blackman(phs)) }
+void blackman      (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackman(phs)) }
     
 template<class T>
-void blackmanHarris(T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::blackmanHarris(phs)) }
+void blackmanHarris(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanHarris(phs)) }
     
 template<class T>
-void hamming       (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::hamming(phs)) }
+void blackmanNuttall(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanNuttall(phs)) }
     
 template<class T>
-void hann          (T * dst, uint32_t len){ SYM_WIN(M_2PI, 0., scl::hann(phs)) }
+void flatTop      (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::flatTop(phs)) }
+
+template<class T>
+void hamming       (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hamming(phs)) }
     
 template<class T>
-void welch         (T * dst, uint32_t len){ SYM_WIN(2.   ,-1., scl::welch(phs)) }
+void hann          (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hann(phs)) }
+
+template<class T>
+void nuttall      (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::nuttall(phs)) }
+    
+template<class T>
+void welch         (T * dst, unsigned len){ SYM_WIN(2.   ,-1., scl::welch(phs)) }
 
 #undef SYM_WIN
 
-template<class T> void rectangle(T * dst, uint32_t len){
-	for(uint32_t i=0; i<len; ++i) dst[i]=T(1);
+template<class T> void rectangle(T * dst, unsigned len){
+	for(unsigned i=0; i<len; ++i) dst[i]=T(1);
 }
 
 template<class T>
-void nyquist(T * dst, uint32_t len, uint32_t str){
+void nyquist(T * dst, unsigned len, unsigned str){
 	LOOP(len, str*2){
 		dst[(i+0)*str] = T( 1);
 		dst[(i+1)*str] = T(-1);
 	}
+}
+
+#undef LOOP
+
+template <class T>
+inline T at(const T * src, uint32_t fbits, uint32_t phase){
+	return src[phase >> fbits];
+}
+
+template <class T>
+inline void put(T * dst, uint32_t fbits, uint32_t phase, T value){
+	dst[phase >> fbits] = value;
 }
 
 inline float atH(const float * src, uint32_t bits, uint32_t phs){
@@ -604,7 +663,7 @@ inline float atH(const float * src, uint32_t bits, uint32_t phs){
 inline float atQ(const float * src, uint32_t fbits, uint32_t phs){
 	uint32_t sign = phs & MaskSign<float>();
 	uint32_t dir = (phs >> 30) & 1; // 0 = fwd or 1 = bwd
-	Twiddle<float> v(src[(((phs^-dir) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
+	Twiddle<float> v(src[(((phs^-int32_t(dir)) + (dir<<fbits)) & 0x7fffffff) >> fbits]);
 	v.i |= sign;	// sign bit
 	return v.f;
 }
@@ -639,28 +698,48 @@ template<> inline double normConstant<PARABOLIC	>(){ return 2/ M_PI; }
 template<> inline double normConstant<SQUARE	>(){ return 4/ M_PI; }
 template<> inline double normConstant<SAW		>(){ return 2/ M_PI; }
 
+namespace{
+	// This enables support for complex-valued tables
+	template<class T>
+	T getSin(double p);
+
+	template<class T>
+	T getSin(double p){
+		return T(::sin(p));
+	}
+
+	template<>
+	Complex<float> getSin<Complex<float> >(double p){
+		return Complex<float>(::cos(p), ::sin(p));
+	}
+
+	template<>
+	Complex<double> getSin<Complex<double> >(double p){
+		return Complex<double>(::cos(p), ::sin(p));
+	}
+};
+
 template <class T>
-void addSine(T * dst, uint32_t len, double cycles, double amp, double phs){
+void addSine(T * dst, unsigned len, double cycles, double amp, double phs){
 	double f = cycles/len;
-	for(uint32_t i=0; i<len; ++i){
+	for(unsigned i=0; i<len; ++i){
 		double p = (f*i + phs)*M_2PI;
-		dst[i] += sin(p) * amp;
+		dst[i] += getSin<T>(p) * amp;
 	}
 }
 
 template <int InvPower, class T>
 void addSinesPow(
-	T * dst, uint32_t len, int numh,
-	double hmul, double hshf, double amp, double hphs, double wphs
+	T * dst, unsigned len, int numh,
+	double hmul, double hshf, double amp, double hphs, double wphs, double cycles
 ){
-	const double inc1 = M_2PI / len;
+	const double inc1 = (M_2PI / len) * cycles;
 
 	for(int j=0; j<numh; ++j){
 		const double h = j*hmul + hshf;
-		if(InvPower && 0==h) continue;
-		const double inch = inc1 * h;
-		double A = amp;
-		
+		if(InvPower && 0==h) continue; // don't bother with DC component
+
+		double A = amp;		
 		switch(InvPower){
 		case 0: break;
 		case 1: A /= h; break;
@@ -668,11 +747,12 @@ void addSinesPow(
 		case 3: A /= h*h*h; break;
 		default:A *= ::pow(h, -InvPower);
 		}
-		
-		double P = (hphs + h*wphs) * M_2PI;
-		
-		for(uint32_t i=0; i<len; ++i){
-			dst[i] += A*sin(inch*i + P);
+
+		const double P = (hphs + h*wphs) * M_2PI;
+		const double inch = inc1 * h;
+
+		for(unsigned i=0; i<len; ++i){
+			dst[i] += A*getSin<T>(inch*i + P);
 		}
 	}
 }
@@ -680,8 +760,8 @@ void addSinesPow(
 
 template <class T>
 void addWave(
-	T * dst, uint32_t len, WaveformType type,
-	int numh, double amp, double phs, double hshf
+	T * dst, unsigned len, WaveformType type,
+	int numh, double amp, double phs, double hshf, double cycles
 ){
 //	static const double ctri = normConstant<TRIANGLE>();
 //	static const double csaw = normConstant<SAW>();
@@ -689,22 +769,20 @@ void addWave(
 	static const double ctri = 1;
 	static const double csaw = 1;
 	static const double csqr = 1;
-	
+
 	switch(type){
-	case SINE:		addSine(dst,len, hshf,amp,phs); break;
-	case COSINE:	addSine(dst,len, hshf,amp,phs+0.25); break;
-	case TRIANGLE:	addSinesPow<2>(dst,len, numh,2,hshf,amp*ctri,0.25,phs-0.25); break;
-	case PARABOLIC:	addSinesPow<2>(dst,len, numh,1,hshf,amp*csaw,0.25,phs); break;
-	case SQUARE:	addSinesPow<1>(dst,len, numh,2,hshf,amp*csqr,0.00,phs); break;
-	case SAW:		addSinesPow<1>(dst,len, numh,1,hshf,amp*csaw,0.00,phs); break;
-	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp     ,0.25,phs); break;
+	case SINE:		addSine(dst,len, hshf*cycles,amp,phs); break;
+	case COSINE:	addSine(dst,len, hshf*cycles,amp,phs+0.25); break;
+	case TRIANGLE:	addSinesPow<2>(dst,len, numh,2,hshf,amp*ctri,0.25,phs-0.25,cycles); break;
+	case PARABOLIC:	addSinesPow<2>(dst,len, numh,1,hshf,amp*csaw,0.25,phs,cycles); break;
+	case SQUARE:	addSinesPow<1>(dst,len, numh,2,hshf,amp*csqr,0.00,phs,cycles); break;
+	case SAW:		addSinesPow<1>(dst,len, numh,1,hshf,amp*csaw,0.00,phs,cycles); break;
+	case IMPULSE:	addSinesPow<0>(dst,len, numh,1,hshf,amp     ,0.25,phs,cycles); break;
 	default:;
 	}
 }
 
 
 } // gam::
-
-#undef LOOP
 
 #endif

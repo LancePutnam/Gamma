@@ -8,9 +8,11 @@
 					phases.
 */
 
-#include "../examples.h"
+#define GAMMA_H_INC_ALL
+#include "Gamma/Gamma.h"
 
 int main(){
+	using namespace gam;
 
 	const int N = 32;		// Number of samples per unit of position
 	Domain::master().spu(1);
@@ -18,19 +20,19 @@ int main(){
 
 	#define FREQ_RESP(f, description)\
 		printf("\n%s:\n", description);\
-			for(uint32_t i=0; i<dft.sizeWin(); ++i){ float v=i?0:1; v=f; dft(v); }\
-		for(uint32_t i=0; i<dft.numBins(); ++i){\
+			for(unsigned i=0; i<dft.sizeWin(); ++i){ float v=i?0:1; v=f; dft(v); }\
+		for(unsigned i=0; i<dft.numBins(); ++i){\
 			float m = dft.bin(i)[0] * N;\
 			float p = dft.bin(i)[1] * M_1_PI;\
-			printf("% 6.3f %6.3f ", m, p);\
-			printPlot(m*0.7, 32);\
-			printPlot(p, 32);\
+			printf("[%2u] % 6.3f %6.3f  ", i, m, p);\
+			printPlot(m*0.7, 30, true, false);\
+			printPlot(p, 30);\
 			printf("\n");\
 		}
-	
+
 	AllPass1<> allPass1;
 	AllPass2<> allPass2(4, 4);
-	Biquad<> biquad(4);
+	Biquad<> bq(4);
 	BlockDC<> blockDC(0.5/N);
 	BlockNyq<> blockNyq(0.5/N);
 	Delay<> delay(N);
@@ -40,7 +42,7 @@ int main(){
 	MovingAvg<> movingAvg(4);
 	Notch<> notch(2, 0.5/N);
 	Reson<> reson(2, 0.5/N);
-	
+
 	allPass1.zero(); allPass1.freq(1./4*0.5); FREQ_RESP(allPass1(v), "1st-order all-pass at 1/4 band")
 	allPass1.zero(); allPass1.freq(2./4*0.5); FREQ_RESP(allPass1(v), "1st-order all-pass at 1/2 band")
 	allPass1.zero(); allPass1.freq(3./4*0.5); FREQ_RESP(allPass1(v), "1st-order all-pass at 3/4 band")
@@ -52,18 +54,41 @@ int main(){
 	allPass2.zero(); allPass2.freq(2./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 1/2 band")
 	allPass2.zero(); allPass2.freq(3./4*0.5); FREQ_RESP(allPass2(v), "2nd-order all-pass at 3/4 band")
 
-	// Note: res=1 will give us the same phase response as a 1st-order all-pass
-	biquad.res(1);
-	biquad.zero(); biquad.freq(1./4*0.5); FREQ_RESP(biquad(v), "Biquad low-pass at 1/4 band")
-	biquad.zero(); biquad.freq(2./4*0.5); FREQ_RESP(biquad(v), "Biquad low-pass at 1/2 band")
-	biquad.zero(); biquad.freq(3./4*0.5); FREQ_RESP(biquad(v), "Biquad low-pass at 3/4 band")
+	// Note: res=0.5 will give us the same phase response as a 1st-order all-pass
+	//biquad.res(0.5);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad low-pass at 1/4 band")
+	bq.zero(); bq.freq(2./4*0.5); FREQ_RESP(bq(v), "Biquad low-pass at 1/2 band")
+	bq.zero(); bq.freq(3./4*0.5); FREQ_RESP(bq(v), "Biquad low-pass at 3/4 band")
 
-	
+	bq.type(HIGH_PASS);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad high-pass at 1/4 band")
+
+	// Note: For band-pass, the peak amplitude equals the resonance amount
+	bq.type(BAND_PASS);
+	bq.res(1);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad band-pass at 1/4 band")
+
+	bq.type(BAND_REJECT);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad band-reject at 1/4 band")
+
+	bq.type(PEAKING);
+	bq.res(0.7);
+	bq.level(0.25);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad peaking at 1/4 band")
+	bq.level(1.25);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad peaking at 1/4 band")
+
 	FREQ_RESP(hilbert(v).i, "Hilbert filter (90 degree phase shift)")
 
-	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole at 1/8 band")
-	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole at 1/4 band")
-	onePole.zero(); onePole.freq(3./8*0.5); FREQ_RESP(onePole(v), "One-pole at 3/8 band")
+	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole LP at 1/8 band")
+	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole LP at 1/4 band")
+	onePole.zero(); onePole.freq(1./2*0.5); FREQ_RESP(onePole(v), "One-pole LP at 1/2 band")
+
+	onePole.type(gam::HIGH_PASS);
+	onePole.zero(); onePole.freq(1./8*0.5); FREQ_RESP(onePole(v), "One-pole HP at 1/8 band")
+	onePole.zero(); onePole.freq(1./4*0.5); FREQ_RESP(onePole(v), "One-pole HP at 1/4 band")
+	onePole.zero(); onePole.freq(1./2*0.5); FREQ_RESP(onePole(v), "One-pole HP at 1/2 band")
+	onePole.zero(); onePole.freq(3./4*0.5); FREQ_RESP(onePole(v), "One-pole HP at 3/4 band")
 
 	notch.zero(); notch.freq(1./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 1/4 band")
 	notch.zero(); notch.freq(2./4*0.5); FREQ_RESP(notch(v), "Two-zero notch at 1/2 band")
@@ -73,7 +98,7 @@ int main(){
 	reson.zero(); reson.freq(2./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 1/2 band")
 	reson.zero(); reson.freq(3./4*0.5); FREQ_RESP(reson(v), "Two-pole reson at 3/4 band")
 	
-	printf("%d\n", delay.size());
+	//printf("%d\n", delay.size());
 	delay.zero(); delay.delay(1); FREQ_RESP(delay(v), "Delay of 1 sample")
 	delay.zero(); delay.delay(2); FREQ_RESP(delay(v), "Delay of 2 samples")
 	
@@ -91,6 +116,5 @@ int main(){
 	movingAvg.resize(2); movingAvg.zero(); FREQ_RESP(movingAvg(v), "Moving average (N=2)")
 	movingAvg.resize(3); movingAvg.zero(); FREQ_RESP(movingAvg(v), "Moving average (N=3)")
 	movingAvg.resize(4); movingAvg.zero(); FREQ_RESP(movingAvg(v), "Moving average (N=4)")
-	return 0;
 }
 

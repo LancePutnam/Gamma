@@ -1,40 +1,55 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Effect / Chebyshev Waveshaping
-	Description:	This demonstrates how to waveshape a sine wave into a sum
-					of cosine waves using Chebyshev polynomials of the first 
-					kind.
+Example:	Chebyshev Waveshaping
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates how to waveshape a sine wave into a sum of harmonic cosine
+waves using Chebyshev polynomials of the first kind.
 */
 
-#include "../examples.h"
+#include "../AudioApp.h"
+#include "Gamma/Effects.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-Sine<> src(110);		// Sine wave
-ChebyN<12> cheby;		// Chebyshev waveshaper
-LFO<> mod;				// Harmonic coefficient modulator
+class MyApp : public AudioApp{
+public:
 
-void audioCB(AudioIOData& io){
+	Sine<> src;				// Sine wave
+	ChebyN<12> cheby;		// Chebyshev waveshaper with 12 harmonics
+	LFO<> mod;				// Harmonic coefficient modulator
 
-	mod.freq((io.fps()*0.5 + 0.1) / cheby.size());
+	void onAudio(AudioIOData& io){
 
-	while(io()){
+		src.freq(110);
+		mod.freq((io.fps()*0.5 + 0.1) / cheby.size());
 
-		// Create harmonic traveling wave
-		for(unsigned k=0; k<cheby.size(); ++k){
-			cheby.coef(k) = mod.para();
+		while(io()){
+
+			// Create harmonic traveling wave
+			for(unsigned k=0; k<cheby.size(); ++k){
+
+				// Set amplitude of kth harmonic
+				cheby.coef(k) = mod.para();
+			}
+
+			// The waveshaper takes a sine wave in [-1, 1]
+			float s = src();
+
+			// Generate harmonics
+			s = cheby(s);
+			
+			// Divide by number of harmonics to prevent clipping
+			s /= cheby.size();
+
+			io.out(0) = io.out(1) = s;
 		}
-
-		// The waveshaper takes a sine wave in [-1, 1]
-		float s = src();
-
-		// Generate harmonics
-		s = cheby(s);
-		
-		// Divide by number of harmonics to prevent clipping
-		s /= cheby.size();
-
-		io.out(0) = io.out(1) = s;
 	}
-}
 
-RUN_AUDIO_MAIN
+};
+
+int main(){
+	MyApp().start();
+}

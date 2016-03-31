@@ -1,11 +1,11 @@
 {
-	const uint32_t N=8;
+	const unsigned N=8;
 	double A[N], B[N];
 
-	#define IOTA(A) for(uint32_t i=0;i<N;++i) A[i]=i
+	#define IOTA(A) for(unsigned i=0;i<N;++i) A[i]=i
 	#define ASSERT(A, a,b,c,d,e,f,g,h) assert(A[0]==a && A[1]==b && A[2]==c && A[3]==d && A[4]==e && A[5]==f && A[6]==g && A[7]==h);
 	#define SET(A, a,b,c,d,e,f,g,h) A[0]=a; A[1]=b; A[2]=c; A[3]=d; A[4]=e; A[5]=f; A[6]=g; A[7]=h;
-	#define PRINT(A) for(uint32_t i=0;i<N;++i) printf("%g ", A[i]); printf("\n")
+	#define PRINT(A) for(unsigned i=0;i<N;++i) printf("%g ", A[i]); printf("\n")
 
 	IOTA(A);
 	IOTA(B);
@@ -17,7 +17,7 @@
 	assert(
 		scl::almostEqual(arr::normalize(A,N), 1./(N-1))
 	);
-	for(uint32_t i=0; i<N; ++i)
+	for(unsigned i=0; i<N; ++i)
 		assert(scl::almostEqual(A[i], i/double(N-1)));
 
 	#undef ASSERT
@@ -26,10 +26,10 @@
 }
 
 //{
-//	const uint32_t lenE = 8;
-//	const uint32_t lenO = lenE + 1;
-////	const uint32_t lenE2 = lenE>>1;
-////	const uint32_t lenO2 = lenO>>1;
+//	const unsigned lenE = 8;
+//	const unsigned lenO = lenE + 1;
+////	const unsigned lenE2 = lenE>>1;
+////	const unsigned lenO2 = lenO>>1;
 //	
 //	float arrE[lenE + 1];
 //	float arrO[lenO + 1];

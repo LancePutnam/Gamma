@@ -472,6 +472,17 @@ public:
 	//void recordNRT(GAM_SCHEDULER_IO_DATA& io, const char * soundFilePath, double durSec);
 	void recordNRT(const char * soundFilePath, double durSec);
 
+	/// Record output to sound file in non-real-time
+
+	/// \param[in] aio				audio i/o data to map to internal audio i/o data
+	/// \param[in] soundFilePath	path to sound file
+	/// \param[in] durSec			duration, in seconds, of recording
+	template <class TAudioIOData>
+	void recordNRT(TAudioIOData& aio, const char * soundFilePath, double durSec){
+		io().mapAudioIOData(aio);
+		recordNRT(soundFilePath, durSec);
+	}
+
 //	void print(){
 //		printf("%d events\n", (int)events().size());
 //		Events::iterator it = events().begin();

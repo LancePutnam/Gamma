@@ -1,32 +1,68 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Effect / Echo
-	Description:	This demonstrates how to create an echo effect from a
-					delay line. An echo is simply a feedback delay line.
+Example:	Echo
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates how to create an echo effect from a delay line. The output of
+the delay line is fed back into the input to create a series of exponentially
+decaying echoes. A low-pass "loop" filter is inserted into the feedback path to
+simulate high-frequency damping due to air absorption.
 */
+#include "../AudioApp.h"
+#include "Gamma/Delay.h"
+#include "Gamma/Filter.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-#include "../examples.h"
+class MyApp : public AudioApp{
+public:
 
-Delay<> delay(0.2);				// 200 ms delay
-Accum<> tmr(1./4);
-SineD<> src(1000, 0.1, 0.1);	// short sine plink
+	Accum<> tmr;	// Timer for triggering sound
+	SineD<> src;	// Sine grain
+	Delay<> delay;	// Delay line
+	OnePole<> lpf;
 
-void audioCB(AudioIOData& io){
+	MyApp(){
+		// Allocate 200 ms in the delay line
+		delay.maxDelay(0.2);
 
-	while(io()){
+		tmr.period(4);
+		tmr.phaseMax();
 
-		if(tmr()) src.reset();
+		// Configure a short cosine grain
+		src.set(1000, 0.8, 0.04, 0.25);
 
-		float s = src();
-
-		// Here is the feedback delay:
-		// We read the oldest sample from the delay line, scale it, and feed
-		// it back into the delay.
-		s += delay(s + delay()*0.7);
-	
-		io.out(0) = io.out(1) = s;
+		// Set up low-pass filter
+		lpf.type(gam::LOW_PASS);
+		lpf.freq(2000);
 	}
-}
 
-RUN_AUDIO_MAIN
+	void onAudio(AudioIOData& io){
+		while(io()){
+
+			if(tmr()) src.reset();
+
+			float s = src();
+
+			// Read the end of the delay line to get the echo
+			float echo = delay();
+
+			// Low-pass filter and attenuate the echo
+			echo = lpf(echo) * 0.8;
+
+			// Write sum of current sample and echo to delay line
+			delay(s + echo);
+
+			// Finally output sum of dry and wet signals
+			s += echo;
+		
+			io.out(0) = io.out(1) = s;
+		}
+	}
+};
+
+int main(){
+	MyApp().start();
+}

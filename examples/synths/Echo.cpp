@@ -4,14 +4,13 @@
     By Professor Phil Conrad 
 */
 
-#include "../examples.h"
-#include "Gamma/Scheduler.h"
+#include "examples.h"
 
 int globalCounter = 0;
 
 
-struct Echo : public Process<AudioIOData>{
-  Echo(): echo(0.4, 0.323, 0, 0.8){}
+struct EchoEffect : public Process<AudioIOData>{
+  EchoEffect(): echo(0.4, 0.323, 0, 0.8){}
   //Echo(const Process& p): Process(p), echo(0.4, 0.323, 0, 0.8){}
 	
 	void onProcess(AudioIOData& io){
@@ -27,9 +26,9 @@ struct Echo : public Process<AudioIOData>{
 
 /// Dual delay-line chorus driven by quadrature sinusoid
 
-struct Chorus1 : public Process<AudioIOData> {
-  Chorus1(): chorus(0.0021, 0.001, 1, 0.9, 0.1){}
- // Chorus1(const Process& p): Process(p), chorus(0.0021, 0.001, 1, 0.9, 0.1){}
+struct ChorusEffect : public Process<AudioIOData> {
+  ChorusEffect(): chorus(0.0021, 0.001, 1, 0.9, 0.1){}
+ // ChorusEffect(const Process& p): Process(p), chorus(0.0021, 0.001, 1, 0.9, 0.1){}
 	
 	void onProcess(AudioIOData& io){
     while(io()){
@@ -120,8 +119,8 @@ int main(){
 	//s.add<Echo>(effects); // add Echo to effects
 	//s.add<Chorus1>(effects); // add chorus to effects
 
-	s.add<Chorus1>(effects); // add chorus to effects
-	s.add<Echo>(effects); // add Echo to effects
+	s.add<ChorusEffect>(effects); // add chorus to effects
+	s.add<EchoEffect>(effects); // add Echo to effects
 
 	double attack = 0.1;
 	double decay = 0.1;
@@ -145,8 +144,8 @@ int main(){
 	s.add<SineEnv>( start + (2.00*aug)  ).set( aug * h+q, ti, dyn, attack, decay, -0.2*pan);
 
 
-	AudioIO io(256, 44100., s.audioCB, &s);
-	Sync::master().spu(io.fps());
+	AudioIO io(256, 44100., Scheduler::audioCB, &s);
+	gam::sampleRate(io.fps());
 	io.start();
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

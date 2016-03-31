@@ -8,15 +8,11 @@
 	This file defines some commonly needed scalar functions.
 */
 
-#include <math.h>
-#include <stdlib.h>				/* labs(long) */
-#include "Gamma/Config.h"
-#include "Gamma/Conversion.h"
-
-
 // Define some standard C99 functions that Windows is too stubborn to support.
 #if GAM_WINDOWS
-	#include <float.h> /* _nextafter */
+	// MS puts nextafter here instead of in math.h. Also, we must include
+	// float.h before math.h to avoid a problem with MinGW.
+	#include <float.h>
 	// Undefine macros in windows.h
 	#ifdef max
 	#undef max
@@ -25,10 +21,14 @@
 	#undef min
 	#endif
 	float nextafterf(float x, float y); // Defined in scl.cpp
-	//#define nextafterf(x,y)	_nextafterf(x,y)
 	#define nextafter(x,y)	_nextafter(x,y)
 	#define nextafterl(x,y)	_nextafter(x,y)
 #endif
+
+#include <math.h>
+#include <stdlib.h>				/* labs(long) */
+#include "Gamma/Config.h"
+#include "Gamma/Conversion.h"
 
 
 namespace gam{
@@ -42,86 +42,6 @@ template<class T> double normCompare(const T& v);
 
 /// Scalar rank functions for numerical types
 namespace scl{
-
-
-template<int N, class T, template<class> class F> struct NewtonIterator{
-	NewtonIterator(T& v, T v0){
-		F<T>(v,v0);
-		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
-	}
-};
-template<class T, template<class> class F> struct NewtonIterator<0,T,F>{ NewtonIterator(T& v, T v0){} };
-
-template<class T> struct NewtonSqrtMap{ NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); } };
-template<int N, class T> struct SqrtNewton
-:	public NewtonIterator<N,T, NewtonSqrtMap>{
-	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0){}
-};
-
-
-template<class T> struct NewtonInvSqrtMap{ NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; } };
-template<int N, class T> struct InvSqrtNewton
-:	public NewtonIterator<N,T, NewtonInvSqrtMap>{
-	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0){}
-};
-
-template<class T> const Twiddle<T> invSqrtMagic();
-template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(uint32_t(0x5f3759df)); }
-template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(uint64_t(0x5fe6ec85e7de30daULL)); }
-
-
-/// Approximate square root using a quick log base-2 method.
-inline float sqrtLog2(float v){
-	Twiddle<float> u(v);
-	u.u=(1<<29) + (u.u>>1) - (1<<22);
-	return u.f;
-}
-
-/// Approximate square root using a quick log base-2 method.
-inline double sqrtLog2(double v){
-	Twiddle<double> u(v);
-	u.u=((uint64_t(1))<<61) + (u.u>>1) - ((uint64_t(1))<<51);
-	return u.f;
-}
-
-/// Approximate square root using Newton's method.
-template<int N, class T> void sqrtNewton(T& v, T v0){ SqrtNewton<N,T>(v,v0); }
-
-/// Approximate square root using log base-2 and Newton methods.
-
-/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
-/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
-/// are applied to improve the result.
-template<uint32_t N, class T>
-inline T sqrt(T v){
-	T r=sqrtLog2(v);
-	sqrtNewton<N>(r,v);
-	return r;
-}
-
-/// Approximate inverse square root using Newton's method.
-template<int N, class T> void invSqrtNewton(T& v, T v0){ InvSqrtNewton<N,T>(v,v0); }
-
-/// Approximate inverse square root using a quick log base-2 method.
-template <class T>
-inline T invSqrtLog2(T v){
-	Twiddle<T> u(v);
-	u.u = invSqrtMagic<T>().u - (u.u>>1);
-	return u.f;
-}
-
-/// Approximate inverse square root using log base-2 and Newton methods.
-
-/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
-/// log base-2 approximation is performed. For N>0, N-1 Newton iterations
-/// are applied to improve the result.
-template<uint32_t N, class T>
-inline T invSqrt(T v){
-	T r=invSqrtLog2(v);
-	invSqrtNewton<N>(r, v*T(0.5));
-	return r;
-}
-
 
 // Define overloaded versions of certain basic functions for primitive types.
 // Custom types, such as vectors, can define their own specialized versions in
@@ -149,18 +69,6 @@ DEF(int) DEF(unsigned)
 DEF(short) DEF(unsigned short)
 DEF(char) DEF(unsigned char)
 #undef DEF
-
-
-// Returns absolute value.
-//template<class T> T abs(T value);
-
-/// Tests whether two values are close in value
-
-/// 'maxULP' (maximum units in the last place) is the maximum difference allowed
-/// between the values punned as integers.
-/// Code taken from Bruce Dawson, "Comparing floating point numbers."
-bool almostEqual(float a, float b, int maxULP=10);
-bool almostEqual(double a, double b, int maxUlps=10);
 
 /// Fast approximation to atan2().
 
@@ -215,6 +123,14 @@ inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 template <class T>
 inline T ampTodB(const T& amp){ return 20*::log(amp); }
 
+/// Returns an equal-loudness amplitude for a given frequency, in Hz.
+
+/// The curve used is an A-weighting curve which approximates a 40-phon equal
+/// loudness Fletcher-Munson contour.
+/// \param[in] freq		frequency, in Hz
+/// \param[in] maxAmp	maximum amplitude to clamp return value to
+double eqLoudAmp(double freq, double maxAmp=4.);
+
 /// Returns weights for linear fade.
 template<class T> void fadeLin(T& weight1, T& weight2, T fade);
 
@@ -250,18 +166,20 @@ template<class T> T fold(T v, long& numFolds, T hi=T(1), T lo=T(0));
 /// Returns value folded into [lo, hi] one time.
 template<class T> T foldOnce(T value, T hi=T(1), T lo=T(0));
 
-/// Returns frequency in Hz from a 12-TET note string.
+/// Returns base-2 log linearly mapped to [0, 1]
 
-/// Notes are specified by a letter in [a, g], followed optionally by one of
-/// '+', '-', ' ', to specify a sharp, flat or natural, and finally an integer
-/// in [0,9] representing the octave number.  For example, middle C is specified
-/// as "c5" or "c 5" and the A sharp below that as "a+4".
-double freq(const char * note);
+/// This function applies a log2 mapping and then normalizes the result to the
+/// interval [0, 1]. Since the log(0) = -inf, the result of the log is clipped
+/// below -1/recMin. The equation used is\n
+///
+/// v -> (log2(|v|) recMin) + 1
+///
+/// \param[in] v		input value
+/// \param[in] recMin	negative of reciprocal of minimum log value
+/// \returns log base-2 linearly mapped to [0, 1]
+template<class T> T linLog2(T v, T recMin = T(1./16));
 
-/// Convert linear value to log2 in range [0, 1]
-template<class T> T linLog2(T v, T recMin);
-
-/// Returns base 2 logarithm of value.
+/// Returns base-2 logarithm of value.
 
 /// If the value is not an exact power of two, the logarithm of the next
 /// highest power of two will taken.
@@ -269,7 +187,7 @@ template<class T> T linLog2(T v, T recMin);
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
 uint32_t log2(uint32_t v);
 
-/// Fast base 2 logarithm.  For value <= 0, behavior is undefined.
+/// Fast base-2 logarithm. For value <= 0, behavior is undefined.
 float log2Fast(float v);
 
 /// Maps value from [-1,1] to [depth, 1].
@@ -305,32 +223,17 @@ template<class T> T mapSinUU(T v);
 /// Mixes two values together (1 = thru, 0.5 = mono, 0 = swap).
 template<class T> void mix2(T& io1, T& io2, T mix);
 
-/// Returns nearest "note" within a pitch class set
-
-/// \param[in] v			the value to match
-/// \param[in] intervals	sequence of base-36 intervals 
-/// \param[in] mod			modulo amount
-///
-/// The sum of the values in the interval array should be equal to 'mod'.
-template<class T>
-T nearest(T v, const char * intervals="2212221", long mod=12);
-
 /// Returns the next representable floating-point or integer value following x in the direction of y
 template<class T> T nextAfter(T x, T y);
 
 template<class T> T pow2(T v);			///< Returns value to the 2nd power
 template<class T> T pow3(T v);			///< Returns value to the 3rd power
 template<class T> T pow4(T v);			///< Returns value to the 4th power
+template<class T> T pow5(T v);			///< Returns value to the 5th power
+template<class T> T pow8(T v);			///< Returns value to the 8th power
 
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
-
-/// Returns equal temperament ratio- octave^(pitch/divs)
-
-/// \param[in] pitch	pitch class
-/// \param[in] divs		number of equally tempered divisions in octave
-/// \param[in] octave	base multiplier of (pseudo) octave
-template<class T> T ratioET(T pitch, T divs=12, T octave=2);
 
 /// Returns floating point value rounded to nearest integer.
 template<class T> T round(T v);
@@ -350,8 +253,14 @@ template<class T> T roundAway(T v, T step);
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
 inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
 
-//
-template<class T> T sinFast(T radians);
+/// Returns sign of a number
+template<class T> int sgn(T v);
+
+/// Fast sine function approximation
+
+/// \param[in] x	angle in [-2, 2] corresponding to [-pi, pi]
+///
+template<class T> T sinFast(T x);
 
 /// 7th order minimax polynomial approximation to sin(pi x).
 
@@ -426,6 +335,20 @@ template <class T, class F> T smoothZero(T v, T bw, F f);
 /// square of the value for evaluation.
 template<class T> T smoothZero(T v, T bw);
 
+/// Approximate square root using log base-2 and Newton methods.
+
+/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
+/// log base-2 approximation is performed. For N>0, N Newton iterations
+/// are applied to improve the result.
+template<unsigned N, class T> T sqrt(T v);
+
+/// Approximate inverse square root using log base-2 and Newton methods.
+
+/// 'N' determines the accuracy of the approximation. For N=0, a quick and dirty
+/// log base-2 approximation is performed. For N>0, N Newton iterations
+/// are applied to improve the result.
+template<unsigned N, class T> T invSqrt(T v);
+
 /// Truncates floating point value at decimal.
 template<class T> T trunc(T value);
 
@@ -460,21 +383,22 @@ template<class T> T wrapPhaseOnce(T radians);		///< Like wrapPhase(), but only w
 
 
 
-//
-// Analysis
-//
+
+//---- ANALYSIS
+
+/// Tests whether two values are close in value
+
+/// 'maxULP' (maximum units in the last place) is the maximum difference allowed
+/// between the values punned as integers.
+/// Code taken from Bruce Dawson, "Comparing floating point numbers."
+bool almostEqual(float a, float b, int maxULP=10);
+bool almostEqual(double a, double b, int maxUlps=10);
 
 /// Returns whether or not an integer value is even.
 template<class T> bool even(T v);
 
-// Returns maximum of two values.
-//template<class T> T max(T v1, T v2);
-
 /// Returns maximum of three values.
 template<class T> T max(T v1, T v2, T v3);
-
-// Returns minimum of two values.
-//template<class T> T min(T v1, T v2);
 
 /// Returns minimum of three values.
 template<class T> T min(T v1, T v2, T v3);
@@ -500,7 +424,7 @@ bool zeroCrossP(float prev, float now);
 
 
 
-//---- Waveform generators
+//---- WAVEFORM GENERATORS
 
 /// Returns value quantized to multiples of 2^q
 uint32_t quantizePow2(uint32_t value, uint32_t q);
@@ -510,6 +434,12 @@ float rampDown	(uint32_t phase);	///< Returns value of bipolar downward ramp fun
 float rampUp	(uint32_t phase);	///< Returns value of bipolar upward ramp function.
 float square	(uint32_t phase);	///< Returns value of bipolar square function.
 float triangle	(uint32_t phase);	///< Returns value of bipolar triangle function.
+
+/// Returns value of fast sine function approximation
+float sinFast	(uint32_t phase);
+
+/// Returns value of sine-like function constructed from parabolic sections
+float sinPara	(uint32_t phase);
 
 /// Returns value of bipolar pulse function (rampDown() + rampUp()).
 float pulse		(uint32_t phase, uint32_t width);
@@ -529,42 +459,66 @@ float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
 float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
 float triangleU	(uint32_t phase);	///< Returns value of unipolar triangle function.
 
-template<class T> T bartlett(T nphase);				///< Bartlett window. nphase => [-1, 1)
-template<class T> T blackman(T phase);				///< Blackman window function.
-template<class T> T blackmanHarris(T phase);			///< Blackman-Harris window function.
-template<class T> T hamming(T phase);					///< Hamming window function.
-template<class T> T hann(T phase);					///< von Hann window function.
+template<class T> T bartlett(T nphase);								///< Bartlett window. nphase => [-1, 1)
+template<class T> T blackman(T phase);								///< Blackman window function.
+template<class T> T blackmanHarris(T phase);					///< Blackman-Harris window function.
+template<class T> T blackmanNuttall(T phase);					///< Blackman-Nuttall window function.
+template<class T> T flatTop(T phase);									///< Flat-Top window function.
+template<class T> T hamming(T phase);									///< Hamming window function.
+template<class T> T hann(T phase);										///< von Hann window function.
 template<class T> T raisedCosine(T phase, T a, T b);	///< Raised cosine f(x) = a - b cos(x).
-template<class T> T welch(T nphase);					///< Welch window function. nphase => [-1, 1)
+template<class T> T welch(T nphase);									///< Welch window function. nphase => [-1, 1)
 
+
+
+//---- NOTE-BASED FUNCTIONS
+
+/// Returns frequency in Hz from a 12-TET note string.
+
+/// Notes are specified by a letter in [A, G] or [a, g], followed by an 
+/// accidental '+' or '#' for a sharp, '-' or 'b' for a flat, or ' ' or nothing 
+/// for a natural, and finally an integer in [0, 9] representing the octave 
+/// number. For example, middle C is specified as "c4" or "c 4" and the A sharp 
+/// below that as "a+3" or a#3.
+double freq(const char * note);
+
+/// Returns nearest note number within a pitch class set
+
+/// \param[in] v			the note number to match
+/// \param[in] intervals	sequence of base-36 intervals 
+/// \param[in] mod			modulo amount
+///
+/// The sum of the values in the interval array should be equal to 'mod'.
+double nearest(double v, const char * intervals="2212221", long mod=12);
+
+/// Returns equal temperament ratio- octave^(pitch/divs)
+
+/// \param[in] pitch	pitch class
+/// \param[in] divs		number of equally tempered divisions in octave
+/// \param[in] octave	base multiplier of (pseudo) octave
+double ratioET(double pitch, double divs=12, double octave=2);
+
+
+
+
+// Implementation ______________________________________________________________
 
 // internal
 namespace{
-
 	inline uint32_t deBruijn(uint32_t v){
-
-		static const uint32_t deBruijnBitPosition[32] = {
+		static const unsigned char deBruijnBitPosition[32] = {
 			 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8,
 			31, 27, 13, 23, 21, 19, 16,  7, 26, 12, 18,  6, 11,  5, 10,  9
 		};
-
 		// Note: this is basically a hash function
 		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
-
-	template<class T> T taylorFactor3(T vv, T c1, T c2, T c3);
-	template<class T> T taylorFactor4(T vv, T c1, T c2, T c3, T c4);
-	template<class T> T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5);
 }
-
-
-// Implementation_______________________________________________________________
 
 //#define GEN(t, f) template<> inline t abs<t>(t v){ return f(v); }
 //GEN(int, ::abs) GEN(long, labs) GEN(long long, llabs) GEN(float, fabsf) GEN(double, fabs)
 ////template<class T> inline T abs(T v){ return v < T(0) ? -v : v; } // only allow specializations
 //#undef GEN
-
 
 template<class T> T atan2Fast(T y, T x){
 
@@ -706,35 +660,6 @@ template<class T> inline void mix2(T& io1, T& io2, T mix){
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
 }
 
-template<class T> T nearest(T val, const char * intervals, long div){
-	long vr = castIntRound(val);
-	long numWraps = 0;
-	long vm = wrap(vr, numWraps, div, 0L);
-	long min = 0;
-
-	struct F{
-		static int base36To10(char v){
-			v = tolower(v);
-			if(v>='0' && v<='9') return v - '0';
-			if(v>='a' && v<='z') return v - 'a' + 10;
-			return 0;	// non-alphanumeric
-		}
-	};
-
-	while(*intervals){
-		long dia = F::base36To10(*intervals++);
-		long max = min + dia;
-		if(vm < max){	// are we within current interval?
-			if(vm < (min + dia*0.5))	vm = min;
-			else						vm = max;
-			break;
-		}
-		min = max;
-	}
-
-	return T(vm + numWraps * div);
-}
-
 template<class T>
 inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<>
@@ -744,11 +669,14 @@ inline double nextAfter(double x, double y){ return nextafter(x,y); }
 template<>
 inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
 
-template<class T> inline T pow2 (T v){ return v*v; }
-template<class T> inline T pow3 (T v){ return v*v*v; }
-template<class T> inline T pow4 (T v){ return pow2(pow2(v)); }
-template<class T> inline T ratioET(T pc, T divs, T ival){
-	return T(::pow(double(ival), double(pc) / double(divs)));
+template<class T> inline T pow2(T v){ return v*v; }
+template<class T> inline T pow3(T v){ return v*v*v; }
+template<class T> inline T pow4(T v){ return pow2(v*v); }
+template<class T> inline T pow5(T v){ return pow4(v)*v; }
+template<class T> inline T pow8(T v){ return pow4(v*v); }
+
+inline double ratioET(double pc, double divs, double ival){
+	return ::pow(ival, pc/divs);
 }
 
 //template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
@@ -780,6 +708,9 @@ inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //}
 
 template<class T>
+inline int sgn(T v){ return (T(0) < v) - (v < T(0)); }
+
+template<class T>
 inline T smoothNeg		(T v, T bw){ return T(0.5) - smoothSign(v, bw)*T(0.5); }
 template<class T>
 inline T smoothNeg		(T v, T bw, T a){ return a - (T(1)-a)*smoothSign(v, bw); }
@@ -804,35 +735,108 @@ inline T smoothZero		(T v, T bw, F f){ return bw/(f(v) + bw); }
 template<class T>
 inline T smoothZero		(T v, T bw){ return smoothZero(v, bw, scl::pow2<T>); }
 
-template<class T>
-inline T taylorFactor3(T vv, T c1, T c2, T c3){
-	return c1 * vv * (c2 - vv * (c3 - vv));
+
+template<unsigned N, class T, template<class> class F>
+struct NewtonIterator{
+	NewtonIterator(T& v, T v0){
+		F<T>(v,v0);
+		NewtonIterator<N-1,T,F>(v,v0); // this just iterates
+	}
+};
+
+template<class T, template<class> class F>
+struct NewtonIterator<0,T,F>{
+	NewtonIterator(T& v, T v0){}
+};
+
+template<class T> struct NewtonSqrtMap{
+	NewtonSqrtMap(T& v, T v0){ v=T(0.5)*(v+v0/v); }
+};
+
+template<unsigned N, class T>
+struct SqrtNewton : public NewtonIterator<N,T, NewtonSqrtMap> {
+	SqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonSqrtMap>(v,v0)
+	{}
+};
+
+
+template<class T> struct NewtonInvSqrtMap{
+	NewtonInvSqrtMap(T& v, T v0_2){ v *= T(1.5)-v0_2*v*v; }
+};
+
+template<unsigned N, class T>
+struct InvSqrtNewton : public NewtonIterator<N,T, NewtonInvSqrtMap>{
+	InvSqrtNewton(T& v, T v0): NewtonIterator<N,T, NewtonInvSqrtMap>(v,v0)
+	{}
+};
+
+template<class T> const Twiddle<T> invSqrtMagic();
+template<> inline const Twiddle<float > invSqrtMagic(){ return Twiddle<float >(uint32_t(0x5f3759df)); }
+template<> inline const Twiddle<double> invSqrtMagic(){ return Twiddle<double>(uint64_t(0x5fe6ec85e7de30daULL)); }
+
+inline float sqrtLog2(float v){
+	Twiddle<float> u(v);
+	u.u=(1<<29) + (u.u>>1) - (1<<22);
+	return u.f;
 }
-template<class T>
-inline T taylorFactor4(T vv, T c1, T c2, T c3, T c4){
-	return c1 * vv * (c2 - vv * (c3 - vv * (c4 - vv)));
+
+inline double sqrtLog2(double v){
+	Twiddle<double> u(v);
+	u.u=((uint64_t(1))<<61) + (u.u>>1) - ((uint64_t(1))<<51);
+	return u.f;
 }
-template<class T>
-inline T taylorFactor5(T vv, T c1, T c2, T c3, T c4, T c5){
-	return c1 * vv * (c2 - vv * (c3 - vv * (c4 - vv * (c5 - vv))));
+
+template<unsigned N, class T> void sqrtNewton(T& v, T v0){
+	SqrtNewton<N,T>(v,v0);
+}
+
+template<unsigned N, class T>
+inline T sqrt(T v){
+	T r=sqrtLog2(v);
+	sqrtNewton<N>(r,v);
+	return r;
+}
+
+template<unsigned N, class T> void invSqrtNewton(T& v, T v0){
+	InvSqrtNewton<N,T>(v,v0);
+}
+
+template <class T>
+inline T invSqrtLog2(T v){
+	Twiddle<T> u(v);
+	u.u = invSqrtMagic<T>().u - (u.u>>1);
+	return u.f;
+}
+
+template<unsigned N, class T>
+inline T invSqrt(T v){
+	T r=invSqrtLog2(v);
+	invSqrtNewton<N>(r, v*T(0.5));
+	return r;
 }
 
 
-template<class T> inline T cosP3(T n){
-	return T(1) - T(32) * n * n * (T(0.75) - n);
+// sin/cos Taylor polynomial coefs
+namespace{ static const double
+	t73 = 42.,
+	t72 = 840.,
+	t71 = 1.9841269841e-04,
+	t84 = 56.,
+	t83 = 1680.,
+	t82 = 20160.,
+	t81 = 2.4801587302e-05,
+	t94 = 72.,
+	t93 = 3024.,
+	t92 = 60480.,
+	t91 = 2.7557319224e-06,
+	ta5 = 90.,
+	ta4 = 5040.,
+	ta3 = 151200.,
+	ta2 = 1814400.,
+	ta1 = 2.7557319224e-07;
 }
-
-
-#define t84 56.
-#define t83 1680.
-#define t82 20160.
-#define t81 2.4801587302e-05
-#define t73 42.
-#define t72 840.
-#define t71 1.9841269841e-04
 
 template<class T> inline T cosT8(T r){
-
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		float rr = r*r;
 		return (T)1 - rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
@@ -849,38 +853,7 @@ template<class T> inline T cosT8(T r){
 	}
 }
 
-
-template<class T> inline T sinFast(T r){
-    const T B = 4 / M_PI, C = -4 / (M_PI*M_PI);
-    T y = B * r + C * r * scl::abs(r);
-	const T P = 0.225; // const float Q = 0.775;
-	return P * (y * scl::abs(y) - y) + y;   // Q * y + P * y * abs(y)
-}
-
-template<class T> inline T sinP7(T n){
-	T nn = n*n;
-	return n * (T(3.138982) + nn * (T(-5.133625) + nn * (T(2.428288) - nn * T(0.433645))));
-}
-
-template<class T> inline T sinP9(T n){
-	T nn = n*n;
-	return n * (T(3.1415191) + nn * (T(-5.1662729) + nn * (T(2.5422065) + nn * (T(-0.5811243) + nn * T(0.0636716)))));
-}
-
 template<class T> inline T sinT7(T r){
-
-//	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
-//		return r * ((T)1 - taylorFactor3<T>(r*r, t71, t72, t73));
-//	}
-//	else if(r > (T)0){
-//		r -= (T)M_PI_2;
-//		return (T)1 - taylorFactor4<T>(r*r, t81, t82, t83, t84);
-//	}
-//	else{
-//		r += (T)M_PI_2;
-//		return (T)-1 + taylorFactor4<T>(r*r, t81, t82, t83, t84);
-//	}
-
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
 		T rr = r*r;
 		return r * ((T)1 - (T)t71 * rr * ((T)t72 - rr * ((T)t73 - rr)));
@@ -896,23 +869,6 @@ template<class T> inline T sinT7(T r){
 		return (T)-1 + rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
 	}
 }
-#undef t84
-#undef t83
-#undef t82
-#undef t81
-#undef t73
-#undef t72
-#undef t71
-
-#define ta5 90.
-#define ta4 5040.
-#define ta3 151200.
-#define ta2 1814400.
-#define ta1 2.7557319224e-07
-#define t94 72.
-#define t93 3024.
-#define t92 60480.
-#define t91 2.7557319224e-06
 
 template<class T> inline T sinT9(T r){
 	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
@@ -930,15 +886,27 @@ template<class T> inline T sinT9(T r){
 		return (T)-1 + rr * (T)ta1 * ((T)ta2 - rr * ((T)ta3 - rr * ((T)ta4 - rr * ((T)ta5 - rr))));
 	}
 }
-#undef ta5
-#undef ta4
-#undef ta3
-#undef ta2
-#undef ta1
-#undef t94
-#undef t93
-#undef t92
-#undef t91
+
+// Input is in [-2, 2] corresponding to [-pi, pi]
+template<class T> inline T sinFast(T x){
+	T y = x * (T(2) - gam::scl::abs(x));
+	return y * (T(0.775) + T(0.225) * gam::scl::abs(y));
+}
+
+template<class T> inline T cosP3(T n){
+	return T(1) - T(32) * n * n * (T(0.75) - n);
+}
+
+template<class T> inline T sinP7(T n){
+	T nn = n*n;
+	return n * (T(3.138982) + nn * (T(-5.133625) + nn * (T(2.428288) - nn * T(0.433645))));
+}
+
+template<class T> inline T sinP9(T n){
+	T nn = n*n;
+	return n * (T(3.1415191) + nn * (T(-5.1662729) + nn * (T(2.5422065) + nn * (T(-0.5811243) + nn * T(0.0636716)))));
+}
+
 
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
@@ -987,12 +955,12 @@ template<class T> inline T wrap(T v, T hi, T lo){
 	if(!(v < hi)){
 		T diff = hi - lo;
 		v -= diff;
-		if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
+		if(!(v < hi)) v -= diff * (T)(unsigned)((v - lo)/diff);
 	}
 	else if(v < lo){
 		T diff = hi - lo;
 		v += diff;	// this might give diff if range is too large, so check at end of block...
-		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+		if(v < lo) v += diff * (T)(unsigned)(((lo - v)/diff) + 1);
 		if(v==diff) return nextAfter(v, lo);
 	}
 	return v;
@@ -1072,7 +1040,7 @@ template<class T> inline bool odd(T v){ return v & T(1); }
 
 template<class T> inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
-inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
+inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -int32_t(v)); }
 
 template<class T> inline bool within(T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 
@@ -1092,9 +1060,6 @@ inline uint32_t quantizePow2(uint32_t v, uint32_t q){
 }
 
 
-// Freq precision:	32 bits
-// Amp precision:	24 bits
-// Width precision:	32 bits
 inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
 	uint32_t saw1 = ((p-w) >> 9) | Expo1<float>();
@@ -1103,51 +1068,47 @@ inline float pulse(uint32_t p, uint32_t w){
 }
 
 inline float pulseU(uint32_t p, uint32_t w){	
-	return p > w ? 0.f : 1.f;
+	return p < w ? 1.f : 0.f;
 }
 
 // [1, 0.5, 0, -0.5]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampDown(uint32_t p){
 	p = (p >> 9) | Expo2<float>();
 	return 3.f - punUF(p);
 }
 
 // [1, 0.75, 0.5, 0.25]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampDownU(uint32_t p){
 	p = (p >> 9) | ExpoNeg1<float>();
 	return punUF(p) + 2.f;
 }
 
 // [-1, -0.5, 0, 0.5]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampUp(uint32_t p){
 	p = (p >> 9) | Expo2<float>();
 	return punUF(p) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float rampUpU(uint32_t p){
 	p = (p >> 9) | Expo1<float>();
 	return punUF(p) - 1.f;
 }
 
 inline float rampUp2(uint32_t p, uint32_t w){
-	uint32_t saw1 = ( p    >> 9) | Expo1<float>();
-	uint32_t saw2 = ((p+w) >> 9) | Expo1<float>();
-	return punUF(saw1) + punUF(saw2) - 3.f;
+	uint32_t saw1 = (p    )>>10;
+	uint32_t saw2 = (p + w)>>10;
+	return punUF(Expo2<float>() | (saw1 + saw2)) - 3.f;
 }
 
 inline float rampUp2U(uint32_t p, uint32_t w){
-	uint32_t saw1 = ( p    >> 9) | Expo1_2<float>();
-	uint32_t saw2 = ((p+w) >> 9) | Expo1_2<float>();
-	return punUF(saw1) + punUF(saw2) - 1.f;
+	uint32_t saw1 = (p    )>>10;
+	uint32_t saw2 = (p + w)>>10;
+	return punUF(Expo1<float>() | (saw1 + saw2)) - 1.f;
+}
+
+inline float sinFast(uint32_t p){
+	return sinFast(6.f - punUF(Expo4<float>() | p>>9));
 }
 
 inline float sinPara(uint32_t p){
@@ -1157,8 +1118,6 @@ inline float sinPara(uint32_t p){
 }
 
 // [1, 1,-1,-1]
-// Freq precision:	31 bits
-// Amp precision:	NA
 inline float square(uint32_t p){
 	// use MSB to set sign of 1.f
 	p = (p & MaskSign<float>()) | Expo1<float>();
@@ -1188,38 +1147,48 @@ inline float stairU(uint32_t p, uint32_t w){
 	return ((p & MaskSign<float>()) ? 0.5f : 0.f) + (((p+w) & MaskSign<float>()) ? 0.5f : 0.f);
 }
 
-// [ 1, 0,-1, 0]
-// Freq precision:	31 bits
-// Amp precision:	25 bits
+// Triangle follows sequence [ 1, 0,-1, 0]
+
+//* abs on ramp down
+inline float triangle(uint32_t p){
+	p = (p >> 9) | Expo4<float>(); // [4, 8]
+	return abs(gam::punUF(p) - 6.f) - 1.f;
+}
+//*/
+
+/* Fancy phase reversal using xor
 inline float triangle(uint32_t p){
 	uint32_t dir = p >> 31;
-	p = ((p^(-dir)) + dir);
+	p = ((p^(-int32_t(dir))) + dir);
 	p = (p >> 8) | Expo2<float>();
 	return 3.f - punUF(p);
-}
+}//*/
 
-//inline float triangle(uint32_t p){
-//	p = (p >> 9) | Expo4<float>(); // [4, 8]
-//	return abs(gam::punUF(p) - 6.f) - 1.f;
-//}
+/* 2x trapezoid minus square
+inline float triangle(uint32_t p){
+	uint32_t dir = p & MaskSign<float>();
+	dir |= Expo2<float>(); // +/- 2
+	p = (p << 1 >> 9) | dir;
+	dir |= 0x400000;	// make it +/-3
+	return punUF(dir) - punUF(p);
+}//*/
 
-// Just another triangle wave algorithm
-//inline float triangle(uint32_t p){
-//	uint32_t dir = p & MaskSign<float>();
-//	dir |= 0x40000000;
-//	p = (p << 1 >> 9) | dir;
-//	dir |= 0x400000;	// make it +/-3
-//	return punUF(dir) - punUF(p);
-//}
+/* (2x ramp down) x (square)
+inline float triangle(uint32_t p){
+	//return rampDown(p<<1) * square(p);
+	uint32_t r2 = Expo1<float>() | (p >> 8); // [1,2] 2x
+	uint32_t sq = (p & MaskSign<float>()) | Expo2<float>();
+	return (1.5f - punUF(r2)) * punUF(sq);
+}//*/
 
-// and another...
-//inline float triangle(uint32_t p){
-//	return rampDown(p<<1) * square(p);
-//}
+/* Difference of parabolic waves
+inline float triangle(uint32_t p){
+	float a = rampDown(p);
+	float b = rampDown(p + (1<<31));
+	return a*a - b*b;
+}//*/
 
 // [1, 0.5, 0, 0.5]
-// Freq precision:	32 bits
-// Amp precision:	24 bits
 inline float triangleU(uint32_t p){
 	union{ float f; uint32_t i; } u;
 	u.i = (p >> 9) | Expo2<float>();
@@ -1236,6 +1205,15 @@ template<class T> inline T blackman(T r){
 }
 template<class T> inline T blackmanHarris(T r){
 	return T(0.35875) - T(0.48829) * cos(r) + T(0.14128) * cos(T(2)*r) - T(0.01168) * cos(T(3)*r);
+}
+template<class T> inline T blackmanNuttall(T r){
+	return T(0.3635819) - T(0.4891775) * cos(r) + T(0.1365995) * cos(T(2)*r) - T(0.0106411) * cos(T(3)*r);
+}
+template<class T> inline T nuttall(T r){
+	return T(0.355768) - T(0.487396) * cos(r) + T(0.144232) * cos(T(2)*r) - T(0.012604) * cos(T(3)*r);
+}
+template<class T> inline T flatTop(T r){
+	return T(1.0) - T(1.93) * cos(r) + T(1.29) * cos(T(2)*r) - T(0.388) * cos(T(3)*r) + T(0.028) * cos(T(4)*r);
 }
 template<class T> inline T hamming(T r){ return raisedCosine(r, T(0.53836), T(0.46164)); }
 template<class T> inline T hann(T r){ return raisedCosine(r, T(0.5), T(0.5)); }

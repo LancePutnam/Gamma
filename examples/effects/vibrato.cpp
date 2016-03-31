@@ -1,16 +1,21 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Effect / Vibrato
-	Description:	This demonstrates how to create a vibrato effect by
-					slowly modulating the delay time of a delay line.
+Example:	Vibrato Effect
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates how to create a vibrato effect by slowly modulating the delay
+time of a delay line. Since the vibrato uses a delay line, it can be applied to
+any sound source.
 */
+#include "../AudioApp.h"
+#include "Gamma/Delay.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-#include "../examples.h"
-
-
-struct Vibrato{
-
+class Vibrato{
+public:
 	Vibrato(float modAmount=1./400, float modFreq=5)
 	:	modAmount(modAmount),
 		delay(0.1, 0), mod(modFreq)
@@ -26,20 +31,28 @@ struct Vibrato{
 	LFO<> mod;
 };
 
+class MyApp : public AudioApp{
+public:
 
-LFO<> src(220);			// A rich source
-Vibrato vibrato;		// Vibrato unit
+	LFO<> src1, src2;	// Sound sources
+	Vibrato vibrato;	// Vibrato unit
 
+	void onAudio(AudioIOData& io){
 
-void audioCB(AudioIOData& io){
+		src1.freq(220);
+		src2.freq(220 * 1.26);
 
-	while(io()){
+		while(io()){
+			float s = (src1.tri() + src2.tri()) * 0.2;
 
-		float s = src.tri();
-		s = vibrato(s);
+			// Apply the vibrato
+			s = vibrato(s);
 
-		io.out(0) = io.out(1) = s;
+			io.out(0) = io.out(1) = s;
+		}
 	}
-}
+};
 
-RUN_AUDIO_MAIN
+int main(){
+	MyApp().start();
+}
