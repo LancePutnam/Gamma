@@ -8,6 +8,8 @@
 	This file defines some commonly needed scalar functions.
 */
 
+#include "Gamma/Config.h"
+
 // Define some standard C99 functions that Windows is too stubborn to support.
 #if GAM_WINDOWS
 	// MS puts nextafter here instead of in math.h. Also, we must include
@@ -27,7 +29,6 @@
 
 #include <math.h>
 #include <stdlib.h>				/* labs(long) */
-#include "Gamma/Config.h"
 #include "Gamma/Conversion.h"
 
 
