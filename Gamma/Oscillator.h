@@ -601,6 +601,7 @@ public:
 	float line2();		///< 2-segment line. mod changes wave from down to tri to up
 	float para();		///< Parabolic wave (triangle wave with all harmonics)
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
+	float pulseRange(); ///< Pulse (up + down). 'mod' controls pulse width. amplitude doesn't change with mod.
 	float sinPara();	///< Sine-like wave constructed from parabolas (odd harmonics)
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
 	float sqr();		///< Square (-1 to 1)
@@ -1202,19 +1203,18 @@ template<class Sp, class Td> inline TLFO& TLFO::modI(uint32_t v){
 }
 
 template<class Sp, class Td> inline float TLFO::line2(){
-	using namespace gam::scl;
-	
-//	// Starts at 1
-//	float r1 = rampDown(phaseI());
-//	float r2 = rampDown(phaseI() + mMod);
-
-	// Starts at -1 (better for creating attack/decay like envelopes)
 	uint32_t m = scl::clip<uint32_t>(mMod, 0xffefffff, 512); // avoid div by zero
-	float r1 = rampDown(phaseI() - m);
-	float r2 = rampDown(phaseI());
-	float p  = rampUpU(m);
 
-	float r = (r1*r1 - r2*r2)/(4.f*p*(1.f - p));
+	/* Starts at 1
+	float r1 = scl::rampDown(phaseI());
+	float r2 = scl::rampDown(phaseI() + m); //*/
+
+	//* Starts at -1 (better for creating attack/decay like envelopes)
+	float r1 = scl::rampDown(phaseI() - m);
+	float r2 = scl::rampDown(phaseI()); //*/
+
+	float p  = punUF(Expo2<float>() | (m >> 9)) - 2.f; // [0, 2);
+	float r = (r1*r1 - r2*r2)/(p*(2.f - p));
 	nextPhase();
 	return r;
 }
@@ -1243,6 +1243,7 @@ DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
 DEF(impU(),		scl::pulseU(nextPhase(), this->freqI()) )
 DEF(paraU(),	up(); r*=r;)
 DEF(pulseU(),	scl::pulseU(nextPhase(), mMod))
+DEF(pulseRange(), scl::pulseRange(nextPhase(), mMod))
 DEF(sqrU(),		scl::squareU(nextPhase()))
 DEF(stairU(),	scl::stairU(nextPhase(), mMod))
 DEF(triU(),		scl::triangleU(nextPhase()))

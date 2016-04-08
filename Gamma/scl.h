@@ -453,6 +453,7 @@ float rampUp2	(uint32_t phase, uint32_t width);	// rampUp + rampUp
 
 //---- Unipolar waveforms [0, 1)
 float pulseU	(uint32_t phase, uint32_t width);	///< Returns value of unipolar pulse function.
+float pulseRange(uint32_t phase, uint32_t width, float highVal = 1.0, float lowVal = -1.0); ///< Returns value of ranged pulse function.
 float rampUpU	(uint32_t phase);	///< Returns value of unipolar downward ramp function.
 float rampUp2U	(uint32_t phase);	///< Returns value of unipolar upward ramp2 function.
 float rampDownU	(uint32_t phase);	///< Returns value of unipolar upward ramp function.
@@ -1068,6 +1069,10 @@ inline float pulse(uint32_t p, uint32_t w){
 
 inline float pulseU(uint32_t p, uint32_t w){	
 	return p < w ? 1.f : 0.f;
+}
+
+inline float pulseRange(uint32_t p, uint32_t w, float highVal, float lowVal){
+	return p < w ? highVal : lowVal;
 }
 
 // [1, 0.5, 0, -0.5]
