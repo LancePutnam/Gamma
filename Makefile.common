@@ -24,6 +24,11 @@ else ifeq ($(UNAME), Darwin)
 	OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 else
 	PLATFORM = windows
+	ifneq (,$(findstring MSYS,$(UNAME)))
+		MSYS_VERSION := 2
+	else ifneq (,$(findstring MINGW,$(UNAME)))
+		MSYS_VERSION := 1
+	endif
 endif
 
 
@@ -219,13 +224,14 @@ else ifeq ($(PLATFORM), windows)
 
 	PLATFORM_DIR = windows/
 
-	# Needed for MinGW libs...
-	LDFLAGS  += -L/mingw/lib/
-	CPPFLAGS += -I/mingw/include/
+	ifeq ($(MSYS_VERSION), 2)
+		LDFLAGS  += -L/mingw64/lib/ -L/usr/lib/
+		CPPFLAGS += -I/mingw64/include/ -I/usr/include/
+	else ifeq ($(MSYS_VERSION), 1)
+		LDFLAGS  += -L/mingw/lib/ -L/local/lib/
+		CPPFLAGS += -I/mingw/include/ -I/local/include/
+	endif
 
-	# Needed for MSYS libs...
-	LDFLAGS  += -L/local/lib/
-	CPPFLAGS += -I/local/include/
 	CPPFLAGS += -I`pwd`
 
 #	SLIB_EXT = lib

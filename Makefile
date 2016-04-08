@@ -22,6 +22,12 @@ ifneq ($(NO_AUDIO_IO), 1)
 endif
 
 ifneq ($(NO_SOUNDFILE), 1)
+	# needed for msys2 to compile sndfile.h
+	ifeq ($(PLATFORM), windows)
+		ifeq ($(MSYS_VERSION), 2)
+			CPPFLAGS += -D __int64=int64_t
+		endif
+	endif
 	SRCS += SoundFile.cpp
 endif
 
