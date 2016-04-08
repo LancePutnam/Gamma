@@ -667,8 +667,6 @@ template<>
 inline float nextAfter(float x, float y){ return nextafterf(x,y); }
 template<>
 inline double nextAfter(double x, double y){ return nextafter(x,y); }
-template<>
-inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
 
 template<class T> inline T pow2(T v){ return v*v; }
 template<class T> inline T pow3(T v){ return v*v*v; }
