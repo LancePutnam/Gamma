@@ -107,6 +107,7 @@ public:
 	const T * bufferInverse() const { return bufInvPos(); }
 
 	double binFreq() const;		///< Get width of frequency bins
+	unsigned numAux() const;	///< Get number of auxiliary buffers
 	unsigned numBins() const;	///< Get number of frequency bins
 	unsigned sizeDFT() const;	///< Get size of transform, in samples
 	Domain& domainFreq();		///< Get frequency domain
@@ -506,19 +507,22 @@ DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
 
 template<class T>
 inline T * DFTBase<T>::aux(unsigned num){ return mAux + numBins() * num; }
-    
+
 template<class T>
 inline double DFTBase<T>::binFreq() const { return spu() / sizeDFT(); }
-    
+
 template<class T>
-unsigned	DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
-    
+unsigned DFTBase<T>::numAux() const { return mNumAux; }
+
 template<class T>
-unsigned	DFTBase<T>::sizeDFT() const { return mSizeDFT; }
-    
+unsigned DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
+
+template<class T>
+unsigned DFTBase<T>::sizeDFT() const { return mSizeDFT; }
+
 template<class T>
 Domain& DFTBase<T>::domainFreq(){ return mDomFreq; }
-    
+
 template<class T>
 T DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
 
