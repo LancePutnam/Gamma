@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>		/* memset() */
-#include <math.h>
+#include <cmath>
 
 #include "portaudio.h"
 #include "Gamma/AudioIO.h"

@@ -8,14 +8,12 @@
 	Functions for processing arrays of data.
 */
 
-#include <math.h>
 #include "Gamma/mem.h"
 #include "Gamma/scl.h"
 
 #define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
 
 namespace gam{
-
 
 /// Array rank functions for numerical types.
 
@@ -231,7 +229,7 @@ double inline normalize(ArrayType<T>& arr, double scale=1){
 /// Returns norm of array values.
 template <class T>
 double norm(const T * src, unsigned len, unsigned str=1){
-	return sqrt((double)sumSquares(src, len,str));
+	return std::sqrt((double)sumSquares(src, len,str));
 }
 
 /// Returns taxicab norm of array values (sum of absolute values).
@@ -426,7 +424,7 @@ void cluster(const T * src, Index * indices, unsigned& numIndices, T threshold){
 		Index index = *indices++;
 		T curr = src[index];
 
-		if( fabs(curr - prev) <= threshold ){
+		if( scl::abs(curr - prev) <= threshold ){
 			if(!inCluster){
 				// Add previous index
 				*newIndices++ = indices[-2];

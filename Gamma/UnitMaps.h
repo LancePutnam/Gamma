@@ -4,11 +4,11 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <math.h>
 #include <map>
 #include <vector>
 #include "Gamma/scl.h"
 #include "Gamma/Access.h"
+#include "Gamma/Constants.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Types.h"
 
@@ -206,8 +206,8 @@ private:
 			for(unsigned j=0; j<D; ++j){		// iterate resolution (course to fine)
 				for(unsigned i=0; i<M; ++i){	// iterate arc of unit circle
 					double p = (i*M_PI)/(N>>1);
-					arc(j)[i].real() = cos(p);
-					arc(j)[i].imag() = sin(p);
+					arc(j)[i].real() = std::cos(p);
+					arc(j)[i].imag() = std::sin(p);
 				}
 				N *= M;
 			}
@@ -299,11 +299,11 @@ template <class T> T UnitMapper<T>::unmap(T v){
 
 	case MAP_POW:
 		v = scl::mapLin(v, min, max, T(0), T(1));
-		return pow(v, 1. / p1);
+		return std::pow(v, 1. / p1);
 		//return mapPow(pow(v, 1. / p1));
 
 	case MAP_EXP2:
-		v = log2(v / p1);
+		v = std::log(v / p1) * M_LOG2E; // log2(x)
 		return scl::mapLin(v, min, max, T(0), T(1));
 		//v = scl::mapLin(v, min, max, T(0), T(1));
 		//return mapExp2(value);
@@ -314,16 +314,18 @@ template <class T> T UnitMapper<T>::unmap(T v){
 
 
 template <class T> T UnitMapper<T>::mapLin(T u){
-	doClip(u); return min + u * (max - min);
+	doClip(u);
+	return min + u * (max - min);
 }
 
 template <class T> T UnitMapper<T>::mapPow(T u){
-	doClip(u); return (T)scl::mapPower(u, max, min, p1);
+	doClip(u);
+	return (T)scl::mapPower(u, max, min, p1);
 }
 
 template <class T> T UnitMapper<T>::mapExp2(T u){
 	doClip(u);
-	return (T)(pow(2., scl::mapPower(u, max, min, 1.)) * p1);
+	return (T)(std::pow(2., scl::mapPower(u, max, min, 1.)) * p1);
 }
 
 } // gam::

@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <math.h>
+#include <cmath>
 //#include <stdio.h>
 #include "Gamma/arr.h"
 #include "Gamma/Constants.h"

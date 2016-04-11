@@ -8,13 +8,12 @@
 	Complex numbers and n-vectors.
 */
 
-#include <math.h>
+#include <cmath>
 
 namespace gam{
 
 template<class T> class Complex;
 template<unsigned N, class T> class Vec;
-
 
 typedef float real;				///< Default real number type
 typedef Vec<2,float > float2;	///< Vector of 2 floats
@@ -74,11 +73,11 @@ public:
 	C& norm(const T& v){ return fromPolar(v, arg()); }					///< Set norm leaving argument the same
 	C& mag(const T& v){ return norm(v); }
 
-	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
+	C& fromPhase(const T& v){ r=std::cos(v); i=std::sin(v); return *this; }	///< Set phase and normalize
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
 
 	template <class U>
-	C& operator = (const Polar<U>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
+	C& operator = (const Polar<U>& v){ r=v.m*std::cos(v.p); i=v.m*std::sin(v.p); return *this; }
 
 	template <class U>
 	C& operator = (const Complex<U>& v){ r=v.r; i=v.i; return *this; }
@@ -125,9 +124,9 @@ public:
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
-	C exp() const { return Polar<T>(::exp(r), i); }			///< Returns e^z
-	C log() const { return Complex<T>(T(0.5)*::log(normSqr()), arg()); } ///< Returns log(z)
-	T norm() const { return ::sqrt(normSqr()); }			///< Returns norm (radius), |z|
+	C exp() const { return Polar<T>(std::exp(r), i); }		///< Returns e^z
+	C log() const { return Complex<T>(T(0.5)*std::log(normSqr()), arg()); } ///< Returns log(z)
+	T norm() const { return std::sqrt(normSqr()); }			///< Returns norm (radius), |z|
 	T normSqr() const { return dot(*this); }				///< Returns square of norm, |z|^2
 	C& normalize(T m=T(1)){ return *this *= (m/norm()); }	///< Sets norm (radius) to 1, |z|=1
 	C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
@@ -138,15 +137,22 @@ public:
 
 	/// Returns square root
 	C sqrt() const {
-		static const T c = T(1)/::sqrt(T(2));
+		static const T c = T(1)/std::sqrt(T(2));
 		T n = norm();
-		T a = ::sqrt(n+r) * c;
-		T b = ::sqrt(n-r) * (i<T(0) ? -c : c);		
+		T a = std::sqrt(n+r) * c;
+		T b = std::sqrt(n-r) * (i<T(0) ? -c : c);		
 		return C(a,b);
 	}
 
-	C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
-	C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
+	/// Returns cos(z)
+	C cos() const { using namespace std;
+		return C(cos(r)*cosh(i),-sin(r)*sinh(i));
+	}
+
+	/// Returns sin(z)
+	C sin() const { using namespace std;
+		return C(sin(r)*cosh(i), cos(r)*sinh(i));
+	}
 
 	T abs() const { return norm(); }						///< Returns norm (radius), |z|
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
@@ -263,13 +269,13 @@ public:
 
 	T dot(const Vec& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
 	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
-	T mag() const { return sqrt(magSqr()); }
+	T mag() const { return std::sqrt(magSqr()); }
 	T magSqr() const { return dot(*this); }
 	Vec normalized() const { return Vec(*this).normalize(); }
 
 	Vec& normalize(){
 		T msqr = magSqr();
-		if(msqr > 0) return (*this) /= sqrt(msqr);
+		if(msqr > 0) return (*this) /= std::sqrt(msqr);
 		return Vec().setIdentity();
 	}
 

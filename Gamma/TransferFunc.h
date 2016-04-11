@@ -4,12 +4,11 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <complex>
 
 namespace gam{
-
 
 /// Transfer function of an arbitrary difference equation
     
@@ -36,8 +35,8 @@ public:
 		/// \param[in] f	frequency, in radians
 		Complex response(double f){
 			double phs = f*d;
-			return Complex(c*::cos(phs), c*::sin(phs));
-			// return response(Complex(::cos(f), ::sin(f)));
+			return Complex(c*std::cos(phs), c*std::sin(phs));
+			// return response(Complex(std::cos(f), std::sin(f)));
 		}
 
 		double c, d;

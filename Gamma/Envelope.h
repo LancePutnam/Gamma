@@ -7,10 +7,7 @@
 /// \defgroup Envelopes
 /// Everything in Gamma having to do with envelopes.
 
-
-#include <math.h>
 #include <float.h>
-
 #include "Gamma/gen.h"
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
@@ -732,8 +729,8 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	*/
 
 	mEnd = end;
-	mMul = ::exp(crvOverLen);
-	mA = (end-start) / (Tp(1) - ::exp(crv));
+	mMul = std::exp(crvOverLen);
+	mA = (end-start) / (Tp(1) - std::exp(crv));
 	mB = mA / mMul;
 	mA+= start;
 	return *this;
