@@ -5,56 +5,6 @@
 #include <string.h>
 #include "Gamma/scl.h"
 
-#if GAM_WINDOWS
-/*
- * s_nextafterf.c -- float version of s_nextafter.c.
- * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
- * ====================================================
- */
-inline float nextafterf(float x, float y){
-	union{ float f; int32_t i; } ux, uy;
-	ux.f=x;
-	uy.f=y;
-	int32_t hx=ux.i;
-	int32_t hy=uy.i;
-	int32_t ix=ux.i&0x7fffffff;	/* |x| */
-	int32_t iy=uy.i&0x7fffffff;	/* |y| */
-	if((ix>0x7f800000)||(iy>0x7f800000)) return x+y; /* x or y are nan */
-	if(x==y) return y;			/* x=y, return y */
-	if(ix==0){					/* x == 0 */
-		ux.i=(hy&0x80000000)|1;	/* return +-minsubnormal */
-		x = ux.f;
-		float t = x*x;
-		return t==x ? t : x;	/* raise underflow flag */
-	}
-	if(hx>=0) {					/* x > 0 */
-		if(hx>hy)	--hx;		/* x > y, x -= ulp */
-		else		++hx;		/* x < y, x += ulp */
-	} else {					/* x < 0 */
-		if(hy>=0||hx>hy)--hx;	/* x < y, x -= ulp */
-		else			++hx;	/* x > y, x += ulp */
-	}
-	hy = hx&0x7f800000;
-	if(hy>=0x7f800000) return x+x;	/* overflow  */
-	if(hy <0x00800000){			/* underflow */
-		float t = x*x;
-		if(t!=x){				/* raise underflow flag */
-			ux.i = hx;
-			return ux.f;
-		}
-	}
-	ux.i = hx;
-	return ux.f;
-}
-#endif
-
 namespace gam{
 namespace scl{
 
@@ -130,7 +80,7 @@ double freq(const char * note){
 		// add octave
 		result += (c-48)*12;
 
-		return ::pow(2., double(result-9)/12.) * 27.5;
+		return std::pow(2., double(result-9)/12.) * 27.5;
 	}
 	return 0.;
 }

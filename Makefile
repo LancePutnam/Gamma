@@ -36,6 +36,8 @@ ifeq ($(MSYS_VERSION), 1)
 	CPPFLAGS += -U _hypot -D _hypot=hypot
 endif
 
+CXXFLAGS += -std=c++11
+
 #OBJS = $(SRCS:.cpp=.o)
 #OBJS := $(addprefix $(OBJ_DIR), $(OBJS))
 #SRCS := $(addprefix $(SRC_DIR), $(SRCS))

@@ -12,9 +12,6 @@
 
 // Define some standard C99 functions that Windows is too stubborn to support.
 #if GAM_WINDOWS
-	// MS puts nextafter here instead of in math.h. Also, we must include
-	// float.h before math.h to avoid a problem with MinGW.
-	#include <float.h>
 	// Undefine macros in windows.h
 	#ifdef max
 	#undef max
@@ -22,13 +19,9 @@
 	#ifdef min
 	#undef min
 	#endif
-	float nextafterf(float x, float y); // Defined in scl.cpp
-	#define nextafter(x,y)	_nextafter(x,y)
-	#define nextafterl(x,y)	_nextafter(x,y)
 #endif
 
-#include <math.h>
-#include <stdlib.h>				/* labs(long) */
+#include <cmath>
 #include "Gamma/Conversion.h"
 
 
@@ -44,23 +37,6 @@ template<class T> double normCompare(const T& v);
 /// Scalar rank functions for numerical types
 namespace scl{
 
-// Define overloaded versions of certain basic functions for primitive types.
-// Custom types, such as vectors, can define their own specialized versions in
-// a different header file.
-#define DEF(T, f)\
-inline T abs(T v){ return f(v); }
-DEF(int, ::abs)
-DEF(long, labs)
-DEF(long long, llabs)
-#ifdef GAM_WINDOWS
-	DEF(float, fabs)
-#else
-	DEF(float, fabsf)
-#endif
-DEF(double, fabs)
-#undef DEF
-
-
 #define DEF(T)\
 inline T max(T v1, T v2){ return v1<v2?v2:v1; }\
 inline T min(T v1, T v2){ return v1<v2?v1:v2; }
@@ -71,10 +47,13 @@ DEF(short) DEF(unsigned short)
 DEF(char) DEF(unsigned char)
 #undef DEF
 
-/// Fast approximation to atan2().
+/// Absolute value
+template<class T> T abs(T v){ return std::abs(v); }
 
-// Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
-// |error| < 0.01 rad
+/// Fast approximation to atan2
+
+/// Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
+/// |error| < 0.01 rad
 template<class T> T atan2Fast(T y, T x);
 
 /// Returns floating point value rounded to next highest integer.
@@ -662,12 +641,18 @@ template<class T> inline void mix2(T& io1, T& io2, T mix){
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
 }
 
+#ifdef __MSYS__
+// MSYS2 does not support C++11 std::nextafter like it should
 template<class T>
 inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<>
 inline float nextAfter(float x, float y){ return nextafterf(x,y); }
 template<>
 inline double nextAfter(double x, double y){ return nextafter(x,y); }
+#else
+template<class T>
+inline T nextAfter(T x, T y){ return std::nextafter(x,y); }
+#endif
 
 template<class T> inline T pow2(T v){ return v*v; }
 template<class T> inline T pow3(T v){ return v*v*v; }
