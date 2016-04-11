@@ -275,8 +275,8 @@ public:
 
 	Vec& normalize(){
 		T msqr = magSqr();
-		if(msqr > 0) return (*this) /= std::sqrt(msqr);
-		return Vec().setIdentity();
+		if(msqr > 0)	return (*this) /= std::sqrt(msqr);
+		else			return setIdentity();
 	}
 
 	template <unsigned N2, class T2>
