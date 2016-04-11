@@ -42,6 +42,52 @@ public:
 
 
 
+/// Silence detector
+
+/// This returns true if the magnitude of the input signal remains less than
+/// some threshold over a specified number of samples.
+/// \ingroup Analysis
+class SilenceDetect{
+public:
+	SilenceDetect(unsigned count = 1000)
+	:	mNumSilent(0), mCount(count)
+	{}
+
+
+	/// Set number of samples required to trigger silence
+
+	/// This is the number of contiguous samples that must be below the
+	/// threshold magnitude in order to trigger a silence detection.
+	SilenceDetect& count(unsigned v){
+		mCount=v; return *this;
+	}
+
+	/// Reset the silence counter
+	void reset(){ mNumSilent = 0; }
+
+	/// Detect silence in input signal
+	/// \param[in] input		The input signal
+	/// \param[in] threshold	Magnitude below which a signal is considered silent
+	/// \returns true if silence was detected, otherwise false
+	template <typename T>
+	bool operator()(const T& input, const T& threshold=T(0.001)){
+		if(scl::abs(input) < threshold){
+			++mNumSilent;
+			return done();
+		}
+		reset();
+		return false;
+	}
+
+	/// Returns true if silence is being detected
+	bool done() const { return mNumSilent >= mCount; }
+
+private:
+	unsigned mNumSilent, mCount;
+};
+
+
+
 /// Compares signal magnitude to a threshold
 
 /// This filter compares the input magnitude to a threshold and returns 1 if 
