@@ -168,7 +168,7 @@ TEM Complex<T> pow(const Complex<T>& b, const T& e){ return b.pow(e); }
 TEM Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
 TEM Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
 TEM Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
-TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.normSqr()); }
 #undef TEM
 
 
