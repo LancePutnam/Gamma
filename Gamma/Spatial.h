@@ -206,6 +206,7 @@ private:
 enum ReverbFlavor{
 	JCREVERB,	// John Chowning (4-comb, 3-allpass)
 	FREEVERB,	// Jezar's Freeverb (8-comb, 4-allpass)
+	SATREV,		// John Chowning MUS10 implementation (4-comb, 3-allpass)
 };
 
 
@@ -514,6 +515,11 @@ ReverbMS<TARG>& ReverbMS<TARG>::resize(ReverbFlavor flavor, unsigned d){
 			{1116+d, 1188+d, 1277+d, 1356+d, 1422+d, 1491+d, 1557+d, 1617+d},
 			{556+d, 441+d, 341+d, 225+d}
 		);
+	case SATREV:
+  		return resize(
+      			{901+d, 778+d, 1011+d, 1123+d},
+			{125+d, 42+d, 12+d}
+  		);
 	default:;
 	}
 	return *this;
