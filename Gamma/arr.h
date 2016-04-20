@@ -229,7 +229,7 @@ double inline normalize(ArrayType<T>& arr, double scale=1){
 /// Returns norm of array values.
 template <class T>
 double norm(const T * src, unsigned len, unsigned str=1){
-	return std::sqrt((double)sumSquares(src, len,str));
+	return sqrt((double)sumSquares(src, len,str));
 }
 
 /// Returns taxicab norm of array values (sum of absolute values).

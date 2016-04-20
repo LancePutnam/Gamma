@@ -463,8 +463,8 @@ public:
 	/// Set amplitude decay/grow factor after N iterations
 	void decay(const T& target, const T& N=T(1)){
 		// NOTE: this handles negative decays, thought better to leave this to frequency component
-		//factor(freq(), (1==N) ? target : (::pow(scl::abs(target), 1./N)*scl::sgn(target)));
-		factor(freq(), (1==N) ? target : (::pow(scl::abs(target), 1./N)));
+		//factor(freq(), (1==N) ? target : (pow(scl::abs(target), 1./N)*scl::sgn(target)));
+		factor(freq(), (1==N) ? target : (pow(scl::abs(target), 1./N)));
 	}
 
 	/// Set recursive multiplication factor (frequency and decay/growth factor)

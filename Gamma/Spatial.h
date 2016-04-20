@@ -360,12 +360,12 @@ namespace{
 
 template <typename T>
 inline T decayToFbk(T decay, T delay){
-	return ::pow(0.001, delay/decay);
+	return pow(0.001, delay/decay);
 }
 
 template <typename T>
 inline T fbkToDecay(T fbk, T delay){
-	return T(-3)*delay / ::log(scl::abs(fbk));
+	return T(-3)*delay / log(scl::abs(fbk));
 }
 
 }

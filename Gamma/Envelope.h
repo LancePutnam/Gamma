@@ -729,8 +729,8 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	*/
 
 	mEnd = end;
-	mMul = std::exp(crvOverLen);
-	mA = (end-start) / (Tp(1) - std::exp(crv));
+	mMul = exp(crvOverLen);
+	mA = (end-start) / (Tp(1) - exp(crv));
 	mB = mA / mMul;
 	mA+= start;
 	return *this;

@@ -206,8 +206,8 @@ private:
 			for(unsigned j=0; j<D; ++j){		// iterate resolution (course to fine)
 				for(unsigned i=0; i<M; ++i){	// iterate arc of unit circle
 					double p = (i*M_PI)/(N>>1);
-					arc(j)[i].real() = std::cos(p);
-					arc(j)[i].imag() = std::sin(p);
+					arc(j)[i].real() = cos(p);
+					arc(j)[i].imag() = sin(p);
 				}
 				N *= M;
 			}
@@ -299,11 +299,11 @@ template <class T> T UnitMapper<T>::unmap(T v){
 
 	case MAP_POW:
 		v = scl::mapLin(v, min, max, T(0), T(1));
-		return std::pow(v, 1. / p1);
+		return pow(v, 1. / p1);
 		//return mapPow(pow(v, 1. / p1));
 
 	case MAP_EXP2:
-		v = std::log(v / p1) * M_LOG2E; // log2(x)
+		v = log(v / p1) * M_LOG2E; // log2(x)
 		return scl::mapLin(v, min, max, T(0), T(1));
 		//v = scl::mapLin(v, min, max, T(0), T(1));
 		//return mapExp2(value);
@@ -325,7 +325,7 @@ template <class T> T UnitMapper<T>::mapPow(T u){
 
 template <class T> T UnitMapper<T>::mapExp2(T u){
 	doClip(u);
-	return (T)(std::pow(2., scl::mapPower(u, max, min, 1.)) * p1);
+	return (T)(pow(2., scl::mapPower(u, max, min, 1.)) * p1);
 }
 
 } // gam::

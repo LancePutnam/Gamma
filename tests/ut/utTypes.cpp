@@ -24,8 +24,8 @@
 		double p=0.1; c(1,0); c *= Polard(1, p); T(c.arg(), p)
 
 		c.fromPolar(4,0.2);
-		T(c.sqrt().norm(), 2)
-		T(c.sqrt().arg(), 0.1)
+		T(sqrt(c).norm(), 2)
+		T(sqrt(c).arg(), 0.1)
 		#undef T
 	}
 	

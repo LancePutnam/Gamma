@@ -10,7 +10,6 @@
 
 #include "Gamma/Config.h"
 
-// Define some standard C99 functions that Windows is too stubborn to support.
 #if GAM_WINDOWS
 	// Undefine macros in windows.h
 	#ifdef max
@@ -26,6 +25,11 @@
 
 
 namespace gam{
+
+using std::exp;
+using std::log;
+using std::pow;
+using std::sqrt;
 
 /// Returns a positive length associated with argument
 template<class T> double norm(const T& v);
@@ -97,11 +101,11 @@ template<class T> T cosT8(T radians);
 
 /// Convert decibels to amplitude
 template <class T>
-inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
+inline T dBToAmp(const T& db){ return pow(10, db/20.); }
 
 /// Convert amplitude to decibels
 template <class T>
-inline T ampTodB(const T& amp){ return 20*::log(amp); }
+inline T ampTodB(const T& amp){ return 20*log(amp); }
 
 /// Returns an equal-loudness amplitude for a given frequency, in Hz.
 
@@ -213,7 +217,7 @@ template<class T> T pow5(T v);			///< Returns value to the 5th power
 template<class T> T pow8(T v);			///< Returns value to the 8th power
 
 /// Returns pole radius given a T60 decay length and units/sample
-inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
+inline double radius60(double dcy, double ups){ return exp(M_LN001/dcy * ups); } // u/s * 1/u
 
 /// Returns floating point value rounded to nearest integer.
 template<class T> T round(T v);
@@ -342,19 +346,19 @@ template<class T> T trunc(T value, T step, T recStep);
 double t60(double samples);
 
 /// Returns value wrapped in [lo, hi).
-template<class T> T wrap(T value, T hi=(T)1, T lo=(T)0);
+template<class T> T wrap(T value, T hi=T(1), T lo=T(0));
 
 /// Returns value wrapped in [lo, hi).
 
 /// 'numWraps' reports how many wrappings occured where the sign, + or -,
 /// signifies above 'hi' or below 'lo', respectively.
-template<class T> T wrap(T value, long & numWraps, T hi=(T)1, T lo=(T)0);
+template<class T> T wrap(T value, long & numWraps, T hi=T(1), T lo=T(0));
 
 /// Returns value incremented by 1 and wrapped into interval [0, max).
 template<class T> T wrapAdd1(T v, T max){ ++v; return v == max ? 0 : v; }
 
 /// Like wrap(), but only adds or subtracts 'hi' once from value.
-template<class T> T wrapOnce(T value, T hi=(T)1);
+template<class T> T wrapOnce(T value, T hi=T(1));
 
 template<class T> T wrapOnce(T value, T hi, T lo);
 
@@ -661,7 +665,7 @@ template<class T> inline T pow5(T v){ return pow4(v)*v; }
 template<class T> inline T pow8(T v){ return pow4(v*v); }
 
 inline double ratioET(double pc, double divs, double ival){
-	return ::pow(ival, pc/divs);
+	return pow(ival, pc/divs);
 }
 
 //template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
@@ -1187,22 +1191,39 @@ inline float triangleU(uint32_t p){
 }
 
 
-template<class T> inline T bartlett(T n){	return T(1) - scl::abs(n); }
+template<class T> inline T bartlett(T n){
+	return T(1) - scl::abs(n);
+}
 
 template<class T> inline T blackman(T r){
-	return T(0.42) + T(0.08) * cos(T(2)*r) - T(0.5) * cos(r);	// prevents -0s
+	return	T(0.42)
+		+ T(0.08) * cos(T(2)*r)
+		- T(0.5 ) * cos(     r); // prevents -0s
 }
 template<class T> inline T blackmanHarris(T r){
-	return T(0.35875) - T(0.48829) * cos(r) + T(0.14128) * cos(T(2)*r) - T(0.01168) * cos(T(3)*r);
+	return T(0.35875)
+		- T(0.48829) * cos(     r)
+		+ T(0.14128) * cos(T(2)*r)
+		- T(0.01168) * cos(T(3)*r);
 }
 template<class T> inline T blackmanNuttall(T r){
-	return T(0.3635819) - T(0.4891775) * cos(r) + T(0.1365995) * cos(T(2)*r) - T(0.0106411) * cos(T(3)*r);
+	return T(0.3635819)
+		- T(0.4891775) * cos(     r)
+		+ T(0.1365995) * cos(T(2)*r)
+		- T(0.0106411) * cos(T(3)*r);
 }
 template<class T> inline T nuttall(T r){
-	return T(0.355768) - T(0.487396) * cos(r) + T(0.144232) * cos(T(2)*r) - T(0.012604) * cos(T(3)*r);
+	return T(0.355768)
+		- T(0.487396) * cos(     r)
+		+ T(0.144232) * cos(T(2)*r)
+		- T(0.012604) * cos(T(3)*r);
 }
 template<class T> inline T flatTop(T r){
-	return T(1.0) - T(1.93) * cos(r) + T(1.29) * cos(T(2)*r) - T(0.388) * cos(T(3)*r) + T(0.028) * cos(T(4)*r);
+	return T(1.0)
+		- T(1.93 ) * cos(     r)
+		+ T(1.29 ) * cos(T(2)*r)
+		- T(0.388) * cos(T(3)*r)
+		+ T(0.028) * cos(T(4)*r);
 }
 template<class T> inline T hamming(T r){ return raisedCosine(r, T(0.53836), T(0.46164)); }
 template<class T> inline T hann(T r){ return raisedCosine(r, T(0.5), T(0.5)); }

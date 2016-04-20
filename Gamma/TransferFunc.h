@@ -29,14 +29,14 @@ public:
 
 		// H(z) = c z^d
 		Complex response(Complex z){
-			return c * std::pow(z,-d);
+			return c * pow(z,-d);
 		}
 		
 		/// \param[in] f	frequency, in radians
 		Complex response(double f){
 			double phs = f*d;
-			return Complex(c*std::cos(phs), c*std::sin(phs));
-			// return response(Complex(std::cos(f), std::sin(f)));
+			return Complex(c*cos(phs), c*sin(phs));
+			// return response(Complex(cos(f), sin(f)));
 		}
 
 		double c, d;

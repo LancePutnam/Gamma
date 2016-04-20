@@ -308,7 +308,7 @@ float gaussian(RNG& rng = rnd::gen){
 		w = x1 * x1 + x2 * x2;
 	} while( w >= 1.f );
 
-	w = std::sqrt((-2.f * std::log(w)) / w);
+	w = sqrt((-2.f * log(w)) / w);
 	y1 = x1 * w;
 	y2 = x2 * w;
 	return y1;

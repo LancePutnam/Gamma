@@ -388,7 +388,7 @@ void cosine(T * dst, unsigned len){
 
 	len -= 1;
 	LOOP(len, 1){
-		T val = T(std::cos(phs));
+		T val = T(cos(phs));
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -408,7 +408,7 @@ void sine(T * dst, unsigned len){
 	
 	--len;
 	LOOP(len, 1){
-		T val = std::sin(phs);
+		T val = sin(phs);
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -420,7 +420,7 @@ template<class T>
 void sinusoid(T * dst, unsigned len, double phase, double periods){
 	double inc = M_2PI * periods / len;
 	for(unsigned i=0; i<len; ++i){
-		*dst++ = std::sin(inc * i + phase);
+		*dst++ = sin(inc * i + phase);
 	}
 }
 
@@ -437,7 +437,7 @@ void multiImpulse(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		LOOP(hLen+1, 1){
-			*dst1++ += T(std::cos(phs));
+			*dst1++ += T(cos(phs));
 			phs += phaseInc;
 		}
 	}
@@ -464,7 +464,7 @@ void multiSaw(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<hLen; ++j){
-			*dst1++ += T(amp * std::sin(phs));
+			*dst1++ += T(amp * sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -495,7 +495,7 @@ void multiSquare(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<=qLen; ++j){
-			*dst1++ += T(amp * std::sin(phs));
+			*dst1++ += T(amp * sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -701,17 +701,17 @@ namespace{
 
 	template<class T>
 	T getSin(double p){
-		return T(std::sin(p));
+		return T(sin(p));
 	}
 
 	template<>
 	Complex<float> getSin<Complex<float> >(double p){
-		return Complex<float>(std::cos(p), std::sin(p));
+		return Complex<float>(cos(p), sin(p));
 	}
 
 	template<>
 	Complex<double> getSin<Complex<double> >(double p){
-		return Complex<double>(std::cos(p), std::sin(p));
+		return Complex<double>(cos(p), sin(p));
 	}
 };
 
@@ -729,6 +729,7 @@ void addSinesPow(
 	T * dst, unsigned len, int numh,
 	double hmul, double hshf, double amp, double hphs, double wphs, double cycles
 ){
+	using std::pow;
 	const double inc1 = (M_2PI / len) * cycles;
 
 	for(int j=0; j<numh; ++j){
@@ -741,7 +742,7 @@ void addSinesPow(
 		case 1: A /= h; break;
 		case 2: A /= h*h; break;
 		case 3: A /= h*h*h; break;
-		default:A *= std::pow(h, -InvPower);
+		default:A *= pow(h, -InvPower);
 		}
 
 		const double P = (hphs + h*wphs) * M_2PI;
