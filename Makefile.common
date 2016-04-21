@@ -24,10 +24,23 @@ else ifeq ($(UNAME), Darwin)
 	OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 else
 	PLATFORM = windows
-	ifneq (,$(findstring MSYS,$(UNAME)))
-		MSYS_VERSION := 2
-	else ifneq (,$(findstring MINGW,$(UNAME)))
+
+	# uname returns:
+	# MSYS/MinGW:		MINGW32_NT-6.2
+	# MSYS2/MinGW-32:	MINGW32_NT-10.0
+	# MSYS2/MinGW-64:	MINGW64_NT-10.0
+	# MSYS2:			MSYS_NT-10.0
+	ifneq (,$(findstring MINGW32,$(UNAME)))
+		MINGW_VERSION := 32
+	else ifneq (,$(findstring MINGW64,$(UNAME)))
+		MINGW_VERSION := 64
+	endif
+
+	# uname -o returns 'Msys' for both Msys and Msys2, so can't be used
+	ifneq (,$(wildcard /msys.bat))
 		MSYS_VERSION := 1
+	else
+		MSYS_VERSION := 2
 	endif
 endif
 
@@ -225,11 +238,13 @@ else ifeq ($(PLATFORM), windows)
 	PLATFORM_DIR = windows/
 
 	ifeq ($(MSYS_VERSION), 2)
-		LDFLAGS  += -L/mingw64/lib/ -L/usr/lib/
-		CPPFLAGS += -I/mingw64/include/ -I/usr/include/
+		# user packages in /mingw64, standard libs in /usr
+		LDFLAGS  += -L/mingw$(MINGW_VERSION)/lib/ -L/usr/lib/
+		CPPFLAGS += -I/mingw$(MINGW_VERSION)/include/ -I/usr/include/
 	else ifeq ($(MSYS_VERSION), 1)
-		LDFLAGS  += -L/mingw/lib/ -L/local/lib/
-		CPPFLAGS += -I/mingw/include/ -I/local/include/
+		# user packages in /local, standard libs in /mingw
+		LDFLAGS  += -L/local/lib/ -L/mingw/lib/
+		CPPFLAGS += -I/local/include/ -I/mingw/include/
 	endif
 
 	CPPFLAGS += -I`pwd`
