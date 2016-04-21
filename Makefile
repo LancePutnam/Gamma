@@ -31,11 +31,6 @@ ifneq ($(NO_SOUNDFILE), 1)
 	SRCS += SoundFile.cpp
 endif
 
-# This fixes a bug in MINGW/MSYS math.h
-ifeq ($(MSYS_VERSION), 1)
-	CPPFLAGS += -U _hypot -D _hypot=hypot
-endif
-
 CXXFLAGS += -std=c++11
 
 #OBJS = $(SRCS:.cpp=.o)

@@ -247,6 +247,9 @@ else ifeq ($(PLATFORM), windows)
 		CPPFLAGS += -I/mingw/include/
 		PREFIX := /local/
 		CC := gcc
+
+		# This fixes a bug in MINGW/MSYS math.h (!!!)
+		CPPFLAGS += -U _hypot -D _hypot=hypot
 	endif
 
 	# Location of user installed libs
