@@ -238,14 +238,20 @@ else ifeq ($(PLATFORM), windows)
 	PLATFORM_DIR = windows/
 
 	ifeq ($(MSYS_VERSION), 2)
-		# user packages in /mingw64, standard libs in /usr
-		LDFLAGS  += -L/mingw$(MINGW_VERSION)/lib/ -L/usr/lib/
-		CPPFLAGS += -I/mingw$(MINGW_VERSION)/include/ -I/usr/include/
+		LDFLAGS  += -L/usr/lib/
+		CPPFLAGS += -I/usr/include/
+		CPPFLAGS += -D_WIN$(MINGW_VERSION)
+		PREFIX := /mingw$(MINGW_VERSION)/
 	else ifeq ($(MSYS_VERSION), 1)
-		# user packages in /local, standard libs in /mingw
-		LDFLAGS  += -L/local/lib/ -L/mingw/lib/
-		CPPFLAGS += -I/local/include/ -I/mingw/include/
+		LDFLAGS  += -L/mingw/lib/
+		CPPFLAGS += -I/mingw/include/
+		PREFIX := /local/
+		CC := gcc
 	endif
+
+	# Location of user installed libs
+	LDFLAGS += -L$(PREFIX)/lib/
+	CPPFLAGS += -I$(PREFIX)/include/
 
 	CPPFLAGS += -I`pwd`
 
