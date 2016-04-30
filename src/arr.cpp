@@ -2,7 +2,6 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <cmath>
-//#include <stdio.h>
 #include "Gamma/arr.h"
 #include "Gamma/Constants.h"
 
@@ -18,7 +17,7 @@ void linToDB(float * arr, unsigned len, float minDB){
 		uint32_t * arrI = (uint32_t *)arr;
 		uint32_t sign = (*arrI) & MaskSign<float>();
 		
-		float val = fabs(*arr);
+		float val = std::fabs(*arr);
 		
 		if(val == 0.f){
 			*arr++ = 0.f;

@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdlib.h>
+#include <cstdlib> // exit
 #include "Gamma/Print.h"
 
 namespace gam{
@@ -93,7 +93,7 @@ void printPlot(float value, unsigned width, bool spaces, bool sign, const char *
 
 void err(const char * msg, const char * src, bool exits){
 	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
-	if(exits) exit(EXIT_FAILURE);
+	if(exits) std::exit(EXIT_FAILURE);
 }
 
 void warn(const char * msg, const char * src){

@@ -1,10 +1,9 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <algorithm>
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>		/* memset() */
+#include <algorithm>
+#include <cstring> // memset
 #include <cmath>
 
 #include "portaudio.h"
@@ -36,7 +35,7 @@ static int resize(T *& buf, int n){
 }
 
 template <class T>
-static inline void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
+static inline void zero(T * buf, int n){ std::memset(buf, 0, n*sizeof(T)); }
 
 template <class T>
 static void deinterleave(T * dst, const T * src, int numFrames, int numChannels){

@@ -1,8 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <ctype.h>
-#include <string.h>
+#include <cctype> // tolower
 #include "Gamma/scl.h"
 
 namespace gam{
@@ -62,7 +61,7 @@ double eqLoudAmp(double freq, double maxAmp){
 
 double freq(const char * note){
 
-	char c = tolower(*note++);
+	char c = std::tolower(*note++);
 	if(within(c, 'a','g')){
 		c -= 97;
 
@@ -93,7 +92,7 @@ double nearest(double val, const char * intervals, long div){
 
 	struct F{
 		static int base36To10(char v){
-			v = tolower(v);
+			v = std::tolower(v);
 			if(v>='0' && v<='9') return v - '0';
 			if(v>='a' && v<='z') return v - 'a' + 10;
 			return 0;	// non-alphanumeric
