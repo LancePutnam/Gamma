@@ -34,6 +34,8 @@ else
 		MINGW_VERSION := 32
 	else ifneq (,$(findstring MINGW64,$(UNAME)))
 		MINGW_VERSION := 64
+	else ifneq (,$(findstring MSYS_NT,$(UNAME)))
+		MINGW_VERSION := 64
 	endif
 
 	# uname -o returns 'Msys' for both Msys and Msys2, so can't be used
