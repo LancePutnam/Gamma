@@ -54,8 +54,8 @@ int main(){
 	//AudioDevice adevi = AudioDevice("firewire_pcm");
 	//AudioDevice adevo = AudioDevice("firewire_pcm");
 
+	int maxIChans = adevi.channelsInMax();
 	int maxOChans = adevo.channelsOutMax();
-	int maxIChans = adevi.channelsOutMax();
 	printf("Max input channels:  %d\n", maxIChans);
 	printf("Max output channels: %d\n", maxOChans);
 
