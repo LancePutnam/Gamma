@@ -7,7 +7,7 @@
 /// \defgroup Envelopes
 /// Everything in Gamma having to do with envelopes.
 
-#include <float.h>
+#include <cfloat> /* DBL_MAX, FLT_MAX */
 #include "Gamma/gen.h"
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"

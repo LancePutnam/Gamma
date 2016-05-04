@@ -10,10 +10,8 @@
 
 /// \defgroup Containers
 
-#include <stdlib.h>
 #include <vector>
 #include <map>
-
 #include "Gamma/Allocator.h"
 #include "Gamma/Conversion.h"
 #include "Gamma/mem.h"

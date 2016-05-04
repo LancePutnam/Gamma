@@ -1,5 +1,5 @@
 //#include <stdio.h> // printf
-#include <string.h> // memcpy
+#include <cstring> // memcpy
 #include "Gamma/Recorder.h"
 
 namespace gam{
@@ -24,13 +24,13 @@ int Recorder::write(const float * buf, int numFrames){
 	if((mIW+Nw) > Nr){ // need to write across array boundary
 		int N0 = Nr - mIW;
 		int N1 = mIW + Nw - Nr;
-		memcpy(&mRing[mIW], buf, N0);
-		memcpy(&mRing[  0], buf + N0, N1);
+		std::memcpy(&mRing[mIW], buf, N0);
+		std::memcpy(&mRing[  0], buf + N0, N1);
 		mIW = N1;
 	}
 	else{
 		int newIW = mIW + Nw;		
-		memcpy(&mRing[mIW], buf, Nw);		
+		std::memcpy(&mRing[mIW], buf, Nw);
 		if(newIW < Nr)	mIW = newIW;
 		else			mIW = 0;
 	}

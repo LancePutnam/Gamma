@@ -9,7 +9,7 @@
 */
 
 #include <stdio.h>
-#include <time.h>	/* for time() */
+#include <ctime> // time()
 #include "Gamma/gen.h"
 #include "Gamma/mem.h"
 #include "Gamma/Conversion.h"
@@ -23,7 +23,7 @@ namespace rnd{
 		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
 		static bool initSeed = true;
 		if(initSeed){
-			seedGen.val = time(NULL);
+			seedGen.val = std::time(NULL);
 			initSeed = false;
 		} 
 		return seedGen();
