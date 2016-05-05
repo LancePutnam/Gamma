@@ -31,8 +31,6 @@ ifneq ($(NO_SOUNDFILE), 1)
 	SRCS += SoundFile.cpp
 endif
 
-CXXFLAGS += -std=c++11
-
 #OBJS = $(SRCS:.cpp=.o)
 #OBJS := $(addprefix $(OBJ_DIR), $(OBJS))
 #SRCS := $(addprefix $(SRC_DIR), $(SRCS))
