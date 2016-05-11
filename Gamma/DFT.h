@@ -4,16 +4,13 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <math.h>
 #include "Gamma/mem.h"			// *Ring functions
-#include "Gamma/scl.h"
-#include "Gamma/tbl.h"
+#include "Gamma/tbl.h"			// WindowType
 #include "Gamma/Domain.h"
 #include "Gamma/Constants.h"
 #include "Gamma/Containers.h"	
 #include "Gamma/FFT.h"
 #include "Gamma/Types.h"		// Complex
-
 
 namespace gam{
 
@@ -25,7 +22,6 @@ enum SpectralType{
 	MAG_PHASE,	/**< Magnitude and phase */
 	MAG_FREQ	/**< Magnitude and frequency */
 };
-
 
 
 /// Sliding window for analysis

@@ -1,4 +1,4 @@
-#include <string.h> // memset
+#include <cstring> // memset
 #include "Gamma/Scheduler.h"
 
 /*
@@ -330,7 +330,7 @@ void Scheduler::recordNRT(const char * soundFilePath, double durationSec){
 		while(t < durationSec){
 
 			//io.zeroOut();
-			memset(io().buffersOut, 0, numChans*numFrames*sizeof(float));
+			std::memset(io().buffersOut, 0, numChans*numFrames*sizeof(float));
 			update();
 			
 			// interleave channel data

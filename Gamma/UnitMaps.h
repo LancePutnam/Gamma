@@ -4,11 +4,11 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <math.h>
 #include <map>
 #include <vector>
 #include "Gamma/scl.h"
 #include "Gamma/Access.h"
+#include "Gamma/Constants.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Types.h"
 
@@ -303,7 +303,7 @@ template <class T> T UnitMapper<T>::unmap(T v){
 		//return mapPow(pow(v, 1. / p1));
 
 	case MAP_EXP2:
-		v = log2(v / p1);
+		v = log(v / p1) * M_LOG2E; // log2(x)
 		return scl::mapLin(v, min, max, T(0), T(1));
 		//v = scl::mapLin(v, min, max, T(0), T(1));
 		//return mapExp2(value);
@@ -314,11 +314,13 @@ template <class T> T UnitMapper<T>::unmap(T v){
 
 
 template <class T> T UnitMapper<T>::mapLin(T u){
-	doClip(u); return min + u * (max - min);
+	doClip(u);
+	return min + u * (max - min);
 }
 
 template <class T> T UnitMapper<T>::mapPow(T u){
-	doClip(u); return (T)scl::mapPower(u, max, min, p1);
+	doClip(u);
+	return (T)scl::mapPower(u, max, min, p1);
 }
 
 template <class T> T UnitMapper<T>::mapExp2(T u){

@@ -8,13 +8,15 @@
 	Complex numbers and n-vectors.
 */
 
-#include <math.h>
+#include <cmath>
 
 namespace gam{
 
+using std::cos;
+using std::sin;
+
 template<class T> class Complex;
 template<unsigned N, class T> class Vec;
-
 
 typedef float real;				///< Default real number type
 typedef Vec<2,float > float2;	///< Vector of 2 floats
@@ -74,11 +76,11 @@ public:
 	C& norm(const T& v){ return fromPolar(v, arg()); }					///< Set norm leaving argument the same
 	C& mag(const T& v){ return norm(v); }
 
-	C& fromPhase(const T& v){ r=::cos(v); i=::sin(v); return *this; }	///< Set phase and normalize
+	C& fromPhase(const T& v){ r=cos(v); i=sin(v); return *this; }		///< Set phase and normalize
 	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
 
 	template <class U>
-	C& operator = (const Polar<U>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
+	C& operator = (const Polar<U>& v){ r=v.m*cos(v.p); i=v.m*sin(v.p); return *this; }
 
 	template <class U>
 	C& operator = (const Complex<U>& v){ r=v.r; i=v.i; return *this; }
@@ -125,30 +127,13 @@ public:
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
-	C exp() const { return Polar<T>(::exp(r), i); }			///< Returns e^z
-	C log() const { return Complex<T>(T(0.5)*::log(normSqr()), arg()); } ///< Returns log(z)
-	T norm() const { return ::sqrt(normSqr()); }			///< Returns norm (radius), |z|
+	T norm() const { return sqrt(normSqr()); }				///< Returns norm (radius), |z|
 	T normSqr() const { return dot(*this); }				///< Returns square of norm, |z|^2
 	C& normalize(T m=T(1)){ return *this *= (m/norm()); }	///< Sets norm (radius) to 1, |z|=1
-	C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
-	C pow(const T& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
 	C recip() const { return conj()/normSqr(); }			///< Return multiplicative inverse, 1/z
 	C sgn(T m=T(1)) const { return C(*this).normalize(m); }	///< Returns signum, z/|z|, the closest point on unit circle
 	C sqr() const { return C(r*r-i*i, T(2)*r*i); }			///< Returns square
 
-	/// Returns square root
-	C sqrt() const {
-		static const T c = T(1)/::sqrt(T(2));
-		T n = norm();
-		T a = ::sqrt(n+r) * c;
-		T b = ::sqrt(n-r) * (i<T(0) ? -c : c);		
-		return C(a,b);
-	}
-
-	C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
-	C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
-
-	T abs() const { return norm(); }						///< Returns norm (radius), |z|
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
 	T magSqr() const { return normSqr(); }					///< Returns magnitude squared, |z|^2
 	T phase() const { return arg(); }						///< Returns argument (angle)
@@ -160,11 +145,20 @@ public:
 };
 
 #define TEM template <class T>
-TEM Complex<T> abs(const Complex<T>& c){ return c.abs(); }
-TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
-TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
-TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
-TEM Complex<T> pow(const Complex<T>& b, const T& e){ return b.pow(e); }
+TEM Complex<T> abs(const Complex<T>& z){ return z.norm(); }
+TEM Complex<T> cos(const Complex<T>& z){ return Complex<T>(cos(z.r)*cosh(z.i),-sin(z.r)*sinh(z.i)); }
+TEM Complex<T> sin(const Complex<T>& z){ return Complex<T>(sin(z.r)*cosh(z.i), cos(z.r)*sinh(z.i)); }
+TEM Complex<T> exp(const Complex<T>& z){ return Polar<T>(exp(z.r), z.i); }
+TEM Complex<T> log(const Complex<T>& z){ return Complex<T>(T(0.5)*log(z.normSqr()), z.arg()); }
+TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return exp(log(b)*e); }
+TEM Complex<T> pow(const Complex<T>& b, const T& e){ return exp(log(b)*e); }
+TEM Complex<T> sqrt(const Complex<T>& z){
+	static const T c = T(1)/sqrt(T(2));
+	T n = z.norm();
+	T a = sqrt(n + z.r) * c;
+	T b = sqrt(n - z.r) * (z.i<T(0) ? -c : c);
+	return Complex<T>(a,b);
+}
 TEM Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
 TEM Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
 TEM Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
@@ -263,14 +257,14 @@ public:
 
 	T dot(const Vec& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
 	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
-	T mag() const { return sqrt(magSqr()); }
+	T mag() const { return std::sqrt(magSqr()); }
 	T magSqr() const { return dot(*this); }
 	Vec normalized() const { return Vec(*this).normalize(); }
 
 	Vec& normalize(){
 		T msqr = magSqr();
-		if(msqr > 0) return (*this) /= sqrt(msqr);
-		return Vec().setIdentity();
+		if(msqr > 0)	return (*this) /= sqrt(msqr);
+		else			return setIdentity();
 	}
 
 	template <unsigned N2, class T2>

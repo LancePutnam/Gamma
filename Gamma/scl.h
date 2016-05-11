@@ -10,11 +10,7 @@
 
 #include "Gamma/Config.h"
 
-// Define some standard C99 functions that Windows is too stubborn to support.
 #if GAM_WINDOWS
-	// MS puts nextafter here instead of in math.h. Also, we must include
-	// float.h before math.h to avoid a problem with MinGW.
-	#include <float.h>
 	// Undefine macros in windows.h
 	#ifdef max
 	#undef max
@@ -22,17 +18,18 @@
 	#ifdef min
 	#undef min
 	#endif
-	float nextafterf(float x, float y); // Defined in scl.cpp
-	#define nextafter(x,y)	_nextafter(x,y)
-	#define nextafterl(x,y)	_nextafter(x,y)
 #endif
 
-#include <math.h>
-#include <stdlib.h>				/* labs(long) */
+#include <cmath>
 #include "Gamma/Conversion.h"
 
 
 namespace gam{
+
+using std::exp;
+using std::log;
+using std::pow;
+using std::sqrt;
 
 /// Returns a positive length associated with argument
 template<class T> double norm(const T& v);
@@ -44,23 +41,6 @@ template<class T> double normCompare(const T& v);
 /// Scalar rank functions for numerical types
 namespace scl{
 
-// Define overloaded versions of certain basic functions for primitive types.
-// Custom types, such as vectors, can define their own specialized versions in
-// a different header file.
-#define DEF(T, f)\
-inline T abs(T v){ return f(v); }
-DEF(int, ::abs)
-DEF(long, labs)
-DEF(long long, llabs)
-#ifdef GAM_WINDOWS
-	DEF(float, fabs)
-#else
-	DEF(float, fabsf)
-#endif
-DEF(double, fabs)
-#undef DEF
-
-
 #define DEF(T)\
 inline T max(T v1, T v2){ return v1<v2?v2:v1; }\
 inline T min(T v1, T v2){ return v1<v2?v1:v2; }
@@ -71,10 +51,13 @@ DEF(short) DEF(unsigned short)
 DEF(char) DEF(unsigned char)
 #undef DEF
 
-/// Fast approximation to atan2().
+/// Absolute value
+template<class T> T abs(T v){ return std::abs(v); }
 
-// Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
-// |error| < 0.01 rad
+/// Fast approximation to atan2
+
+/// Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
+/// |error| < 0.01 rad
 template<class T> T atan2Fast(T y, T x);
 
 /// Returns floating point value rounded to next highest integer.
@@ -118,11 +101,11 @@ template<class T> T cosT8(T radians);
 
 /// Convert decibels to amplitude
 template <class T>
-inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
+inline T dBToAmp(const T& db){ return pow(10, db/20.); }
 
 /// Convert amplitude to decibels
 template <class T>
-inline T ampTodB(const T& amp){ return 20*::log(amp); }
+inline T ampTodB(const T& amp){ return 20*log(amp); }
 
 /// Returns an equal-loudness amplitude for a given frequency, in Hz.
 
@@ -234,7 +217,7 @@ template<class T> T pow5(T v);			///< Returns value to the 5th power
 template<class T> T pow8(T v);			///< Returns value to the 8th power
 
 /// Returns pole radius given a T60 decay length and units/sample
-inline double radius60(double dcy, double ups){ return ::exp(M_LN001/dcy * ups); } // u/s * 1/u
+inline double radius60(double dcy, double ups){ return exp(M_LN001/dcy * ups); } // u/s * 1/u
 
 /// Returns floating point value rounded to nearest integer.
 template<class T> T round(T v);
@@ -363,19 +346,19 @@ template<class T> T trunc(T value, T step, T recStep);
 double t60(double samples);
 
 /// Returns value wrapped in [lo, hi).
-template<class T> T wrap(T value, T hi=(T)1, T lo=(T)0);
+template<class T> T wrap(T value, T hi=T(1), T lo=T(0));
 
 /// Returns value wrapped in [lo, hi).
 
 /// 'numWraps' reports how many wrappings occured where the sign, + or -,
 /// signifies above 'hi' or below 'lo', respectively.
-template<class T> T wrap(T value, long & numWraps, T hi=(T)1, T lo=(T)0);
+template<class T> T wrap(T value, long & numWraps, T hi=T(1), T lo=T(0));
 
 /// Returns value incremented by 1 and wrapped into interval [0, max).
 template<class T> T wrapAdd1(T v, T max){ ++v; return v == max ? 0 : v; }
 
 /// Like wrap(), but only adds or subtracts 'hi' once from value.
-template<class T> T wrapOnce(T value, T hi=(T)1);
+template<class T> T wrapOnce(T value, T hi=T(1));
 
 template<class T> T wrapOnce(T value, T hi, T lo);
 
@@ -662,12 +645,18 @@ template<class T> inline void mix2(T& io1, T& io2, T mix){
 	//io2 = io2 * mix + io1 * ((T)1 - mix);
 }
 
+#ifdef __MSYS__
+// MSYS2 does not support C++11 std::nextafter like it should
 template<class T>
 inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<>
 inline float nextAfter(float x, float y){ return nextafterf(x,y); }
 template<>
 inline double nextAfter(double x, double y){ return nextafter(x,y); }
+#else
+template<class T>
+inline T nextAfter(T x, T y){ return std::nextafter(x,y); }
+#endif
 
 template<class T> inline T pow2(T v){ return v*v; }
 template<class T> inline T pow3(T v){ return v*v*v; }
@@ -676,7 +665,7 @@ template<class T> inline T pow5(T v){ return pow4(v)*v; }
 template<class T> inline T pow8(T v){ return pow4(v*v); }
 
 inline double ratioET(double pc, double divs, double ival){
-	return ::pow(ival, pc/divs);
+	return pow(ival, pc/divs);
 }
 
 //template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
@@ -1202,22 +1191,39 @@ inline float triangleU(uint32_t p){
 }
 
 
-template<class T> inline T bartlett(T n){	return T(1) - scl::abs(n); }
+template<class T> inline T bartlett(T n){
+	return T(1) - scl::abs(n);
+}
 
 template<class T> inline T blackman(T r){
-	return T(0.42) + T(0.08) * cos(T(2)*r) - T(0.5) * cos(r);	// prevents -0s
+	return	T(0.42)
+		+ T(0.08) * cos(T(2)*r)
+		- T(0.5 ) * cos(     r); // prevents -0s
 }
 template<class T> inline T blackmanHarris(T r){
-	return T(0.35875) - T(0.48829) * cos(r) + T(0.14128) * cos(T(2)*r) - T(0.01168) * cos(T(3)*r);
+	return T(0.35875)
+		- T(0.48829) * cos(     r)
+		+ T(0.14128) * cos(T(2)*r)
+		- T(0.01168) * cos(T(3)*r);
 }
 template<class T> inline T blackmanNuttall(T r){
-	return T(0.3635819) - T(0.4891775) * cos(r) + T(0.1365995) * cos(T(2)*r) - T(0.0106411) * cos(T(3)*r);
+	return T(0.3635819)
+		- T(0.4891775) * cos(     r)
+		+ T(0.1365995) * cos(T(2)*r)
+		- T(0.0106411) * cos(T(3)*r);
 }
 template<class T> inline T nuttall(T r){
-	return T(0.355768) - T(0.487396) * cos(r) + T(0.144232) * cos(T(2)*r) - T(0.012604) * cos(T(3)*r);
+	return T(0.355768)
+		- T(0.487396) * cos(     r)
+		+ T(0.144232) * cos(T(2)*r)
+		- T(0.012604) * cos(T(3)*r);
 }
 template<class T> inline T flatTop(T r){
-	return T(1.0) - T(1.93) * cos(r) + T(1.29) * cos(T(2)*r) - T(0.388) * cos(T(3)*r) + T(0.028) * cos(T(4)*r);
+	return T(1.0)
+		- T(1.93 ) * cos(     r)
+		+ T(1.29 ) * cos(T(2)*r)
+		- T(0.388) * cos(T(3)*r)
+		+ T(0.028) * cos(T(4)*r);
 }
 template<class T> inline T hamming(T r){ return raisedCosine(r, T(0.53836), T(0.46164)); }
 template<class T> inline T hann(T r){ return raisedCosine(r, T(0.5), T(0.5)); }

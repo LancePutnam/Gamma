@@ -4,8 +4,8 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <string.h>
-#include <stdlib.h>
+#include <cstring> // memcpy, memmove, etc.
+#include <cstdlib> // free, realloc
 #include "Gamma/Access.h" // indexLast
 
 #define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
@@ -54,21 +54,21 @@ void copyAllFromRing(const T * ring, unsigned ringSize, unsigned ringTap, T * ds
 
 /// Copy source 'src' array bytes to destination 'dst'.
 template <class T>
-void deepCopy(T * dst, const T * src, unsigned len){ memcpy(dst, src, len*sizeof(T)); }
+void deepCopy(T * dst, const T * src, unsigned len){ std::memcpy(dst, src, len*sizeof(T)); }
 
 /// Returns whether array bytes are equal (==).
 template <class T>
 bool deepEqual(const T * src1, const T * src2, unsigned len){
-	return 0 == memcmp(src1, src2, len*sizeof(T));
+	return 0 == std::memcmp(src1, src2, len*sizeof(T));
 }
 
 /// Move source 'src' array bytes to destination 'dst'. Arrays can overlap.
 template <class T>
-void deepMove(T * dst, const T * src, unsigned len){ memmove(dst, src, len*sizeof(T)); }
+void deepMove(T * dst, const T * src, unsigned len){ std::memmove(dst, src, len*sizeof(T)); }
 
 /// Set elements' bytes to zero.
 template <class T>
-void deepZero(T * arr, unsigned len){ memset(arr, 0, len*sizeof(T)); }
+void deepZero(T * arr, unsigned len){ std::memset(arr, 0, len*sizeof(T)); }
 
 /// Deinterleave an array of elements with any number of channels.
 
@@ -383,7 +383,7 @@ inline void expand(T * dst, const T * src, unsigned lenSrc, unsigned amount){
 
 template <class T>
 inline void free(T *& ptr){
-	if(ptr){ ::free(ptr); ptr=0; }
+	if(ptr){ std::free(ptr); ptr=0; }
 }
 
 template <class T>
@@ -474,7 +474,7 @@ inline void repeat(unsigned chunkSize, T * arr, unsigned len){
 template <class T>
 bool resize(T *& arr, unsigned sizeNow, unsigned sizeNew){
 	if((sizeNow != sizeNew) && (0 != sizeNew)){
-		T * ptr = (T *)realloc(arr, sizeNew * sizeof(T));
+		T * ptr = (T *)std::realloc(arr, sizeNew * sizeof(T));
 		if(0 != ptr){ arr = ptr; return true; }	// successful resize
 	}
 	return false;

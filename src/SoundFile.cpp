@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <ctype.h>
+#include <cctype> // tolower
 #include <string>
 #include <stdio.h>
 #include "sndfile.h"
@@ -94,7 +94,7 @@ values. All other fields of the structure are filled in by the library.
 		
 		if(string::npos != pos){
 			string ext = sfpath.substr(pos+1);
-			for(unsigned i=0; i<ext.size(); ++i) ext[i] = tolower(ext[i]);
+			for(unsigned i=0; i<ext.size(); ++i) ext[i] = std::tolower(ext[i]);
 			
 			//printf("%s\n", ext.c_str());
 			if(ext == "wav")					return SF_FORMAT_WAV;

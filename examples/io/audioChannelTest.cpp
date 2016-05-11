@@ -51,24 +51,27 @@ int main(){
 
 	AudioDevice adevi = AudioDevice::defaultInput();
 	AudioDevice adevo = AudioDevice::defaultOutput();
-	//AudioDevice adevi = AudioDevice("firewire_pcm");
-	//AudioDevice adevo = AudioDevice("firewire_pcm");
-
+	//AudioDevice adevi = AudioDevice("Microphone (AUREON");
+	//AudioDevice adevo = AudioDevice("Speakers (AUREON");
+	//AudioDevice adevi = AudioDevice(11);
+	//AudioDevice adevo = AudioDevice(16);
+		
+	int maxIChans = adevi.channelsInMax();
 	int maxOChans = adevo.channelsOutMax();
-	int maxIChans = adevi.channelsOutMax();
 	printf("Max input channels:  %d\n", maxIChans);
 	printf("Max output channels: %d\n", maxOChans);
 
-	// To open the maximum number of channels, we can hand in the queried values...
-	//AudioIO io(256, 44100., audioCB, NULL, maxOChans, maxIChans);
-
-	// ... or just use -1
-	AudioIO io(256, 44100., audioCB, NULL, -1, -1);
-
+	AudioIO io(256, 44100., audioCB);
+	
+	// Set i/o devices
 	io.deviceIn(adevi);
 	io.deviceOut(adevo);
+	
+	// Use the maximum number of channels
+	io.channelsIn(-1);
+	io.channelsOut(-1);
 
-	//Sync::master().spu(io.framesPerSecond());
+	//gam::sampleRate(io.framesPerSecond());
 	if(io.start()){
 		printf("start successful\n");
 		io.print();

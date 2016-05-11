@@ -4,16 +4,13 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <math.h>
 #include "Gamma/arr.h"
 #include "Gamma/mem.h"
 #include "Gamma/scl.h"
 #include "Gamma/Constants.h"
 #include "Gamma/Types.h"
 
-/// Main namespace
 namespace gam{
-
 
 /// Window types
 enum WindowType{
@@ -391,7 +388,7 @@ void cosine(T * dst, unsigned len){
 
 	len -= 1;
 	LOOP(len, 1){
-		T val = T(::cos(phs));
+		T val = T(cos(phs));
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -411,7 +408,7 @@ void sine(T * dst, unsigned len){
 	
 	--len;
 	LOOP(len, 1){
-		T val = ::sin(phs);
+		T val = sin(phs);
 		*dst++  =  val;
 		*dst2++ = -val;
 		phs += inc;
@@ -423,7 +420,7 @@ template<class T>
 void sinusoid(T * dst, unsigned len, double phase, double periods){
 	double inc = M_2PI * periods / len;
 	for(unsigned i=0; i<len; ++i){
-		*dst++ = ::sin(inc * i + phase);
+		*dst++ = sin(inc * i + phase);
 	}
 }
 
@@ -440,7 +437,7 @@ void multiImpulse(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		LOOP(hLen+1, 1){
-			*dst1++ += T(::cos(phs));
+			*dst1++ += T(cos(phs));
 			phs += phaseInc;
 		}
 	}
@@ -467,7 +464,7 @@ void multiSaw(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<hLen; ++j){
-			*dst1++ += T(amp * ::sin(phs));
+			*dst1++ += T(amp * sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -498,7 +495,7 @@ void multiSquare(T * dst, unsigned len, unsigned hrmLo, unsigned hrmHi){
 		T * dst1 = dst;
 		
 		for(unsigned j=1; j<=qLen; ++j){
-			*dst1++ += T(amp * ::sin(phs));
+			*dst1++ += T(amp * sin(phs));
 			phs += phaseInc;
 		}
 	}
@@ -556,12 +553,11 @@ void multiWave(T * dst, unsigned len, unsigned order, void (* func)(T *, unsigne
 	dst += len * (order - 1);
 
 	func(dst, len, 1, 1);
-	
+
 	unsigned hrmLo = 2;
 	unsigned hrmHi = 2;
 
 	for(unsigned o=0; o<order-1; o++){
-	
 		T * dstPrev = dst;
 		dst -= len;
 		mem::deepCopy(dst, dstPrev, len);
@@ -602,31 +598,31 @@ void window(T * dst, unsigned len, WindowType type){
 	}
 	
 template<class T>
-void bartlett      (T * dst, unsigned len){ SYM_WIN(2.   , 0., phs) }
+void bartlett		(T * dst, unsigned len){ SYM_WIN(2.   , 0., phs) }
     
 template<class T>
-void blackman      (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackman(phs)) }
+void blackman		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackman(phs)) }
     
 template<class T>
-void blackmanHarris(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanHarris(phs)) }
+void blackmanHarris	(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanHarris(phs)) }
     
 template<class T>
 void blackmanNuttall(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanNuttall(phs)) }
     
 template<class T>
-void flatTop      (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::flatTop(phs)) }
+void flatTop		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::flatTop(phs)) }
 
 template<class T>
-void hamming       (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hamming(phs)) }
+void hamming		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hamming(phs)) }
     
 template<class T>
-void hann          (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hann(phs)) }
+void hann			(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hann(phs)) }
 
 template<class T>
-void nuttall      (T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::nuttall(phs)) }
+void nuttall		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::nuttall(phs)) }
     
 template<class T>
-void welch         (T * dst, unsigned len){ SYM_WIN(2.   ,-1., scl::welch(phs)) }
+void welch			(T * dst, unsigned len){ SYM_WIN(2.   ,-1., scl::welch(phs)) }
 
 #undef SYM_WIN
 
@@ -705,17 +701,17 @@ namespace{
 
 	template<class T>
 	T getSin(double p){
-		return T(::sin(p));
+		return T(sin(p));
 	}
 
 	template<>
 	Complex<float> getSin<Complex<float> >(double p){
-		return Complex<float>(::cos(p), ::sin(p));
+		return Complex<float>(cos(p), sin(p));
 	}
 
 	template<>
 	Complex<double> getSin<Complex<double> >(double p){
-		return Complex<double>(::cos(p), ::sin(p));
+		return Complex<double>(cos(p), sin(p));
 	}
 };
 
@@ -733,6 +729,7 @@ void addSinesPow(
 	T * dst, unsigned len, int numh,
 	double hmul, double hshf, double amp, double hphs, double wphs, double cycles
 ){
+	using std::pow;
 	const double inc1 = (M_2PI / len) * cycles;
 
 	for(int j=0; j<numh; ++j){
@@ -745,7 +742,7 @@ void addSinesPow(
 		case 1: A /= h; break;
 		case 2: A /= h*h; break;
 		case 3: A /= h*h*h; break;
-		default:A *= ::pow(h, -InvPower);
+		default:A *= pow(h, -InvPower);
 		}
 
 		const double P = (hphs + h*wphs) * M_2PI;

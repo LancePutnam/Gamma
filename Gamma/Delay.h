@@ -534,7 +534,7 @@ TM1 inline Tv Comb<TM2>::nextFbk(const Tv& i0){
 	return circulateFbk(i0, (*this)()); }
 
 TM1 inline void Comb<TM2>::decay(float units, float end){
-	mFBK = ::pow(end, this->delay() / scl::abs(units));
+	mFBK = pow(end, this->delay() / scl::abs(units));
 	if(units < 0.f) mFBK = -mFBK;
 }
 

@@ -2,13 +2,12 @@
 	See COPYRIGHT file for authors and license information */
 
 #include "Gamma/Conversion.h"
-#include <ctype.h>
-#include <string.h>
+#include <cstring> // strlen
 
 namespace gam{
 
 uint32_t bits(const char * string){
-	uint32_t v=0; int n = strlen(string);
+	uint32_t v=0; int n = std::strlen(string);
 	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);
 	return v;
 }
@@ -37,7 +36,7 @@ int32_t floatToInt(float value){
 	u.u += 0x800000;
 
 	if(u.u & 0x40000000){	// mag outside [0, 1)
-		int32_t shift = ((u.u)>>23) & 0x7F;
+		int32_t shift = (u.u>>23) & 0x7F;
 		int32_t sign = u.u & MaskSign<float>();
 		int32_t result = (1<<shift) | ((u.u & MaskFrac<float>())>>(23-shift));
 		
@@ -56,7 +55,7 @@ float split(float value, int32_t& intPart){
 	u.u += 0x800000;
 
 	if(u.u & 0x40000000){
-		int32_t shift = ((u.u)>>23) & 0x7F;
+		int32_t shift = (u.u>>23) & 0x7F;
 		intPart = (1<<shift) | ((u.u & MaskFrac<float>())>>(23-shift));
 		u.u = Expo1<float>() | ((u.u << shift) & MaskFrac<float>());
 		return u.f - 1.f;

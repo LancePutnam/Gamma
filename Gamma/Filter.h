@@ -34,7 +34,7 @@ enum FilterType{
 
 /// Returns pole radius given a unit bandwidth
 template <class T>
-inline T poleRadius(T bw){ return ::exp(-M_PI * bw); }
+inline T poleRadius(T bw){ return exp(-M_PI * bw); }
 
 /// Returns pole radius given a bandwidth and sampling interval
 template <class T>
@@ -851,7 +851,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// b1 found by setting |H(w)| = 0.707
 		Tp re = getReal(v * Td::ups());
 		Tp p1 = re - Tp(2);
-		mB1 = -(p1 + ::sqrt(p1*p1 - Tp(1)));
+		mB1 = -(p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) - mB1;
 		}
 		break;
@@ -861,7 +861,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// b1 found by setting |H(w)| = 0.707
 		Tp re = getReal(v * Td::ups());
 		Tp p1 = -re - Tp(2); // -re flips cutoff
-		mB1 = (p1 + ::sqrt(p1*p1 - Tp(1)));
+		mB1 = (p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;
 		//printf("%g\n", mB1);
 		}
@@ -880,7 +880,7 @@ inline void OnePole<Tv,Tp,Td>::lag(Tp length, Tp thresh){
 	mFreq = Tp(1)/length;
 	// Since b^(length f_s) = thresh,
 	// 	b = thresh ^ (1 / (length fs))
-	mB1 = ::pow(thresh, Tp(this->ups()/length));
+	mB1 = pow(thresh, Tp(this->ups()/length));
 	mA0 = Tp(1) - mB1;
 }
 
