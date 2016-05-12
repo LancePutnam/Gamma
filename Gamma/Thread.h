@@ -106,7 +106,7 @@ struct ThreadFunctor{
 	Thread::Function func;
 	void * userData;
 
-	static unsigned __stdcall call(void * user){
+	static DWORD WINAPI call(void * user){
 		ThreadFunctor * pF = reinterpret_cast<ThreadFunctor*>(user);
 		(*(pF->func))(pF->userData);
 		delete pF;
@@ -122,7 +122,7 @@ inline bool Thread::start(Thread::Function func, void * user){
 	f->func = func;
 	f->userData = user;
 
-	unsigned thread_id;
+	DWORD thread_id;
 	// _beginthreadex should be used if the C run-time library is used in
 	// the thread function. However, it is not available in MSYS2...
 	//mHandle = _beginthreadex(NULL, 0, ThreadFunctor::call, f, 0, &thread_id);

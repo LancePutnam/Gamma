@@ -10,8 +10,8 @@
 namespace gam{
 using std::string;
 
-struct SoundFile::Impl{
-
+class SoundFile::Impl{
+public:
 	Impl()
 	:	fp(0)
 	{
