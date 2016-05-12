@@ -10,7 +10,6 @@
 #include "Gamma/Print.h"
 #include "Gamma/Thread.h"
 #include "Gamma/Timer.h"
-#include "Gamma/SoundFile.h"
 
 namespace gam{
 

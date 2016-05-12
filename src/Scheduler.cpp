@@ -1,5 +1,6 @@
 #include <cstring> // memset
 #include "Gamma/Scheduler.h"
+#include "Gamma/SoundFile.h"
 
 /*
 The audio thread reads through the event list and calls back into objects to
