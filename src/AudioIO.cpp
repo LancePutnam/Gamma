@@ -156,7 +156,8 @@ void AudioDevice::printAll(){
 
 
 //==============================================================================
-struct AudioIOData::Impl{
+class AudioIOData::Impl{
+public:
 	Impl(): mStream(0), mErrNum(0), mIsOpen(false), mIsRunning(false){}
 
 	bool error() const { return mErrNum != paNoError; }
