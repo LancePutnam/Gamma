@@ -160,21 +160,6 @@ values. All other fields of the structure are filled in by the library.
 	template <class T> int read(T * dst, int numFrames);
 	template <class T> int write(const T * src, int numFrames);
 
-	#define DEF_SPECIAL(type)\
-	template<>\
-	int read<type>(type * dst, int numFrames){\
-		return sf_readf_##type(fp, dst, numFrames);\
-	}\
-	template<>\
-	int write<type>(const type * src, int numFrames){\
-		return sf_writef_##type(fp, src, numFrames);\
-	}
-	DEF_SPECIAL(float)
-	DEF_SPECIAL(short)
-	DEF_SPECIAL(int)
-	DEF_SPECIAL(double)
-	#undef DEF_SPECIAL
-
 	void seek(int pos, int mode){
 		sf_seek(fp, pos, mode);
 	}
@@ -194,6 +179,21 @@ values. All other fields of the structure are filled in by the library.
 	SF_INSTRUMENT mInst;
 	SF_FORMAT_INFO mFormatInfo;
 };
+
+#define DEF_SPECIAL(type)\
+template<>\
+int SoundFile::Impl::read<type>(type * dst, int numFrames){\
+	return sf_readf_##type(fp, dst, numFrames);\
+}\
+template<>\
+int SoundFile::Impl::write<type>(const type * src, int numFrames){\
+	return sf_writef_##type(fp, src, numFrames);\
+}
+DEF_SPECIAL(float)
+DEF_SPECIAL(short)
+DEF_SPECIAL(int)
+DEF_SPECIAL(double)
+#undef DEF_SPECIAL
 
 #endif
 
