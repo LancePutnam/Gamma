@@ -24,10 +24,25 @@ else ifeq ($(UNAME), Darwin)
 	OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 else
 	PLATFORM = windows
-	ifneq (,$(findstring MSYS,$(UNAME)))
-		MSYS_VERSION := 2
-	else ifneq (,$(findstring MINGW,$(UNAME)))
+
+	# uname returns:
+	# MSYS/MinGW:		MINGW32_NT-6.2
+	# MSYS2/MinGW-32:	MINGW32_NT-10.0
+	# MSYS2/MinGW-64:	MINGW64_NT-10.0
+	# MSYS2:			MSYS_NT-10.0
+	ifneq (,$(findstring MINGW32,$(UNAME)))
+		MINGW_VERSION := 32
+	else ifneq (,$(findstring MINGW64,$(UNAME)))
+		MINGW_VERSION := 64
+	else ifneq (,$(findstring MSYS_NT,$(UNAME)))
+		MINGW_VERSION := 64
+	endif
+
+	# uname -o returns 'Msys' for both Msys and Msys2, so can't be used
+	ifneq (,$(wildcard /msys.bat))
 		MSYS_VERSION := 1
+	else
+		MSYS_VERSION := 2
 	endif
 endif
 
@@ -225,12 +240,23 @@ else ifeq ($(PLATFORM), windows)
 	PLATFORM_DIR = windows/
 
 	ifeq ($(MSYS_VERSION), 2)
-		LDFLAGS  += -L/mingw64/lib/ -L/usr/lib/
-		CPPFLAGS += -I/mingw64/include/ -I/usr/include/
+		LDFLAGS  += -L/usr/lib/
+		CPPFLAGS += -I/usr/include/
+		CPPFLAGS += -D_WIN$(MINGW_VERSION)
+		PREFIX := /mingw$(MINGW_VERSION)/
 	else ifeq ($(MSYS_VERSION), 1)
-		LDFLAGS  += -L/mingw/lib/ -L/local/lib/
-		CPPFLAGS += -I/mingw/include/ -I/local/include/
+		LDFLAGS  += -L/mingw/lib/
+		CPPFLAGS += -I/mingw/include/
+		PREFIX := /local/
+		CC := gcc
+
+		# This fixes a bug in MINGW/MSYS math.h (!!!)
+		CPPFLAGS += -U _hypot -D _hypot=hypot
 	endif
+
+	# Location of user installed libs
+	LDFLAGS += -L$(PREFIX)/lib/
+	CPPFLAGS += -I$(PREFIX)/include/
 
 	CPPFLAGS += -I`pwd`
 

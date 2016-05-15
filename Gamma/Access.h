@@ -12,6 +12,10 @@
 
 namespace gam{
 
+#ifdef max
+#undef max
+#endif
+
 typedef int index_t;
 
 /// Returns last index of an arithmetic iteration starting from 0

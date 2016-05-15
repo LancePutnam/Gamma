@@ -49,8 +49,8 @@
 			assert(almostEqual(2./b,Complex(1 * 2./5, -2 * 2./5)));
 
 		c.fromPolar(4, 0.2);
-			assert(almostEqual(c.sqrt().norm(), 2));
-			assert(almostEqual(c.sqrt().arg(), 0.1));
+			assert(almostEqual(sqrt(c).norm(), 2));
+			assert(almostEqual(sqrt(c).arg(), 0.1));
 	}
 
 	// Vec

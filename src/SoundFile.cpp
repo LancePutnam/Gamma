@@ -1,7 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <ctype.h>
+#include <cctype> // tolower
 #include <string>
 #include <stdio.h>
 #include "sndfile.h"
@@ -10,8 +10,46 @@
 namespace gam{
 using std::string;
 
-struct SoundFile::Impl{
+#ifdef GAM_NO_SOUNDFILE
+class SoundFile::Impl {
+public:
 
+	double frameRate() const { return 1; }
+	int frames() const { return 0; }
+	int channels() const { return 0; }
+
+	void channels(int num){}
+	void frameRate(double hz){}
+
+	bool close(){ return true; }
+
+	int format() const { return 0; }
+	int formatMajor() const { return 0; }
+	int formatMinor() const { return 0; }
+	void format(int v){}
+
+	bool opened() const { return false; }
+
+	bool openRead(const std::string& path){ return false; }
+	bool openWrite(const std::string& path){ return false; }
+
+	const char * extension(){ return ""; }
+	int formatMajor(const string& sfpath){ return 0; }
+	void formatMajor(int v){}
+	void formatMinor(int v){}
+
+	void info(const Impl& src){}
+
+	template <class T> int read(T * dst, int numFrames){ return 0; }
+	template <class T> int write(const T * src, int numFrames){ return 0; }
+
+	void seek(int pos, int mode){}
+
+	//void printInfo(){}
+};
+#else
+class SoundFile::Impl{
+public:
 	Impl()
 	:	fp(0)
 	{
@@ -94,7 +132,7 @@ values. All other fields of the structure are filled in by the library.
 		
 		if(string::npos != pos){
 			string ext = sfpath.substr(pos+1);
-			for(unsigned i=0; i<ext.size(); ++i) ext[i] = tolower(ext[i]);
+			for(unsigned i=0; i<ext.size(); ++i) ext[i] = std::tolower(ext[i]);
 			
 			//printf("%s\n", ext.c_str());
 			if(ext == "wav")					return SF_FORMAT_WAV;
@@ -119,6 +157,13 @@ values. All other fields of the structure are filled in by the library.
 		memcpy(&mInfo, &src.mInfo, sizeof(mInfo));
 	}
 
+	template <class T> int read(T * dst, int numFrames);
+	template <class T> int write(const T * src, int numFrames);
+
+	void seek(int pos, int mode){
+		sf_seek(fp, pos, mode);
+	}
+
 	void printInfo(){
 		printf("\n");
 		printf("frames=     %d\n", (int)mInfo.frames);
@@ -135,8 +180,22 @@ values. All other fields of the structure are filled in by the library.
 	SF_FORMAT_INFO mFormatInfo;
 };
 
+#define DEF_SPECIAL(type)\
+template<>\
+int SoundFile::Impl::read<type>(type * dst, int numFrames){\
+	return sf_readf_##type(fp, dst, numFrames);\
+}\
+template<>\
+int SoundFile::Impl::write<type>(const type * src, int numFrames){\
+	return sf_writef_##type(fp, src, numFrames);\
+}
+DEF_SPECIAL(float)
+DEF_SPECIAL(short)
+DEF_SPECIAL(int)
+DEF_SPECIAL(double)
+#undef DEF_SPECIAL
 
-
+#endif
 
 
 SoundFile::SoundFile(const string& path_)
@@ -294,24 +353,23 @@ void SoundFile::print(){
 		toString(format()), toString(encoding()), frameRate(), channels(), frames(), frames()/frameRate());
 }
 
-// specialized templates to hook into libsndfile functions
-#define DEFINE_SPECIAL(type) \
-	template<> \
+#define DEF_SPECIAL(type)\
+	template<>\
 	int SoundFile::read<type>(type * dst, int numFrames){\
-		return sf_readf_##type(mImpl->fp, dst, numFrames);\
+		return mImpl->read(dst, numFrames);\
 	}\
-	template<> \
+	template<>\
 	int SoundFile::write<type>(const type * src, int numFrames){\
-		return sf_writef_##type(mImpl->fp, src, numFrames);\
+		return mImpl->write(src, numFrames);\
 	}
-	DEFINE_SPECIAL(float)
-	DEFINE_SPECIAL(short)
-	DEFINE_SPECIAL(int)
-	DEFINE_SPECIAL(double)
-#undef DEFINE_SPECIAL
+	DEF_SPECIAL(float)
+	DEF_SPECIAL(short)
+	DEF_SPECIAL(int)
+	DEF_SPECIAL(double)
+#undef DEF_SPECIAL
 
 void SoundFile::seek(int pos, int mode){
-	sf_seek(mImpl->fp, pos, mode);
+	mImpl->seek(pos, mode);
 }
 
 } // gam::

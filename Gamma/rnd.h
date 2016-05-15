@@ -8,18 +8,14 @@
 	Random variable classes
 */
 
-#include <math.h>
 #include <stdio.h>
-#include <time.h>	/* for time() */
-
+#include <ctime> // time()
 #include "Gamma/gen.h"
 #include "Gamma/mem.h"
-#include "Gamma/scl.h"
 #include "Gamma/Conversion.h"
 #include "Gamma/Types.h"
 
 namespace gam{
-
 
 namespace rnd{	
 	/// Get a random seed
@@ -27,7 +23,7 @@ namespace rnd{
 		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
 		static bool initSeed = true;
 		if(initSeed){
-			seedGen.val = time(NULL);
+			seedGen.val = std::time(NULL);
 			initSeed = false;
 		} 
 		return seedGen();
@@ -312,7 +308,7 @@ float gaussian(RNG& rng = rnd::gen){
 		w = x1 * x1 + x2 * x2;
 	} while( w >= 1.f );
 
-	w = sqrt((-2.f * ::log(w)) / w);
+	w = sqrt((-2.f * log(w)) / w);
 	y1 = x1 * w;
 	y2 = x2 * w;
 	return y1;

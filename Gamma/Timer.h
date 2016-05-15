@@ -87,7 +87,7 @@ inline double Timer::elapsedMSec(){ return ((double)elapsed() * 1e-6); }
 // platform specific
 
 // Windows
-#ifdef _WIN32
+#ifdef GAM_WINDOWS
 
 	inline nsec_t timeNow(){
 		return (nsec_t)timeGetTime() * (nsec_t)1e6;

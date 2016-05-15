@@ -1,8 +1,8 @@
 #ifndef INC_GAM_SCHEDULER_H
 #define INC_GAM_SCHEDULER_H
 
-#include <stdlib.h> // exit
-#include <string.h> // memcpy, size_t
+#include <cstdlib> // exit
+#include <cstring> // memcpy, size_t
 #include <queue>
 #include <list>
 
@@ -10,7 +10,6 @@
 #include "Gamma/Print.h"
 #include "Gamma/Thread.h"
 #include "Gamma/Timer.h"
-#include "Gamma/SoundFile.h"
 
 namespace gam{
 
@@ -180,10 +179,10 @@ private:
 			fprintf(stderr, "Func maximum data size exceeded. "
 				"Attempt to use %d bytes with maximum size set to %d.\n",
 				size, GAM_FUNC_MAX_DATA_SIZE);
-			exit(-1);
+			std::exit(-1);
 		}
 		#endif
-		memcpy(mData, data, size);
+		std::memcpy(mData, data, size);
 		//printf("Func::set() with %d bytes\n", size);		
 	}
 };
@@ -246,13 +245,13 @@ struct SchedulerAudioIOData{
 
 private:
 	template <class T>
-	static size_t typeID(){
+	static std::size_t typeID(){
 		static int x;
-		return size_t(&x);
+		return std::size_t(&x);
 	}
 
-	void * mUserData;			// User data (usually other audio I/O data)
-	size_t mUserDataTypeID;		// Use for safe casting
+	void * mUserData;				// User data (usually other audio I/O data)
+	std::size_t mUserDataTypeID;	// Use for safe casting
 };
 
 

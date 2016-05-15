@@ -4,42 +4,16 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-/***************************************************/
-/* \class Thread
-    \brief STK thread class.
-
-    This class provides a uniform interface for cross-platform
-    threads.  On unix systems, the pthread library is used.  Under
-    Windows, the C runtime threadex functions are used.
-
-    Each instance of the Thread class can be used to control a single
-    thread process.  Routines are provided to signal cancelation
-    and/or joining with a thread, though it is not possible for this
-    class to know the running status of a thread once it is started.
-
-    For cross-platform compatability, thread functions should be
-    declared as follows:
-
-    THREAD_FUNCTION(thread_function_name)
-
-    by Perry R. Cook and Gary P. Scavone, 1995 - 2005.
-*/
-/***************************************************/
-
-//#define GAM_USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
-//#define GAM_USE_THREADEX	(defined(WIN32) || defined(_WIN32) || defined(WIN64))
-
 #include "Gamma/Config.h"
 
 #define GAM_USE_PTHREAD		(GAM_OSX || GAM_LINUX)
-#define GAM_USE_THREADEX	(GAM_WINDOWS)
+#define GAM_USE_WINTHREAD	(GAM_WINDOWS)
 
 #if GAM_USE_PTHREAD
 	#include <pthread.h>
-#elif GAM_USE_THREADEX
+#elif GAM_USE_WINTHREAD
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
-	#include <process.h>
 #endif
 
 namespace gam{
@@ -50,9 +24,9 @@ public:
 	typedef void * (*Function)(void * user);
 
 	#if GAM_USE_PTHREAD
-		typedef pthread_t		Handle;
-	#elif GAM_USE_THREADEX
-		typedef unsigned long	Handle;
+		typedef pthread_t	Handle;
+	#elif GAM_USE_WINTHREAD
+		typedef HANDLE		Handle;
 	#endif
 
 	Thread()
@@ -125,16 +99,15 @@ inline bool Thread::join(){
 }
 
 
-#elif GAM_USE_THREADEX
+#elif GAM_USE_WINTHREAD
 
 namespace{
-struct ThreadExFunctor{
+struct ThreadFunctor{
 	Thread::Function func;
 	void * userData;
 
-	static unsigned __stdcall call(void * user){
-		ThreadExFunctor *pF
-			= reinterpret_cast<ThreadExFunctor*>(user);
+	static DWORD WINAPI call(void * user){
+		ThreadFunctor * pF = reinterpret_cast<ThreadFunctor*>(user);
 		(*(pF->func))(pF->userData);
 		delete pF;
 		return 0;
@@ -145,25 +118,28 @@ struct ThreadExFunctor{
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
 
-	struct ThreadExFunctor* f = new ThreadExFunctor;
+	struct ThreadFunctor* f = new ThreadFunctor;
 	f->func = func;
 	f->userData = user;
 
-	unsigned thread_id;
-	mHandle = _beginthreadex(NULL, 0, ThreadExFunctor::call, f, 0, &thread_id);
+	DWORD thread_id;
+	// _beginthreadex should be used if the C run-time library is used in
+	// the thread function. However, it is not available in MSYS2...
+	//mHandle = _beginthreadex(NULL, 0, ThreadFunctor::call, f, 0, &thread_id);
+	mHandle = CreateThread(NULL, 0, ThreadFunctor::call, f, 0, &thread_id);
 	if(mHandle) return true;
 	return false;
 }
 
 inline bool Thread::cancel(){
-	TerminateThread((HANDLE)mHandle, 0);
+	TerminateThread(mHandle, 0);
 	return true;
 }
 
 inline bool Thread::join(){
-	long retval = WaitForSingleObject((HANDLE)mHandle, INFINITE);
+	long retval = WaitForSingleObject(mHandle, INFINITE);
 	if(WAIT_OBJECT_0 == retval){
-		CloseHandle((HANDLE)mHandle);
+		CloseHandle(mHandle);
 		mHandle = 0;
 		return true;
 	}

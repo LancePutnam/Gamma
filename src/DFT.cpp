@@ -3,6 +3,7 @@
 
 #include "Gamma/DFT.h"
 #include "Gamma/arr.h"
+#include "Gamma/scl.h"
 
 #define CART_TO_POL(bins)\
 	if(mPrecise){\

@@ -1,5 +1,6 @@
-#include <string.h> // memset
+#include <cstring> // memset
 #include "Gamma/Scheduler.h"
+#include "Gamma/SoundFile.h"
 
 /*
 The audio thread reads through the event list and calls back into objects to
@@ -330,7 +331,7 @@ void Scheduler::recordNRT(const char * soundFilePath, double durationSec){
 		while(t < durationSec){
 
 			//io.zeroOut();
-			memset(io().buffersOut, 0, numChans*numFrames*sizeof(float));
+			std::memset(io().buffersOut, 0, numChans*numFrames*sizeof(float));
 			update();
 			
 			// interleave channel data
