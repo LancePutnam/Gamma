@@ -11,7 +11,6 @@ SRCS = 	arr.cpp\
 	FFT_fftpack.cpp\
 	fftpack++1.cpp\
 	fftpack++2.cpp\
-	File.cpp\
 	Print.cpp\
 	scl.cpp\
 	Recorder.cpp\
