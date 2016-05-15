@@ -199,6 +199,12 @@ public:
 
 private:
 	Complex<Tv> mB, mG;
+	float mFbkFreq;
+
+	virtual void onDomainChange(double r){
+		Delay<Complex<Tv>,Si,Td>::onDomainChange(r);
+		if(mFbkFreq>0.f) fbkFreq(mFbkFreq);
+	}
 };
 
 
@@ -417,6 +423,7 @@ EchoCSine<TARG>& EchoCSine<TARG>::gain(float amt, float ang){
 
 template<TDEC>
 EchoCSine<TARG>& EchoCSine<TARG>::fbk(float amt, float ang){
+	mFbkFreq = 0.f;
 	mB.fromPolar(amt, ang*2*M_PI);
 	return *this;
 }
@@ -430,6 +437,7 @@ EchoCSine<TARG>& EchoCSine<TARG>::decay(float units){
 
 template<TDEC>
 EchoCSine<TARG>& EchoCSine<TARG>::fbkFreq(float frq, float addCycle){
+	mFbkFreq = frq;
 	/*
 	d		seconds/echo
 	frq		cycles/second
