@@ -38,27 +38,6 @@ int main(int argc, char* argv[]){
 
 	// Unit tests are ordered from the least to most dependent functions/objects
 	// in order to catch errors in base functionality.
-
-	// File I/O
-	{
-		const char * path = "test.txt";
-		File f(path, "w");
-		assert(f.open());
-		
-		char buf[] = {'H','e','l','l','o',' ','W','o','r','l','d','!'};
-		assert(f.write(buf, 1, sizeof(buf)) == sizeof(buf));
-		f.close();
-		assert(!f.opened());
-		
-		assert(File::exists(path));
-		
-		f.mode("r");
-		assert(f.open());
-		
-		char * bufR = f.readAll();
-		for(int i=0; i<f.size(); ++i) assert(buf[i] == bufR[i]);
-		f.close();
-	}
 	
 	// LookupTable
 	{

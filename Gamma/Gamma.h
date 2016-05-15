@@ -43,7 +43,6 @@
 	// System/Utility
 	#include "Gamma/AudioIO.h"
 	#include "Gamma/Conversion.h"
-	#include "Gamma/File.h"
 	#include "Gamma/Print.h"
 	#include "Gamma/TransferFunc.h"
 
