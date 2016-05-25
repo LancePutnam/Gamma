@@ -17,6 +17,12 @@
 #elif GAM_USE_WINTHREAD
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
+	#ifdef far
+	#undef far
+	#endif
+	#ifdef near
+	#undef near
+	#endif
 #endif
 
 namespace gam{
