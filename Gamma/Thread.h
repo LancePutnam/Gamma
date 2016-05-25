@@ -6,10 +6,13 @@
 
 #include "Gamma/Config.h"
 
+//#define GAM_USE_STD_THREAD	1
 #define GAM_USE_PTHREAD		(GAM_OSX || GAM_LINUX)
 #define GAM_USE_WINTHREAD	(GAM_WINDOWS)
 
-#if GAM_USE_PTHREAD
+#if GAM_USE_STD_THREAD
+	#include <thread>
+#elif GAM_USE_PTHREAD
 	#include <pthread.h>
 #elif GAM_USE_WINTHREAD
 	#define WIN32_LEAN_AND_MEAN
@@ -23,7 +26,9 @@ public:
 
 	typedef void * (*Function)(void * user);
 
-	#if GAM_USE_PTHREAD
+	#if GAM_USE_STD_THREAD
+		typedef std::thread	Handle;
+	#elif GAM_USE_PTHREAD
 		typedef pthread_t	Handle;
 	#elif GAM_USE_WINTHREAD
 		typedef HANDLE		Handle;
@@ -79,7 +84,23 @@ protected:
 
 // Implementation
 
-#if GAM_USE_PTHREAD
+#if GAM_USE_STD_THREAD
+
+inline bool Thread::start(Thread::Function func, void * user){
+	mHandle = std::thread(func, user);
+}
+
+inline bool Thread::cancel(){
+	// Not possible and not good practice anyway...
+	return false;
+}
+
+inline bool Thread::join(){
+	mHandle.join();
+	return true;
+}
+
+#elif GAM_USE_PTHREAD
 
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
