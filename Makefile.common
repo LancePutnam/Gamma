@@ -67,6 +67,12 @@ USING_PUREDYNE	= 0
 #--------------------------------------------------------------------------
 # Build settings
 #--------------------------------------------------------------------------
+# Language version
+CXX_VERSION ?= 11
+ifeq ($(CXX_VERSION), 11)
+	CXXFLAGS += -std=c++11
+endif
+
 # Name of the library
 # This should be defined prior to including this file
 LIB_NAME	?=
