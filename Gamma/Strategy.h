@@ -518,7 +518,7 @@ namespace phsInc{
 
 	/// \ingroup Strategies, phsInc
 	struct NShot{
-		NShot(){ number(1); reset(); }
+		NShot(){ repeats(1); reset(); }
 		
 		void reset(){ mCount=0; }
 
@@ -529,25 +529,26 @@ namespace phsInc{
 			// Check MSB goes from 1 to 0
 			// TODO: works only for positive increments and non-zero mNumber
 			if((~pos & prev) & 0x80000000){
-				if(++mCount >= mNumber) pos = 0xffffffff;
+				if(++mCount >= mRepeats) pos = 0xffffffff;
 			}
 			return pos;
 		}
 		
-		bool done(uint32_t pos) const { return (mCount >= mNumber) && (pos == 0xffffffff); }
+		bool done(uint32_t pos) const { return (mCount >= mRepeats) && (pos == 0xffffffff); }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){
 			v += inc;
 			if(v >= max || v < min) ++mCount;
-			return mCount < mNumber ? scl::wrap(v, max, min) : incClip(v, inc, max, min);
+			return mCount < mRepeats ? scl::wrap(v, max, min) : incClip(v, inc, max, min);
 		}
 		
-		// Set number of repetitions
-		NShot& number(uint32_t v){ mNumber=v; return *this; }
+		/// Set number of repetitions
+		NShot& repeats(uint32_t v){ mRepeats=v; return *this; }
+		NShot& number(uint32_t v){ mRepeats=v; return *this; }
 
 	private:
-		uint32_t mNumber;
+		uint32_t mRepeats;
 		uint32_t mCount;
 	};
 
