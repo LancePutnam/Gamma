@@ -4,53 +4,33 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include "Gamma/Config.h"
-
 namespace gam{
 
-// We use an 8-byte signed integer to represent time in nanoseconds.  This
-// allows us represent times accurately up to +/- 292.5 years.
-
-// Windows
-#if GAM_WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-	#include <mmsystem.h>
-	typedef __int64 nsec_t;		///< nanoseconds type
-	
-// Posix (Mac, Linux)
-#else
-	#include <sys/time.h>
-	#include <time.h>
-	typedef long long nsec_t;	///< nanoseconds type
-	
-#endif /* platform specific */
+typedef long long nsec_t; ///< Nanoseconds type; good up to +/- 292.5 years
 
 
 /// Suspend thread execution for dt nsec
-static void sleep(nsec_t dt);
+void sleep(nsec_t dt);
 
 /// Suspend thread execution for a specified amount of seconds
-static void sleepSec(double sec);
+void sleepSec(double sec);
 
 /// Suspend thread execution until absolute time, t. Returns ns slept.
-static nsec_t sleepUntil(nsec_t t);
+nsec_t sleepUntil(nsec_t t);
 
 /// Get current time from OS
-static nsec_t timeNow();
+nsec_t timeNow();
 
 /// Convert nsec to sec
-static double toSec(nsec_t nsec);
+double toSec(nsec_t nsec);
 
 /// Convert sec to nsec
-static nsec_t toNsec(double sec);
+nsec_t toNSec(double sec);
 
 
 /// Timer
 class Timer {
 public:
-	Timer();
-	~Timer();
 
 	nsec_t elapsed();		///< Returns nsec between start() and stop() calls
 	double elapsedSec();	///< Returns  sec between start() and stop() calls
@@ -66,68 +46,8 @@ private:
 
 // Implementation_______________________________________________________________
 
-inline void sleepSec(double t){ sleep(toNsec(t)); }
-
-inline nsec_t sleepUntil(nsec_t t){
-	nsec_t now = timeNow();
-	if(t > now) sleep(t - now);
-	return t - now;
-}
-
-inline double toSec(nsec_t nsec){ return ((double)nsec) * 1e-9; }
-inline nsec_t toNsec(double sec){ return (nsec_t)(sec * 1e9); }
-
-inline void Timer::start(){ mStart = timeNow(); }
-inline void Timer::stop (){ mStop  = timeNow(); }
-inline nsec_t Timer::elapsed(){ return mStop - mStart; }
-inline double Timer::elapsedSec() { return toSec(elapsed()); }
-inline double Timer::elapsedMSec(){ return ((double)elapsed() * 1e-6); }
-
-
-// platform specific
-
-// Windows
-#ifdef GAM_WINDOWS
-
-	inline nsec_t timeNow(){
-		return (nsec_t)timeGetTime() * (nsec_t)1e6;
-	}
-
-	inline void sleep(nsec_t dt){
-		Sleep((DWORD)(dt / (nsec_t)1e6));
-	}
-
-	inline Timer::Timer(){
-		timeBeginPeriod(1);		// adjust timer precision (1 millisecond)
-	}
-
-	inline Timer::~Timer(){
-		timeEndPeriod(1);		// must call on program exit!
-	}
-
-// Posix (Mac, Linux)
-#else
-
-	#define NS_S ((nsec_t)1e9)
-
-	inline nsec_t timeNow(){
-		timeval t;
-		gettimeofday(&t, NULL);	
-		return ((nsec_t)t.tv_sec) * NS_S + (nsec_t)(t.tv_usec * 1e3);
-	}
-
-	inline void sleep(nsec_t t){
-		time_t sec = (time_t)(t / NS_S);
-		timespec tspec = { sec, (long)(t - ((nsec_t)sec * NS_S)) }; // { sec, nsec }
-		nanosleep(&tspec, NULL);
-	}
-
-	#undef NS_S
-
-	inline Timer::Timer(){}
-	inline Timer::~Timer(){}
-	
-#endif	/* platform specific */
+inline double toSec(nsec_t nsec){ return double(nsec) * 1e-9; }
+inline nsec_t toNSec(double sec){ return nsec_t(sec * 1e9); }
 
 } // gam::
 

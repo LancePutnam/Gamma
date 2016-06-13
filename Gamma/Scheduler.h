@@ -9,7 +9,6 @@
 #include "Gamma/Node.h"
 #include "Gamma/Print.h"
 #include "Gamma/Thread.h"
-#include "Gamma/Timer.h"
 
 namespace gam{
 

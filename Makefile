@@ -14,7 +14,8 @@ SRCS = 	arr.cpp\
 	Print.cpp\
 	scl.cpp\
 	Recorder.cpp\
-	Scheduler.cpp
+	Scheduler.cpp\
+	Timer.cpp
 
 ifneq ($(NO_AUDIO_IO), 1)
 	SRCS += AudioIO.cpp
