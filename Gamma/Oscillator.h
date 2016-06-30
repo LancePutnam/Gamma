@@ -610,7 +610,7 @@ public:
 	float up();			///< Upward ramp
 	float up2();		///< Dual upward ramp (up + up). 'mod' controls pulse width.
 
-	float S1();			///< S1 Clausen function; sum_k cos(kt)/k^1
+	float S1();			///< S1 Clausen function; sum_k sin(kt)/k^1
 	float C2();			///< C2 Clausen function; sum_k cos(kt)/k^2
 	float S3();			///< S3 Clausen function; sum_k sin(kt)/k^3
 	float C4();			///< C4 Clausen function; sum_k cos(kt)/k^4
