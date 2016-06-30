@@ -610,6 +610,12 @@ public:
 	float up();			///< Upward ramp
 	float up2();		///< Dual upward ramp (up + up). 'mod' controls pulse width.
 
+	float S1();			///< S1 Clausen function; sum_k cos(kt)/k^1
+	float C2();			///< C2 Clausen function; sum_k cos(kt)/k^2
+	float S3();			///< S3 Clausen function; sum_k sin(kt)/k^3
+	float C4();			///< C4 Clausen function; sum_k cos(kt)/k^4
+	float S5();			///< S5 Clausen function; sum_k sin(kt)/k^5
+
 	float cosU();		///< Unipolar cosine based on 3rd order polynomial
 	float downU();		///< Unipolar downward ramp
 	float hann();		///< Hann window
@@ -1238,6 +1244,11 @@ DEF(sqr(),		scl::square(nextPhase()))
 DEF(tri(),		scl::triangle(nextPhase()))
 DEF(up(),		scl::rampUp(nextPhase()))
 DEF(up2(),		scl::rampUp2(nextPhase(), mMod))
+DEF(S1(),		up(); float c=          -M_PI /  2; r = c*r)
+DEF(C2(),		up(); float c= scl::pow2(M_PI)/  4; r = c*(r*r - 1.f/3))
+DEF(S3(),		up(); float c= scl::pow3(M_PI)/ 12; r = c*(r*r*r - r))
+DEF(C4(),		up(); float c=-scl::pow4(M_PI)/ 48; float rr=r*r; r = c*(rr*(rr - 2.f) + 7.f/15))
+DEF(S5(),		up(); float c=-scl::pow5(M_PI)/240; float rr=r*r; r = c*r*(rr*(rr - 10.f/3) + 7.f/3))
 DEF(cosU(),		tri(); r = scl::mapSinSU(r))
 DEF(downU(),	scl::rampDownU(nextPhase()))
 DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
