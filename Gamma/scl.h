@@ -508,19 +508,19 @@ namespace{
 template<class T> T atan2Fast(T y, T x){
 
 	T r, angle;
-	T ay = scl::abs(y) + (T)1e-10;      // kludge to prevent 0/0 condition
+	T ay = scl::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
 
-	if(x < (T)0){
+	if(x < T(0)){
 		r = (x + ay) / (ay - x);
-		angle = (T)M_3PI_4;
+		angle = T(M_3PI_4);
 	}
 	else{
 		r = (x - ay) / (x + ay);
-		angle = (T)M_PI_4;
+		angle = T(M_PI_4);
 	}
 
-	angle += ((T)0.1963*r*r - (T)0.9817)*r;
-	return y < (T)0 ? -angle : angle;
+	angle += (T(0.1963)*r*r - T(0.9817))*r;
+	return y < T(0) ? -angle : angle;
 }
 
 template<class T> inline T ceil(T v){ return round(v + roundEps<T>()); }
@@ -560,16 +560,16 @@ template <class T, class F>
 inline T equals(T v1, T v2, T bw, F f){ return bw/(f(v1-v2) + bw); }
 
 template<class T>
-inline void fadeLin(T & w1, T & w2, T f){ w1 = (T)1 - f; w2 = f; }
+inline void fadeLin(T& w1, T& w2, T f){ w1 = T(1) - f; w2 = f; }
 
 template<class T>
-inline void fadeTri(T & w1, T & w2, T f){
+inline void fadeTri(T& w1, T& w2, T f){
 	if(f < 0.25){
 		w1 = f * 4;
 		w2 = 0;
 	}
 	else if( (f >= 0.25) && (f < 0.75) ){
-		fadeLin(w1, w2, (T)(f * 2 - 0.5));
+		fadeLin(w1, w2, T(f * 2 - 0.5));
 	}
 	else{
 		w1 = 0;
@@ -641,8 +641,8 @@ template<class T> inline void mix2(T& io1, T& io2, T mix){
 	T t2 = io1 - t1;
 	io1 = t1 + io2;
 	io2 = t2;
-	//io1 = io1 * mix + io2 * ((T)1 - mix);
-	//io2 = io2 * mix + io1 * ((T)1 - mix);
+	//io1 = io1 * mix + io2 * (T(1) - mix);
+	//io2 = io2 * mix + io1 * (T(1) - mix);
 }
 
 #ifdef __MSYS__
@@ -710,7 +710,7 @@ inline T smoothNotchFunc(T v, T bw){ return v/(v+bw); }
 template<class T>
 inline T smoothNotch	(T v, T bw){ return smoothNotchFunc(scl::abs(v), bw); }
 template<class T>
-inline T smoothNotch	(T v, T bw, T amt){ return (T)1 - amt*smoothPeak1(v, bw); }
+inline T smoothNotch	(T v, T bw, T amt){ return T(1) - amt*smoothPeak1(v, bw); }
 template<class T>
 inline T smoothNotch2	(T v, T bw){ return smoothNotchFunc(v*v, bw); }
 template<class T>
@@ -826,53 +826,53 @@ namespace{ static const double
 }
 
 template<class T> inline T cosT8(T r){
-	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
+	if(r < T(M_PI_4) && r > T(-M_PI_4)){
 		float rr = r*r;
-		return (T)1 - rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
+		return T(1) - rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
 	}
-	else if(r > (T)0){
-		r -= (T)M_PI_2;
+	else if(r > T(0)){
+		r -= T(M_PI_2);
 		T rr = r*r;
-		return -r * ((T)1 - (T)t71 * rr * ((T)t72 - rr * ((T)t73 - rr)));
+		return -r * (T(1) - T(t71) * rr * (T(t72) - rr * (T(t73) - rr)));
 	}
 	else{
-		r += (T)M_PI_2;
+		r += T(M_PI_2);
 		float rr = r*r;
-		return r * ((T)1 - (T)t71 * rr * ((T)t72 - rr * ((T)t73 - rr)));
+		return r * (T(1) - T(t71) * rr * (T(t72) - rr * (T(t73) - rr)));
 	}
 }
 
 template<class T> inline T sinT7(T r){
-	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
+	if(r < T(M_PI_4) && r > T(-M_PI_4)){
 		T rr = r*r;
-		return r * ((T)1 - (T)t71 * rr * ((T)t72 - rr * ((T)t73 - rr)));
+		return r * (T(1) - T(t71) * rr * (T(t72) - rr * (T(t73) - rr)));
 	}
-	else if(r > (T)0){
-		r -= (T)M_PI_2;
+	else if(r > T(0)){
+		r -= T(M_PI_2);
 		float rr = r*r;
-		return (T)1 - rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
+		return T(1) - rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
 	}
 	else{
-		r += (T)M_PI_2;
+		r += T(M_PI_2);
 		float rr = r*r;
-		return (T)-1 + rr * (T)t81 * ((T)t82 - rr * ((T)t83 - rr * ((T)t84 - rr)));
+		return T(-1) + rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
 	}
 }
 
 template<class T> inline T sinT9(T r){
-	if(r < (T)M_PI_4 && r > (T)-M_PI_4){
+	if(r < T(M_PI_4) && r > T(-M_PI_4)){
 		T rr = r*r;
-		return r * ((T)1 - (T)t91 * rr * ((T)t92 - rr * ((T)t93 - rr * ((T)t94 - rr))));
+		return r * (T(1) - T(t91) * rr * (T(t92) - rr * (T(t93) - rr * (T(t94) - rr))));
 	}
-	else if(r > 0.){
-		r -= (T)M_PI_2;
+	else if(r > T(0)){
+		r -= T(M_PI_2);
 		T rr = r*r;
-		return (T)1 - rr * (T)ta1 * ((T)ta2 - rr * ((T)ta3 - rr * ((T)ta4 - rr * ((T)ta5 - rr))));
+		return T(1) - rr * T(ta1) * (T(ta2) - rr * (T(ta3) - rr * (T(ta4) - rr * (T(ta5) - rr))));
 	}
 	else{
-		r += (T)M_PI_2;
+		r += T(M_PI_2);
 		T rr = r*r;
-		return (T)-1 + rr * (T)ta1 * ((T)ta2 - rr * ((T)ta3 - rr * ((T)ta4 - rr * ((T)ta5 - rr))));
+		return T(-1) + rr * T(ta1) * (T(ta2) - rr * (T(ta3) - rr * (T(ta4) - rr * (T(ta5) - rr))));
 	}
 }
 
@@ -900,7 +900,7 @@ template<class T> inline T sinP9(T n){
 inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
 template<class T>
-inline T trunc(T v){ return round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
+inline T trunc(T v){ return round( (v > T(0)) ? v-roundEps<T>() : v+roundEps<T>() ); }
     
 template<class T>
 inline T trunc(T v, T s){ return trunc(v/s)*s; }
@@ -964,7 +964,7 @@ template<class T> inline T wrap(T v, long& numWraps, T hi, T lo){
 	if(v >= hi){
 		v -= diff;
 		if(v >= hi){
-			numWraps = (long)((v - lo)/diff);
+			numWraps = long((v - lo)/diff);
 			v -= diff * T(numWraps);
 		}
 		++numWraps;
@@ -972,7 +972,7 @@ template<class T> inline T wrap(T v, long& numWraps, T hi, T lo){
 	else if(v < lo){
 		v += diff;
 		if(v < lo){
-			numWraps = (long)((v - lo)/diff) - 1;
+			numWraps = long((v - lo)/diff) - 1;
 			v -= diff * T(numWraps);
 		}
 		--numWraps;
