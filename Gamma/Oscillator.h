@@ -594,7 +594,7 @@ public:
 	uint32_t modI() const { return mMod; }
 	double mod() const { return mMod / 4294967296.; }
 
-	float cos();		///< Cosine based on 3rd order polynomial
+	float cos();		///< Cosine-like wave based on 3rd order polynomial
 	float down();		///< Downward ramp (1 to -1); S1 Clausen function
 	float even3();		///< Even harmonic sine-like wave (3rd order); S3 Clausen function
 	float even5();		///< Even harmonic sine-like wave (5th order)
@@ -616,9 +616,9 @@ public:
 	float C4();			///< C4 Clausen function; sum_k cos(kt)/k^4
 	float S5();			///< S5 Clausen function; sum_k sin(kt)/k^5
 
-	float cosU();		///< Unipolar cosine based on 3rd order polynomial
+	float cosU();		///< Unipolar cosine-like wave based on 3rd order polynomial
 	float downU();		///< Unipolar downward ramp
-	float hann();		///< Hann window
+	float hann();		///< Hann-like window based on 3rd order polynomial
 	float impU();		///< Unipolar impulse train
 	float line2U();		///< Unipolar line2
 	float paraU();		///< Unipolar parabolic wave
@@ -1251,7 +1251,8 @@ DEF(C4(),		up(); float c=-scl::pow4(M_PI)/ 48; float rr=r*r; r = c*(rr*(rr - 2.f
 DEF(S5(),		up(); float c=-scl::pow5(M_PI)/240; float rr=r*r; r = c*r*(rr*(rr - 10.f/3) + 7.f/3))
 DEF(cosU(),		tri(); r = scl::mapSinSU(r))
 DEF(downU(),	scl::rampDownU(nextPhase()))
-DEF(hann(),		tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
+//DEF(hann(),	tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
+DEF(hann(),		up(); r = 1.f + r*r*(2.f*scl::abs(r)-3.f))
 DEF(impU(),		scl::pulseU(nextPhase(), this->freqI()) )
 DEF(paraU(),	up(); r*=r;)
 DEF(pulseU(),	scl::pulseU(nextPhase(), mMod))
