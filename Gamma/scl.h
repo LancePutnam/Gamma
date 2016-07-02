@@ -1140,56 +1140,17 @@ inline float stairU(uint32_t p, uint32_t w){
 	return ((p & MaskSign<float>()) ? 0.5f : 0.f) + (((p+w) & MaskSign<float>()) ? 0.5f : 0.f);
 }
 
-// Triangle follows sequence [ 1, 0,-1, 0]
-
-//* abs on ramp down
+// [1, 0, -1, 0]; abs on ramp down
 inline float triangle(uint32_t p){
 	p = (p >> 9) | Expo4<float>(); // [4, 8]
 	return abs(gam::punUF(p) - 6.f) - 1.f;
 }
-//*/
-
-/* Fancy phase reversal using xor
-inline float triangle(uint32_t p){
-	uint32_t dir = p >> 31;
-	p = ((p^(-int32_t(dir))) + dir);
-	p = (p >> 8) | Expo2<float>();
-	return 3.f - punUF(p);
-}//*/
-
-/* 2x trapezoid minus square
-inline float triangle(uint32_t p){
-	uint32_t dir = p & MaskSign<float>();
-	dir |= Expo2<float>(); // +/- 2
-	p = (p << 1 >> 9) | dir;
-	dir |= 0x400000;	// make it +/-3
-	return punUF(dir) - punUF(p);
-}//*/
-
-/* (2x ramp down) x (square)
-inline float triangle(uint32_t p){
-	//return rampDown(p<<1) * square(p);
-	uint32_t r2 = Expo1<float>() | (p >> 8); // [1,2] 2x
-	uint32_t sq = (p & MaskSign<float>()) | Expo2<float>();
-	return (1.5f - punUF(r2)) * punUF(sq);
-}//*/
-
-/* Difference of parabolic waves
-inline float triangle(uint32_t p){
-	float a = rampDown(p);
-	float b = rampDown(p + (1<<31));
-	return a*a - b*b;
-}//*/
 
 // [1, 0.5, 0, 0.5]
 inline float triangleU(uint32_t p){
-	union{ float f; uint32_t i; } u;
-	u.i = (p >> 9) | Expo2<float>();
-	u.f -= 3.f;
-	u.i &= 0x7fffffff;
-	return u.f;
+	float r = rampDown(p);
+	return scl::abs(r);
 }
-
 
 template<class T> inline T bartlett(T n){
 	return T(1) - scl::abs(n);
