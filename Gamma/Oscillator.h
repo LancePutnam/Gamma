@@ -1309,7 +1309,7 @@ inline void DWO<Sp,Td>::freq(float v){
 	float freq1 = this->freqUnit();
 	// Very low freq will produce quantization noise
 	if(freq1 < 1e-5) freq1 = 1e-5;
-	mGain = 0.25/freq1;
+	mGain = -0.25/freq1;
 }
 
 /* Ideally we would use a differencing filter, however, it has a serious shortcoming. Any sudden changes in phase (or frequency) will lead a large amplitude impulse in the output which becomes worse the lower the frequency. A related problem is what to initialize the filter's previous input sample to. Instead of a filter, we use an analytic approach which subtracts two phase-shifted waveforms.
@@ -1334,7 +1334,7 @@ inline float DWO<Sp,Td>::up(){
 	uint32_t p = this->nextPhase();
 	float s = para01(p);
 	float t = para01(p + this->freqI());
-	return (t - s)*mGain;//*/
+	return (s - t)*mGain;//*/
 }
 
 template <class Sp, class Td>
@@ -1344,7 +1344,7 @@ inline float DWO<Sp,Td>::down(){
 	uint32_t p = this->nextPhase();
 	float s = para01(p);
 	float t = para01(p + this->freqI());
-	return (s - t)*mGain;
+	return (t - s)*mGain;
 }
 
 template <class Sp, class Td>
@@ -1361,7 +1361,7 @@ inline float DWO<Sp,Td>::sqr(){
 
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::para(){
-	static const float c = (M_PI*M_PI*M_PI/12.)*0.5;
+	static const float c = (-M_PI*M_PI*M_PI/12.)*0.5;
 	uint32_t p = this->nextPhase();
 	float s = scl::rampUp(p);
 	s = s*s*s - s;
@@ -1379,7 +1379,7 @@ inline float DWO<Sp,Td>::tri(){
 	uint32_t p = this->nextPhase();
 	float s = scl::sinPara(p);
 	float t = scl::sinPara(p + this->freqI());
-	return (t - s)*0.5f*mGain;//*/
+	return (t - s)*-0.5f*mGain;//*/
 }
 
 template <class Sp, class Td>
@@ -1392,11 +1392,11 @@ inline float DWO<Sp,Td>::pulse(){
 	//*
 	uint32_t p = this->nextPhase();
 	float s1 = para01(p);
-	float s2 = para01(p + mMod);
+	float s2 = para01(p - mMod);
 	float s  = s1 - s2;
 	uint32_t q = p + this->freqI();
 	float t1 = para01(q);
-	float t2 = para01(q + mMod);
+	float t2 = para01(q - mMod);
 	float t  = t1 - t2;
 	return (t - s)*0.5f*mGain;//*/
 }
