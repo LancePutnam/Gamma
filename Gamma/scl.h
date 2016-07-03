@@ -1132,8 +1132,8 @@ inline float squareU(uint32_t p){
 
 inline float stair(uint32_t p, uint32_t w){
 	uint32_t sqr1 = Expo1_2<float>() | ( p    & MaskSign<float>());
-	uint32_t sqr2 = Expo1_2<float>() | ((p+w) & MaskSign<float>());
-	return punUF(sqr1) + punUF(sqr2);
+	uint32_t sqr2 = Expo1_2<float>() | ((p-w) & MaskSign<float>());
+	return punUF(sqr1) - punUF(sqr2);
 }
 
 inline float stairU(uint32_t p, uint32_t w){
