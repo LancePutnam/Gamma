@@ -6,6 +6,38 @@
 
 namespace gam{
 
+std::string plotString(
+	float value, unsigned width, bool spaces, bool sign, const char * point
+){
+	std::string res;
+
+	float min, max;
+	if(sign)	{ min=-1; max=1; }
+	else		{ min= 0; max=1; }
+	float dia = max-min;
+
+	int clipFlag;
+	value = scl::clip(value, clipFlag, max, min);
+	
+	const char * pt = clipFlag != 0 ? "+" : point;
+
+	int imin = min/dia * width;	// normalize by diameter, then multiply by width
+	int imax = imin + width;
+	int pos = castIntRound(value / dia * width);
+
+	if(!spaces) imax = pos<=0 ? 1 : pos;
+
+	if(pos >= imax) pos = imax-1;
+	
+	for(int i=imin; i<imax; ++i){
+		if(i == pos)	res += pt;
+		else if(i==0)	res += "|";
+		else if((i>pos && i<0) || (i<pos && i>0))	res += "-";
+		else			res += " ";
+	}
+	return res;
+}
+
 #define LOOP_BITS(exp) for(int i=(msb-1); i>=0; --i){ exp }
 void printBinary(uint32_t v, const char * zero, const char * one, int msb){
 	LOOP_BITS(
@@ -42,52 +74,7 @@ void printHexArray(const float * a, unsigned len,unsigned valuesPerLine){
 }
 
 void printPlot(float value, unsigned width, bool spaces, bool sign, const char * point){
-
-	float min, max;
-	if(sign)	{ min=-1; max=1; }
-	else		{ min= 0; max=1; }
-	float dia = max-min;
-
-	int clipFlag;
-	value = scl::clip(value, clipFlag, max, min);
-	
-	const char * pt = clipFlag != 0 ? "+" : point;
-
-	int imin = min/dia * width;	// normalize by diameter, then multiply by width
-	int imax = imin + width;
-	int pos = castIntRound(value / dia * width);
-
-	if(!spaces) imax = pos<=0 ? 1 : pos;
-
-	if(pos >= imax) pos = imax-1;
-	
-	for(int i=imin; i<imax; ++i){
-		if(i == pos)	printf("%s", pt);
-		else if(i==0)	printf("|");
-		else if((i>pos && i<0) || (i<pos && i>0))	printf("-");
-		else			printf(" ");
-	}
-	
-//	unsigned pos = castIntRound((value + 1.f) * 0.5f * (float)(width));
-//	unsigned mid = width >> 1;
-//	unsigned i=0;
-//
-//	if(pos < mid){	// [-1, 0)
-//		for(; i<pos; ++i) printf(" ");
-//		printf("%s", pt); ++i;
-//		for(; i<mid; ++i) printf("-");
-//		printf("|");
-//	}
-//	else{			// (0, 1]
-//		for(; i<mid; ++i) printf(" ");
-//		if(pos == mid){ printf("%s", pt); goto end; }
-//		printf("|"); ++i;
-//		for(; i<pos; ++i) printf("-");
-//		printf("%s", pt);
-//	}
-//	
-//	end: 
-//	if(spaces) for(; i<width; ++i) printf(" ");
+	fprintf(stdout, "%s", plotString(value,width,spaces,sign,point).c_str());
 }
 
 

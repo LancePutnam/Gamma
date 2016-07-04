@@ -9,6 +9,7 @@
 */
 
 #include <stdio.h>
+#include <string>
 #include "Gamma/Constants.h"
 #include "Gamma/scl.h"
 
@@ -16,6 +17,11 @@ namespace gam{
 
 /// Returns an ASCII character most closely matching an intensity value in [0,1].
 char intensityToASCII(float v);
+
+std::string plotString(
+	float value, unsigned width=50, bool spaces=true, bool sign=true, const char * point="o"
+);
+
 
 /// Prints 2D pixel array
 template<class T>
@@ -27,10 +33,10 @@ void printBinary(uint64_t value, const char * zero="0", const char * one="1", in
 void printBinary(float value, const char * zero="0", const char * one="1", int msb=32);
 void printBinary(const void * value32, const char * zero="0", const char * one="1", int msb=32);
 
-/// Prints array as hexidecimal values.
+/// Prints array as hexidecimal values
 void printHexArray(const float * table, unsigned len, unsigned valuesPerLine);
 
-/// Print signed unit value on a horizontal plot.
+/// Print signed unit value on a horizontal plot
 
 /// \param[in]	value	Normalized value to plot
 /// \param[in]	width	Character width of plot excluding center point
