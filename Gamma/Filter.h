@@ -27,6 +27,8 @@ enum FilterType{
 	BAND_REJECT,		/**< Band-reject */
 	ALL_PASS,			/**< All-pass */
 	PEAKING,			/**< Peaking */
+	LOW_SHELF,			/**< Low-shelf */
+	HIGH_SHELF,			/**< High-shelf */
 	SMOOTHING			/**< Smoothing */
 };
 
@@ -129,7 +131,7 @@ public:
 
 	void freq(Tp v);					///< Set center frequency
 	void res(Tp v);						///< Set resonance (Q)
-	void level(Tp v);					///< Set level (PEAKING type only)
+	void level(Tp v);					///< Set level (PEAKING, LOW_SHELF, HIGH_SHELF types only)
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
 	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
 	void type(FilterType type);			///< Set type of filter
@@ -152,7 +154,7 @@ protected:
 	Tp mLevel;			// amplitude level (for peaking)
 	FilterType mType;
 	Tp mReal, mImag;	// real, imag components of center frequency
-	Tp mAlpha;
+	Tp mAlpha, mBeta;
 	Tp mFrqToRad;
 
 	void resRecip(Tp v);
@@ -656,7 +658,7 @@ void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 //---- Biquad
 template <class Tv, class Tp, class Td>
 Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
-:	d1(0), d2(0), mLevel(1)
+:	d1(0), d2(0), mLevel(1), mBeta(1)
 {
 	onDomainChange(1);
 	set(frq, res, type);
@@ -672,16 +674,16 @@ template <class Tv, class Tp, class Td>
 Tp Biquad<Tv,Tp,Td>::freq() const { return mFreq; }
 
 template <class Tv, class Tp, class Td>
-Tp Biquad<Tv,Tp,Td>::res() const { return Tp(0.5)/(mResRecip*mLevel); }
+Tp Biquad<Tv,Tp,Td>::res() const { return Tp(0.5)/mResRecip; }
 
 template <class Tv, class Tp, class Td>
 FilterType Biquad<Tv,Tp,Td>::type() const { return mType; }
 
 template <class Tv, class Tp, class Td>
-void Biquad<Tv,Tp,Td>::set(Tp freqA, Tp resA, FilterType typeA){
-	mResRecip = Tp(0.5)/(resA*mLevel);
-	mType = typeA;
-	freq(freqA);
+void Biquad<Tv,Tp,Td>::set(Tp freq_, Tp res_, FilterType type_){
+	mType = type_;
+	res(res_);
+	freq(freq_);
 }
 
 template <class Tv, class Tp, class Td>
@@ -693,13 +695,6 @@ void Biquad<Tv,Tp,Td>::zero(){ d1=d2=Tv(0); }
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 	mA[0]=a0; mA[1]=a1; mA[2]=a2; mB[1]=b1; mB[2]=b2;
-}
-
-template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::level(Tp v){
-	mResRecip *= mLevel;
-	mLevel=v;
-	resRecip(mResRecip);
 }
 
 template <class Tv, class Tp, class Td>
@@ -729,22 +724,43 @@ inline void Biquad<Tv,Tp,Td>::width(Tp v){
 */
 
 template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::level(Tp v){
+	mLevel=v;
+	switch(mType){
+	case PEAKING:
+		mBeta = Tp(1)/mLevel;
+		break;
+	case LOW_SHELF:
+	case HIGH_SHELF:
+		mBeta = Tp(2)*std::pow(mLevel, Tp(0.25));
+		break;
+	default:
+		mBeta = Tp(1);
+	}
+	resRecip(mResRecip);
+}
+
+template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::resRecip(Tp v){
 	mResRecip = v;
-	mAlpha = mImag * mResRecip;
+	mAlpha = mImag * mResRecip * mBeta;
 
-	// Note: mB[0] is assumed to be equal to 1 in the difference equation. 
-	// For this reason, we divide all other coefficients by mB[0].
-	mB[0] = Tp(1) / (Tp(1) + mAlpha);	// reciprocal of b0
-	mB[1] = Tp(-2) * mReal * mB[0];
-	mB[2] = (Tp(1) - mAlpha) * mB[0];
+	switch(mType){
+	case LOW_SHELF: case HIGH_SHELF: break; // coefs computed in type()
+	default:
+		// Note: b_0 is assumed to be equal to 1 in the difference equation.
+		// For this reason, we divide all other coefficients by b_0.
+		mB[0] = Tp(1) / (Tp(1) + mAlpha);	// 1/b_0
+		mB[1] = Tp(-2) * mReal * mB[0];
+		mB[2] = (Tp(1) - mAlpha) * mB[0];
+	}
 
 	type(mType);
 }
 
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::res(Tp v){
-	resRecip(Tp(0.5)/(v*mLevel));
+	resRecip(Tp(0.5)/v);
 }
 
 template <class Tv, class Tp, class Td>
@@ -787,6 +803,28 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[0] = mB[0] + alpha_A_b0;
 		mA[1] = mB[1];
 		mA[2] = mB[0] - alpha_A_b0;
+		}
+		break;
+	case LOW_SHELF:{
+		Tp A = mBeta*mBeta*Tp(0.25); // sqrt(mLevel)
+		Tp Ap1 = A + Tp(1), Am1 = A - Tp(1);
+		mB[0] =    Tp(1)/(Ap1 + Am1*mReal + mAlpha); // 1/b_0
+		mB[1] =   Tp(-2)*(Am1 + Ap1*mReal         ) * mB[0];
+		mB[2] =          (Ap1 + Am1*mReal - mAlpha) * mB[0];
+		mA[0] =        A*(Ap1 - Am1*mReal + mAlpha) * mB[0];
+		mA[1] = Tp( 2)*A*(Am1 - Ap1*mReal         ) * mB[0];
+		mA[2] =        A*(Ap1 - Am1*mReal - mAlpha) * mB[0];
+		}
+		break;
+	case HIGH_SHELF:{
+		Tp A = mBeta*mBeta*Tp(0.25); // sqrt(mLevel)
+		Tp Ap1 = A + Tp(1), Am1 = A - Tp(1);
+		mB[0] =   Tp(1)/(Ap1 - Am1*mReal + mAlpha); // 1/b_0
+		mB[1] =   Tp(2)*(Am1 - Ap1*mReal         ) * mB[0];
+		mB[2] =         (Ap1 - Am1*mReal - mAlpha) * mB[0];
+		mA[0] =       A*(Ap1 + Am1*mReal + mAlpha) * mB[0];
+		mA[1] =Tp(-2)*A*(Am1 + Ap1*mReal         ) * mB[0];
+		mA[2] =       A*(Ap1 + Am1*mReal - mAlpha) * mB[0];
 		}
 		break;
 	default:;

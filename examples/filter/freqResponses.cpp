@@ -72,11 +72,18 @@ int main(){
 	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad band-reject at 1/4 band")
 
 	bq.type(PEAKING);
-	bq.res(0.7);
-	bq.level(0.25);
+	bq.res(1);
+	bq.level(0.75);
 	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad peaking at 1/4 band")
 	bq.level(1.25);
 	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad peaking at 1/4 band")
+
+	bq.type(LOW_SHELF);
+	bq.res(0.71);
+	bq.level(0.5);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad low-shelf at 1/4 band")
+	bq.type(HIGH_SHELF);
+	bq.zero(); bq.freq(1./4*0.5); FREQ_RESP(bq(v), "Biquad high-shelf at 1/4 band")
 
 	FREQ_RESP(hilbert(v).i, "Hilbert filter (90 degree phase shift)")
 
