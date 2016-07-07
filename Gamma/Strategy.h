@@ -629,7 +629,17 @@ namespace phsInc{
 			}
 			return *this;
 		}
-		
+
+		/// Set pattern of play then hold cycles
+		Rhythm& pulse(uint8_t play, uint8_t hold){
+			mSize=play+hold;
+			mPattern=0;
+			for(uint8_t i=0; i<play; ++i){
+				mPattern |= 1 << (mSize-1-i);
+			}
+			return *this;
+		}
+
 	private:
 		uint32_t mPhase;
 		uint32_t mPattern;
