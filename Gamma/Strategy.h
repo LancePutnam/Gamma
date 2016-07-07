@@ -614,7 +614,7 @@ namespace phsInc{
 
 		bool done(uint32_t pos) const { return false; }
 		
-		Rhythm& pattern(uint32_t bits, uint8_t size){
+		Rhythm& pattern(uint64_t bits, uint8_t size){
 			mPattern=bits;
 			mSize=size;
 			return *this;
@@ -635,7 +635,7 @@ namespace phsInc{
 			mSize=play+hold;
 			mPattern=0;
 			for(uint8_t i=0; i<play; ++i){
-				mPattern |= 1 << (mSize-1-i);
+				mPattern |= uint64_t(1) << (mSize-1-i);
 			}
 			return *this;
 		}
@@ -646,7 +646,6 @@ namespace phsInc{
 		uint8_t mOn;
 		uint8_t mIndex;
 		uint8_t mSize;
-		void setOn(){ mOn = (mPattern >> (mSize-1 - mIndex)) & 1UL; }
 	};
 
 	typedef Loop Wrap;
