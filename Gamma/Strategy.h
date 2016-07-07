@@ -589,40 +589,41 @@ namespace phsInc{
 	struct Rhythm{
 	
 		Rhythm(){
-			pattern(0,0);
+			pattern(2,2);
 			reset();
 		}
 	
-		void reset(){ mPhase=0; mIndex=0; }
+		void reset(){ mPhase=0; mIndex=0; setOn(); }
 
 		uint32_t operator()(uint32_t& pos, uint32_t inc){
 			uint32_t prev = mPhase;
 			mPhase += inc;
 
-			// Check MSB goes from 1 to 0
-			// TODO: works only for positive increments
-			if((~mPhase & prev) & 0x80000000){
+			// Check for phase wrap
+			if(((prev^mPhase) & (prev^inc)) & 0x80000000){
 				if(++mIndex >= mSize) mIndex=0;
+				setOn();
 			}
 
-			uint32_t bit = (mPattern >> (mSize-1 - mIndex)) & 1UL;
-			if(bit){
+			if(mOn){
 				pos = mPhase;
 			}
+
 			return pos;
 		}
 		
-		Rhythm& pattern(uint32_t bits, uint16_t size){
+		Rhythm& pattern(uint32_t bits, uint8_t size){
 			mPattern=bits;
 			mSize=size;
 			return *this;
 		}
 		
-		Rhythm& pattern(const char* bits){
+		/// Specify on/off pattern as string, e.g., "/./....."
+		Rhythm& pattern(const char* bits, char offChar='.'){
 			mSize = strlen(bits);
 			mPattern = 0;
 			for(int i=0; i<mSize; ++i){
-				mPattern |= (bits[i]!='.') << (mSize-1-i);
+				mPattern |= (bits[i]!=offChar) << (mSize-1-i);
 			}
 			return *this;
 		}
@@ -630,8 +631,10 @@ namespace phsInc{
 	private:
 		uint32_t mPhase;
 		uint32_t mPattern;
-		uint16_t mIndex;
-		uint16_t mSize;
+		uint8_t mOn;
+		uint8_t mIndex;
+		uint8_t mSize;
+		void setOn(){ mOn = (mPattern >> (mSize-1 - mIndex)) & 1UL; }
 	};
 
 	typedef Loop Wrap;
