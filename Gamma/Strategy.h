@@ -611,6 +611,8 @@ namespace phsInc{
 
 			return pos;
 		}
+
+		bool done(uint32_t pos) const { return false; }
 		
 		Rhythm& pattern(uint32_t bits, uint8_t size){
 			mPattern=bits;
