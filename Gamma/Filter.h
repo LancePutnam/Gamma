@@ -142,6 +142,7 @@ public:
 	
 	Tp freq() const;					///< Get center frequency
 	Tp res() const;						///< Get resonance (Q)
+	Tp level() const;					///< Get level
 	FilterType type() const;			///< Get filter type
 	
 	void onDomainChange(double r);
@@ -675,6 +676,9 @@ Tp Biquad<Tv,Tp,Td>::freq() const { return mFreq; }
 
 template <class Tv, class Tp, class Td>
 Tp Biquad<Tv,Tp,Td>::res() const { return Tp(0.5)/mResRecip; }
+
+template <class Tv, class Tp, class Td>
+Tp Biquad<Tv,Tp,Td>::level() const { return mLevel; }
 
 template <class Tv, class Tp, class Td>
 FilterType Biquad<Tv,Tp,Td>::type() const { return mType; }
