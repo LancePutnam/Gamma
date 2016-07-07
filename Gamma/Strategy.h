@@ -633,19 +633,18 @@ namespace phsInc{
 		/// Set pattern of play then hold cycles
 		Rhythm& pulse(uint8_t play, uint8_t hold){
 			mSize=play+hold;
-			mPattern=0;
-			for(uint8_t i=0; i<play; ++i){
-				mPattern |= uint64_t(1) << (mSize-1-i);
-			}
+			uint64_t ones = -1;
+			mPattern = (ones>>(64-mSize)) & (ones<<hold);			
 			return *this;
 		}
 
 	private:
+		uint64_t mPattern;
 		uint32_t mPhase;
-		uint32_t mPattern;
 		uint8_t mOn;
 		uint8_t mIndex;
 		uint8_t mSize;
+		void setOn(){ mOn = (mPattern >> (mSize-1 - mIndex)) & uint64_t(1); }
 	};
 
 	typedef Loop Wrap;
