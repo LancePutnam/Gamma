@@ -601,7 +601,7 @@ namespace phsInc{
 
 			// Check for phase wrap
 			if((prev>mPhase) ^ (inc>>31)){
-				if(++mIndex >= mSize) mIndex=0;
+				mIndex = (mIndex+1) % mSize;
 				setOn();
 			}
 
