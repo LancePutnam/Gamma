@@ -600,7 +600,7 @@ namespace phsInc{
 			mPhase += inc;
 
 			// Check for phase wrap
-			if(((prev^mPhase) & (prev^inc)) & 0x80000000){
+			if((prev>mPhase) ^ (inc>>31)){
 				if(++mIndex >= mSize) mIndex=0;
 				setOn();
 			}
