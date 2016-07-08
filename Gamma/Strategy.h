@@ -631,10 +631,13 @@ namespace phsInc{
 		}
 
 		/// Set pattern of play then hold cycles
-		Rhythm& pulse(uint8_t play, uint8_t hold){
-			mSize=play+hold;
+
+		/// \param[in] pulseWidth	pulse width in cycles
+		/// \param[in] length		total pulse length in cycles
+		Rhythm& pulse(uint8_t pulseWidth, uint8_t length){
+			mSize = length;
 			uint64_t ones = -1;
-			mPattern = (ones>>(64-mSize)) & (ones<<hold);			
+			mPattern = (ones>>(64-mSize)) & (ones<<(length-pulseWidth));			
 			return *this;
 		}
 
