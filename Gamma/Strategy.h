@@ -190,6 +190,7 @@ struct Cubic{
 
 	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+		//*
 		uint32_t one = a.oneIndex();
 		return ipl::cubic(
 			a.fraction(phase),
@@ -197,7 +198,17 @@ struct Cubic{
 			a.atPhase(phase),
 			a.atPhase(phase + one),
 			a.atPhase(phase + (one<<1))
-		);
+		);//*/
+		/*
+		unsigned i = a.index(phase);
+		unsigned m = a.size() - 1;
+		return ipl::cubic(
+			a.fraction(phase),
+			a[(i-1)&m],
+			a[ i ],
+			a[(i+1)&m],
+			a[(i+2)&m]
+		);//*/
 	}
 
 	/// Return interpolated element from array
@@ -482,6 +493,56 @@ namespace phsInc{
 	};
 
 
+	/// Play then hold waveform
+	struct Pulse{
+
+		Pulse(){
+			pulse(2,4);
+			reset();
+		}
+
+		/// Set width and period of pulse
+
+		/// \param[in] width	pulse width in cycles
+		/// \param[in] period	total pulse period in cycles
+		Pulse& pulse(uint32_t width, uint32_t period){
+			mWidth = width;
+			mPeriod = period;
+			return *this;
+		}
+
+		void reset(){ mPhase=0; mCycle=0; setOn(); }
+
+		uint32_t operator()(uint32_t& pos, uint32_t inc){
+			uint32_t prev = mPhase;
+			mPhase += inc;
+
+			// Check for phase wrap
+			if((prev > mPhase) ^ (inc >> 31)){
+				//if(++mCycle >= mPeriod) mCycle=0;
+				mCycle = (mCycle+1) % mPeriod;
+				setOn();
+			}
+
+			if(mOn){
+				pos = mPhase;
+			}
+
+			return pos;
+		}
+
+		bool done(uint32_t pos) const { return false; }
+
+	private:
+		uint32_t mPhase;
+		uint32_t mCycle;
+		uint32_t mWidth;
+		uint32_t mPeriod;
+		uint8_t mOn;
+		void setOn(){ mOn = mCycle<mWidth; }
+	};
+
+
 	/// Play waveform one cycle, then hold at the end. A one-shot.
 
 	/// \ingroup Strategies, phsInc
@@ -492,6 +553,10 @@ namespace phsInc{
 			uint32_t prev = pos;
 			pos += inc;
 			if(~pos & prev & 0x80000000) pos = 0xffffffff;
+			// correct version
+			/*if((prev>pos) ^ (inc>>31)){
+				pos = (inc>>31) ? 0 : -1;
+			}*/
 			// pos3:	1101	inc = 0001
 			// pos2:	1110
 			// pos1:	1111
