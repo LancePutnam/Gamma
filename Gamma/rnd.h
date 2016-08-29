@@ -137,6 +137,7 @@ private:
 ///\endcode
 ///
 /// where "distr" is one of the following random number distributions:\n\n
+/// tri   - triangular distribution in [-1,1]
 /// add2  - sum of 2 uniform values (triangle) \n
 /// add2I - inverse pdf of add2 \n
 /// add3  - sum of 3 uniform values (2nd order normal curve) \n
@@ -189,7 +190,7 @@ namespace rnd{
 	template <class T> float name##_float(T & rng);
 	//template <class Tv, class Tr> Tv name(Tr & rng);
 
-	FUNCS(add2) FUNCS(add2I) FUNCS(add3) FUNCS(binS) FUNCS(lin) FUNCS(mul2)
+	FUNCS(tri) FUNCS(add2) FUNCS(add2I) FUNCS(add3) FUNCS(binS) FUNCS(lin) FUNCS(mul2)
 	FUNCS(pow2) FUNCS(pow3) FUNCS(uni) FUNCS(uniS)
 
 	#undef FUNCS
@@ -271,6 +272,7 @@ inline void RNGTaus::iterate(){
 namespace rnd{
 
 #define R uni_float(rng)
+template <class T> inline float  tri_float(T& rng){ return R - R; }
 template <class T> inline float add2_float(T& rng){ return (R + R) * 0.5f; }
 template <class T> inline float add3_float(T& rng){ return (R + R + R) * 0.33333333333f; }
 template <class T> inline float  lin_float(T& rng){ float r = R; float s = R; return r < s ? r : s; }
@@ -371,7 +373,7 @@ template <class T> inline T uniExc(const T& exc, const T& max, const T& min){
 	template <class T> inline void fnc(T * dst, uint32_t len, T * src, uint32_t srcLen){\
 		LOOP(len){ dst[i] = src[rnd::fnc(srcLen)]; }\
 	}
-	DEF(float, add2) DEF(float, add2I) DEF(float, add3) DEF(float, lin)
+	DEF(float, tri) DEF(float, add2) DEF(float, add2I) DEF(float, add3) DEF(float, lin)
 	DEF(float, mul2) DEF(float, pow2 ) DEF(float, pow3) DEF(float, uni)
 	DEF(float, uniS)
 #undef DEF
