@@ -237,7 +237,10 @@ public:
 	}
 
 	/// Get current value
-	Tv val() const { return mIpol(table(), this->phaseI()); }
+	Tv val() const { return atPhaseI(this->phaseI()); }
+
+	/// Get table value at fixed-point phase
+	Tv atPhaseI(uint32_t v) const { return mIpol(table(), v); }
 	
 	/// Add sine to table
 	
