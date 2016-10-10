@@ -154,8 +154,12 @@ public:
 	/// If the new size is greater than the old size, then the argument value
 	/// is copied into the additional elements.
 	void resize(uint32_t newSize, const T& c=T());
-	void source(ArrayBase<T,S,A>& src);		///< Sets source of array elements to another array
-	void source(T * src, uint32_t size);	///< Sets source of array elements to another array
+
+	/// Sets source of array elements to another array
+	void source(ArrayBase<T,S,A>& src);
+
+	/// Sets source of array elements to another array
+	void source(T * src, uint32_t size, bool unmanaged=false);
 
 	/// Called whenever the size changes
 	virtual void onResize(){}
@@ -537,11 +541,13 @@ void ArrayBase<T,S,A>::source(ArrayBase<T,S,A>& src){
 }
 
 template <class T, class S, class A>
-void ArrayBase<T,S,A>::source(T * src, uint32_t size){
+void ArrayBase<T,S,A>::source(T * src, uint32_t size, bool unmanaged){
 	if(src == mElems) return; // check for self assignment
-	clear();
-	if(managing(src)){
-		++refCount()[src];
+	if(false==unmanaged){
+		clear();
+		if(managing(src)){
+			++refCount()[src];
+		}
 	}
 	mElems = src;
 	mSize(size);
