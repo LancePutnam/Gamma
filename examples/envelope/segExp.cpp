@@ -1,42 +1,53 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information
 	
-	Example:		Generator / Envelope
-	Description:	Using an exponentially decaying envelope to control the
-					amplitude of a noise source.
+Example:	Generator / Envelope
+Author:		Lance Putnam, 2012
+
+Description:
+This demonstrates how to use an exponential segment to smooth out sudden changes
+in frequency of an oscillator which, musically, results in a portamento.
 */
 
-#include "../examples.h"
+#include "../AudioApp.h"
+#include "Gamma/Envelope.h"
+#include "Gamma/Oscillator.h"
+using namespace gam;
 
-Accum<> tmr(1);			// Timer for resetting envelope
-NoiseWhite<> src;		// Noise source
+class MyApp : public AudioApp{
+public:
 
-SegExp<> env(	// Exponential envelope
-	1,			// Length
-	0.2,		// Curvature
-	0.2,0		// Start/end values
-);
+	Accum<> tmr{1};		// Timer for selecting new frequency
+	Sine<> osc{100};	// Test oscillator
+	SegExp<> env{		// Exponential envelope used to smooth pitch
+		0.2,		// Length in seconds
+		-4,			// Curvature
+		2000,100	// Start/end values
+	};
 
-float curvature = 10;
+	void onAudio(AudioIOData& io){
+		while(io()){
+		
+			if(tmr()){
+				// Change the frequency
+				float freq = osc.freq();
+				if(freq < 900){
+					env = freq + 100;
+				} else {
+					env = 100;
+				}
+			}
 
-void audioCB(AudioIOData& io){
+			// Assign envelope value to oscillator frequency
+			osc.freq(env());
 
-	while(io()){
-	
-		if(tmr()){
-			// reset envelope to beginning
-			env.reset();
-			
-			// set a new curvature value
-			if(--curvature < -10) curvature+=20;
-			env.curve(curvature);
-			printf("curvature = % g\n", curvature);
+			float s = osc() * 0.1;
+
+			io.out(0) = io.out(1) = s;
 		}
-
-		float s = src() * env();
-
-		io.out(0) = io.out(1) = s;
 	}
-}
+};
 
-RUN_AUDIO_MAIN
+int main(){
+	MyApp().start();
+}
