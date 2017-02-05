@@ -295,6 +295,58 @@ protected:
 };
 
 
+/// Recursive Gaussian window generator
+template <class T=gam::real>
+struct RGauss{
+	RGauss(): val(1), mul1(1), mul2(1)
+	{}
+
+	/// (Re)set window function
+
+	/// \param[in] length	length of window in samples
+	/// \param[in] offset	start/end offset of window over its length
+	///						(must be greater than 0)
+	void set(double length, T offset=0.001){
+		using namespace std;
+		length *= 0.5;
+		mul2= pow(offset, T(2.)/(length*length)); // b^2
+		mul1= pow(T(1.)/mul2, T(length+0.5)); // rewind from center of window
+		val = offset;
+	}
+
+	/// Generate next value
+	T operator()(){
+		T res = val;
+		mul1 *= mul2;
+		val  *= mul1;
+		return res;
+	}
+
+	/// Returns whether envelope is done
+	bool done(float thresh=0.001) const {
+		// slope negative and value < threshold
+		return (gam::magSqr(mul1) < 1.) && (gam::magSqr(val) < thresh*thresh);
+	}
+
+	double length() const {
+		/*m1 = (1/m2)^(L+0.5)
+		log(m1) = (L+0.5)log(1/m2)
+		L = log(m1)/log(1/m2) - 0.5
+		L = log(m1)/(-log(m2)) - 0.5*/
+		return (log(gam::norm(mul1))/-log(gam::norm(mul2)) - 0.5)*2;
+	}
+
+	T offset() const {
+		/*m2 = O^(2/LL)
+		m2^(LL/2) = O*/
+		double L = length();
+		return pow(mul2, T(L*L*0.125));
+	}
+
+	T val, mul1, mul2;
+};
+
+
 /// Recursive add generator that generates lines
 template <class T=gam::real>
 struct RAdd: public Val<T>{ INHERIT;

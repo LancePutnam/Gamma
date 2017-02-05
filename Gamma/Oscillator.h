@@ -517,7 +517,7 @@ private:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillators
 /// \sa SineD
 template <class Tv = double, class Td = DomainObserver>
 class SineDs : public Array<SineD<Tv, Domain1> >, Td{
@@ -561,6 +561,95 @@ public:
 	}
 private:
 	typedef Array<SineD<Tv, Domain1> > Base;
+};
+
+
+
+/// Swept sinusoid with Gaussian envelope
+
+/// This generates a sinusoid with a linear frequency sweep and Gaussian
+/// envelope. Only two complex multiplies are required per sample.
+/// Single-precision should be used only for very short envelopes due to
+/// accumulation error.
+///
+/// \tparam Tv	Value (sample) type
+/// \tparam Td	Domain type
+/// \ingroup Oscillators
+template<class Tv = double, class Td = DomainObserver>
+class Chirplet : public Td{
+public:
+
+	typedef Complex<Tv> complex;
+
+	/// \param[in] frq1		Start frequency
+	/// \param[in] frq2		End frequency
+	/// \param[in] amp		Amplitude
+	/// \param[in] len		Length
+	/// \param[in] phs		Phase in [0, 1)
+	Chirplet(Tv frq1=440, Tv frq2=880, Tv amp=1, Tv len=1, Tv phs=0){
+		freq(frq1, frq2);
+		this->amp(amp);
+		length(len);
+	}
+
+
+	/// Set start and end frequencies
+	Chirplet& freq(double start, double end){
+		mFreq1 = start;
+		mFreq2 = end;
+		mRGauss.mul1.arg(freqToRad(start));
+		mRGauss.mul2.arg(freqToRad(end-start)/mRGauss.length());
+		//printf("(%g, %g), (%g, %g)\n", mRGauss.mul2.mag(), mRGauss.mul2.arg()/2/M_PI, mRGauss.mul1.mag(), mRGauss.mul1.arg()/2/M_PI);
+		return *this;
+	}
+
+	/// Set frequency
+	Chirplet& freq(double v){
+		mFreq1 = v;
+		mFreq2 = v;
+		mRGauss.mul1.arg(freqToRad(v));
+		mRGauss.mul2.arg(0);
+		return *this;
+	}
+
+	/// Set envelope length
+	Chirplet& length(double v, const complex& offset=complex(0.01)){
+		mLength = v;
+		mRGauss.set(v*Td::spu(), offset);
+		return *this;
+	}
+
+	/// Set amplitude
+	Chirplet& amp(double v){
+		mRGauss.mul1.mag(v);
+		return *this;
+	}
+
+	/// Get next sample
+	complex operator()(){
+		return mRGauss();
+	}
+
+	/// Reset envelope
+	Chirplet& reset(){ return length(mLength); }
+
+	/// Returns true if envelope done
+	bool done(float thresh=0.001) const { return mRGauss.done(); }
+
+	/// Get length
+	Tv length() const { return mLength; }
+
+	void onDomainChange(double r){
+		//Tv A = mRGauss.mul1.mag();
+		length(mLength);
+		freq(mFreq1, mFreq2);
+		//amp(A);
+	}
+
+protected:
+	gen::RGauss<complex> mRGauss;
+	Tv mFreq1, mFreq2, mLength;
+	double freqToRad(double v){ return v * 2*M_PI*Td::ups(); }
 };
 
 
