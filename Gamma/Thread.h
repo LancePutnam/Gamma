@@ -59,15 +59,6 @@ public:
 	/// return value is false.
 	bool start(Function func, void * user = NULL);
 
-	/// Signal cancellation of a thread routine, returning true on success.
-	
-	/// This function only signals thread cancellation.  It does not
-	/// wait to verify actual routine termination.  A true return value
-	/// only signifies that the cancellation signal was properly executed,
-	/// not thread cancellation.  A thread routine may need to make use of
-	/// the testCancel() function to specify a cancellation point.
-	bool cancel();
-
 	/// Block the calling routine indefinitely until the thread terminates.
 	
 	/// This function suspends execution of the calling routine until the thread 
@@ -96,11 +87,6 @@ inline bool Thread::start(Thread::Function func, void * user){
 	mHandle = std::thread(func, user);
 }
 
-inline bool Thread::cancel(){
-	// Not possible and not good practice anyway...
-	return false;
-}
-
 inline bool Thread::join(){
 	mHandle.join();
 	return true;
@@ -111,10 +97,6 @@ inline bool Thread::join(){
 inline bool Thread::start(Thread::Function func, void * user){
 	if(mHandle) return false;
 	return 0 == pthread_create(&mHandle, NULL, *func, user);
-}
-
-inline bool Thread::cancel(){
-	return 0 == pthread_cancel(mHandle);
 }
 
 inline bool Thread::join(){
@@ -156,11 +138,6 @@ inline bool Thread::start(Thread::Function func, void * user){
 	mHandle = CreateThread(NULL, 0, ThreadFunctor::call, f, 0, &thread_id);
 	if(mHandle) return true;
 	return false;
-}
-
-inline bool Thread::cancel(){
-	TerminateThread(mHandle, 0);
-	return true;
 }
 
 inline bool Thread::join(){
