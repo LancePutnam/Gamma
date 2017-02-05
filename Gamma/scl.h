@@ -1193,6 +1193,8 @@ template<class T> inline T welch(T n){ return T(1) - n*n; }
 
 } // scl::
 
+template<class T> inline T magSqr(const T& v){ return v*v; }
+
 template<class T> inline double norm(const T& v){ return scl::abs(v); }
 template<class T> inline double normCompare(const T& v){ return norm(v); }
 

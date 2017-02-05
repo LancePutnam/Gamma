@@ -400,10 +400,11 @@ Vec<3,T> rotateZ(const Vec<3,T>& v, const Complex<T>& a){
 	Complex<T> t(v[0], v[1]); t*=a; return Vec<3,T>(t[0], t[1], v[2]);
 }
 
-
-
+template<class T> inline T magSqr(const Complex<T>& v){ return v.magSqr(); }
 template<class T> inline double norm(const Complex<T>& v){ return v.norm(); }
 template<class T> inline double normCompare(const Complex<T>& v){ return v.normSqr(); }
+
+template<int N,class T> inline T magSqr(const Vec<N,T>& v){ return v.magSqr(); }
 template<int N,class T> inline double norm(const Vec<N,T>& v){ return v.mag(); }
 template<int N,class T> inline double normCompare(const Vec<N,T>& v){ return v.magSqr(); }
 
