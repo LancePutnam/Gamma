@@ -243,14 +243,15 @@ STFT& STFT::windowType(WindowType v){
 
 
 void STFT::resize(unsigned winSize, unsigned padSize){
-	float * tmp = mBufInv;
+	auto * origBufInv = mBufInv;
 	unsigned oldWinSize = sizeWin();
 	unsigned oldNumBins = numBins();
 	
 	// resize DFT buffers
 	DFT::resize(winSize, padSize);
 	
-	mBufInv = tmp;	// DFT::resize changes this, so change it back
+	mBufInv = origBufInv;			// DFT::resize changes this, so change it back
+	mSizeHop = mSlide.sizeHop();	// DFT::resize changes this, so change it back
 	
 	// resize STFT-specific buffers
 	mSlide.sizeWin(winSize);
@@ -269,7 +270,8 @@ void STFT::resize(unsigned winSize, unsigned padSize){
 
 
 STFT& STFT::sizeHop(unsigned size){
-	mSlide.sizeHop(size);
+	// Note that this call will not trigger any memory reallocation
+	mSlide.sizeHop(size); // sets member var only
 	mSizeHop = mSlide.sizeHop();
 	computeInvWinMul();
 	onDomainChange(1);

@@ -401,7 +401,6 @@ SlidingWindow<T>::SlidingWindow(unsigned winSize, unsigned hopSize)
 :	mBuf(0), mSizeWin(0), mSizeHop(0), mTapW(0), mHopCnt(0)
 {
 	resize(winSize, hopSize);
-	mem::deepZero(mBuf, sizeWin());
 }
 
 template<class T>
@@ -419,8 +418,10 @@ template<class T>
 void SlidingWindow<T>::sizeWin(unsigned size){
 	if(mem::resize(mBuf, sizeWin(), size)){
 		mSizeWin = size;
+		mem::deepZero(mBuf, sizeWin());
 		//mTapW = hopStart();	// for single-buffer slide mode
 		mTapW = 0;				// for single-buffer rotate mode
+		mHopCnt = 0;
 		sizeHop(mSizeHop);		// ensures hop size <= win size
 	}
 }
@@ -467,7 +468,7 @@ inline bool SlidingWindow<T>::operator()(T input){
 template<class T>
 inline bool SlidingWindow<T>::operator()(T * output, T input){
 	mBuf[mTapW] = input;
-	if(++mTapW == sizeWin()) mTapW = 0;
+	if(++mTapW == sizeWin()) mTapW = 0; // increment tap and modulo window size
 
 	if(++mHopCnt == sizeHop()){
 		mem::copyAllFromRing(mBuf, sizeWin(), mTapW, output);
