@@ -8,8 +8,8 @@ CFLAGS		+= $(LINK_CFLAGS)
 CXXFLAGS	+= $(LINK_CXXFLAGS)
 LDFLAGS		+= $(LINK_LDFLAGS)
 
-CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
-CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
+ALL_CFLAGS	:= $(CPPFLAGS) $(CFLAGS)
+ALL_CXXFLAGS:= $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
 
 DEPFLAGS	=
 ifneq ($(DEP_TRACK), 0)
@@ -28,26 +28,26 @@ all: $(LIB_PATH)
 # Build object file from C++ source
 $(OBJ_DIR)%.o:: %.cpp
 	@echo CXX $< $@
-	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
+	$(CXX) -c $(ALL_CXXFLAGS) $< -o $@ $(DEPFLAGS)
 
 $(OBJ_DIR)%.o:: %.cc
 	@echo CXX $< $@
-	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
+	$(CXX) -c $(ALL_CXXFLAGS) $< -o $@ $(DEPFLAGS)
 
 # Build object file from C source
 $(OBJ_DIR)%.o:: %.c
 	@echo CC $< $@
-	$(CC) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
+	$(CC) -c $(ALL_CFLAGS) $< -o $@ $(DEPFLAGS)
 	
 # Build object file from Obj-C++ source
 $(OBJ_DIR)%.o:: %.mm
 	@echo CC $< $@
-	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
+	$(CXX) -c $(ALL_CFLAGS) $< -o $@ $(DEPFLAGS)
 
 # Build pre-compiled headers
 $(OBJ_DIR)%.hpp.gch:: %.hpp
 	@echo CXX $< $@
-	$(CXX) -x c++ -c $(CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
+	$(CXX) -x c++ -c $(ALL_CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
 
 # Include GCC generated dependency files
 -include $(wildcard $(OBJ_DIR)*.dep)
@@ -75,7 +75,7 @@ endif
 $(DLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
 ifneq ($(OBJS),)
 	@echo DY $@
-	$(CXX) $(DLIB_FLAGS) $(CXXFLAGS) -o $@ $(filter %.o, $^) $(LDFLAGS)
+	$(CXX) $(DLIB_FLAGS) $(ALL_CXXFLAGS) -o $@ $(filter %.o, $^) $(LDFLAGS)
 endif
 
 

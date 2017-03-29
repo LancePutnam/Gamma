@@ -504,6 +504,25 @@ protected:
 
 
 
+/// Differencing filter
+
+/// Returns difference between successive samples.
+/// The frequency response has a zero at DC.
+/// \ingroup Filters
+template <class T=gam::real>
+class Differencer{
+public:
+	T operator()(T in){
+		T res = in-mPrev;
+		mPrev = in;
+		return res;
+	}
+private:
+	T mPrev = T(0);
+};
+
+
+
 /// Moving average filter
 
 /// The moving average filter is a special case of an FIR filter whose kernel
