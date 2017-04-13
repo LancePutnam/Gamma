@@ -5,7 +5,7 @@ Example:	Portamento
 Author:		Lance Putnam, 2012
 
 Description:
-The demonstrates how to implement portamento using a one-pole filter.
+This demonstrates how to implement portamento using a one-pole filter.
 One-pole filters can be used to smooth out control signals--in this case random 
 stepping of the frequency of an oscillator.
 */
