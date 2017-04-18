@@ -131,6 +131,11 @@ public:
 	const T * elems() const;		///< Get read-only pointer to elements
 	uint32_t size() const;			///< Returns number of elements in array
 
+	T * begin(){ return elems(); }
+	const T * begin() const { return elems(); }
+	T * end(){ return elems()+size(); }
+	const T * end() const { return elems()+size(); }
+
 	/// Destroys all elements and frees memory
 	void clear();
 

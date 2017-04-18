@@ -206,6 +206,11 @@ public:
     T * elems(){ return &x; }
     const T * elems() const { return &x; }
 
+    T * begin(){ return &x; }
+    const T * begin() const { return &x; }
+    T * end(){ return begin()+N; }
+    const T * end() const { return begin()+N; }
+
     /// Set element at index (no bounds checking)
     T& operator[](unsigned i){ return elems()[i];}
 
