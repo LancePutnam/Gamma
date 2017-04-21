@@ -1105,9 +1105,11 @@ inline float sinFast(uint32_t p){
 }
 
 inline float sinPara(uint32_t p){
-	uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
+	/*uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
 	uint32_t tri = ((p+MaskSign<float>()) >> 9) | Expo4<float>();
-	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));
+	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));//*/
+	auto x = punUF(Expo4<float>() | (p>>9)) - 6.f;
+	return x*(scl::abs(x) - 2.f);
 }
 
 // [1, 1,-1,-1]
