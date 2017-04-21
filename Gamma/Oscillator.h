@@ -695,7 +695,7 @@ public:
 	float para();		///< Parabolic wave; C2 Clausen function
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
 	float pulseRange(); ///< Pulse (up + down). 'mod' controls pulse width. amplitude doesn't change with mod.
-	float sinPara();	///< Sine-like wave constructed from parabolas (odd harmonics)
+	float sinPara();	///< Sine-like wave constructed from parabolas; integral of triangle
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
 	float sqr();		///< Square (-1 to 1)
 	float tri();		///< Triangle (starts at 1 goes down to -1 then up to 1)
