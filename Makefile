@@ -56,7 +56,7 @@ include Makefile.rules
 EXEC_TARGETS = examples/%.cpp tests/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): $(LIB_PATH) FORCE
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LIB_PATH) $(LDFLAGS)
+	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LIB_PATH) $(LDFLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
