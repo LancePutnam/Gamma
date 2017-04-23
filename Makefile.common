@@ -280,6 +280,7 @@ endif
 
 # Append optimization flags
 ifeq ($(BUILD_CONFIG), Release)
+	CPPFLAGS += -DNDEBUG
 	CFLAGS += -O3
 	#CFLAGS += -fpeel-loops # not supported by clang
 else
