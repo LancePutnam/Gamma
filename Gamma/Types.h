@@ -320,9 +320,25 @@ public:
 		for(unsigned i=1; i<N; ++i) (*this)[i] = T(0);
 		return *this;
 	}
-
-	#undef IT
 };
+
+
+template <unsigned N, class T, class S>
+inline Vec<N,T> operator + (const S& s, const Vec<N,T>& v){ return  v+s; }
+
+template <unsigned N, class T, class S>
+inline Vec<N,T> operator - (const S& s, const Vec<N,T>& v){ return -v+s; }
+
+template <unsigned N, class T, class S>
+inline Vec<N,T> operator * (const S& s, const Vec<N,T>& v){ return  v*s; }
+
+template <unsigned N, class T, class S>
+inline Vec<N,T> operator / (const S& s, const Vec<N,T>& v){
+	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
+}
+
+#undef IT
+
 
 namespace scl{
 
