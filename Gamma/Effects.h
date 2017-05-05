@@ -82,7 +82,10 @@ public:
 		freq1 = frq1; freq2 = frq2; env.decay(dec); if(rst) reset();
 	}
 	
-	void reset(){ env.reset(); }
+	void reset(float amp=1){
+		env.reset(amp);
+		fil.zero();
+	}
 	
 	float freq1, freq2;
 	NoiseWhite<RNGMulLinCon> src;
