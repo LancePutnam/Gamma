@@ -60,6 +60,7 @@ public:
 	/// Returns true on success and false otherwise.
 	///
 	bool openRead();
+	bool openRead(const std::string& path);
 
 	/// Open sound file for writing
 
@@ -68,6 +69,7 @@ public:
 	/// used. The Format of the sound file is derived from the extension.
 	/// \returns true on success and false otherwise.
 	bool openWrite();
+	bool openWrite(const std::string& path);
 
 	/// Close sound file
 

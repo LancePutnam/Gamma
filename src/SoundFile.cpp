@@ -348,8 +348,10 @@ enum
 
 
 bool SoundFile::openRead(){ return mImpl->openRead(path()); }
+bool SoundFile::openRead(const std::string& path_){ path(path_); return openRead(); }
 
 bool SoundFile::openWrite(){ return mImpl->openWrite(path()); }
+bool SoundFile::openWrite(const std::string& path_){ path(path_); return openWrite(); }
 
 
 void SoundFile::print(){
