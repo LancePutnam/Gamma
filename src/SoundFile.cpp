@@ -216,6 +216,11 @@ SoundFile::~SoundFile(){
 	delete mImpl;
 }
 
+SoundFile& SoundFile::path(const std::string& v){ mPath=v; return *this; }
+int SoundFile::samples() const { return frames() * channels(); }
+
+const std::string& SoundFile::path() const { return mPath; }
+
 bool SoundFile::opened() const { return mImpl->opened(); }
 
 bool SoundFile::close(){ return mImpl->close(); }

@@ -136,12 +136,6 @@ private:
 
 
 // Implementation_______________________________________________________________
-
-inline SoundFile& SoundFile::path(const std::string& v){ mPath=v; return *this; }
-inline int SoundFile::samples() const { return frames() * channels(); }
-
-inline const std::string& SoundFile::path() const { return mPath; }
-
 template<class T>
 inline int SoundFile::readAll(T * dst){
 	seek(0, SEEK_SET);
