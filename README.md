@@ -35,14 +35,13 @@ There are several other rules within Makefile. These are:
 	make			- builds static library
 	make install		- installs library into DESTDIR
 	make clean		- removes binaries from build folder
-	make examples/y/x.cpp	- builds and runs example source file y/x.cpp
 	make test		- performs unit tests
 
-The rule that builds examples will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples rule follows standard Unix conventions so that, for instance, all the examples can be built and run by typing the command 
+The script 'run.sh' can be used to compile and run examples and other source files against the Gamma library. For example,
 
-	make examples/*/*.cpp
+	./run.sh examples/oscillator/sine.cpp
 
-Binaries are located in the directory ./build/. On OSX, the Gamma library will be linked to the pre-compiled dependent libraries in external/lib_osx. On Linux, use apt-get to install the necessary dependent libraries (see 2.3 below).
+To only compile the source file without running, include AUTORUN=0 after the source file. Binaries are located in the automatically generated 'build/' directory. On OSX, the Gamma library will be linked to the pre-compiled dependent libraries in external/lib_osx. On Linux, use apt-get to install the necessary dependent libraries (see 2.3 below).
 
 
 ### Xcode (OS X)
