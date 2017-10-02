@@ -1,10 +1,9 @@
-# Gamma
--------
+# Gamma #
 ### Generic Synthesis C++ Library
 
 
-# About
--------
+# About #
+
 Gamma is a cross-platform, C++ library for doing generic synthesis and 
 filtering of signals. It contains helpful mathematical functions, 
 types, such as vectors and complex numbers, an assortment of sequence 
@@ -13,8 +12,8 @@ It is oriented towards real-time sound and graphics synthesis, but is
 equally useful for non-real-time tasks.
 
 
-# Compilation Instructions
---------------------------
+# Compilation Instructions #
+
 The source code can either be built into a library or directly compiled from source into an application. In the following, the base directory is where this README file is located.
 
 ## Building a Library
