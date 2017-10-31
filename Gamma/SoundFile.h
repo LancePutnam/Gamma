@@ -5,6 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <string>
+#include <vector>
 #include <stdio.h>
 #include "Gamma/mem.h"
 
@@ -91,6 +92,10 @@ public:
 	template<class T>
     int readAll(T * dst);
 
+	/// Copy all contents of file into array interleaved. Returns number of frames read.
+	template<class T>
+    int readAll(std::vector<T>& dst);
+
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 
 	/// If the number of channels is > 1, memory will be dynamically allocated
@@ -106,6 +111,9 @@ public:
 	/// of frames and the number of channels.
 	template<class T>
     int write(const T * src, int numFrames);
+
+	template<class T>
+    int write(const std::vector<T>& src);
 
 	// Sound file properties
 	bool opened() const;						///< Returns whether the sound file is open
@@ -139,9 +147,15 @@ private:
 
 // Implementation_______________________________________________________________
 template<class T>
-inline int SoundFile::readAll(T * dst){
+int SoundFile::readAll(T * dst){
 	seek(0, SEEK_SET);
 	return read(dst, frames());
+}
+
+template<class T>
+int SoundFile::readAll(std::vector<T>& dst){
+	dst.resize(samples());
+	return readAll(&dst[0]);
 }
 
 template<class T>
@@ -163,6 +177,11 @@ int SoundFile::readAllD(T * dst){
 		delete[] temp;
 	}
 	return framesRead;
+}
+
+template<class T>
+int SoundFile::write(const std::vector<T>& src){
+	return write(&src[0], src.size()/channels());
 }
 
 } // gam::
