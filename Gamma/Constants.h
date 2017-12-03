@@ -49,8 +49,8 @@ namespace{
 	const double roundMagic = 6755399441055744.; // 2^52 * 1.5
 	
 	template<class T> const T roundEps();
-	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
-	template<> inline const double roundEps<double>(){ return 0.499999985; }
+	template<> inline const float  roundEps<float >() { return 0.499999925f; }
+	template<> inline const double roundEps<double>() { return 0.499999985; }
 }
 
 
