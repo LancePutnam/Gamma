@@ -196,7 +196,7 @@ public:
 
 	void zero(){ d1=0; }
 
-	void onDomainChange(double r){ width(mWidth); }
+	void onDomainChange(double r) override{ width(mWidth); }
 
 protected:
 	Tv d1;
