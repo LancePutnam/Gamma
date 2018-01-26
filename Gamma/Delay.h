@@ -89,7 +89,7 @@ public:
 	float maxDelay() const;						///< Get maximum delay length units
 
 	virtual void onResize() override;
-	void onDomainChange(double r) override;
+	void onDomainChange(double r);
 
 	void print();
 
@@ -394,14 +394,14 @@ TM1 inline uint32_t Delay<TM2>::delayFToI(float v) const {
 
 TM1 inline void Delay<TM2>::incPhase(){ mPhase += mPhaseInc; }
 
-TM1 void Delay<TM2>::onResize() { //printf("Delay::onResize %d elements\n", this->size());
+TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this->size());
 	mPhaseInc = this->oneIndex();
 	//for(uint32_t i=0; i<this->size(); ++i) (*this)[i] = Tv(0);
 	if(this->isSoleOwner()) this->zero();
 	onDomainChange(1);
 }
 
-TM1 void Delay<TM2>::onDomainChange(double r) { //printf("Delay::onDomainChange\n");
+TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n");
 	if(this->usingExternalSource()){
 		mMaxDelay = this->size() * Td::ups();
 	}
