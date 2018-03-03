@@ -13,36 +13,39 @@
 # Operating system variables
 #--------------------------------------------------------------------------
 # Operating system: 'macosx', 'linux', or 'windows'
-UNAME := $(shell uname)
-ifeq ($(UNAME), Linux)
-	PLATFORM = linux
-else ifeq ($(UNAME), Darwin)
-	PLATFORM = macosx
 
-	# Mac OS X version
-	OSX_VERSION := $(shell sw_vers -productVersion)
-	OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
-else
-	PLATFORM = windows
+ifndef PLATFORM
+	UNAME := $(shell uname)
+	ifeq ($(UNAME), Linux)
+		PLATFORM = linux
+	else ifeq ($(UNAME), Darwin)
+		PLATFORM = macosx
 
-	# uname returns:
-	# MSYS/MinGW:		MINGW32_NT-6.2
-	# MSYS2/MinGW-32:	MINGW32_NT-10.0
-	# MSYS2/MinGW-64:	MINGW64_NT-10.0
-	# MSYS2:			MSYS_NT-10.0
-	ifneq (,$(findstring MINGW32,$(UNAME)))
-		MINGW_VERSION := 32
-	else ifneq (,$(findstring MINGW64,$(UNAME)))
-		MINGW_VERSION := 64
-	else ifneq (,$(findstring MSYS_NT,$(UNAME)))
-		MINGW_VERSION := 64
-	endif
-
-	# uname -o returns 'Msys' for both Msys and Msys2, so can't be used
-	ifneq (,$(wildcard /msys.bat))
-		MSYS_VERSION := 1
+		# Mac OS X version
+		OSX_VERSION := $(shell sw_vers -productVersion)
+		OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 	else
-		MSYS_VERSION := 2
+		PLATFORM = windows
+
+		# uname returns:
+		# MSYS/MinGW:		MINGW32_NT-6.2
+		# MSYS2/MinGW-32:	MINGW32_NT-10.0
+		# MSYS2/MinGW-64:	MINGW64_NT-10.0
+		# MSYS2:			MSYS_NT-10.0
+		ifneq (,$(findstring MINGW32,$(UNAME)))
+			MINGW_VERSION := 32
+		else ifneq (,$(findstring MINGW64,$(UNAME)))
+			MINGW_VERSION := 64
+		else ifneq (,$(findstring MSYS_NT,$(UNAME)))
+			MINGW_VERSION := 64
+		endif
+
+		# uname -o returns 'Msys' for both Msys and Msys2, so can't be used
+		ifneq (,$(wildcard /msys.bat))
+			MSYS_VERSION := 1
+		else
+			MSYS_VERSION := 2
+		endif
 	endif
 endif
 
@@ -169,8 +172,19 @@ ifeq ($(ARCH), 32_64)
 	DEP_TRACK = 0
 endif
 
+# Emscripten (is Unix-like)
+ifeq ($(PLATFORM), em)
+	AR = emar crs
+	RANLIB = emranlib
+
+	LDFLAGS	 += -lm
+	LDFLAGS	 += -lstdc++
+
+	DLIB_FLAGS += -shared
+	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
+
 # Linux:
-ifeq ($(PLATFORM), linux)
+else ifeq ($(PLATFORM), linux)
 
 	PLATFORM_DIR = linux/
 
