@@ -88,7 +88,7 @@ public:
 	uint32_t indexBack() const;					///< Get index of backmost element
 	float maxDelay() const;						///< Get maximum delay length units
 
-	virtual void onResize() override;
+	virtual void onResize();
 	void onDomainChange(double r);
 
 	void print();
