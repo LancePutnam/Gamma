@@ -337,6 +337,16 @@ inline Vec<N,T> operator / (const S& s, const Vec<N,T>& v){
 	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
 }
 
+template <unsigned N, class T, class U>
+inline Vec<N,T> operator + (const Vec<N,T>& v, const Complex<U>& c){
+	Vec<N,T> r; for(auto i:{0,1}) r[i]=v[i]+c[i]; return r;
+}
+
+template <unsigned N, class T, class U>
+inline Complex<U> operator + (const Complex<U>& c, const Vec<N,T>& v){
+	Complex<U> r; for(auto i:{0,1}) r[i] = c[i] + v[i]; return r;
+}
+
 #undef IT
 
 
