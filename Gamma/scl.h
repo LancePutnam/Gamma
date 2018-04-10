@@ -214,6 +214,8 @@ template<class T> T pow2(T v);			///< Returns value to the 2nd power
 template<class T> T pow3(T v);			///< Returns value to the 3rd power
 template<class T> T pow4(T v);			///< Returns value to the 4th power
 template<class T> T pow5(T v);			///< Returns value to the 5th power
+template<class T> T pow6(T v);			///< Returns value to the 6th power
+template<class T> T pow7(T v);			///< Returns value to the 7th power
 template<class T> T pow8(T v);			///< Returns value to the 8th power
 
 /// Returns pole radius given a T60 decay length and units/sample
@@ -662,6 +664,8 @@ template<class T> inline T pow2(T v){ return v*v; }
 template<class T> inline T pow3(T v){ return v*v*v; }
 template<class T> inline T pow4(T v){ return pow2(v*v); }
 template<class T> inline T pow5(T v){ return pow4(v)*v; }
+template<class T> inline T pow6(T v){ return pow3(pow2(v)); }
+template<class T> inline T pow7(T v){ return pow6(v)*v; }
 template<class T> inline T pow8(T v){ return pow4(v*v); }
 
 inline double ratioET(double pc, double divs, double ival){
