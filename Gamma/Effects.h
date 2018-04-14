@@ -23,6 +23,7 @@ namespace gam{
 /// of all frequencies of the carrier and modulator.
 /// Ring modulation is given by the operation M x C and thus, unlike amplitude
 /// modulation, does not pass the carrier signal.
+/// \ingroup Effects
 template <class Tp=real>
 class AM{
 public:
@@ -47,8 +48,7 @@ private:
 
 /// 3 biquad filters (of floats) in parallel
 
-/// \ingroup Filters
-/// \ingroup Effects
+/// \ingroup Effects Filter
 class Biquad3{
 public:
 	/// Constructor
@@ -139,7 +139,7 @@ public:
 /// This filter applies a Chebyshev polynomial to generate the 2nd through Nth 
 /// cosine harmonics of the input signal which is presumed to be a unity gain 
 /// sinusoid.
-///\ingroup Filters
+///\ingroup Filter
 template <unsigned N, class T=gam::real> 
 class ChebyN{
 public:
@@ -312,7 +312,7 @@ public:
 /// Equal-power 2-channel panner
 
 ///
-/// \ingroup Effects
+/// \ingroup Spatial
 template <class T=gam::real>
 class Pan{
 public:
@@ -390,8 +390,8 @@ protected:
 
 /// Plucked string source/filter
 
+/// \ingroup Oscillator
 ///
-/// \ingroup Oscillators
 class Pluck{
 public:
 	Pluck(double freq=440, double decay=0.99)

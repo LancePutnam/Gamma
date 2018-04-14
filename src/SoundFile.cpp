@@ -198,13 +198,13 @@ DEF_SPECIAL(double)
 #endif
 
 
-SoundFile::SoundFile(const string& path_)
+SoundFile::SoundFile(const std::string& path_)
 :	mImpl(new Impl)
 {
 	path(path_);
 }
 
-SoundFile::SoundFile(const string& path_, const SoundFile& infoSrc)
+SoundFile::SoundFile(const std::string& path_, const SoundFile& infoSrc)
 :	mImpl(new Impl)
 {
 	path(path_);

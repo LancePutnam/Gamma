@@ -4,11 +4,6 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-
-/// \defgroup Filters
-/// <A HREF="https://ccrma.stanford.edu/~jos/filters/What_Filter.html">
-/// When you think about it, everything is a filter.</A>
-
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
 #include "Gamma/Containers.h"
@@ -16,6 +11,14 @@
 #include "Gamma/Types.h"
 
 namespace gam{
+
+/// Signal transformers
+
+/// \defgroup Filter
+/// A linear filter boosts or attenuates the amplitudes of frequency components.
+/// In contrast, a non-linear filter typically produces new frequency components.
+/// Both types of filters also typically alter the phases of frequencies.
+/// Most of the filters in this group are linear filters.
 
 
 /// Filter types
@@ -63,7 +66,7 @@ inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class AllPass1 : public Td {
 public:
@@ -105,7 +108,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Biquad : public Td{
 public:
@@ -168,7 +171,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class BlockDC : public Td{
 public:
@@ -210,7 +213,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters  
+/// \ingroup Filter  
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class BlockNyq : public BlockDC<Tv,Tp,Td>{
 public:
@@ -246,7 +249,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Filter2 : public Td{
 public:
@@ -311,7 +314,7 @@ using Base::d1
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class AllPass2 : public Filter2<Tv,Tp,Td>{
 public:
@@ -340,7 +343,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Notch : public Filter2<Tv,Tp,Td>{
 public:
@@ -383,7 +386,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Reson : public Filter2<Tv,Tp,Td>{
 public:
@@ -440,7 +443,7 @@ protected:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real>
 class Hilbert {
 public:
@@ -477,7 +480,7 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=double, class Tp=double>
 class Integrator{
 public:
@@ -508,7 +511,7 @@ protected:
 
 /// Returns difference between successive samples.
 /// The frequency response has a zero at DC.
-/// \ingroup Filters
+/// \ingroup Filter
 template <class T=gam::real>
 class Differencer{
 public:
@@ -530,7 +533,7 @@ private:
 /// size. Due to the symmetry of the window, the moving average filter can be
 /// implemented efficiently using a single delay line with O(1) processing time
 /// complexity.
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
@@ -573,7 +576,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class OnePole : public Td{ 
 public:

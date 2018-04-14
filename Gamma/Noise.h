@@ -7,9 +7,11 @@
 #include "Gamma/rnd.h"
 #include "Gamma/scl.h"
 
-///\defgroup Noise
-
 namespace gam{
+
+/// Random signals
+
+///\defgroup Noise
 
 
 /// Brown noise

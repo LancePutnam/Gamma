@@ -4,9 +4,6 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-/// \defgroup Envelopes
-/// Everything in Gamma having to do with envelopes.
-
 #include <cfloat> /* DBL_MAX, FLT_MAX */
 #include "Gamma/gen.h"
 #include "Gamma/ipl.h"
@@ -15,6 +12,11 @@
 #include "Gamma/Strategy.h"
 
 namespace gam{
+
+/// Non-periodic, slowly varying modulation sources
+
+/// \defgroup Envelope
+
 
 /// Exponential curve with variable curvature
 
@@ -32,7 +34,7 @@ namespace gam{
 ///
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \ingroup Envelopes
+/// \ingroup Envelope
 /// \sa Decay
 template <class Tv=real, class Tp=real>
 class Curve{
@@ -84,7 +86,7 @@ protected:
 /// \tparam N	number of segments
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
-/// \ingroup Envelopes 
+/// \ingroup Envelope 
 template <int N, class Tv=real, class Tp=real, class Td=DomainObserver>
 class Env : public Td{
 public:
@@ -301,7 +303,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Td	domain observer type
-/// \ingroup Envelopes 
+/// \ingroup Envelope 
 template <class Tv=real, class Tp=real, class Td=DomainObserver>
 class AD : public Env<2,Tv,Tp,Td>{
 public:
@@ -358,7 +360,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \tparam Td	domain observer type
-/// \ingroup Envelopes 
+/// \ingroup Envelope 
 template <class Tv=real, class Tp=real, class Td=DomainObserver>
 class ADSR : public Env<3,Tv,Tp,Td>{
 public:
@@ -431,7 +433,7 @@ protected:
 /// envelope is -60 dB down from its initial value. This envelope is one of the 
 /// most computationally efficient envelopes requiring only a single multiply
 /// per iteration. \n\n Compare to Curve which touches exactly both start and end points.
-/// \ingroup Envelopes
+/// \ingroup Envelope
 /// \sa Curve
 template <class T=real, class Td=DomainObserver>
 class Decay : public Td{
@@ -470,7 +472,7 @@ protected:
 /// closes. This is equivalent to what is known in electronics as a comparator
 /// with hysteresis.
 ///
-/// \ingroup Envelopes
+/// \ingroup Envelope
 template <class T=real, class Td=DomainObserver>
 class Gate : public Td{
 public:
@@ -511,7 +513,7 @@ protected:
 
 /// Interpolation envelope segment
 
-/// \ingroup Envelopes
+/// \ingroup Envelope Interpolation
 template <
 	class Tv=real,
 	template <class> class Si=iplSeq::Linear,
@@ -598,10 +600,9 @@ protected:
 
 
 
-
 /// Exponential envelope segment for smoothing out value changes.
 
-/// \ingroup Envelopes
+/// \ingroup Envelope Interpolation
 template <class T=gam::real, class Td=DomainObserver>
 class SegExp : public Td{
 public:
@@ -652,8 +653,6 @@ protected:
 	T mLen, mCrv, mVal1, mVal0;
 	Curve<T,T> mCurve;
 };
-
-
 
 
 

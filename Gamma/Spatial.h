@@ -14,9 +14,12 @@
 #include "Gamma/Delay.h"
 #include "Gamma/Filter.h"
 
-/// \defgroup Spatial
 
 namespace gam{
+
+/// Simulate aspects of sound propagation through space
+
+/// \defgroup Spatial
 
 
 /// Gain loop filter (all-pass)

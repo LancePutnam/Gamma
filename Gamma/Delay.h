@@ -14,7 +14,10 @@
 
 namespace gam{
 
-/// \defgroup Delays
+/// Filters that keep a history of previous input samples
+
+/// \defgroup Delay
+
 
 /// Variable length delay line
 
@@ -35,7 +38,7 @@ namespace gam{
 /// \tparam Tv	Value (sample) type
 /// \tparam Si	Interpolation strategy
 /// \tparam Td	Domain type
-/// \ingroup Delays
+/// \ingroup Delay
 template<
 	class Tv = gam::real,
 	template<class> class Si = ipl::Linear,
@@ -112,7 +115,7 @@ protected:
 
 /// Variable delay-line with multiple read taps
 
-/// \ingroup Delays
+/// \ingroup Delay
 ///
 template <
 	class Tv = gam::real,
@@ -165,7 +168,7 @@ protected:
 ///
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
-/// \ingroup Delays
+/// \ingroup Delay
 template <unsigned N, class T>
 class DelayShift{
 public:
@@ -205,7 +208,7 @@ protected:
 
 /// One sample delay. Returns last input sample.
 
-/// \ingroup Delays
+/// \ingroup Delay
 ///  
 template<class T = gam::real>
 class Delay1 : public DelayShift<1,T>{
@@ -218,7 +221,7 @@ public:
 
 /// Two sample delay. Returns second to last input sample.
 
-/// \ingroup Delays
+/// \ingroup Delay
 ///
 template<class T = gam::real>
 class Delay2 : public DelayShift<2,T>{
@@ -248,8 +251,7 @@ public:
 /// \tparam Si	Interpolation strategy
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain type
-/// \ingroup Delays   
-/// \ingroup Filters
+/// \ingroup Delay Filter
 // H(z) = (ffd + z^-m) / (1 - fbk z^-m)
 // y[n] = ffd x[n] + x[n-m] + fbk y[n-m]
 template<
