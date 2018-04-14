@@ -9,6 +9,7 @@
 */
 
 #include <cmath>
+#include <initializer_list>
 
 namespace gam{
 
@@ -25,6 +26,8 @@ typedef Vec<3,float > float3;	///< Vector of 3 floats
 typedef Vec<3,double> double3;	///< Vector of 3 doubles
 typedef Vec<4,float > float4;	///< Vector of 4 floats
 typedef Vec<4,double> double4;	///< Vector of 4 doubles
+
+#define IT(n) for(unsigned i=0; i<(n); ++i)
 
 
 /// Polar number with argument in radians
@@ -174,6 +177,7 @@ template<class T> struct NamedElems<3,T>{ T x,y,z; };
 template<class T> struct NamedElems<4,T>{ T x,y,z,w; };
 
 
+
 /// N-vector or fixed-size array
 
 /// This is fixed in size to enable better loop unrolling optimizations and to 
@@ -182,7 +186,7 @@ template <unsigned N, class T>
 class Vec : public NamedElems<N,T> {
 public:
 
-    using NamedElems<N,T>::x;
+	using NamedElems<N,T>::x;
 
 
 	Vec(const T& v=T()){ set(v); }
@@ -200,22 +204,22 @@ public:
 	Vec(const Vec<N-1, Tv>& v, Ts s){ set(v,s);}
 
 
-    /// Returns size of vector
-    static unsigned size(){ return N; }
+	/// Returns size of vector
+	static unsigned size(){ return N; }
 
-    T * elems(){ return &x; }
-    const T * elems() const { return &x; }
+	T * elems(){ return &x; }
+	const T * elems() const { return &x; }
 
-    T * begin(){ return &x; }
-    const T * begin() const { return &x; }
-    T * end(){ return begin()+N; }
-    const T * end() const { return begin()+N; }
+	T * begin(){ return &x; }
+	const T * begin() const { return &x; }
+	T * end(){ return begin()+N; }
+	const T * end() const { return begin()+N; }
 
-    /// Set element at index (no bounds checking)
-    T& operator[](unsigned i){ return elems()[i];}
+	/// Set element at index (no bounds checking)
+	T& operator[](unsigned i){ return elems()[i];}
 
-    /// Get element at index (no bounds checking)
-    const T& operator[](unsigned i) const { return elems()[i]; }
+	/// Get element at index (no bounds checking)
+	const T& operator[](unsigned i) const { return elems()[i]; }
 
 	/// Get a vector comprised of indexed elements
 	Vec<2,T> get(int i0, int i1) const {
@@ -229,36 +233,33 @@ public:
 	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
 		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
 
-
-	#define IT(n) for(unsigned i=0; i<(n); ++i)
-
 	bool operator !=(const Vec& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
-	bool operator !=(const T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
+	bool operator !=(const   T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
 	Vec& operator = (const Vec& v){ IT(N) (*this)[i] = v[i]; return *this; }
-	Vec& operator = (const T& v){ IT(N) (*this)[i] = v;    return *this; }
+	Vec& operator = (const   T& v){ IT(N) (*this)[i] = v; return *this; }
 	bool operator ==(const Vec& v){ IT(N){ if((*this)[i] != v[i]) return false; } return true; }
-	bool operator ==(const T& v){ IT(N){ if((*this)[i] != v   ) return false; } return true; }
+	bool operator ==(const   T& v){ IT(N){ if((*this)[i] != v   ) return false; } return true; }
 
 	Vec  operator * (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] * v[i]; return r; }
-	Vec  operator * (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] * v;    return r; }
+	Vec  operator * (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] * v;    return r; }
 	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
-	Vec& operator *=(const T& v){ IT(N) (*this)[i] *= v;    return *this; }
+	Vec& operator *=(const   T& v){ IT(N) (*this)[i] *= v;    return *this; }
 	Vec  operator / (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] / v[i]; return r; }
-	Vec  operator / (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] / v;    return r; }
+	Vec  operator / (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] / v;    return r; }
 	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
-	Vec& operator /=(const T& v){ IT(N) (*this)[i] /= v;    return *this; }
+	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
 	Vec  operator - (          ) const { Vec r; IT(N) r[i] = -(*this)[i]; return r; }
 	Vec  operator - (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] - v[i]; return r; }
-	Vec  operator - (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] - v;    return r; }
+	Vec  operator - (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] - v;    return r; }
 	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
-	Vec& operator -=(const T& v){ IT(N) (*this)[i] -= v;    return *this; }
+	Vec& operator -=(const   T& v){ IT(N) (*this)[i] -= v;    return *this; }
 	Vec  operator + (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] + v[i]; return r; }
-	Vec  operator + (const T& v) const { Vec r; IT(N) r[i] = (*this)[i] + v;    return r; }
+	Vec  operator + (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] + v;    return r; }
 	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
-	Vec& operator +=(const T& v){ IT(N) (*this)[i] += v;    return *this; }
+	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
 
-    /// Zeros all elements
-    void zero(){ memset(elems(), 0, N * sizeof(T)); }
+	/// Zeros all elements
+	void zero(){ memset(elems(), 0, N * sizeof(T)); }
 
 	T dot(const Vec& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
 	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
@@ -346,8 +347,6 @@ template <unsigned N, class T, class U>
 inline Complex<U> operator + (const Complex<U>& c, const Vec<N,T>& v){
 	Complex<U> r; for(auto i:{0,1}) r[i] = c[i] + v[i]; return r;
 }
-
-#undef IT
 
 
 namespace scl{
@@ -438,6 +437,8 @@ template<class T> inline double normCompare(const Complex<T>& v){ return v.normS
 template<int N,class T> inline T magSqr(const Vec<N,T>& v){ return v.magSqr(); }
 template<int N,class T> inline double norm(const Vec<N,T>& v){ return v.mag(); }
 template<int N,class T> inline double normCompare(const Vec<N,T>& v){ return v.magSqr(); }
+
+#undef IT
 
 } // gam::
 
