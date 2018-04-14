@@ -28,7 +28,7 @@ namespace gam{
 ///
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
-/// \ingroup Oscillators     
+/// \ingroup Oscillators
 template <class Sp = phsInc::Loop, class Td = DomainObserver>
 class Accum : public Td {
 public:
@@ -128,12 +128,12 @@ public:
 	}
 };
 
-    
+
 /// Floating-point phase accumulator with output in [-A, A)
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-///\ingroup Oscillators     
+///\ingroup Oscillators
 template <class Tv = gam::real, class Td = DomainObserver>
 class AccumPhase : public Td{
 public:

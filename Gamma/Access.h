@@ -57,8 +57,8 @@ namespace acc{
 
 
 /// Maps a real number in [0, pmax) to an integer in [0, imax).
-    
-///\ingroup access    
+
+///\ingroup access
 template <class T>
 class IndexMap{
 

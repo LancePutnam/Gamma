@@ -31,7 +31,7 @@ T * defaultArray(){
 
 
 /// Size functor for ArrayPow2
-    
+
 ///\ingroup Containers
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
@@ -53,7 +53,7 @@ struct SizeArrayPow2{
 
 
 /// Size functor for Array
-    
+
 /// \ingroup Containers
 struct SizeArray{
 	SizeArray(uint32_t size): mSize(size){}
@@ -195,7 +195,7 @@ private: ArrayBase& operator=(const ArrayBase& v);
 
 
 /// Resizable array
-    
+
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class Array : public ArrayBase<T, SizeArray, A>{
@@ -216,7 +216,7 @@ private: Array& operator=(const Array& v);
 
 
 ///Resizable array with a power-of-2 number of elements
-    
+
 ///\ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class ArrayPow2 : public ArrayBase<T, SizeArrayPow2, A>{
@@ -579,7 +579,7 @@ inline uint32_t ArrayPow2<T,A>::log2Size() const { return mSize.mBitsI; }
 
 template<class T, class A>
 inline uint32_t ArrayPow2<T,A>::fracBits() const { return mSize.mBitsF; }
-    
+
 template<class T, class A>
 inline uint32_t ArrayPow2<T,A>::index(uint32_t phase) const { return phase >> fracBits(); }
 
@@ -643,13 +643,13 @@ inline uint32_t Ring<T,A>::indexPrev(uint32_t v) const {
 
 template<class T, class A>
 inline uint32_t Ring<T,A>::pos() const { return mPos; }
-    
+
 template<class T, class A>
 inline bool Ring<T,A>::reachedEnd() const { return pos() == (size()-1); }
 
 template<class T, class A>
 inline void Ring<T,A>::incPos(){ if(++mPos >= size()) mPos = 0; }
-    
+
 template<class T, class A>
 void Ring<T,A>::pos(uint32_t index){ mPos = index; }
 

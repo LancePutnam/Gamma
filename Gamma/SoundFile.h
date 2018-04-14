@@ -86,22 +86,22 @@ public:
 	/// to hold the product of frames and the number of channels.
 	//ULONG read(float * dst, ULONG numFrames);
 	template<class T>
-    int read(T * dst, int numFrames);
+	int read(T * dst, int numFrames);
 
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
 	template<class T>
-    int readAll(T * dst);
+	int readAll(T * dst);
 
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
 	template<class T>
-    int readAll(std::vector<T>& dst);
+	int readAll(std::vector<T>& dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 
 	/// If the number of channels is > 1, memory will be dynamically allocated
 	///	and freed for the deinterleaving.
 	template<class T>
-    int readAllD(T * dst);
+	int readAllD(T * dst);
 
 	/// Write interleaved frames from array to file
 
@@ -110,10 +110,10 @@ public:
 	/// by ptr to the file. The array must be large enough to hold the product
 	/// of frames and the number of channels.
 	template<class T>
-    int write(const T * src, int numFrames);
+	int write(const T * src, int numFrames);
 
 	template<class T>
-    int write(const std::vector<T>& src);
+	int write(const std::vector<T>& src);
 
 	// Sound file properties
 	bool opened() const;						///< Returns whether the sound file is open

@@ -25,7 +25,7 @@ enum SpectralType{
 
 
 /// Sliding window for analysis
-    
+
 ///\ingroup DFT
 ///
 template <class T=gam::real>
@@ -75,7 +75,7 @@ private:
 
 
 /// Base class for DFTs
-    
+
 ///\ingroup DFT
 ///
 template <class T=gam::real>
@@ -433,13 +433,13 @@ void SlidingWindow<T>::sizeHop(unsigned size){
 
 template<class T>
 inline unsigned SlidingWindow<T>::sizeHop() const { return mSizeHop; }
-    
+
 template<class T>
 inline unsigned SlidingWindow<T>::sizeWin() const { return mSizeWin; }
-    
+
 template<class T>
 inline const T * SlidingWindow<T>::window(){ return mBuf; }
-    
+
 template<class T>
 inline const T * SlidingWindow<T>::operator()(){ return mBuf; }
 

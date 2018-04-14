@@ -435,7 +435,7 @@ namespace iplSeq{
 
 	/// Cubic sequence interpolation strategy
 
-    /// \ingroup Strategies, iplSeq
+	/// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Cubic : public Base<4,T>{
 		using Base<4,T>::v;
@@ -446,7 +446,7 @@ namespace iplSeq{
 	};
 
 	/// Cosine sequence interpolation strategy
-    
+
 	/// \ingroup Strategies, iplSeq
 	template <class T>
 	struct Cosine : public Base<2,T>{

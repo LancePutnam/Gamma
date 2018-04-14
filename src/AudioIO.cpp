@@ -421,7 +421,7 @@ bool AudioIO::open(){
 			outParams,			// PaStreamParameters * out
 			mFramesPerSecond,	// frames/sec (double)
 			mFramesPerBuffer,	// frames/buffer (unsigned long)
-            paNoFlag,			// paNoFlag, paClipOff, paDitherOff
+			paNoFlag,			// paNoFlag, paClipOff, paDitherOff
 			paCallback,			// static callback function (PaStreamCallback *)
 			this
 		);

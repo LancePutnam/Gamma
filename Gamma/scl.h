@@ -510,7 +510,7 @@ namespace{
 template<class T> T atan2Fast(T y, T x){
 
 	T r, angle;
-	T ay = scl::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
+	T ay = scl::abs(y) + T(1e-10); // kludge to prevent 0/0 condition
 
 	if(x < T(0)){
 		r = (x + ay) / (ay - x);
@@ -905,7 +905,7 @@ inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
 template<class T>
 inline T trunc(T v){ return round( (v > T(0)) ? v-roundEps<T>() : v+roundEps<T>() ); }
-    
+
 template<class T>
 inline T trunc(T v, T s){ return trunc(v/s)*s; }
 

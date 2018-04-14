@@ -46,7 +46,7 @@ private:
 
 
 /// 3 biquad filters (of floats) in parallel
-    
+
 /// \ingroup Filters
 /// \ingroup Effects
 class Biquad3{

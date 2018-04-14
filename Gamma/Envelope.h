@@ -510,7 +510,7 @@ protected:
 
 
 /// Interpolation envelope segment
-    
+
 /// \ingroup Envelopes
 template <
 	class Tv=real,
@@ -600,7 +600,7 @@ protected:
 
 
 /// Exponential envelope segment for smoothing out value changes.
-    
+
 /// \ingroup Envelopes
 template <class T=gam::real, class Td=DomainObserver>
 class SegExp : public Td{

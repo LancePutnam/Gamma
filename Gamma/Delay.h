@@ -35,7 +35,7 @@ namespace gam{
 /// \tparam Tv	Value (sample) type
 /// \tparam Si	Interpolation strategy
 /// \tparam Td	Domain type
-/// \ingroup Delays    
+/// \ingroup Delays
 template<
 	class Tv = gam::real,
 	template<class> class Si = ipl::Linear,
@@ -111,7 +111,7 @@ protected:
 
 
 /// Variable delay-line with multiple read taps
-    
+
 /// \ingroup Delays
 ///
 template <
@@ -144,8 +144,8 @@ public:
 	
 	/// Set a tap's delay length as a frequency
 	void freq(float v, unsigned tap){
-        	delay(1.f/v, tap);
-    	}
+		delay(1.f/v, tap);
+	}
 
 	/// Set number of read taps
 	void taps(unsigned numTaps){ mDelays.resize(numTaps); }
@@ -157,7 +157,7 @@ protected:
 
 
 /// Fixed-size delay that uses memory-shifting.
-    
+
 /// Where N is the number of elements in the delay, insertion is O(N) which is 
 /// slower than that of the average ring buffer at O(1). Access, however, will 
 /// be optimal (a direct array access) versus that of the ring buffer which 
@@ -165,7 +165,7 @@ protected:
 ///
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
-/// \ingroup Delays    
+/// \ingroup Delays
 template <unsigned N, class T>
 class DelayShift{
 public:
@@ -217,7 +217,7 @@ public:
 
 
 /// Two sample delay. Returns second to last input sample.
-    
+
 /// \ingroup Delays
 ///
 template<class T = gam::real>

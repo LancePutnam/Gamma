@@ -663,13 +663,13 @@ inline Tv AllPass1<Tv,Tp,Td>::operator()(Tv i0){
 
 template <class Tv, class Tp, class Td>
 inline Tv AllPass1<Tv,Tp,Td>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
-    
+
 template <class Tv, class Tp, class Td>
 inline Tv AllPass1<Tv,Tp,Td>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
 
 template <class Tv, class Tp, class Td>
 inline Tp AllPass1<Tv,Tp,Td>::freq(){ return mFreq; }
-    
+
 template <class Tv, class Tp, class Td>
 void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 
@@ -807,14 +807,14 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[2] =-mA[0];
 		break;
 	case BAND_PASS_UNIT:
-        mA[0] = mAlpha * mB[0];
-        mA[1] = Tp(0);
-        mA[2] =-mA[0];
+		mA[0] = mAlpha * mB[0];
+		mA[1] = Tp(0);
+		mA[2] =-mA[0];
 		break;
 	case BAND_REJECT:
-        mA[0] = mB[0];
-        mA[1] = mB[1];
-        mA[2] = mB[0];
+		mA[0] = mB[0];
+		mA[1] = mB[1];
+		mA[2] = mB[0];
 		break;
 	case ALL_PASS:
 		mA[0] = mB[2];
@@ -950,7 +950,7 @@ inline void OnePole<Tv,Tp,Td>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(){ return (*this)(mStored); }
-    
+
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(Tv in){
 	o1 = o1*mB1 + in*mA0;
@@ -965,13 +965,13 @@ inline void OnePole<Tv,Tp,Td>::operator *= (Tv v){ mStored *= v; }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::last() const { return o1; }
-    
+
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::stored() const { return mStored; }
-    
+
 template <class Tv, class Tp, class Td>
 inline Tv& OnePole<Tv,Tp,Td>::stored(){ return mStored; }
-    
+
 template <class Tv, class Tp, class Td>
 inline bool OnePole<Tv,Tp,Td>::zeroing(Tv eps) const {
 	return scl::abs(o1) < eps && mStored == Tv(0);
