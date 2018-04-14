@@ -1,4 +1,5 @@
 build/
+doc/html/
 xcuserdata
 doxygen_objdb_*
 .DS_Store
