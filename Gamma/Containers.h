@@ -25,7 +25,7 @@ namespace gam{
 /// dereference.
 template<class T>
 T * defaultArray(){
-	static T v(0);
+	static T v = T();
 	return &v;
 }
 
