@@ -26,7 +26,7 @@ enum FilterType{
 	LOW_PASS,			/**< Low-pass */
 	HIGH_PASS,			/**< High-pass */
 	BAND_PASS,			/**< Band-pass */
-	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
+	RESONANT,			/**< Resonant band-pass */
 	BAND_REJECT,		/**< Band-reject */
 	ALL_PASS,			/**< All-pass */
 	PEAKING,			/**< Peaking */
@@ -804,12 +804,12 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[0] = mA[1] * Tp(-0.5);
 		mA[2] = mA[0];
 		break;
-	case BAND_PASS:
+	case RESONANT:
 		mA[0] = mImag * Tp(0.5) * mB[0];
 		mA[1] = Tp(0);
 		mA[2] =-mA[0];
 		break;
-	case BAND_PASS_UNIT:
+	case BAND_PASS:
 		mA[0] = mAlpha * mB[0];
 		mA[1] = Tp(0);
 		mA[2] =-mA[0];
