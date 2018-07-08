@@ -198,13 +198,13 @@ DEF_SPECIAL(double)
 #endif
 
 
-SoundFile::SoundFile(const string& path_)
+SoundFile::SoundFile(const std::string& path_)
 :	mImpl(new Impl)
 {
 	path(path_);
 }
 
-SoundFile::SoundFile(const string& path_, const SoundFile& infoSrc)
+SoundFile::SoundFile(const std::string& path_, const SoundFile& infoSrc)
 :	mImpl(new Impl)
 {
 	path(path_);
@@ -215,6 +215,11 @@ SoundFile::~SoundFile(){
 	close();
 	delete mImpl;
 }
+
+SoundFile& SoundFile::path(const std::string& v){ mPath=v; return *this; }
+int SoundFile::samples() const { return frames() * channels(); }
+
+const std::string& SoundFile::path() const { return mPath; }
 
 bool SoundFile::opened() const { return mImpl->opened(); }
 
@@ -343,8 +348,10 @@ enum
 
 
 bool SoundFile::openRead(){ return mImpl->openRead(path()); }
+bool SoundFile::openRead(const std::string& path_){ path(path_); return openRead(); }
 
 bool SoundFile::openWrite(){ return mImpl->openWrite(path()); }
+bool SoundFile::openWrite(const std::string& path_){ path(path_); return openWrite(); }
 
 
 void SoundFile::print(){

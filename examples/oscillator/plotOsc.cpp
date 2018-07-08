@@ -45,6 +45,7 @@ int main(){
 
 	PLOT(LFO<>, g.period(N/2);, cos, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, tri, "period=N/2")
+	PLOT(LFO<>, g.period(N/2);, sinPara, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, para, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, even3, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, even5, "period=N/2")

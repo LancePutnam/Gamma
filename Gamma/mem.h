@@ -228,7 +228,7 @@ void rotateRight(unsigned order, T * arr, unsigned len);
 
 /// The destination indices are rounded up.
 /// 'dst' must have room for 'lenSrc' times 'amount' elements. \n
-/// Ex.: 12345678 -> 12.34.56.78    (amount = 1.5) \n
+/// Ex.: 12345678 -> 12.34.56.78 (amount = 1.5) \n
 /// Ex.: 1234 -> 1..2..3..4.. (amount = 3)
 template <class T>
 void scale(T * dst, const T * src, unsigned lenSrc, float stride);
@@ -283,7 +283,7 @@ void transpose2(T * arr, unsigned len);
 /// Returns true if all elements are different
 template <class T>
 bool unique(const T * src, unsigned len, unsigned str=1);
-    
+
 template <class T>
 bool unique(const T * src, unsigned len, unsigned str){
 	for(unsigned j=0; j<len-str; j+=str){
@@ -410,12 +410,12 @@ inline void keep(T * arr, unsigned len, unsigned stride, unsigned offset){
 
 template <class T>
 void permute(T * arr, unsigned len, unsigned long long k) {
-     unsigned long long factorial = 1;
-     for(unsigned i=1; i<len; i++){
-        factorial *= i;
+	unsigned long long factorial = 1;
+	for(unsigned i=1; i<len; i++){
+		factorial *= i;
 		unsigned j = i - ((k / factorial) % (i + 1));
 		swap(arr[i], arr[j]);
-     }
+	}
 }
 
 template <class T>
@@ -463,13 +463,13 @@ inline void repeat(unsigned chunkSize, T * arr, unsigned len){
 
 /*	void * realloc(void *ptr, size_t size);
 	 
-     The realloc() function tries to change the size of the allocation pointed
-     to by ptr to size, and return ptr.  If there is not enough room to
-     enlarge the memory allocation pointed to by ptr, realloc() creates a new
-     allocation, copies as much of the old data pointed to by ptr as will fit
-     to the new allocation, frees the old allocation, and returns a pointer to
-     the allocated memory.  realloc() returns a NULL pointer if there is an
-     error, and the allocation pointed to by ptr is still valid.
+The realloc() function tries to change the size of the allocation pointed
+to by ptr to size, and return ptr.  If there is not enough room to
+enlarge the memory allocation pointed to by ptr, realloc() creates a new
+allocation, copies as much of the old data pointed to by ptr as will fit
+to the new allocation, frees the old allocation, and returns a pointer to
+the allocated memory.  realloc() returns a NULL pointer if there is an
+error, and the allocation pointed to by ptr is still valid.
 */
 template <class T>
 bool resize(T *& arr, unsigned sizeNow, unsigned sizeNew){

@@ -24,13 +24,8 @@ public:
 	NoiseWhite<> white;		// 1/f^0 noise generator
 	NoisePink<> pink;		// 1/f^1 noise generator
 	NoiseBrown<> brown;		// 1/f^2 noise generator
-	Accum<> tmr;			// Timer for switching noise
-	int type;				// Noise type
-
-	MyApp(){
-		tmr.period(2);
-		type=0;
-	}
+	Accum<> tmr{1./4};		// Timer for switching noise
+	int type=0;				// Noise type
 
 	void onAudio(AudioIOData& io){
 
@@ -39,18 +34,17 @@ public:
 			if(tmr()) (++type)%=4;
 			
 			float s = 0;
-			
+
+			auto printType = [&](const char * msg){ if(tmr.cycled()) printf("%s\n",msg); };
+
 			switch(type){
-				case 0: s = violet();	break;
-				case 1: s = white()*0.5;break;
-				case 2: s = pink();		break;
-				default:s = brown();	break;
+				case 0: s = violet();    printType("Violet noise"); break;
+				case 1: s = white()*0.5; printType("White noise"); break;
+				case 2: s = pink();      printType("Pink noise"); break;
+				default:s = brown();     printType("Brown noise"); break;
 			}
 
-			s *= 0.2;
-
-			io.out(0) = s;
-			io.out(1) = s;
+			io.out(0) = io.out(1) = s*0.2;
 		}
 	}
 };

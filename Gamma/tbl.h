@@ -17,11 +17,11 @@ enum WindowType{
 	BARTLETT,			/**< Bartlett (Triangle) */
 	BLACKMAN,			/**< Blackman */
 	BLACKMAN_HARRIS,	/**< Blackman-Harris */
-	BLACKMAN_NUTTALL,   /**< Blackman-Nuttall */
-	FLATTOP,            /**< Flat-Top */
+	BLACKMAN_NUTTALL,	/**< Blackman-Nuttall */
+	FLATTOP,			/**< Flat-Top */
 	HAMMING,			/**< Hamming */
 	HANN,				/**< von Hann */
-	NUTTALL,            /**< Nuttall */
+	NUTTALL,			/**< Nuttall */
 	WELCH,				/**< Welch */
 	NYQUIST,			/**< Nyquist */
 	RECTANGLE			/**< Rectangle (no window) */
@@ -283,10 +283,10 @@ void window			(T * dst, unsigned len, WindowType type);
 
 template<class T>
 void bartlett		(T * dst, unsigned len); ///< Fills array with Bartlett window
-    
+
 template<class T>
 void blackman		(T * dst, unsigned len); ///< Fills array with Blackman window
-    
+
 template<class T>
 void blackmanHarris	(T * dst, unsigned len); ///< Fills array with Blackman-Harris window
 
@@ -298,19 +298,19 @@ void flatTop		(T * dst, unsigned len); ///< Fills array with Flat-Top window
 
 template<class T>
 void hamming		(T * dst, unsigned len); ///< Fills array with Hamming window
-    
+
 template<class T>
 void hann			(T * dst, unsigned len); ///< Fills array with von Hann window
 
 template<class T>
 void nuttall		(T * dst, unsigned len); ///< Fills array with Nuttall window
-    
+
 template<class T>
 void welch			(T * dst, unsigned len); ///< Fills array with Welch window
-    
+
 template<class T>
 void rectangle		(T * dst, unsigned len); ///< Fills array with Rectangle window
-    
+
 template<class T>
 void nyquist		(T * dst, unsigned len, unsigned str=1); ///< Fills array with Nyquist window
 
@@ -599,28 +599,28 @@ void window(T * dst, unsigned len, WindowType type){
 	
 template<class T>
 void bartlett		(T * dst, unsigned len){ SYM_WIN(2.   , 0., phs) }
-    
+
 template<class T>
 void blackman		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackman(phs)) }
-    
+
 template<class T>
 void blackmanHarris	(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanHarris(phs)) }
-    
+
 template<class T>
 void blackmanNuttall(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::blackmanNuttall(phs)) }
-    
+
 template<class T>
 void flatTop		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::flatTop(phs)) }
 
 template<class T>
 void hamming		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hamming(phs)) }
-    
+
 template<class T>
 void hann			(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::hann(phs)) }
 
 template<class T>
 void nuttall		(T * dst, unsigned len){ SYM_WIN(M_2PI, 0., scl::nuttall(phs)) }
-    
+
 template<class T>
 void welch			(T * dst, unsigned len){ SYM_WIN(2.   ,-1., scl::welch(phs)) }
 

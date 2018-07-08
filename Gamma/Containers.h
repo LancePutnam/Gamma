@@ -25,13 +25,13 @@ namespace gam{
 /// dereference.
 template<class T>
 T * defaultArray(){
-	static T v(0);
+	static T v = T();
 	return &v;
 }
 
 
 /// Size functor for ArrayPow2
-    
+
 ///\ingroup Containers
 struct SizeArrayPow2{
 	SizeArrayPow2(uint32_t size){ (*this)(size); }
@@ -53,7 +53,7 @@ struct SizeArrayPow2{
 
 
 /// Size functor for Array
-    
+
 /// \ingroup Containers
 struct SizeArray{
 	SizeArray(uint32_t size): mSize(size){}
@@ -131,6 +131,11 @@ public:
 	const T * elems() const;		///< Get read-only pointer to elements
 	uint32_t size() const;			///< Returns number of elements in array
 
+	T * begin(){ return elems(); }
+	const T * begin() const { return elems(); }
+	T * end(){ return elems()+size(); }
+	const T * end() const { return elems()+size(); }
+
 	/// Destroys all elements and frees memory
 	void clear();
 
@@ -190,7 +195,7 @@ private: ArrayBase& operator=(const ArrayBase& v);
 
 
 /// Resizable array
-    
+
 /// \ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class Array : public ArrayBase<T, SizeArray, A>{
@@ -211,7 +216,7 @@ private: Array& operator=(const Array& v);
 
 
 ///Resizable array with a power-of-2 number of elements
-    
+
 ///\ingroup Containers
 template <class T, class A=gam::Allocator<T> >
 class ArrayPow2 : public ArrayBase<T, SizeArrayPow2, A>{
@@ -279,6 +284,15 @@ public:
 	/// \param[ in] delay	how many elements ago to begin copy;
 	///						if delay<0, then delay -> size() + delay
 	void read(T * dst, uint32_t len, int32_t delay=-1) const;
+
+	/// Copies elements out of ring to another array
+
+	/// \param[out] dst		array to copy elements to
+	/// \param[ in] len		number of elements to copy
+	/// \param[ in] delay	how many elements ago to begin copy;
+	///						if delay<0, then delay -> size() + delay
+	///	\param[ in] from	array index to read history relative to
+	void readFrom(T * dst, uint32_t len, int32_t delay, uint32_t from) const;
 	
 	uint32_t pos() const;			///< Return absolute index of frontmost (newest) element
 	bool reachedEnd() const;		///< Returns whether the last element written was at the end of the array
@@ -565,7 +579,7 @@ inline uint32_t ArrayPow2<T,A>::log2Size() const { return mSize.mBitsI; }
 
 template<class T, class A>
 inline uint32_t ArrayPow2<T,A>::fracBits() const { return mSize.mBitsF; }
-    
+
 template<class T, class A>
 inline uint32_t ArrayPow2<T,A>::index(uint32_t phase) const { return phase >> fracBits(); }
 
@@ -594,16 +608,20 @@ inline void Ring<T,A>::operator()(const T& v){
 
 template<class T, class A>
 void Ring<T,A>::read(T * dst, uint32_t len, int32_t delay) const{
+	// pos() points to most recently written slot
+	readFrom(dst, len, delay, pos());
+}
+
+template<class T, class A>
+void Ring<T,A>::readFrom(T * dst, uint32_t len, int32_t delay, uint32_t from) const{
 
 	if(delay < 0) delay += int32_t(size());
 
-	// pos() points to most recently written slot
-	//uint32_t begin = (pos() - delay) % size();
-	uint32_t begin = (uint32_t)scl::wrap(int32_t(pos()) - delay, int32_t(size()));
+	uint32_t begin = (uint32_t)scl::wrap(int32_t(from) - delay, int32_t(size()));
 
 	// this ensures that we don't copy across the ring tap boundary
 	// we add one to maxLen because of a fence post anomaly
-	uint32_t maxLen = (begin < pos() ? (pos() - begin) : (pos() + (size() - begin))) + 1;
+	uint32_t maxLen = (begin < from ? (from - begin) : (from + (size() - begin))) + 1;
 	len = scl::min(len, maxLen);
 	
 	mem::copyFromRing(elems(), size(), begin, dst, len);
@@ -625,13 +643,13 @@ inline uint32_t Ring<T,A>::indexPrev(uint32_t v) const {
 
 template<class T, class A>
 inline uint32_t Ring<T,A>::pos() const { return mPos; }
-    
+
 template<class T, class A>
 inline bool Ring<T,A>::reachedEnd() const { return pos() == (size()-1); }
 
 template<class T, class A>
 inline void Ring<T,A>::incPos(){ if(++mPos >= size()) mPos = 0; }
-    
+
 template<class T, class A>
 void Ring<T,A>::pos(uint32_t index){ mPos = index; }
 

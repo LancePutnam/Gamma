@@ -214,6 +214,8 @@ template<class T> T pow2(T v);			///< Returns value to the 2nd power
 template<class T> T pow3(T v);			///< Returns value to the 3rd power
 template<class T> T pow4(T v);			///< Returns value to the 4th power
 template<class T> T pow5(T v);			///< Returns value to the 5th power
+template<class T> T pow6(T v);			///< Returns value to the 6th power
+template<class T> T pow7(T v);			///< Returns value to the 7th power
 template<class T> T pow8(T v);			///< Returns value to the 8th power
 
 /// Returns pole radius given a T60 decay length and units/sample
@@ -508,7 +510,7 @@ namespace{
 template<class T> T atan2Fast(T y, T x){
 
 	T r, angle;
-	T ay = scl::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
+	T ay = scl::abs(y) + T(1e-10); // kludge to prevent 0/0 condition
 
 	if(x < T(0)){
 		r = (x + ay) / (ay - x);
@@ -662,6 +664,8 @@ template<class T> inline T pow2(T v){ return v*v; }
 template<class T> inline T pow3(T v){ return v*v*v; }
 template<class T> inline T pow4(T v){ return pow2(v*v); }
 template<class T> inline T pow5(T v){ return pow4(v)*v; }
+template<class T> inline T pow6(T v){ return pow3(pow2(v)); }
+template<class T> inline T pow7(T v){ return pow6(v)*v; }
 template<class T> inline T pow8(T v){ return pow4(v*v); }
 
 inline double ratioET(double pc, double divs, double ival){
@@ -901,7 +905,7 @@ inline double t60(double samples){ return ::pow(0.001, 1./samples); }
 
 template<class T>
 inline T trunc(T v){ return round( (v > T(0)) ? v-roundEps<T>() : v+roundEps<T>() ); }
-    
+
 template<class T>
 inline T trunc(T v, T s){ return trunc(v/s)*s; }
 
@@ -1105,9 +1109,11 @@ inline float sinFast(uint32_t p){
 }
 
 inline float sinPara(uint32_t p){
-	uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
+	/*uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
 	uint32_t tri = ((p+MaskSign<float>()) >> 9) | Expo4<float>();
-	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));
+	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));//*/
+	auto x = punUF(Expo4<float>() | (p>>9)) - 6.f;
+	return x*(scl::abs(x) - 2.f);
 }
 
 // [1, 1,-1,-1]

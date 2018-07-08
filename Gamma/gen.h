@@ -12,7 +12,7 @@
 namespace gam{
 
 /// Generator function objects
-    
+
 /// A generator is a lightweight object that generates a sequence of elements.
 /// Generators have a standard interface specified by the Val class. The array
 /// access operator, [], is overloaded so generators can be treated like
@@ -627,8 +627,7 @@ private:
 
 
 /// Triggers after a specified number of iterations and then resets.
-    
-    
+
 /// Outputs true on every nth sample and false on the rest.
 /// Argument "num" determines the length of the sequence.
 /// Argument "val", with a default value of zero can be set by the user

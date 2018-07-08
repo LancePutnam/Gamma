@@ -11,7 +11,7 @@
 namespace gam{
 
 /// Transfer function of an arbitrary difference equation
-    
+
 /// http://en.wikipedia.org/wiki/Transfer_function
 ///
 class TransferFunc {

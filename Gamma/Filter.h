@@ -4,11 +4,6 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-
-/// \defgroup Filters
-/// <A HREF="https://ccrma.stanford.edu/~jos/filters/What_Filter.html">
-/// When you think about it, everything is a filter.</A>
-
 #include "Gamma/ipl.h"
 #include "Gamma/scl.h"
 #include "Gamma/Containers.h"
@@ -17,13 +12,21 @@
 
 namespace gam{
 
+/// Signal transformers
+
+/// \defgroup Filter
+/// A linear filter boosts or attenuates the amplitudes of frequency components.
+/// In contrast, a non-linear filter typically produces new frequency components.
+/// Both types of filters also typically alter the phases of frequencies.
+/// Most of the filters in this group are linear filters.
+
 
 /// Filter types
 enum FilterType{
 	LOW_PASS,			/**< Low-pass */
 	HIGH_PASS,			/**< High-pass */
 	BAND_PASS,			/**< Band-pass */
-	BAND_PASS_UNIT,		/**< Band-pass with unit gain */
+	RESONANT,			/**< Resonant band-pass */
 	BAND_REJECT,		/**< Band-reject */
 	ALL_PASS,			/**< All-pass */
 	PEAKING,			/**< Peaking */
@@ -63,7 +66,7 @@ inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class AllPass1 : public Td {
 public:
@@ -105,7 +108,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Biquad : public Td{
 public:
@@ -168,7 +171,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class BlockDC : public Td{
 public:
@@ -210,7 +213,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters  
+/// \ingroup Filter  
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class BlockNyq : public BlockDC<Tv,Tp,Td>{
 public:
@@ -246,7 +249,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Filter2 : public Td{
 public:
@@ -311,7 +314,7 @@ using Base::d1
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class AllPass2 : public Filter2<Tv,Tp,Td>{
 public:
@@ -340,7 +343,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Notch : public Filter2<Tv,Tp,Td>{
 public:
@@ -383,7 +386,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class Reson : public Filter2<Tv,Tp,Td>{
 public:
@@ -440,7 +443,7 @@ protected:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real, class Tp=gam::real>
 class Hilbert {
 public:
@@ -477,7 +480,7 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=double, class Tp=double>
 class Integrator{
 public:
@@ -504,6 +507,25 @@ protected:
 
 
 
+/// Differencing filter
+
+/// Returns difference between successive samples.
+/// The frequency response has a zero at DC.
+/// \ingroup Filter
+template <class T=gam::real>
+class Differencer{
+public:
+	T operator()(T in){
+		T res = in-mPrev;
+		mPrev = in;
+		return res;
+	}
+private:
+	T mPrev = T(0);
+};
+
+
+
 /// Moving average filter
 
 /// The moving average filter is a special case of an FIR filter whose kernel
@@ -511,7 +533,7 @@ protected:
 /// size. Due to the symmetry of the window, the moving average filter can be
 /// implemented efficiently using a single delay line with O(1) processing time
 /// complexity.
-/// \ingroup Filters
+/// \ingroup Filter
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
 public:
@@ -554,7 +576,7 @@ protected:
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
 /// \tparam Td	Domain observer type
-/// \ingroup Filters
+/// \ingroup Filter
 template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
 class OnePole : public Td{ 
 public:
@@ -644,13 +666,13 @@ inline Tv AllPass1<Tv,Tp,Td>::operator()(Tv i0){
 
 template <class Tv, class Tp, class Td>
 inline Tv AllPass1<Tv,Tp,Td>::high(Tv i0){ return (i0 - operator()(i0)) * Tv(0.5); }
-    
+
 template <class Tv, class Tp, class Td>
 inline Tv AllPass1<Tv,Tp,Td>::low (Tv i0){ return (i0 + operator()(i0)) * Tv(0.5); }
 
 template <class Tv, class Tp, class Td>
 inline Tp AllPass1<Tv,Tp,Td>::freq(){ return mFreq; }
-    
+
 template <class Tv, class Tp, class Td>
 void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
 
@@ -782,20 +804,20 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[0] = mA[1] * Tp(-0.5);
 		mA[2] = mA[0];
 		break;
-	case BAND_PASS:
+	case RESONANT:
 		mA[0] = mImag * Tp(0.5) * mB[0];
 		mA[1] = Tp(0);
 		mA[2] =-mA[0];
 		break;
-	case BAND_PASS_UNIT:
-        mA[0] = mAlpha * mB[0];
-        mA[1] = Tp(0);
-        mA[2] =-mA[0];
+	case BAND_PASS:
+		mA[0] = mAlpha * mB[0];
+		mA[1] = Tp(0);
+		mA[2] =-mA[0];
 		break;
 	case BAND_REJECT:
-        mA[0] = mB[0];
-        mA[1] = mB[1];
-        mA[2] = mB[0];
+		mA[0] = mB[0];
+		mA[1] = mB[1];
+		mA[2] = mB[0];
 		break;
 	case ALL_PASS:
 		mA[0] = mB[2];
@@ -931,7 +953,7 @@ inline void OnePole<Tv,Tp,Td>::smooth(Tp v){ mB1=v; mA0=Tp(1) - scl::abs(v); }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(){ return (*this)(mStored); }
-    
+
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(Tv in){
 	o1 = o1*mB1 + in*mA0;
@@ -946,13 +968,13 @@ inline void OnePole<Tv,Tp,Td>::operator *= (Tv v){ mStored *= v; }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::last() const { return o1; }
-    
+
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::stored() const { return mStored; }
-    
+
 template <class Tv, class Tp, class Td>
 inline Tv& OnePole<Tv,Tp,Td>::stored(){ return mStored; }
-    
+
 template <class Tv, class Tp, class Td>
 inline bool OnePole<Tv,Tp,Td>::zeroing(Tv eps) const {
 	return scl::abs(o1) < eps && mStored == Tv(0);

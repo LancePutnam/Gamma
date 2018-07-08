@@ -14,16 +14,18 @@
 #include "Gamma/Delay.h"
 #include "Gamma/Filter.h"
 
-/// \defgroup Spatial
 
 namespace gam{
+
+/// Simulate aspects of sound propagation through space
+
+/// \defgroup Spatial
 
 
 /// Gain loop filter (all-pass)
 template <typename T>
 class LoopGain{
 public:
-	LoopGain(): mA0(0){}
 
 	/// Set filter gain
 	void gain(float v){
@@ -35,7 +37,7 @@ public:
 	}
 
 private:
-	float mA0;
+	float mA0=0.f;
 };
 
 
@@ -43,8 +45,6 @@ private:
 template <typename T>
 class Loop1P{
 public:
-
-	Loop1P(): mA0(0), mB1(0), mO1(0){}
 
 	/// Set filter gain
 	void gain(float v){
@@ -68,8 +68,8 @@ public:
 	}
 
 private:
-	float mA0, mB1;
-	T mO1;
+	float mA0=0.f, mB1=0.f;
+	T mO1=T(0);
 };
 
 
@@ -77,8 +77,6 @@ private:
 template <typename T>
 class Loop1P1Z{
 public:
-
-	Loop1P1Z(): mA0(0), mB1(0), mI1(0), mO1(0){}
 
 	/// Set filter gain
 	void gain(float v){
@@ -105,8 +103,8 @@ public:
 	}
 
 private:
-	float mA0, mB1;
-	T mI1, mO1;
+	float mA0=0.f, mB1=0.f;
+	T mI1=T(0), mO1=T(0);
 };
 
 
@@ -144,7 +142,7 @@ public:
 	LoopFilter<Tv>& loopFilter(){ return mFilter; }
 
 protected:
-	float mDecay;
+	float mDecay=1.f;
 	LoopFilter<Tv> mFilter;
 
 	virtual void onDomainChange(double r){
@@ -198,8 +196,8 @@ public:
 	Complex<float> gain() const { return mG; }
 
 private:
-	Complex<Tv> mB, mG;
-	float mFbkFreq;
+	Complex<Tv> mB{0.5,0}, mG{1,0};
+	float mFbkFreq=0.f;
 
 	virtual void onDomainChange(double r){
 		Delay<Complex<Tv>,Si,Td>::onDomainChange(r);
@@ -408,11 +406,11 @@ inline Tv Echo<TARG>::operator()(Tv in){
 
 
 template<TDEC>
-EchoCSine<TARG>::EchoCSine(): mB(0.5,0), mG(1,0){}
+EchoCSine<TARG>::EchoCSine(){}
 
 template<TDEC>
 EchoCSine<TARG>::EchoCSine(double delay)
-:	Base(delay), mB(0.5,0), mG(1,0)
+:	Base(delay)
 {}
 
 template<TDEC>

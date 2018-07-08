@@ -608,14 +608,14 @@ T meanAbsDiff(const T * src, unsigned len){
 	T mean = (T)0;
 	
 	T prev = *src++;
-    LOOP(len - 1, 1){
+	LOOP(len - 1, 1){
 		T now = *src++;
 		T diff = now - prev;
 		T abs = scl::abs(now);
 		sum += scl::abs(diff);
 		mean += abs;
 		prev = now;
-    }
+	}
 	//if(mean < 0.0001f) mean = 0.0001f;
 	return mean < T(0.25) ? T(-1) : sum * T(0.5) / mean;
 
@@ -732,7 +732,7 @@ void sortInsertion(T * arr, unsigned len){
 		T val = arr[i];
 		unsigned j = i - 1;
 		for(; (j < len) && (arr[j] > val); j--){
-			arr[j + 1] = arr[j];                                      
+			arr[j + 1] = arr[j];
 		}
 		arr[j + 1] = val;
 	} 
@@ -748,7 +748,7 @@ void sortInsertion(const T * src, Index * indices, unsigned numIndices){
 		while((j < numIndices) && (val < src[indices[j]]))
 		{
 			indices[j + 1] = indices[j]; 
-			--j;                                         
+			--j;
 		}
 		indices[j + 1] = index;
 	} 

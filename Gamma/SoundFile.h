@@ -5,6 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <string>
+#include <vector>
 #include <stdio.h>
 #include "Gamma/mem.h"
 
@@ -60,6 +61,7 @@ public:
 	/// Returns true on success and false otherwise.
 	///
 	bool openRead();
+	bool openRead(const std::string& path);
 
 	/// Open sound file for writing
 
@@ -68,6 +70,7 @@ public:
 	/// used. The Format of the sound file is derived from the extension.
 	/// \returns true on success and false otherwise.
 	bool openWrite();
+	bool openWrite(const std::string& path);
 
 	/// Close sound file
 
@@ -83,18 +86,22 @@ public:
 	/// to hold the product of frames and the number of channels.
 	//ULONG read(float * dst, ULONG numFrames);
 	template<class T>
-    int read(T * dst, int numFrames);
+	int read(T * dst, int numFrames);
 
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
 	template<class T>
-    int readAll(T * dst);
+	int readAll(T * dst);
+
+	/// Copy all contents of file into array interleaved. Returns number of frames read.
+	template<class T>
+	int readAll(std::vector<T>& dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 
 	/// If the number of channels is > 1, memory will be dynamically allocated
 	///	and freed for the deinterleaving.
 	template<class T>
-    int readAllD(T * dst);
+	int readAllD(T * dst);
 
 	/// Write interleaved frames from array to file
 
@@ -103,7 +110,10 @@ public:
 	/// by ptr to the file. The array must be large enough to hold the product
 	/// of frames and the number of channels.
 	template<class T>
-    int write(const T * src, int numFrames);
+	int write(const T * src, int numFrames);
+
+	template<class T>
+	int write(const std::vector<T>& src);
 
 	// Sound file properties
 	bool opened() const;						///< Returns whether the sound file is open
@@ -136,16 +146,16 @@ private:
 
 
 // Implementation_______________________________________________________________
-
-inline SoundFile& SoundFile::path(const std::string& v){ mPath=v; return *this; }
-inline int SoundFile::samples() const { return frames() * channels(); }
-
-inline const std::string& SoundFile::path() const { return mPath; }
-
 template<class T>
-inline int SoundFile::readAll(T * dst){
+int SoundFile::readAll(T * dst){
 	seek(0, SEEK_SET);
 	return read(dst, frames());
+}
+
+template<class T>
+int SoundFile::readAll(std::vector<T>& dst){
+	dst.resize(samples());
+	return readAll(&dst[0]);
 }
 
 template<class T>
@@ -167,6 +177,11 @@ int SoundFile::readAllD(T * dst){
 		delete[] temp;
 	}
 	return framesRead;
+}
+
+template<class T>
+int SoundFile::write(const std::vector<T>& src){
+	return write(&src[0], src.size()/channels());
 }
 
 } // gam::

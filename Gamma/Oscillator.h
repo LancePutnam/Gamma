@@ -4,8 +4,6 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-///\defgroup Oscillators
-
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"
 #include "Gamma/tbl.h"
@@ -14,6 +12,10 @@
 #include "Gamma/Types.h"
 
 namespace gam{
+
+/// Periodic waveforms to be used as sound or modulation sources
+
+/// \defgroup Oscillator
 
 
 /// Fixed-point phase accumulator
@@ -28,7 +30,7 @@ namespace gam{
 ///
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
-/// \ingroup Oscillators     
+/// \ingroup Oscillator
 template <class Sp = phsInc::Loop, class Td = DomainObserver>
 class Accum : public Td {
 public:
@@ -112,7 +114,7 @@ private:
 
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
-///\ingroup Oscillators
+///\ingroup Oscillator
 template <class Sp = phsInc::Loop, class Td = DomainObserver>
 class Sweep : public Accum<Sp, Td> {
 public:
@@ -128,12 +130,12 @@ public:
 	}
 };
 
-    
+
 /// Floating-point phase accumulator with output in [-A, A)
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-///\ingroup Oscillators     
+///\ingroup Oscillator
 template <class Tv = gam::real, class Td = DomainObserver>
 class AccumPhase : public Td{
 public:
@@ -191,8 +193,7 @@ protected:
 /// \tparam Si	Interpolation strategy
 /// \tparam Sp	Phase increment strategy
 /// \tparam Td	Domain type
-/// \ingroup Oscillators
-/// \ingroup Envelopes
+/// \ingroup Oscillator Envelope
 /// \sa Other ways to synthesize sine waves: TableSine, CSine, LFO, Sine, SineR
 /// \sa Functions for building waveforms in tables with additive synthesis: 
 ///		addSine, addSines, addSinesPow, addWave
@@ -281,7 +282,7 @@ protected:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 ///  \sa Osc, TableSine, CSine, LFO, Sine, SineR
 template<class Tv = gam::real, class Td = DomainObserver>
 class CSine : public Td{
@@ -331,7 +332,7 @@ protected:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 /// \sa Osc, TableSine, CSine, LFO, SineR
 template<class Tv = gam::real, class Td = DomainObserver>
 class Sine : public AccumPhase<Tv,Td> {
@@ -363,7 +364,7 @@ public:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 /// \sa Osc, TableSine, CSine, LFO, Sine, SineRs (Synthesizes multiple sines)
 template <class Tv = double, class Td = DomainObserver>
 class SineR : public gen::RSin<Tv>, Td{
@@ -404,7 +405,7 @@ private:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 /// \sa SineR (synthesizes a single sine)
 template <class Tv = double, class Td = DomainObserver>
 class SineRs : public Array<SineR<Tv, Domain1> >, Td{
@@ -449,7 +450,7 @@ private:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 /// \sa SineR, SineDs
 template <class Tv = double, class Td = DomainObserver>
 class SineD : public gen::RSin2<Tv>, Td{
@@ -517,7 +518,7 @@ private:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators
+/// \ingroup Oscillator
 /// \sa SineD
 template <class Tv = double, class Td = DomainObserver>
 class SineDs : public Array<SineD<Tv, Domain1> >, Td{
@@ -574,7 +575,7 @@ private:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators
+/// \ingroup Oscillator
 template<class Tv = double, class Td = DomainObserver>
 class Chirplet : public Td{
 public:
@@ -662,7 +663,7 @@ protected:
 ///
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 /// \sa Osc, TableSine, CSine, Sine, SineR
 template <class Sp = phsInc::Loop, class Td = DomainObserver>
 class LFO : public Accum<Sp,Td>{
@@ -695,7 +696,7 @@ public:
 	float para();		///< Parabolic wave; C2 Clausen function
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
 	float pulseRange(); ///< Pulse (up + down). 'mod' controls pulse width. amplitude doesn't change with mod.
-	float sinPara();	///< Sine-like wave constructed from parabolas (odd harmonics)
+	float sinPara();	///< Sine-like wave constructed from parabolas; integral of triangle
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
 	float sqr();		///< Square (-1 to 1)
 	float tri();		///< Triangle (starts at 1 goes down to -1 then up to 1)
@@ -790,7 +791,7 @@ private:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 template<class Tv = gam::real, class Td = DomainObserver>
 class Buzz : public AccumPhase<Tv,Td> {
 public:
@@ -836,7 +837,7 @@ private: typedef AccumPhase<Tv,Td> Base;
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators
+/// \ingroup Oscillator
 /// \sa Buzz
 template <class Tv = gam::real, class Td = DomainObserver>
 struct Impulse : public Buzz<Tv,Td>{
@@ -871,7 +872,7 @@ private: typedef Buzz<Tv,Td> Base;
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 template <class Tv = gam::real, class Td = DomainObserver>
 struct Saw : public Impulse<Tv,Td> {
 
@@ -898,7 +899,7 @@ struct Saw : public Impulse<Tv,Td> {
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 template <class Tv = gam::real, class Td = DomainObserver>
 struct Square : public Impulse<Tv,Td> {
 
@@ -925,7 +926,7 @@ struct Square : public Impulse<Tv,Td> {
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
-/// \ingroup Oscillators 
+/// \ingroup Oscillator 
 template<class Tv = gam::real, class Td = DomainObserver>
 class DSF : public AccumPhase<Tv,Td> {
 public:
@@ -976,7 +977,7 @@ protected:
 /// \tparam Si	Sequence interpolation strategy
 /// \tparam Sp	Phase increment strategy
 /// \tparam Td	Domain type
-/// \ingroup Oscillators
+/// \ingroup Oscillator
 template <
 	class Gen = gen::Default<>,
 	template <typename> class Si = iplSeq::Linear,
