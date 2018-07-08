@@ -588,7 +588,7 @@ public:
 
 	Si<Tv>& ipol(){ return mIpl; }
 
-	void onDomainChange(double r){ freq(mFreq); }
+	void onDomainChange(double /*r*/){ freq(mFreq); }
 
 protected:
 	Tp mFreq;
