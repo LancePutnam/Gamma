@@ -726,7 +726,7 @@ void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
-	float w = scl::clip(mFreq * mFrqToRad, 3.13f);
+	Tp w = scl::clip(mFreq * mFrqToRad, Tp(3.13));
 	mReal = scl::cosT8(w);
 	mImag = scl::sinT7(w);
 	resRecip(mResRecip);
