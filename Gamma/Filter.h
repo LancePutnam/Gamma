@@ -674,7 +674,7 @@ template <class Tv, class Tp, class Td>
 inline Tp AllPass1<Tv,Tp,Td>::freq(){ return mFreq; }
 
 template <class Tv, class Tp, class Td>
-void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
+void AllPass1<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
 
 
 
@@ -688,7 +688,7 @@ Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
 }
 
 template <class Tv, class Tp, class Td>
-void Biquad<Tv,Tp,Td>::onDomainChange(double r){
+void Biquad<Tv,Tp,Td>::onDomainChange(double /*r*/){
 	mFrqToRad = M_2PI * Td::ups();
 	freq(mFreq);
 }
@@ -884,7 +884,7 @@ OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
 }
 
 template <class Tv, class Tp, class Td>
-void OnePole<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
+void OnePole<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
 
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::type(FilterType v){

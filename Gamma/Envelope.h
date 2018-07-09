@@ -948,7 +948,7 @@ template <class T, class Td>
 T Decay<T,Td>::value() const { return mVal; }
 
 template <class T, class Td>
-void Decay<T,Td>::onDomainChange(double r){ decay(mDcy); }
+void Decay<T,Td>::onDomainChange(double /*r*/){ decay(mDcy); }
 
 
 } // gam::

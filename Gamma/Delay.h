@@ -403,7 +403,7 @@ TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this-
 	onDomainChange(1);
 }
 
-TM1 void Delay<TM2>::onDomainChange(double r){ //printf("Delay::onDomainChange\n");
+TM1 void Delay<TM2>::onDomainChange(double /*r*/){ //printf("Delay::onDomainChange\n");
 	if(this->usingExternalSource()){
 		mMaxDelay = this->size() * Td::ups();
 	}

@@ -564,7 +564,7 @@ template<class T>
 void DFTBase<T>::zeroAux(unsigned num){ mem::deepZero(aux(num), numBins()); }
 
 template<class T>
-void DFTBase<T>::onDomainChange(double r){
+void DFTBase<T>::onDomainChange(double /*r*/){
 	domainFreq().ups(binFreq());
 }
 
