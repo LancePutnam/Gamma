@@ -1096,7 +1096,7 @@ inline bool Accum<Sp,Td>::cycled() const {
 	uint32_t prev = phaseI();
 	Sp temp = mSp;
 	temp(prev, ~freqI());
-	return (~phaseI() & prev) & 0x80000000;
+	return ((~phaseI() & prev) & 0x80000000) != 0;
 }
 
 template<class Sp, class Td> inline float Accum<Sp,Td>::freq() const { return mFreq; }
@@ -1120,7 +1120,7 @@ template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(){
 
 template<class Sp, class Td> inline bool Accum<Sp,Td>::operator()(){ return cycle(); }
 
-template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return bool(cycles() & 0x80000000); }
+template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return (cycles() & 0x80000000) != 0; }
 
 //template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::cycle(uint32_t mask){
 //	return cycles() & mask;
