@@ -119,7 +119,7 @@ private:
 template<
 	typename Tv = gam::real,
 	template<typename> class Si = ipl::Linear,
-	template<typename> class LoopFilter = LoopGain,
+	template<typename> class LoopFilter = Loop1P,
 	class Td = DomainObserver
 >
 class Echo : public Delay<Tv,Si,Td> {
