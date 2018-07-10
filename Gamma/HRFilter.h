@@ -35,6 +35,7 @@ public:
 
 	Dist<3>& dist(){ return mDist; }
 
+	/// Set ear distance (measured from center of head)
 	HRFilter& earDist(float v){ mEarDist = v; return *this; }
 
 	/// Set position of source
@@ -131,6 +132,8 @@ public:
 	Biquad<> mBackShelf;
 	Biquad<> mPinnaNotch1, mPinnaNotch2, mPinnaPeak1, mPinnaPeak2;
 	float mTorsoAmt=0., mTorsoDelay=0.;
+	float mShadows[2] = {1,1}; // TODO: these should be LPFs
+	float mEarDist = 0.07; // about half the average bitragion breadth
 	float mRoomSize = 3;
 };
 
