@@ -32,9 +32,14 @@ public:
 		mA0 = v;
 	}
 
+	void damping(float v){}
+
 	T operator()(T in){
 		return in*mA0;
 	}
+
+	/// Get filter gain
+	float gain() const { return mA0; }
 
 private:
 	float mA0=0.f;
@@ -119,7 +124,7 @@ private:
 template<
 	typename Tv = gam::real,
 	template<typename> class Si = ipl::Linear,
-	template<typename> class LoopFilter = Loop1P,
+	template<typename> class LoopFilter = LoopGain,
 	class Td = DomainObserver
 >
 class Echo : public Delay<Tv,Si,Td> {
