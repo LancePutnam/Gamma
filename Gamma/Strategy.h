@@ -488,7 +488,7 @@ namespace phsInc{
 		void reset(){}
 	
 		uint32_t operator()(uint32_t& pos, uint32_t inc){ return pos+=inc; }
-		bool done(uint32_t pos) const { return false; }
+		bool done(uint32_t /*pos*/) const { return false; }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){ return scl::wrap(v+inc, max, min); }
@@ -533,7 +533,7 @@ namespace phsInc{
 			return pos;
 		}
 
-		bool done(uint32_t pos) const { return false; }
+		bool done(uint32_t /*pos*/) const { return false; }
 
 	private:
 		uint32_t mPhase;
@@ -626,7 +626,7 @@ namespace phsInc{
 			return pos;
 		}
 
-		bool done(uint32_t pos) const { return false; }
+		bool done(uint32_t /*pos*/) const { return false; }
 		
 		template <class T>
 		T operator()(T v, T inc, T max, T min){		
@@ -670,7 +670,7 @@ namespace phsInc{
 			return pos;
 		}
 
-		bool done(uint32_t pos) const { return false; }
+		bool done(uint32_t /*pos*/) const { return false; }
 		
 		Rhythm& pattern(uint64_t bits, uint8_t size){
 			mPattern=bits;
@@ -680,7 +680,7 @@ namespace phsInc{
 		
 		/// Specify on/off pattern as string, e.g., "/./....."
 		Rhythm& pattern(const char* bits, char offChar='.'){
-			mSize = strlen(bits);
+			mSize = uint8_t(strlen(bits));
 			mPattern = 0;
 			for(int i=0; i<mSize; ++i){
 				mPattern |= (bits[i]!=offChar) << (mSize-1-i);

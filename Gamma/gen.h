@@ -574,7 +574,7 @@ typedef CReson<double>	CResond;
 
 
 struct OnOff{
-	OnOff(unsigned max, unsigned ons) : max(max), ons(ons), cnt(0){}
+	OnOff(unsigned _max, unsigned _ons) : max(_max), ons(_ons), cnt(0){}
 
 	bool operator()(){
 		cnt++;
@@ -583,8 +583,8 @@ struct OnOff{
 		return ons >= max;
 	}
 
-	void set(unsigned max, unsigned ons, unsigned cnt){
-		this->max = max; this->ons = ons; this->cnt = cnt;
+	void set(unsigned _max, unsigned _ons, unsigned _cnt){
+		this->max = _max; this->ons = _ons; this->cnt = _cnt;
 	}
 
 	unsigned max, ons, cnt;

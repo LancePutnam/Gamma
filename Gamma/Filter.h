@@ -199,7 +199,7 @@ public:
 
 	void zero(){ d1=0; }
 
-	void onDomainChange(double r){ width(mWidth); }
+	void onDomainChange(double /*r*/){ width(mWidth); }
 
 protected:
 	Tv d1;
@@ -674,7 +674,7 @@ template <class Tv, class Tp, class Td>
 inline Tp AllPass1<Tv,Tp,Td>::freq(){ return mFreq; }
 
 template <class Tv, class Tp, class Td>
-void AllPass1<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
+void AllPass1<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
 
 
 
@@ -688,7 +688,7 @@ Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
 }
 
 template <class Tv, class Tp, class Td>
-void Biquad<Tv,Tp,Td>::onDomainChange(double r){
+void Biquad<Tv,Tp,Td>::onDomainChange(double /*r*/){
 	mFrqToRad = M_2PI * Td::ups();
 	freq(mFreq);
 }
@@ -726,7 +726,7 @@ void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
-	float w = scl::clip(mFreq * mFrqToRad, 3.13f);
+	Tp w = scl::clip(mFreq * mFrqToRad, Tp(3.13));
 	mReal = scl::cosT8(w);
 	mImag = scl::sinT7(w);
 	resRecip(mResRecip);
@@ -884,7 +884,7 @@ OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
 }
 
 template <class Tv, class Tp, class Td>
-void OnePole<Tv,Tp,Td>::onDomainChange(double r){ freq(mFreq); }
+void OnePole<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
 
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::type(FilterType v){

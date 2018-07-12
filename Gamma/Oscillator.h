@@ -1063,7 +1063,7 @@ inline uint32_t Accum<Sp,Td>::mapFreq(float v) const {
 }
 
 template<class Sp, class Td>
-void Accum<Sp,Td>::onDomainChange(double r){ //printf("Accum: onDomainChange (%p)\n", this);
+void Accum<Sp,Td>::onDomainChange(double /*r*/){ //printf("Accum: onDomainChange (%p)\n", this);
 	mFreqToInt = 4294967296. / Td::spu();
 	freq(mFreq);
 }
@@ -1096,7 +1096,7 @@ inline bool Accum<Sp,Td>::cycled() const {
 	uint32_t prev = phaseI();
 	Sp temp = mSp;
 	temp(prev, ~freqI());
-	return (~phaseI() & prev) & 0x80000000;
+	return ((~phaseI() & prev) & 0x80000000) != 0;
 }
 
 template<class Sp, class Td> inline float Accum<Sp,Td>::freq() const { return mFreq; }
@@ -1120,7 +1120,7 @@ template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(){
 
 template<class Sp, class Td> inline bool Accum<Sp,Td>::operator()(){ return cycle(); }
 
-template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return bool(cycles() & 0x80000000); }
+template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return (cycles() & 0x80000000) != 0; }
 
 //template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::cycle(uint32_t mask){
 //	return cycles() & mask;
@@ -1211,7 +1211,7 @@ template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::period() const { retu
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase() const { return mPhase/(Tv(2)*mAmp); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::amp() const { return mAmp; }
 
-template<class Tv, class Td> void AccumPhase<Tv, Td>::onDomainChange(double r){
+template<class Tv, class Td> void AccumPhase<Tv, Td>::onDomainChange(double /*r*/){
 	Tv f=freq();
 	recache();
 	freq(f);
@@ -1277,7 +1277,7 @@ template<class Tv, class Td> inline Complex<Tv> CSine<Tv, Td>::operator()(){
 	return c;
 }
 
-template<class Tv, class Td> void CSine<Tv, Td>::onDomainChange(double r){
+template<class Tv, class Td> void CSine<Tv, Td>::onDomainChange(double /*r*/){
 	decay(mDcy60); // this sets frequency as well
 }
 

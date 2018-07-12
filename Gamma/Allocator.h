@@ -46,11 +46,11 @@ public:
 	pointer address(reference x) const { return &x; }
 	const_pointer address(const_reference x) const { return &x; }
 
-	pointer allocate(size_type n, Allocator<void>::const_pointer hint = 0){
+	pointer allocate(size_type n){
 		return reinterpret_cast<pointer>(::operator new(n * sizeof(T)));
 	}
 
-	void deallocate(pointer p, size_type n){ ::operator delete(p); }
+	void deallocate(pointer p, size_type /*n*/){ ::operator delete(p); }
 
 	size_type max_size() const {
 		return static_cast<size_type>(-1) / sizeof(T);

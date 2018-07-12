@@ -27,10 +27,10 @@ public:
 
 	/// Any instance state that depends on the samples/unit ratio should be 
 	/// updated here. The ratio of the new to the old samples/unit is passed in.
-	void onDomainChange(double ratioSPU){}
+	void onDomainChange(double /*ratioSPU*/){}
 
-	void spu(double val){}			///< Set samples/unit
-	void ups(double val){}			///< Set units/sample
+	void spu(double /*val*/){}			///< Set samples/unit
+	void ups(double /*val*/){}			///< Set units/sample
 };
 
 
@@ -63,7 +63,7 @@ public:
 
 	/// Any instance state that depends on the samples/unit ratio should be 
 	/// updated here. The ratio of the new to the old samples/unit is passed in.
-	virtual void onDomainChange(double ratioSPU){}
+	virtual void onDomainChange(double /*ratioSPU*/){}
 
 	/// Set domain subject
 	

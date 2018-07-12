@@ -739,7 +739,7 @@ struct NewtonIterator{
 
 template<class T, template<class> class F>
 struct NewtonIterator<0,T,F>{
-	NewtonIterator(T& v, T v0){}
+	NewtonIterator(T& /*v*/, T /*v0*/){}
 };
 
 template<class T> struct NewtonSqrtMap{
