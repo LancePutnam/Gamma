@@ -104,7 +104,7 @@ public:
 	int size() const { return N; }
 	
 	/// Get the position, in samples, within the current segment
-	int position() const { return mPos; }
+	unsigned position() const { return mPos; }
 	
 	/// Get the sustain break-point
 	int sustainPoint() const { return mSustain; }
@@ -288,7 +288,7 @@ protected:
 	Tp mCurves[N];		// segment curvatures
 	Tv mLevels[N+1];	// break-point levels
 
-	int mPos, mLen;		// position in and length of current segment, in samples
+	unsigned mPos, mLen;// position in and length of current segment, in samples
 	int mStage;			// the current curve segment
 	int mSustain;		// index of sustain point
 	int mLoop;
