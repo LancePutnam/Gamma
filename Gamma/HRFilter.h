@@ -1,6 +1,8 @@
 #ifndef GAM_INC_HR_FILTER_H
 #define GAM_INC_HR_FILTER_H
 
+#include <cmath>
+#include <algorithm>
 #include "Gamma/Filter.h"
 #include "Gamma/Spatial.h"
 #include "Gamma/Types.h"
@@ -27,11 +29,7 @@ float headShadow(const Vec3& earDir, const Vec3& srcDir){
 class HRFilter{
 public:
 
-	HRFilter(){
-		mBackShelf.set(4000, 0.707, gam::HIGH_SHELF);
-		mPinnaPeak1.set(5000, 1.000, gam::PEAKING); mPinnaPeak1.level(2); // concha resonance
-		mPinnaPeak2.set(8000, 4.000, gam::PEAKING);
-	}
+	HRFilter(){}
 
 	Dist<3>& dist(){ return mDist; }
 
@@ -46,49 +44,65 @@ public:
 	///							with column-major layout.
 	template <class Vec3, class Mat4>
 	HRFilter& pos(const Vec3& sourcePos, const Mat4& headPose){
-		auto headToSrc = sourcePos - Vec3(headPose[12], headPose[13], headPose[14]);
-		Vec3 headR(headPose[ 0], headPose[ 1], headPose[ 2]);
-		Vec3 headU(headPose[ 4], headPose[ 5], headPose[ 6]);
-		Vec3 headB(headPose[ 8], headPose[ 9], headPose[10]); // pose stores back vector since right-handed
-		auto earR = headR*mEarDist;
-		const auto& S = headToSrc;
+		Vec3 Ur(headPose[ 0], headPose[ 1], headPose[ 2]);
+		Vec3 Uu(headPose[ 4], headPose[ 5], headPose[ 6]);
+		Vec3 Ub(headPose[ 8], headPose[ 9], headPose[10]); // pose stores back vector since right-handed
+		
+		//auto earR = Ur*mEarDist;
+		//auto headToSrc = sourcePos - Vec3(headPose[12], headPose[13], headPose[14]);
+		//const auto& S = headToSrc;
 
 		mDist.near(mEarDist);
-		mDist.dist(0, (S + earR).mag()); // left channel
-		mDist.dist(1, (S - earR).mag()); // right channel
+		//mDist.dist(0, (S + earR).mag()); // left channel
+		//mDist.dist(1, (S - earR).mag()); // right channel
 		mDist.dist(2, mRoomSize); // diameter of room
 
-		// TODO: apply for each ear?
-		auto Su = S; Su.normalize();
-		//float hsLvl = headB.dot(Su)*-0.15 + 0.85; // [0.7, 1] -> [back,front]
-		float hsLvl = headB.dot(Su)*-0.25 + 0.75; // [0.5, 1] -> [back,front]
-		mBackShelf.level(hsLvl);
+		for(int i=0; i<2; ++i){
+			auto& e = mEarFilters[i];
+			auto earVec = Ur*(i==0?-mEarDist:mEarDist);
+			auto earToSource = sourcePos - (Vec3(headPose[12], headPose[13], headPose[14]) + earVec);
+			auto dist = earToSource.mag() + 1e-8;
+			mDist.dist(i, dist);
+			auto Su = earToSource / dist; // ear to source direction vector
 
-		// Pinna filtering
-		auto elVec = Su - (headR*Su.dot(headR)); // projection of source dir onto up-back plane
-		elVec.normalize();
-		float srcUp = headU.dot(elVec); // how much source is up, [-1,1], sine of elevation angle
-		float pinnaFrq1 = srcUp*2000. + 8000.; // [6k, 10k] -> [below, above]
-		// Notch weak above, and strong in front (-10 dB / 0.3)
-		// Following a half-period raised cosine
-		float pinnaLvl1 = srcUp*srcUp*0.7+0.3; // [0.3, 1]
-		mPinnaNotch1.set(pinnaFrq1, 24., gam::PEAKING);
-		mPinnaNotch1.level(pinnaLvl1);
+			float rightness = Su.dot(Ur); // how much source is to right of ear, in [-1,1]
+			float pinnaStrength = std::abs(rightness)*0.5+0.5;
 
-		float srcB = headB.dot(elVec);
-		float pinnaFrq2 = srcB*1000. + 10000.; // [9k, 11k] -> [front, above, behind]
-		// Notch weak above, and strong in front (-10 dB / 0.3)
-		// Following a half-period raised cosine
-		float pinnaLvl2 = srcUp*srcUp*0.8+0.2; // [0.2, 1]
-		mPinnaNotch2.set(pinnaFrq2, 48., gam::PEAKING);
-		mPinnaNotch2.level(pinnaLvl2);
+			//float hsLvl = Su.dot(Ub)*-0.15 + 0.85; // [0.7, 1] -> [back,front]
+			float hsLvl = Su.dot(Ub)*-0.25 + 0.75; // [0.5, 1] -> [back,front]
+			e.backShelf.level(hsLvl);
+	
+			// Pinna filtering
+			auto elVec = Su - (Ur*rightness); // projection of source dir onto up-back plane
+			elVec.normalize();
+			float srcUp = Uu.dot(elVec); // how much source is up, [-1,1], sine of elevation angle
+			float pinnaFrq1 = srcUp*2000. + 8000.; // [6k, 10k] -> [front, above]
+			//float pinnaFrq1 = std::max(srcUp, 0.f)*4000. + 6000.;
+			// Notch weak above, and strong in front (-10 dB / 0.3)
+			// Following a half-period raised cosine
+			float pinnaLvl1 = srcUp*srcUp*0.7+0.3; // [0.3, 1]
+			pinnaLvl1 = (pinnaLvl1-1.)*pinnaStrength + 1.;
+			e.pinnaNotch1.set(pinnaFrq1, 24./1., gam::PEAKING);
+			e.pinnaNotch1.level(pinnaLvl1);
 
-		float above = srcUp>0. ? srcUp : 0.;
-		//mPinnaPeak2.level(srcUp*srcUp*1.+1.);
-		mPinnaPeak2.level(above + 1.);
+			float srcB = Ub.dot(elVec);
+			float pinnaFrq2 = srcB*1000. + 10000.; // [9k, 11k] -> [front, above, behind]
+			// Notch weak above, and strong in front (-10 dB / 0.3)
+			// Following a half-period raised cosine
+			float pinnaLvl2 = srcUp*srcUp*0.8+0.2; // [0.2, 1]
+			pinnaLvl2 = (pinnaLvl2-1.)*pinnaStrength + 1.;
+			e.pinnaNotch2.set(pinnaFrq2, 48./1., gam::PEAKING);
+			e.pinnaNotch2.level(pinnaLvl2);
 
-		mShadows[0] = headShadow(-headR, (S + earR).normalize());
-		mShadows[1] = headShadow( headR, (S - earR).normalize());
+			float above = srcUp>0. ? srcUp : 0.;
+			//e.pinnaPeak2.level(srcUp*srcUp*1.+1.);
+			e.pinnaPeak2.level(above + 1.);
+
+			e.shadow = (i==0?-rightness:rightness)*0.25+0.75;
+		}
+		
+		//mShadows[0] = headShadow(-Ur, (S + earR).normalize()); // left
+		//mShadows[1] = headShadow( Ur, (S - earR).normalize()); // right
 
 		/* Torso filtering (only useful if body orientation available!)
 		mTorsoAmt = al::abs(srcUp)*0.1;
@@ -98,41 +112,46 @@ public:
 		//printf("front/back high-shelf level: %f\n", mBackShelf.level());
 		//printf("pinna notch 1: %.2f Hz @ %.2f\n", mPinnaNotch1.freq(), mPinnaNotch1.level());
 		//printf("pinna notch 2: %.2f Hz @ %.2f\n", mPinnaNotch2.freq(), mPinnaNotch2.level());
-		//printf("head shadow on left ear: %f\n", headShadow(-headR, (S + earR).normalize()));
+		//printf("head shadow on left ear: %f\n", headShadow(-Ur, (S + earR).normalize()));
 		return *this;
-
-		//return posOld(&headPose[0], &headToSrc[0]);
 	}
 
 	/// Return spatialized sample as (left, right, room)
 	float3 operator()(float src){
-		// Note: the correct way would be to filter at each ear
-		src = mBackShelf(src);
-		src = mPinnaNotch1(src);
-		src = mPinnaNotch2(src);
-		src = mPinnaPeak1(src);
-		src = mPinnaPeak2(src);
 		//src += mDist.delayLine().read(mTorsoDelay) * mTorsoAmt;
 		auto res = mDist(src);
-		for(int i=0;i<2;++i) res[i] *= mShadows[i];
+		for(int i=0;i<2;++i) res[i] = mEarFilters[i](res[i]);
 		return res;
 	}
 
-/*
-	// @param[in] headPose		pointer to elements of column-major 4x4 matrix
-	//								using a right-handed coordinate system
-	// @param[in] headToSrcVec	vector pointing from head to source position
-	HRFilter& posOld(const float * headPose, const float * headToSrcVec){
-		return pos();
-	}
-*/
-
 public:
 	Dist<2+1> mDist;
-	Biquad<> mBackShelf;
-	Biquad<> mPinnaNotch1, mPinnaNotch2, mPinnaPeak1, mPinnaPeak2;
+
+	struct EarFilter{
+		Biquad<>
+			backShelf {4000, 0.707, gam::HIGH_SHELF},
+			pinnaPeak1{4000, 1.000, gam::PEAKING}, // concha resonance
+			pinnaPeak2{8000, 4.000, gam::PEAKING}, // for above localization
+			pinnaNotch1, pinnaNotch2;
+		float shadow = 1.; // TODO: should be LPF
+
+		EarFilter(){
+			pinnaPeak1.level(2); 
+		}
+
+		float operator()(float s){
+			s = backShelf(s);
+			s = pinnaNotch1(s);
+			s = pinnaNotch2(s);
+			//s = pinnaPeak1(s); // not convinced this helps
+			s = pinnaPeak2(s);
+			return s * shadow;
+		}
+	};
+
+	EarFilter mEarFilters[2];
+
 	float mTorsoAmt=0., mTorsoDelay=0.;
-	float mShadows[2] = {1,1}; // TODO: these should be LPFs
 	float mEarDist = 0.07; // about half the average bitragion breadth
 	float mRoomSize = 3;
 };
