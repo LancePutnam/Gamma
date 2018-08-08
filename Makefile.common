@@ -71,8 +71,10 @@ USING_PUREDYNE	= 0
 # Build settings
 #--------------------------------------------------------------------------
 # Language version
-CXX_VERSION ?= 11
-ifeq ($(CXX_VERSION), 11)
+CXX_VERSION ?= 14
+ifeq ($(CXX_VERSION), 14)
+	CXXFLAGS += -std=c++14
+else ifeq ($(CXX_VERSION), 11)
 	CXXFLAGS += -std=c++11
 endif
 
