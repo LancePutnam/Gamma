@@ -243,6 +243,9 @@ template<
 class ReverbMS : public Td {
 public:
 
+	typedef std::vector<Echo<Tv, Si, LoopFilter, Domain1>> Combs;
+	typedef std::vector<Comb<Tv, Si, float, Domain1>> Allpasses;
+
 	ReverbMS();
 
 
@@ -283,12 +286,15 @@ public:
 	/// Get decay length
 	float decay() const { return mDecay; }
 
+	Combs& combs(){ return mCombs; }
+	Allpasses& allpasses(){ return mAllpasses; }
+
 	void print() const;
 
 private:
 	float mDecay;
-	std::vector<Echo<Tv, Si, LoopFilter, Domain1>> mCombs;
-	std::vector<Comb<Tv, Si, float, Domain1>> mAllpasses;
+	Combs mCombs;
+	Allpasses mAllpasses;
 
 	virtual void onDomainChange(double r){
 		decay(decay());
