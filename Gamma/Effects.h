@@ -73,7 +73,7 @@ public:
 	{}
 	
 	float operator()(){
-		if(env.done()) return 0.f;
+		if(env.done()) return 0.f; // faster and avoids denormals
 		fil.freq(freq2 + (freq1-freq2)*env());
 		return fil(src()) * env.value();
 	}
@@ -82,12 +82,12 @@ public:
 		freq1 = frq1; freq2 = frq2; env.decay(dec); if(rst) reset();
 	}
 	
-	void reset(float amp=1){
+	void reset(){
 		env.reset(amp);
 		fil.zero();
 	}
 	
-	float freq1, freq2;
+	float freq1, freq2, amp=1.f;
 	NoiseWhite<RNGMulLinCon> src;
 	Biquad<> fil;
 	Decay<float> env;
