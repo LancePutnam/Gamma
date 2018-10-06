@@ -141,8 +141,8 @@ class AccumPhase : public Td{
 public:
 	/// \param[in] frq		Frequency
 	/// \param[in] phs		Phase in [0, 1)
-	/// \param[in] amp		Amplitude
-	AccumPhase(Tv frq=440, Tv phs=0, Tv amp=M_PI);
+	/// \param[in] radius	Output range in [-radius, radius)
+	AccumPhase(Tv frq=440, Tv phs=0, Tv rad=M_PI);
 
 	
 	/// Generate next sample. Stored phase is post-incremented.
@@ -157,19 +157,19 @@ public:
 	void period(Tv v);		///< Set period length
 	void phase(Tv v);		///< Set phase from [0, 1) of one period
 	void phaseAdd(Tv v);	///< Add value to unit phase
-	void amp(Tv v);			///< Set amplitude
+	void radius(Tv v);		///< Set output range to be in [-radius, radius)
 	
 	Tv freq() const;		///< Get frequency
 	Tv freqUnit() const;	///< Get frequency in [0, 1)
 	Tv period() const;		///< Get period
 	Tv phase() const ;		///< Get normalized phase in [0, 1)
-	Tv amp() const;			///< Get amplitude
+	Tv radius() const;		///< Get radius of output
 	
 	void onDomainChange(double r);
 	void print(FILE * fp = stdout, const char * append = "\n");
 	
 protected:
-	Tv mInc, mPhase, mAmp;
+	Tv mInc, mPhase, mRadius;
 	Tv mFreqToInc;
 	void recache();
 	Tv mapFreq(Tv v) const;
@@ -1157,8 +1157,8 @@ template<class Sp, class Td> inline bool Accum<Sp,Td>::seq(uint32_t pat){
 //---- AccumPhase
 
 template<class Tv, class Td>
-AccumPhase<Tv, Td>::AccumPhase(Tv f, Tv p, Tv a)
-:	mInc(f), mAmp(a), mFreqToInc(1)
+AccumPhase<Tv, Td>::AccumPhase(Tv f, Tv p, Tv r)
+:	mInc(f), mRadius(r), mFreqToInc(1)
 {
 	onDomainChange(1);
 	this->phase(p);
@@ -1169,12 +1169,12 @@ template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapFreq(Tv v) const {
 }
 
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::mapPhase(Tv v) const {
-	return v*Tv(2)*mAmp;
+	return v*Tv(2)*mRadius;
 }
 
 template<class Tv, class Td>
 inline Tv AccumPhase<Tv, Td>::nextPhaseUsing(Tv inc){
-	mPhase = scl::wrap(mPhase, mAmp,-mAmp); // guarantees that result is in [-A, A)
+	mPhase = scl::wrap(mPhase, mRadius,-mRadius); // guarantees that result is in [-A, A)
 	Tv r = mPhase;
 	mPhase += inc;
 	return r;
@@ -1198,9 +1198,9 @@ template<class Tv, class Td> inline void AccumPhase<Tv, Td>::freqMul(Tv v){
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::period(Tv v){ freq(Tv(1)/v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phase(Tv v){ mPhase = mapPhase(v); }
 template<class Tv, class Td> inline void AccumPhase<Tv, Td>::phaseAdd(Tv v){ mPhase += mapPhase(v); }
-template<class Tv, class Td> inline void AccumPhase<Tv, Td>::amp(Tv v){
+template<class Tv, class Td> inline void AccumPhase<Tv, Td>::radius(Tv v){
 	Tv f = freq();
-	mAmp=v;
+	mRadius=v;
 	recache();
 	freq(f);
 }
@@ -1208,8 +1208,8 @@ template<class Tv, class Td> inline void AccumPhase<Tv, Td>::amp(Tv v){
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freq() const { return mInc/mFreqToInc; }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::freqUnit() const { return freq()*this->ups(); }
 template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::period() const { return Tv(1)/freq(); }
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase() const { return mPhase/(Tv(2)*mAmp); }
-template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::amp() const { return mAmp; }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::phase() const { return mPhase/(Tv(2)*mRadius); }
+template<class Tv, class Td> inline Tv AccumPhase<Tv, Td>::radius() const { return mRadius; }
 
 template<class Tv, class Td> void AccumPhase<Tv, Td>::onDomainChange(double /*r*/){
 	Tv f=freq();
@@ -1217,7 +1217,7 @@ template<class Tv, class Td> void AccumPhase<Tv, Td>::onDomainChange(double /*r*
 	freq(f);
 }
 template<class Tv, class Td> void AccumPhase<Tv, Td>::recache(){
-	mFreqToInc = Tv(Td::ups() * Tv(2)*mAmp);
+	mFreqToInc = Tv(Td::ups() * Tv(2)*mRadius);
 }
 
 template<class Tv, class Td> void AccumPhase<Tv, Td>::print(FILE * fp, const char * append){
