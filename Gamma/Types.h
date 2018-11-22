@@ -34,6 +34,8 @@ typedef Vec<4,double> double4;	///< Vector of 4 doubles
 template <class T>
 struct Polar{
 
+	typedef T value_type;
+
 	union{
 		struct{ T m, p; };	///< Magnitude and phase values
 		T elems[2];			///< Component 2-vector
@@ -56,12 +58,13 @@ class Complex{
 public:
 
 	typedef Complex<T> C;
+	typedef T value_type;
 
 	union{
 		struct{ T r, i; };	///< Real and imaginary values
 		T elems[2];			///< Component 2-vector
 	};
-	
+
 	Complex(const Complex& v): r(v.r), i(v.i){}
 	Complex(const Polar<T>& v){ *this = v; }
 	Complex(const T& r=T(0), const T& i=T(0)): r(r), i(i){}
@@ -187,7 +190,7 @@ class Vec : public NamedElems<N,T> {
 public:
 
 	using NamedElems<N,T>::x;
-
+	typedef T value_type;
 
 	Vec(const T& v=T()){ set(v); }
 	Vec(const T& v1, const T& v2){ set(v1,v2); }
