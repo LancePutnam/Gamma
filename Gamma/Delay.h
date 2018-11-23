@@ -71,6 +71,7 @@ public:
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer
 	Tv read(float ago) const;					///< Returns element 'ago' units ago
+	template <template <class> class InterpolationStrategy> Tv read(float ago) const;
 	void write(const Tv& v);					///< Writes new element into buffer
 
 	/// Copy delay elements to another array
@@ -418,6 +419,10 @@ TM1 void Delay<TM2>::onDomainChange(double /*r*/){ //printf("Delay::onDomainChan
 
 TM1 inline Tv Delay<TM2>::read(float ago) const {
 	return mIpol(*this, mPhase - delayFToI(ago));
+}
+
+TM1 template <template <class> class InterpolationStrategy> inline Tv Delay<TM2>::read(float ago) const {
+	return InterpolationStrategy<Tv>()(*this, mPhase - delayFToI(ago));
 }
 
 TM1
