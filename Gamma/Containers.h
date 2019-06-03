@@ -104,10 +104,10 @@ public:
 
 	/// Get write reference to element
 	T& operator[](uint32_t i);
-	
+
 	/// Get read-only reference to element
 	const T& operator[](uint32_t i) const;
-	
+
 	/// Sets all elements to value
 	ArrayBase& assign(const T& v);
 
@@ -140,21 +140,21 @@ public:
 	void clear();
 
 	/// Ensures ownership of elements
-	
+
 	/// If the array is not already the sole owner, new memory is allocated and 
 	/// the previously referenced array elements are copied.
 	void own();
-	
+
 	/// Returns true if we are the sole owner of data internally allocated
 	bool isSoleOwner() const;
-	
+
 	bool usingExternalSource() const;
 
 	/// Returns whether internal memory pointer is valid
 	bool valid() const;
-	
+
 	/// Resizes number of elements in array
-	
+
 	/// If the new size is less than the old size, then elements are truncated.
 	/// If the new size is greater than the old size, then the argument value
 	/// is copied into the additional elements.
@@ -164,6 +164,10 @@ public:
 	void source(ArrayBase<T,S,A>& src);
 
 	/// Sets source of array elements to another array
+
+	/// \param[in] src			C array to reference
+	/// \param[in] size			size of array, in elements
+	/// \param[in] unmanaged	whether the array memory shall be managed externally
 	void source(T * src, uint32_t size, bool unmanaged=false);
 
 	/// Called whenever the size changes
@@ -185,8 +189,8 @@ protected:
 		static RefCount * o = new RefCount;
 		return *o;
 	}
-	
-	// is memory being managed automatically?
+
+	// Is memory being managed (allocated/freed) automatically?
 	static bool managing(T* m){ return references(m) != 0; }
 
 private: ArrayBase& operator=(const ArrayBase& v);
@@ -239,7 +243,7 @@ public:
 
 	const T& atPhase(uint32_t phase) const;	///< Get element at truncated fixed-point phase
 	void putPhase(uint32_t phase, T v);		///< Set element at truncated fixed point phase
-	
+
 private:
 	using Base::mSize;
 private: ArrayPow2& operator=(const ArrayPow2& v);
@@ -268,11 +272,11 @@ public:
 	/// Returns reference to backmost (oldest) element
 	T& readBack(){ return (*this)[indexBack()]; }
 	const T& readBack() const { return (*this)[indexBack()]; }
-	
+
 	/// Returns reference to frontmost (newest) element
 	T& readFront(){ return (*this)[indexFront()]; }
 	const T& readFront() const { return (*this)[indexFront()]; }
-	
+
 	/// Returns reference to element 'ago' indices behind front
 	T& read(uint32_t ago){ return (*this)[indexPrev(ago)]; }
 	const T& read(uint32_t ago) const { return (*this)[indexPrev(ago)]; }
@@ -293,7 +297,7 @@ public:
 	///						if delay<0, then delay -> size() + delay
 	///	\param[ in] from	array index to read history relative to
 	void readFrom(T * dst, uint32_t len, int32_t delay, uint32_t from) const;
-	
+
 	uint32_t pos() const;			///< Return absolute index of frontmost (newest) element
 	bool reachedEnd() const;		///< Returns whether the last element written was at the end of the array
 	uint32_t indexBack() const;		///< Returns absolute index of backmost (oldest) element
@@ -304,7 +308,7 @@ public:
 	void pos(uint32_t index);		///< Set absolute buffer index of writer
 	void reset();					///< Reset write position to beginning
 	void writeClip(const T& v);		///< Writes element unless at end of buffer
-	
+
 protected:
 	uint32_t mPos;
 	void incPos();
@@ -333,16 +337,16 @@ public:
 	const Array<T,A>& readBuf() const { return mRead; }
 
 	/// Copy elements into read buffer unwrapping from ring
-	
+
 	/// \returns a pointer to the read buffer
 	///
 	T * read(){
 		Ring<T,A>::read(mRead.elems(), mRead.size());
 		return mRead.elems();
 	}
-	
+
 	/// Copy elements into read buffer "as is" from ring
-	
+
 	/// \returns a pointer to the read buffer
 	///
 	T * copy(){
@@ -464,7 +468,7 @@ inline const T * ArrayBase<T,S,A>::elems() const { return mElems; }
 
 template <class T, class S, class A>
 void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n", mElems);
-	
+
 	// We will only attempt to deallocate the data if it exists and is being 
 	// managed (reference counted) by ArrayBase.
 	if(mElems && managing(mElems)){
@@ -482,7 +486,7 @@ void ArrayBase<T,S,A>::clear(){ //printf("ArrayBase::clear(): mElems=%p\n", mEle
 template <class T, class S, class A>
 void ArrayBase<T,S,A>::own(){
 	T * oldElems = elems();
-	
+
 	// If we are not the sole owner, do nothing...
 	if(!isSoleOwner()){
 		uint32_t oldSize = size();
@@ -517,27 +521,27 @@ void ArrayBase<T,S,A>::resize(uint32_t newSize, const T& c){
 	}
 
 	if(newSize != size()){
-		
+
 		T * newElems = A::allocate(newSize);
 
 		// If successful allocation...
 		if(newElems){
 
 			uint32_t nOldToCopy = newSize<size() ? newSize : size();
-		
+
 			// Copy over old elements
 			for(uint32_t i=0; i<nOldToCopy; ++i){
 				A::construct(newElems+i, (*this)[i]);
 			}
-			
+
 			// Copy argument into any additional elements
 			for(uint32_t i=nOldToCopy; i<newSize; ++i){
 				A::construct(newElems+i, c);
 			}
-		
+
 			clear();
 			mElems = newElems;
-		
+
 			refCount()[mElems] = 1;
 			mSize(newSize);
 			onResize();
@@ -623,7 +627,7 @@ void Ring<T,A>::readFrom(T * dst, uint32_t len, int32_t delay, uint32_t from) co
 	// we add one to maxLen because of a fence post anomaly
 	uint32_t maxLen = (begin < from ? (from - begin) : (from + (size() - begin))) + 1;
 	len = scl::min(len, maxLen);
-	
+
 	mem::copyFromRing(elems(), size(), begin, dst, len);
 }
 
