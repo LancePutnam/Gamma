@@ -68,16 +68,26 @@ public:
 	/// Returns sample at current position on specified channel (without incrementing phase)
 	T read(int channel) const;
 
-	/// Set sample buffer
+	/// Set sample buffer reference
 	
 	/// \param[in] src		Sample buffer (if multichannel, must be deinterleaved)
 	/// \param[in] frmRate	Frame rate of sample buffer.
 	///						If the sample is a wavetable, then this should be
 	///						its period, in frames.
-	/// \param[in] channels	Number of channels in sample buffer
-	void buffer(Array<T>& src, double frmRate, int channels);
+	/// \param[in] chans	Number of channels in sample buffer
+	void buffer(Array<T>& src, double frmRate, int chans);
 
-	/// Set sample buffer
+	/// Set sample buffer reference
+	
+	/// \param[in] src		C array of samples (if multichannel, must be deinterleaved)
+	/// \param[in] numFrms	Number of frames
+	/// \param[in] frmRate	Frame rate of sample buffer.
+	///						If the sample is a wavetable, then this should be
+	///						its period, in frames.
+	/// \param[in] chans	Number of channels in sample buffer
+	void buffer(T * src, int numFrms, double frmRate, int chans);
+
+	/// Set sample buffer reference
 	
 	/// \param[in] src		A source SamplePlayer from which to use the same 
 	///						samples, sample rate, and channel count
@@ -222,13 +232,22 @@ PRE inline T CLS::read(int channel) const {
 }
 
 
-PRE void CLS::buffer(Array<T>& src, double smpRate, int channels){
+PRE void CLS::buffer(Array<T>& src, double frmRate, int chans){
+	mPos = 0;
 	this->source(src);
-	frameRate(smpRate);	// sets mFrameRate, mRate, and mInc
-	mChans = channels;
+	frameRate(frmRate);	// sets mFrameRate, mRate, and mInc
+	mChans = chans;
 	mMin = 0;
 	mMax = frames();
+}
+
+PRE void CLS::buffer(T * src, int numFrms, double frmRate, int chans){
 	mPos = 0;
+	this->source(src, numFrms*chans, true);
+	frameRate(frmRate);	// sets mFrameRate, mRate, and mInc
+	mChans = chans;
+	mMin = 0;
+	mMax = frames();
 }
 
 PRE void CLS::buffer(SamplePlayer& src){
