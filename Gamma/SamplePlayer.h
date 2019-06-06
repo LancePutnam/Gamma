@@ -129,7 +129,7 @@ public:
 	double freq() const { return rate(); }	///< Get frequency if sample buffer is a wavetable
 	double max() const { return mMax; }		///< Get playback interval maximum frame (open)
 	double min() const { return mMin; }		///< Get playback interval minimum frame (closed)
-	double period() const;					///< Get total period, in seconds, of sample data
+	double length() const;					///< Get total length (in seconds) of frame data
 	double pos() const { return mPos; }		///< Get playback position, in frames
 	double posInInterval(double frac) const;///< Get position from fraction within interval
 	double rate() const { return mRate; }	///< Get playback rate
@@ -328,7 +328,7 @@ PRE void CLS::fade(int fadeOutFrames, int fadeInFrames){
 	}	
 }
 
-PRE inline double CLS::period() const { return frames() * ups(); }
+PRE inline double CLS::length() const { return frames() / frameRate(); }
 
 PRE inline double CLS::posInInterval(double frac) const {
 	return min() + (max() - min()) * frac;
