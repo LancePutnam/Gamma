@@ -78,23 +78,37 @@ template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
 
-	/// Constructor that allocates memory, but does not initialize elements
+	/// Construct without allocating any memory
+	ArrayBase();
 
-	/// \param[in] size		number of elements to allocate
+	/// Construct with internal memory allocation and no value intialization
+
+	/// Memory (de)allocation is managed internally.
 	///
+	/// \param[in] size		number of elements to allocate
 	explicit ArrayBase(uint32_t size);
 
+	/// Construct with internal memory allocation and value intialization
+
+	/// Memory (de)allocation is managed internally.
+	///
 	/// \param[in] size		number of elements to allocate
 	/// \param[in] init		value to initialize all elements to
 	ArrayBase(uint32_t size, const T& init);
 
+	/// Construct with memory referenced from an external array
+
+	/// The memory pointed to must persist as long as this object. No memory
+	/// deallocation will be attempted upon destruction of this object.
+	///
 	/// \param[in] src		external array to reference
 	/// \param[in] size		size of external array
 	ArrayBase(T * src, uint32_t size);
 
-	/// Default constructor that does not allocate memory
-	ArrayBase();
+	/// Construct as copy of another array
 
+	/// Memory (de)allocation is managed internally.
+	///
 	/// \param[in] src		array to copy
 	explicit ArrayBase(const ArrayBase<T,S,A>& src);
 
@@ -180,8 +194,8 @@ public:
 	}
 
 protected:
-	T * mElems;
-	S mSize;
+	T * mElems = 0;
+	S mSize{0};
 
 	typedef std::map<T *, int> RefCount;
 
@@ -397,34 +411,25 @@ struct DelayN: public Ring<T,A>{
 
 //---- ArrayBase
 
-#define ARRAYBASE_INIT mElems(0), mSize(0)
-
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase()
-:	ARRAYBASE_INIT
 {}
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(const ArrayBase<T,S,A>& src)
-:	ARRAYBASE_INIT
 {	resize(src.size()); assign(src); }
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(uint32_t sz)
-:	ARRAYBASE_INIT
 {	resize(sz); }
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(uint32_t sz, const T& initial)
-:	ARRAYBASE_INIT
 {	resize(sz); assign(initial); }
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::ArrayBase(T * src, uint32_t sz)
-:	ARRAYBASE_INIT
 {	source(src, sz); }
-
-#undef ARRAYBASE_INIT
 
 template <class T, class S, class A>
 ArrayBase<T,S,A>::~ArrayBase(){ clear(); }
