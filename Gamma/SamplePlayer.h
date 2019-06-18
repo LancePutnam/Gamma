@@ -132,6 +132,7 @@ public:
 	double length() const;					///< Get total length (in seconds) of frame data
 	double pos() const { return mPos; }		///< Get playback position, in frames
 	double posInInterval(double frac) const;///< Get position from fraction within interval
+	double phase() const;					///< Get playback position, in [0, 1)
 	double rate() const { return mRate; }	///< Get playback rate
 
 
@@ -333,6 +334,8 @@ PRE inline double CLS::length() const { return frames() / frameRate(); }
 PRE inline double CLS::posInInterval(double frac) const {
 	return min() + (max() - min()) * frac;
 }
+
+PRE inline double CLS::phase() const { return mPos/frames(); }
 
 #undef PRE
 #undef CLS
