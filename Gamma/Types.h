@@ -341,16 +341,25 @@ inline Vec<N,T> operator / (const S& s, const Vec<N,T>& v){
 	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
 }
 
-template <unsigned N, class T, class U>
-inline Vec<N,T> operator + (const Vec<N,T>& v, const Complex<U>& c){
-	Vec<N,T> r; for(auto i:{0,1}) r[i]=v[i]+c[i]; return r;
+#define DEF_CVOP(op)\
+template <unsigned N, class T, class U>\
+inline Vec<N,T> operator op (const Vec<N,T>& v, const Complex<U>& c){\
+	Vec<N,T> r; for(auto i:{0,1}) r[i]=v[i] op c[i]; return r;\
+}\
+template <unsigned N, class T, class U>\
+inline Complex<U> operator op (const Complex<U>& c, const Vec<N,T>& v){\
+	Complex<U> r; for(auto i:{0,1}) r[i]=c[i] op v[i]; return r;\
+}\
+template <unsigned N, class T, class U>\
+inline Vec<N,T>& operator op##= (Vec<N,T>& v, const Complex<U>& c){\
+	for(auto i:{0,1}) v[i] op##= c[i]; return v;\
+}\
+template <unsigned N, class T, class U>\
+inline Complex<U>& operator op##= (Complex<U>& c, const Vec<N,T>& v){\
+	for(auto i:{0,1}) c[i] op##= v[i]; return c;\
 }
-
-template <unsigned N, class T, class U>
-inline Complex<U> operator + (const Complex<U>& c, const Vec<N,T>& v){
-	Complex<U> r; for(auto i:{0,1}) r[i] = c[i] + v[i]; return r;
-}
-
+DEF_CVOP(+) DEF_CVOP(-)
+#undef DEF_CVOP
 
 namespace scl{
 
