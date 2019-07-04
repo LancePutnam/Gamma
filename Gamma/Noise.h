@@ -140,6 +140,34 @@ private:
 };
 
 
+/// Binary noise
+
+/// This noise flips randomly between -A and A. When A is very small, say 1e-20,
+/// then this can be added to the input of filters to prevent denormals.
+/// \ingroup Noise
+template <class RNG = RNGLinCon>
+class NoiseBinary{
+public:
+	typedef float value_type;
+
+	NoiseBinary(): amp(1.f){}
+	
+	/// \param[in] seed		random number generator seed
+	NoiseBinary(float ampi, uint32_t seedi=0)
+	: amp(ampi){ if(seedi) seed(seedi); }
+
+	/// Generate next value
+	float operator()(){
+		return (rng()&0x80000000) ? -amp : amp;
+	}
+
+	/// Set seed of RNG
+	void seed(uint32_t v){ rng = v; }
+
+	RNG rng;
+	float amp;
+};
+
 
 // Implementation_______________________________________________________________
 
