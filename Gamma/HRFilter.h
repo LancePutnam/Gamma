@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include "Gamma/Filter.h"
+#include "Gamma/Noise.h"
 #include "Gamma/Spatial.h"
 #include "Gamma/Types.h"
 
@@ -184,9 +185,14 @@ public:
 	/// Return next spatialized sample as (left, right, room)
 	float2 operator()(){
 
+		// Any zero-valued input will devastate the CPU due to denormals 
+		// emerging and propagating through all the IIR filters. We add some 
+		// inaudible noise to all input samples to prevent this.
+		float noise = mNoise();
+
 		float3 spat(0,0,0);
 		for(int i=0; i<Nsrc; ++i){
-			spat += mSources[i](mSamples[i]);
+			spat += mSources[i](mSamples[i] + noise);
 		}
 
 		spat[2] *= mWallAtten;
@@ -208,6 +214,7 @@ private:
 	float mSamples[Nsrc] = {0.f};	// source input samples
 	ReverbMS<> mReverbs[2]; 		// one reverb for each ear
 	float mWallAtten = 0.1;
+	NoiseBinary<RNGMulLinCon> mNoise{1e-20, 17};
 };
 
 } // gam::
