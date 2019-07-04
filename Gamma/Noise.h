@@ -158,7 +158,7 @@ public:
 
 	/// Generate next value
 	float operator()(){
-		return (rng()&0x80000000) ? -amp : amp;
+		return punUF((rng()&0x80000000) ^ punFU(amp));
 	}
 
 	/// Set seed of RNG
