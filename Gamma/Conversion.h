@@ -246,7 +246,7 @@ inline uint32_t unitToUInt2(float v){
 
 inline uint8_t unitToUInt8(float u){
 	++u;
-	return (punFU(u) >> 15) & MaskFrac<float>();
+	return uint8_t((punFU(u) >> 15) & MaskFrac<float>());
 }
 
 } // gam::

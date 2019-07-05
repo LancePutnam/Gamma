@@ -237,7 +237,7 @@ template<class T> T roundAway(T v);
 template<class T> T roundAway(T v, T step);
 
 /// Returns the section 'v' lies in in [0,num] divided into 'div' sections.
-inline int section(int v, int num, int divs){ return (v*divs)/double(num); }
+inline int section(int v, int num, int divs){ return int((v*divs)/double(num)); }
 
 /// Returns sign of a number
 template<class T> int sgn(T v);
@@ -674,7 +674,7 @@ inline double ratioET(double pc, double divs, double ival){
 
 //template<class T> inline T round(T v){ return (v + roundMagic<T>()) - roundMagic<T>(); }
 template<class T>
-inline T round(T v){ double r=v; return (r + roundMagic) - roundMagic; }
+inline T round(T v){ double r=v; return T((r + roundMagic) - roundMagic); }
 template<class T>
 inline T round(T v, T s){ return round<double>(v/s) * s; }
 template<class T>
@@ -831,7 +831,7 @@ namespace{ static const double
 
 template<class T> inline T cosT8(T r){
 	if(r < T(M_PI_4) && r > T(-M_PI_4)){
-		float rr = r*r;
+		T rr = r*r;
 		return T(1) - rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
 	}
 	else if(r > T(0)){
@@ -841,7 +841,7 @@ template<class T> inline T cosT8(T r){
 	}
 	else{
 		r += T(M_PI_2);
-		float rr = r*r;
+		T rr = r*r;
 		return r * (T(1) - T(t71) * rr * (T(t72) - rr * (T(t73) - rr)));
 	}
 }
@@ -853,12 +853,12 @@ template<class T> inline T sinT7(T r){
 	}
 	else if(r > T(0)){
 		r -= T(M_PI_2);
-		float rr = r*r;
+		T rr = r*r;
 		return T(1) - rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
 	}
 	else{
 		r += T(M_PI_2);
-		float rr = r*r;
+		T rr = r*r;
 		return T(-1) + rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
 	}
 }
@@ -1002,12 +1002,12 @@ template<class T> inline T wrapPhase(T r){
 	if(r >= T(M_PI)){
 		r -= T(M_2PI);
 		if(r < T(M_PI)) return r;
-		return r - T(long((r+M_PI)*M_1_2PI)  )*M_2PI;
+		return r - T(long((r+M_PI)*M_1_2PI)  )*T(M_2PI);
 	}
 	else if (r < T(-M_PI)){
 		r += T(M_2PI);
 		if(r >= T(-M_PI)) return r;
-		return r - T(long((r+M_PI)*M_1_2PI)-1)*M_2PI;
+		return r - T(long((r+M_PI)*M_1_2PI)-1)*T(M_2PI);
 	}
 	else return r;
 }

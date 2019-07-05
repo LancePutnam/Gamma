@@ -574,7 +574,7 @@ void DFTBase<T>::onDomainChange(double /*r*/){
 inline DFT& DFT::spectrumType(SpectralType v){ mSpctFormat=v; return *this; }
 inline DFT& DFT::precise(bool w){ mPrecise=w; return *this; }
 
-inline float DFT::freqRes() const { return spu() / sizeWin(); }
+inline float DFT::freqRes() const { return float(spu() / sizeWin()); }
 inline float DFT::overlap() const { return float(sizeWin()) / sizeHop(); }
 inline bool DFT::overlapping() const { return sizeHop() < sizeWin(); }
 inline unsigned DFT::sizeHop() const { return mSizeHop; }

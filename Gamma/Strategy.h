@@ -693,10 +693,13 @@ namespace phsInc{
 		/// \param[in] pulseWidth	pulse width in cycles
 		/// \param[in] length		total pulse length in cycles
 		Rhythm& pulse(uint8_t pulseWidth, uint8_t length){
+#pragma warning(push)
+#pragma warning(disable: 4245)
 			mSize = length;
 			uint64_t ones = -1;
 			mPattern = (ones>>(64-mSize)) & (ones<<(length-pulseWidth));			
 			return *this;
+#pragma warning(pop)
 		}
 
 	private:

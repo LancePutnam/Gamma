@@ -23,7 +23,7 @@ namespace rnd{
 		static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223);
 		static bool initSeed = true;
 		if(initSeed){
-			seedGen.val = std::time(NULL);
+			seedGen.val = uint32_t(std::time(NULL));
 			initSeed = false;
 		} 
 		return seedGen();

@@ -682,7 +682,7 @@ inline float atQ(const float * src, uint32_t fbits, uint32_t phs){
 
 inline float phaseIncFactor(double framesPerSec){
 	//return float(4294967296. / framesPerSec);
-	return float(65536. / framesPerSec) * 65536.;
+	return float(65536. / framesPerSec) * 65536.0f;
 }
 
 } // tbl::
@@ -706,7 +706,7 @@ namespace{
 
 	template<>
 	Complex<float> getSin<Complex<float> >(double p){
-		return Complex<float>(cos(p), sin(p));
+		return Complex<float>(float(cos(p)), float(sin(p)));
 	}
 
 	template<>
