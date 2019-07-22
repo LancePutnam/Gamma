@@ -305,6 +305,7 @@ endif
 
 # Append warning flags
 ifneq ($(STRICT_WARNINGS), 0)
+	# See https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
@@ -312,6 +313,9 @@ ifneq ($(STRICT_WARNINGS), 0)
 		-Wuninitialized -Winit-self
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
+
+# Turn some warnings into errors as they can cause program crashes
+CFLAGS += -Werror=return-type
 
 SLIB_FILE	= lib$(LIB_NAME).$(SLIB_EXT)
 DLIB_FILE	= lib$(LIB_NAME).$(DLIB_EXT)
