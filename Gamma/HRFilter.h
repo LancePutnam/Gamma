@@ -182,6 +182,9 @@ public:
 	/// Set/get source sample
 	float& sample(int i){ return mSamples[i]; }
 
+	/// Set all source samples to zero
+	HRScene& zeroSamples(){ for(auto& v : mSamples) v=0.f; return *this; }
+
 	/// Return next spatialized sample as (left, right, room)
 	float2 operator()(){
 
