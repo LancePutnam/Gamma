@@ -77,6 +77,7 @@ private:
 	float mOctave[11];
 	uint32_t mPhase;
 	float mRunningSum;
+	void init();
 };
 
 
@@ -172,6 +173,18 @@ public:
 
 template<class T>
 NoisePink<T>::NoisePink(){
+	init();
+}
+    
+template<class T>
+NoisePink<T>::NoisePink(uint32_t seed)
+:	rng(seed)
+{
+	init();
+}
+
+template<class T>
+void NoisePink<T>::init(){
 	mRunningSum = 0.f;
 	for(uint32_t i=0; i<11; ++i){	/* init octaves with uniform randoms */
 		float r = rnd::uniS_float(rng);
@@ -180,11 +193,6 @@ NoisePink<T>::NoisePink(){
 	}
 	mPhase = 0;
 }
-    
-template<class T>
-NoisePink<T>::NoisePink(uint32_t seed)
-:	rng(seed), NoisePink()
-{}
 
 template<class T>
 inline float NoisePink<T>::operator()(){
