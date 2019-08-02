@@ -1101,9 +1101,9 @@ inline bool Accum<Sp,Td>::cycled() const {
 
 template<class Sp, class Td> inline float Accum<Sp,Td>::freq() const { return mFreq; }
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::freqI() const { return mFreqI; }
-template<class Sp, class Td> inline float Accum<Sp,Td>::freqUnit() const { return mapIF(mFreqI); }
+template<class Sp, class Td> inline float Accum<Sp,Td>::freqUnit() const { return float(mapIF(mFreqI)); }
 template<class Sp, class Td> inline float Accum<Sp,Td>::period() const { return 1.f/freq(); }
-template<class Sp, class Td> inline float Accum<Sp,Td>::phase() const { return mapIF(mPhaseI); }
+template<class Sp, class Td> inline float Accum<Sp,Td>::phase() const { return float(mapIF(mPhaseI)); }
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::phaseI() const { return mPhaseI; }
 
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(float frqOffset){

@@ -293,7 +293,7 @@ protected:
 	int mSustain;		// index of sustain point
 	int mLoop;
 
-	void setLen(int i){ mLen=mLengths[i]*Td::spu(); }
+	void setLen(int i){ mLen=unsigned(mLengths[i]*Td::spu()); }
 };
 
 
@@ -573,7 +573,7 @@ public:
 	}
 	
 	/// Set frequency of envelope
-	void freq(Tp v){ mFreq = v; mAcc.add = v * Td::ups(); }
+	void freq(Tp v){ mFreq = v; mAcc.add = v * Tp(Td::ups()); }
 	
 	/// Set length, in domain units
 	void length(Tp v){ freq(Tp(1)/v); }
@@ -758,8 +758,8 @@ template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>::Env()
 :	mSustain(N), mLoop(0){
 	for(int i=0; i<N; ++i){
-		mLengths[i]= 1e-8;
-		mCurves[i] =-4;
+		mLengths[i]= Tp(1e-8);
+		mCurves[i] = Tp(-4);
 		mLevels[i] = Tv();
 	}
 	mLevels[N] = Tv();
@@ -820,7 +820,7 @@ inline Tv Env<N,Tv,Tp,Td>::operator()(){
 			int nextStage = mStage+1;
 			// If looping, ensure we wrap back around to first level
 			if(mLoop && (nextStage==size())) nextStage = 0;
-			mCurve.set(mLen, mCurves[mStage], mLevels[mStage], mLevels[nextStage]);
+			mCurve.set(Tp(mLen), mCurves[mStage], mLevels[mStage], mLevels[nextStage]);
 
 			// Immediately return start level of new stage
 			return (*this)();
@@ -844,7 +844,7 @@ void Env<N,Tv,Tp,Td>::release(){
 	if(!done()){
 		mPos = 0;
 		setLen(mStage);
-		mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
+		mCurve.set(Tp(mLen), mCurves[mStage], curVal, mLevels[mStage+1]);
 	}
 }
 
@@ -863,7 +863,7 @@ void Env<N,Tv,Tp,Td>::resetSoft(){
 	mPos = 0;
 	mStage = 0;
 	setLen(mStage);
-	mCurve.set(mLen, mCurves[mStage], curVal, mLevels[mStage+1]);
+	mCurve.set(Tp(mLen), mCurves[mStage], curVal, mLevels[mStage+1]);
 	mSustain = scl::abs(mSustain);
 }
 

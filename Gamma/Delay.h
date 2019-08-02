@@ -406,7 +406,7 @@ TM1 void Delay<TM2>::onResize(){ //printf("Delay::onResize %d elements\n", this-
 
 TM1 void Delay<TM2>::onDomainChange(double /*r*/){ //printf("Delay::onDomainChange\n");
 	if(this->usingExternalSource()){
-		mMaxDelay = this->size() * Td::ups();
+		mMaxDelay = float(this->size() * Td::ups());
 	}
 	else{
 		maxDelay(mMaxDelay, false);
@@ -435,7 +435,7 @@ void Delay<TM2>::read(V * dst, unsigned len, unsigned end) const {
 	}
 }
 
-TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1./maxDelay(); }
+TM1 void Delay<TM2>::refreshDelayFactor(){ mDelayFactor = 1.0f/maxDelay(); }
 
 TM1 inline void Delay<TM2>::write(const Tv& v){
 	//incPhase();
@@ -485,7 +485,7 @@ TM1 inline uint32_t Delay<TM2>::indexBack() const {
 	return this->index(mPhase + this->oneIndex());
 }
 
-TM1 float Delay<TM2>::maxDelay() const { return this->size() * Td::ups(); }
+TM1 float Delay<TM2>::maxDelay() const { return float(this->size() * Td::ups()); }
 
 TM1 void Delay<TM2>::print(){
 	printf("SPU:       %f\n", Td::spu());

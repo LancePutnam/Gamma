@@ -22,7 +22,7 @@ typedef int index_t;
 inline unsigned indexLast(unsigned len, unsigned str){ return ((len-1)/str)*str; }
 
 /// Maps a position in [-1, 1] to an index in [0, n). No boundary operations are performed.
-inline index_t posToInd(float v, index_t n){ return n * (v*0.49999f + 0.5f); }
+inline index_t posToInd(float v, index_t n){ return index_t(n * (v*0.49999f + 0.5f)); }
 
 
 // Neighbor accessing strategies

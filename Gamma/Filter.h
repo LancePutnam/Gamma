@@ -689,7 +689,7 @@ Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
 
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::onDomainChange(double /*r*/){
-	mFrqToRad = M_2PI * Td::ups();
+	mFrqToRad = Tp(M_2PI * Td::ups());
 	freq(mFreq);
 }
 
@@ -913,7 +913,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at DC (inaccurate with large bandwidth)
 		//mB1 = poleRadius(Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tp re = getReal(v * Td::ups());
+		Tp re = getReal(v * Tp(Td::ups()));
 		Tp p1 = re - Tp(2);
 		mB1 = -(p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) - mB1;
@@ -923,7 +923,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
 		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tp re = getReal(v * Td::ups());
+		Tp re = getReal(v * Tp(Td::ups()));
 		Tp p1 = -re - Tp(2); // -re flips cutoff
 		mB1 = (p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;
