@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <limits> // numeric_limits
 #include "Gamma/Access.h"
 #include "Gamma/Containers.h"
 #include "Gamma/ipl.h"
@@ -693,13 +694,10 @@ namespace phsInc{
 		/// \param[in] pulseWidth	pulse width in cycles
 		/// \param[in] length		total pulse length in cycles
 		Rhythm& pulse(uint8_t pulseWidth, uint8_t length){
-#pragma warning(push)
-#pragma warning(disable: 4245)
 			mSize = length;
-			uint64_t ones = -1;
+			auto ones = std::numeric_limits<uint64_t>::max();
 			mPattern = (ones>>(64-mSize)) & (ones<<(length-pulseWidth));			
 			return *this;
-#pragma warning(pop)
 		}
 
 	private:
