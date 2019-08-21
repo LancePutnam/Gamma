@@ -72,10 +72,8 @@ USING_PUREDYNE	= 0
 #--------------------------------------------------------------------------
 # Language version
 CXX_VERSION ?= 14
-ifeq ($(CXX_VERSION), 14)
-	CXXFLAGS += -std=c++14
-else ifeq ($(CXX_VERSION), 11)
-	CXXFLAGS += -std=c++11
+ifneq ($(CXX_VERSION),)
+	CXXFLAGS += -std=c++$(CXX_VERSION)
 endif
 
 # Name of the library
@@ -104,7 +102,7 @@ VERBOSE		= 0
 DEP_TRACK	= 1
 
 # Whether to enable strict warnings
-STRICT_WARNINGS = 1
+STRICT_WARNINGS = 0
 
 # Whether to automatically run executables after building
 AUTORUN		= 1
