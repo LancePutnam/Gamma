@@ -9,7 +9,7 @@ CXXFLAGS	+= $(LINK_CXXFLAGS)
 LDFLAGS		+= $(LINK_LDFLAGS)
 
 ALL_CFLAGS	:= $(CPPFLAGS) $(CFLAGS)
-ALL_CXXFLAGS:= $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
+ALL_CXXFLAGS	:= $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
 
 DEPFLAGS	=
 ifneq ($(DEP_TRACK), 0)
@@ -25,6 +25,11 @@ ALL_BUILD_DIRS = $(BIN_DIR)/ $(OBJ_DIR)/ $(BUILD_DIR)include/ $(BUILD_DIR)lib/
 all: $(LIB_PATH)
 
 
+# Build object file from C source
+$(OBJ_DIR)%.o:: %.c
+	@echo CC $< $@
+	$(CC) -c $(ALL_CFLAGS) $< -o $@ $(DEPFLAGS)
+
 # Build object file from C++ source
 $(OBJ_DIR)%.o:: %.cpp
 	@echo CXX $< $@
@@ -33,16 +38,11 @@ $(OBJ_DIR)%.o:: %.cpp
 $(OBJ_DIR)%.o:: %.cc
 	@echo CXX $< $@
 	$(CXX) -c $(ALL_CXXFLAGS) $< -o $@ $(DEPFLAGS)
-
-# Build object file from C source
-$(OBJ_DIR)%.o:: %.c
-	@echo CC $< $@
-	$(CC) -c $(ALL_CFLAGS) $< -o $@ $(DEPFLAGS)
 	
 # Build object file from Obj-C++ source
 $(OBJ_DIR)%.o:: %.mm
-	@echo CC $< $@
-	$(CXX) -c $(ALL_CFLAGS) $< -o $@ $(DEPFLAGS)
+	@echo CXX $< $@
+	$(CXX) -c $(ALL_CXXFLAGS) $< -o $@ $(DEPFLAGS)
 
 # Build pre-compiled headers
 $(OBJ_DIR)%.hpp.gch:: %.hpp
@@ -93,10 +93,20 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\n\
-	CFLAGS +=$(LINK_CFLAGS)\r\n\
-	CXXFLAGS +=$(LINK_CXXFLAGS)\r\n\
-	LDFLAGS +=-l$(LIB_NAME) $(LINK_LDFLAGS)"> Makefile.link
+	$(eval $@_STR := "LDFLAGS += -l$(LIB_NAME)")
+ifneq ($(strip $(LINK_LDFLAGS)),)
+	$(eval $@_STR += " $(LINK_LDFLAGS)")
+endif
+ifneq ($(strip $(LINK_CPPFLAGS)),)
+	$(eval $@_STR += "\r\nCPPFLAGS +=$(LINK_CPPFLAGS)")
+endif
+ifneq ($(strip $(LINK_CFLAGS)),)
+	$(eval $@_STR += "\r\nCFLAGS +=$(LINK_CFLAGS)")
+endif
+ifneq ($(strip $(LINK_CXXFLAGS)),)
+	$(eval $@_STR += "\r\nCXXFLAGS +=$(LINK_CXXFLAGS)")
+endif
+	@printf "%b" $($@_STR) > Makefile.link
 
 
 # Archive repository
