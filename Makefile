@@ -52,8 +52,8 @@ include Makefile.rules
 .PHONY: clean cleanall external test
 
 
-# Compile and run source files in examples/ and tests/ folders
-EXEC_TARGETS = examples/%.cpp tests/%.cpp
+# Compile and run source files in RUN_DIRS
+EXEC_TARGETS = $(addsuffix *.cpp, $(RUN_DIRS)) $(addsuffix *.c, $(RUN_DIRS)) $(addsuffix *.mm, $(RUN_DIRS))
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): $(LIB_PATH) FORCE
 	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LIB_PATH) $(LDFLAGS)
