@@ -495,16 +495,16 @@ void add(T * arr, Indices & ind, T val){
 template <class Ts, class Tb>
 inline void histogram(const Ts * src, unsigned len, Tb * bins, unsigned numBins, Ts scale){
 	LOOP(len, 1){
-		int32_t j = (int32_t)(src[i] * scale);
-		if(j >= 0 && j < (int32_t)numBins) bins[j]++;
+		auto j = int(src[i] * scale);
+		if(j >= 0 && j < int(numBins)) bins[j]++;
 	}
 }
 
 template <class Ts, class Tb>
 inline void histogram(const Ts * src, unsigned len, Tb * bins, unsigned numBins, Ts scale, Ts offset){
 	LOOP(len, 1){
-		int32_t j = (int32_t)(src[i] * scale + offset);
-		if(j >= 0 && j < (int32_t)numBins) bins[j]++;
+		auto j = int(src[i] * scale + offset);
+		if(j >= 0 && j < int(numBins)) bins[j]++;
 	}
 }
 
