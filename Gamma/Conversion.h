@@ -228,7 +228,7 @@ inline uint32_t unitToUInt(float v){
 	uint32_t rbs = 126UL - (normalU >> 23UL);
 //	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
 //	printf("%x\n", 0x80000000UL >> rbs);
-	return ((normalU | 0x800000UL) << 8UL) >> rbs;
+	return ((normalU | 0x800000) << 8UL) >> rbs;
 //Her00	
 //float y = v + 1.f; 
 //return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
