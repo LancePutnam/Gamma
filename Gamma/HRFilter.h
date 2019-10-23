@@ -165,6 +165,10 @@ public:
 	typedef HRFilter Source;
 
 	HRScene(){
+		for(int i=0; i<Nsrc; ++i){
+			mSamples[i] = 0.f;
+			mActive[i] = true;
+		}
 		for(int i=0; i<2; ++i){
 			mReverbs[i].resize(gam::JCREVERB, i*2);
 			mReverbs[i].decay(4);
@@ -179,11 +183,27 @@ public:
 	/// Get sound source
 	Source& source(int i){ return mSources[i]; }
 
-	/// Set/get source sample
+	/// Set source sample
 	float& sample(int i){ return mSamples[i]; }
+
+	/// Get source sample
+	const float& sample(int i) const { return mSamples[i]; }
 
 	/// Set all source samples to zero
 	HRScene& zeroSamples(){ for(auto& v : mSamples) v=0.f; return *this; }
+
+	/// Set all samples to zero and make all sources inactive
+	HRScene& clear(){
+		for(int i=0; i<Nsrc; ++i){
+			mSamples[i] = 0.f;
+			mActive[i] = false;
+		}
+		return *this;
+	}
+
+	/// Set whether a source is active
+	HRScene& active(int i, bool v){ mActive[i]=v; return *this; }
+	bool active(int i) const { return mActive[i]; }
 
 	/// Return next spatialized sample as (left, right, room)
 	float2 operator()(){
@@ -195,7 +215,7 @@ public:
 
 		float3 spat(0,0,0);
 		for(int i=0; i<Nsrc; ++i){
-			spat += mSources[i](mSamples[i] + noise);
+			if(mActive[i]) spat += mSources[i](mSamples[i] + noise);
 		}
 
 		spat[2] *= mWallAtten;
@@ -214,7 +234,8 @@ public:
 
 private:
 	Source mSources[Nsrc];
-	float mSamples[Nsrc] = {0.f};	// source input samples
+	float mSamples[Nsrc];			// source input samples
+	bool mActive[Nsrc];
 	ReverbMS<> mReverbs[2]; 		// one reverb for each ear
 	float mWallAtten = 0.1;
 	NoiseBinary<RNGMulLinCon> mNoise{1e-20, 17};
