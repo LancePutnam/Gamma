@@ -113,7 +113,7 @@ unsigned indexOfMaxNorm(const T * src, unsigned len, unsigned str=1);
 
 /// Returns index of minimum value
 template <class T>
-unsigned indexOfMin(const T * src, unsigned len);
+unsigned indexOfMin(const T * src, unsigned len, unsigned str=1);
 
 /// Sets indices [numIndices, maxNumIndices) to complement indices.
 
@@ -510,11 +510,11 @@ inline void histogram(const Ts * src, unsigned len, Tb * bins, unsigned numBins,
 
 template <class T>
 unsigned indexOfMax(const T * src, unsigned len, unsigned str){
-	unsigned r=0;
-	T max = src[0];
+	unsigned r = 0;
+	T mx = src[0];
 	for(unsigned i=str; i<len; i+=str){
 		const T& v = src[i];
-		if(v > max){ max=v; r=i; }
+		if(v > mx){ mx=v; r=i; }
 	}
 	return r;
 }
@@ -531,18 +531,14 @@ unsigned indexOfMaxNorm(const T * src, unsigned len, unsigned str){
 }
 
 template <class T>
-unsigned indexOfMin(const T * src, unsigned len){
-	unsigned index = 0;
-	T min = src[0];
-
-	for(unsigned i=1; i<len; i++){
-		T val = src[i];
-		if(val < min){
-			min = val;
-			index = i;
-		}
+unsigned indexOfMin(const T * src, unsigned len, unsigned str){
+	unsigned r = 0;
+	T mn = src[0];
+	for(unsigned i=str; i<len; i+=str){
+		const T& v = src[i];
+		if(v < mn){ mn=v; r=i; }
 	}
-	return index;
+	return r;
 }
 
 /*
