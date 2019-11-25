@@ -179,6 +179,7 @@ public:
 
 	/// Get number of sources
 	int numSources() const { return Nsrc; }
+	int size() const { return Nsrc; }
 
 	/// Get sound source
 	Source& source(int i){ return mSources[i]; }
