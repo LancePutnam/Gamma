@@ -55,17 +55,15 @@ Make sure to pass in the following flags to the compiler:
 
 ## Dependencies
 
-Gamma depends on PortAudio v19 and libsndfile for performing audio and sound file i/o, respectively. They are required only if using certain Gamma classes. 
-
 PortAudio is required ONLY if you are using Gamma's AudioIO class (defined in Gamma/AudioIO.h). If you do not wish to use audio i/o, then pass the flag
 
 	NO_AUDIO_IO=1
 
 into make or, if not using make, exclude `src/AudioIO.cpp` from your project.
 
-libsndfile is required ONLY if you would like to use Gamma's SoundFile class (defined in Gamma/SoundFile.h).  If you do not wish to use sound file i/o, then pass the flag
+libsndfile may be used as the backend for the SoundFile class by passing the flag
 
-	NO_SOUNDFILE=1
+	USE_LIBSNDFILE=1
 
-into make or, if not using make, exclude `src/SoundFile.cpp` from your project.
+into make.
 

@@ -4,50 +4,32 @@
 #include <cctype> // tolower
 #include <string>
 #include <stdio.h>
-#include "sndfile.h"
 #include "Gamma/SoundFile.h"
 
 namespace gam{
-using std::string;
 
-#ifdef GAM_NO_SOUNDFILE
-class SoundFile::Impl {
-public:
+// Get file format type based on extension
+SoundFile::Format getFormatFromPath(const std::string& sfpath){
+	auto pos = sfpath.find_last_of(".");
+	if(std::string::npos != pos){
+		auto ext = sfpath.substr(pos+1);
+		for(auto& c : ext) c = std::tolower(c);
+		if(ext == "wav")					return SoundFile::WAV;
+		if(ext == "aiff" || ext == "aif")	return SoundFile::AIFF;
+		if(ext == "au" || ext == "snd")		return SoundFile::AU;
+	}
+	return SoundFile::NO_FORMAT;
+}
 
-	double frameRate() const { return 1; }
-	int frames() const { return 0; }
-	int channels() const { return 0; }
+} // gam::
 
-	void channels(int num){}
-	void frameRate(double hz){}
 
-	bool close(){ return true; }
+#ifdef GAM_USE_LIBSNDFILE
 
-	int format() const { return 0; }
-	int formatMajor() const { return 0; }
-	int formatMinor() const { return 0; }
-	void format(int v){}
+#include "sndfile.h"
 
-	bool opened() const { return false; }
+namespace gam{
 
-	bool openRead(const std::string& path){ return false; }
-	bool openWrite(const std::string& path){ return false; }
-
-	const char * extension(){ return ""; }
-	int formatMajor(const string& sfpath){ return 0; }
-	void formatMajor(int v){}
-	void formatMinor(int v){}
-
-	void info(const Impl& src){}
-
-	template <class T> int read(T * dst, int numFrames){ return 0; }
-	template <class T> int write(const T * src, int numFrames){ return 0; }
-
-	void seek(int pos, int mode){}
-
-	//void printInfo(){}
-};
-#else
 class SoundFile::Impl{
 public:
 	Impl()
@@ -64,11 +46,44 @@ public:
 	void channels(int num){ mInfo.channels = (int)num; }
 	void frameRate(double hz){ mInfo.samplerate = (int)hz; }
 
-	bool close(){
-		bool didClose = true;
-		if(0 != fp && 0 == sf_close(fp))	fp = 0;
-		else								didClose = false;
-		return didClose;
+	Format format() const {
+		#define CS(x) case SF_FORMAT_##x: return x;
+		switch(formatMajor()){
+		CS(WAV) CS(AIFF) CS(AU) CS(RAW)
+		//CS(FLAC)
+		default: return Format(0);
+		}
+		#undef CS
+	}
+
+	void format(Format v){
+		#define CS(x) case x: formatMajor(SF_FORMAT_##x); break;
+		switch(v){
+		CS(WAV) CS(AIFF) CS(AU) CS(RAW)
+		//CS(FLAC)
+		default:;
+		}
+		#undef CS
+	}
+
+	EncodingType encoding() const {
+		#define CS(x) case SF_FORMAT_##x: return x;
+		switch(formatMinor()){
+		CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
+		CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
+		default: return EncodingType(0);
+		}
+		#undef CS
+	}
+
+	void encoding(EncodingType v){
+		#define CS(x) case x: formatMinor(SF_FORMAT_##x); break;
+		switch(v){
+		CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
+		CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
+		default:;
+		}
+		#undef CS
 	}
 
 	void formatInfoMajor(){
@@ -81,10 +96,10 @@ public:
 		sf_command(fp, SFC_GET_FORMAT_INFO, &mFormatInfo, sizeof(mFormatInfo));
 	}
 
-	int format() const { return mInfo.format; }
-	int formatMajor() const { return mInfo.format & SF_FORMAT_TYPEMASK; }
-	int formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; }
-	void format(int v){ mInfo.format = v; }
+	//int format() const { return mInfo.format; }
+	int formatMajor() const { return mInfo.format & SF_FORMAT_TYPEMASK; } // WAV, AIFF, ...
+	int formatMinor() const { return mInfo.format & SF_FORMAT_SUBMASK; } // PCM, FLOAT, ULAW, ...
+	//void format(int v){ mInfo.format = v; }
 
 /*
 When opening a file for read, the format field should be set to zero before 
@@ -98,21 +113,16 @@ values. All other fields of the structure are filled in by the library.
 	bool openRead(const std::string& path){
 		if(formatMinor() != SF_FORMAT_RAW) mInfo.format = 0;
 		fp = sf_open(path.c_str(), SFM_READ, &mInfo);
-
-		//printf("%s\n", path.c_str());
-		//printInfo();
 		return opened();
 	}
 
 	bool openWrite(const std::string& path){
 
-		// set major format based on path
-		formatMajor(formatMajor(path));
+		// set major (file) format based on path
+		format(getFormatFromPath(path));
 
 		// if no encoding type, use sensible default...
 		if(!formatMinor()) formatMinor(SF_FORMAT_PCM_16);
-
-//		printInfo();
 
 		fp = sf_open(path.c_str(), SFM_WRITE, &mInfo);
 
@@ -120,27 +130,16 @@ values. All other fields of the structure are filled in by the library.
 		return opened();
 	}
 
+	bool close(){
+		bool didClose = true;
+		if(0 != fp && 0 == sf_close(fp))	fp = 0;
+		else								didClose = false;
+		return didClose;
+	}
 
 	const char * extension(){
 		formatInfoMajor();
 		return mFormatInfo.extension;
-	}
-
-	// get file format type based on extension
-	int formatMajor(const string& sfpath){
-		size_t pos = sfpath.find_last_of(".");
-		
-		if(string::npos != pos){
-			string ext = sfpath.substr(pos+1);
-			for(unsigned i=0; i<ext.size(); ++i) ext[i] = std::tolower(ext[i]);
-			
-			//printf("%s\n", ext.c_str());
-			if(ext == "wav")					return SF_FORMAT_WAV;
-			if(ext == "aiff" || ext == "aif")	return SF_FORMAT_AIFF;
-			if(ext == "au")						return SF_FORMAT_AU;
-			//if(ext == "flac")					return SF_FORMAT_FLAC;
-		}
-		return 0;
 	}
 
 	void formatMajor(int v){
@@ -195,8 +194,130 @@ DEF_SPECIAL(int)
 DEF_SPECIAL(double)
 #undef DEF_SPECIAL
 
+} // gam::
+
+
+#else
+
+#include "SoundFileIO.h"
+
+namespace gam{
+
+class SoundFile::Impl {
+public:
+
+	double frameRate() const { return sfinfo ? sfinfo->frameRate() : 1; }
+	int frames() const { return sfinfo ? sfinfo->frames() : 0; }
+	int channels() const { return sfinfo ? sfinfo->channels() : 0; }
+
+	void channels(int num){ if(sfinfo) sfinfo->channels(num); }
+	void frameRate(double hz){ if(sfinfo) sfinfo->frameRate(hz); }
+
+	const char * extension(){ return sfinfo ? sfinfo->extension().c_str() : ""; }
+
+	Format format() const {
+		if(sfinfo){
+			#define CS(x) case sfinfo->x: return x;
+			switch(sfinfo->format()){
+			CS(WAV) CS(AIFF) CS(AU)
+			default:;
+			}
+			#undef CS
+		}
+		return Format(0);
+	}
+
+	void format(Format v){
+		if(sfinfo){
+			#define CS(x) case x: sfinfo->format(sfinfo->x); break;
+			switch(v){
+			CS(WAV) CS(AIFF) CS(AU)
+			default:;
+			}
+			#undef CS
+		}
+	}
+
+	EncodingType encoding() const {
+		if(sfinfo){
+			#define CS(x) case sfinfo->x: return x;
+			switch(sfinfo->encoding()){
+			CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
+			CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
+			default:;
+			}
+			#undef CS
+		}
+		 return EncodingType(0);
+	}
+
+	void encoding(EncodingType v){
+		if(sfinfo){
+			#define CS(x) case x: sfinfo->encoding(sfinfo->x); break;
+			switch(v){
+			CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
+			CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
+			default:;
+			}
+			#undef CS
+		}
+	}
+
+	bool close(){
+		if(sfinfo == &sfread) sfread.close();
+		if(sfinfo == &sfwrite){
+			sfwrite.save(savePath);
+			sfwrite.close();
+		}
+		return true;
+	}
+
+	bool opened() const { return sfinfo; }
+
+	bool openRead(const std::string& path){
+		if(sfread.open(path)){
+			sfinfo = &sfread;
+			return true;
+		}
+		return false;
+	}
+
+	bool openWrite(const std::string& path){
+		savePath=path;
+		sfinfo = &sfwrite;
+		format(getFormatFromPath(path));
+		return true;
+	}
+
+	template <class T> int read(T * dst, int numFrames){
+		if(sfinfo == &sfread) return sfread.read(dst, numFrames);
+		return 0;
+	}
+
+	template <class T> int write(const T * src, int numFrames){
+		if(sfinfo == &sfwrite) return sfwrite.write(src, numFrames);
+		return 0;
+	}
+
+	void seek(int pos, int mode){}
+
+	void info(const Impl& src){
+		//memcpy(&mInfo, &src.mInfo, sizeof(mInfo));
+		if(sfinfo && src.sfinfo) *sfinfo = *src.sfinfo;
+	}
+
+	SoundFileReader sfread;
+	SoundFileWriter sfwrite;
+	SoundFileInfo * sfinfo = nullptr;
+	std::string savePath;
+};
+
+} // gam::
+
 #endif
 
+
+namespace gam{
 
 SoundFile::SoundFile(const std::string& path_)
 :	mImpl(new Impl)
@@ -235,47 +356,12 @@ int SoundFile::channels() const { return mImpl->channels(); }
 SoundFile& SoundFile::channels(int num){ mImpl->channels(num); return *this; }
 SoundFile& SoundFile::frameRate(double hz){ mImpl->frameRate(hz); return *this; }
 
-SoundFile::Format SoundFile::format() const {
-	#define CS(x) case SF_FORMAT_##x: return x;
-	switch(mImpl->formatMajor()){
-	CS(WAV) CS(AIFF) CS(AU) CS(RAW)
-	//CS(FLAC)
-	default: return Format(0);
-	}
-	#undef CS
-}
+SoundFile::Format SoundFile::format() const { return mImpl->format(); }
+SoundFile& SoundFile::format(Format v){ mImpl->format(v); return *this; }
 
-SoundFile& SoundFile::format(Format v){
-	#define CS(x) case x: mImpl->formatMajor(SF_FORMAT_##x); break;
-	switch(v){
-	CS(WAV) CS(AIFF) CS(AU) CS(RAW)
-	//CS(FLAC)
-	default:;
-	}
-	#undef CS
-	return *this;
-}
+SoundFile::EncodingType SoundFile::encoding() const { return mImpl->encoding(); }
 
-SoundFile::EncodingType SoundFile::encoding() const {
-	#define CS(x) case SF_FORMAT_##x: return x;
-	switch(mImpl->formatMinor()){
-	CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
-	CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
-	default: return EncodingType(0);
-	}
-	#undef CS
-}
-
-SoundFile& SoundFile::encoding(EncodingType v){
-	#define CS(x) case x: mImpl->formatMinor(SF_FORMAT_##x); break;
-	switch(v){
-	CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
-	CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
-	default:;
-	}
-	#undef CS
-	return *this;
-}
+SoundFile& SoundFile::encoding(EncodingType v){ mImpl->encoding(v); return *this; }
 
 const char * SoundFile::toString(Format v){
 	#define CS(x) case x: return #x;

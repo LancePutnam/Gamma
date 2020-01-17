@@ -22,6 +22,7 @@ public:
 		AIFF,		/**< Apple/SGI AIFF format (big endian). */
 		AU,			/**< Sun/NeXT AU format (big endian). */
 		RAW,		/**< RAW PCM data. */
+		NO_FORMAT
 	};
 
 	/// Sound file sample encoding types
