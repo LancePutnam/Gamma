@@ -50,13 +50,14 @@ struct Trunc{
 	/// \param[in] iFrac		fractional part of index, in [0, 1)
 	/// \param[in] max			maximum index for accessing
 	/// \param[in] min			minimum index for accessing
+	/// \param[in] str			array stride (post-multiplier on indices)
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return src[iInt];
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return src[iInt*str];
 	}
 
-	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min, str);
 	}
 };
 
@@ -86,17 +87,18 @@ struct Round{
 	/// \param[in] iFrac		fractional part of index, in [0, 1)
 	/// \param[in] max			maximum index for accessing
 	/// \param[in] min			minimum index for accessing
+	/// \param[in] str			array stride (post-multiplier on indices)
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		return ipl::nearest(
 			iFrac,
-			src[iInt],
-			src[acc.mapP1(iInt+1, max, min)]
+			src[iInt*str],
+			src[acc.mapP1(iInt+1, max, min)*str]
 		);
 	}
 
-	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min, str);
 	}
 };
 
@@ -127,13 +129,14 @@ struct Mean2{
 	/// \param[in] iFrac		fractional part of index, in [0, 1)
 	/// \param[in] max			maximum index for accessing
 	/// \param[in] min			minimum index for accessing
+	/// \param[in] str			array stride (post-multiplier on indices)
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (src[iInt] + src[acc.mapP1(iInt+1, max, min)])*0.5;
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (src[iInt*str] + src[acc.mapP1(iInt+1, max, min)*str])*0.5;
 	}
 
-	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min, str);
 	}
 };
 
@@ -166,17 +169,18 @@ struct Linear{
 	/// \param[in] iFrac		fractional part of index, in [0, 1)
 	/// \param[in] max			maximum index for accessing
 	/// \param[in] min			minimum index for accessing
+	/// \param[in] str			array stride (post-multiplier on indices)
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		return ipl::linear(
 			iFrac,
-			src[iInt],
-			src[acc.mapP1(iInt+1, max, min)]
+			src[iInt*str],
+			src[acc.mapP1(iInt+1, max, min)*str]
 		);
 	}
 
-	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min, str);
 		// TODO: wrapping access maybe not correct for one-shot playback
 	}
 };
@@ -224,37 +228,21 @@ struct Cubic{
 	/// \param[in] iFrac		fractional part of index, in [0, 1)
 	/// \param[in] max			maximum index for accessing
 	/// \param[in] min			minimum index for accessing
+	/// \param[in] str			array stride (post-multiplier on indices)
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		return ipl::cubic(
 			iFrac,
-			src[acc.mapM1(iInt-1, max, min)],
-			src[iInt],
-			src[acc.mapP1(iInt+1, max, min)],
-			src[acc.map  (iInt+2, max, min)]
+			src[acc.mapM1(iInt-1, max, min)*str],
+			src[iInt*str],
+			src[acc.mapP1(iInt+1, max, min)*str],
+			src[acc.map  (iInt+2, max, min)*str]
 		);
 	}
 
-	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min, str);
 	}
-/*
-	// TODO: is it worth trying to support strided arrays?
-	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min, index_t str) const{		
-		return ipl::cubic(
-			iFrac,
-			a[s.map(iInt-str, max, min)],
-			a[iInt],
-			a[s.map(iInt+str, max, min)],
-			a[s.map(iInt+(str<<1), max, min)]
-		);
-	}
-
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min, index_t str) const{
-		return (*this)(acc::Wrap(), a, iInt,iFrac, max,min,str);
-	}
-*/
 };
 
 
@@ -289,18 +277,19 @@ struct AllPass{
 	/// \param[in] iFrac		fractional part of index, in [0, 1)
 	/// \param[in] max			maximum index for accessing
 	/// \param[in] min			minimum index for accessing
+	/// \param[in] str			array stride (post-multiplier on indices)
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		return ipl::allpass(
 			iFrac,
-			src[iInt],
-			src[acc.mapP1(iInt+1, max, min)],
+			src[iInt*str],
+			src[acc.mapP1(iInt+1, max, min)*str],
 			prev
 		);
 	}
 
-	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0) const{
-		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min);
+	T operator()(const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
+		return (*this)(acc::Wrap(), src, iInt, iFrac, max, min, str);
 	}
 	
 	mutable T prev;
@@ -330,23 +319,23 @@ struct Switchable{
 	}
 
 	template <class AccessStrategy>
-	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const AccessStrategy& s, const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		switch(mType){
-			case ROUND:		return round	(s,a,iInt,iFrac,max,min);
-			case LINEAR:	return linear	(s,a,iInt,iFrac,max,min);
-			case CUBIC:		return cubic	(s,a,iInt,iFrac,max,min);
-			case ALLPASS:	return allpass	(s,a,iInt,iFrac,max,min);
-			default:		return trunc	(s,a,iInt,iFrac,max,min);
+			case ROUND:		return round	(s,a,iInt,iFrac,max,min,str);
+			case LINEAR:	return linear	(s,a,iInt,iFrac,max,min,str);
+			case CUBIC:		return cubic	(s,a,iInt,iFrac,max,min,str);
+			case ALLPASS:	return allpass	(s,a,iInt,iFrac,max,min,str);
+			default:		return trunc	(s,a,iInt,iFrac,max,min,str);
 		}
 	}
 
-	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0) const{
+	T operator()(const Array<T>& a, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		switch(mType){
-			case ROUND:		return round	(a,iInt,iFrac,max,min);
-			case LINEAR:	return linear	(a,iInt,iFrac,max,min);
-			case CUBIC:		return cubic	(a,iInt,iFrac,max,min);
-			case ALLPASS:	return allpass	(a,iInt,iFrac,max,min);
-			default:		return trunc	(a,iInt,iFrac,max,min);
+			case ROUND:		return round	(a,iInt,iFrac,max,min,str);
+			case LINEAR:	return linear	(a,iInt,iFrac,max,min,str);
+			case CUBIC:		return cubic	(a,iInt,iFrac,max,min,str);
+			case ALLPASS:	return allpass	(a,iInt,iFrac,max,min,str);
+			default:		return trunc	(a,iInt,iFrac,max,min,str);
 		}
 	}
 

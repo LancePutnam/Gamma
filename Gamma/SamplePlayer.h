@@ -75,7 +75,8 @@ public:
 	///						If the sample is a wavetable, then this should be
 	///						its period, in frames.
 	/// \param[in] chans	Number of channels in sample buffer
-	void buffer(Array<T>& src, double frmRate, int chans);
+	/// \param[in] interleaved	Whether channel data is interleaved (tightly packed)
+	void buffer(Array<T>& src, double frmRate, int chans, bool interleaved=false);
 
 	/// Set sample buffer reference
 	
@@ -85,7 +86,8 @@ public:
 	///						If the sample is a wavetable, then this should be
 	///						its period, in frames.
 	/// \param[in] chans	Number of channels in sample buffer
-	void buffer(T * src, int numFrms, double frmRate, int chans);
+	/// \param[in] interleaved	Whether channel data is interleaved (tightly packed)
+	void buffer(T * src, int numFrms, double frmRate, int chans, bool interleaved=false);
 
 	/// Set sample buffer reference
 	
@@ -145,6 +147,8 @@ protected:
 	double mPos, mInc;			// real index position and increment
 	double mFrameRate;			// frame rate of array data
 	int mChans;					// number of channels
+	int mStrideChan;			// array stride btw channels
+	int mStrideSamp;			// array stride btw channel samples
 	double mRate;				// playback rate factor
 	double mMin, mMax;			// [min, max) playback interval, in frames
 	
@@ -153,8 +157,18 @@ protected:
 		rate(mRate);
 	}
 
+	void initBufferAccess(double frmRate, int chans, bool interleaved){
+		frameRate(frmRate);	// sets mFrameRate, mRate, and mInc
+		mChans = chans;
+		mStrideChan = interleaved ? chans : frames();
+		mStrideSamp = interleaved ? chans : 1;
+		mMin = 0;
+		mMax = frames();
+		mPos = mMin;
+	}
+
 	T& sample(int idx, int chan){
-		return (*this)[frames()*chan + idx];
+		return (*this)[chan*mStrideChan + idx*mStrideSamp];
 	}
 };
 
@@ -198,11 +212,7 @@ PRE bool CLS::load(const char * pathToSoundFile){
 	if(sf.openRead()){
 		Array<T>::resize(sf.samples());
 		sf.readAllD(elems());
-		frameRate(sf.frameRate());
-		mChans = sf.channels();
-		mMin = 0;
-		mMax = frames();
-		mPos = 0;
+		initBufferAccess(sf.frameRate(), sf.channels(), /*interleaved*/false);
 		sf.close();
 		return true;
 	}
@@ -226,29 +236,34 @@ PRE inline T CLS::operator()(int channel){
 }
 
 PRE inline T CLS::read(int channel) const {
+/*
 	int posi = int(pos());
 	int Nframes= frames();
 	int offset = channel*Nframes;
+	// const T * src, index_t iInt, double iFrac, index_t max, index_t min
 	return mIpol(elems(), posi+offset, pos()-posi, offset+Nframes-1, offset);
+	//*/
+
+//*
+	// 12121212
+	// 11112222
+	int posi = int(pos());
+	// const T * src, index_t iInt, double iFrac, index_t max, index_t min
+	return mIpol(elems() + mStrideChan*channel, posi, pos()-posi, frames()-1, 0, mStrideSamp);
+//*/
 }
 
 
-PRE void CLS::buffer(Array<T>& src, double frmRate, int chans){
+PRE void CLS::buffer(Array<T>& src, double frmRate, int chans, bool interleaved){
 	mPos = 0;
 	this->source(src);
-	frameRate(frmRate);	// sets mFrameRate, mRate, and mInc
-	mChans = chans;
-	mMin = 0;
-	mMax = frames();
+	initBufferAccess(frmRate, chans, interleaved);
 }
 
-PRE void CLS::buffer(T * src, int numFrms, double frmRate, int chans){
+PRE void CLS::buffer(T * src, int numFrms, double frmRate, int chans, bool interleaved){
 	mPos = 0;
 	this->source(src, numFrms*chans, true);
-	frameRate(frmRate);	// sets mFrameRate, mRate, and mInc
-	mChans = chans;
-	mMin = 0;
-	mMax = frames();
+	initBufferAccess(frmRate, chans, interleaved);
 }
 
 PRE void CLS::buffer(SamplePlayer& src){
