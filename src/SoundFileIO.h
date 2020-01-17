@@ -402,7 +402,7 @@ public:
 			auto aiffID = readBE<uint32_t>(mFile);
 			if(ID("AIFF") == aiffID || ID("AIFC") == aiffID){
 				const bool isAIFC = (aiffID == ID("AIFC"));
-				//printf("Found %s file\n", isAIFC ? "AIFC" : "AIFF");
+				DPRINTF("Found %s file\n", isAIFC ? "AIFC" : "AIFF");
 				format(AIFF);
 				unsigned bps = 1; // bits/sample
 
@@ -427,9 +427,9 @@ public:
 				while(!mFile.eof()){
 					auto chunkID = readBE<uint32_t>(mFile, bufs);
 					if(mFile.gcount() != 4) break;
-					printf("%c%c%c%c ", bufs[0], bufs[1], bufs[2], bufs[3]);
+					DPRINTF("%c%c%c%c ", bufs[0], bufs[1], bufs[2], bufs[3]);
 					auto chunkSize = readBE<uint32_t>(mFile);
-					printf("(%u bytes)\n", chunkSize);
+					DPRINTF("(%u bytes)\n", chunkSize);
 
 					switch(chunkID){
 					case ID("COMM"):{
@@ -440,7 +440,7 @@ public:
 						mEncoding = NO_ENCODING;
 						if(isAIFC){
 							auto compID = readBE<uint32_t>(mFile, bufs);
-							//printf("%c%c%c%c\n", bufs[0], bufs[1], bufs[2], bufs[3]);
+							DPRINTF("%c%c%c%c\n", bufs[0], bufs[1], bufs[2], bufs[3]);
 							if(chunkSize > 22) mFile.seekg(chunkSize-22, mFile.cur); // remaining bytes are compression name string
 							switch(compID){
 							case ID("sowt"): mDataBigEndian = false; break;
@@ -463,13 +463,13 @@ public:
 							default: goto error; // unsupported PCM bit depth
 							}
 						}
-						//printf("  chans: %u, SR: %u, frames: %u, bps: %u\n", mChannels, mFrameRate, mFrames, bps);
+						DPRINTF("  chans: %u, SR: %u, frames: %u, bps: %u\n", mChannels, mFrameRate, mFrames, bps);
 					} break;
 
 					case ID("SSND"):{
 						auto offset    = readBE<uint32_t>(mFile);
 						auto blockSize = readBE<uint32_t>(mFile);
-						//printf("  offset: %u, blockSize: %u\n", offset, blockSize);
+						DPRINTF("  offset: %u, blockSize: %u\n", offset, blockSize);
 						mFile.read(bufs, offset);
 						filePosOfData = mFile.tellg();
 						mFile.seekg(chunkSize - (8+offset), mFile.cur);
