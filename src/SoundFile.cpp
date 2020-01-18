@@ -217,7 +217,7 @@ public:
 
 	Format format() const {
 		if(sfinfo){
-			#define CS(x) case sfinfo->x: return x;
+			#define CS(x) case SoundFileInfo::x: return x;
 			switch(sfinfo->format()){
 			CS(WAV) CS(AIFF) CS(AU)
 			default:;
@@ -240,7 +240,7 @@ public:
 
 	EncodingType encoding() const {
 		if(sfinfo){
-			#define CS(x) case sfinfo->x: return x;
+			#define CS(x) case SoundFileInfo::x: return x;
 			switch(sfinfo->encoding()){
 			CS(PCM_S8) CS(PCM_16) CS(PCM_24) CS(PCM_32) CS(PCM_U8)
 			CS(FLOAT) CS(DOUBLE) CS(ULAW) CS(ALAW)
