@@ -40,6 +40,7 @@ OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	:= $(addprefix -I, $(INC_DIRS)) $(CPPFLAGS)
 
+
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
@@ -49,7 +50,7 @@ gamma: $(LIB_PATH)
 include Makefile.rules
 
 # Force these targets to always execute
-.PHONY: clean cleanall external test
+.PHONY: clean test
 
 
 # Compile and run source files in RUN_DIRS
@@ -90,7 +91,7 @@ endif
 
 # Run unit tests
 test:
-	@$(MAKE) tests/unitTests.cpp
+	@$(MAKE) RUN_DIRS=tests/ tests/unitTests.cpp
 
 buildtest: test
 	@for v in algorithmic analysis curves effects filter function io oscillator source spatial spectral synthesis synths techniques; do \
