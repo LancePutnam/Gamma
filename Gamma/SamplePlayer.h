@@ -160,7 +160,7 @@ protected:
 	void initBufferAccess(double frmRate, int chans, bool interleaved){
 		frameRate(frmRate);	// sets mFrameRate, mRate, and mInc
 		mChans = chans;
-		mStrideChan = interleaved ? chans : frames();
+		mStrideChan = interleaved ? 1 : frames();
 		mStrideSamp = interleaved ? chans : 1;
 		mMin = 0;
 		mMax = frames();
