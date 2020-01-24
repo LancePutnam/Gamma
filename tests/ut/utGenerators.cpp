@@ -86,7 +86,7 @@
 			Array<float> a(N);
 			SamplePlayer<float, ipl::Trunc, tap::Clip> p(a, SR);
 			
-			Sync::master().spu(SR);
+			gam::sampleRate(SR);
 			
 			assert(p.min() == 0);
 			assert(p.max() == N);
@@ -105,6 +105,29 @@
 			
 			p.reset();
 			assert(p.pos() == 0);
+		}
+
+		{ // Multichannel
+			SamplePlayer<float> p;
+			static const int frames = 3;
+			static const int chans = 2;
+			float SR = 1;
+			gam::sampleRate(SR);
+			float bufI[frames*chans] = {1.,10., 2.,20., 3.,30.};
+			p.buffer(bufI, frames, SR, chans, true /*interleaved*/);
+			for(int i=1; i<=frames; ++i){
+				assert(p.read(0) == i);
+				assert(p.read(1) == i*10);
+				p.advance();
+			}
+			//printf("%g %g\n", p.read(0), p.read(1));
+			float bufD[frames*chans] = {1.,2.,3., 10.,20.,30.};
+			p.buffer(bufD, frames, SR, chans, false /*interleaved*/);
+			for(int i=1; i<=frames; ++i){
+				assert(p.read(0) == i);
+				assert(p.read(1) == i*10);
+				p.advance();
+			}
 		}
 	}
 }
