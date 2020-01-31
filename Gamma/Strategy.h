@@ -466,7 +466,7 @@ namespace phsInc{
 	template <class T>
 	T incClip(T v, T inc, T max, T min){
 		T res = v + inc;
-		if(res >= max) return v;
+		if(res >= max) return v < max ? v : max-1e-8;
 		if(res <  min) return min;
 		return res;
 	}
