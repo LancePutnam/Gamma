@@ -30,11 +30,6 @@ bool almostEqual(const Complex<T>& a, const Polar<T>& b, int maxULP=10){
 }}
 
 
-//template<class A, class B>
-//inline bool near(A a, B b, double eps=1e-6){
-//	return scl::abs(a-b) < eps;
-//}
-
 int main(int argc, char* argv[]){
 
 	// Unit tests are ordered from the least to most dependent functions/objects
@@ -57,6 +52,7 @@ int main(int argc, char* argv[]){
 	#include "ut/utConversion.cpp"
 	#include "ut/utContainers.cpp"
 	#include "ut/utAccess.cpp"
+	#include "ut/utStrategy.cpp"
 
 	#include "ut/utFFT.cpp"
 
