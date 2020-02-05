@@ -14,8 +14,4 @@
 		assert(Wrap::map(3,2,1) == 1);
 		assert(Clip::map(3,2,1) == 2);
 	}
-
-	#undef ASSERT
-	#undef SET
-	#undef PRINT
 }

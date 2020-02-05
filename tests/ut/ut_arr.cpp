@@ -20,6 +20,7 @@
 	for(unsigned i=0; i<N; ++i)
 		assert(scl::almostEqual(A[i], i/double(N-1)));
 
+	#undef IOTA
 	#undef ASSERT
 	#undef SET
 	#undef PRINT
