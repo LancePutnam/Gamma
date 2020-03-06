@@ -14,6 +14,28 @@ namespace gam{
 ///\defgroup Noise
 
 
+template <class RNG>
+class NoiseBase{
+public:
+	typedef float value_type;
+
+	NoiseBase(){}
+
+	/// \param[in] seed		random number generator seed
+	NoiseBase(uint32_t seed): rng(seed){}
+
+	/// Set seed of RNG
+	void seed(uint32_t v){ rng = v; }
+	
+	RNG rng;
+
+protected:
+	float U(){ return rnd::uni_float(rng); }
+	float Us(){ return rnd::uniS_float(rng); }
+	bool P(float p=0.5){ return U() < p; }
+};
+
+
 /// Brown noise
 
 /// Brown noise has a power spectrum of 1/f^2. This corresponds to an amplitude
@@ -21,29 +43,24 @@ namespace gam{
 /// white noise. The output value is clipped within a specified interval.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
-class NoiseBrown{
+class NoiseBrown : public NoiseBase<RNG> {
 public:
-	typedef float value_type;
 
 	/// \param[in] val		start value
 	/// \param[in] step		accumulation step factor
 	/// \param[in] min		minimum of clipping interval
 	/// \param[in] max		maximum of clipping interval
-	/// \param[in] seed		random number generator seed; 0 generates a random seed
-	NoiseBrown(float val=0, float step=0.04, float min=-1, float max=1, uint32_t seed=0) 
+	/// \param[in] seedi	random number generator seed; 0 generates a random seed
+	NoiseBrown(float val=0, float step=0.04, float min=-1, float max=1, uint32_t seedi=0) 
 	:	val(val), step(step), min(min), max(max)
-	{	if(seed) rng = seed; }
+	{	if(seedi) this->seed(seedi); }
 	
 	/// Generate next value
 	float operator()(){
-		val = scl::clip(val + rnd::uniS_float(rng) * step, max, min);
+		val = scl::clip(val + this->Us() * step, max, min);
 		return val;
 	}
 	
-	/// Set seed value of RNG
-	void seed(uint32_t v){ rng = v; }
-	
-	RNG rng;
 	float val, step, min, max;
 };
 
@@ -56,22 +73,16 @@ public:
 /// downsampled white noise.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
-class NoisePink{
+class NoisePink : public NoiseBase<RNG> {
 public:
-	typedef float value_type;
 
 	NoisePink();
 
 	/// \param[in] seed		random number generator seed
 	NoisePink(uint32_t seed);
-	
+
 	/// Generate next value
 	float operator()();
-	
-	/// Set seed of RNG
-	void seed(uint32_t v){ rng = v; }
-	
-	RNG rng;
 	
 private:
 	float mOctave[11];
@@ -86,22 +97,11 @@ private:
 /// White noise has a uniform power spectrum.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
-class NoiseWhite{
+class NoiseWhite : public NoiseBase<RNG> {
 public:
-	typedef float value_type;
-
-	NoiseWhite(){}
-	
-	/// \param[in] seed		random number generator seed
-	NoiseWhite(uint32_t seed): rng(seed){}
 
 	/// Generate next value
-	float operator()(){ return rnd::uniS_float(rng); }
-
-	/// Set seed of RNG
-	void seed(uint32_t v){ rng = v; }
-	
-	RNG rng;
+	float operator()(){ return this->Us(); }
 };
 
 
@@ -112,31 +112,19 @@ public:
 /// white noise.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
-class NoiseViolet{
+class NoiseViolet : public NoiseBase<RNG> {
 public:
-	typedef float value_type;
-
-	NoiseViolet(): mPrev(1.5f){}
 	
-	/// \param[in] seed		random number generator seed
-	NoiseViolet(uint32_t seed)
-	:	rng(seed), mPrev(1.5f){}
-
 	/// Generate next value
 	float operator()(){
-		float curr = punUF(Expo1<float>() | (rng()>>9)); // in [1,2)
-		float diff = curr - mPrev;
+		auto curr = punUF(Expo1<float>() | (this->rng()>>9)); // in [1,2)
+		auto diff = curr - mPrev;
 		mPrev = curr;
 		return diff;
 	}
 
-	/// Set seed of RNG
-	void seed(uint32_t v){ rng = v; mPrev = 1.5f; }
-	
-	RNG rng;
-
 private:
-	float mPrev;
+	float mPrev = 1.5f;
 };
 
 
@@ -146,25 +134,20 @@ private:
 /// then this can be added to the input of filters to prevent denormals.
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
-class NoiseBinary{
+class NoiseBinary : public NoiseBase<RNG> {
 public:
-	typedef float value_type;
 
-	NoiseBinary(): amp(1.f){}
-	
-	/// \param[in] seed		random number generator seed
-	NoiseBinary(float ampi, uint32_t seedi=0)
-	: amp(ampi){ if(seedi) seed(seedi); }
+	/// \param[in] ampi		peak-to-peak amplitude of noise
+	/// \param[in] seedi	random number generator seedi; 0 generates a random seed
+	NoiseBinary(float ampi = 1.f, uint32_t seedi = 0)
+	:	amp(ampi)
+	{	if(seedi) this->seed(seedi); }
 
 	/// Generate next value
 	float operator()(){
-		return punUF((rng()&0x80000000) ^ punFU(amp));
+		return punUF((this->rng()&0x80000000) ^ punFU(amp));
 	}
 
-	/// Set seed of RNG
-	void seed(uint32_t v){ rng = v; }
-
-	RNG rng;
 	float amp;
 };
 
@@ -178,7 +161,7 @@ NoisePink<T>::NoisePink(){
     
 template<class T>
 NoisePink<T>::NoisePink(uint32_t seed)
-:	rng(seed)
+:	NoiseBase<T>(seed)
 {
 	init();
 }
@@ -187,7 +170,7 @@ template<class T>
 void NoisePink<T>::init(){
 	mRunningSum = 0.f;
 	for(uint32_t i=0; i<11; ++i){	/* init octaves with uniform randoms */
-		float r = rnd::uniS_float(rng);
+		auto r = this->Us();
 		mOctave[i] = r;
 		mRunningSum += r;
 	}
@@ -201,7 +184,7 @@ inline float NoisePink<T>::operator()(){
 	++mPhase;
 	if(mPhase != 2048){
 		uint32_t i = scl::trailingZeroes(mPhase);	// # trailing zeroes is octave
-		float r = rnd::uniS_float(rng);			// uniform random
+		auto r = this->Us();					// uniform random
 		mRunningSum += r - mOctave[i];			// add new & subtract stored
 		mOctave[i] = r;							// store new
 	}
@@ -210,7 +193,7 @@ inline float NoisePink<T>::operator()(){
 	}
 	
 	// add white noise every sample
-	return (mRunningSum + rnd::uniS_float(rng)) * 0.083333333f;
+	return (mRunningSum + this->Us()) * 0.083333333f;
 }
 
 
