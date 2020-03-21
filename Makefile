@@ -91,11 +91,11 @@ endif
 
 # Run unit tests
 test:
-	@$(MAKE) RUN_DIRS=tests/ tests/unitTests.cpp
+	@$(MAKE) tests/unitTests.cpp RUN_DIRS=tests/
 
 buildtest: test
 	@for v in algorithmic analysis curves effects filter function io oscillator source spatial spectral synthesis synths techniques; do \
-		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
+		$(MAKE) --no-print-directory examples/$$v/*.cpp RUN_DIRS=examples/$$v/ AUTORUN=0; \
 	done
 
 
