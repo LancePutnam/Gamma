@@ -17,53 +17,59 @@ int main(int argc, char* argv[]){
 	const int iterations = 24;
 	#define LOOP for(int i=0; i<iterations; i++)
 
+
+	// Several core PRNGs are available:
+	//   RNGLinCon  Linear congruential generator; fast with poor statistical quality
+	//   RNGMulCon  Multiplicative congruential generator; very fast with poor statistical quality
+	//   RNGTaus    Combined Tausworthe generator; slower with better statistical quality
+
+	// Each PRNG generates a uniform random integer in [0, 2^32)
+	{	printf("\n\nPRNG integer sequence (randomly seeded):\n");
+		RNGLinCon rng; // not seeded
+		LOOP{
+			uint32_t randInt = rng();
+			printf("%u ", randInt>>29);
+		}
+	}
+	{	printf("\n\nPRNG integer sequence (seeded):\n");
+		RNGLinCon rng(1337); // seeded, so same on each run
+		LOOP{
+			uint32_t randInt = rng();
+			printf("%u ", randInt>>29);
+		}
+	}
+
+	// For convenience, several random number generation functions are provided.
+
+	printf("\n\nUniform variate in [0,1):\n");
+		LOOP printf("%4.2f ", rnd::uni(1.f));
+
+	printf("\n\nUniform variate in [-1,1):\n");
+		LOOP printf("%4.2f ", rnd::uniS(1.f));
+
 	float floats[iterations];
 	int ints[iterations];
 
-	RNGLinCon lc;
-	RNGMulCon mc;
-	RNGTaus tw;
+	printf("\n\nProbability, prob(0.2):\n");
+		for(int i=0; i<256; ++i) printf("%c", rnd::prob(0.2) ? '|' : '.');
+	
+	printf("\n\nProbability, prob(0.8):\n");
+		for(int i=0; i<256; ++i) printf("%c", rnd::prob(0.8) ? '|' : '.');
 
-	printf("\n\nRNG LinCon float:\n");
-		LOOP printf("%4.2f ", rnd::uni_float(lc));
-
-	printf("\n\nRNG MulCon float:\n");
-		LOOP printf("%4.2f ", rnd::uni_float(mc));
-
-	printf("\n\nRNG Tausworthe float:\n");
-		LOOP printf("%4.2f ", rnd::uni_float(tw));
-		
-	printf("\n\nRNG shared float:\n");
-		LOOP printf("%4.2f ", rnd::uni(1.f));
-
-	printf("\n\npermute:\n");
-		for(int i=0; i<16; i++){
-			slice(ints,iterations) = gen::RAdd1<int>();
-			rnd::permute(ints, iterations);
-			LOOP printf("%2i ", ints[i]);
-			printf("\n");
-		}
-
-	printf("\n\ncond(0.2, 0.2):\n");
+	printf("\n\nConditional probability, cond(0.2, 0.2):\n");
 		char v = '|';
 		for(int i=0; i<256; ++i) printf("%c", rnd::cond(v, '.', '|', 0.2, 0.2));
 
-	printf("\n\ncond(0.8, 0.8):\n");
+	printf("\n\nConditional probability, cond(0.8, 0.8):\n");
 		for(int i=0; i<256; ++i) printf("%c", rnd::cond(v, '.', '|', 0.8, 0.8));
 
-	printf("\n\nprob(0.2):\n");
-		for(int i=0; i<256; ++i) printf("%c", rnd::prob(0.2) ? '|' : '.');
-	
-	printf("\n\nprob(0.8):\n");
-		for(int i=0; i<256; ++i) printf("%c", rnd::prob(0.8) ? '|' : '.');
-
 	printf("\n\nthin(0.2):\n");
-		slice(floats, iterations) = gen::Val<>(1);
+		for(auto& v : floats) v = 1;
 		rnd::thin(floats, iterations, 0.2);
 		LOOP printf("%c", floats[i] != 0.f ? '|' : '.');
 
 	printf("\n\nthin(0.8):\n");
-		slice(floats, iterations) = gen::Val<>(1);
+		for(auto& v : floats) v = 1;
 		rnd::thin(floats, iterations, 0.8);
 		LOOP printf("%c", floats[i] != 0.f ? '|' : '.');
 
@@ -94,6 +100,15 @@ int main(int argc, char* argv[]){
 	printf("\n\nweighted [0.7, 0.1, 0.1, 0.1]\n");
 		float weights[4] = {0.7, 0.1, 0.1, 0.1};
 		LOOP printf("%d ", rnd::weighted(weights, 4));
+
+	printf("\n\nPermute array:\n");
+		for(int i=0; i<16; i++){
+			//slice(ints,iterations) = gen::RAdd1<int>();
+			for(int i=0; i<iterations; ++i) ints[i] = i;
+			rnd::permute(ints, iterations);
+			LOOP printf("%2i ", ints[i]);
+			printf("\n");
+		}
 
 	printf("\n\nPDFs:\n");
 	const unsigned len = 8192 * 8;
