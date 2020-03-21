@@ -59,16 +59,16 @@ public:
 
 
 
-/// Multiplicative linear congruential uniform pseudo-random number generator.
+/// Multiplicative congruential uniform pseudo-random number generator.
 
 ///	This generator is a faster LCG requiring only a single integer multiply.
 ///
-class RNGMulLinCon : public gen::RMul<uint32_t>{
+class RNGMulCon : public gen::RMul<uint32_t>{
 public:
-	RNGMulLinCon(){ val=rnd::getSeed(); type(0); }
+	RNGMulCon(){ val=rnd::getSeed(); type(0); }
 	
 	/// \param[in] seed	Initial seed value
-	RNGMulLinCon(uint32_t seed): gen::RMul<uint32_t>(1,seed){ type(0); }
+	RNGMulCon(uint32_t seed): gen::RMul<uint32_t>(1,seed){ type(0); }
 	
 	/// Change the type of equation used.
 

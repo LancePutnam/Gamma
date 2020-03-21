@@ -88,7 +88,7 @@ public:
 	}
 	
 	float freq1, freq2, amp=1.f;
-	NoiseWhite<RNGMulLinCon> src;
+	NoiseWhite<RNGMulCon> src;
 	Biquad<> fil;
 	Decay<float> env;
 };

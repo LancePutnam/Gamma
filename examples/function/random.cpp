@@ -21,14 +21,14 @@ int main(int argc, char* argv[]){
 	int ints[iterations];
 
 	RNGLinCon lc;
-	RNGMulLinCon mlc;
+	RNGMulCon mc;
 	RNGTaus tw;
 
 	printf("\n\nRNG LinCon float:\n");
 		LOOP printf("%4.2f ", rnd::uni_float(lc));
 
-	printf("\n\nRNG MulLinCon float:\n");
-		LOOP printf("%4.2f ", rnd::uni_float(mlc));
+	printf("\n\nRNG MulCon float:\n");
+		LOOP printf("%4.2f ", rnd::uni_float(mc));
 
 	printf("\n\nRNG Tausworthe float:\n");
 		LOOP printf("%4.2f ", rnd::uni_float(tw));
