@@ -33,10 +33,11 @@ enum Type{
 /// First order allpass interpolation
 
 /// Allpass interpolation preserves the spectral magnitude of the interpolated
-/// sequence. It should only be used for interpolating at a regular speed across
-/// a sequence. It will fail miserably at random access.
+/// sequence at the expense of phase delay. It should only be used for
+/// interpolating at a regular speed across a sequence. It will fail miserably
+/// at random access.
 template <class Tf, class Tv>
-Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
+Tv allpass(Tf frac, const Tv& w, const Tv& x, const Tv& y, Tv& o1);
 
 /// Computes FIR coefficients for Waring-Lagrange interpolation.
 
@@ -106,22 +107,32 @@ Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 // Implementation_______________________________________________________________
 
 template <class Tf, class Tv>
-inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
+inline Tv allpass(Tf f, const Tv& w, const Tv& x, const Tv& y, Tv& o1){
 	// y[n]	= a x[n] + x[n-1] - a y[n-1]
 	//		= a (x[n] - y[n-1]) + x[n-1]
 
-	//Tf a = f; // apx #1
-	//Tf a = Tf(0.4722)*f - Tf(0.2361); // apx #2
+	// The delay is shifted to minimize transients when changing the delay time.
+	// This avoids having a pole on the unit circle. See:
+	// Valimaki, V., Laakso, T. I., and Mackenzie, J. (1995). Elimination of transients in time-varying allpass fractional delay filters with application to digital waveguide modeling. In Proceedings of the International Computer Music Conference, pages 327–334.
+	const Tf shift = 0.5;
 
-	//f = 1-f;			// convert to sample delay
-	//f += Tf(0.618);	// keeps 'a' near zero to dampen transients
-	//Tf a = (Tf(1)-f)/(Tf(1)+f);
+	f = Tf(1)+shift-f;	// convert to sample delay
 
-	// Taylor approximation to above to avoid division
-	Tf a = Tf(0.5)*f - Tf(0.309); // = 0.5 - 0.5*(1-f + 0.618)
-	a = a*(Tf(1) + a*(Tf(1) + a*(Tf(1) + a)));
+	auto i1 = x;
+	auto i0 = y;
 
-	return o1 = (y - o1) * a + x;
+	if(f >= Tf(1)){ // delay must be in [0,1], so jump back 1 sample of input
+		--f;
+		i1=w;
+		i0=x;
+	}
+
+	Tf a = (Tf(1)-f)/(Tf(1)+f);
+	// TODO: approx to avoid division, Taylor series?
+	//Tf a = 1.-f; // apx
+	//Tf a = (1.-f)*(2.-f)*0.5; // apx
+
+	return o1 = (i0 - o1) * a + i1;
 }
 
 template <class Tf, class Tv>

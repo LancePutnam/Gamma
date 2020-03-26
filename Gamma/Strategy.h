@@ -260,7 +260,8 @@ struct AllPass{
 	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		return ipl::allpass(
-			a.fraction(phase), 
+			a.fraction(phase),
+			a.atPhase(phase - a.oneIndex()),
 			a.atPhase(phase), 
 			a.atPhase(phase + a.oneIndex()),
 			prev
@@ -282,6 +283,7 @@ struct AllPass{
 	T operator()(const AccessStrategy& acc, const T * src, index_t iInt, double iFrac, index_t max, index_t min=0, index_t str=1) const{
 		return ipl::allpass(
 			iFrac,
+			src[acc.mapM1(iInt-1, max, min)*str],
 			src[iInt*str],
 			src[acc.mapP1(iInt+1, max, min)*str],
 			prev
