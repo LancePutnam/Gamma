@@ -127,10 +127,12 @@ inline Tv allpass(Tf f, const Tv& w, const Tv& x, const Tv& y, Tv& o1){
 		i0=x;
 	}
 
-	Tf a = (Tf(1)-f)/(Tf(1)+f);
-	// TODO: approx to avoid division, Taylor series?
-	//Tf a = 1.-f; // apx
-	//Tf a = (1.-f)*(2.-f)*0.5; // apx
+	//Tf a = (Tf(1)-f)/(Tf(1)+f);
+
+	// Approx above to avoid division
+	//Tf a = Tf(1)-f; // apx
+	//Tf a = Tf(0.5)*(Tf(1)-f)*(Tf(2)-f); // apx
+	Tf a = (Tf(1)-f); a = Tf(0.4545454545)*a*(a*a + Tf(1.2));
 
 	return o1 = (i0 - o1) * a + i1;
 }

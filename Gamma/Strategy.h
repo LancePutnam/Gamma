@@ -198,15 +198,15 @@ struct Cubic{
 	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		//*
-		uint32_t one = a.oneIndex();
+		const auto oneIndex = a.oneIndex();
 		return ipl::cubic(
 			a.fraction(phase),
-			a.atPhase(phase - one),
+			a.atPhase(phase - oneIndex),
 			a.atPhase(phase),
-			a.atPhase(phase + one),
-			a.atPhase(phase + (one<<1))
+			a.atPhase(phase + oneIndex),
+			a.atPhase(phase + (oneIndex<<1))
 		);//*/
-		/*
+		/* faster
 		unsigned i = a.index(phase);
 		unsigned m = a.size() - 1;
 		return ipl::cubic(
@@ -259,11 +259,12 @@ struct AllPass{
 
 	/// Return interpolated element from power-of-2 array
 	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
+		const auto oneIndex = a.oneIndex();
 		return ipl::allpass(
 			a.fraction(phase),
-			a.atPhase(phase - a.oneIndex()),
+			a.atPhase(phase - oneIndex),
 			a.atPhase(phase), 
-			a.atPhase(phase + a.oneIndex()),
+			a.atPhase(phase + oneIndex),
 			prev
 		);
 	}
