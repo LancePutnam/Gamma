@@ -94,7 +94,12 @@ public:
 	/// Get pointer to bin data
 	Complex<T> * bins(){ return mBins; }
 	const Complex<T> * bins() const { return mBins; }
-	
+
+	Complex<T> * begin(){ return mBins; }
+	const Complex<T> * begin() const { return mBins; }
+	Complex<T> * end(){ return mBins + numBins(); }
+	const Complex<T> * end() const { return mBins + numBins(); }
+
 	/// Get reference to bin value
 	Complex<T>& bin(unsigned k){ return mBins[k]; }
 	
