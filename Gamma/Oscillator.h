@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <functional> // std::function
 #include "Gamma/gen.h"
 #include "Gamma/scl.h"
 #include "Gamma/tbl.h"
@@ -1000,9 +1001,13 @@ public:
 	// Upsample an external generator
 	template <class SampleGen>
 	value_type operator()(SampleGen& gen){
-		if(this->cycle()){
-			mIpl.push(gen());
-		}
+		if(this->cycle()) mIpl.push(gen());
+		return mIpl(this->phase());
+	}
+
+	// Upsample an external function
+	value_type operator()(const std::function<value_type(void)>& onCycle){
+		if(this->cycle()) mIpl.push(onCycle());
 		return mIpl(this->phase());
 	}
 
