@@ -886,6 +886,12 @@ template<class T> inline T sinFast(T x){
 	return y * (T(0.775) + T(0.225) * gam::scl::abs(y));
 }
 
+// Input is in [0, 2] corresponding to [0, pi]
+template <class T> inline T sinFast02(T x){
+	T y = x * (T(2) - x);
+	return y * (T(0.775) + T(0.225) * y);
+}
+
 template<class T> inline T cosP3(T n){
 	return T(1) - T(32) * n * n * (T(0.75) - n);
 }

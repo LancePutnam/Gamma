@@ -50,6 +50,36 @@ inline T poleRadius(T bw, double ups){ return poleRadius(bw * ups); }
 template <class T>
 inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_PI; }
 
+namespace{
+	#ifndef GAM_FILTER_PRECISION
+	#define GAM_FILTER_PRECISION 1
+	#endif
+
+	#if GAM_FILTER_PRECISION >= 2
+	inline double getFreqToAng(double ups){ return M_2PI*ups; }
+	template <class T> inline T getRe(T ang){ return std::cos(ang); }
+	template <class T> inline T getIm(T ang){ return std::sin(ang); }
+	template <class T> inline T clipAng(T ang){ return scl::clip<T>(ang, 3.14); }
+	#elif GAM_FILTER_PRECISION == 1
+	// sinFast domain [-2,2] -> [-pi,pi]
+	inline double getFreqToAng(double ups){ return 4.*ups; }
+	template <class T> inline T getRe(T ang){ return scl::sinFast(T(1)-ang); }
+	template <class T> inline T getIm(T ang){ return scl::sinFast02(ang); }
+	template <class T> inline T clipAng(T ang){ return scl::clip<T>(ang, 2.); }
+	#endif
+
+	template <class T>
+	inline void getPole(T& re, T& im, T ang){
+		ang = clipAng(ang);
+		re = getRe(ang);
+		im = getIm(ang);
+	}
+
+	template <class T>
+	inline T getPoleRe(T ang){
+		return getRe(clipAng(ang));
+	}
+};
 
 
 /// First-order all-pass filter
@@ -159,7 +189,7 @@ protected:
 	FilterType mType;
 	Tp mReal, mImag;	// real, imag components of center frequency
 	Tp mAlpha, mBeta;
-	Tp mFrqToRad;
+	Tp mFreqToAng;
 
 	void resRecip(Tp v);
 };
@@ -255,7 +285,14 @@ class Filter2 : public Td{
 public:
 
 	/// Set frequency
-	void freq(Tp v){ freqRef(v); }
+	void freq(Tp v){
+		mFreq = v;		
+		/*v = scl::clip<Tp>(v * Td::ups(), 0.5);
+		//mReal = scl::cosP3<Tp>(v);
+		mReal = scl::cosT8<Tp>(v * M_2PI);*/
+		mReal = getPoleRe(v * mFreqToAng);
+		computeCoef1();
+	}
 
 	/// Set bandwidth
 	void width(Tp v){
@@ -268,43 +305,47 @@ public:
 	/// Zero delay elements
 	void zero(){ d2=d1=Tv(0); }
 	
-	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
+	void onDomainChange(double r){
+		mFreqToAng = getFreqToAng(Td::ups());
+		onCacheVars();
+	}
 
 protected:
 
 	Filter2(Tp frq, Tp wid)
 	:	mFreq(frq), mWidth(wid)
-	{	zero(); }
-
-	void freqRef(Tp& v){
-		mFreq = v;		
-		v = scl::clip<Tp>(v * Td::ups(), 0.5);
-		//mCos = scl::cosP3<Tp>(v);
-		mCos = scl::cosT8<Tp>(v * M_2PI);
-		computeCoef1();
+	{
+		zero();
+		onDomainChange(1);
 	}
-	
-	void computeCoef1(){ mC[1] = Tp(2) * mRad * mCos; }
+
+	virtual void onCacheVars(){ freq(mFreq); width(mWidth); }
+
+	void computeCoef1(){ mC[1] = Tp(2) * mRad * mReal; }
 	void delay(Tv v){ d2=d1; d1=v; }
 	Tp& gain(){ return mC[0]; }
 	
 	Tp mFreq, mWidth;
+	Tp mFreqToAng;
 	Tp mC[3];			// coefficients
-	Tp mCos, mRad;
+	Tp mReal, mRad;
 	Tv d2, d1;			// 2- and 1-sample delays
 };
 
 
 #define INHERIT_FILTER2 \
 typedef Filter2<Tv,Tp,Td> Base;\
+using Base::onDomainChange;\
+using Base::computeCoef1;\
 using Base::mFreq;\
+using Base::mFreqToAng;\
 using Base::mWidth;\
 using Base::gain;\
 using Base::mC;\
 using Base::mRad;\
-using Base::mCos;\
+using Base::mReal;\
 using Base::d2;\
-using Base::d1
+using Base::d1;
 
 
 /// Second-order all-pass filter
@@ -351,10 +392,7 @@ public:
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth
 	Notch(Tp frq = Tp(1000), Tp wid = Tp(100))
-	:	Base(frq, wid)
-	{
-		onDomainChange(1);
-	}
+	:	Base(frq, wid){}
 
 	/// Set center frequency
 	void freq(Tp v){ Base::freq(v); computeGain(); }
@@ -370,10 +408,10 @@ public:
 		return o0;
 	}
 
-	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
-
 protected:
 	INHERIT_FILTER2;
+
+	virtual void onCacheVars(){ freq(mFreq); width(mWidth); }
 
 	// compute constant gain factor
 	void computeGain(){ gain() = Tp(1) / (Tp(1) + scl::abs(mC[1]) - mC[2]); }
@@ -394,15 +432,12 @@ public:
 	/// \param[in] frq	Center frequency
 	/// \param[in] wid	Bandwidth	
 	Reson(Tp frq = Tp(1000), Tp wid = Tp(100))
-	:	Base(frq, wid)
-	{
-		onDomainChange(1);
-	}
+	:	Base(frq, wid){}
 
 	/// Set center frequency
 	void freq(Tp v){
-		Base::freqRef(v);
-		mSin = scl::cosP3<Tp>(scl::foldOnce<Tp>(v - Tp(0.25), Tp(0.5)));
+		getPole(mReal, mImag, v * mFreqToAng);
+		computeCoef1();
 		computeGain();
 	}
 
@@ -418,14 +453,14 @@ public:
 		return t;
 	}
 
-	void onDomainChange(double r){ freq(mFreq); width(mWidth); }
-
 protected:
 	INHERIT_FILTER2;
-	Tp mSin;
+	Tp mImag;
+
+	virtual void onCacheVars(){ freq(mFreq); width(mWidth); }
 
 	// compute constant gain factor
-	void computeGain(){ gain() = (Tp(1) - mRad*mRad) * mSin; }
+	void computeGain(){ gain() = (Tp(1) - mRad*mRad) * mImag; }
 };
 
 
@@ -618,6 +653,7 @@ public:
 protected:
 	FilterType mType;
 	Tp mFreq, mA0, mB1;
+	Tp mFreqToAng;
 	Tv mStored, o1;
 };
 
@@ -627,7 +663,6 @@ protected:
 // Implementation_______________________________________________________________
 
 //---- AllPass1
-
 template <class Tv, class Tp, class Td>
 AllPass1<Tv,Tp,Td>::AllPass1(Tp frq)
 :	d1(Tv(0)), mFreq(frq)
@@ -677,7 +712,6 @@ template <class Tv, class Tp, class Td>
 void AllPass1<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
 
 
-
 //---- Biquad
 template <class Tv, class Tp, class Td>
 Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
@@ -689,7 +723,7 @@ Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
 
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::onDomainChange(double /*r*/){
-	mFrqToRad = Tp(M_2PI * Td::ups());
+	mFreqToAng = getFreqToAng(Td::ups());
 	freq(mFreq);
 }
 
@@ -726,9 +760,7 @@ void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
-	Tp w = scl::clip(mFreq * mFrqToRad, Tp(3.13));
-	mReal = scl::cosT8(w);
-	mImag = scl::sinT7(w);
+	getPole(mReal, mImag, mFreq * mFreqToAng);
 	resRecip(mResRecip);
 }
 
@@ -884,22 +916,15 @@ OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
 }
 
 template <class Tv, class Tp, class Td>
-void OnePole<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
+void OnePole<Tv,Tp,Td>::onDomainChange(double /*r*/){
+	mFreqToAng = getFreqToAng(Td::ups());
+	freq(mFreq);
+}
 
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::type(FilterType v){
 	mType = v;
 	freq(mFreq);
-}
-
-namespace{
-	template<class T>
-	inline T getReal(T freq){
-		freq = scl::clip(freq, T(0.5));
-		//return cos(2*M_PI * freq);
-		//return 1 - freq*freq*(24 - 32*freq); // cubic apx.
-		return scl::sinFast(T(1) - T(4)*freq);
-	}
 }
 
 template <class Tv, class Tp, class Td>
@@ -913,7 +938,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at DC (inaccurate with large bandwidth)
 		//mB1 = poleRadius(Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tp re = getReal(v * Tp(Td::ups()));
+		Tp re = getPoleRe(v * mFreqToAng);
 		Tp p1 = re - Tp(2);
 		mB1 = -(p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) - mB1;
@@ -923,8 +948,8 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
 		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tp re = getReal(v * Tp(Td::ups()));
-		Tp p1 = -re - Tp(2); // -re flips cutoff
+		Tp re = getPoleRe(v * mFreqToAng);
+		Tp p1 = -Tp(2) - re; // -re flips cutoff
 		mB1 = (p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;
 		//printf("%g\n", mB1);
@@ -944,7 +969,7 @@ inline void OnePole<Tv,Tp,Td>::lag(Tp length, Tp thresh){
 	mFreq = Tp(1)/length;
 	// Since b^(length f_s) = thresh,
 	// 	b = thresh ^ (1 / (length fs))
-	mB1 = pow(thresh, Tp(this->ups()/length));
+	mB1 = pow(thresh, Tp(Td::ups()/length));
 	mA0 = Tp(1) - mB1;
 }
 
