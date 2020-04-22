@@ -239,7 +239,7 @@ private:
 	bool mActive[Nsrc];
 	ReverbMS<> mReverbs[2]; 		// one reverb for each ear
 	float mWallAtten = 0.1;
-	NoiseBinary<RNGMulLinCon> mNoise{1e-20, 17};
+	NoiseBinary<RNGMulCon> mNoise{1e-20, 17};
 };
 
 } // gam::
