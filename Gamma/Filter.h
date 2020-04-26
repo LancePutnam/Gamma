@@ -32,7 +32,8 @@ enum FilterType{
 	PEAKING,			/**< Peaking */
 	LOW_SHELF,			/**< Low-shelf */
 	HIGH_SHELF,			/**< High-shelf */
-	SMOOTHING			/**< Smoothing */
+	SMOOTHING,			/**< Smoothing */
+	THRU_PASS			/**< Thru-pass (no filter) */
 };
 
 
@@ -804,7 +805,7 @@ inline void Biquad<Tv,Tp,Td>::resRecip(Tp v){
 	mAlpha = mImag * mResRecip * mBeta;
 
 	switch(mType){
-	case LOW_SHELF: case HIGH_SHELF: break; // coefs computed in type()
+	case LOW_SHELF: case HIGH_SHELF: case THRU_PASS: break; // coefs computed in type()
 	default:
 		// Note: b_0 is assumed to be equal to 1 in the difference equation.
 		// For this reason, we divide all other coefficients by b_0.
@@ -885,6 +886,12 @@ inline void Biquad<Tv,Tp,Td>::type(FilterType typeA){
 		mA[2] =       A*(Ap1 + Am1*mReal - mAlpha) * mB[0];
 		}
 		break;
+	case THRU_PASS:
+		mB[0] = Tp(1);
+		mB[1] = mB[2] = Tp(0);
+		mA[0] = Tp(1); // = mLevel for free gain?
+		mA[1] = mA[2] = Tp(0);
+		break;
 	default:;
 	};
 }
@@ -957,6 +964,10 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		break;
 	case SMOOTHING:
 		lag(Tp(1)/mFreq);
+		break;
+	case THRU_PASS:
+		mB1 = Tp(0);
+		mA0 = Tp(1);
 		break;
 	}
 
