@@ -168,6 +168,10 @@ T meanWeighted(const T * src, const T * weights, unsigned len);
 template <class T>
 T meanWeightedIndex(const T * weights, unsigned len);
 
+/// Computes min, max and mean values of array
+template <class T>
+void minMaxMean(T& min, T& max, T& mean, const T * src, unsigned len, unsigned str=1);
+
 template <class T, class Index>
 void minimaRemove(const T * src, Index * indices, unsigned& numIndices);
 
@@ -646,6 +650,19 @@ T meanWeightedIndex(const T * weights, unsigned len){
 		weightFactor += normFactor;
 	}
 	return mean;
+}
+
+template <class T>
+void minMaxMean(T& min, T& max, T& mean, const T * src, unsigned len, unsigned str){
+	min = max = src[0];
+	mean = T(0);
+	LOOP(len,str){
+		const auto& v = src[i];
+		mean += v;
+		if(v < min) min = v;
+		else if (v > max) max = v;
+	}
+	mean /= (len/str);
 }
 
 template <class T, class Index>
