@@ -966,10 +966,15 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::lag(Tp length, Tp thresh){
 	mType = SMOOTHING;
-	mFreq = Tp(1)/length;
-	// Since b^(length f_s) = thresh,
-	// 	b = thresh ^ (1 / (length fs))
-	mB1 = pow(thresh, Tp(Td::ups()/length));
+	if(length > Tp(0)){
+		mFreq = Tp(1)/length;
+		// Since b^(length f_s) = thresh,
+		// 	b = thresh ^ (1 / (length f_s))
+		mB1 = pow(thresh, Tp(Td::ups()*mFreq));
+	} else {
+		mFreq = Td::spu()*0.5;
+		mB1 = Tp(0);
+	}
 	mA0 = Tp(1) - mB1;
 }
 
