@@ -224,25 +224,29 @@ template<> inline float uintToUnitS<float>(uint32_t v){
 }
 
 inline uint32_t unitToUInt(float v){
+	// Convert to double in [1,2), then extract MSBs from mantissa
+	// uint64_t -> uint32_t takes value modulo 2^32.
+	//   (See https://en.cppreference.com/w/c/language/conversion)
+	return punFU(double(v)+1.) >> 20;
+
+	/* Old version: issues near zero
 	uint32_t normalU = punFU(v);
 	uint32_t rbs = 126UL - (normalU >> 23UL);
-//	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
-//	printf("%x\n", 0x80000000UL >> rbs);
 	return ((normalU | 0x800000) << 8UL) >> rbs;
-//Her00	
-//float y = v + 1.f; 
-//return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
+	//*/
 }
 
+// Faster version, but with 23-bit precision
 inline uint32_t unitToUInt2(float v){
-	++v;	// go into [1,2] range, FP fraction is now result
-	return punFU(v) << 9;
+	// Convert to float in [1,2), then extract MSBs from mantissa
+	return punFU(v+1.f) << 9;
 }
 
-//inline uint32_t unitToUInt2(double v){
-//	++v;	// go into [1,2] range, FP fraction is now result
-//	return punFU(v) << 12;
-//}
+/*
+inline uint32_t unitToUInt2(double v){
+	// Convert to double in [1,2), then extract MSBs from mantissa
+	return punFU(v+1.) << 12;
+}//*/
 
 inline uint8_t unitToUInt8(float u){
 	++u;
