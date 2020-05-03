@@ -1061,8 +1061,8 @@ inline uint32_t quantizePow2(uint32_t v, uint32_t q){
 
 inline float pulse(uint32_t p, uint32_t w){
 	// output floating point exponent should be [1, 2)
-	uint32_t saw1 = ((p-w) >> 9) | Expo1<float>();
-	uint32_t saw2 = ( p    >> 9) | Expo1<float>();
+	uint32_t saw1 = Expo1<float>() | ((p-w) >> 9);
+	uint32_t saw2 = Expo1<float>() | ( p    >> 9);
 	return punUF(saw1) - punUF(saw2);
 }
 
@@ -1076,25 +1076,25 @@ inline float pulseRange(uint32_t p, uint32_t w, float highVal, float lowVal){
 
 // [1, 0.5, 0, -0.5]
 inline float rampDown(uint32_t p){
-	p = (p >> 9) | Expo2<float>();
+	p = Expo2<float>() | (p >> 9);
 	return 3.f - punUF(p);
 }
 
 // [1, 0.75, 0.5, 0.25]
 inline float rampDownU(uint32_t p){
-	p = (p >> 9) | ExpoNeg1<float>();
+	p = ExpoNeg1<float>() | (p >> 9);
 	return punUF(p) + 2.f;
 }
 
 // [-1, -0.5, 0, 0.5]
 inline float rampUp(uint32_t p){
-	p = (p >> 9) | Expo2<float>();
+	p = Expo2<float>() | (p >> 9);
 	return punUF(p) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
 inline float rampUpU(uint32_t p){
-	p = (p >> 9) | Expo1<float>();
+	p = Expo1<float>() | (p >> 9);
 	return punUF(p) - 1.f;
 }
 
@@ -1143,8 +1143,8 @@ inline float squareU(uint32_t p){
 }
 
 inline float stair(uint32_t p, uint32_t w){
-	uint32_t sqr1 = Expo1_2<float>() | ( p    & MaskSign<float>());
-	uint32_t sqr2 = Expo1_2<float>() | ((p-w) & MaskSign<float>());
+	uint32_t sqr1 = ( p    & MaskSign<float>()) | Expo1_2<float>();
+	uint32_t sqr2 = ((p-w) & MaskSign<float>()) | Expo1_2<float>();
 	return punUF(sqr1) - punUF(sqr2);
 }
 
@@ -1154,14 +1154,13 @@ inline float stairU(uint32_t p, uint32_t w){
 
 // [1, 0, -1, 0]; abs on ramp down
 inline float triangle(uint32_t p){
-	p = (p >> 9) | Expo4<float>(); // [4, 8]
-	return abs(gam::punUF(p) - 6.f) - 1.f;
+	p = Expo4<float>() | (p >> 9); // [4, 8]
+	return scl::abs(gam::punUF(p) - 6.f) - 1.f;
 }
 
 // [1, 0.5, 0, 0.5]
 inline float triangleU(uint32_t p){
-	float r = rampDown(p);
-	return scl::abs(r);
+	return scl::abs(rampDown(p));
 }
 
 template<class T> inline T bartlett(T n){
