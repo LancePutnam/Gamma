@@ -288,7 +288,7 @@ public:
 	/// \returns true if the file opened successfully. The file pointer will
 	/// be at the start of the first frame.
 	bool open(const std::string& path){
-		mFile.open(path);
+		mFile.open(path, std::ios::in | std::ios::binary);
 		if(!mFile.is_open()) return false;
 
 		union{
@@ -390,6 +390,12 @@ public:
 						DPRINTF("  fact (num samples): %u\n", numSamps);
 						if(chunkSize > 4) mFile.seekg(chunkSize-4, mFile.cur);
 					} break;
+
+					/*case ID("LIST"):{
+						mFile.read(bufs, 4);
+						DPRINTF("%c%c%c%c\n", bufs[0], bufs[1], bufs[2], bufs[3]);
+						// list of subchunks follows, can just parse as normal chunks
+					} break;*/
 
 					default: // unhandled chunk
 						mFile.seekg(chunkSize, mFile.cur);
@@ -690,7 +696,7 @@ public:
 
 		if("au"==ext || "snd"==ext) mFormat = AU;*/
 
-		mFile.open(path);
+		mFile.open(path, std::ios::out | std::ios::binary);
 		if(!mFile.is_open()) return false;
 
 		if(AU == mFormat){
