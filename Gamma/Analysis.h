@@ -146,8 +146,11 @@ private:
 /// Computes the zero-crossing rate of an input signal
 
 /// The zero-crossing rate (ZCR) is a measure proportional to how many times a 
-/// signal crosses zero over a given number of samples. It can be used to 
-/// distinguish between noise (high ZCR) and tones (low ZCR).
+/// signal crosses zero over a given number of samples. The result very closely 
+/// matches the spectral centroid of the input signal. High ZCR correlates to
+/// noisy, bright and high-pitched signals whereas low ZCR correlates to dark
+/// and low-frequency signals. If applied to sampled audio, low amplitude
+/// sections should be rejected as the true signal is likely buried in noise.
 ///\ingroup Analysis
 template <class Tv=gam::real>
 class ZeroCrossRate{
