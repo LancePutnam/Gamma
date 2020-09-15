@@ -194,7 +194,7 @@ public:
 	/// Set format of spectrum data
 	DFT& spectrumType(SpectralType v);
 
-	/// Set whether to use precise (but slower) for converting to polar
+	/// Set whether to use precise (but slower) polar conversion
 	DFT& precise(bool whether);
 
 	/// Set size parameters of transform
