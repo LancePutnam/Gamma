@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <cmath> // abs
 #include "Gamma/Filter.h"
 
 namespace gam{
@@ -143,6 +144,86 @@ private:
 
 
 
+/// Periodic counter
+
+/// Triggers periodically after reaching a specified maximum count. Useful for
+/// determining when a window of samples has passed.
+class PCounter{
+public:
+
+	PCounter(unsigned period=256): mPeriod(period){}
+
+	/// Set period
+	PCounter& period(unsigned n){ mPeriod=n; return *this; }
+	unsigned period() const { return mPeriod; }
+
+	/// Whether counter just finished one period
+	bool cycled() const { return 0==mCount; }
+
+	/// Get the current count
+	unsigned count() const { return mCount; }
+
+	/// Reset count to zero
+	PCounter& reset(){ mCount=0; return *this; }
+
+	/// Returns true when end of period is reached, otherwise false
+	bool operator()(){
+		++mCount;
+		if(mCount == mPeriod){
+			mCount = 0;
+			return true;
+		}
+		return false;
+	}
+
+private:
+	unsigned mPeriod;
+	unsigned mCount = 0;
+};
+
+
+
+/// Maximum absolute value over window
+
+/// This produces an accurate estimate of a signal's amplitude envelope by 
+/// measuring the maximum absolute value over a given window size.
+/// Unlike estimators that use low-pass filters, this estimator is less affected 
+/// by the frequency content of the input signal, namely high frequencies.
+template <class Tv=gam::real>
+class MaxAbs : public PCounter {
+public:
+
+	MaxAbs(int winSize=256): PCounter(winSize){}
+
+	const Tv& operator()(const Tv& in){
+		using std::abs;
+		auto inAbs = abs(in);
+		if(inAbs > mMaxCalc) mMaxCalc = inAbs;
+		if(PCounter::operator()()){
+			mInc = (mMaxCalc - mMaxPrev) / period();
+			mVal = mMaxPrev - mInc;
+			mMaxPrev = mMaxCalc;
+			mMaxCalc = Tv(0);
+		}
+		mVal += mInc;
+		return mVal;
+	}
+
+	/// Current (non-smoothed) value
+	const Tv& value() const { return mMaxPrev; }
+
+	/// Current linearly smoothed value
+	const Tv& valueL() const { return mVal; }
+
+private:
+	Tv mMaxCalc = Tv(0);
+	Tv mMaxPrev = Tv(0);
+	Tv mVal = Tv(0);
+	Tv mInc = Tv(0);
+};
+
+
+
 /// Computes the zero-crossing rate of an input signal
 
 /// The zero-crossing rate (ZCR) is a measure proportional to how many times a 
@@ -153,34 +234,26 @@ private:
 /// sections should be rejected as the true signal is likely buried in noise.
 ///\ingroup Analysis
 template <class Tv=gam::real>
-class ZeroCrossRate{
+class ZeroCrossRate : public PCounter {
 public:
 
 	/// \param[in] winSize		size of analysis window
 	ZeroCrossRate(int winSize=256)
-	:	mRate(0), mWinSize(winSize), mCrosses(0), mCount(0)
+	:	PCounter(winSize), mRate(0), mCrosses(0)
 	{}
-
-	/// Set window size, in samples
-	ZeroCrossRate& winSize(unsigned n){ mWinSize=n; return *this; }
 
 	/// Get the current zero-crossing rate, in [0, 0.5]
 	float rate() const { return mRate; }
 	float value() const { return mRate; }
-	
-	/// Get window size
-	unsigned winSize() const { return mWinSize; }
 
 	/// Input next sample and return current zero-crossing rate
 	Tv operator()(Tv input){
 		if(0 != mDetector(input)){
 			++mCrosses;
 		}
-		++mCount;
-		if(mCount >= mWinSize){
-			mRate = float(mCrosses) / mWinSize;
+		if(PCounter::operator()()){
+			mRate = float(mCrosses) / period();
 			mCrosses = 0;
-			mCount = 0;
 		}
 		return mRate;
 	}
@@ -188,9 +261,7 @@ public:
 private:
 	ZeroCross<Tv> mDetector;
 	float mRate;
-	unsigned mWinSize;
 	unsigned mCrosses;
-	unsigned mCount;
 };
 
 } // gam::
