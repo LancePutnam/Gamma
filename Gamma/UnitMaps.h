@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <functional>
 #include <map>
 #include <vector>
 #include "Gamma/scl.h"
@@ -110,8 +111,30 @@ public:
 
 	enum{ N = 1<<B };
 
+	/// Construct and leave elements uninitialized
+	TablePow2(){}
+	
+	/// Construct and assign value to all elements
+	TablePow2(const T& fillValue){
+		for(auto& v : *this) v = fillValue;
+	}
+	
+	/// Construct and fill table according to function
+	
+	/// @param[in] x01	Unit position in table, in [0,1)
+	///
+	TablePow2(const std::function<T(float x01)>& fillFunc){
+		for(int i=0; i<N; ++i) mElems[i] = fillFunc(float(i)/N);
+	}
+
 	const T& operator[](unsigned i) const { return mElems[i]; }
 	T& operator[](unsigned i){ return mElems[i]; }
+
+	const T * begin() const { return mElems; }
+	T * begin(){ return mElems; }
+	const T * end() const { return mElems+N; }
+	T * end(){ return mElems+N; }
+
 
 	/// Read value using truncating interpolation
 	
