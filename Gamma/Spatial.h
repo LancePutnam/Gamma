@@ -259,16 +259,18 @@ public:
 
 	/// \param[in] combDelays		comb delay sizes in samples
 	/// \param[in] allpassDelays	allpass delay sizes in samples
+	/// \param[in] offset			offset to add to delay lengths, in samples
 	ReverbMS& resize(
 		std::initializer_list<unsigned> combDelays,
-		std::initializer_list<unsigned> allpassDelays
+		std::initializer_list<unsigned> allpassDelays,
+		unsigned offset = 0
 	);
 
 	/// Set comb delay sizes in samples
-	ReverbMS& resizeComb(std::initializer_list<unsigned> delays);
+	ReverbMS& resizeComb(std::initializer_list<unsigned> delays, unsigned offset=0);
 
 	/// Set allpass delay sizes in samples
-	ReverbMS& resizeAllpass(std::initializer_list<unsigned> delays);
+	ReverbMS& resizeAllpass(std::initializer_list<unsigned> delays, unsigned offset=0);
 
 	/// Set decay length
 	ReverbMS& decay(float v);
@@ -483,12 +485,12 @@ ReverbMS<TARG>::ReverbMS(){
 }
 
 template<TDEC>
-ReverbMS<TARG>& ReverbMS<TARG>::resizeComb(std::initializer_list<unsigned> delays){
+ReverbMS<TARG>& ReverbMS<TARG>::resizeComb(std::initializer_list<unsigned> delays, unsigned offset){
 	if(delays.size() != mCombs.size()){
 		mCombs.resize(delays.size());
 	}
 	for(unsigned i=0; i<mCombs.size(); ++i){
-		unsigned d = delays.begin()[i];
+		unsigned d = delays.begin()[i] + offset;
 		mCombs[i].maxDelay(d);
 		mCombs[i].delay(d);
 	}
@@ -497,12 +499,12 @@ ReverbMS<TARG>& ReverbMS<TARG>::resizeComb(std::initializer_list<unsigned> delay
 }
 
 template<TDEC>
-ReverbMS<TARG>& ReverbMS<TARG>::resizeAllpass(std::initializer_list<unsigned> delays){
+ReverbMS<TARG>& ReverbMS<TARG>::resizeAllpass(std::initializer_list<unsigned> delays, unsigned offset){
 	if(delays.size() != mAllpasses.size()){
 		mAllpasses.resize(delays.size());
 	}
 	for(unsigned i=0; i<mAllpasses.size(); ++i){
-		unsigned d = delays.begin()[i];
+		unsigned d = delays.begin()[i] + offset;
 		mAllpasses[i].maxDelay(d);
 		mAllpasses[i].delay(d);
 		mAllpasses[i].allPass(0.71); // all use the same feedback amount
@@ -513,9 +515,10 @@ ReverbMS<TARG>& ReverbMS<TARG>::resizeAllpass(std::initializer_list<unsigned> de
 template<TDEC>
 ReverbMS<TARG>& ReverbMS<TARG>::resize(
 	std::initializer_list<unsigned> combDelays,
-	std::initializer_list<unsigned> allpassDelays
+	std::initializer_list<unsigned> allpassDelays,
+	unsigned offset
 ){
-	return resizeComb(combDelays).resizeAllpass(allpassDelays);
+	return resizeComb(combDelays,offset).resizeAllpass(allpassDelays,offset);
 }
 
 template<TDEC>
