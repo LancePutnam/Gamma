@@ -31,9 +31,8 @@ namespace gam{
 		QueryPerformanceFrequency(&freq);
 		QueryPerformanceCounter(&time);
 		// convert ticks to microseconds
-		time.QuadPart *= 1000000;
-		time.QuadPart /= freq.QuadPart;
-		return nsec_t(time.QuadPart);
+		// As long as time.QuadPart < 9.0e15, this will work:
+		return nsec_t(time.QuadPart / double(freq.QuadPart) * 1.0e6);
 	}
 
 	nsec_t timeNow(){
