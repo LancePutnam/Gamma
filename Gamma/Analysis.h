@@ -54,7 +54,7 @@ public:
 class SilenceDetect{
 public:
 	SilenceDetect(unsigned count = 1000)
-	:	mNumSilent(0), mCount(count)
+	:	mCount(count)
 	{}
 
 
@@ -88,7 +88,7 @@ public:
 	bool done() const { return mNumSilent >= mCount; }
 
 private:
-	unsigned mNumSilent, mCount;
+	unsigned mNumSilent=0, mCount;
 };
 
 
@@ -248,11 +248,10 @@ public:
 
 	/// \param[in] winSize		size of analysis window
 	ZeroCrossRate(int winSize=256)
-	:	PCounter(winSize), mRate(0), mCrosses(0)
+	:	PCounter(winSize)
 	{}
 
 	/// Get the current zero-crossing rate, in [0, 0.5]
-	float rate() const { return mRate; }
 	float value() const { return mRate; }
 
 	/// Input next sample and return current zero-crossing rate
@@ -269,8 +268,8 @@ public:
 
 private:
 	ZeroCross<Tv> mDetector;
-	float mRate;
-	unsigned mCrosses;
+	float mRate = 0.f;
+	unsigned mCrosses = 0;
 };
 
 } // gam::

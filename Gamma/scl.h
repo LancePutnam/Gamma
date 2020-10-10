@@ -667,6 +667,25 @@ template<class T> inline T pow5(T v){ return pow4(v)*v; }
 template<class T> inline T pow6(T v){ return pow3(pow2(v)); }
 template<class T> inline T pow7(T v){ return pow6(v)*v; }
 template<class T> inline T pow8(T v){ return pow4(v*v); }
+template<class T> inline T powN(T v, int power){
+	switch(power){
+	case  0: return T(1);
+	case  1: return v;
+	case  2: return pow2(v);
+	case  3: return pow3(v);
+	case  4: return pow4(v);
+	case  5: return pow5(v);
+	case  6: return pow6(v);
+	case  7: return pow7(v);
+	case  8: return pow8(v);
+	case  9: return pow3(pow3(v));
+	case 10: return pow2(pow5(v));
+	case 11: {auto vv=v*v; return pow3(vv*v)*vv;}
+	case 12: return pow3(pow4(v));
+	case 13: return pow3(pow4(v))*v;
+	default: return std::pow(v,power);
+	}
+}
 
 inline double ratioET(double pc, double divs, double ival){
 	return pow(ival, pc/divs);
