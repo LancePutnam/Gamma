@@ -255,15 +255,15 @@ PRE inline T CLS::read(int channel) const {
 
 
 PRE void CLS::buffer(Array<T>& src, double frmRate, int chans, bool interleaved){
-	mPos = 0;
-	this->source(src);
-	initBufferAccess(frmRate, chans, interleaved);
+	if(this->source(src)){
+		initBufferAccess(frmRate, chans, interleaved);
+	}
 }
 
 PRE void CLS::buffer(T * src, int numFrms, double frmRate, int chans, bool interleaved){
-	mPos = 0;
-	this->source(src, numFrms*chans, true);
-	initBufferAccess(frmRate, chans, interleaved);
+	if(this->source(src, numFrms*chans, true)){
+		initBufferAccess(frmRate, chans, interleaved);
+	}
 }
 
 PRE void CLS::buffer(SamplePlayer& src){
