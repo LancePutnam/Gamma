@@ -138,7 +138,7 @@ public:
 
 	/// \returns 
 	///		 0 if no zero crossing,
-	///		-1 if a negative (falling) zero crossing, and
+	///		-1 if a negative (falling) zero crossing, or	
 	///		 1 if a positive (rising) zero crossing.
 	int operator()(Tv input){
 		int pzc = int((input > Tv(0)) && (mPrev <= Tv(0)));
@@ -251,7 +251,7 @@ public:
 	:	PCounter(winSize)
 	{}
 
-	/// Get the current zero-crossing rate, in [0, 0.5]
+	/// Get the current zero-crossing rate, in [0, 1]
 	float value() const { return mRate; }
 
 	/// Input next sample and return current zero-crossing rate

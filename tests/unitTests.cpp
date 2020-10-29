@@ -68,6 +68,7 @@ int main(int argc, char* argv[]){
 	#include "ut/utEnvelope.cpp"
 	#include "ut/utFilter.cpp"
 	#include "ut/utGenerators.cpp"
+	#include "ut/utAnalysis.cpp"
 
 //	printf("Unit testing succeeded.\n");
 
