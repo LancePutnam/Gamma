@@ -224,17 +224,6 @@ Slice<T> slice(T * src, int cnt, int str=1, int off=0){
 	return Slice<T>(src,cnt,str,off);
 }
 
-
-/*
-1 2 3 4 5 6 7 8
-1 5 2 6 3 7 4 8		d = 4 + 1/2
-1 3 5 7 2 4 6 8		d = 2 + 1/4
-
-1 2 3 4 5 6 7 8 9
-1 4 7 2 5 8 3 6 9	d = 3 + 1/3
-
-*/
-
 } // gam::
 
 #endif

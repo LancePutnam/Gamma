@@ -729,16 +729,6 @@ unsigned slopeMax(const T * src, unsigned len){
 	return index;
 }
 
-//template <class T> void sort3(T * arr){
-//
-//	T v1 = *arr;
-//	T v2 = arr[1];
-//	T v3 = arr[2];
-//	
-//	
-//
-//}
-
 template <class T>
 void sortInsertion(T * arr, unsigned len){
 	for(unsigned i = 1; i < len; i++){
@@ -862,12 +852,6 @@ unsigned zeroCrossMax(const T * src, unsigned len){
 	return ind;
 }
 
-/*
-
-7243....
-23470156
-
-*/
 template <class Index>
 void indicesComplement(Index * indices, unsigned numIndices, unsigned maxNumIndices){
 	Index * comp = indices + numIndices;
