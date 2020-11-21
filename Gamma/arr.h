@@ -8,8 +8,9 @@
 	Functions for processing arrays of data.
 */
 
-#include "Gamma/mem.h"
-#include "Gamma/scl.h"
+#include <cmath>
+#include <utility> // swap
+#include "Gamma/scl.h" // norm
 
 #define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
 
@@ -418,17 +419,17 @@ void cluster(const T * src, Index * indices, unsigned& numIndices, T threshold){
 
 	if(numIndices == 0) return;
 
-	Index * newIndices = indices;
+	auto * newIndices = indices;
 	unsigned newNumIndices = 0;
 
 	T prev = src[*indices++];
 	bool inCluster = false;
 
 	LOOP(numIndices - 1, 1){
-		Index index = *indices++;
+		auto index = *indices++;
 		T curr = src[index];
 
-		if( scl::abs(curr - prev) <= threshold ){
+		if( std::abs(curr - prev) <= threshold ){
 			if(!inCluster){
 				// Add previous index
 				*newIndices++ = indices[-2];
@@ -611,9 +612,8 @@ T meanAbsDiff(const T * src, unsigned len){
 	LOOP(len - 1, 1){
 		T now = *src++;
 		T diff = now - prev;
-		T abs = scl::abs(now);
-		sum += scl::abs(diff);
-		mean += abs;
+		sum += std::abs(diff);
+		mean += std::abs(now);
 		prev = now;
 	}
 	//if(mean < 0.0001f) mean = 0.0001f;
@@ -670,14 +670,14 @@ void minimaRemove(const T * src, Index * indices, unsigned& numIndices){
 
 	if(numIndices < 3) return;
 
-	Index * newIndices = indices + 1;	// first index is never a minima
+	auto * newIndices = indices + 1;	// first index is never a minima
 	unsigned newNumIndices = 2;			// always keep first and last indices
 
 	T prev = src[*indices++];
 	T curr = src[*indices++];
 
 	for(unsigned i=1; i<numIndices-1; i++){
-		Index index = *indices++;
+		auto index = *indices++;
 		T next = src[index];
 
 		if(curr >= prev || curr >= next){		// it's not a minima
@@ -701,7 +701,7 @@ unsigned slopeAbsMax(const T * src, unsigned len){
 
 	LOOP(len-1,1){
 		T now = *src++;
-		T slope = scl::abs(now - prev);
+		T slope = std::abs(now - prev);
 		if(slope > maxSlope){
 			maxSlope = slope;
 			index = i;
@@ -745,7 +745,7 @@ template <class T, class Index>
 void sortInsertion(const T * src, Index * indices, unsigned numIndices){
 	for(unsigned i = 1; i < numIndices; i++)
 	{
-		Index index = indices[i];
+		auto index = indices[i];
 		T val = src[index];
 		unsigned j = i - 1;
 		while((j < numIndices) && (val < src[indices[j]]))
@@ -767,9 +767,9 @@ void sortQuick(const T * src, Index * indices, long beg, long end){
 			if ( src[indices[l]] <= pivVal ) 
 				l++;
 			else 
-				mem::swap(indices[l], indices[--r]);
+				std::swap(indices[l], indices[--r]);
 		}
-		mem::swap(indices[--l], indices[beg]);
+		std::swap(indices[--l], indices[beg]);
 		sortQuick(src, indices, beg, l);
 		sortQuick(src, indices, r, end);
 	}
@@ -854,7 +854,7 @@ unsigned zeroCrossMax(const T * src, unsigned len){
 
 template <class Index>
 void indicesComplement(Index * indices, unsigned numIndices, unsigned maxNumIndices){
-	Index * comp = indices + numIndices;
+	auto * comp = indices + numIndices;
 	for(unsigned i=0; i<maxNumIndices; i++){
 		if(*indices == i)	++indices;
 		else				*comp++ = i;

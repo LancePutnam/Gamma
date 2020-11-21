@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "Gamma/arr.h"
+#include "Gamma/mem.h" // deepCopy
 #include "Gamma/Constants.h"
 
 #define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
