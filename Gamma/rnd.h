@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <ctime> // time()
 #include "Gamma/gen.h"
-#include "Gamma/mem.h"
+#include "Gamma/std_swap.h"
 #include "Gamma/Conversion.h"
 #include "Gamma/Types.h"
 
@@ -344,7 +344,7 @@ template <class T> inline void set(T * arr, uint32_t len, uint32_t num, T val){
 }
 
 template <class T> inline void permute(T * arr, uint32_t len){
-	LOOP(len-1){ mem::swap(arr[i], arr[rnd::uni(len, i)]); }
+	LOOP(len-1){ std::swap(arr[i], arr[rnd::uni(len, i)]); }
 }
 
 inline float quan(uint32_t q){ return uni(q) / (float)q; }

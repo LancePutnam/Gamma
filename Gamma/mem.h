@@ -7,6 +7,7 @@
 #include <cstring> // memcpy, memmove, etc.
 #include <cstdlib> // free, realloc
 #include "Gamma/Access.h" // indexLast
+#include "Gamma/std_swap.h"
 
 #define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
 
@@ -268,10 +269,6 @@ void stretch(T * arr, unsigned len, unsigned amount);
 template <class T>
 void stretch(T * dst, const T * src, unsigned lenSrc, unsigned amount);
 
-/// Swaps two elements in memory.
-template <class T>
-void swap(T & elem1, T & elem2);
-
 /// Transpose a 2 x (len/2) matrix.
 
 /// Example: 12121212 -> 11112222
@@ -404,7 +401,7 @@ void permute(T * arr, unsigned len, unsigned long long k) {
 	for(unsigned i=1; i<len; i++){
 		factorial *= i;
 		unsigned j = i - ((k / factorial) % (i + 1));
-		swap(arr[i], arr[j]);
+		std::swap(arr[i], arr[j]);
 	}
 }
 
@@ -417,7 +414,7 @@ inline void pivot(unsigned index, T * arr, unsigned len){
 	LOOP((len-1)>>1,1){
 		if(lt >= len) lt = len - 1;
 		if(rt >= len) rt = 0;
-		swap(arr[lt], arr[rt]);
+		std::swap(arr[lt], arr[rt]);
 		lt--;
 		rt++;
 	}
@@ -473,18 +470,18 @@ bool resize(T *& arr, unsigned sizeNow, unsigned sizeNew){
 template <class T>
 inline void reverse(T * arr, unsigned len, unsigned str){
 	unsigned end = indexLast(len,str);
-	LOOP(len>>1, str){ swap(arr[i], arr[end-i]); }
+	LOOP(len>>1, str){ std::swap(arr[i], arr[end-i]); }
 }
 
 template <class T>
 inline void reverse2(T * arr, unsigned len, unsigned str){
-	LOOP(len, 2){ swap(arr[i], arr[i+1]); }
+	LOOP(len, 2){ std::swap(arr[i], arr[i+1]); }
 }
 
 template <class T>
 inline void rotateHalf(T * arr, unsigned len, unsigned str){
 	T * half = arr + (((len>>1)/str)*str);
-	LOOP(len>>1, str){ swap(arr[i], half[i]); }
+	LOOP(len>>1, str){ std::swap(arr[i], half[i]); }
 }
 
 template <class T>
@@ -502,7 +499,7 @@ void rotateLeft(unsigned order, T * arr, unsigned len){
 	LOOP(numSwaps, 1){
 		if(lt >= len) lt = len - 1;
 		if(rt >= len) rt = 0;
-		swap(arr[lt--], arr[rt++]);
+		std::swap(arr[lt--], arr[rt++]);
 	}
 	
 	reverse(arr, len);
@@ -510,7 +507,7 @@ void rotateLeft(unsigned order, T * arr, unsigned len){
 
 template <class T>
 inline void rotateLeft1(T * arr, unsigned len, unsigned str){
-	LOOP(len-str, str){	swap(arr[i], arr[i+str]); }
+	LOOP(len-str, str){	std::swap(arr[i], arr[i+str]); }
 }
 
 template <class T>
@@ -522,7 +519,7 @@ template <class T>
 inline void rotateRight1(T * arr, unsigned len, unsigned str){
 	unsigned end = indexLast(len,str);
 	for(unsigned i=end; i>=str; i-=str){
-		swap(arr[i], arr[i-str]);
+		std::swap(arr[i], arr[i-str]);
 	}
 }
 
@@ -569,11 +566,6 @@ inline void stretch(T * dst, const T * src, unsigned lenSrc, unsigned amount){
 		for(unsigned k=0; k<amount; ++k) dst[k]=v;
 		dst += amount;
 	}
-}
-
-template <class T>
-inline void swap(T& a, T& b){
-	T t=a; a=b; b=t;
 }
 
 template <class T>

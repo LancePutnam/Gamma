@@ -9,8 +9,8 @@
 */
 
 #include <cmath>
-#include <utility> // swap
 #include "Gamma/scl.h" // norm
+#include "Gamma/std_swap.h"
 
 #define LOOP(n,s) for(unsigned i=0; i<n; i+=s)
 
