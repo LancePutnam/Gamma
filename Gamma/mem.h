@@ -302,16 +302,6 @@ inline void zero(T * arr, unsigned len, unsigned str=1){
 	LOOP(len,str){ arr[i]=T(0); }
 }
 
-//template <class T>
-//inline void zero(T * arr, unsigned int len){ zero(arr, (uint)len); }
-//
-//template <class To0> void zero(To0& o0){ zero(&o0[0], (uint)o0.size()); }
-//
-///// o0[i] = 0
-//template <class To0, class Tind>
-//void zero(To0& o0, const Tind& ind){ LOOP_IND(o0[i] = 0;) }
-
-
 
 
 // Implementation_______________________________________________________________
