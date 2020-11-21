@@ -1,6 +1,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include <stdio.h>
 #include "Gamma/Domain.h"
 
 namespace gam{
@@ -117,8 +118,8 @@ void Domain::spu(double v){ //printf("[%p] Domain::spu(%g)\n", this, v);
 
 void Domain::ups(double val){ spu(1./val); }
 
-void Domain::print(FILE * fp) const {
-	fprintf(fp, "Domain %p:\n\tspu = %f, ups = %f\n", this, spu(), ups());
+void Domain::print() const {
+	printf("Domain %p:\n\tspu = %f, ups = %f\n", this, spu(), ups());
 
 	DomainObserver * o = mHeadObserver;
 	unsigned numObs = 0;
@@ -127,15 +128,15 @@ void Domain::print(FILE * fp) const {
 		o = o->nodeR;
 	}
 	
-	fprintf(fp, "\t %u observers%s", numObs, numObs ? ": " : "\n");
+	printf("\t %u observers%s", numObs, numObs ? ": " : "\n");
 
 	if(numObs){
 		o = mHeadObserver;
 		while(o){
-			fprintf(fp, "%p ", o);
+			printf("%p ", o);
 			o = o->nodeR;
 		}
-		fprintf(fp, "\n");
+		printf("\n");
 	}
 }
 
