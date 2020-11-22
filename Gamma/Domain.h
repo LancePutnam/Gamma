@@ -139,6 +139,4 @@ inline double Domain::spu() const { return mSPU; }
 inline double Domain::ups() const { return mUPS; }
 } // gam::
 
-#include "Gamma/Sync.h"
-
 #endif
