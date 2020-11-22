@@ -176,8 +176,8 @@ protected:
 
 
 
-#define PRE template <class T, template<class> class Si, class Sp>
-#define CLS SamplePlayer<T,Si,Sp>
+#define PRE template <class T, template<class> class Si, class Sp, class Td>
+#define CLS SamplePlayer<T,Si,Sp,Td>
 
 PRE CLS::SamplePlayer()
 :	Array<T>(defaultArray<T>(), 1),
@@ -284,13 +284,13 @@ PRE void CLS::free(){ this->freeElements(); }
 
 PRE inline void CLS::rate(double v){
 	mRate = v;
-	mInc = v * frameRate() * ups();
+	mInc = v * frameRate() * this->ups();
 }
 
 PRE void CLS::range(double posn, double period){
 	phase(posn);
 	min(pos());
-	max(pos() + period * spu());
+	max(pos() + period * this->spu());
 }
 
 PRE void CLS::reset(){
