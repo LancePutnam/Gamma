@@ -263,7 +263,7 @@ PRE void CLS::buffer(Array<T>& src, double frmRate, int chans, bool interleaved)
 }
 
 PRE void CLS::buffer(T * src, int numFrms, double frmRate, int chans, bool interleaved){
-	if(this->source(src, numFrms*chans, true)){
+	if(this->source(src, numFrms*chans)){
 		initBufferAccess(frmRate, chans, interleaved);
 	}
 }

@@ -29,8 +29,8 @@
 		const int N=16;
 		typedef int t;
 		typedef Array<t> array_t;
-		array_t * a = new array_t(N, 123);
-		array_t * b = new array_t;
+		auto * a = new array_t(N, 123);
+		auto * b = new array_t;
 		b->source(*a);
 
 		for(unsigned i=0; i<a->size(); ++i) assert((*a)[i] == 123);
@@ -44,17 +44,15 @@
 
 		delete a;
 		assert(array_t::references(b->elems()) == 1);
-		
-		array_t * c = new array_t(b->elems(), b->size());
-		assert(array_t::references(b->elems()) == 2);
+
+		{ // setting from raw pointer should not manage
+			auto * c = new array_t(b->elems(), b->size());
+			assert(array_t::references(b->elems()) == 1);
+		}
 
 		delete b;
-		assert(array_t::references(c->elems()) == 1);
-		
-		t * elemsC = c->elems();
-		delete c;
-		assert(array_t::references(elemsC) == 0);
-		
+		assert(array_t::references(b->elems()) == 0);
+
 		a = new array_t(N, 123);
 		b = new array_t(*a);
 		

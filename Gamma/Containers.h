@@ -176,17 +176,17 @@ public:
 
 	/// Sets source of array elements to another array
 
+	/// Memory will be managed internally (reference counted).
 	/// \returns true if the internal data reference changed, otherwise false
-	///
 	bool source(ArrayBase<T,S,A>& src);
 
-	/// Sets source of array elements to another array
+	/// Sets source of array elements to an externally managed array
 
 	/// \param[in] src			C array to reference
 	/// \param[in] size			size of array, in elements
-	/// \param[in] unmanaged	whether the array memory shall be managed externally
+	///
 	/// \returns true if the internal data reference changed, otherwise false
-	bool source(T * src, uint32_t size, bool unmanaged=false);
+	bool source(T * src, uint32_t size);
 
 	/// Called whenever the size changes
 	virtual void onResize(){}
@@ -200,6 +200,8 @@ public:
 protected:
 	T * mElems = 0;
 	S mSize{0};
+
+	bool source(T * src, uint32_t size, bool unmanaged);
 
 	typedef std::map<T *, int> RefCount;
 
@@ -564,7 +566,12 @@ inline uint32_t ArrayBase<T,S,A>::size() const { return mSize(); }
 
 template <class T, class S, class A>
 bool ArrayBase<T,S,A>::source(ArrayBase<T,S,A>& src){
-	return source(src.elems(), src.size());
+	return source(src.elems(), src.size(), false);
+}
+
+template <class T, class S, class A>
+bool ArrayBase<T,S,A>::source(T * src, uint32_t size){
+	return source(src, size, true);
 }
 
 template <class T, class S, class A>
