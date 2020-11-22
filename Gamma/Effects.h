@@ -419,61 +419,50 @@ template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class Quantizer : public Td{
 public:
 	/// \param[in] freq		Frequency of sequence quantization
-	/// \param[in] step		Step size of amplitude quantization
-	Quantizer(double freq=2000, T step=0);
+	/// \param[in] stepAmt	Step amount of amplitude quantization
+	Quantizer(double freq=2000, T stepAmt=0)
+	:	mPeriod(1./freq){
+		step(stepAmt);
+	}
 
-	void freq(double value);	///< Set freqency of sequence quantization
-	void period(double value);	///< Set period of sequence quantization
-	void step(T value);			///< Set amplitude quantization amount
+	/// Set freqency of sequence quantization
+	void freq(double v){ period(1./v); }
 
-	T operator()(T input);		///< Return next filtered sample
+	/// Set period of sequence quantization
+	void period(double v){
+		mPeriod = v;
+		mSamples = v * this->spu();
+		if(mSamples < 1.) mSamples = 1.;
+	}
+
+	/// Set amplitude quantization amount
+	void step(T v){
+		mStep = v;
+		mDoStep = mStep > 0.;
+		if(mDoStep) mStepRec = 1./mStep;
+	}
+
+	/// Return next filtered sample
+	T operator()(T in){
+		if(++mCount >= mSamples){
+			mCount -= mSamples;
+			mHeld = mDoStep ? scl::round(in, mStep, mStepRec) : in;
+		}
+		return mHeld;
+	}
 	
-	virtual void onDomainChange(double r);
+	virtual void onDomainChange(double r){
+		period(mPeriod);
+	}
 
 private:
-	T mHeld;
-	double mCount, mSamples, mPeriod;
+	T mHeld = T(0);
+	// A float can represent integers up to 16,777,216.
+	// Max period at 44.1kHz is thus 38 seconds.
+	float mCount=0., mSamples, mPeriod;
 	T mStep, mStepRec;
 	bool mDoStep;
 };
-
-template<class T>
-Quantizer<T>::Quantizer(double freq, T step)
-:	mPeriod(1./freq)
-{
-	this->step(step);
-}
-
-template<class T>
-inline void Quantizer<T>::freq(double v){ period(1./v); }
-
-template<class T>
-inline void Quantizer<T>::period(double v){
-	mPeriod = v;
-	mSamples = v * spu();
-	if(mSamples < 1.) mSamples = 1.;
-}
-
-template<class T>
-inline void Quantizer<T>::step(T v){
-	mStep = v;
-	mDoStep = mStep > 0.;
-	if(mDoStep) mStepRec = 1./mStep;
-}
-
-template<class T>
-inline T Quantizer<T>::operator()(T vi){
-	if(++mCount >= mSamples){
-		mCount -= mSamples;
-		mHeld = mDoStep ? scl::round(vi, mStep, mStepRec) : vi;
-	}
-	return mHeld;
-}
-
-template<class T>
-void Quantizer<T>::onDomainChange(double r){
-	period(mPeriod);
-}
 
 } // gam::
 #endif
