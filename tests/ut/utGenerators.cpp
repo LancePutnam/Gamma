@@ -4,7 +4,7 @@
 	float buf[N+2];
 	std::complex<float> * fdbuf = (std::complex<float> *)buf;
 	float * tdbuf = buf+1;
-	Sync::master().spu(1);
+	gam::sampleRate(1);
 
 	{
 		Accum<> g;
