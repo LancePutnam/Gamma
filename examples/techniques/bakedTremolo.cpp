@@ -6,8 +6,9 @@ Author:		Lance Putnam, 2012
 
 Description:
 The shows how to "bake" a tremolo into a wavetable to save on having an
-additional modulator oscillator. The downside of this approach, however, is
-that the tremolo rate is always an integer division of the oscillator frequency.
+additional modulator oscillator. The only caveat is that the tremolo rate is 
+always an integer division of the oscillator frequency. However, this can
+produce very rich modulation when oscillators are combined in parallel.
 */
 
 #include "../AudioApp.h"
