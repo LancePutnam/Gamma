@@ -87,7 +87,7 @@ protected:
 /// \tparam Tv	value (sample) type
 /// \tparam Tp	parameter type
 /// \ingroup Envelope 
-template <int N, class Tv=real, class Tp=real, class Td=DomainObserver>
+template <int N, class Tv=real, class Tp=real, class Td=GAM_DEFAULT_DOMAIN>
 class Env : public Td{
 public:
 
@@ -290,8 +290,8 @@ protected:
 
 	unsigned mPos, mLen;// position in and length of current segment, in samples
 	int mStage;			// the current curve segment
-	int mSustain;		// index of sustain point
-	int mLoop;
+	int mSustain=N;		// index of sustain point
+	int mLoop=0;
 
 	void setLen(int i){ mLen=unsigned(mLengths[i]*Td::spu()); }
 };
@@ -304,7 +304,7 @@ protected:
 /// \tparam Tp	parameter type
 /// \tparam Td	domain observer type
 /// \ingroup Envelope 
-template <class Tv=real, class Tp=real, class Td=DomainObserver>
+template <class Tv=real, class Tp=real, class Td=GAM_DEFAULT_DOMAIN>
 class AD : public Env<2,Tv,Tp,Td>{
 public:
 	using Env<2,Tv,Tp,Td>::release;
@@ -361,7 +361,7 @@ protected:
 /// \tparam Tp	parameter type
 /// \tparam Td	domain observer type
 /// \ingroup Envelope 
-template <class Tv=real, class Tp=real, class Td=DomainObserver>
+template <class Tv=real, class Tp=real, class Td=GAM_DEFAULT_DOMAIN>
 class ADSR : public Env<3,Tv,Tp,Td>{
 public:
 	using Env<3,Tv,Tp,Td>::release;
@@ -435,7 +435,7 @@ protected:
 /// per iteration. \n\n Compare to Curve which touches exactly both start and end points.
 /// \ingroup Envelope
 /// \sa Curve
-template <class T=real, class Td=DomainObserver>
+template <class T=real, class Td=GAM_DEFAULT_DOMAIN>
 class Decay : public Td{
 public:
 
@@ -473,7 +473,7 @@ protected:
 /// with hysteresis.
 ///
 /// \ingroup Envelope
-template <class T=real, class Td=DomainObserver>
+template <class T=real, class Td=GAM_DEFAULT_DOMAIN>
 class Gate : public Td{
 public:
 
@@ -518,7 +518,7 @@ template <
 	class Tv=real,
 	template <class> class Si=iplSeq::Linear,
 	class Tp=real,
-	class Td=DomainObserver
+	class Td=GAM_DEFAULT_DOMAIN
 >
 class Seg : public Td{
 public:
@@ -603,7 +603,7 @@ protected:
 /// Exponential envelope segment for smoothing out value changes.
 
 /// \ingroup Envelope Interpolation
-template <class T=gam::real, class Td=DomainObserver>
+template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class SegExp : public Td{
 public:
 
@@ -755,8 +755,7 @@ inline Tv Curve<Tv,Tp>::operator()(){
 
 
 template <int N,class Tv,class Tp,class Td>
-Env<N,Tv,Tp,Td>::Env()
-:	mSustain(N), mLoop(0){
+Env<N,Tv,Tp,Td>::Env(){
 	for(int i=0; i<N; ++i){
 		mLengths[i]= Tp(1e-8);
 		mCurves[i] = Tp(-4);
@@ -767,9 +766,7 @@ Env<N,Tv,Tp,Td>::Env()
 }
 
 template <int N,class Tv,class Tp,class Td>
-Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2)
-:	mSustain(N), mLoop(0)
-{
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2){
 	levels(lvl1,lvl2);
 	lengths()[0] = len1;
 	curve(-4);
@@ -777,9 +774,7 @@ Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2)
 }
 
 template <int N,class Tv,class Tp,class Td>
-Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
-:	mSustain(N), mLoop(0)
-{
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3){
 	levels(lvl1,lvl2,lvl3);
 	lengths(len1,len2);
 	curve(-4);
@@ -787,9 +782,7 @@ Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3)
 }
 
 template <int N,class Tv,class Tp,class Td>
-Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4)
-:	mSustain(N), mLoop(0)
-{
+Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4){
 	levels(lvl1,lvl2,lvl3,lvl4);
 	lengths(len1,len2,len3);
 	curve(-4);
@@ -836,12 +829,29 @@ void Env<N,Tv,Tp,Td>::release(){
 
 	if(released()) return;
 
-	mSustain = -scl::abs(mSustain);
-
 	// begin release portion immediately starting at current level
 	Tv curVal = value();
-	mStage = -mSustain;
-	if(!done()){
+
+	/* pre-sustain release?
+	auto oldStage = mStage;
+	if(mStage < mSustain-1){
+		//if(mSustain >= 1) mStage = mSustain-1;
+		// go back until non-zero length segment is found...
+		if(mSustain >= 1){
+			mStage = mSustain-1;
+			while(mStage > 0){
+				if(mLengths[mStage] > 0.) break;
+				--mStage;
+			}
+		}
+		//printf("stage set to %d\n", mStage);
+	}//*/
+
+	mSustain = -mSustain; // neg. sustain means released
+
+	mStage = -mSustain; // old version
+
+	if(!done() /*&& oldStage != mStage*/){
 		mPos = 0;
 		setLen(mStage);
 		mCurve.set(Tp(mLen), mCurves[mStage], curVal, mLevels[mStage+1]);

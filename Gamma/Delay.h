@@ -42,7 +42,7 @@ namespace gam{
 template<
 	class Tv = gam::real,
 	template<class> class Si = ipl::Linear,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class Delay : public ArrayPow2<Tv>, public Td{
 public:
@@ -121,7 +121,7 @@ protected:
 template <
 	class Tv = gam::real,
 	template <class> class Si = ipl::Linear,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class Multitap : public Delay<Tv,Si,Td> {
 public:
@@ -259,7 +259,7 @@ template<
 	class Tv = gam::real,
 	template <class> class Si = ipl::Linear,
 	class Tp = gam::real,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class Comb : public Delay<Tv,Si,Td> {
 

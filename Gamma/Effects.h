@@ -415,8 +415,8 @@ public:
 
 /// This effect is also known as a bitcrusher.
 ///\ingroup Effects
-template <class T=gam::real>
-class Quantizer : public DomainObserver{
+template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
+class Quantizer : public Td{
 public:
 	/// \param[in] freq		Frequency of sequence quantization
 	/// \param[in] step		Step size of amplitude quantization

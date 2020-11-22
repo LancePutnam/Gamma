@@ -10,6 +10,10 @@ namespace gam{
 
 class Domain;
 
+#ifndef GAM_DEFAULT_DOMAIN
+#define GAM_DEFAULT_DOMAIN DomainObserver
+#endif
+
 
 /// Domain with normalized sampling frequency and interval
 class Domain1{

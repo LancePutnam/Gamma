@@ -32,7 +32,7 @@ namespace gam{
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
 /// \ingroup Oscillator
-template <class Sp = phsInc::Loop, class Td = DomainObserver>
+template <class Sp = phsInc::Loop, class Td = GAM_DEFAULT_DOMAIN>
 class Accum : public Td {
 public:
 
@@ -116,7 +116,7 @@ private:
 /// \tparam Sp	Phase increment strategy (e.g., phsInc::Loop, phsInc::Oneshot)
 /// \tparam Td	Domain type
 ///\ingroup Oscillator
-template <class Sp = phsInc::Loop, class Td = DomainObserver>
+template <class Sp = phsInc::Loop, class Td = GAM_DEFAULT_DOMAIN>
 class Sweep : public Accum<Sp, Td> {
 public:
 	/// \param[in] frq		Frequency
@@ -137,7 +137,7 @@ public:
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
 ///\ingroup Oscillator
-template <class Tv = gam::real, class Td = DomainObserver>
+template <class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 class AccumPhase : public Td{
 public:
 	/// \param[in] frq		Frequency
@@ -202,7 +202,7 @@ template<
 	class Tv = gam::real,
 	template<class> class Si = ipl::Linear,
 	class Sp = phsInc::Loop,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class Osc : public Accum<Sp,Td>, public ArrayPow2<Tv>{
 public:
@@ -285,7 +285,7 @@ protected:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
 ///  \sa Osc, TableSine, CSine, LFO, Sine, SineR
-template<class Tv = gam::real, class Td = DomainObserver>
+template<class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 class CSine : public Td{
 public:
 
@@ -335,7 +335,7 @@ protected:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
 /// \sa Osc, TableSine, CSine, LFO, SineR
-template<class Tv = gam::real, class Td = DomainObserver>
+template<class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 class Sine : public AccumPhase<Tv,Td> {
 public:
 	/// \param[in]	frq		Frequency
@@ -367,7 +367,7 @@ public:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
 /// \sa Osc, TableSine, CSine, LFO, Sine, SineRs (Synthesizes multiple sines)
-template <class Tv = double, class Td = DomainObserver>
+template <class Tv = double, class Td = GAM_DEFAULT_DOMAIN>
 class SineR : public gen::RSin<Tv>, Td{
 public:
 
@@ -408,7 +408,7 @@ private:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
 /// \sa SineR (synthesizes a single sine)
-template <class Tv = double, class Td = DomainObserver>
+template <class Tv = double, class Td = GAM_DEFAULT_DOMAIN>
 class SineRs : public Array<SineR<Tv, Domain1> >, Td{
 public:
 
@@ -453,7 +453,7 @@ private:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
 /// \sa SineR, SineDs
-template <class Tv = double, class Td = DomainObserver>
+template <class Tv = double, class Td = GAM_DEFAULT_DOMAIN>
 class SineD : public gen::RSin2<Tv>, Td{
 public:
 
@@ -521,7 +521,7 @@ private:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator
 /// \sa SineD
-template <class Tv = double, class Td = DomainObserver>
+template <class Tv = double, class Td = GAM_DEFAULT_DOMAIN>
 class SineDs : public Array<SineD<Tv, Domain1> >, Td{
 public:
 
@@ -577,7 +577,7 @@ private:
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
 /// \ingroup Oscillator
-template<class Tv = double, class Td = DomainObserver>
+template<class Tv = double, class Td = GAM_DEFAULT_DOMAIN>
 class Chirplet : public Td{
 public:
 
@@ -666,7 +666,7 @@ protected:
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
 /// \sa Osc, TableSine, CSine, Sine, SineR
-template <class Sp = phsInc::Loop, class Td = DomainObserver>
+template <class Sp = phsInc::Loop, class Td = GAM_DEFAULT_DOMAIN>
 class LFO : public Accum<Sp,Td>{
 public:
 
@@ -741,7 +741,7 @@ private:
 /// This oscillator uses a difference between two waveforms to reduce aliasing.
 /// Computation time is higher than that of an LFO unit generator, however,
 /// the output exhibits far less aliasing at high frequencies.
-template <class Sp = phsInc::Loop, class Td = DomainObserver>
+template <class Sp = phsInc::Loop, class Td = GAM_DEFAULT_DOMAIN>
 class DWO : public Accum<Sp,Td>{
 public:
 
@@ -793,7 +793,7 @@ private:
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
-template<class Tv = gam::real, class Td = DomainObserver>
+template<class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 class Buzz : public AccumPhase<Tv,Td> {
 public:
 
@@ -840,7 +840,7 @@ private: typedef AccumPhase<Tv,Td> Base;
 /// \tparam Td	Domain type
 /// \ingroup Oscillator
 /// \sa Buzz
-template <class Tv = gam::real, class Td = DomainObserver>
+template <class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 struct Impulse : public Buzz<Tv,Td>{
 public:
 
@@ -874,7 +874,7 @@ private: typedef Buzz<Tv,Td> Base;
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
-template <class Tv = gam::real, class Td = DomainObserver>
+template <class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 struct Saw : public Impulse<Tv,Td> {
 
 	/// \param[in] frq		Frequency
@@ -901,7 +901,7 @@ struct Saw : public Impulse<Tv,Td> {
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
-template <class Tv = gam::real, class Td = DomainObserver>
+template <class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 struct Square : public Impulse<Tv,Td> {
 
 	/// \param[in] frq		Frequency
@@ -928,7 +928,7 @@ struct Square : public Impulse<Tv,Td> {
 /// \tparam Tv	Value (sample) type
 /// \tparam Td	Domain type
 /// \ingroup Oscillator 
-template<class Tv = gam::real, class Td = DomainObserver>
+template<class Tv = gam::real, class Td = GAM_DEFAULT_DOMAIN>
 class DSF : public AccumPhase<Tv,Td> {
 public:
 
@@ -983,7 +983,7 @@ template <
 	class Gen = gen::Default<>,
 	template <typename> class Si = iplSeq::Linear,
 	class Sp = phsInc::Loop,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class Upsample : public Accum<Sp,Td>{
 public:

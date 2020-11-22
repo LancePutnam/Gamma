@@ -96,9 +96,9 @@ namespace{
 /// When the center frequency is fs/2, the filter acts as an inverter.
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template<class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class AllPass1 : public Td {
 public:
 	///
@@ -138,9 +138,9 @@ protected:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class Biquad : public Td{
 public:
 
@@ -201,9 +201,9 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class BlockDC : public Td{
 public:
 
@@ -243,9 +243,9 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter  
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class BlockNyq : public BlockDC<Tv,Tp,Td>{
 public:
 
@@ -279,9 +279,9 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class Filter2 : public Td{
 public:
 
@@ -355,9 +355,9 @@ using Base::d1;
 /// center frequency controls where the phase is shifted by pi.
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class AllPass2 : public Filter2<Tv,Tp,Td>{
 public:
 
@@ -384,9 +384,9 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class Notch : public Filter2<Tv,Tp,Td>{
 public:
 	
@@ -424,9 +424,9 @@ protected:
 
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template <class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template <class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class Reson : public Filter2<Tv,Tp,Td>{
 public:
 
@@ -611,9 +611,9 @@ protected:
 ///
 /// \tparam Tv	Value (sample) type
 /// \tparam Tp	Parameter type
-/// \tparam Td	Domain observer type
+/// \tparam Td	Domain type
 /// \ingroup Filter
-template<class Tv=gam::real, class Tp=gam::real, class Td=DomainObserver>
+template<class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class OnePole : public Td{ 
 public:
 

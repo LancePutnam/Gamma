@@ -125,7 +125,7 @@ template<
 	typename Tv = gam::real,
 	template<typename> class Si = ipl::Linear,
 	template<typename> class LoopFilter = LoopGain,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class Echo : public Delay<Tv,Si,Td> {
 public:
@@ -162,7 +162,7 @@ template<
 	typename Tv = gam::real,
 	template<typename> class Si = ipl::Linear,
 	template<typename> class LoopFilter = LoopGain,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class EchoCSine : public Delay<Complex<Tv>, Si, Td> {
 public:
@@ -238,7 +238,7 @@ template<
 	typename Tv = gam::real,
 	template<typename> class LoopFilter = Loop1P,
 	template<typename> class Si = ipl::Trunc,
-	class Td = DomainObserver
+	class Td = GAM_DEFAULT_DOMAIN
 >
 class ReverbMS : public Td {
 public:

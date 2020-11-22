@@ -81,8 +81,8 @@ private:
 
 ///\ingroup Spectral
 ///
-template <class T=gam::real>
-class DFTBase : public DomainObserver{
+template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
+class DFTBase : public Td{
 public:
 	DFTBase();
 	virtual ~DFTBase();
@@ -497,79 +497,79 @@ inline unsigned SlidingWindow<T>::hopStart() const { return sizeWin() - sizeHop(
 
 
 
-template<class T>
-DFTBase<T>::DFTBase()
+template<class T, class Td>
+DFTBase<T,Td>::DFTBase()
 :	mSizeDFT(0), mNumAux(0), mBuf(0), mAux(0)
 {
 	onDomainChange(1);
 }
 
-template<class T>
-DFTBase<T>::~DFTBase(){ //printf("~DFTBase\n");
+template<class T, class Td>
+DFTBase<T,Td>::~DFTBase(){ //printf("~DFTBase\n");
 	mem::free(mBuf);
 	mem::free(mAux);
 }
 
-template<class T>
-inline T * DFTBase<T>::aux(unsigned num){ return mAux + numBins() * num; }
+template<class T, class Td>
+inline T * DFTBase<T,Td>::aux(unsigned num){ return mAux + numBins() * num; }
 
-template<class T>
-inline double DFTBase<T>::binFreq() const { return spu() / sizeDFT(); }
+template<class T, class Td>
+inline double DFTBase<T,Td>::binFreq() const { return Td::spu() / sizeDFT(); }
 
-template<class T>
-unsigned DFTBase<T>::numAux() const { return mNumAux; }
+template<class T, class Td>
+unsigned DFTBase<T,Td>::numAux() const { return mNumAux; }
 
-template<class T>
-unsigned DFTBase<T>::numBins() const { return (sizeDFT() + 2)>>1; }
+template<class T, class Td>
+unsigned DFTBase<T,Td>::numBins() const { return (sizeDFT() + 2)>>1; }
 
-template<class T>
-unsigned DFTBase<T>::sizeDFT() const { return mSizeDFT; }
+template<class T, class Td>
+unsigned DFTBase<T,Td>::sizeDFT() const { return mSizeDFT; }
 
-template<class T>
-Domain& DFTBase<T>::domainFreq(){ return mDomFreq; }
+template<class T, class Td>
+Domain& DFTBase<T,Td>::domainFreq(){ return mDomFreq; }
 
-template<class T>
-T DFTBase<T>::normForward() const { return T(2) / T(sizeDFT()); }
+template<class T, class Td>
+T DFTBase<T,Td>::normForward() const { return T(2) / T(sizeDFT()); }
 
-template<class T>
-void DFTBase<T>::numAux(unsigned num){
+template<class T, class Td>
+void DFTBase<T,Td>::numAux(unsigned num){
 	if(mem::resize(mAux, mNumAux * numBins(), num * numBins())){
 		mNumAux = num;
 		zeroAux();
 	}
 }
 
-template<class T>
-void DFTBase<T>::copyBinsToAux(unsigned binComp, unsigned auxNum){
+template<class T, class Td>
+void DFTBase<T,Td>::copyBinsToAux(unsigned binComp, unsigned auxNum){
 	T * auxBuf = aux(auxNum);
 	for(unsigned k=0; k<numBins(); ++k)
 		auxBuf[k] = bin(k)[binComp];
 }
 
-template<class T>
-void DFTBase<T>::copyAuxToBins(unsigned auxNum, unsigned binComp){
+template<class T, class Td>
+void DFTBase<T,Td>::copyAuxToBins(unsigned auxNum, unsigned binComp){
 	T * auxBuf = aux(auxNum);
 	for(unsigned k=0; k<numBins(); ++k)
 		bin(k)[binComp] = auxBuf[k];
 }
 
-template<class T>
-void DFTBase<T>::zero(){ mem::deepZero(mBuf, sizeDFT() + 2); }
+template<class T, class Td>
+void DFTBase<T,Td>::zero(){ mem::deepZero(mBuf, sizeDFT() + 2); }
 
-template<class T>
-void DFTBase<T>::zeroEnds(){
+template<class T, class Td>
+void DFTBase<T,Td>::zeroEnds(){
 	bins()[0](0,0);
 	bins()[numBins()-1](0,0);
 }
 
-template<class T>
-void DFTBase<T>::zeroAux(){ mem::deepZero(mAux, mNumAux * numBins()); }
+template<class T, class Td>
+void DFTBase<T,Td>::zeroAux(){ mem::deepZero(mAux, mNumAux * numBins()); }
 
-template<class T>
-void DFTBase<T>::zeroAux(unsigned num){ mem::deepZero(aux(num), numBins()); }
+template<class T, class Td>
+void DFTBase<T,Td>::zeroAux(unsigned num){ mem::deepZero(aux(num), numBins()); }
 
-template<class T>
-void DFTBase<T>::onDomainChange(double /*r*/){
+template<class T, class Td>
+void DFTBase<T,Td>::onDomainChange(double /*r*/){
 	domainFreq().ups(binFreq());
 }
 

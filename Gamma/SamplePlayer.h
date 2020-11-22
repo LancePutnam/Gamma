@@ -25,12 +25,14 @@ namespace gam{
 /// \tparam T	Value (sample) type
 /// \tparam Si	Interpolation strategy
 /// \tparam Sp	Phase increment strategy
+/// \tparam Td	Domain type
 template<
 	class T = float,
 	template<class> class Si = ipl::Trunc,
-	class Sp = phsInc::OneShot
+	class Sp = phsInc::OneShot,
+	class Td = GAM_DEFAULT_DOMAIN
 >
-class SamplePlayer: public DomainObserver, public Array<T>{
+class SamplePlayer: public Td, public Array<T>{
 public:
 	using Array<T>::size;
 	using Array<T>::elems;

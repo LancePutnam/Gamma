@@ -17,7 +17,7 @@ namespace gam{
 /// This object produces an estimate of the amplitude envelope of a signal
 /// by feeding a full-wave rectification of the signal through a low-pass filter.
 ///\ingroup Filter Envelope Analysis
-template <class Tv=real, class Tp=real, class Td=DomainObserver>
+template <class Tv=real, class Tp=real, class Td=GAM_DEFAULT_DOMAIN>
 class EnvFollow : public Td {
 public:
 
