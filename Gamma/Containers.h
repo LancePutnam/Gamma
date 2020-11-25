@@ -77,6 +77,7 @@ struct SizeArray{
 template <class T, class S, class A=gam::Allocator<T> >
 class ArrayBase : private A{
 public:
+	typedef T value_type;
 
 	/// Construct without allocating any memory
 	ArrayBase();
