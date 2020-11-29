@@ -459,7 +459,7 @@ namespace iplSeq{
 // The expected interface is:
 //	uint32_t operator()(uint32_t& pos, uint32_t inc);	// fixed-point tap increment
 //	bool done(uint32_t pos);							// fixed-point tap done reading
-//	T operator()(T v, T max, T min);					// float tap post increment check
+//	T operator()(T v, T inc, T max, T min);				// float tap increment
 //	void reset();										// reset internal state, if any
 
 /// \defgroup phsInc Phase Increment Strategies
