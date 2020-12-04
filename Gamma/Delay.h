@@ -162,10 +162,13 @@ protected:
 
 /// Fixed-size delay that uses memory-shifting.
 
-/// Where N is the number of elements in the delay, insertion is O(N) which is 
-/// slower than that of the average ring buffer at O(1). Access, however, will 
-/// be optimal (a direct array access) versus that of the ring buffer which 
-/// requires an additional conversion of a relative index into an absolute index.
+/// This delay employs a shift buffer rather than the ring buffer used in a
+/// typical delay. The primary advantage of a shift buffer is that elements
+/// remain sorted in the buffer chronologically, leading to optimal access.
+/// Access is also simple making this delay a good choice for implementing an
+/// small-sized FIR filter. The disadvantage of a shift buffer is that for every
+/// new element added, all elements must be shifted (moved) over by one array 
+/// slot (i.e. insertion is O(N)).
 ///
 /// \tparam N	size of delay
 /// \tparam T	value (sample) type
@@ -173,10 +176,9 @@ protected:
 template <unsigned N, class T>
 class DelayShift{
 public:
-	#define IT for(unsigned i=0; i<N; ++i)
 
 	/// \param[in] v	Initial value of elements
-	DelayShift(const T& v=T()){ IT mElems[i]=v; }
+	DelayShift(const T& v=T()){ for(auto& e:mElems) e=v; }
 
 	/// Set nth delayed element
 	T& operator[](unsigned i){ return mElems[i]; }
@@ -188,22 +190,24 @@ public:
 	T * elems(){ return mElems; }
 	const T * elems() const { return mElems; }
 
-
-	/// Input element and return Nth delayed element
-	T operator()(const T& v) const {
-		const T r = mElems[N-1];
+	/// Write new element
+	void write(const T& v){
 		for(unsigned i=N-1; i>0; --i) mElems[i] = mElems[i-1];
 		mElems[0]=v;
+	}
+
+	/// Write new element and return Nth delayed element
+	T operator()(const T& v){
+		T r = mElems[N-1];
+		write(v);
 		return r;
 	}
 
 	/// Get size of delay
 	static unsigned size(){ return N; }
 
-	#undef IT
-
 protected:
-	mutable T mElems[N];
+	T mElems[N];
 };
 
 
