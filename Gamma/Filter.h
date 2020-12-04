@@ -564,11 +564,12 @@ private:
 
 /// Moving average filter
 
-/// The moving average filter is a special case of an FIR filter whose kernel
-/// is a rectangular window with a magnitude equal to the inverse of the kernel
-/// size. Due to the symmetry of the window, the moving average filter can be
-/// implemented efficiently using a single delay line with O(1) processing time
-/// complexity.
+/// A moving average (MA) filter is a low-pass FIR filter. The filter kernel is
+/// a rectangle function with magnitude equal to the reciprocal of the kernel
+/// size, N. The cutoff frequency is controlled by the kernel size and is 
+/// approximately fs/N where fs is the sampling frequency. Due to the symmetry 
+/// of the window, the moving average filter can be implemented efficiently
+/// using a single delay line with O(1) processing time complexity.
 /// \ingroup Filter
 template <class Tv=gam::real>
 class MovingAvg : public DelayN<Tv>{
