@@ -26,9 +26,6 @@ Supported encodings:
 struct int24_t{ int32_t v; };
 struct uint24_t{ uint32_t v; };
 
-//typedef int32_t int24_t;
-//typedef uint32_t uint24_t;
-
 template <class T> constexpr size_t numBytes(){ return sizeof(T); }
 template <> constexpr size_t numBytes< int24_t>(){ return 3; }
 template <> constexpr size_t numBytes<uint24_t>(){ return 3; }
@@ -143,10 +140,25 @@ template <class T> T readBE(std::ifstream& f){
 	return readBE<T>(f,buf);
 }
 template <class T>
+void readBE(std::ifstream& f, T * dst, unsigned len){
+	f.read((char *)dst, sizeof(T)*len);
+	for(unsigned i=0; i<len; ++i){
+		dst[i] = toBE<T>(((unsigned char *)dst) + sizeof(T)*i);
+	}
+}
+
+template <class T>
 T readLE(std::ifstream& f){
 	unsigned char buf[sizeof(T)];
 	f.read((char *)buf, sizeof(T));
 	return toLE<T>(buf);
+}
+template <class T>
+void readLE(std::ifstream& f, T * dst, unsigned len){
+	f.read((char *)dst, sizeof(T)*len);
+	for(unsigned i=0; i<len; ++i){
+		dst[i] = toLE<T>(((unsigned char *)dst) + sizeof(T)*i);
+	}
 }
 
 template <class From, class To> To convert(From v);
@@ -259,6 +271,38 @@ public:
 	}
 	unsigned bytesPerFrame() const { return bytesPerSample() * channels(); }
 
+	struct Chunk{
+		std::string name;
+		std::vector<unsigned char> data;
+	};
+
+	typedef std::vector<Chunk> Chunks;
+
+	const Chunks& chunks() const { return mChunks; }
+
+	struct Loop{
+		double begin = 0.;
+		double end = 0.;
+		uint32_t count = 0; // 0 means infinite
+		uint8_t type = 0; // 0:forward 1:pingpong 2:backward
+		bool valid() const { return begin!=end; }
+	};
+
+	struct SamplerInfo{
+		float note = 60; // MIDI note (middle C is 60)
+		float gain = 1.;
+		int8_t noteLo = 0;
+		int8_t noteHi = 127;
+		int8_t velLo = 1;
+		int8_t velHi = 127;
+		Loop sustainLoop;
+		Loop releaseLoop;
+	};
+
+	typedef std::vector<SamplerInfo> SamplerInfos;
+
+	const SamplerInfos& samplerInfos() const { return mSamplerInfos; }
+
 	void print() const {
 		static const char * e[]={"PCM_U8","PCM_S8","PCM_16","PCM_24","PCM_32","FLOAT","DOUBLE","ULAW","ALAW","NO_ENCODING"};
 		static_assert(sizeof(e)/sizeof(e[0])==(NO_ENCODING+1), "");
@@ -269,6 +313,8 @@ protected:
 	Format mFormat = NO_FORMAT;
 	Encoding mEncoding = NO_ENCODING;
 	unsigned mChannels=0, mFrameRate=1, mFrames=0;
+	Chunks mChunks;
+	SamplerInfos mSamplerInfos;
 	bool mDataBigEndian = false;
 };
 
@@ -295,10 +341,22 @@ public:
 			char bufs[32];
 			unsigned char buf[32];
 		};
+		char chunkName[4];
 
 		mReadFrame = 0;
 		std::streampos filePosOfData = -1;
 		const auto fileID = readBE<uint32_t>(mFile);
+
+		// For chunked formats wav, aiff, etc.
+		auto storeChunk = [&](uint32_t chunkSize, int copyMode){
+			if(0==copyMode) return;
+			mChunks.emplace_back();
+			auto& chunk = mChunks.back();
+			chunk.name.assign(chunkName, 4);
+			chunk.data.resize(chunkSize);
+			if(2==copyMode) mFile.seekg(-int(chunkSize), mFile.cur);
+			mFile.read((char*)&chunk.data[0], chunk.data.size());
+		};
 
 		if(ID(".snd") == fileID){
 			format(AU);
@@ -333,11 +391,12 @@ public:
 				unsigned bps = 1; // bits/sample
 
 				while(!mFile.eof()){
-					auto chunkID = readBE<uint32_t>(mFile, bufs);
+					auto chunkID = readBE<uint32_t>(mFile, chunkName);
 					if(mFile.gcount() != 4) break;
-					DPRINTF("%c%c%c%c ", bufs[0], bufs[1], bufs[2], bufs[3]);
+					DPRINTF("%c%c%c%c ", chunkName[0], chunkName[1], chunkName[2], chunkName[3]);
 					auto chunkSize = readLE<uint32_t>(mFile);
 					DPRINTF("(%u bytes)\n", chunkSize);
+					int chunkStoreFlag = 0;
 
 					switch(chunkID){
 					case ID("fmt "):{
@@ -347,7 +406,7 @@ public:
 						auto BR        = readLE<uint32_t>(mFile);
 						auto blockAlign= readLE<uint16_t>(mFile);
 						bps = readLE<uint16_t>(mFile);
-						DPRINTF("  format: %u, chans: %u, SR: %u, BR: %u, blockAlign: %u, bps: %u\n", format, mChannels, mFrameRate, BR, blockAlign, bps);
+						DPRINTF("  format:%u chans:%u SR:%u BR:%u blockAlign:%u bps:%u\n", format, mChannels, mFrameRate, BR, blockAlign, bps);
 						if(1 == format){ // PCM
 							switch(bps){
 							case  8: mEncoding = PCM_U8; break;
@@ -376,19 +435,21 @@ public:
 							// ignore ext data; use chunk size in case extSize=0
 							mFile.seekg(chunkSize-16-2, mFile.cur);
 						}
-
+						chunkStoreFlag = 2;
 					} break;
 
 					case ID("data"):{
 						mFrames = chunkSize/mChannels/(bps/8);
 						filePosOfData = mFile.tellg();
-						mFile.seekg(chunkSize, mFile.cur);
+						if(mStoreDataChunk) chunkStoreFlag = 1;
+						else mFile.seekg(chunkSize, mFile.cur);
 					} break;
 
 					case ID("fact"):{
 						auto numSamps = readLE<uint32_t>(mFile);
 						DPRINTF("  fact (num samples): %u\n", numSamps);
 						if(chunkSize > 4) mFile.seekg(chunkSize-4, mFile.cur);
+						chunkStoreFlag = 2;
 					} break;
 
 					/*case ID("LIST"):{
@@ -397,9 +458,45 @@ public:
 						// list of subchunks follows, can just parse as normal chunks
 					} break;*/
 
+					case ID("smpl"):{
+						uint32_t d[9];
+						readLE(mFile, d,9); // 0:manf 1:prod 2:period 3:note 4:semitone up 5:smpteFmt 6:smpteOff 7:loops 8:sampler data size
+						DPRINTF("  manf:%u prod:%u period:%u note:%u semi:%u loops:%u data:%u\n", d[0],d[1],d[2],d[3],d[4],d[7],d[8]);
+						for(unsigned i=0; i<d[7]; ++i){
+							uint32_t l[6]; // 0:cue ID 1:type 2:beg 3:end 4:frac 5:count
+							readLE(mFile, l,6);
+							DPRINTF("  ID:%u type:%u beg:%u end:%u frac:%u cnt:%u\n", l[0],l[1],l[2],l[3],l[4],l[5]);
+							SamplerInfo I;
+							I.note = d[3] + d[4]/4294967296.;
+							I.sustainLoop.type  = l[1];
+							I.sustainLoop.begin = l[2];
+							I.sustainLoop.end   = l[3] + l[4]/4294967296.;
+							I.sustainLoop.count = l[5];
+							mSamplerInfos.push_back(I);
+						}
+						if(d[8]) mFile.seekg(chunkSize-(36+d[7]*24), mFile.cur);
+						chunkStoreFlag = 2;
+					} break;
+
+					case ID("inst"):{
+						char d[7]; // 0:note 1:cents 2:gain(dB) 3:low note 4:high note 5:low vel 6:high vel
+						mFile.read(d,7);
+						SamplerInfo I;
+						I.note = d[0] + d[1]/100.;
+						I.gain = std::pow(10., d[2]/20.);
+						I.noteLo = d[3];
+						I.noteHi = d[4];
+						I.velLo = d[5];
+						I.velHi = d[6];
+						mSamplerInfos.push_back(I);
+						chunkStoreFlag = 2;
+					} break;
+
 					default: // unhandled chunk
-						mFile.seekg(chunkSize, mFile.cur);
+						chunkStoreFlag = 1;
 					}
+
+					storeChunk(chunkSize, chunkStoreFlag);
 				}
 			}
 
@@ -431,11 +528,12 @@ public:
 				};
 
 				while(!mFile.eof()){
-					auto chunkID = readBE<uint32_t>(mFile, bufs);
+					auto chunkID = readBE<uint32_t>(mFile, chunkName);
 					if(mFile.gcount() != 4) break;
-					DPRINTF("%c%c%c%c ", bufs[0], bufs[1], bufs[2], bufs[3]);
+					DPRINTF("%c%c%c%c ", chunkName[0], chunkName[1], chunkName[2], chunkName[3]);
 					auto chunkSize = readBE<uint32_t>(mFile);
 					DPRINTF("(%u bytes)\n", chunkSize);
+					int chunkStoreFlag = 0;
 
 					switch(chunkID){
 					case ID("COMM"):{
@@ -469,21 +567,62 @@ public:
 							default: goto error; // unsupported PCM bit depth
 							}
 						}
-						DPRINTF("  chans: %u, SR: %u, frames: %u, bps: %u\n", mChannels, mFrameRate, mFrames, bps);
+						DPRINTF("  chans:%u SR:%u frames:%u bps:%u\n", mChannels, mFrameRate, mFrames, bps);
+						chunkStoreFlag = 2;
 					} break;
 
 					case ID("SSND"):{
 						auto offset    = readBE<uint32_t>(mFile);
 						auto blockSize = readBE<uint32_t>(mFile);
-						DPRINTF("  offset: %u, blockSize: %u\n", offset, blockSize);
+						DPRINTF("  offset:%u blockSize:%u\n", offset, blockSize);
 						mFile.read(bufs, offset);
 						filePosOfData = mFile.tellg();
 						mFile.seekg(chunkSize - (8+offset), mFile.cur);
+						if(mStoreDataChunk) chunkStoreFlag = 2;
+					} break;
+
+					case ID("INST"):{
+						// http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/AIFF/Docs/AIFF-1.3.pdf
+						SamplerInfo I;
+						{	char d[6]; // 0:note 1:cents 2:low note 3:high note 4:low vel 5:high vel
+							mFile.read(d,6);
+							I.note = d[0] + d[1]/100.;
+							I.noteLo = d[2];
+							I.noteHi = d[3];
+							I.velLo = d[4];
+							I.velHi = d[5];
+						}
+						{	int16_t d[7]; // 0:gain 1:sus dir 2:sus mark beg 3:sus mark end 4:rel dir 5:rel mark beg 6:rel mark end
+							readBE(mFile, d,7);
+							I.gain = std::pow(10., d[0]/20.);
+							I.sustainLoop.type = d[1];
+							I.sustainLoop.begin = d[2];
+							I.sustainLoop.end = d[3];
+							I.releaseLoop.type = d[4];
+							I.releaseLoop.begin = d[5];
+							I.releaseLoop.end = d[6];
+							// TODO: get loop samples from markers (in MARK chunk)
+						}
+						mSamplerInfos.push_back(I);
+						chunkStoreFlag = 2;
+					} break;
+						
+					case ID("MARK"):{
+						auto cnt   = readBE<uint16_t>(mFile);
+						for(uint16_t i=0; i<cnt; ++i){
+							auto id  = readBE<int16_t>(mFile);
+							auto pos = readBE<uint32_t>(mFile);
+							uint8_t strlen = mFile.get();
+							// next strlen bytes are name, must pad read out to even number of bytes
+						}
+						chunkStoreFlag = 2;
 					} break;
 
 					default: // unhandled chunk
-						mFile.seekg(chunkSize, mFile.cur);
+						chunkStoreFlag = 1;
 					}
+
+					storeChunk(chunkSize, chunkStoreFlag);
 				}
 			}
 		}
@@ -580,52 +719,55 @@ public:
 		return read(dst, mFrames);
 	}
 
+	SoundFileInfo& storeDataChunk(bool v){ mStoreDataChunk=v; return *this; }
+
 private:
 	std::ifstream mFile;
 	std::vector<char> mFrameData;
 	unsigned mReadFrame = 0;
+	bool mStoreDataChunk = false;
 };
 
 
 //template <class T> char * toBE(char * dst, T v);
-char * toBE(char * dst, uint16_t v){
+inline char * toBE(char * dst, uint16_t v){
 	((uint8_t *)dst)[0] = v>> 8;
 	((uint8_t *)dst)[1] = v;
 	return dst;
 }
-char * toLE(char * dst, uint16_t v){
+inline char * toLE(char * dst, uint16_t v){
 	((uint8_t *)dst)[1] = v>> 8;
 	((uint8_t *)dst)[0] = v;
 	return dst;
 }
 
-char * toBE(char * dst, int16_t v){	return toBE(dst, pun<uint16_t>(v)); }
-char * toLE(char * dst, int16_t v){ return toLE(dst, pun<uint16_t>(v)); }
+inline char * toBE(char * dst, int16_t v){ return toBE(dst, pun<uint16_t>(v)); }
+inline char * toLE(char * dst, int16_t v){ return toLE(dst, pun<uint16_t>(v)); }
 
-char * toBE(char * dst, uint24_t v){
+inline char * toBE(char * dst, uint24_t v){
 	((uint8_t *)dst)[0] = v.v>>16;
 	((uint8_t *)dst)[1] = v.v>> 8;
 	((uint8_t *)dst)[2] = v.v;
 	return dst;
 }
-char * toLE(char * dst, uint24_t v){
+inline char * toLE(char * dst, uint24_t v){
 	((uint8_t *)dst)[2] = v.v>>16;
 	((uint8_t *)dst)[1] = v.v>> 8;
 	((uint8_t *)dst)[0] = v.v;
 	return dst;
 }
 
-char * toBE(char * dst, int24_t v){	return toBE(dst, pun<uint24_t>(v)); }
-char * toLE(char * dst, int24_t v){ return toLE(dst, pun<uint24_t>(v)); }
+inline char * toBE(char * dst, int24_t v){ return toBE(dst, pun<uint24_t>(v)); }
+inline char * toLE(char * dst, int24_t v){ return toLE(dst, pun<uint24_t>(v)); }
 
-char * toBE(char * dst, uint32_t v){
+inline char * toBE(char * dst, uint32_t v){
 	((uint8_t *)dst)[0] = v>>24;
 	((uint8_t *)dst)[1] = v>>16;
 	((uint8_t *)dst)[2] = v>> 8;
 	((uint8_t *)dst)[3] = v;
 	return dst;
 }
-char * toLE(char * dst, uint32_t v){
+inline char * toLE(char * dst, uint32_t v){
 	((uint8_t *)dst)[3] = v>>24;
 	((uint8_t *)dst)[2] = v>>16;
 	((uint8_t *)dst)[1] = v>> 8;
@@ -633,10 +775,10 @@ char * toLE(char * dst, uint32_t v){
 	return dst;
 }
 
-char * toBE(char * dst, int32_t v){ return toBE(dst, pun<uint32_t>(v)); }
-char * toLE(char * dst, int32_t v){ return toLE(dst, pun<uint32_t>(v)); }
+inline char * toBE(char * dst, int32_t v){ return toBE(dst, pun<uint32_t>(v)); }
+inline char * toLE(char * dst, int32_t v){ return toLE(dst, pun<uint32_t>(v)); }
 
-char * toBE(char * dst, uint64_t v){
+inline char * toBE(char * dst, uint64_t v){
 	((uint8_t *)dst)[0] = v>>56;
 	((uint8_t *)dst)[1] = v>>48;
 	((uint8_t *)dst)[2] = v>>40;
@@ -647,7 +789,7 @@ char * toBE(char * dst, uint64_t v){
 	((uint8_t *)dst)[7] = v;
 	return dst;
 }
-char * toLE(char * dst, uint64_t v){
+inline char * toLE(char * dst, uint64_t v){
 	((uint8_t *)dst)[7] = v>>56;
 	((uint8_t *)dst)[6] = v>>48;
 	((uint8_t *)dst)[5] = v>>40;
@@ -659,11 +801,11 @@ char * toLE(char * dst, uint64_t v){
 	return dst;
 }
 
-char * toBE(char * dst, float v){ return toBE(dst, pun<uint32_t>(v)); }
-char * toLE(char * dst, float v){ return toLE(dst, pun<uint32_t>(v)); }
+inline char * toBE(char * dst, float v){ return toBE(dst, pun<uint32_t>(v)); }
+inline char * toLE(char * dst, float v){ return toLE(dst, pun<uint32_t>(v)); }
 
-char * toBE(char * dst, double v){ return toBE(dst, pun<uint64_t>(v)); }
-char * toLE(char * dst, double v){ return toLE(dst, pun<uint64_t>(v)); }
+inline char * toBE(char * dst, double v){ return toBE(dst, pun<uint64_t>(v)); }
+inline char * toLE(char * dst, double v){ return toLE(dst, pun<uint64_t>(v)); }
 
 template <class T>
 void writeBE(std::ofstream& f, const T& v){
