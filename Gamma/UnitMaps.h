@@ -124,7 +124,23 @@ public:
 	/// @param[in] x01	Unit position in table, in [0,1)
 	///
 	TablePow2(const std::function<T(float x01)>& fillFunc){
-		for(int i=0; i<N; ++i) mElems[i] = fillFunc(float(i)/N);
+		assign(fillFunc);
+	}
+
+	/// Assign elements from function
+	
+	/// @param[in] x01	Unit position in table, in [0,1)
+	///
+	TablePow2& assign(const std::function<T(float x01)>& f){
+		for(int i=0; i<N; ++i) mElems[i] = f(float(i)/N);
+		return *this;
+	}
+
+	/// Assign elements from another array
+	template <class U>
+	TablePow2& assign(const U * src){
+		for(int i=0; i<N; ++i) mElems[i] = src[i];
+		return *this;
 	}
 
 	const T& operator[](unsigned i) const { return mElems[i]; }
