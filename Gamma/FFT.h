@@ -13,6 +13,8 @@ template <class T>
 class CFFT{
 public:
 
+	typedef T value_type;
+
 	/// \param[in] size		size of complex input sequence; 
 	///						most efficient when a product of small primes
 	CFFT(int size=0);
@@ -56,6 +58,8 @@ private:
 template <class T>
 class RFFT{
 public:
+
+	typedef T value_type;
 
 	/// \param[in] size		size of real input sequence; 
 	///						most efficient when a product of small primes
