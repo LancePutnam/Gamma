@@ -432,7 +432,10 @@ protected:
 /// value. Because zero is never reached, the decay length determines when the
 /// envelope is -60 dB down from its initial value. This envelope is one of the 
 /// most computationally efficient envelopes requiring only a single multiply
-/// per iteration. \n\n Compare to Curve which touches exactly both start and end points.
+/// per iteration. That said, after a certain number iterations, denormalized
+/// floats may be generated which can dramatically decrease performance. To
+/// avoid denormals get the next sample via: decay.done() ? 0.f : decay().
+/// \n\n Compare to Curve which touches exactly both start and end points.
 /// \ingroup Envelope
 /// \sa Curve
 template <class T=real, class Td=GAM_DEFAULT_DOMAIN>
