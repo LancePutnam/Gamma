@@ -164,7 +164,7 @@ public:
 
 
 	void freq(Tp v);					///< Set center frequency
-	void res(Tp v);						///< Set resonance (Q)
+	void res(Tp v);						///< Set resonance (Q); gain at center frequency
 	void level(Tp v);					///< Set level (PEAKING, LOW_SHELF, HIGH_SHELF types only)
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
 	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
