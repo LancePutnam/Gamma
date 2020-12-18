@@ -363,7 +363,7 @@ public:
 
 	/// Get number of global voice parameters
 	unsigned numParams() const {
-		return mParams.size();
+		return unsigned(mParams.size());
 	}
 
 	/// Get global voice parameter (object)
