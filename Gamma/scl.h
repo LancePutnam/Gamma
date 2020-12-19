@@ -217,6 +217,7 @@ template<class T> T pow5(T v);			///< Returns value to the 5th power
 template<class T> T pow6(T v);			///< Returns value to the 6th power
 template<class T> T pow7(T v);			///< Returns value to the 7th power
 template<class T> T pow8(T v);			///< Returns value to the 8th power
+template<class T> T pow9(T v);			///< Returns value to the 9th power
 
 /// Returns pole radius given a T60 decay length and units/sample
 inline double radius60(double dcy, double ups){ return exp(M_LN001/dcy * ups); } // u/s * 1/u
@@ -667,6 +668,7 @@ template<class T> inline T pow5(T v){ return pow4(v)*v; }
 template<class T> inline T pow6(T v){ return pow3(pow2(v)); }
 template<class T> inline T pow7(T v){ return pow6(v)*v; }
 template<class T> inline T pow8(T v){ return pow4(v*v); }
+template<class T> inline T pow9(T v){ return pow3(pow3(v)); }
 template<class T> inline T powN(T v, int power){
 	switch(power){
 	case  0: return T(1);
@@ -678,7 +680,7 @@ template<class T> inline T powN(T v, int power){
 	case  6: return pow6(v);
 	case  7: return pow7(v);
 	case  8: return pow8(v);
-	case  9: return pow3(pow3(v));
+	case  9: return pow9(v);
 	case 10: return pow2(pow5(v));
 	case 11: {auto vv=v*v; return pow3(vv*v)*vv;}
 	case 12: return pow3(pow4(v));
