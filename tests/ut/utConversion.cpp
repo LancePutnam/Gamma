@@ -71,4 +71,23 @@
 	#define T(x, y) assert(unitToUInt8(x) == y);
 	T(0, 0) T(1./4, 64) T(1./2, 128) T(3./4, 192)
 	#undef T
+
+	// from Sample.h
+	for(int i=-127; i<=127; ++i){
+		auto v = sampleTo<float>(char(i));
+		auto j = sampleTo<char>(v);
+		//printf("%d -> %g -> %d\n", i,v,j);
+		assert(("char-float roundtrip", j==i));
+	}
+	for(int i=-127; i<=127; ++i){
+		auto v = sampleTo<short>(char(i));
+		auto j = sampleTo<char>(v);
+		//printf("%d -> %d -> %d\n", i,v,j);
+		assert(("char-short roundtrip", j==i));
+	}
+	for(int i=-32767; i<=32767; ++i){
+		auto v = sampleTo<float>(short(i));
+		auto j = sampleTo<short>(v);
+		assert(("short-float roundtrip", j==i));
+	}
 }
