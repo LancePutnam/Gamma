@@ -4,10 +4,8 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdio.h>
 #include "Gamma/Containers.h"	// Array
-#include "Gamma/ipl.h"
-#include "Gamma/scl.h"
+#include "Gamma/Sample.h" // sampleTo
 #include "Gamma/SoundFile.h"
 #include "Gamma/Strategy.h"
 #include "Gamma/Domain.h"
@@ -61,14 +59,18 @@ public:
 	bool load(const char * pathToSoundFile);
 
 
-	/// Increment read tap
-	void advance();
-
-	/// Returns sample at current position on specified channel and increments phase
+	/// Returns sample at current position on specified channel and advances
 	T operator()(int channel=0);
 
-	/// Returns sample at current position on specified channel (without incrementing phase)
+	/// Returns sample at current position on specified channel (without advancing)
 	T read(int channel) const;
+
+	/// Returns float sample at current position on specified channel (without advancing)
+	float readFloat(int channel) const;
+
+	/// Advance read tap
+	void advance();
+
 
 	/// Set sample buffer reference
 	
@@ -146,7 +148,7 @@ protected:
 	Si<T> mIpol;
 	Sp mPhsInc;
 
-	double mPos, mInc;			// real index position and increment
+	double mPos=0., mInc=1.;	// real index position and increment
 	double mFrameRate;			// frame rate of array data
 	int mChans;					// number of channels
 	int mStrideChan;			// array stride btw channels
@@ -181,27 +183,27 @@ protected:
 
 PRE CLS::SamplePlayer()
 :	Array<T>(defaultArray<T>(), 1),
-	mPos(0), mInc(0),
+	mInc(0),
 	mFrameRate(1), mChans(1),
 	mRate(1), mMin(0), mMax(1)
 {}
 
 
 PRE CLS::SamplePlayer(SamplePlayer<T>& src, double rate)
-:	mPos(0), mInc(1), mRate(rate)
+:	mRate(rate)
 {
 	buffer(src);
 }
 
 PRE CLS::SamplePlayer(Array<T>& src, double smpRate, double rate)
-:	mPos(0), mInc(1), mRate(rate)
+:	mRate(rate)
 {
 	buffer(src, smpRate, 1);
 }
 
 
 PRE CLS::SamplePlayer(const char * path, double rate)
-:	Array<T>(), mPos(0), mInc(1), mChans(1), mRate(rate), mMin(0), mMax(1)
+:	Array<T>(), mChans(1), mRate(rate), mMin(0), mMax(1)
 {	
 	if(!load(path)){
 		this->source(defaultArray<T>(), 1);
@@ -238,23 +240,16 @@ PRE inline T CLS::operator()(int channel){
 }
 
 PRE inline T CLS::read(int channel) const {
-/*
-	int posi = int(pos());
-	int Nframes= frames();
-	int offset = channel*Nframes;
-	// const T * src, index_t iInt, double iFrac, index_t max, index_t min
-	return mIpol(elems(), posi+offset, pos()-posi, offset+Nframes-1, offset);
-	//*/
-
-//*
 	// 12121212
 	// 11112222
 	int posi = int(pos());
 	// const T * src, index_t iInt, double iFrac, index_t max, index_t min
 	return mIpol(elems() + mStrideChan*channel, posi, pos()-posi, frames()-1, 0, mStrideSamp);
-//*/
 }
 
+PRE inline float CLS::readFloat(int channel) const {
+	return sampleTo<float>(read(channel));
+}
 
 PRE void CLS::buffer(Array<T>& src, double frmRate, int chans, bool interleaved){
 	if(this->source(src)){
@@ -276,9 +271,15 @@ PRE inline void CLS::pos(double v){	mPos = v; }
 
 PRE inline void CLS::phase(double v){ pos(v * frames()); }
 
-PRE void CLS::min(double v){ mMin = scl::clip<double>(v, mMax, 0.); }	
+namespace{
+	inline double clipd(double v, double mx, double mn){
+		return v>mx?mx:v<mn?mn:v;
+	}
+}
 
-PRE void CLS::max(double v){ mMax = scl::clip<double>(v, frames(), mMin); }
+PRE void CLS::min(double v){ mMin = clipd(v, mMax, 0.); }	
+
+PRE void CLS::max(double v){ mMax = clipd(v, frames(), mMin); }
 
 PRE void CLS::free(){ this->freeElements(); }
 
@@ -360,4 +361,3 @@ PRE inline double CLS::phase() const { return mPos/frames(); }
 } // gam::
 
 #endif
-
