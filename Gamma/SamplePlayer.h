@@ -71,6 +71,8 @@ public:
 	/// Advance read tap
 	void advance();
 
+	/// Advance read tap by a specific number of frames
+	void advance(double frames);
 
 	/// Set sample buffer reference
 	
@@ -230,7 +232,11 @@ PRE bool CLS::load(const char * pathToSoundFile){
 
 
 PRE inline void CLS::advance(){
-	mPos = mPhsInc(pos(), mInc, max(), min()); // update read position, in frames
+	advance(mInc);
+}
+
+PRE inline void CLS::advance(double v){
+	mPos = mPhsInc(pos(), v, max(), min()); // update read position, in frames
 }
 
 PRE inline T CLS::operator()(int channel){
