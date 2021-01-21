@@ -8,6 +8,7 @@
 #include <cstdint> // uint64_t
 #include <cmath>
 #include <functional>
+#include "Gamma/Types.h" // magSqr
 
 namespace gam{
 
