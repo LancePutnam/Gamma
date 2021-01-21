@@ -130,6 +130,15 @@ template<
 class Echo : public Delay<Tv,Si,Td> {
 public:
 
+	typedef Delay<Tv,Si,Td> Base;
+
+
+	Echo();
+
+	/// \param[in] delay	delay length
+	Echo(double delay);
+
+
 	/// Set decay length
 	Echo& decay(float v);
 
@@ -394,6 +403,14 @@ inline T fbkToDecay(T fbk, T delay){
 	class Td
 
 #define TARG Tv,Si,LoopFilter,Td
+
+template<TDEC>
+Echo<TARG>::Echo(){}
+
+template<TDEC>
+Echo<TARG>::Echo(double delay)
+:	Base(delay)
+{}
 
 template<TDEC>
 Echo<TARG>& Echo<TARG>::decay(float v){
