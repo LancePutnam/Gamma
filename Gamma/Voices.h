@@ -8,6 +8,7 @@
 #include <cstdint> // uint64_t
 #include <cmath>
 #include <functional>
+#include "Gamma/Types.h" // magSqr
 
 namespace gam{
 
@@ -228,11 +229,12 @@ class VoicesBase;
 /// Representation of a single synthesizer voice
 
 /// This class is to be subclassed by the user for a specific synth.
-/// At a minimum, the onAttack and onRelease functions should be overridden to
-/// trigger the attack and release phases of a note. The 'done' function should
-/// ideally be overriden as well to indicate when the note is completely silent
-/// and eligible for placement back in the voice pool. If 'done' is not
-/// overridden, then a basic silence detection algorithm is used.
+/// The function call operator must be overridden and return the next sample.
+/// The onAttack and onRelease functions are overridden to trigger the attack
+/// and release phases of a note. The 'done' function should be overriden to
+/// indicate when the note is completely silent and eligible for placement back
+/// in the voice pool. If 'done' is not overridden, then a basic silence
+/// detection algorithm is used.
 ///
 /// \tparam Tv			Value (sample) type of the voice generator
 template <class Tv = float>
@@ -244,10 +246,13 @@ public:
 		silenceThreshold(0.001);
 	}
 
-	/// Called when the voice is started
+	/// Generates next sample (must be overridden)
+	Tv operator()() = delete;
+
+	/// Called when the voice is started (key down)
 	void onAttack(){}
 
-	/// Called when the voice should be released
+	/// Called when the voice is released (key up)
 	void onRelease(){}
 
 	/// Called to check if the voice is done playing
