@@ -770,6 +770,7 @@ public:
 	float para();			///< Parabolic
 	float tri();			///< Triangle
 	float pulse();			///< Pulse
+	float imp();			///< Impulse train
 
 	void onDomainChange(double r);
 
@@ -1497,6 +1498,11 @@ inline float DWO<Sp,Td>::pulse(){
 	float t2 = para01(q - mMod);
 	float t  = t1 - t2;
 	return (t - s)*0.5f*mGain;//*/
+}
+
+template <class Sp, class Td>
+inline float DWO<Sp,Td>::imp(){
+	return scl::pulse(this->nextPhase(), this->freqI());
 }
 
 /*template <class Sp, class Td>
