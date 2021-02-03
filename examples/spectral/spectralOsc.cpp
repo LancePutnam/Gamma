@@ -19,7 +19,8 @@ class MyApp : public AudioApp{
 public:
 
 	NoisePink<> src;
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, spectralFormat
+	STFT stft{2048, 2048/4, 0, HANN, COMPLEX};
 
 	// Spectral magnitude oscillators
 	LFO<> oscMag1, oscMag2;
@@ -27,10 +28,7 @@ public:
 	// LFOs used to vary the starting phase of the magnitude oscillators
 	LFO<> modPhase1, modPhase2;
 
-	MyApp()
-		// STFT(winSize, hopSize, padSize, winType, spectralFormat)
-	:	stft(2048, 2048/4, 0, HANN, COMPLEX)
-	{
+	MyApp(){
 		// Attach the phase modulation LFOs to the hop-rate domain
 		stft.domainHop() << modPhase1 << modPhase2;
 

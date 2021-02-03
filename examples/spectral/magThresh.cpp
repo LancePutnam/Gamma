@@ -20,16 +20,10 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, spectralFormat
+	STFT stft{4096, 4096/4, 0, HANN, MAG_PHASE};
 	NoiseWhite<> noise;
-	Saw<> saw;
-
-	MyApp()
-		// STFT(winSize, hopSize, padSize, winType, spectralFormat)
-	:	stft(4096, 4096/4, 0, HANN, MAG_PHASE)
-	{
-		saw.freq(220);
-	}
+	Saw<> saw{220};
 
 	void onAudio(AudioIOData& io){
 		while(io()){

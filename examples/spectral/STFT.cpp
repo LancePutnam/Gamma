@@ -17,11 +17,8 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;		// Short-time Fourier transform
-	Sine<> src;
-
-	MyApp()
-	: stft(
+	// Short-time Fourier transform
+	STFT stft{
 		2048,		// Window size
 		2048/4,		// Hop size; number of samples between transforms
 		0,			// Pad size; number of zero-valued samples appended to window
@@ -29,8 +26,10 @@ public:
 					//		HAMMING, HANN, WELCH, NYQUIST, or RECTANGLE
 		COMPLEX		// Format of frequency samples:
 					//		COMPLEX, MAG_PHASE, or MAG_FREQ
-	)
-	{}
+	};
+
+	// Test tone
+	Sine<> src;
 
 	void onAudio(AudioIOData& io){
 		while(io()){

@@ -51,20 +51,17 @@ class MyApp : public AudioApp{
 public:
 
 	Accum<> tmr;
-	unsigned ivowel;
+	unsigned ivowel = 0;
 	VowelFilter filt;
 	OnePole<> pitch;
 	DWO<> osc;
-	Sine<> vib;
-	Delay<> echo;
+	Sine<> vib{5};
+	Delay<> echo{0.27};
 
 	MyApp(){
 		tmr.period(2);
 		tmr.phaseMax();
 		pitch.lag(1);
-		ivowel=0;
-		vib.freq(5);
-		echo.maxDelay(0.27);
 	}
 
 	void onAudio(AudioIOData& io){

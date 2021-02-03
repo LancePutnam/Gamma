@@ -15,13 +15,9 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, spectralFormat)
+	STFT stft{2048, 2048/4, 0, HANN, COMPLEX};
 	NoisePink<> src;
-
-	MyApp()
-	:	// STFT(winSize, hopSize, padSize, winType, spectralFormat)
-		stft(2048, 2048/4, 0, HANN, COMPLEX)
-	{}
 
 	void onAudio(AudioIOData& io){
 		while(io()){

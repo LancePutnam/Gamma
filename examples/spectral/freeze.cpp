@@ -9,7 +9,7 @@ This shows how to create a spectral freezing effect with an STFT. We capture
 one window of audio, perform a forward transform to get its spectrum and then
 perform resynthesis multiple times on this spectrum. The STFT is configured to 
 compute frequency estimates in each bin so upon resynthesis we obtain a more 
-pleasing and natural continuation of the sound, i.e., it will not sound buzzy.
+pleasing and natural (non-buzzy) continuation of the sound.
 */
 #include "../AudioApp.h"
 #include "Gamma/DFT.h"
@@ -20,18 +20,11 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, spectralFormat
+	STFT stft{2048, 2048/4, 0, HANN, MAG_FREQ};
 	NoisePink<> src;
-	Accum<> tmr;
-	int captureCount;
-
-	MyApp()
-	:	// STFT(winSize, hopSize, padSize, winType, spectralFormat)
-		stft(2048, 2048/4, 0, HANN, MAG_FREQ)
-	{
-		captureCount = 0;
-		tmr.period(2);
-	}
+	Accum<> tmr{1./2.};
+	int captureCount = 0;
 
 	void onAudio(AudioIOData& io){
 		while(io()){

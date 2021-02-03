@@ -19,14 +19,12 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, spectralFormat, auxBufs
+	STFT stft{2048, 2048/4, 0, RECTANGLE, COMPLEX, 1};
 	NoisePink<> src;
 	Sweep<> pluckEnvs;
 
-	MyApp()
-		// STFT(winSize, hopSize, padSize, winType, spectralFormat, auxBufs)
-	:	stft(2048, 2048/4, 0, RECTANGLE, COMPLEX, 1)
-	{
+	MyApp(){
 		// Attach the pluck envelope accumulator to the hop-rate domain
 		stft.domainHop() << pluckEnvs;
 	}

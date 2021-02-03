@@ -18,13 +18,11 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, sampType, auxBufs
+	STFT stft{4096, 4096/4, 0, gam::HAMMING, gam::MAG_FREQ, 3};
 	SamplePlayer<> play;
 
-	MyApp()
-		// STFT(winSize, hopSize, padSize, winType, sampType, auxBufs)
-	:	stft(4096, 4096/4, 0, gam::HAMMING, gam::MAG_FREQ, 3)
-	{
+	MyApp(){
 		play.load("../../sounds/count.wav");
 	}
 

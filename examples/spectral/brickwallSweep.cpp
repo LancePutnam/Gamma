@@ -19,17 +19,12 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	STFT stft;
+	// args: winSize, hopSize, padSize, winType, spectralFormat
+	STFT stft{2048, 2048/4, 0, HANN, COMPLEX};
 	NoisePink<> src;
-	LFO<> modCutoff;
+	LFO<> modCutoff{1./16, 0.5}; // args: freq, phase
 
-	MyApp()
-	//	STFT(winSize, hopSize, padSize, winType, spectralFormat)
-	:	stft(2048, 2048/4, 0, HANN, COMPLEX)
-	{
-		modCutoff.period(16);
-		modCutoff.phase(0.5);
-
+	MyApp(){
 		// Attach the cutoff frequency modulator to the hop-rate domain
 		stft.domainHop() << modCutoff;
 	}

@@ -20,15 +20,13 @@ class MyApp : public AudioApp{
 public:
 
 	static const int N = 4096;
-	STFT stft1, stft2;
+	// We need two STFTs with the same settings
+	STFT stft1{N, N/1, N, RECTANGLE, COMPLEX};
+	STFT stft2{N, N/1, N, RECTANGLE, COMPLEX};
 	NoisePink<> noise;
 	Impulse<> imp1, imp2, imp3;
 
-	MyApp()
-		// We need two STFTs with the same settings
-	:	stft1(N, N/1, N, RECTANGLE, COMPLEX),
-		stft2(N, N/1, N, RECTANGLE, COMPLEX)
-	{
+	MyApp(){
 		imp1.normalize(false);
 		imp2.normalize(false);
 		imp3.normalize(false);
