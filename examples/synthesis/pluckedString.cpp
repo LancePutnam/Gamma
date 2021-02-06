@@ -45,16 +45,12 @@ public:
 class MyApp : public AudioApp{
 public:
 
-	Accum<> tmr;
-	PluckedString pluck1, pluck2, pluck3, pluck4;
-
-	MyApp(){
-		tmr.period(0.1);
-		pluck1.freq(scl::freq("d6"));
-		pluck2.freq(scl::freq("g5"));
-		pluck3.freq(scl::freq("a4"));
-		pluck4.freq(scl::freq("d3"));
-	}
+	Accum<> tmr{1./0.1};
+	PluckedString
+		pluck1{scl::freq("d6")},
+		pluck2{scl::freq("g5")},
+		pluck3{scl::freq("a4")},
+		pluck4{scl::freq("d3")};
 
 	void onAudio(AudioIOData& io){
 

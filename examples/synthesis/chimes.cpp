@@ -30,14 +30,11 @@ public:
 
 	static const int Nc = 9; // # of chimes
 	static const int Nm = 5; // # of modes
-	SineDs<> src;
+	SineDs<> src{Nc * Nm};
 	Accum<> tmr;
-	Chorus<> chr1, chr2; // chorusing for more natural beating
+	Chorus<> chr1{0.10}, chr2{0.11}; // chorusing for more natural beating
 
-	MyApp()
-	:	chr1(0.10), chr2(0.11)
-	{
-		src.resize(Nc * Nm);
+	MyApp(){
 		tmr.finish();
 	}
 

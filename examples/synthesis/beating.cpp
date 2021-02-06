@@ -17,14 +17,10 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	Sine<> osc1, osc2;
+	Sine<> osc1{220};
+	Sine<> osc2{220 + 1};
 
 	void onAudio(AudioIOData& io){
-
-		float fund = 220;
-		float freqBeat = 1;
-		osc1.freq(fund);
-		osc2.freq(fund + freqBeat);
 
 		while(io()){
 			float s = (osc1() + osc2()) * 0.2;

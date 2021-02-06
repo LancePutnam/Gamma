@@ -18,13 +18,12 @@ public:
 
 	Sine<> car;	// Carrier sine (gets its frequency modulated)
 	Sine<> mod;	// Modulator sine (used to modulate frequency)
-	LFO<> env;
+	LFO<> env{1./30};
 
 	void onAudio(AudioIOData& io){
 
 		float fc = 220;		// Carrier frequency, e.g., the fundamental
 		float I = 3;		// Modulation index
-		env.period(30);
 
 		while(io()){
 			float ratio = env.hann();

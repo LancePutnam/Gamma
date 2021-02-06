@@ -16,14 +16,11 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	Sine<> oscC;	// Carrier
-	Sine<> oscM;	// Modulator
-	LFO<> modFreq;	// Envelope for changing modulator frequency
+	Sine<> oscC{440};		// Carrier
+	Sine<> oscM;			// Modulator
+	LFO<> modFreq{1./20};	// Envelope for changing modulator frequency
 
 	void onAudio(AudioIOData& io){
-
-		oscC.freq(440);
-		modFreq.period(20);
 
 		while(io()){
 

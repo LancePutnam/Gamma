@@ -21,13 +21,13 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	Saw<> saw;			// Saw oscillator
+	DWO<> osc;			// Saw oscillator
 	Biquad<> lpf;		// Resonant low-pass filter
 	AD<> env;			// Envelope on amplitude and cutoff
 	LFO<> modCutoff;	// Modulator on cutoff
 	OnePole<> freq;		// Portamento filter
 	Accum<> tmr;		// Sequencer timer
-	int step;			// Sequencer step
+	int step = 0;		// Sequencer step
 
 	MyApp(){
 		lpf.type(LOW_PASS);		// Set filter to low-pass response
@@ -39,7 +39,6 @@ public:
 		modCutoff.period(30);	// Set period of cutoff modulation
 		modCutoff.phase(0.5);	// Start half-way through cycle
 		freq.lag(0.1);			// Lag time of portamento effect
-		step=0;
 	}
 
 	void onAudio(AudioIOData& io){
@@ -58,15 +57,15 @@ public:
 				env.resetSoft();
 			}
 
-			// Set saw frequency from portamento filter
-			saw.freq(freq());
+			// Set oscillator frequency from portamento filter
+			osc.freq(freq());
 
 			// Get next envelope value
 			float e = env();
 			// Map envelope value to cutoff frequency
 			lpf.freq(e * (modCutoff.paraU()*6000 + 500) + 40);
 			// Generate next saw sample
-			float s = saw() * 0.3;
+			float s = osc.saw() * 0.2;
 			// Filter saw sample
 			s = lpf(s) * e;
 			// Send sample to DAC

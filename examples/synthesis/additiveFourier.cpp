@@ -14,19 +14,14 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	Accum<> timer;
-	Osc<> osc;
-	Sine<> sine;
+	Accum<> timer{1};
+	Osc<> osc{220, 0, 512}; // freq, phase, table size
 	static const int K = 16; // max harmonics
 	int hNum; // harmonic number
-	int wave; // waveform
+	int wave = 0; // waveform
 
 	MyApp(){
-		timer.period(1);
-		osc.resize(512);
-		osc.freq(220);
 		reset();
-		wave = 0;
 	}
 
 	void reset(){

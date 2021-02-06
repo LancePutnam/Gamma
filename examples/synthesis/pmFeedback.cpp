@@ -15,15 +15,9 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	Sine<> osc;		// Source sine
-	LFO<> mod;		// Modulator on feedback amount
-	float prev;		// Previous sample
-
-	MyApp(){
-		osc.freq(220);
-		mod.period(10);
-		prev=0;
-	}
+	Sine<> osc{220};	// Source sine
+	LFO<> mod{1./10};	// Modulator on feedback amount
+	float prev = 0;		// Previous sample
 
 	void onAudio(AudioIOData& io){
 		while(io()){
