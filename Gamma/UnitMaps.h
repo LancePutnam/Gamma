@@ -5,6 +5,7 @@
 	See COPYRIGHT file for authors and license information */
 
 #include <functional>
+#include <initializer_list>
 #include <map>
 #include <vector>
 #include "Gamma/scl.h"
@@ -126,6 +127,14 @@ public:
 	TablePow2(const std::function<T(float x01)>& fillFunc){
 		assign(fillFunc);
 	}
+
+	/// Construct from initializer list
+	TablePow2(std::initializer_list<T> vals){
+		int len = vals.size() < N ? vals.size() : N;
+		for(int i=0; i<len; ++i)
+			mElems[i] = vals.begin()[i];
+	}
+
 
 	/// Assign elements from function
 	
