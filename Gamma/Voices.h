@@ -293,7 +293,7 @@ private:
 	unsigned short mSilenceCountMax = 12000;
 	long mAge = 0; // max 27 hours @ 44.1 kHz
 	unsigned mIndex = 0;
-	VoicesBase * mParent = NULL;
+	VoicesBase * mParent = nullptr;
 
 	// Returns true if the input has been below the threshold for the
 	// maximum number of samples.
@@ -315,12 +315,11 @@ private:
 		mOutput = newOutput;
 		++mAge;
 	}
-
 };
 
 
 
-/// A synthesis parameter with exponential smoothing
+/// A synthesis parameter with exponential (one-pole low-pass) smoothing
 class Param{
 public:
 
@@ -469,7 +468,7 @@ public:
 
 	/// Get a reference to the voice with the given ID
 	VoiceGen& voiceWithID(unsigned ID){
-		unsigned idx = mIndexPool.indexWithID(ID);
+		auto idx = mIndexPool.indexWithID(ID);
 		if(idx != mIndexPool.npos){
 			return voice(idx);
 		}
@@ -485,7 +484,7 @@ public:
 
 	/// Obtain a new voice index
 	unsigned obtainIndex(){
-		unsigned idx = mIndexPool.obtain();
+		auto idx = mIndexPool.obtain();
 		
 		// steal voice
 		if(idx == mIndexPool.npos){
@@ -508,7 +507,7 @@ public:
 	/// This calls Voice::onAttack.
 	///
 	VoiceGen& attack(){
-		VoiceGen& v = obtain();
+		auto& v = obtain();
 		v.onAttack(); // user-defined attack
 		play(v);
 		return v;
@@ -519,7 +518,7 @@ public:
 	/// The arguments are user-defined variables that are forwarded to
 	/// Voice::onAttack. Typical parameters are frequency and amplitude.
 	VoiceGen& attack(double a, double b){
-		VoiceGen& v = obtain();
+		auto& v = obtain();
 		v.onAttack(a,b); // user-defined attack
 		play(v);
 		return v;
@@ -527,21 +526,21 @@ public:
 
 	/// Start new voice with given ID
 	VoiceGen& attackWithID(unsigned ID){
-		VoiceGen& v = attack();
+		auto& v = attack();
 		mIndexPool.idToIndex()[ID] = v.mIndex;
 		return v;
 	}
 
 	/// Start new voice with given ID
 	VoiceGen& attackWithID(unsigned ID, double a, double b){
-		VoiceGen& v = attack(a,b);
+		auto& v = attack(a,b);
 		mIndexPool.idToIndex()[ID] = v.mIndex;
 		return v;
 	}
 
 	/// Release voice with given ID
 	VoiceGen& releaseWithID(unsigned ID){
-		VoiceGen& v = voiceWithID(ID);
+		auto& v = voiceWithID(ID);
 		v.onRelease();
 		return v;
 	}
@@ -601,11 +600,9 @@ public:
 
 		Tv res = Tv(0);
 
-		typename IndexPool::iterator it = mIndexPool.begin();
-		while(it != mIndexPool.end()){
-			unsigned idx = *it; ++it;
+		for(auto idx : mIndexPool){
 
-			VoiceGen& v = voice(idx);
+			auto& v = voice(idx);
 
 			if(v.age() >= 0){
 				Tv s = v(); // compute next sample
@@ -628,9 +625,7 @@ public:
 	/* Generate next buffer (surprisingly, no faster than single-sample!)
 	void operator()(Tv * buf, unsigned size){
 		for(int i=0; i<size; ++i) buf[i] = Tv(0);
-		typename IndexPool::iterator it = mIndexPool.begin();
-		while(it != mIndexPool.end()){
-			unsigned idx = *it; ++it;
+		for(auto idx : mIndexPool){
 			for(int i=0; i<size; ++i){
 				Tv s = mVoiceGens[idx]();
 				mVoiceGens[idx].voiceUpdate(s);
@@ -647,11 +642,7 @@ public:
 
 	/// Traverse all active voices
 	Voices& traverseActive(const std::function<void(unsigned i)>& onVisit){
-		auto it = mIndexPool.begin();
-		while(it != mIndexPool.end()){
-			auto idx = *it; ++it;
-			onVisit(idx);
-		}
+		for(auto idx : mIndexPool) onVisit(idx);
 		return *this;
 	}
 
