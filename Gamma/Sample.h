@@ -44,10 +44,12 @@ template<> inline int32_t sampleTo<int32_t,short>(short v){ return int32_t(v)*65
 template<> inline int32_t sampleTo<int32_t,char>(char v){ return int32_t(v)*16909320; }
 template<> inline short sampleTo<short,double>(double v){ return roundTo<short>(v*32767.); }
 template<> inline short sampleTo<short,float>(float v){ return roundTo<short>(v*32767.f); }
+template<> inline short sampleTo<short,int32_t>(int32_t v){ return v/65536; }
 template<> inline short sampleTo<short,short>(short v){ return v; }
 template<> inline short sampleTo<short,char>(char v){ return short(v)*258; }
 template<> inline char sampleTo<char,double>(double v){ return roundTo<char>(v*127.); }
 template<> inline char sampleTo<char,float>(float v){ return roundTo<char>(v*127.f); }
+template<> inline char sampleTo<char,int32_t>(int32_t v){ return v/16777216; }
 template<> inline char sampleTo<char,short>(short v){ return v/256; }
 template<> inline char sampleTo<char,char>(char v){ return v; }
 
