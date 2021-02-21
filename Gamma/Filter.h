@@ -627,9 +627,9 @@ public:
 	void type(FilterType type);			///< Set type of filter (gam::LOW_PASS or gam::HIGH_PASS)
 	void freq(Tp val);					///< Set cutoff frequency (-3 dB bandwidth of pole)
 
-	/// Set lag length of low-pass response (AKA tau)
+	/// Set lag length of low-pass response
 
-	/// \param[in] length	Length of lag
+	/// \param[in] length	Length of lag with zero for no lag
 	/// \param[in] thresh	Value to which a downward unit step reaches after
 	///						the lag length. Must be greater than 0.
 	void lag(Tp length, Tp thresh=Tp(0.001));
