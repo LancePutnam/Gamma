@@ -91,6 +91,9 @@ struct Recip : public Val<T>{ INHERIT;
 
 
 /// Cosine generator based on recursive formula x0 = c x1 - x2
+
+/// This has an optimal initial state configuration (set) requiring only one
+/// trig call. The general sinusoid requires three trig calls.
 template <class T=double>
 struct RCos : public Val<T>{ INHERIT;
 
@@ -98,7 +101,7 @@ struct RCos : public Val<T>{ INHERIT;
 	RCos(const T& frq=T(0), const T& amp=T(1))
 	:	val2(0), c1(0){ set(frq,amp); }
 
-	/// Generate next value.
+	/// Generate next value
 	T operator()() const {
 		T v0 = val*c1 - val2;
 		val2 = val; val = v0;
@@ -107,7 +110,7 @@ struct RCos : public Val<T>{ INHERIT;
 	
 	T freq() const { return acos(c1*0.5) * M_1_2PI; }
 	
-	/// Set parameters from unit freq, phase, and amplitude.
+	/// Set parameters from unit freq and amplitude
 	RCos& set(const T& frq, const T& amp=T(1)){
 		c1  = T(cos(frq*M_2PI));
 		val2= c1*amp;
@@ -128,10 +131,10 @@ template <class T=double>
 struct RSin : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1))
-	:	val2(0), mul(0){ set(frq,phs,amp); }
+	RSin(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0))
+	:	val2(0), mul(0){ set(frq,amp,phs); }
 
-	/// Generate next value.
+	/// Generate next value
 	T operator()() const {
 		T v0 = mul * val - val2;
 		val2 = val;
@@ -148,19 +151,19 @@ struct RSin : public Val<T>{ INHERIT;
 	T phase() const { return mPhase; }
 
 	/// Set amplitude
-	RSin& amp(const T& v){ return set(freq(), phase(), v); }
+	RSin& amp(const T& v){ return set(freq(), v, phase()); }
 	
 	/// Set unit frequency
-	RSin& freq(const T& v){	return set(v, phase(), amp()); }
+	RSin& freq(const T& v){	return set(v, amp(), phase()); }
 
 	/// Set unit phase
-	RSin& phase(const T& v){ return set(freq(), v, amp()); }
+	RSin& phase(const T& v){ return set(freq(), amp(), v); }
 
 	/// Reset state from stored parameters
-	RSin& reset(){ set(freq(), phase(), amp()); return *this; }
+	RSin& reset(){ set(freq(), amp(), phase()); return *this; }
 
-	/// Set parameters from unit freq, phase, and amplitude.
-	RSin& set(const T& frq, const T& phs, const T& amp=T(1)){
+	/// Set parameters from unit freq, amplitude and phase
+	RSin& set(const T& frq, const T& amp=T(1), const T& phs=T(0)){
 		//printf("%g %g %g\n", frq, phs, amp);
 		mFreq = frq;
 		mAmp = amp;
@@ -220,8 +223,8 @@ template <class T=double>
 struct RSin2 : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RSin2(const T& frq=T(0), const T& phs=T(0), const T& dcy=T(1), const T& amp=T(1))
-	{ set(frq,phs,dcy,amp); }
+	RSin2(const T& frq=T(0), const T& amp=T(1), const T& dcy=T(1), const T& phs=T(0))
+	{ set(frq,amp,dcy,phs); }
 
 	/// Generate next value
 	T operator()() const {
@@ -253,22 +256,22 @@ struct RSin2 : public Val<T>{ INHERIT;
 
 
 	/// Set amplitude
-	RSin2& amp(const T& v){ return set(freq(), phase(), decay(), v); }
+	RSin2& amp(const T& v){ return set(freq(), v, decay(), phase()); }
 
 	/// Set decay
-	RSin2& decay(const T& v){ return set(freq(), phase(), v, amp()); }
+	RSin2& decay(const T& v){ return set(freq(), amp(), v, phase()); }
 	
 	/// Set unit frequency
-	RSin2& freq(const T& v){ return set(v, phase(), decay(), amp()); }
+	RSin2& freq(const T& v){ return set(v, amp(), decay(), phase()); }
 
 	/// Set unit phase
-	RSin2& phase(const T& v){ return set(freq(), v, decay(), amp()); }
+	RSin2& phase(const T& v){ return set(freq(), amp(), decay(), v); }
 
 	/// Reset state from stored parameters
-	RSin2& reset(){ set(freq(), phase(), decay(), amp()); return *this; }
+	RSin2& reset(){ set(freq(), amp(), decay(), phase()); return *this; }
 
-	/// Set parameters from freq (rad/unit), phase (rad), decay, and amplitude.
-	RSin2& set(T frq, T phs, T dcy, T amp=T(1)){
+	/// Set parameters from freq (rad/unit), amplitude, decay and phase
+	RSin2& set(T frq, T amp=T(1), T dcy=T(1), T phs=T(0)){
 //		printf("%g %g %g %g\n", frq, phs, dcy, amp);
 		mFreq = frq;
 		mAmp = amp;

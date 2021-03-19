@@ -389,7 +389,7 @@ public:
 	void period(Tv v){ Base::freq(Td::ups()/v); }
 
 	/// Set all control parameters
-	void set(Tv frq, Tv amp, Tv phs=0){ Base::set(frq*Td::ups(), phs, amp); }
+	void set(Tv frq, Tv amp, Tv phs=0){ Base::set(frq*Td::ups(), amp, phs); }
 
 
 	void onDomainChange(double ratio){ Base::freq(Base::freq()/ratio); }
@@ -489,9 +489,9 @@ public:
 	void set(Tv frq, Tv amp, Tv dcy, Tv phs=0){
 		Base::set(
 			frq * Td::ups(),
-			phs,
+			amp,
 			decayFactor(dcy),
-			amp
+			phs
 		);
 	}
 
