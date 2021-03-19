@@ -174,7 +174,7 @@ uint32_t log2(uint32_t v);
 /// Fast base-2 logarithm. For value <= 0, behavior is undefined.
 float log2Fast(float v);
 
-/// Maps value from [-1,1] to [depth, 1].
+/// Maps value from [-1,1] to [1-depth, 1].
 template<class T>
 T mapDepth(T v, T depth){ return (v - T(1)) * T(0.5) * depth + T(1);  }
 
