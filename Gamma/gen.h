@@ -97,9 +97,13 @@ struct Recip : public Val<T>{ INHERIT;
 template <class T=double>
 struct RCos : public Val<T>{ INHERIT;
 
+	/// Default constructor
+	RCos(){ zero(); }
+
 	/// Constructor
-	RCos(const T& frq=T(0), const T& amp=T(1))
-	:	val2(0), c1(0){ set(frq,amp); }
+	RCos(const T& frq, const T& amp=T(1)){
+		set(frq,amp);
+	}
 
 	/// Generate next value
 	T operator()() const {
@@ -107,7 +111,8 @@ struct RCos : public Val<T>{ INHERIT;
 		val2 = val; val = v0;
 		return val2;
 	}
-	
+
+	/// Get frequency
 	T freq() const { return acos(c1*0.5) * M_1_2PI; }
 	
 	/// Set parameters from unit freq and amplitude
@@ -118,6 +123,15 @@ struct RCos : public Val<T>{ INHERIT;
 		c1 *= T(2);
 		return *this;
 	}
+
+	RCos& constant(const T& amp = T(1)){
+		c1 = T(2);
+		val2 = amp;
+		val = amp;
+		return *this;
+	}
+
+	RCos& zero(){ return constant(T(0)); }
 
 	mutable T val2;		///< 2-previous value
 	T c1;				///< 1-previous coefficient
