@@ -182,11 +182,11 @@ public:
 		return lo + (hi - lo)*fr;
 	}
 
-	static uint32_t mask(){ return N-1; }
-	static uint32_t size(){ return N; }
-	static uint32_t bits(){ return B; }
-	static uint32_t shift(){ return 32U-B; }
-	static uint32_t oneIndex(){ return 1<<shift(); }
+	static constexpr uint32_t mask(){ return N-1; }
+	static constexpr uint32_t size(){ return N; }
+	static constexpr uint32_t bits(){ return B; }
+	static constexpr uint32_t shift(){ return 32U-B; }
+	static constexpr uint32_t oneIndex(){ return 1<<shift(); }
 
 protected:
 	T mElems[N];
