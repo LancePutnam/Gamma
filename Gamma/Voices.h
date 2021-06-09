@@ -23,13 +23,13 @@ public:
 	typedef uint64_t bits_t;
 	typedef unsigned index_t;
 	
-	static constexpr index_t npos = -1;
+	static constexpr index_t npos = ~index_t(0);
 	static constexpr index_t maxSize = sizeof(bits_t)*8;
 
 
 	/// @param[in]	Maximum number of indices (up to 64)
 	IndexPool(unsigned size = 8)
-	:	mSize(size), mAutoPlay(-1ull)
+	:	mSize(size), mAutoPlay(~bits_t(0))
 	{
 		recycleAll();
 	}
