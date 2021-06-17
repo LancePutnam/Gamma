@@ -171,6 +171,9 @@ template<class T> T linLog2(T v, T recMin = T(1./16));
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
 uint32_t log2(uint32_t v);
 
+/// Compile-time log2 (for powers of 2)
+template <uint32_t PowerOf2> constexpr uint32_t log2();
+
 /// Fast base-2 logarithm. For value <= 0, behavior is undefined.
 float log2Fast(float v);
 
@@ -609,6 +612,21 @@ template<class T> inline T linLog2(T v, T recMin){
 }
 
 inline uint32_t log2(uint32_t v){ return deBruijn(ceilPow2(v)); }
+
+template<> constexpr uint32_t log2<   1>(){ return  0; }
+template<> constexpr uint32_t log2<   2>(){ return  1; }
+template<> constexpr uint32_t log2<   4>(){ return  2; }
+template<> constexpr uint32_t log2<   8>(){ return  3; }
+template<> constexpr uint32_t log2<  16>(){ return  4; }
+template<> constexpr uint32_t log2<  32>(){ return  5; }
+template<> constexpr uint32_t log2<  64>(){ return  6; }
+template<> constexpr uint32_t log2< 128>(){ return  7; }
+template<> constexpr uint32_t log2< 256>(){ return  8; }
+template<> constexpr uint32_t log2< 512>(){ return  9; }
+template<> constexpr uint32_t log2<1024>(){ return 10; }
+template<> constexpr uint32_t log2<2048>(){ return 11; }
+template<> constexpr uint32_t log2<4096>(){ return 12; }
+template<> constexpr uint32_t log2<8192>(){ return 13; }
 
 inline float log2Fast(float v){
 	Twiddle<float> u(v);
