@@ -181,7 +181,7 @@ public:
 
 	EchoCSine();
 
-	/// \param[in] delay	delay length
+	/// \param[in] delay	delay length (and max delay)
 	EchoCSine(double delay);
 
 
