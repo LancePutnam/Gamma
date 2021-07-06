@@ -237,6 +237,17 @@ public:
 	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
 		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
 
+	/// Get a subvector
+	template <int M, int Begin=0>
+	const Vec<M,T>& sub() const {
+		return const_cast<Vec*>(this)->sub<M,Begin>();
+	}
+	template <int M, int Begin=0>
+	Vec<M,T>& sub(){
+		static_assert((Begin+M)<=N, "Invalid subvector range");
+		return *(Vec<M,T>*)(elems()+Begin);
+	}
+
 	bool operator !=(const Vec& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
 	bool operator !=(const   T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
 	Vec& operator = (const Vec& v){ IT(N) (*this)[i] = v[i]; return *this; }
