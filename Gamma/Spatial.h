@@ -259,6 +259,12 @@ public:
 
 	ReverbMS(ReverbFlavor flavor, unsigned offset=0);
 
+	ReverbMS(
+		std::initializer_list<unsigned> combDelays,
+		std::initializer_list<unsigned> allpassDelays,
+		unsigned offset = 0
+	);
+
 
 	/// Resize delay lines based on a particular flavor of reverb
 
@@ -505,9 +511,20 @@ ReverbMS<TARG>::ReverbMS(){
 
 template<TDEC>
 ReverbMS<TARG>::ReverbMS(ReverbFlavor flavor, unsigned offset)
-	: ReverbMS()
+:	ReverbMS()
 {
 	resize(flavor, offset);
+}
+
+template<TDEC>
+ReverbMS<TARG>::ReverbMS(
+	std::initializer_list<unsigned> combDelays,
+	std::initializer_list<unsigned> allpassDelays,
+	unsigned offset
+)
+:	ReverbMS()
+{
+	resize(combDelays, allpassDelays, offset);
 }
 
 template<TDEC>
