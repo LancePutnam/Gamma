@@ -4,6 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
+#include "Gamma/scl.h" // roundN
 #include "Gamma/Delay.h"
 #include "Gamma/Envelope.h"
 #include "Gamma/Filter.h"
@@ -420,7 +421,7 @@ class Quantizer : public Td{
 public:
 	/// \param[in] freq		Frequency of sequence quantization
 	/// \param[in] stepAmt	Step amount of amplitude quantization
-	Quantizer(double freq=2000, T stepAmt=0)
+	Quantizer(double freq=2000, float stepAmt=0)
 	:	mPeriod(1./freq){
 		step(stepAmt);
 	}
@@ -436,17 +437,17 @@ public:
 	}
 
 	/// Set amplitude quantization amount
-	void step(T v){
+	void step(float v){
 		mStep = v;
-		mDoStep = mStep > 0.;
-		if(mDoStep) mStepRec = 1./mStep;
+		mDoStep = mStep > 0.f;
+		if(mDoStep) mStepRec = 1.f/mStep;
 	}
 
 	/// Return next filtered sample
 	T operator()(T in){
 		if(++mCount >= mSamples){
 			mCount -= mSamples;
-			mHeld = mDoStep ? scl::round(in, mStep, mStepRec) : in;
+			mHeld = mDoStep ? scl::roundN(in, mStep, mStepRec) : in;
 		}
 		return mHeld;
 	}
@@ -460,7 +461,7 @@ private:
 	// A float can represent integers up to 16,777,216.
 	// Max period at 44.1kHz is thus 38 seconds.
 	float mCount=0., mSamples, mPeriod;
-	T mStep, mStepRec;
+	float mStep, mStepRec;
 	bool mDoStep;
 };
 
