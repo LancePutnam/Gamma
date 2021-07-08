@@ -21,6 +21,7 @@
 #endif
 
 #include <cmath>
+#include <type_traits> // is_fundamental
 #include "Gamma/Conversion.h"
 
 
@@ -738,6 +739,38 @@ inline T roundAway(T v, T s){ return v<T(0) ? floor(v,s) : ceil(v,s); }
 //	//val = fastFloor(val * step + u.f) * stepRec;
 //	return float(long(val * stepRec + u.f)) * step;
 //}
+
+namespace detail{
+	template <class T, bool isFund> struct RoundN;
+
+	template <class T>
+	struct RoundN<T,true>{
+		T operator()(const T& v, float step, float stepRec){
+			return round<T>(v,step,stepRec);
+		}
+	};
+
+	template <class T>
+	struct RoundN<T,false>{
+		T operator()(const T& v, float step, float stepRec){
+			auto res = v;
+			for(auto& e : res) e = round<typename T::value_type>(e,step,stepRec);
+			return res;
+		}
+	};
+}
+
+template <class T> T roundN(const T& v, float step, float stepRec){
+	return detail::RoundN<T, std::is_fundamental<T>::value>()(v,step,stepRec);
+}
+
+template <class T> T roundN(const T& v, float step){
+	return detail::RoundN<T, std::is_fundamental<T>::value>()(v,step,1.f/step);
+}
+
+template <class T> T roundN(const T& v){
+	return detail::RoundN<T, std::is_fundamental<T>::value>()(v,1.f,1.f);
+}
 
 template<class T>
 inline int sgn(T v){ return (T(0) < v) - (v < T(0)); }
