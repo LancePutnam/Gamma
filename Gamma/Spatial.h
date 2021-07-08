@@ -257,6 +257,8 @@ public:
 
 	ReverbMS();
 
+	ReverbMS(ReverbFlavor flavor, unsigned offset=0);
+
 
 	/// Resize delay lines based on a particular flavor of reverb
 
@@ -499,6 +501,13 @@ inline Complex<Tv> EchoCSine<TARG>::operator()(Tv v){
 template<TDEC>
 ReverbMS<TARG>::ReverbMS(){
 	decay(1);
+}
+
+template<TDEC>
+ReverbMS<TARG>::ReverbMS(ReverbFlavor flavor, unsigned offset)
+	: ReverbMS()
+{
+	resize(flavor, offset);
 }
 
 template<TDEC>
