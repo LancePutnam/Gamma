@@ -142,6 +142,9 @@ public:
 	/// Set decay length
 	Echo& decay(float v);
 
+	/// Set feedback coefficient, in [-1,1]
+	Echo& fbk(float v);
+
 	/// Set damping factor of loop filter
 	Echo& damping(float v);
 
@@ -425,6 +428,13 @@ Echo<TARG>& Echo<TARG>::decay(float v){
 	mDecay = v;
 	float fbk = decayToFbk(mDecay, this->delay());
 	mFilter.gain(fbk);
+	return *this;
+}
+
+template<TDEC>
+Echo<TARG>& Echo<TARG>::fbk(float v){
+	mDecay = fbkToDecay(v, this->delay());
+	mFilter.gain(v);
 	return *this;
 }
 
