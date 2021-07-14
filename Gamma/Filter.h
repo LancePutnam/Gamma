@@ -618,9 +618,15 @@ template<class Tv=gam::real, class Tp=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class OnePole : public Td{ 
 public:
 
-	/// \param[in]	freq	Smoothing frequency
+	/// \param[in]	freq	Cutoff frequency
+	/// \param[in]	type	Filter type (LOW_PASS or HIGH_PASS)
 	/// \param[in]	stored	Initial stored value
-	OnePole(Tp freq = Tp(1000), const Tv& stored = Tv(0));
+	OnePole(Tp freq = Tp(1000), FilterType type = LOW_PASS, const Tv& stored = Tv(0));
+
+	/// \param[in]	freq	Cutoff frequency
+	/// \param[in]	stored	Initial stored value
+	OnePole(Tp freq, const Tv& stored);
+
 
 	const Tp& freq() const { return mFreq; }	///< Get cutoff frequency
 
@@ -635,8 +641,8 @@ public:
 	void lag(Tp length, Tp thresh=Tp(0.001));
 
 	void smooth(Tp val);				///< Set smoothing coefficient directly
-	void zero(){ o1=0; }				///< Zero internal delay
-	void reset(Tv v = Tv(0)){ o1=mStored=v; }
+	void zero(){ mO1=0; }				///< Zero internal delay
+	void reset(Tv v = Tv(0)){ mO1=mStored=v; }
 
 	const Tv& operator()();				///< Returns filtered output using stored value
 	const Tv& operator()(Tv in);		///< Returns filtered output from input value
@@ -656,7 +662,7 @@ protected:
 	FilterType mType;
 	Tp mFreq, mA0, mB1;
 	Tp mFreqToAng;
-	Tv mStored, o1;
+	Tv mStored, mO1;
 };
 
 
@@ -917,11 +923,16 @@ inline Tv Biquad<Tv,Tp,Td>::nextBP(Tv i0){
 
 //---- OnePole
 template <class Tv, class Tp, class Td>
-OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
-:	mType(LOW_PASS), mFreq(frq), mStored(stored), o1(stored)
+OnePole<Tv,Tp,Td>::OnePole(Tp frq, FilterType type, const Tv& stored)
+:	mType(type), mFreq(frq), mStored(stored), mO1(stored)
 {
 	onDomainChange(1);
 }
+
+template <class Tv, class Tp, class Td>
+OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
+:	OnePole(frq, LOW_PASS, stored)
+{}
 
 template <class Tv, class Tp, class Td>
 void OnePole<Tv,Tp,Td>::onDomainChange(double /*r*/){
@@ -998,8 +1009,8 @@ inline const Tv& OnePole<Tv,Tp,Td>::operator()(){ return (*this)(mStored); }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::operator()(Tv in){
-	o1 = o1*mB1 + in*mA0;
-	return o1;
+	mO1 = mO1*mB1 + in*mA0;
+	return mO1;
 }
 
 template <class Tv, class Tp, class Td>
@@ -1009,7 +1020,7 @@ template <class Tv, class Tp, class Td>
 inline void OnePole<Tv,Tp,Td>::operator *= (Tv v){ mStored *= v; }
 
 template <class Tv, class Tp, class Td>
-inline const Tv& OnePole<Tv,Tp,Td>::last() const { return o1; }
+inline const Tv& OnePole<Tv,Tp,Td>::last() const { return mO1; }
 
 template <class Tv, class Tp, class Td>
 inline const Tv& OnePole<Tv,Tp,Td>::stored() const { return mStored; }
@@ -1019,7 +1030,7 @@ inline Tv& OnePole<Tv,Tp,Td>::stored(){ return mStored; }
 
 template <class Tv, class Tp, class Td>
 inline bool OnePole<Tv,Tp,Td>::zeroing(Tv eps) const {
-	return scl::abs(o1) < eps && mStored == Tv(0);
+	return scl::abs(mO1) < eps && mStored == Tv(0);
 }
 } // gam::
 #endif
