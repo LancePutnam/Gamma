@@ -190,7 +190,6 @@ template <unsigned N, class T>
 class Vec : public NamedElems<N,T> {
 public:
 
-	using NamedElems<N,T>::x;
 	typedef T value_type;
 
 	Vec(const T& v=T()){ set(v); }
@@ -211,11 +210,11 @@ public:
 	/// Returns size of vector
 	static constexpr unsigned size(){ return N; }
 
-	T * elems(){ return &x; }
-	const T * elems() const { return &x; }
+	T * elems(){ return &(this->x); }
+	const T * elems() const { return &(this->x); }
 
-	T * begin(){ return &x; }
-	const T * begin() const { return &x; }
+	T * begin(){ return elems(); }
+	const T * begin() const { return elems(); }
 	T * end(){ return begin()+N; }
 	const T * end() const { return begin()+N; }
 
