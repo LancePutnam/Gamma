@@ -209,7 +209,7 @@ public:
 
 
 	/// Returns size of vector
-	static unsigned size(){ return N; }
+	static constexpr unsigned size(){ return N; }
 
 	T * elems(){ return &x; }
 	const T * elems() const { return &x; }
