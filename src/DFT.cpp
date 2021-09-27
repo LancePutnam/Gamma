@@ -365,6 +365,7 @@ void STFT::inverse(float * dst){
 			t *= factor;				// freq deviation to phase diff
 			t += k*expdp1;				// add expected phase diff due to overlap
 			mAccums[k] += t;			// accumulate phase diff
+			mAccums[k] = scl::wrapPhase(mAccums[k]); // wrap to avoid numerical overflow (o.w. begin to see artifacts around 6.9e7)
 			//bin(k)[1] = mAccums[k];		// copy accum phase for inverse xfm
 			bufInvFrq()[2*k] = bin(k)[0];
 			bufInvFrq()[2*k+1] = mAccums[k];
