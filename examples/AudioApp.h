@@ -36,7 +36,9 @@ public:
 	void start(bool block=true){
 		mAudioIO.start();
 		if(block){		
-			printf("Press 'enter' to quit...\n"); getchar();
+			printf("Press 'enter' to quit...\n");
+			fflush(stdout);
+			getchar();
 		}
 	}
 
