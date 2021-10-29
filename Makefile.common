@@ -158,7 +158,7 @@ AR 		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -f
-
+DBG = gdb
 
 # Let user override variables
 -include Makefile.user
@@ -290,15 +290,18 @@ ifeq ($(VERBOSE), 0)
 	AR  := @$(AR)
 	CC  := @$(CC)
 	CXX := @$(CXX)
+	#Redundant, gdb echoes by default
+	#DBG := @$(DBG)
 endif
 
 # Append optimization flags
 ifeq ($(BUILD_CONFIG), Release)
 	CPPFLAGS += -DNDEBUG
 	CFLAGS += -O3
+	#CFLAGS += -flto=8 # link-time optimization
 	#CFLAGS += -fpeel-loops # not supported by clang
 else
-	CFLAGS += -g -O0 -fno-inline
+	CFLAGS += -O0 -fno-inline -ggdb3
 endif
 
 # Append warning flags
