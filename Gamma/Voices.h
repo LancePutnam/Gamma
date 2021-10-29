@@ -212,13 +212,13 @@ private:
 // These functions are used for measuring amplitude of different sample types.
 namespace{
 	template<unsigned N, class T>
-	T magSqr(const gam::Vec<N,T>& v){ return v.magSqr(); }
+	T ampSqr(const gam::Vec<N,T>& v){ return v.magSqr(); }
 
 	template<class T>
-	T magSqr(const gam::Complex<T>& v){ return v.magSqr(); }
+	T ampSqr(const gam::Complex<T>& v){ return v.magSqr(); }
 
 	template <class T>
-	static T magSqr(T v){ return float(v*v); }
+	static T ampSqr(T v){ return float(v*v); }
 };
 
 
@@ -298,7 +298,7 @@ private:
 	// Returns true if the input has been below the threshold for the
 	// maximum number of samples.
 	bool detectSilence(){
-		if(magSqr(mOutput) < mSilenceThresh){
+		if(ampSqr(mOutput) < mSilenceThresh){
 			++mSilenceCount;
 			return mSilenceCount >= mSilenceCountMax;
 		}
