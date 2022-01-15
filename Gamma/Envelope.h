@@ -167,7 +167,7 @@ public:
 		for(int i=0; i<n; ++i) lengths()[i] = vals[i];
 		return *this;
 	}
-	
+
 	/// Set first two segment lengths
 	Env& lengths(Tp a, Tp b){ Tp v[]={a,b}; return lengths(v,2); }
 
@@ -179,6 +179,13 @@ public:
 
 	/// Set first five segment lengths
 	Env& lengths(Tp a, Tp b, Tp c, Tp d, Tp e){ Tp v[]={a,b,c,d,e}; return lengths(v,5); }
+
+	template <unsigned i>
+	Env& length(Tp v){
+		static_assert(i<N, "Invalid segment index");
+		lengths()[i] = v;
+		return *this;
+	}
 
 	/// Get total length of all envelope segments
 	Tp totalLength() const;
@@ -223,12 +230,25 @@ public:
 	Env& curves(Tp ca, Tp cb, Tp cc, Tp cd){
 		Tp c[]={ca,cb,cc,cd}; return curves(c,4); }
 
+	template <unsigned i>
+	Env& curve(Tp v){
+		static_assert(i<N, "Invalid curve index");
+		curves()[i] = v;
+		return *this;
+	}
+
 
 	/// Set length and curvature of a segment
 	Env& segment(int i, Tp len, Tp crv){
 		mLengths[i]=len;
 		mCurves [i]=crv;
 		return *this;
+	}
+
+	template <unsigned i>
+	Env& segment(Tp len, Tp crv){
+		static_assert(i<N, "Invalid segment index");
+		return segment(i, len,crv);
 	}
 
 	/// Set length and curvature of many segments
@@ -278,6 +298,13 @@ public:
 
 	/// Set first five break-point levels
 	Env& levels(Tv a, Tv b, Tv c, Tv d, Tv e){ Tv v[]={a,b,c,d,e}; return levels(v,5); }
+
+	template <unsigned i>
+	Env& level(Tv v){
+		static_assert(i<(N+1), "Invalid level index");
+		levels()[i] = v;
+		return *this;
+	}
 
 	/// Set maximum level
 	Env& maxLevel(Tv v);
