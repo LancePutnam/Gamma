@@ -43,28 +43,33 @@ public:
 
 	~AudioDevice();
 
-	bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
-	int id() const { return mID; }			///< Get device unique ID
-	const char * name() const;				///< Get device name
-	int channelsInMax() const;				///< Get maximum number of input channels supported
-	int channelsOutMax() const;				///< Get maximum number of output channels supported
-	double defaultSampleRate() const;		///< Get default sample rate
+	bool valid() const;					///< Get whether device is valid
+	int id() const;						///< Get device unique ID
+	const char * name() const;			///< Get device name
+	int channelsInMax() const;			///< Get maximum number of input channels supported
+	int channelsOutMax() const;			///< Get maximum number of output channels supported
+	double defaultSampleRate() const;	///< Get default sample rate
 	
-	bool hasInput() const;					///< Returns whether device has input
-	bool hasOutput() const;					///< Returns whether device has output
+	bool hasInput() const;				///< Get whether device has input
+	bool hasOutput() const;				///< Get whether device has output
 	
-	void print() const;						///< Prints info about specific i/o device to stdout
+	void print() const;					///< Prints info about specific i/o device to stdout
 
-	static AudioDevice defaultInput();		///< Get system's default input device
-	static AudioDevice defaultOutput();		///< Get system's default output device
-	static int numDevices();				///< Returns number of audio i/o devices available
-	static void printAll();					///< Prints info about all available i/o devices to stdout
+	static AudioDevice defaultInput();	///< Get system's default input device
+	static AudioDevice defaultOutput();	///< Get system's default output device
+	static int numDevices();			///< Get number of audio i/o devices available
+	static void printAll();				///< Prints info about all available i/o devices to stdout
 
 private:
-	void setImpl(int deviceNum);
-	static void initDevices();
 	int mID = -1;
 	const void * mImpl = nullptr;
+	const char * mName = "";
+	unsigned short mChanIMax = 0;
+	unsigned short mChanOMax = 0;
+	double mDefSampleRate = 1.;
+
+	void setImpl(int deviceNum);
+	static void initDevices();
 };
 
 inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){

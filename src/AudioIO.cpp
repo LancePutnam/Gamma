@@ -57,6 +57,17 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 
 
 //==============================================================================
+
+
+void AudioDevice::initDevices(){
+	struct InitSingleton{
+		InitSingleton(): mCleanUp(paNoError == Pa_Initialize()){}
+		~InitSingleton(){ if(mCleanUp){ Pa_Terminate(); } }
+		bool mCleanUp;
+	};
+	static InitSingleton dummy;
+}
+
 AudioDevice::AudioDevice(int deviceNum){
 	setImpl(deviceNum);
 }
@@ -77,27 +88,40 @@ AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream){
 
 AudioDevice::~AudioDevice(){}
 
-const char * AudioDevice::name() const { return ((const PaDeviceInfo*)mImpl)->name; }
-int AudioDevice::channelsInMax() const { return ((const PaDeviceInfo*)mImpl)->maxInputChannels; }
-int AudioDevice::channelsOutMax() const { return ((const PaDeviceInfo*)mImpl)->maxOutputChannels; }
-double AudioDevice::defaultSampleRate() const { return ((const PaDeviceInfo*)mImpl)->defaultSampleRate; }
+bool AudioDevice::valid() const { return 0!=mImpl; }
+int AudioDevice::id() const { return mID; }
+const char * AudioDevice::name() const { return mName; }
+int AudioDevice::channelsInMax() const { return mChanIMax; }
+int AudioDevice::channelsOutMax() const { return mChanOMax; }
+double AudioDevice::defaultSampleRate() const { return mDefSampleRate; }
 bool AudioDevice::hasInput() const { return channelsInMax()>0; }
 bool AudioDevice::hasOutput() const { return channelsOutMax()>0; }
-void AudioDevice::setImpl(int deviceNum){ initDevices(); mImpl = Pa_GetDeviceInfo(deviceNum); mID=deviceNum; }
-AudioDevice AudioDevice::defaultInput(){ initDevices(); return AudioDevice(Pa_GetDefaultInputDevice()); }
-AudioDevice AudioDevice::defaultOutput(){ initDevices(); return AudioDevice(Pa_GetDefaultOutputDevice()); }
 
-struct InitSingleton{
-	InitSingleton(): mCleanUp(paNoError == Pa_Initialize()){}
-	~InitSingleton(){ if(mCleanUp){ Pa_Terminate(); } }
-	bool mCleanUp;
-};
-
-void AudioDevice::initDevices(){
-	static InitSingleton dummy;
+void AudioDevice::setImpl(int deviceNum){
+	initDevices();
+	auto * info = Pa_GetDeviceInfo(deviceNum);
+	mName = info->name;
+	mChanIMax = info->maxInputChannels;
+	mChanOMax = info->maxOutputChannels;
+	mDefSampleRate = info->defaultSampleRate;
+	mImpl = info;
+	mID = deviceNum;
 }
 
-int AudioDevice::numDevices(){ initDevices(); return Pa_GetDeviceCount(); }
+/*static*/ AudioDevice AudioDevice::defaultInput(){
+	initDevices();
+	return AudioDevice(Pa_GetDefaultInputDevice());
+}
+
+/*static*/ AudioDevice AudioDevice::defaultOutput(){
+	initDevices();
+	return AudioDevice(Pa_GetDefaultOutputDevice());
+}
+
+/*static*/ int AudioDevice::numDevices(){
+	initDevices();
+	return Pa_GetDeviceCount();
+}
 
 void AudioDevice::print() const{
 
@@ -140,7 +164,7 @@ void AudioDevice::print() const{
 	*/
 }
 
-void AudioDevice::printAll(){
+/*static*/ void AudioDevice::printAll(){
 	for(int i=0; i<numDevices(); i++){
 		printf("[%2d] ", i);
 		AudioDevice dev(i);
