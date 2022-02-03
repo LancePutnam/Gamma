@@ -114,29 +114,30 @@ void AudioDevice::print() const{
 	if(chans > 0) printf("%2i out, ", chans);
 
 	printf("%.0f Hz\n", defaultSampleRate());
+	/*
+	PaSampleFormat sampleFormats = info->nativeSampleFormats;
 	
-//	PaSampleFormat sampleFormats = info->nativeSampleFormats;
-//	
-//	printf("[ ");
-//	if(0 != sampleFormats & paFloat32)		printf("f32 ");
-//	if(0 != sampleFormats & paInt32)		printf("i32 ");
-//	if(0 != sampleFormats & paInt24)		printf("i24 ");
-//	if(0 != sampleFormats & paInt16)		printf("i16 ");
-//	if(0 != sampleFormats & paInt8)			printf("i8 ");
-//	if(0 != sampleFormats & paUInt8)		printf("ui8 ");
-//	printf("], ");
+	printf("[ ");
+	if(0 != sampleFormats & paFloat32)		printf("f32 ");
+	if(0 != sampleFormats & paInt32)		printf("i32 ");
+	if(0 != sampleFormats & paInt24)		printf("i24 ");
+	if(0 != sampleFormats & paInt16)		printf("i16 ");
+	if(0 != sampleFormats & paInt8)			printf("i8 ");
+	if(0 != sampleFormats & paUInt8)		printf("ui8 ");
+	printf("], ");
 	
-//	if(info->numSampleRates != -1){
-//		printf("[");
-//		for(int i=0; i<info->numSampleRates; i++){
-//			printf("%f ", info->sampleRates[i]);
-//		}
-//		printf("] Hz");
-//	}
-//	else{
-//		printf("[%.0f <-> %.0f] Hz", info->sampleRates[0], info->sampleRates[1]);
-//	}
-//	printf("\n");
+	if(info->numSampleRates != -1){
+		printf("[");
+		for(int i=0; i<info->numSampleRates; i++){
+			printf("%f ", info->sampleRates[i]);
+		}
+		printf("] Hz");
+	}
+	else{
+		printf("[%.0f <-> %.0f] Hz", info->sampleRates[0], info->sampleRates[1]);
+	}
+	printf("\n");
+	*/
 }
 
 void AudioDevice::printAll(){
@@ -258,23 +259,23 @@ void AudioIO::init(){
 	// Choose default devices for now...
 	deviceIn(AudioDevice::defaultInput());
 	deviceOut(AudioDevice::defaultOutput());
+	/*
+	inDevice(defaultInDevice());
+	outDevice(defaultOutDevice());
 	
-//	inDevice(defaultInDevice());
-//	outDevice(defaultOutDevice());
-//	
-//	// Setup input stream parameters
-//	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);	
-//	if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
-//	mInParams.sampleFormat = paFloat32;// | paNonInterleaved;
-//	//mInParams.sampleFormat = paInt16;
-//	mInParams.hostApiSpecificStreamInfo = NULL;
-//
-//	// Setup output stream parameters
-//	dInfo = Pa_GetDeviceInfo(mOutParams.device);
-//	if(dInfo) mOutParams.suggestedLatency = dInfo->defaultLowOutputLatency; // for RT
-//	mOutParams.sampleFormat = paFloat32;// | paNonInterleaved;
-//	mOutParams.hostApiSpecificStreamInfo = NULL;
+	// Setup input stream parameters
+	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);	
+	if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
+	mInParams.sampleFormat = paFloat32;// | paNonInterleaved;
+	//mInParams.sampleFormat = paInt16;
+	mInParams.hostApiSpecificStreamInfo = NULL;
 
+	// Setup output stream parameters
+	dInfo = Pa_GetDeviceInfo(mOutParams.device);
+	if(dInfo) mOutParams.suggestedLatency = dInfo->defaultLowOutputLatency; // for RT
+	mOutParams.sampleFormat = paFloat32;// | paNonInterleaved;
+	mOutParams.hostApiSpecificStreamInfo = NULL;
+	*/
 	mImpl->setInDeviceChans(0);
 	mImpl->setOutDeviceChans(0);
 }
@@ -298,7 +299,7 @@ AudioIO& AudioIO::remove(AudioCallback& v){
 void AudioIO::deviceIn(const AudioDevice& v){
 
 	if(v.valid() && v.hasInput()){
-//		printf("deviceIn: %s, %d\n", v.name(), v.id());
+		//printf("deviceIn: %s, %d\n", v.name(), v.id());
 		mInDevice = v;
 		mImpl->inDevice(v.id());
 		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mImpl->mInParams.device);	
