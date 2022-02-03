@@ -86,7 +86,6 @@ public:
 
 	virtual ~AudioIOData();
 
-
 	/// Iterate frame counter, returning true while more frames
 	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
 		
@@ -97,7 +96,7 @@ public:
 	float& bus(int chan) const { return bus(chan, frame()); }
 
 	/// Get bus sample at specified channel and frame
-	float& bus(int chan, int frame) const;
+	float& bus(int chan, int frame) const { return mBufB[chan*framesPerBuffer() + frame]; }
 
 	/// Get non-interleaved bus buffer on specified channel
 	float * busBuffer(int chan=0) const { return &bus(chan,0); }
@@ -106,7 +105,7 @@ public:
 	const float& in(int chan) const { return in (chan, frame()); }
 
 	/// Get input sample at specified channel and frame
-	const float& in (int chan, int frame) const;
+	const float& in(int chan, int frame) const { return mBufI[chan*framesPerBuffer() + frame]; }
 
 	/// Get non-interleaved input buffer on specified channel
 	const float * inBuffer(int chan=0) const { return &in(chan,0); }
@@ -115,7 +114,7 @@ public:
 	float& out(int chan) const { return out(chan, frame()); }
 
 	/// Get output sample at specified channel and frame
-	float& out(int chan, int frame) const;
+	float& out(int chan, int frame) const { return mBufO[chan*framesPerBuffer() + frame]; }
 
 	/// Get non-interleaved output buffer on specified channel
 	float * outBuffer(int chan=0) const { return &out(chan,0); }
@@ -127,7 +126,7 @@ public:
 	void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
 	
 	/// Get sample from temporary buffer at specified frame
-	float& temp(int frame) const;
+	float& temp(int frame) const { return mBufT[frame]; }
 
 	/// Get non-interleaved temporary buffer on specified channel
 	float * tempBuffer() const { return &temp(0); }
@@ -265,16 +264,6 @@ private:
 	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
-
-
-
-
-
-//==============================================================================
-inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
-inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
 
 } // gam::
 
