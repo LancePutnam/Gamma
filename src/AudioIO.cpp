@@ -23,7 +23,7 @@ static void warn(const char * msg, const char * src){
 }
 
 template <class T>
-static void deleteBuf(T *& buf){ delete[] buf; buf=0; }
+static void deleteBuf(T *& buf){ delete[] buf; buf=nullptr; }
 
 template <class T>
 static int resize(T *& buf, int n){
@@ -57,15 +57,11 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 
 
 //==============================================================================
-AudioDevice::AudioDevice(int deviceNum)
-:	mID(-1), mImpl(0)
-{
+AudioDevice::AudioDevice(int deviceNum){
 	setImpl(deviceNum);
 }
 
-AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
-:	mID(-1), mImpl(0)
-{
+AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream){
 	for(int i=0; i<numDevices(); ++i){
 		AudioDevice d(i);
 		bool bi = (stream &  INPUT) && d.hasInput();
@@ -156,8 +152,6 @@ void AudioDevice::printAll(){
 //==============================================================================
 class AudioIOData::Impl{
 public:
-	Impl(): mStream(0), mErrNum(0), mIsOpen(false), mIsRunning(false){}
-
 	bool error() const { return mErrNum != paNoError; }
 
 	void printError(const char * text = "") const {
@@ -197,18 +191,15 @@ public:
 	}
 
 	PaStreamParameters mInParams, mOutParams;	// Input and output stream parameters
-	PaStream * mStream;					// i/o stream
-	mutable PaError mErrNum;			// Most recent error number
-	bool mIsOpen;						// An audio device is open
-	bool mIsRunning;					// An audio stream is running
+	PaStream * mStream = nullptr;		// i/o stream
+	mutable PaError mErrNum = 0;		// Most recent error number
+	bool mIsOpen = false;				// An audio device is open
+	bool mIsRunning = false;			// An audio stream is running
 };
 
 AudioIOData::AudioIOData(void * userData)
 :	mImpl(new Impl),
-	mUser(userData),
-	mFramesPerBuffer(0), mFramesPerSecond(0),
-	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
-	mGain(1), mGainPrev(1)
+	mUser(userData)
 {}
 
 AudioIOData::~AudioIOData(){
@@ -247,8 +238,7 @@ AudioIO::AudioIO(
 	int outChansA, int inChansA)
 :	AudioIOData(userData),
 	callback(callbackA),
-	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
-	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
+	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput())
 {
 	init();
 	this->framesPerBuffer(framesPerBuf);

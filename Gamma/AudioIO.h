@@ -63,8 +63,8 @@ public:
 private:
 	void setImpl(int deviceNum);
 	static void initDevices();
-	int mID;
-	const void * mImpl;
+	int mID = -1;
+	const void * mImpl = nullptr;
 };
 
 inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
@@ -160,13 +160,15 @@ protected:
 	class Impl; Impl * mImpl;
 	void * mUser;					// User specified data
 	mutable int mFrame;
-	int mFramesPerBuffer;
-	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
-	float * mBufT;					// temporary one channel buffer
-	int mNumI, mNumO, mNumB;		// input, output, and aux channels
+	int mFramesPerBuffer = 0;
+	double mFramesPerSecond = 0.;
+	float * mBufI = nullptr;		// input buffer
+	float * mBufO = nullptr;		// output buffer
+	float * mBufB = nullptr;		// aux buffer
+	float * mBufT = nullptr;		// temporary one channel buffer
+	int mNumI=0, mNumO=0, mNumB=0;	// input, output, and aux channels
 public:
-	float mGain, mGainPrev;
+	float mGain=1.f, mGainPrev=1.f;
 };
 
 
@@ -255,9 +257,9 @@ public:
 
 private:
 	AudioDevice mInDevice, mOutDevice;
-	bool mZeroNANs;			// whether to zero NANs
-	bool mClipOut;			// whether to clip output between -1 and 1
-	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
+	bool mZeroNANs = true;		// whether to zero NANs
+	bool mClipOut = true;		// whether to clip output between -1 and 1
+	bool mAutoZeroOut = true;	// whether to automatically zero output buffers each block
 	std::vector<AudioCallback *> mAudioCallbacks;
 
 	void init();			//
