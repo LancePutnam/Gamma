@@ -1,17 +1,15 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdio.h>
 #include <algorithm>
-#include <cstring> // memset
 #include <cmath>
+#include <cstdio>
+#include <cstring> // memset
 
 #include "portaudio.h"
 #include "Gamma/AudioIO.h"
 
 namespace gam{
-
-static inline int min(int x, int y){ return x<y?x:y; }
 
 /*
 static void err(const char * msg, const char * src, bool exits){
@@ -390,7 +388,7 @@ void AudioIO::channels(int num, bool forOutput){
 	int currentNum = channels(forOutput);
 	
 	if(num != currentNum){
-		params->channelCount = min(num, maxChans);
+		params->channelCount = std::min(num, maxChans);
 		forOutput ? mNumO = num : mNumI = num;
 		resizeBuffer(forOutput);
 	}
