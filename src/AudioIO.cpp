@@ -227,13 +227,6 @@ double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() 
 
 
 //==============================================================================
-static int paCallback(	const void *input,
-						void *output,
-						unsigned long frameCount,
-						const PaStreamCallbackTimeInfo* timeInfo,
-						PaStreamCallbackFlags statusFlags,
-						void *userData );
-
 AudioIO::AudioIO(
 	int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * userData,
 	int outChansA, int inChansA)
@@ -389,41 +382,7 @@ void AudioIO::channels(int num, bool forOutput){
 bool AudioIO::close(){ return mImpl->close(); }
 
 
-bool AudioIO::open(){
-	Impl& i = *mImpl;
-
-	i.mErrNum = paNoError;
-
-	if(!(i.mIsOpen || i.mIsRunning)){
-		
-		PaStreamParameters * inParams = &i.mInParams;
-		PaStreamParameters * outParams = &i.mOutParams;
-		
-		// Must pass in 0s for input- or output-only streams.
-		// Stream will not be opened if no device or channel count is zero
-		if((paNoDevice ==  inParams->device) || (0 ==  inParams->channelCount)) inParams  = 0;
-		if((paNoDevice == outParams->device) || (0 == outParams->channelCount)) outParams = 0;
-
-		i.mErrNum = Pa_OpenStream(
-			&i.mStream,			// PortAudioStream **
-			inParams,			// PaStreamParameters * in
-			outParams,			// PaStreamParameters * out
-			mFramesPerSecond,	// frames/sec (double)
-			mFramesPerBuffer,	// frames/buffer (unsigned long)
-			paNoFlag,			// paNoFlag, paClipOff, paDitherOff
-			paCallback,			// static callback function (PaStreamCallback *)
-			this
-		);
-
-		i.mIsOpen = paNoError == i.mErrNum;
-	}
-
-	i.printError("Error in al::AudioIO::open()");
-	return paNoError == i.mErrNum;
-}
-
-
-int paCallback(
+static int paCallback(
 	const void *input,
 	void *output,
 	unsigned long frameCount,
@@ -491,6 +450,38 @@ int paCallback(
 	return 0;
 }
 
+bool AudioIO::open(){
+	Impl& i = *mImpl;
+
+	i.mErrNum = paNoError;
+
+	if(!(i.mIsOpen || i.mIsRunning)){
+		
+		PaStreamParameters * inParams = &i.mInParams;
+		PaStreamParameters * outParams = &i.mOutParams;
+		
+		// Must pass in 0s for input- or output-only streams.
+		// Stream will not be opened if no device or channel count is zero
+		if((paNoDevice ==  inParams->device) || (0 ==  inParams->channelCount)) inParams  = 0;
+		if((paNoDevice == outParams->device) || (0 == outParams->channelCount)) outParams = 0;
+
+		i.mErrNum = Pa_OpenStream(
+			&i.mStream,			// PortAudioStream **
+			inParams,			// PaStreamParameters * in
+			outParams,			// PaStreamParameters * out
+			mFramesPerSecond,	// frames/sec (double)
+			mFramesPerBuffer,	// frames/buffer (unsigned long)
+			paNoFlag,			// paNoFlag, paClipOff, paDitherOff
+			paCallback,			// static callback function (PaStreamCallback *)
+			this
+		);
+
+		i.mIsOpen = paNoError == i.mErrNum;
+	}
+
+	i.printError("Error in AudioIO::open()");
+	return paNoError == i.mErrNum;
+}
 
 void AudioIO::reopen(){
 	if(mImpl->mIsRunning)  { close(); start(); }
