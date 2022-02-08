@@ -43,28 +43,33 @@ public:
 
 	~AudioDevice();
 
-	bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
-	int id() const { return mID; }			///< Get device unique ID
-	const char * name() const;				///< Get device name
-	int channelsInMax() const;				///< Get maximum number of input channels supported
-	int channelsOutMax() const;				///< Get maximum number of output channels supported
-	double defaultSampleRate() const;		///< Get default sample rate
+	bool valid() const;					///< Get whether device is valid
+	int id() const;						///< Get device unique ID
+	const char * name() const;			///< Get device name
+	int channelsInMax() const;			///< Get maximum number of input channels supported
+	int channelsOutMax() const;			///< Get maximum number of output channels supported
+	double defaultSampleRate() const;	///< Get default sample rate
 	
-	bool hasInput() const;					///< Returns whether device has input
-	bool hasOutput() const;					///< Returns whether device has output
+	bool hasInput() const;				///< Get whether device has input
+	bool hasOutput() const;				///< Get whether device has output
 	
-	void print() const;						///< Prints info about specific i/o device to stdout
+	void print() const;					///< Prints info about specific i/o device to stdout
 
-	static AudioDevice defaultInput();		///< Get system's default input device
-	static AudioDevice defaultOutput();		///< Get system's default output device
-	static int numDevices();				///< Returns number of audio i/o devices available
-	static void printAll();					///< Prints info about all available i/o devices to stdout
+	static AudioDevice defaultInput();	///< Get system's default input device
+	static AudioDevice defaultOutput();	///< Get system's default output device
+	static int numDevices();			///< Get number of audio i/o devices available
+	static void printAll();				///< Prints info about all available i/o devices to stdout
 
 private:
+	int mID = -1;
+	const void * mImpl = nullptr;
+	const char * mName = "";
+	unsigned short mChanIMax = 0;
+	unsigned short mChanOMax = 0;
+	double mDefSampleRate = 1.;
+
 	void setImpl(int deviceNum);
 	static void initDevices();
-	int mID;
-	const void * mImpl;
 };
 
 inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
@@ -86,7 +91,6 @@ public:
 
 	virtual ~AudioIOData();
 
-
 	/// Iterate frame counter, returning true while more frames
 	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
 		
@@ -97,7 +101,7 @@ public:
 	float& bus(int chan) const { return bus(chan, frame()); }
 
 	/// Get bus sample at specified channel and frame
-	float& bus(int chan, int frame) const;
+	float& bus(int chan, int frame) const { return mBufB[chan*framesPerBuffer() + frame]; }
 
 	/// Get non-interleaved bus buffer on specified channel
 	float * busBuffer(int chan=0) const { return &bus(chan,0); }
@@ -106,7 +110,7 @@ public:
 	const float& in(int chan) const { return in (chan, frame()); }
 
 	/// Get input sample at specified channel and frame
-	const float& in (int chan, int frame) const;
+	const float& in(int chan, int frame) const { return mBufI[chan*framesPerBuffer() + frame]; }
 
 	/// Get non-interleaved input buffer on specified channel
 	const float * inBuffer(int chan=0) const { return &in(chan,0); }
@@ -115,7 +119,7 @@ public:
 	float& out(int chan) const { return out(chan, frame()); }
 
 	/// Get output sample at specified channel and frame
-	float& out(int chan, int frame) const;
+	float& out(int chan, int frame) const { return mBufO[chan*framesPerBuffer() + frame]; }
 
 	/// Get non-interleaved output buffer on specified channel
 	float * outBuffer(int chan=0) const { return &out(chan,0); }
@@ -127,7 +131,7 @@ public:
 	void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
 	
 	/// Get sample from temporary buffer at specified frame
-	float& temp(int frame) const;
+	float& temp(int frame) const { return mBufT[frame]; }
 
 	/// Get non-interleaved temporary buffer on specified channel
 	float * tempBuffer() const { return &temp(0); }
@@ -161,13 +165,15 @@ protected:
 	class Impl; Impl * mImpl;
 	void * mUser;					// User specified data
 	mutable int mFrame;
-	int mFramesPerBuffer;
-	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
-	float * mBufT;					// temporary one channel buffer
-	int mNumI, mNumO, mNumB;		// input, output, and aux channels
+	int mFramesPerBuffer = 0;
+	double mFramesPerSecond = 0.;
+	float * mBufI = nullptr;		// input buffer
+	float * mBufO = nullptr;		// output buffer
+	float * mBufB = nullptr;		// aux buffer
+	float * mBufT = nullptr;		// temporary one channel buffer
+	int mNumI=0, mNumO=0, mNumB=0;	// input, output, and aux channels
 public:
-	float mGain, mGainPrev;
+	float mGain=1.f, mGainPrev=1.f;
 };
 
 
@@ -256,25 +262,15 @@ public:
 
 private:
 	AudioDevice mInDevice, mOutDevice;
-	bool mZeroNANs;			// whether to zero NANs
-	bool mClipOut;			// whether to clip output between -1 and 1
-	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
+	bool mZeroNANs = true;		// whether to zero NANs
+	bool mClipOut = true;		// whether to clip output between -1 and 1
+	bool mAutoZeroOut = true;	// whether to automatically zero output buffers each block
 	std::vector<AudioCallback *> mAudioCallbacks;
 
 	void init();			//
 	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
-
-
-
-
-
-//==============================================================================
-inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
-inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
 
 } // gam::
 
