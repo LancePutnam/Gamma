@@ -82,7 +82,7 @@ install: $(LIB_PATH)
 #	@echo 'INSTALL $(DESTDIR)'
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
-	@$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib
+	-@$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib
 ifneq ($(EXT_LIB_COPY_DIR), )
 	@$(INSTALL) -m 644 $(EXT_LIB_COPY_DIR)/* $(DESTDIR)/lib
 endif
