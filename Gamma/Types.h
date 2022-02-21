@@ -272,6 +272,36 @@ public:
 	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
 	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
 
+	template <class V, class Func, class... Args>
+	Vec<N,V> map(Func func, Args... args) const {
+		Vec<N,V> r;
+		for(int i=0; i<size(); ++i)
+			r[i] = func((*this)[i], args...);
+		return r;
+	}
+
+	/// Map elements through function into new vector
+
+	/// @param[in] func		Function taking old value and returning new value
+	/// @param[in] args		Extra function arguments
+	template <class Func, class... Args>
+	Vec map(Func func, Args... args) const {
+		return map<T>(func, args...);
+	}
+
+	/// Reduce elements into scalar
+
+	/// @param[in] prev		Initial previous value
+	/// @param[in] func		Function taking previous and current values as first 
+	///						two arguments and returning new value
+	/// @param[in] args		Extra function arguments
+	template <class Func, class... Args>
+	T reduce(const T& prev, Func func, Args... args) const {
+		T r = prev;
+		for(auto& v : *this) r = func(r, v, args...);
+		return r;
+	}
+
 	/// Zeros all elements
 	void zero(){ memset(elems(), 0, N * sizeof(T)); }
 
