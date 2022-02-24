@@ -147,7 +147,13 @@ public:
 	/// \param[in]	frq		Center frequency
 	/// \param[in]	res		Resonance (Q) amount in [1, inf)
 	/// \param[in]	type	Type of filter
-	Biquad(Tp frq = Tp(1000), Tp res = Tp(0.707), FilterType type = LOW_PASS);
+	/// \param[in]	lvl		Amplitude level for PEAKING, LOW_SHELF, HIGH_SHELF
+	Biquad(
+		Tp frq = Tp(1000),
+		Tp res = Tp(0.707),
+		FilterType type = LOW_PASS,
+		Tp lvl = Tp(1)
+	);
 
 
 	/// Get array of 3 feedforward coefficients
@@ -192,6 +198,7 @@ protected:
 	Tp mAlpha, mBeta;
 	Tp mFreqToAng;
 
+	void levelNoResUpdate(Tp v);
 	void resRecip(Tp v);
 };
 
@@ -722,11 +729,12 @@ void AllPass1<Tv,Tp,Td>::onDomainChange(double /*r*/){ freq(mFreq); }
 
 //---- Biquad
 template <class Tv, class Tp, class Td>
-Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type)
-:	d1(0), d2(0), mLevel(1), mBeta(1)
+Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type, Tp lvl)
+:	d1(0), d2(0), mType(type)
 {
-	onDomainChange(1);
-	set(frq, res, type);
+	mFreqToAng = getFreqToAng(Td::ups());
+	levelNoResUpdate(lvl);
+	set(frq, res);
 }
 
 template <class Tv, class Tp, class Td>
@@ -750,8 +758,8 @@ FilterType Biquad<Tv,Tp,Td>::type() const { return mType; }
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::set(Tp freq_, Tp res_, FilterType type_){
 	mType = type_;
-	res(res_);
-	freq(freq_);
+	mResRecip = Tp(0.5)/res_;
+	freq(freq_); // updates coefs based on mResRecip
 }
 
 template <class Tv, class Tp, class Td>
@@ -769,6 +777,28 @@ template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
 	getPole(mReal, mImag, mFreq * mFreqToAng);
+	resRecip(mResRecip);
+}
+
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::levelNoResUpdate(Tp v){
+	mLevel=v;
+	switch(mType){
+	case PEAKING:
+		mBeta = Tp(1)/(std::max(mLevel, Tp(0.0001)));
+		break;
+	case LOW_SHELF:
+	case HIGH_SHELF:
+		mBeta = Tp(2)*std::pow(mLevel, Tp(0.25));
+		break;
+	default:
+		mBeta = Tp(1);
+	}
+}
+
+template <class Tv, class Tp, class Td>
+inline void Biquad<Tv,Tp,Td>::level(Tp v){
+	levelNoResUpdate(v);
 	resRecip(mResRecip);
 }
 
@@ -790,25 +820,8 @@ inline void Biquad<Tv,Tp,Td>::width(Tp v){
 */
 
 template <class Tv, class Tp, class Td>
-inline void Biquad<Tv,Tp,Td>::level(Tp v){
-	mLevel=v;
-	switch(mType){
-	case PEAKING:
-		mBeta = Tp(1)/mLevel;
-		break;
-	case LOW_SHELF:
-	case HIGH_SHELF:
-		mBeta = Tp(2)*std::pow(mLevel, Tp(0.25));
-		break;
-	default:
-		mBeta = Tp(1);
-	}
-	resRecip(mResRecip);
-}
-
-template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::resRecip(Tp v){
-	mResRecip = v;
+	mResRecip = v; // 1 / (2 res)
 	mAlpha = mImag * mResRecip * mBeta;
 
 	switch(mType){
