@@ -145,7 +145,7 @@ class Biquad : public Td{
 public:
 
 	/// \param[in]	frq		Center frequency
-	/// \param[in]	res		Resonance (Q) amount in [1, inf)
+	/// \param[in]	res		Resonance (Q) amount in (0, inf)
 	/// \param[in]	type	Type of filter
 	/// \param[in]	lvl		Amplitude level for PEAKING, LOW_SHELF, HIGH_SHELF
 	Biquad(
@@ -157,15 +157,14 @@ public:
 
 
 	/// Get array of 3 feedforward coefficients
+	const Tp * a() const { return mA; }
 	Tp * a(){ return mA; }
 	
 	/// Get array of 3 feedback coefficients (first element, b0, is not used)
+	const Tp * b() const { return mB; }
 	Tp * b(){ return mB; }
 
-	const Tp * a() const { return mA; }
-	const Tp * b() const { return mB; }
-
-	/// Set feedforward (a) and feedback (b) coefficients directly
+	/// Set feedforward (a) and feedback (b) coefficients; b0 assumed to be 1
 	void coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2);
 
 
