@@ -18,7 +18,7 @@ The source code can either be built into a library or directly compiled from sou
 
 ## Building a Library
 
-### Make (Linux, OS X)
+### Make (Linux, OS X, mingw)
 In most cases, simply running
 
 	make
@@ -36,15 +36,16 @@ The script `run.sh` can be used to compile and run examples and other source fil
 
 	./run.sh examples/oscillator/sine.cpp
 
-To only compile the source file without running, include AUTORUN=0 after the source file. Binaries are located in the automatically generated `build/` directory. On OSX, the Gamma library will be linked to the pre-compiled dependent libraries in `external/lib_osx`. On Linux, use `apt-get` to install the necessary dependent libraries (see 2.3 below).
+To only compile the source file without running, include AUTORUN=0 after the source file. Binaries are located in the automatically generated `build/` directory. On OSX, the Gamma library will be linked to the pre-compiled dependent libraries in `external/lib_osx`. On Linux, use `apt-get` to install the necessary dependent libraries.
 
 
 ### Xcode (OS X)
+You may also build the library using the supplied Xcode project.
 1. Open `project/xcode/gamma.xcodeproj`
 2. Build the target `libgamma{.a, .dylib}`. The library will be in project build folder.
 
 
-## Compiling Direct From Source
+## Compiling Directly From Source
 Gamma can easily be compiled directly from source into an existing project.
 
 Make sure to pass in the following flags to the compiler:
@@ -67,3 +68,6 @@ libsndfile may be used as the backend for the SoundFile class by passing the fla
 
 into make.
 
+## License
+
+Gamma is distributed under a permissive free software license. Please see the LICENSE file for details.
