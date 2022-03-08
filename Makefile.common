@@ -64,9 +64,6 @@ else
 endif
 
 
-#
-USING_PUREDYNE	= 0
-
 #--------------------------------------------------------------------------
 # Build settings
 #--------------------------------------------------------------------------
@@ -187,10 +184,6 @@ ifeq ($(PLATFORM), em)
 else ifeq ($(PLATFORM), linux)
 
 	PLATFORM_DIR = linux/
-
-	ifneq ($(USING_PUREDYNE), 0)
-		CXX = gcc
-	endif
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -m32
