@@ -81,6 +81,10 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
+/// Cyclic linear interpolation between three elements
+template <class Tf, class Tv>
+Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
+
 /// Linear interpolation between two arrays
 template <class T>
 void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac);
@@ -234,6 +238,14 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 template <class T>
 void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T f){
 	for(unsigned i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
+}
+
+template <class Tf, class Tv>
+inline Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
+	frac *= Tf(3);
+	if(frac <= Tf(1))		return ipl::linear(frac, x,y);
+	else if(frac >= Tf(2))	return ipl::linear(frac-Tf(2), z,x);
+							return ipl::linear(frac-Tf(1), y,z);
 }
 
 
