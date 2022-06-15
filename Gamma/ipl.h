@@ -52,6 +52,12 @@ Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	return ipl::linear(frac-Tf(1), y,z);
 }
 
+/// Linear interpolation between arrays
+template <class T>
+void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac){
+	for(unsigned i=0; i<len; ++i) dst[i] = linear(frac, xs[i], xp1s[i]);
+}
+
 /// Cyclic linear interpolation between three elements
 template <class Tf, class Tv>
 Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
@@ -61,10 +67,19 @@ Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 							return ipl::linear(frac-Tf(1), y,z);
 }
 
-/// Linear interpolation between arrays
-template <class T>
-void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac){
-	for(unsigned i=0; i<len; ++i) dst[i] = linear(frac, xs[i], xp1s[i]);
+/// Cyclic linear interpolation (lookup) within array
+template <class Tf, class Tv>
+Tv linearCyclic(Tf pos01, const Tv * src, unsigned len){
+	Tf idxf = pos01 * len;
+	unsigned i0 = unsigned(idxf);
+	unsigned i1 = i0+1; if(i1>=len) i1=0;
+	float f = idxf - i0;
+	return linear(f, src[i0], src[i1]);
+}
+
+template <class Tf, class Array>
+typename Array::value_type linearCyclic(Tf pos01, const Array& src){
+	return linearCyclic(pos01, &src[0], src.size());
 }
 
 /// Trapezoidal interpolation
@@ -95,35 +110,56 @@ Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 /// The resulting value will never exceed the range of the interpolation points.
 template <class Tf, class Tv>
 Tv cubic(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
-//	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
-//	Tv c2 = w - x*(Tf)2.5 + y*(Tf)2. - z*(Tf)0.5;
-//	Tv c1 = (y - w)*(Tf)0.5;
-//	return ((c3 * frac + c2) * frac + c1) * frac + x;
+	/*
+	Tv c3 = (x - y)*Tf(1.5) + (z - w)*Tf(0.5);
+	Tv c2 = w - x*Tf(2.5) + y*Tf(2.) - z*Tf(0.5);
+	Tv c1 = (y - w)*Tf(0.5);
+	return ((c3 * frac + c2) * frac + c1) * frac + x;//*/
 
 	// -w + 3x - 3y + z	
 	// 2w - 5x + 4y - z
 	// c2 = w - 2x + y - c3
 
-//	Tv c3 = (x - y)*(Tf)3 + z - w;
-//	Tv c2 = w - x*(Tf)2 + y - c3;
-//	Tv c1 = y - w;
-//	return (((c3 * frac + c2) * frac + c1)) * frac * (Tf)0.5 + x;
-	
-//	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
-//	Tv c2 = (y + w)*(Tf)0.5 - x - c3;
-//	Tv c1 = (y - w)*(Tf)0.5;	
-//	return ((c3 * frac + c2) * frac + c1) * frac + x;
+	/*
+	Tv c3 = (x - y)*Tf(3) + z - w;
+	Tv c2 = w - x*Tf(2) + y - c3;
+	Tv c1 = y - w;
+	return (((c3 * frac + c2) * frac + c1)) * frac * Tf(0.5) + x;//*/
 
+	/*
+	Tv c3 = (x - y)*Tf(1.5) + (z - w)*Tf(0.5);
+	Tv c2 = (y + w)*Tf(0.5) - x - c3;
+	Tv c1 = (y - w)*Tf(0.5);	
+	return ((c3 * frac + c2) * frac + c1) * frac + x; //*/
+
+	//*
 	Tv c1 = (y - w)*Tf(0.5);
 	Tv c3 = (x - y)*Tf(1.5) + (z - w)*Tf(0.5);
 	Tv c2 = c1 + w - x - c3;
-	return ((c3 * frac + c2) * frac + c1) * frac + x;
+	return ((c3 * frac + c2) * frac + c1) * frac + x;//*/
 }
 
 /// Cubic interpolation between arrays
 template <class T>
 void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, unsigned len, T frac){
 	for(unsigned i=0; i<len; ++i) dst[i] = cubic(frac, xm1s[i], xs[i], xp1s[i], xp2s[i]);
+}
+
+/// Cyclic cubic interpolation (lookup) within array
+template <class Tf, class Tv>
+Tv cubicCyclic(Tf pos01, const Tv * src, unsigned len){
+	Tf idxf = pos01 * len;
+	unsigned i0 = unsigned(idxf);
+	unsigned im1= i0>0 ? i0-1 : len-1;
+	unsigned i1 = i0+1; if(i1>=len) i1-=len;
+	unsigned i2 = i0+2; if(i2>=len) i2-=len;
+	float f = idxf - i0;
+	return cubic(f, src[im1], src[i0], src[i1], src[i2]);
+}
+
+template <class Tf, class Array>
+typename Array::value_type cubicCyclic(Tf pos01, const Array& src){
+	return cubicCyclic(pos01, &src[0], src.size());
 }
 
 /// Simplified parabolic interpolation of 3 points.
