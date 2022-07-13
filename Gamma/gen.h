@@ -145,8 +145,9 @@ template <class T=double>
 struct RSin : public Val<T>{ INHERIT;
 
 	/// Constructor
-	RSin(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0))
-	:	val2(0), mul(0){ set(frq,amp,phs); }
+	RSin(const T& frq=T(0), const T& amp=T(1), const T& phs=T(0)){
+		set(frq,amp,phs);
+	}
 
 	/// Generate next value
 	T operator()() const {
