@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <cmath> // abs
+#include <cmath> // abs, fpclassify
 #include "Gamma/Filter.h"
 
 namespace gam{
@@ -270,6 +270,84 @@ private:
 	ZeroCross<Tv> mDetector;
 	float mRate = 0.f;
 	unsigned mCrosses = 0;
+};
+
+
+
+/// Analyzes a signal for potential errors or bad states
+class Inspector {
+public:
+	/// Error status
+	enum {
+		ERR_DC			= 1<<0,	///< Signal has DC
+		ERR_CLIP		= 1<<1,	///< Signal out of [-1,1] range
+		ERR_DENORMAL	= 1<<2,	///< Signal in denormal (subnormal) range
+		ERR_INF			= 1<<3,	///< Signal has an infinity
+		ERR_NAN			= 1<<4	///< Signal has a NaN (not-a-number)
+	};
+
+	/// Input next sample; \returns error status
+	unsigned operator()(float v){
+		auto fpstate = std::fpclassify(v);
+		switch(fpstate){
+		case FP_INFINITE:  mErr |= ERR_INF; break;
+		case FP_NAN:       mErr |= ERR_NAN; break;
+		case FP_SUBNORMAL: mErr |= ERR_DENORMAL; break;
+		default:;
+		}
+
+		mRunSum += v;
+		if(mDCCount()){
+			mDC = mRunSum / mDCCount.period();
+			mRunSum = 0.;
+			auto absDC = std::abs(mDC);
+			if(absDC > mMaxDC) mMaxDC = absDC;
+			if(mMaxDC > 0.005) mErr |= ERR_DC;
+		}
+
+		auto absv = std::abs(v);
+		if(absv > mPeak) mPeak = absv;
+		if(mPeak > 1.) mErr |= ERR_CLIP;
+
+		return mErr;
+	}
+	
+	unsigned status() const { return mErr; }	///< Get error status
+	operator bool() const { return mErr; }
+	float peak() const { return mPeak; }		///< Get running peak value
+	float DC() const { return mDC; }			///< Get current DC value
+	float maxDC() const { return mMaxDC; }		///< Get running max DC value
+
+	/// Reset analysis and error states
+	Inspector& reset(){
+		mErr = 0;
+		mDC = mMaxDC = mRunSum = 0.;
+		mDCCount.reset();
+		mPeak = 0.;
+		return *this;
+	}
+
+	void print() const {
+		printf("peak:%5.3f DC:% 7.4f ", mPeak, mDC);
+
+		if(mErr){
+			printf("[");
+			if(hasErr(ERR_DC      )) printf("DC:% 7.4f ", mMaxDC);
+			if(hasErr(ERR_CLIP    )) printf("clip:%5.3f ", mPeak);
+			if(hasErr(ERR_DENORMAL)) printf("denormal ");
+			if(hasErr(ERR_INF     )) printf("inf ");
+			if(hasErr(ERR_NAN     )) printf("NaN ");
+			printf("\b]");
+		}
+		printf("\n");
+	}
+
+private:
+	unsigned mErr = 0;
+	float mPeak = 0.;
+	float mDC = 0., mMaxDC = 0., mRunSum = 0.;
+	PCounter mDCCount{4096};
+	bool hasErr(unsigned e) const { return mErr&e; }
 };
 
 } // gam::
