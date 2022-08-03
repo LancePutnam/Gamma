@@ -13,6 +13,7 @@
 #include "Gamma/Types.h"
 #include "Gamma/Delay.h"
 #include "Gamma/Filter.h"
+#include "Gamma/Ramped.h"
 
 
 namespace gam{
@@ -342,6 +343,8 @@ public:
 	/// \param[in] far			far clipping distance
 	Dist(float maxDelay=0.2, float near=0.1, float far=10);
 
+	/// Set number of samples over which to smooth coefficients
+	Dist& blockSize(int v){ mBlockSize=v; return *this; }
 
 	/// Set near clipping distance
 	Dist& near(float v){ mNear=v; return updateCoefs(); }
@@ -402,10 +405,11 @@ private:
 	float mFarGain = 0.25;
 	float mA, mB, mC; // coefs for attenuation function
 	float mInvSpeedOfSound = 1./343.2;
+	float mBlockSize = 64.;
 
 	Vec<Ndest,float> mDist;
-	float mDly[Ndest];
-	float mAmp[Ndest];
+	Ramped<T> mDly[Ndest];
+	Ramped<T> mAmp[Ndest];
 	OnePole<T> mLPF[Ndest];
 	bool mToZero = false;
 
@@ -689,10 +693,11 @@ Dist<TARG>::Dist(float maxDelay, float near, float far)
 
 template<TDEC>
 Dist<TARG>& Dist<TARG>::dist(int dest, float d){
+	float amp = inverse(d);
 	mDist[dest]= d;
-	mAmp[dest] = inverse(d);
-	mDly[dest] = d * mInvSpeedOfSound;
-	mLPF[dest].freq(22000 * mAmp[dest]);
+	mAmp[dest].target(amp, mBlockSize);
+	mDly[dest].target(d * mInvSpeedOfSound, mBlockSize);
+	mLPF[dest].freq(22000 * amp + 20.); // low-pass gate
 	return *this;
 }
 
@@ -714,7 +719,7 @@ inline Vec<Ndest, T> Dist<TARG>::operator()(T in){
 	mDelay.write(in);
 	Vec<Ndest, T> res;
 	for(int i=0; i<Ndest; ++i)
-		res[i] = mLPF[i](mDelay.read(mDly[i])) * mAmp[i];
+		res[i] = mLPF[i](mDelay.read(mDly[i]())) * mAmp[i]();
 	return res;
 }
 

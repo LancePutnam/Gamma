@@ -30,9 +30,11 @@ float headShadow(const Vec3& earDir, const Vec3& srcDir){
 class HRFilter{
 public:
 
+	typedef Dist<2+1> dist_type;
+
 	HRFilter(){}
 
-	Dist<3>& dist(){ return mDist; }
+	dist_type& dist(){ return mDist; }
 
 	/// Set ear distance (measured from center of head)
 	HRFilter& earDist(float v){ mEarDist = v; return *this; }
@@ -126,7 +128,7 @@ public:
 	}
 
 public:
-	Dist<2+1> mDist;
+	dist_type mDist;
 
 	struct EarFilter{
 		Biquad<>
@@ -175,6 +177,11 @@ public:
 			mReverbs[i].damping(0.25);		
 		}
 		far(0.5);
+	}
+
+	HRScene& blockSize(int v){
+		for(auto& s : mSources) s.dist().blockSize(v);
+		return *this;
 	}
 
 	/// Get number of sources
