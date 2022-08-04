@@ -57,9 +57,10 @@
 	#include "Gamma/FormantData.h"
 	#include "Gamma/Noise.h"
 	#include "Gamma/Oscillator.h"
+	#include "Gamma/Ramped.h"
+	#include "Gamma/Recorder.h"
 	#include "Gamma/SamplePlayer.h"
 	#include "Gamma/Spatial.h"
-	#include "Gamma/Recorder.h"
 	#include "Gamma/SoundFile.h"
 	#include "Gamma/UnitMaps.h"
 
@@ -70,6 +71,7 @@
 	// Scheduling/Timing
 	#include "Gamma/Scheduler.h"
 	#include "Gamma/Timer.h"
+	#include "Gamma/Voices.h"
 
 #endif
 
