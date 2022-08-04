@@ -39,11 +39,9 @@ public:
 
 	/// Update value; \returns smoothed value
 	T operator()(){
-		if(mVal != mTarget){
-			mVal += mInc;
-			if((mInc>0. && mVal>mTarget) || (mInc<0. && mVal<mTarget))
-				mVal = mTarget;
-		}
+		mVal += mInc;
+		if((mInc>T(0) && mVal>mTarget) || (mInc<T(0) && mVal<mTarget))
+			mVal = mTarget;
 		return mVal;
 	}
 
