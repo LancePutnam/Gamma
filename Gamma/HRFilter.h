@@ -154,7 +154,7 @@ public:
 
 	EarFilter mEarFilters[2];
 
-	float mTorsoAmt=0., mTorsoDelay=0.;
+	//float mTorsoAmt=0., mTorsoDelay=0.;
 	float mEarDist = 0.07; // about half the average bitragion breadth
 	float mRoomSize = 3;
 };
@@ -164,13 +164,23 @@ public:
 template <int Nsrc>
 class HRScene{
 public:
-	typedef HRFilter Source;
+
+	class Source : public HRFilter {
+	public:
+
+		float sample() const { return mSample; }
+		float& sample(){ return mSample; }
+		Source& sample(float v){ mSample=v; return *this; }
+
+		bool active() const { return mActive; }
+		Source& active(bool v){ mActive=v; return *this; }
+
+	private:
+		float mSample = 0.f;
+		bool mActive = true;
+	};
 
 	HRScene(){
-		for(int i=0; i<Nsrc; ++i){
-			mSamples[i] = 0.f;
-			mActive[i] = true;
-		}
 		for(int i=0; i<2; ++i){
 			mReverbs[i].resize(gam::JCREVERB, i*2);
 			mReverbs[i].decay(4);
@@ -192,26 +202,23 @@ public:
 	Source& source(int i){ return mSources[i]; }
 
 	/// Set source sample
-	float& sample(int i){ return mSamples[i]; }
+	float& sample(int i){ return source(i).sample(); }
 
 	/// Get source sample
-	const float& sample(int i) const { return mSamples[i]; }
+	float sample(int i) const { return source(i).sample(); }
 
 	/// Set all source samples to zero
-	HRScene& zeroSamples(){ for(auto& v : mSamples) v=0.f; return *this; }
+	HRScene& zeroSamples(){ for(auto& s : mSources) s.sample(0.f); return *this; }
 
 	/// Set all samples to zero and make all sources inactive
 	HRScene& clear(){
-		for(int i=0; i<Nsrc; ++i){
-			mSamples[i] = 0.f;
-			mActive[i] = false;
-		}
+		for(auto& s : mSources) s.sample(0.f).active(false);
 		return *this;
 	}
 
 	/// Set whether a source is active
-	HRScene& active(int i, bool v){ mActive[i]=v; return *this; }
-	bool active(int i) const { return mActive[i]; }
+	HRScene& active(int i, bool v){ source(i).active(v); return *this; }
+	bool active(int i) const { return source(i).active(); }
 
 	/// Return next spatialized sample as (left, right, room)
 	float2 operator()(){
@@ -222,8 +229,11 @@ public:
 		float noise = mNoise();
 
 		float3 spat(0,0,0);
-		for(int i=0; i<Nsrc; ++i){
+		/*for(int i=0; i<Nsrc; ++i){
 			if(mActive[i]) spat += mSources[i](mSamples[i] + noise);
+		}*/
+		for(auto& s : mSources){
+			if(s.active()) spat += s(s.sample() + noise);
 		}
 
 		spat[2] *= mWallAtten;
@@ -242,8 +252,6 @@ public:
 
 private:
 	Source mSources[Nsrc];
-	float mSamples[Nsrc];			// source input samples
-	bool mActive[Nsrc];
 	ReverbMS<> mReverbs[2]; 		// one reverb for each ear
 	float mWallAtten = 0.1;
 	NoiseBinary<RNGMulCon> mNoise{1e-20, 17};
