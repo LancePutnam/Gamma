@@ -229,9 +229,6 @@ public:
 		float noise = mNoise();
 
 		float3 spat(0,0,0);
-		/*for(int i=0; i<Nsrc; ++i){
-			if(mActive[i]) spat += mSources[i](mSamples[i] + noise);
-		}*/
 		for(auto& s : mSources){
 			if(s.active()) spat += s(s.sample() + noise);
 		}
