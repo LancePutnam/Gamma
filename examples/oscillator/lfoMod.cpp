@@ -16,22 +16,16 @@ using namespace gam;
 class MyApp : public AudioApp{
 public:
 
-	Accum<> tmr;			// Timer to switch between LFO types
+	Accum<> tmr{1./4.};		// Timer to switch between LFO types
 	NoiseWhite<> noise;		// Carrier used for amplitude modulation
 	LFO<> osc;				// Carrier used for frequency modulation
-	LFO<> lfo;				// Modulator on amplitude or frequency
-	LFO<> mod;				// Modulator on modifier parameter
-	gen::Trigger cnt;		// Counter for changing LFO type
-	bool modMode;			// true = amp mod, false = freq mod
+	LFO<> lfo{5.};			// Modulator on amplitude or frequency
+	LFO<> mod{1./2};		// Modulator on modifier parameter
+	gen::Trigger cnt{10,10};// Counter for changing LFO type
+	bool modMode = false;	// true = amp mod, false = freq mod
 
-	MyApp()
-	:	cnt(10,10)
-	{
-		tmr.period(4);
-		tmr.phaseMax();
-		mod.period(2);
-		lfo.freq(5);
-		modMode = false;
+	MyApp(){
+		tmr.finish();
 	}
 
 	void onAudio(AudioIOData& io){
@@ -45,15 +39,15 @@ public:
 				}
 			}
 				
-			lfo.mod(mod.cosU());	// modulate modifier parameter with unipolar cosine wave
+			lfo.mod(mod.cosCubU());	// modulate modifier parameter
 
 			float s = 0.f;			// initialize current sample to zero
 
 			switch(cnt.val){			
 					
 				// non-modifiable generators ordered from smooth to sharp:
-				case  0: s = lfo.cosU();	break;	// unipolar cosine
-				case  1: s = lfo.hann();	break;	// a computed hann window (inverted cosU)
+				case  0: s = lfo.cosCubU();	break;	// unipolar cosine
+				case  1: s = lfo.hann();	break;	// a computed hann window (inverted cosCubU)
 				case  2: s = lfo.triU();	break;	// unipolar triangle
 				case  3: s = lfo.upU();		break;  // unipolar upward ramp
 				case  4: s = lfo.downU();	break;  // unipolar downward ramp

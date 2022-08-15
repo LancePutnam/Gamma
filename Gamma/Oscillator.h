@@ -688,7 +688,10 @@ public:
 	uint32_t modI() const { return mMod; }
 	double mod() const { return mMod / 4294967296.; }
 
-	float cos();		///< Cosine-like wave based on 3rd order polynomial
+	float sin();		///< Fast and clean sine approximation
+	float sinPara();	///< Sine-like wave constructed from parabolas; integral of triangle
+	float cos();		///< Fast and clean cosine approximation
+	float cosCub();		///< Cosine-like wave based on 3rd order polynomial
 	float down();		///< Downward ramp (1 to -1); S1 Clausen function
 	float even3();		///< Even harmonic sine-like wave (3rd order); S3 Clausen function
 	float even5();		///< Even harmonic sine-like wave (5th order)
@@ -698,7 +701,6 @@ public:
 	float pulse();		///< Pulse (up + down). 'mod' controls pulse width
 	float pulseRange(); ///< Pulse (up + down). 'mod' controls pulse width. amplitude doesn't change with mod.
 	float saw(){ return down(); } ///< Saw wave (downward ramp)
-	float sinPara();	///< Sine-like wave constructed from parabolas; integral of triangle
 	float stair();		///< Stair (square + square). 'mod' controls pulse width
 	float sqr();		///< Square (-1 to 1)
 	float tri();		///< Triangle (starts at 1 goes down to -1 then up to 1)
@@ -711,7 +713,7 @@ public:
 	float C4();			///< C4 Clausen function; sum_k cos(kt)/k^4
 	float S5();			///< S5 Clausen function; sum_k sin(kt)/k^5
 
-	float cosU();		///< Unipolar cosine-like wave based on 3rd order polynomial
+	float cosCubU();	///< Unipolar cosine-like wave based on 3rd order polynomial
 	float downU();		///< Unipolar downward ramp
 	float hann();		///< Hann-like window based on 3rd order polynomial
 	float impU();		///< Unipolar impulse train
@@ -1330,16 +1332,18 @@ template<class Sp, class Td> inline float TLFO::line2(){
 template<class Sp, class Td> inline float TLFO::line2U(){ return line2()*0.5f+0.5f; }
 
 #define DEF(name, exp) template<class Sp, class Td> inline float TLFO::name{ float r = exp; return r; }
-//DEF(cos(),		tri(); r *= 0.5f * r*r - 1.5f)
+DEF(sin(),		scl::sinFast(nextPhase()); )
+DEF(sinPara(),	scl::sinPara(nextPhase()))
 //DEF(cos(),		up(); r=scl::abs(r*r) )//r = -1.f - scl::pow2(2.f*r)*(scl::abs(r)-1.5f) )
-DEF(cos(),		up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
+DEF(cos(),		scl::sinFast(nextPhase() + uint32_t(1073741824)); )
+//DEF(cosCub(),		tri(); r *= 0.5f * r*r - 1.5f)
+DEF(cosCub(),	up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
 DEF(down(),		scl::rampDown(nextPhase()))
 DEF(even3(),	up(); float c=-2.598076211353315;/*-1.50*pow(3,0.50)*/ r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); float c=-1.869185976526527;/*-1.25*pow(5,0.25)*/ r *= (1.f-scl::pow4(r))*c;)
 DEF(imp(),		scl::pulse(nextPhase(), this->freqI()) )
 DEF(para(),		paraU()*1.5f - 0.5f)
 DEF(pulse(),	scl::pulse(nextPhase(), mMod))
-DEF(sinPara(),	scl::sinPara(nextPhase()))
 DEF(stair(),	scl::stair(nextPhase(), mMod))
 DEF(sqr(),		scl::square(nextPhase()))
 DEF(tri(),		scl::triangle(nextPhase()))
@@ -1350,7 +1354,7 @@ DEF(C2(),		up(); float c= scl::pow2(M_PI)/  4; r = c*(r*r - 1.f/3))
 DEF(S3(),		up(); float c= scl::pow3(M_PI)/ 12; r = c*(r*r*r - r))
 DEF(C4(),		up(); float c=-scl::pow4(M_PI)/ 48; float rr=r*r; r = c*(rr*(rr - 2.f) + 7.f/15))
 DEF(S5(),		up(); float c=-scl::pow5(M_PI)/240; float rr=r*r; r = c*r*(rr*(rr - 10.f/3) + 7.f/3))
-DEF(cosU(),		up(); r = r*r*(-2.f*scl::abs(r)+3.f))
+DEF(cosCubU(),	up(); r = r*r*(-2.f*scl::abs(r)+3.f))
 DEF(downU(),	scl::rampDownU(nextPhase()))
 //DEF(hann(),	tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
 DEF(hann(),		up(); r = 1.f + r*r*(2.f*scl::abs(r)-3.f))

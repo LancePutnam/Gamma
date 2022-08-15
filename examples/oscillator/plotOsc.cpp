@@ -43,9 +43,11 @@ int main(){
 	PLOT(Buzz<>, g.period(N); g.harmonics(8), operator(), "period=N, harmonics=8")
 	PLOT(Buzz<>, g.period(N); g.harmonics(8); g.normalize(false), operator(), "period=N, harmonics=8, normalize=false")
 
-	PLOT(LFO<>, g.period(N/2);, cos, "period=N/2")
-	PLOT(LFO<>, g.period(N/2);, tri, "period=N/2")
+	PLOT(LFO<>, g.period(N/2);, sin, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, sinPara, "period=N/2")
+	PLOT(LFO<>, g.period(N/2);, cos, "period=N/2")
+	PLOT(LFO<>, g.period(N/2);, cosCub, "period=N/2")
+	PLOT(LFO<>, g.period(N/2);, tri, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, para, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, even3, "period=N/2")
 	PLOT(LFO<>, g.period(N/2);, even5, "period=N/2")
