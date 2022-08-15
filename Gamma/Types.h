@@ -131,7 +131,7 @@ public:
 	C operator / (const T& v) const { return C(*this) /= v; }
 	
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
-	T argUnit() const { T r=arg()/(2*M_PI); return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
+	T argUnit() const { T r=arg()*rad2unit(); return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
 	T norm() const { return sqrt(normSqr()); }				///< Returns norm (radius), |z|
@@ -149,6 +149,9 @@ public:
 	// deprecated
 	C& operator()(const T& vr, const T& vi){ return set(vr,vi); }
 	C& operator()(const Polar<T>& p){ return set(p); }
+
+private:
+	static T rad2unit(){ return T(0.1591549430918953); } // 1/(2pi)
 };
 
 #define TEM template <class T>
