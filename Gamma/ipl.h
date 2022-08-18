@@ -52,6 +52,22 @@ Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	return ipl::linear(frac-Tf(1), y,z);
 }
 
+/// Linear interpolation (lookup) within array
+template <class Tf, class Tv>
+Tv linear(Tf pos01, const Tv * src, unsigned len){
+	if(pos01 >= Tf(1)) return src[len-1];
+	Tf idxf = pos01 * (len-1);
+	unsigned i0 = unsigned(idxf);
+	unsigned i1 = i0+1; if(i1>=len) i1=len-1;
+	float f = idxf - i0;
+	return linear(f, src[i0], src[i1]);
+}
+
+template <class Tf, class Array>
+typename Array::value_type linear(Tf pos01, const Array& src){
+	return linear(pos01, &src[0], src.size());
+}
+
 /// Linear interpolation between arrays
 template <class T>
 void linear(T * dst, const T * xs, const T * xp1s, unsigned len, T frac){
