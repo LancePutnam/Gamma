@@ -129,6 +129,12 @@ public:
 		this->nextPhase();
 		return r;
 	}
+
+	float operator()(float freqOffset){
+		float r = this->phase();
+		this->nextPhase(freqOffset);
+		return r;
+	}
 };
 
 
