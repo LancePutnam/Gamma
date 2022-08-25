@@ -21,27 +21,29 @@ class IndexPool{
 public:
 
 	typedef uint64_t bits_t;
-	typedef unsigned index_t;
+	typedef uint8_t index_t;
 	
 	static constexpr index_t npos = ~index_t(0);
 	static constexpr index_t maxSize = sizeof(bits_t)*8;
 
+	static_assert(maxSize < npos, "index_t too small");
+
 
 	/// @param[in]	Maximum number of indices (up to 64)
-	IndexPool(unsigned size = 8)
-	:	mSize(size), mAutoPlay(~bits_t(0))
+	IndexPool(index_t size = 8)
+	:	mSize(size)
 	{
 		recycleAll();
 	}
 
 	/// \returns maximum number of indices
-	unsigned size() const { return mSize; }
+	index_t size() const { return mSize; }
 
 	/// \returns number of indices left in pool
-	unsigned left() const { return mLeft; }
+	index_t left() const { return mLeft; }
 
 	/// \returns number of indices being used in pool
-	unsigned used() const { return mSize-mLeft; }
+	index_t used() const { return mSize-mLeft; }
 
 	bool active(index_t i) const { return !!(mActive & bit(i)); }
 	
@@ -161,8 +163,8 @@ public:
 
 
 	void print(FILE * fp = stderr) const {
-		fprintf(fp, "active (%3d): ", size()-mLeft);
-		for(unsigned i=0; i<size(); ++i){
+		fprintf(fp, "active (%3d): ", used());
+		for(index_t i=0; i<size(); ++i){
 			fprintf(fp, "%c", active(i)?(playing(i)?'|':':'):'.');
 		}
 		fprintf(fp, "\n");
@@ -171,10 +173,10 @@ public:
 private:
 	bits_t mActive;		// bit array of active objects
 	bits_t mPlaying;	// bit array of playing objects
-	unsigned mLeft;		// number of free slots left
-	unsigned mSize;		// maximum number of objects
+	bits_t mAutoPlay = ~bits_t(0);
 	std::map<unsigned, index_t> mIDToIndex;
-	bits_t mAutoPlay;
+	index_t mLeft;		// number of free slots left
+	index_t mSize;		// maximum number of objects
 
 	void obtain(index_t i){
 		auto mask = bit(i);
@@ -204,7 +206,7 @@ private:
 		return deBruijnBitPosition(v & -int64_t(v));
 	}
 
-	static bits_t bit(unsigned i){ return bits_t(1)<<i; }
+	static bits_t bit(index_t i){ return bits_t(1)<<i; }
 };
 
 
@@ -430,13 +432,9 @@ public:
 	};
 
 
-	Voices()
-	:	mIndexPool(Nvoices), mStealIdx(0), mStealPolicy(OLDEST)
-	{
+	Voices(){
 		mIndexPool.autoPlay(false);
-		for(unsigned i=0; i<Nvoices; ++i){
-			mVoiceGens[i].mParent = this;
-		}
+		for(auto& v : mVoiceGens) v.mParent = this;
 	}
 
 
@@ -677,9 +675,9 @@ public:
 
 private:
 	VoiceGen mVoiceGens[Nvoices+1];
-	IndexPool mIndexPool;
-	StealPolicy mStealPolicy;
-	unsigned mStealIdx;
+	IndexPool mIndexPool{Nvoices};
+	StealPolicy mStealPolicy = OLDEST;
+	unsigned mStealIdx = 0;
 	
 	// Returned when voice stealing is off or encounters an error
 	VoiceGen& dummy(){ return mVoiceGens[Nvoices]; }
