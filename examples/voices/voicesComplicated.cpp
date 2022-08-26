@@ -26,13 +26,6 @@ public:
 		ADSR<> env{0.02, 0.1, 0.7, 3.};
 		float pan = 0.5;
 
-		// Define what happens when the voice attacks
-		void onAttack(float freq, float amp){
-			osc.freq(freq);
-			env.reset();
-			env.amp(amp);
-		}
-
 		// Define what happens when the voice is released
 		void onRelease(){
 			env.release();
@@ -81,14 +74,14 @@ public:
 
 				if(keyStates[i] ^= true){ // press key
 					// Attack with the ID of a keyboard key / MIDI note
-					// All attack functions return a reference to the new voice
-					// which we can use for further configuration.
-					auto& voice = voices.attackWithID(i, f, 0.2);
-
-					// Delay onset of voice (in samples)
-					voice.delay(io.fps() * rnd::uni(0.3));
-
-					voice.pan = rnd::uni(1.);
+					voices.attackWithID(i, [&](auto& v){
+						v.osc.freq(f);
+						v.env.reset();
+						v.env.amp(0.2);
+						v.pan = rnd::uni(1.);
+						// Delay onset of voice (in samples)
+						v.delay(io.fps() * rnd::uni(0.3));
+					});
 
 				} else { // release key
 					// Release the voice with the passed-in key ID

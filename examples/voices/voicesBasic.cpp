@@ -26,13 +26,6 @@ public:
 		Sine<> osc;
 		AD<> env{0.02, 6.}; // long decay to make polyphony evident
 
-		// Define what happens when the voice attacks
-		void onAttack(float freq, float amp){
-			osc.freq(freq);
-			env.reset();
-			env.amp(amp);
-		}
-
 		// Define what happens when the voice is released
 		// In our case, the voice is never explicitly released as it decays on
 		// its own. However, it's good practice to define this anyway.
@@ -59,8 +52,12 @@ public:
 			if(tmr()){
 				// Not a big fan of atonal music, but it's easier to generate...
 				float f = pow(2, rnd::uni(36)/12.)*110;
-				// This spawns a new voice calling onAttack
-				voices.attack(f, 0.2);
+				// This spawns a new voice
+				voices.attack([&](auto& v){
+					v.osc.freq(f);
+					v.env.reset();
+					v.env.amp(0.2);
+				});
 			}
 
 			// Get synth output (sum of all active voices)

@@ -24,16 +24,6 @@ public:
 		Sine<> osc;
 		AD<> env{0.01, 0.02};
 
-		void onAttack(float freq, float amp){
-			osc.freq(freq);
-			env.reset();
-			env.amp(amp);
-		}
-
-		void onRelease(){
-			env.release();
-		}
-
 		float operator()(){
 			return osc() * env();
 		}
@@ -61,8 +51,11 @@ public:
 
 				if(reverseEnv) std::swap(A,D);
 
-				auto& grain = grains.attack(f, 0.2);
-				grain.env.attack(A).decay(D);
+				grains.attack([&](auto& v){
+					v.osc.freq(f);
+					v.env.reset();
+					v.env.attack(A).decay(D).amp(0.2);
+				});
 
 				tmr.period(rnd::uni(0.05) + 0.01);
 				if(rnd::prob(0.1)) spread = rnd::uni(6.);

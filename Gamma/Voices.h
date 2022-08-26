@@ -442,7 +442,7 @@ public:
 	unsigned size() const { return mIndexPool.size(); }
 
 	/// Get number of active voices
-	unsigned numActive() const { return mIndexPool.size() - mIndexPool.left(); }
+	unsigned numActive() const { return mIndexPool.used(); }
 
 	/// Set whether voices should start playback immediately upon acquisition
 	void autoPlay(bool v){ mIndexPool.autoPlay(v); }
@@ -502,8 +502,32 @@ public:
 
 	/// Start new voice
 
+	/// @param[in] f	Called with newly obtained voice, just before playing it
+	///
+	Voices& attack(const std::function<void(VoiceGen&)>& f){
+		auto& v = obtain();
+		f(v);
+		play(v);
+		return *this;
+	}
+
+	/// Start new voice with given ID (so it can later be released)
+
+	/// @param[in] f	Called with newly obtained voice, just before playing it
+	///
+	Voices& attackWithID(unsigned ID, const std::function<void(VoiceGen&)>& f){
+		auto& v = obtain();
+		f(v);
+		mIndexPool.idToIndex()[ID] = v.mIndex;
+		play(v);
+		return *this;
+	}
+
+	/// Start new voice
+
 	/// This calls Voice::onAttack.
 	///
+	[[deprecated("Use attack(const std::function<void(VoiceGen&)>&)")]]
 	VoiceGen& attack(){
 		auto& v = obtain();
 		v.onAttack(); // user-defined attack
@@ -515,6 +539,7 @@ public:
 
 	/// The arguments are user-defined variables that are forwarded to
 	/// Voice::onAttack. Typical parameters are frequency and amplitude.
+	[[deprecated("Use attack(const std::function<void(VoiceGen&)>&)")]]
 	VoiceGen& attack(double a, double b){
 		auto& v = obtain();
 		v.onAttack(a,b); // user-defined attack
@@ -523,6 +548,7 @@ public:
 	}
 
 	/// Start new voice with given ID
+	[[deprecated("Use attackWithID(unsigned, const std::function<void(VoiceGen&)>&)")]]
 	VoiceGen& attackWithID(unsigned ID){
 		auto& v = attack();
 		mIndexPool.idToIndex()[ID] = v.mIndex;
@@ -530,6 +556,7 @@ public:
 	}
 
 	/// Start new voice with given ID
+	[[deprecated("Use attackWithID(unsigned, const std::function<void(VoiceGen&)>&)")]]
 	VoiceGen& attackWithID(unsigned ID, double a, double b){
 		auto& v = attack(a,b);
 		mIndexPool.idToIndex()[ID] = v.mIndex;
