@@ -227,6 +227,19 @@ public:
 	/// Get element at index (no bounds checking)
 	const T& operator[](unsigned i) const { return elems()[i]; }
 
+	/// Set element at index with compile-time bounds checking
+	template <unsigned i>
+	T& at(){
+		static_assert(i<N, "Index out of bounds");
+		return (*this)[i];
+	}
+
+	/// Get element at index with compile-time bounds checking
+	template <unsigned i>
+	const T& at() const {
+		return const_cast<Vec*>(this)->at<i>();
+	}
+
 	/// Get a vector comprised of indexed elements
 	Vec<2,T> get(int i0, int i1) const {
 		return Vec<2,T>((*this)[i0], (*this)[i1]); }
