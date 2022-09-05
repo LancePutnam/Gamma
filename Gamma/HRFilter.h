@@ -8,6 +8,10 @@
 #include "Gamma/Spatial.h"
 #include "Gamma/Types.h"
 
+#ifndef GAM_HR_SCENE_MAX_AUX
+#define GAM_HR_SCENE_MAX_AUX 4
+#endif
+
 namespace gam{
 
 template <class Vec3>
@@ -127,7 +131,18 @@ public:
 		return res;
 	}
 
-public:
+	/// Set auxiliary send channel (negative channel disables)
+	template <int Chan>
+	HRFilter& auxSend(){
+		static_assert(Chan<GAM_HR_SCENE_MAX_AUX, "Invalid aux channel");
+		mAuxSend = Chan;
+		return *this;
+	}
+
+	/// Get auxiliary channel (negative is unassigned)
+	int auxSend() const { return mAuxSend; }
+
+private:
 	dist_type mDist;
 
 	struct EarFilter{
@@ -157,6 +172,7 @@ public:
 	//float mTorsoAmt=0., mTorsoDelay=0.;
 	float mEarDist = 0.07; // about half the average bitragion breadth
 	float mRoomSize = 3;
+	int mAuxSend = -1; // auxiliary send channel (negative for none)
 };
 
 
@@ -220,27 +236,52 @@ public:
 	HRScene& active(int i, bool v){ source(i).active(v); return *this; }
 	bool active(int i) const { return source(i).active(); }
 
+	/// Get sample on aux channel
+	template <int Chan>
+	float3& aux(){
+		static_assert(0<=Chan && Chan<GAM_HR_SCENE_MAX_AUX, "Invalid aux channel");
+		return mAuxs[Chan];
+	}
+
+	/// Unassign aux send channels of all sources
+	HRScene& auxUnassign(){
+		for(auto& s : mSources) s.template auxSend<-1>();
+		return *this;
+	}
+
 	/// Return next spatialized sample as (left, right, room)
-	float2 operator()(){
+	template <class OnProcessAux>
+	float2 operator()(OnProcessAux onProcessAux){
 
 		// Any zero-valued input will devastate the CPU due to denormals 
 		// emerging and propagating through all the IIR filters. We add some 
 		// inaudible noise to all input samples to prevent this.
 		float noise = mNoise();
 
+		for(auto& a : mAuxs) a = 0.f;
+
 		float3 spat(0,0,0);
-		for(auto& s : mSources){
-			if(s.active()) spat += s(s.sample() + noise);
+		for(auto& source : mSources){
+			if(source.active()){
+				auto s = source(source.sample() + noise);
+				spat += s;
+				if(source.auxSend()>=0) mAuxs[source.auxSend()] += s;
+			}
 		}
 
-		spat[2] *= mWallAtten;
+		onProcessAux();
+		for(auto& a : mAuxs) spat += a;
+
+		spat.at<2>() *= mWallAtten;
 
 		float2 echoes(
-			mReverbs[0](spat[2]),
-			mReverbs[1](spat[2])
+			mReverbs[0](spat.at<2>()),
+			mReverbs[1](spat.at<2>())
 		);
-		return spat.get(0,1) + echoes;
+		return spat.sub<2>() + echoes;
 	}
+
+	float2 operator()(){ return (*this)([](){}); }
 
 	HRScene& far(float v){ for(auto& s:mSources) s.dist().far(v); return *this; }
 	HRScene& reverbDecay(float v){ for(auto& r:mReverbs) r.decay(v); return *this; }
@@ -251,6 +292,7 @@ private:
 	Source mSources[Nsrc];
 	ReverbMS<> mReverbs[2]; 		// one reverb for each ear
 	float mWallAtten = 0.1;
+	float3 mAuxs[GAM_HR_SCENE_MAX_AUX];
 	NoiseBinary<RNGMulCon> mNoise{1e-20, 17};
 };
 
