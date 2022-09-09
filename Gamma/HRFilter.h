@@ -124,13 +124,13 @@ public:
 	}
 
 	/// Return spatialized sample as (left, right, room)
-	float3 operator()(float src){
+	float3 operator()(float src, float undernormal=1e-20){
 		//src += mDist.delayLine().read(mTorsoDelay) * mTorsoAmt;
 		auto res = mDist(src);
 		// Any zero-valued input will devastate the CPU due to denormals 
-		// emerging and propagating through all the IIR filters. We add some 
-		// inaudible noise to all filter inputs to prevent this.
-		res += mNoise();
+		// emerging and propagating through all the IIR filters. We add a small 
+		// inaudible (noise) offset to all filter inputs to prevent this.
+		res += undernormal;
 		for(int i=0;i<2;++i) res[i] = mEarFilters[i](res[i]);
 		return res;
 	}
@@ -177,8 +177,6 @@ private:
 	float mEarDist = 0.07; // about half the average bitragion breadth
 	float mRoomSize = 3;
 	int mAuxSend = -1; // auxiliary send channel (negative for none)
-
-	NoiseBinary<RNGMulCon> mNoise{1e-20, 17};
 };
 
 
@@ -259,12 +257,14 @@ public:
 	template <class OnProcessAux>
 	float2 operator()(OnProcessAux onProcessAux){
 
+		auto undernormal = mNoise();
+
 		for(auto& a : mAuxs) a = 0.f;
 
 		float3 spat(0,0,0);
 		for(auto& source : mSources){
 			if(source.active()){
-				auto s = source(source.sample());
+				auto s = source(source.sample(), undernormal);
 				spat += s;
 				if(source.auxSend()>=0) mAuxs[source.auxSend()] += s;
 			}
@@ -274,6 +274,7 @@ public:
 		for(auto& a : mAuxs) spat += a;
 
 		spat.at<2>() *= mWallAtten;
+		spat.at<2>() += undernormal;
 
 		float2 echoes(
 			mReverbs[0](spat.at<2>()),
@@ -294,6 +295,7 @@ private:
 	ReverbMS<> mReverbs[2]; 		// one reverb for each ear
 	float mWallAtten = 0.1;
 	float3 mAuxs[GAM_HR_SCENE_MAX_AUX];
+	NoiseBinary<RNGMulCon> mNoise{1e-20, 17};
 };
 
 } // gam::
