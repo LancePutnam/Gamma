@@ -693,10 +693,11 @@ Dist<TARG>::Dist(float maxDelay, float near, float far)
 
 template<TDEC>
 Dist<TARG>& Dist<TARG>::dist(int dest, float d){
-	auto amp = inverse(d);
 	mDist[dest] = d;
+	auto amp = inverse(d);
 	mAmp[dest].target(amp, mBlockSize);
-	mDly[dest].target(d * mInvSpeedOfSound, mBlockSize);
+	auto delay = std::min(d * mInvSpeedOfSound, mDelay.maxDelay());
+	mDly[dest].target(delay, mBlockSize);
 	mLPF[dest].freq(22000 * amp + 20.); // low-pass gate
 	return *this;
 }
