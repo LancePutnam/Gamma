@@ -681,7 +681,7 @@ void ReverbMS<TARG>::print() const {
 
 template<TDEC>
 Dist<TARG>::Dist(float maxDelay, float near, float far)
-:	mDelay(1), mNear(near), mFar(far)
+:	mDelay(maxDelay), mNear(near), mFar(far)
 {
 	for(int i=0; i<Ndest; ++i){
 		mDist[i] = 1e8;
@@ -693,8 +693,8 @@ Dist<TARG>::Dist(float maxDelay, float near, float far)
 
 template<TDEC>
 Dist<TARG>& Dist<TARG>::dist(int dest, float d){
-	float amp = inverse(d);
-	mDist[dest]= d;
+	auto amp = inverse(d);
+	mDist[dest] = d;
 	mAmp[dest].target(amp, mBlockSize);
 	mDly[dest].target(d * mInvSpeedOfSound, mBlockSize);
 	mLPF[dest].freq(22000 * amp + 20.); // low-pass gate
@@ -703,7 +703,7 @@ Dist<TARG>& Dist<TARG>::dist(int dest, float d){
 
 template<TDEC>
 Dist<TARG>& Dist<TARG>::dist(int dest, float x, float y, float z){
-	float d = std::sqrt(x*x+y*y+z*z);
+	auto d = std::sqrt(x*x+y*y+z*z);
 	return dist(dest, d);
 }
 
