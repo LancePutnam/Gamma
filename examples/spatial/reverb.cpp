@@ -20,12 +20,11 @@ public:
 
 	SineD<> src;		// Decaying sine wave grain
 	Accum<> tmr;		// Timer for firing grains
-	unsigned seed;		// RNG seed
+	unsigned seed = 1;	// RNG seed
 	ReverbMS<> reverb;	// Schroeder reverberator
 	//ReverbMS<float, Loop1P1Z> reverb; // Use a 1-pole, 1-zero loop filter
 
 	MyApp(){
-		seed = 1;
 		tmr.period(2);
 		tmr.finish();
 
