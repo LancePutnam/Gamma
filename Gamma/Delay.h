@@ -332,33 +332,24 @@ protected:
 #define TM1 template <class Tv, template <class> class Ti, class Td>
 #define TM2 Tv,Ti,Td
 
-#define DELAY_INIT mMaxDelay(0), mDelayFactor(0), mDelayLength(0), mPhase(0), mPhaseInc(0), mDelay(0)
-
 TM1 Delay<TM2>::Delay()
-:	DELAY_INIT
+:	mMaxDelay(0), mDelayFactor(0), mDelayLength(0), mPhase(0), mPhaseInc(0), mDelay(0)
 {
 	onDomainChange(1);
 }
 
 TM1 Delay<TM2>::Delay(float maxDly, float dly)
-:	DELAY_INIT
+:	Delay()
 {
-	onDomainChange(1);
 	maxDelay(maxDly, false);
 	this->zero();
 	delay(dly);
 }
 
 TM1 Delay<TM2>::Delay(float dly)
-:	DELAY_INIT
-{	//printf("Delay::Delay(float)\n");
-	onDomainChange(1);
-	maxDelay(dly, false);
-	this->zero();
-	delay(dly);
+:	Delay(dly, dly)
+{
 }
-
-#undef DELAY_INIT
 
 TM1 void Delay<TM2>::maxDelay(float length, bool setDelay){
 	//printf("Delay::maxDelay(%f)\n", length);
