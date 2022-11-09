@@ -85,7 +85,7 @@ public:
 	
 	void reset(){
 		env.reset(amp);
-		fil.zero();
+		fil.reset();
 	}
 	
 	float freq1, freq2, amp=1.f;

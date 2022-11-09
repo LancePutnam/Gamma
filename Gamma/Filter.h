@@ -107,7 +107,7 @@ public:
 
 	void freq (Tp v);		///< Set cutoff frequency
 	void freqF(Tp v);		///< Faster, but slightly less accurate than freq()	
-	void zero(){ d1=Tv(0); }
+	void reset(){ d1=Tv(0); } ///< Reset filter state
 	
 	Tv operator()(Tv in);	///< Filters sample
 	
@@ -174,7 +174,7 @@ public:
 	void set(Tp frq, Tp res);			///< Set filter center frequency and resonance
 	void set(Tp frq, Tp res, FilterType type);	///< Set all filter params
 	void type(FilterType type);			///< Set type of filter
-	void zero();						///< Zero internal delays
+	void reset();						///< Reset filter state
 
 	Tv operator()(Tv in);				///< Filter next sample
 	Tv nextBP(Tv in);					///< Optimized for band-pass types
@@ -234,7 +234,7 @@ public:
 		mB1 = poleRadius(v, Td::ups());
 	}
 
-	void zero(){ d1=0; }
+	void reset(){ d1=0; }
 
 	void onDomainChange(double /*r*/){ width(mWidth); }
 
@@ -309,8 +309,8 @@ public:
 		computeCoef1();
 	}
 
-	/// Zero delay elements
-	void zero(){ d2=d1=Tv(0); }
+	/// Reset filter state
+	void reset(){ d2=d1=Tv(0); }
 	
 	void onDomainChange(double r){
 		mFreqToAng = getFreqToAng(Td::ups());
@@ -322,7 +322,7 @@ protected:
 	Filter2(Tp frq, Tp wid)
 	:	mFreq(frq), mWidth(wid)
 	{
-		zero();
+		reset();
 		onDomainChange(1);
 	}
 
@@ -506,10 +506,9 @@ public:
 		);
 	}
 	
-	void zero()
-	{
-		cf0.zero(); cf1.zero(); cf2.zero(); cf3.zero(); cf4.zero(); cf5.zero();
-		sf0.zero(); sf1.zero(); sf2.zero(); sf3.zero(); sf4.zero(); sf5.zero();
+	void reset(){
+		cf0.reset(); cf1.reset(); cf2.reset(); cf3.reset(); cf4.reset(); cf5.reset();
+		sf0.reset(); sf1.reset(); sf2.reset(); sf3.reset(); sf4.reset(); sf5.reset();
 	}
 
 protected:
@@ -540,7 +539,7 @@ public:
 	}
 	
 	Integrator& leak(Tp v){ mb[0]=v; return *this; }
-	Integrator& zero(){ mo[0]=Tv(0); return *this; }
+	Integrator& reset(){ mo[0]=Tv(0); return *this; }
 
 protected:
 	mutable Tv mo[1];
@@ -647,8 +646,7 @@ public:
 	void lag(Tp length, Tp thresh=Tp(0.001));
 
 	void smooth(Tp val);				///< Set smoothing coefficient directly
-	void zero(){ mO1=0; }				///< Zero internal delay
-	void reset(Tv v = Tv(0)){ mO1=mStored=v; }
+	void reset(Tv v = Tv(0)){ mO1=mStored=v; } ///< Reset filter state
 
 	const Tv& operator()();				///< Returns filtered output using stored value
 	const Tv& operator()(Tv in);		///< Returns filtered output from input value
@@ -765,7 +763,7 @@ template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::set(Tp frq, Tp res){ set(frq, res, mType); }
 
 template <class Tv, class Tp, class Td>
-void Biquad<Tv,Tp,Td>::zero(){ d1=d2=Tv(0); }
+void Biquad<Tv,Tp,Td>::reset(){ d1=d2=Tv(0); }
 
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
