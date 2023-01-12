@@ -346,6 +346,12 @@ public:
 	/// Set number of samples over which to smooth coefficients
 	Dist& blockSize(int v){ mBlockSize=v; return *this; }
 
+	/// Resets internal coefficient smoothers
+
+	/// Call to re-initialize the object to avoid interpolating from the old 
+	/// state to the new state, like when acquiring the object from a pool.
+	Dist& reset(){ mReset=true; return *this; }
+
 	/// Set near clipping distance
 	Dist& near(float v){ mNear=v; return updateCoefs(); }
 	float near() const { return mNear; }
@@ -412,6 +418,7 @@ private:
 	Ramped<T> mAmp[Ndest];
 	OnePole<T> mLPF[Ndest];
 	bool mToZero = false;
+	bool mReset = true; // used to reset ramps
 
 	Dist& updateCoefs();
 };
@@ -692,20 +699,25 @@ Dist<TARG>::Dist(float maxDelay, float near, float far)
 }
 
 template<TDEC>
-Dist<TARG>& Dist<TARG>::dist(int dest, float d){
-	mDist[dest] = d;
+Dist<TARG>& Dist<TARG>::dist(int i, float d){
+	mDist[i] = d;
 	auto amp = inverse(d);
-	mAmp[dest].target(amp, mBlockSize);
-	auto delay = std::min(d * mInvSpeedOfSound, mDelay.maxDelay());
-	mDly[dest].target(delay, mBlockSize);
-	mLPF[dest].freq(22000 * amp + 20.); // low-pass gate
+	auto dly = std::min(d * mInvSpeedOfSound, mDelay.maxDelay());
+	if(mReset){
+		mReset = false;
+		mAmp[i] = amp;
+		mDly[i] = dly;
+	}
+	mAmp[i].target(amp, mBlockSize);
+	mDly[i].target(dly, mBlockSize);
+	mLPF[i].freq(22000 * amp + 20.); // low-pass gate
 	return *this;
 }
 
 template<TDEC>
-Dist<TARG>& Dist<TARG>::dist(int dest, float x, float y, float z){
+Dist<TARG>& Dist<TARG>::dist(int i, float x, float y, float z){
 	auto d = std::sqrt(x*x+y*y+z*z);
-	return dist(dest, d);
+	return dist(i, d);
 }
 
 template<TDEC>
