@@ -135,6 +135,12 @@ public:
 		return res;
 	}
 
+	HRFilter& reset(){
+		mDist.reset();
+		for(auto& f : mEarFilters) f.reset();
+		return *this;
+	}
+
 	/// Set auxiliary send channel (negative channel disables)
 	template <int Chan>
 	HRFilter& auxSend(){
@@ -168,6 +174,14 @@ private:
 			//s = pinnaPeak1(s); // not convinced this helps
 			s = pinnaPeak2(s);
 			return s * shadow;
+		}
+
+		void reset(){
+			backShelf.reset();
+			pinnaPeak1.reset();
+			pinnaPeak2.reset();
+			pinnaNotch1.reset();
+			pinnaNotch2.reset();
 		}
 	};
 
