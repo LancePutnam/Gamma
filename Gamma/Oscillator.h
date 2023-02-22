@@ -1716,7 +1716,7 @@ template<class Tv, class Td> inline Tv DSF<Tv,Td>::harmonics() const {
 }
 
 template<class Tv, class Td> inline Tv DSF<Tv,Td>::maxHarmonics() const {
-	return scl::floor((Tv(this->spu()) * Tv(0.5)/this->freq() - Tv(1))/freqRatio() + Tv(1));
+	return scl::floor((Tv(this->spu()) * Tv(0.5)/Base::freq() - Tv(1))/freqRatio() + Tv(1));
 }
 
 template<class Tv, class Td> inline void DSF<Tv,Td>::updateAPow(){
