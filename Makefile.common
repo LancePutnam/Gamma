@@ -18,12 +18,14 @@ ifndef PLATFORM
 	UNAME := $(shell uname)
 	ifeq ($(UNAME), Linux)
 		PLATFORM = linux
+
 	else ifeq ($(UNAME), Darwin)
 		PLATFORM = macosx
+		ifneq ($(shell sw_vers -productName),macOS)
+			OSX_VERSION := $(shell sw_vers -productVersion)
+			OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
+		endif
 
-		# Mac OS X version
-		OSX_VERSION := $(shell sw_vers -productVersion)
-		OSX_VERSION := $(word 2,$(subst ., , $(OSX_VERSION)))
 	else
 		PLATFORM = windows
 
@@ -51,9 +53,9 @@ endif
 
 
 # Architecture: '32' or '64'
+UNAMEM := $(shell uname -m)
 ifeq ($(shell which getconf 2>/dev/null),)
-	UNAMEM := $(shell uname -m)
-	ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
+	ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64 arm64))
 		ARCH = 64
 	else
 		ARCH = 32
@@ -75,47 +77,47 @@ endif
 
 # Name of the library
 # This should be defined prior to including this file
-LIB_NAME	?=
+LIB_NAME ?=
 
 # Dynamic library major/minor version numbers
-DLIB_MAJ	= 1
-DLIB_MIN	= 0
+DLIB_MAJ = 1
+DLIB_MIN = 0
 
 # Build configuration: 'Release' or 'Debug'
 # 'Release' aggressively optimizes for speed at the expense of greater
 # compile times and program size. 'Debug' generates code suitable for a
 # debugging tool.
-BUILD_CONFIG	= Release
+BUILD_CONFIG = Release
 
 # Whether to build a dynamic library versus a static library
-DYNAMIC		= 0
+DYNAMIC = 0
 
 # Whether to show verbose output
-VERBOSE		= 0
+VERBOSE	= 0
 
 # Whether Make should determine the dependencies of each C or C++ file as
 # it compiles it. This will be automatically disabled for universal builds
 # on Mac OSX.
-DEP_TRACK	= 1
+DEP_TRACK = 1
 
 # Whether to enable strict warnings
 STRICT_WARNINGS = 0
 
 # Whether to automatically run executables after building
-AUTORUN		= 1
+AUTORUN = 1
 
 # Platform-specific library file extensions
-SLIB_EXT	= a
-DLIB_EXT	= so
-DLIB_OPT	= shared
+SLIB_EXT = a
+DLIB_EXT = so
+DLIB_OPT = shared
 
 # Flags required for including and linking against library
-LINK_CPPFLAGS	?=
-LINK_LDFLAGS	?=
+LINK_CPPFLAGS ?=
+LINK_LDFLAGS ?=
 
 # Flags handed to 'ar' command
-SLIB_FLAGS 	?=
-DLIB_FLAGS 	?=
+SLIB_FLAGS ?=
+DLIB_FLAGS ?=
 
 #--------------------------------------------------------------------------
 # Default paths
@@ -151,10 +153,10 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 
 # NOTE: ar -s is completely equivalent to running ranlib
-AR 		= ar crs
-INSTALL		= install
-RANLIB		= ranlib
-RM		= rm -f
+AR = ar crs
+INSTALL = install
+RANLIB = ranlib
+RM = rm -f
 DBG = gdb
 
 # Let user override variables
@@ -206,12 +208,15 @@ else ifeq ($(PLATFORM), macosx)
 
 	PLATFORM_DIR = osx/
 
-	ifeq ($(ARCH), 32)
-		CFLAGS += -arch i386
-	else ifeq ($(ARCH), 64)
-		CFLAGS += -arch x86_64
-	else ifeq ($(ARCH), 32_64)
-		CFLAGS += -arch i386 -arch x86_64
+	# BUILD_ARCHS is a space-separated list in double quotes
+	ifdef BUILD_ARCHS
+		CFLAGS += $(addprefix -arch ,$(BUILD_ARCHS))
+	else
+		ifneq (,$(findstring $(UNAMEM),arm64 x86_64))
+			CFLAGS += -arch $(UNAMEM)
+		else ifeq ($((UNAMEM)), ia86)
+			CFLAGS += -arch i386
+		endif
 	endif
 
 	# Oh where, oh where have my SDKs gone?
@@ -229,7 +234,11 @@ else ifeq ($(PLATFORM), macosx)
 
 	# Set system root directory for stdc++ etc.
 	OSX_SDK := $(lastword $(shell ls $(OSX_SDK_PATH)))
-	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK) -mmacosx-version-min=10.$(OSX_VERSION)
+	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK) 
+	
+	ifdef OSX_VERSION
+		CFLAGS += -mmacosx-version-min=10.$(OSX_VERSION)
+	endif
 
 	# Needed to link to libraries installed through MacPorts
 	ifdef HAS_OPT_LOCAL
@@ -268,7 +277,6 @@ else ifeq ($(PLATFORM), windows)
 		CPPFLAGS += -I/mingw/include/
 		PREFIX := /local/
 		CC := gcc
-
 		# This fixes a bug in MINGW/MSYS math.h (!!!)
 		CPPFLAGS += -U _hypot -D _hypot=hypot
 	endif
