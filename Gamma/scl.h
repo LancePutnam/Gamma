@@ -954,7 +954,8 @@ template<class T> inline T sinT9(T r){
 
 // Input is in [-2, 2] corresponding to [-pi, pi]
 template<class T> inline T sinFast(T x){
-	T y = x * (T(2) - gam::scl::abs(x));
+	// https://www.desmos.com/calculator/irn7qx8dhb
+	T y = x * (T(2) - gam::scl::abs(x)); // parabolic sine apx
 	return y * (T(0.775) + T(0.225) * gam::scl::abs(y));
 }
 
