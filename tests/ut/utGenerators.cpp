@@ -32,14 +32,14 @@
 		//for(int i=0;i<N;++i) printf("% f\n", tdbuf[i]);
 		fft.forward(buf, true);
 		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, norm(fdbuf[i]), arg(fdbuf[i]));
-		assert(near(abs(fdbuf[1]), 1.f));
-		assert(near(arg(fdbuf[1]),-M_PI/2));
+		assert(aeq(abs(fdbuf[1]), 1.f));
+		assert(aeq(arg(fdbuf[1]),-M_PI/2));
 		
 		g.phase(0.25);
 		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
 		fft.forward(buf, true);
-		assert(near(abs(fdbuf[1]), 1.f));
-		assert(near(arg(fdbuf[1]), 0.f));		
+		assert(aeq(abs(fdbuf[1]), 1.f));
+		assert(aeq(arg(fdbuf[1]), 0.f));		
 	}
 
 	{
@@ -52,22 +52,22 @@
 		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
 		fft.forward(buf, true);
 		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, abs(fdbuf[i]), arg(fdbuf[i]));
-		assert(near(abs(fdbuf[1]), 1, eps));
-		assert(near(abs(fdbuf[2]), 0.5, eps));
-		assert(near(abs(fdbuf[3]), 0.5*0.5, eps));
-		assert(near(abs(fdbuf[4]), 0, eps));
+		assert(aeq(abs(fdbuf[1]), 1, eps));
+		assert(aeq(abs(fdbuf[2]), 0.5, eps));
+		assert(aeq(abs(fdbuf[3]), 0.5*0.5, eps));
+		assert(aeq(abs(fdbuf[4]), 0, eps));
 		
 		g.freqRatio(2);
 		for(int i=0;i<N;++i) tdbuf[i]=g()*2;
 		fft.forward(buf, true);
 		//for(int i=0;i<N/2+1;++i) printf("[%2d] % f\t% f\n", i, abs(fdbuf[i]), arg(fdbuf[i]));
-		assert(near(abs(fdbuf[1]), 1, eps));
-		assert(near(abs(fdbuf[3]), 0.5, eps));
-		assert(near(abs(fdbuf[5]), 0.5*0.5, eps));
-		assert(near(abs(fdbuf[2]), 0, eps));
-		assert(near(abs(fdbuf[4]), 0, eps));
-		assert(near(abs(fdbuf[6]), 0, eps));
-		assert(near(abs(fdbuf[7]), 0, eps));
+		assert(aeq(abs(fdbuf[1]), 1, eps));
+		assert(aeq(abs(fdbuf[3]), 0.5, eps));
+		assert(aeq(abs(fdbuf[5]), 0.5*0.5, eps));
+		assert(aeq(abs(fdbuf[2]), 0, eps));
+		assert(aeq(abs(fdbuf[4]), 0, eps));
+		assert(aeq(abs(fdbuf[6]), 0, eps));
+		assert(aeq(abs(fdbuf[7]), 0, eps));
 	}
 
 	{

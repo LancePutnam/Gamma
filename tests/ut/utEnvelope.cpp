@@ -11,7 +11,7 @@
 		for(int i=0; i<N; ++i){
 			double v = c();
 //			printf("%g ?= %g\n", v, double(i)/N*c.end());
-			assert(scl::abs(v - double(i)/N*c.end()) < eps);
+			assert(aeq(v, double(i)/N*c.end(), eps));
 			assert(v == c.value());
 		}
 		
@@ -22,7 +22,7 @@
 		c.reset();
 		for(int i=0; i<N; ++i){
 			double v = c();
-			assert(scl::abs(v - double(i)/N*c.end()) < eps);
+			assert(aeq(v, double(i)/N*c.end(), eps));
 		}
 	}
 
@@ -43,7 +43,7 @@
 			for(int i=0; i<N; ++i){
 				double v = c();
 				//printf("%g ?= %g\n", v, 100 - float(i)/N*50);
-				assert(scl::abs(v - (float(i)/N*(end-start) + start)) < eps);
+				assert(aeq(v, (float(i)/N*(end-start) + start), eps));
 			}
 			
 			c(); // do one more iteration to reach endpoint
@@ -60,24 +60,24 @@
 		
 		e.levels(0, -0.2, 0.5, 0.1);
 		e.maxLevel(2);
-		assert(near(e.levels()[0], 0  ));
-		assert(near(e.levels()[1],-0.8));
-		assert(near(e.levels()[2], 2.0));
-		assert(near(e.levels()[3], 0.4));
+		assert(aeq(e.levels()[0], 0.0f));
+		assert(aeq(e.levels()[1],-0.8f));
+		assert(aeq(e.levels()[2], 2.0f));
+		assert(aeq(e.levels()[3], 0.4f));
 		
 		e.lengths(1,2,3);
-		assert(near(e.totalLength(), 6));
+		assert(aeq(e.totalLength(), 6.f));
 		
 		e.totalLength(2);
-		assert(near(e.lengths()[0], 1./6 * 2));
-		assert(near(e.lengths()[1], 2./6 * 2));
-		assert(near(e.lengths()[2], 3./6 * 2));
+		assert(aeq(e.lengths()[0], 1.f/6 * 2));
+		assert(aeq(e.lengths()[1], 2.f/6 * 2));
+		assert(aeq(e.lengths()[2], 3.f/6 * 2));
 
 		e.lengths(1,3,1);
 		e.totalLength(10, 1);
-		assert(near(e.lengths()[0], 1));
-		assert(near(e.lengths()[1], 8));
-		assert(near(e.lengths()[2], 1));		
+		assert(aeq(e.lengths()[0], 1.f));
+		assert(aeq(e.lengths()[1], 8.f));
+		assert(aeq(e.lengths()[2], 1.f));		
 	}
 	
 	{
@@ -89,11 +89,11 @@
 		
 		e.levels(vec(0, -0.1), vec(0.5, 1), vec(0.1, 0));
 		e.maxLevel(vec(2,3));
-		assert(near(e.levels()[0][0], 0  ));
-		assert(near(e.levels()[1][0], 2.0));
-		assert(near(e.levels()[2][0], 0.4));
-		assert(near(e.levels()[0][1],-0.3));
-		assert(near(e.levels()[1][1], 3.0));
-		assert(near(e.levels()[2][1], 0.0));
+		assert(aeq(e.levels()[0][0], 0.0));
+		assert(aeq(e.levels()[1][0], 2.0));
+		assert(aeq(e.levels()[2][0], 0.4));
+		assert(aeq(e.levels()[0][1],-0.3));
+		assert(aeq(e.levels()[1][1], 3.0));
+		assert(aeq(e.levels()[2][1], 0.0));
 	}
 }

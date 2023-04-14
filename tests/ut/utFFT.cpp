@@ -1,15 +1,6 @@
 {
 	typedef Complex<double> complex;
 
-	struct F{
-		static bool aeq(double a, double b, double eps=1e-8){
-			return scl::abs(a-b) <= eps;
-		}
-		static bool aeq(const complex& a, const complex& b, double eps=1e-8){
-			return aeq(a.r, b.r, eps) && aeq(a.i, b.i, eps);
-		}
-	};
-
 	const int N=16;
 	complex in[N];
 	complex ac[N];
@@ -36,14 +27,14 @@
 	//for(int i=0; i<N; ++i) printf("[%3d] % f % f\n", i, ac[i].r, ac[i].i); printf("\n");
 	//for(int i=0; i<N; ++i) printf("[%3d] % f\n", i, ar[i]); printf("\n");
 
-	assert(F::aeq(ac[  0], complex(1,0)));
-	assert(F::aeq(ac[  1], complex(1,0)));
-	assert(F::aeq(ac[  2], complex(1,0)));
-	assert(F::aeq(ac[N/2], complex(1,0)));
-	assert(F::aeq(ar[  0], 1.0));
-	assert(F::aeq(ar[  1], 0.5));
-	assert(F::aeq(ar[  3], 0.5));
-	assert(F::aeq(ar[N-1], 1.0));
+	assert(aeq(ac[  0], complex(1,0)));
+	assert(aeq(ac[  1], complex(1,0)));
+	assert(aeq(ac[  2], complex(1,0)));
+	assert(aeq(ac[N/2], complex(1,0)));
+	assert(aeq(ar[  0], 1.0));
+	assert(aeq(ar[  1], 0.5));
+	assert(aeq(ar[  3], 0.5));
+	assert(aeq(ar[N-1], 1.0));
 
 	// test inverse transform
 	cfft.inverse(ac);
@@ -52,25 +43,25 @@
 	//for(int i=0; i<N; ++i) printf("[%3d] % f\n", i, ar[i]); printf("\n");
 
 	for(int i=0; i<N; ++i){
-		assert(F::aeq(ac[i], in[i]));
-		assert(F::aeq(ar[i], in[i].r));
+		assert(aeq(ac[i], in[i]));
+		assert(aeq(ar[i], in[i].r));
 	}
 	
 	
 	// test complex output buffer real-to-complex
 	rfft.forward(ar2, true);
 
-	assert(F::aeq(ar2[  0], 1.0));
-	assert(F::aeq(ar2[  1], 0. ));
-	assert(F::aeq(ar2[  2], 0.5));
-	assert(F::aeq(ar2[  3], 0. ));
-	assert(F::aeq(ar2[  4], 0.5));
-	assert(F::aeq(ar2[  N], 1. ));
-	assert(F::aeq(ar2[N+1], 0.0));
+	assert(aeq(ar2[  0], 1.0));
+	assert(aeq(ar2[  1], 0. ));
+	assert(aeq(ar2[  2], 0.5));
+	assert(aeq(ar2[  3], 0. ));
+	assert(aeq(ar2[  4], 0.5));
+	assert(aeq(ar2[  N], 1. ));
+	assert(aeq(ar2[N+1], 0.0));
 
 	rfft.inverse(ar2, true);
 	for(int i=0; i<N; ++i){
-		assert(F::aeq(ar2[i+1], in[i].r));
+		assert(aeq(ar2[i+1], in[i].r));
 	}
 }
 
@@ -98,7 +89,7 @@
 			// output should match input after N-1 samples
 			if(i>=N){
 				//printf("[%3d] %f %f\n", i, s,t);
-				assert(near(s,t, 2e-6));
+				assert(aeq(s,t, 2e-6f));
 			}
 
 			t = stft();

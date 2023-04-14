@@ -30,7 +30,7 @@
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, -0.5) T(-1., -1) T(-1.2, -1.)
 	#undef T
 
-	#define T(x) assert(scl::abs(scl::cosP3(x) - cos(x*M_2PI)) < 0.018);
+	#define T(x) assert(aeq(scl::cosP3(x), std::cos(x*M_2PI), 0.018));
 	T(0.) T(0.1) T(0.2) T(0.3) T(0.4) T(0.5)
 	#undef T
 
@@ -44,7 +44,7 @@
 	T(2.2, 0.2) T(3.2, 0.8) T(4.2, 0.2) T(5.2, 0.8)
 	#undef T
 
-	#define T(x) assert(scl::abs(scl::invSqrt<1>(x) - 1./sqrt(x)) < 0.002);
+	#define T(x) assert(aeq(scl::invSqrt<1>(x), 1./sqrt(x), 0.002));
 	T(0.5f) T(1.f) T(4.f) T(8.f) T(1111.f)
 	T(0.50) T(4.0) T(8.0) T(1111.0)
 	#undef T
@@ -82,7 +82,7 @@
 	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 1.0) T(-0.20, 0.0) T(-0.80,-1.0) T(0.50, 0.0) T(-0.50, 0.0)
 	#undef T
 
-	#define T(x) assert(scl::abs(scl::sqrt<1>(x) - sqrt(x)) < 0.008);
+	#define T(x) assert(aeq(scl::sqrt<1>(x), sqrt(x), 0.008));
 	T(0.f) T(1.f) T(4.f) T(8.f) T(1111.f)
 	T(0.0) T(1.0) T(4.0) T(8.0) T(1111.0)
 	#undef T

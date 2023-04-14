@@ -6,11 +6,11 @@
 
 {
 	MovingAvg<> fil(4);
-	assert(near(fil(1), 0.25));
-	assert(near(fil(1), 0.5 ));
-	assert(near(fil(1), 0.75));
-	assert(near(fil(1), 1.  ));
-	assert(near(fil(1), 1.  ));
+	assert(aeq(fil(1), 0.25));
+	assert(aeq(fil(1), 0.50));
+	assert(aeq(fil(1), 0.75));
+	assert(aeq(fil(1), 1.00));
+	assert(aeq(fil(1), 1.00));
 }
 
 }
