@@ -84,6 +84,11 @@ private:
 template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class DFTBase : public Td{
 public:
+
+	typedef T value_type;
+	typedef Complex<T> bin_type;
+
+
 	DFTBase();
 	virtual ~DFTBase();
 
