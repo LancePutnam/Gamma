@@ -302,7 +302,7 @@ public:
 			mRunSum = 0.;
 			auto absDC = std::abs(mDC);
 			if(absDC > mMaxDC) mMaxDC = absDC;
-			if(mMaxDC > 0.005) mErr |= ERR_DC;
+			if(mMaxDC > mDCThresh) mErr |= ERR_DC;
 		}
 
 		auto absv = std::abs(v);
@@ -327,6 +327,9 @@ public:
 		return *this;
 	}
 
+	/// Set DC trigger threshold
+	Inspector& DCThresh(float v){ mDCThresh=v; return *this; }
+
 	void print() const {
 		printf("peak:%5.3f DC:% 7.4f ", mPeak, mDC);
 
@@ -345,7 +348,7 @@ public:
 private:
 	unsigned mErr = 0;
 	float mPeak = 0.;
-	float mDC = 0., mMaxDC = 0., mRunSum = 0.;
+	float mDC = 0., mMaxDC = 0., mDCThresh=0.005, mRunSum = 0.;
 	PCounter mDCCount{4096};
 	bool hasErr(unsigned e) const { return mErr&e; }
 };
