@@ -195,7 +195,7 @@ public:
 
 	typedef T value_type;
 
-	Vec(const T& v=T()){ set(v); }
+	Vec(const T& v=T()){ *this = v; }
 	Vec(const T& v1, const T& v2){ set(v1,v2); }
 	Vec(const T& v1, const T& v2, const T& v3){ set(v1,v2,v3); }
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1,v2,v3,v4); }
@@ -203,11 +203,11 @@ public:
 	template <class U>
 	Vec(const U * src){ set(src); }
 
-	template <unsigned N2, class T2>
-	Vec(const Vec<N2, T2>& v){ set(v); }
+	template <class U>
+	Vec(const Vec<N,U>& v){ *this = v; }
 
-	template <class Tv, class Ts>
-	Vec(const Vec<N-1, Tv>& v, Ts s){ set(v,s);}
+	template <class U, class S>
+	Vec(const Vec<N-1,U>& v, S s){ set(v,s);}
 
 
 	/// Returns size of vector
@@ -263,10 +263,59 @@ public:
 		return *(Vec<M,T>*)(elems()+Begin);
 	}
 
+	template <class U>
+	Vec& operator = (const Vec<N,U>& v){ IT(N) (*this)[i] = T(v[i]); return *this; }
+	Vec& operator = (const        T& v){ IT(N) (*this)[i] =       v; return *this; }
+
+	template <class U, class S>
+	Vec& set(const Vec<N-1,U>& v, S s){
+		at<N-1>() = s;
+		return *this = v.template sub<N-1>();
+	}
+
+	/// Set first 2 elements
+	Vec& set(const T& v1, const T& v2){
+		return set(v1,v2,v1,v1,v1,v1); }
+
+	/// Set first 3 elements
+	Vec& set(const T& v1, const T& v2, const T& v3){
+		return set(v1,v2,v3,v1,v1,v1); }
+
+	/// Set first 4 elements
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
+		return set(v1,v2,v3,v4,v1,v1); }
+
+	/// Set first 5 elements
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
+		return set(v1,v2,v3,v4,v5,v1); }
+
+	/// Set first 6 elements
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
+		switch(N){
+		default:(*this)[5] = v6;
+		case 5: (*this)[4] = v5;
+		case 4: (*this)[3] = v4;
+		case 3: (*this)[2] = v3;
+		case 2: (*this)[1] = v2;
+		case 1: (*this)[0] = v1;
+		}
+		return *this;
+	}
+
+	/// Set elements to values from C array
+	template <class U>
+	Vec& set(const U * src){ IT(N){ (*this)[i]=src[i]; } return *this; }
+
+	/// Set to identity, i.e., {1, 0, ..., 0}
+	Vec& setIdentity(){
+		at<0>() = T(1);
+		for(unsigned i=1; i<N; ++i) (*this)[i] = T(0);
+		return *this;
+	}
+
+
 	bool operator !=(const Vec& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
 	bool operator !=(const   T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
-	Vec& operator = (const Vec& v){ IT(N) (*this)[i] = v[i]; return *this; }
-	Vec& operator = (const   T& v){ IT(N) (*this)[i] = v; return *this; }
 	bool operator ==(const Vec& v){ IT(N){ if((*this)[i] != v[i]) return false; } return true; }
 	bool operator ==(const   T& v){ IT(N){ if((*this)[i] != v   ) return false; } return true; }
 
@@ -318,9 +367,6 @@ public:
 		return r;
 	}
 
-	/// Zeros all elements
-	void zero(){ memset(elems(), 0, N * sizeof(T)); }
-
 	T dot(const Vec& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
 	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
 	T mag() const { return std::sqrt(magSqr()); }
@@ -329,57 +375,8 @@ public:
 
 	Vec& normalize(){
 		T msqr = magSqr();
-		if(msqr > 0)	return (*this) /= sqrt(msqr);
+		if(msqr > T(0))	return (*this) /= std::sqrt(msqr);
 		else			return setIdentity();
-	}
-
-	template <unsigned N2, class T2>
-	Vec& set(const Vec<N2, T2>& v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
-
-	template <class Tv, class Ts>
-	Vec& set(const Vec<N-1, Tv>& v, Ts s){ (*this)[N-1]=s; return set(v); }
-
-	/// Set all elements to the same value
-	Vec& set(const T& v){ return (*this = v); }
-
-	/// Set first 2 elements
-	Vec& set(const T& v1, const T& v2){
-		return set(v1,v2,v1,v1,v1,v1); }
-
-	/// Set first 3 elements
-	Vec& set(const T& v1, const T& v2, const T& v3){
-		return set(v1,v2,v3,v1,v1,v1); }
-
-	/// Set first 4 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
-		return set(v1,v2,v3,v4,v1,v1); }
-
-	/// Set first 5 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
-		return set(v1,v2,v3,v4,v5,v1); }
-
-	/// Set first 6 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
-		switch(N){
-		default:(*this)[5] = v6;
-		case 5: (*this)[4] = v5;
-		case 4: (*this)[3] = v4;
-		case 3: (*this)[2] = v3;
-		case 2: (*this)[1] = v2;
-		case 1: (*this)[0] = v1;
-		}
-		return *this;
-	}
-
-	/// Set elements to values from C array
-	template <class U>
-	Vec& set(const U * src){ IT(N){ (*this)[i]=src[i]; } return *this; }
-
-	/// Set to identity, i.e., {1, 0, ..., 0}
-	Vec& setIdentity(){
-		(*this)[0] = T(1);
-		for(unsigned i=1; i<N; ++i) (*this)[i] = T(0);
-		return *this;
 	}
 };
 
