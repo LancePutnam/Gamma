@@ -348,7 +348,7 @@ public:
 private:
 	unsigned mErr = 0;
 	float mPeak = 0.;
-	float mDC = 0., mMaxDC = 0., mDCThresh=0.005, mRunSum = 0.;
+	float mDC = 0., mMaxDC = 0., mDCThresh=0.015, mRunSum = 0.;
 	PCounter mDCCount{4096};
 	bool hasErr(unsigned e) const { return mErr&e; }
 };
