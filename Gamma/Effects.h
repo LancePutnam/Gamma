@@ -419,11 +419,11 @@ public:
 template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
 class Quantizer : public Td{
 public:
-	/// \param[in] freq		Frequency of sequence quantization
-	/// \param[in] stepAmt	Step amount of amplitude quantization
-	Quantizer(double freq=2000, float stepAmt=0)
-	:	mPeriod(1./freq){
-		step(stepAmt);
+	/// \param[in] freq_	Frequency of sequence quantization
+	/// \param[in] step_	Step amount of amplitude quantization
+	Quantizer(double freq_=2000, float step_=0){
+		freq(freq_);
+		step(step_);
 	}
 
 	/// Set freqency of sequence quantization
