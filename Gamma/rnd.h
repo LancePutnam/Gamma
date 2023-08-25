@@ -8,7 +8,6 @@
 	Random variable classes
 */
 
-#include <stdio.h>
 #include <ctime> // time()
 #include "Gamma/gen.h"
 #include "Gamma/std_swap.h"

@@ -8,9 +8,6 @@
 	Functions/objects for converting amongst standard data types and strings.
 */
 
-#include <stdio.h>
-#include <iostream>
-#include <sstream>		/* string conversion */
 #include "Gamma/Constants.h"
 
 namespace gam{
