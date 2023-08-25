@@ -439,7 +439,7 @@ public:
 	/// Set amplitude quantization amount
 	void step(float v){
 		mStep = v;
-		mDoStep = mStep > 0.f;
+		mDoStep = mStep > 1e-8;
 		if(mDoStep) mStepRec = 1.f/mStep;
 	}
 
