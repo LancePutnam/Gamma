@@ -145,6 +145,12 @@ public:
 		return *this;
 	}
 
+	/// Set all elements to a constant value
+	TablePow2& assign(const T& val){
+		for(auto& v : *this) v = val;
+		return *this;
+	}
+
 	/// Assign elements from another array
 	template <class U>
 	TablePow2& assign(const U * src){
