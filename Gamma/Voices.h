@@ -330,8 +330,13 @@ public:
 	{}
 
 
+	/// Get smoothed value
 	float value() const { return mValue; }
 
+	/// Get target value
+	float target() const { return mTarget; }
+
+	/// Set target value
 	Param& operator= (float target){
 		mTarget = target;
 		return *this;
@@ -342,6 +347,7 @@ public:
 		return *this;
 	}
 
+	/// Set smoothing coefficient
 	Param& smooth(float v){
 		mSmooth = v;
 		return *this;
