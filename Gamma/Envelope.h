@@ -539,8 +539,9 @@ public:
 	:	mDelay(closingDelay), mRemain(closingDelay), mThresh(threshold), mClosed(0)
 	{}
 
-	/// Check whether gate is closed
-	bool done() const { return mClosed; }
+
+	/// Set closing delay
+	Gate& delay(double v){ mDelay=mRemain=v; return *this; }
 
 	/// Filter value
 	T operator()(const T& v){		
@@ -553,9 +554,10 @@ public:
 		}
 		return open();
 	}
-	
-	/// Set closing delay
-	Gate& delay(double v){ mDelay=mRemain=v; return *this; }
+
+
+	/// Check whether gate is closed
+	bool done() const { return mClosed; }
 
 protected:
 	double mDelay, mRemain;
@@ -591,19 +593,31 @@ public:
 	}
 
 
-	/// Returns whether envelope is done
-	bool done() const { return mAcc.val >= Tp(1); }
+	/// Set frequency of envelope
+	Seg& freq(Tp v){ mFreq = v; mAcc.add = v * Tp(Td::ups()); return *this; }
 
-	/// Get current value
-	Tv value() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
+	/// Set length, in domain units
+	Seg& length(Tp v){ return freq(Tp(1)/v); }
 
-	
+	/// Set length, in domain units
+	Seg& period(Tp v){ return length(v); }
+
+	/// Set phase along segment
+	Seg& phase(Tp v){ mAcc = v; return *this; }
+
+	/// Reset envelope
+	Seg& reset(){ return phase(Tp(0)); }
+
+	/// Set start and end values and reset
+	Seg& levels(Tv start, Tv end){
+		mIpl.val(start);
+		mIpl.push(end);
+		return reset();
+	}
+
 	/// Set new end value (start value set to current value)
 	Seg& operator= (Tv v){
-		mIpl.val(mIpl(scl::min(mAcc.val, Tp(1))));
-		mIpl.push(v);
-		reset();
-		return *this;
+		return levels(mIpl(scl::min(mAcc.val, Tp(1))), v);
 	}
 
 	/// Generate next value
@@ -628,22 +642,13 @@ public:
 		mAcc();
 		return mIpl(f);
 	}
-	
-	/// Set frequency of envelope
-	Seg& freq(Tp v){ mFreq = v; mAcc.add = v * Tp(Td::ups()); return *this; }
-	
-	/// Set length, in domain units
-	Seg& length(Tp v){ return freq(Tp(1)/v); }
 
-	/// Set length, in domain units
-	Seg& period(Tp v){ return length(v); }
 
-	/// Set phase along segment
-	Seg& phase(Tp v){ mAcc = v; return *this; }
+	/// Returns whether envelope is done
+	bool done() const { return mAcc.val >= Tp(1); }
 
-	/// Reset envelope
-	Seg& reset(){ return phase(Tp(0)); }
-
+	/// Get current value
+	Tv value() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
 
 	Si<Tv>& ipol(){ return mIpl; }
 
@@ -673,27 +678,11 @@ public:
 	{
 		onDomainChange(1);
 	}
-	
-	/// Returns whether envelope is done
-	bool done() const { return mCurve.value() >= T(1); }
-	
-	/// Generate next value
-	T operator()(){
-		if(done()) return mVal0;
-		return ipl::linear(scl::min(mCurve(), T(1)), mVal1, mVal0);
-	}
-	
-	/// Set new end value.  Start value is set to current value.
-	SegExp& operator= (T v){
-		mVal1 = ipl::linear(scl::min(mCurve.value(), T(1)), mVal1, mVal0);
-		mVal0 = v;
-		mCurve.reset();
-		return *this;
-	}
-	
+
+
 	/// Set curvature (negative for fast approach, positive for slow approach)
 	SegExp& curve(T v){ return set(mLen, v); }
-	
+
 	/// Set length in domain units.
 	SegExp& period(T v){ return set(v, mCrv); }
 
@@ -705,7 +694,25 @@ public:
 		mCurve.set(len * Td::spu(), crv);
 		return *this;
 	}
+
+	/// Set new end value (start value set to current value)
+	SegExp& operator= (T v){
+		mVal1 = ipl::linear(scl::min(mCurve.value(), T(1)), mVal1, mVal0);
+		mVal0 = v;
+		mCurve.reset();
+		return *this;
+	}
+
+	/// Generate next value
+	T operator()(){
+		if(done()) return mVal0;
+		return ipl::linear(scl::min(mCurve(), T(1)), mVal1, mVal0);
+	}
 	
+
+	/// Returns whether envelope is done
+	bool done() const { return mCurve.value() >= T(1); }
+
 	void onDomainChange(double r){ set(mLen, mCrv); }
 	
 protected:
