@@ -469,24 +469,50 @@ template <class T=real, class Td=GAM_DEFAULT_DOMAIN>
 class Decay : public Td{
 public:
 
-	/// \param[in] decay	Number of units until initial value decays -60 dB
+	/// \param[in] decay_	Number of units until initial value decays -60 dB
 	/// \param[in] val		Intial value
-	Decay(T decay=T(1), T val=T(1));
+	Decay(T decay_=T(1), T val=T(1))
+	:	mVal(val)
+	{
+		onDomainChange(1);
+		decay(decay_);
+	}
 
-	T decay() const;		///< Returns -60 dB decay length
-	bool done(T thresh=T(0.001)) const; ///< Returns whether value is below threshold
-	T value() const;		///< Returns current value
+	/// Set number of units for curve to decay -60 dB
+	Decay& decay(T v){
+		mDcy = v;
+		mMul = scl::t60(v * Td::spu());
+		return *this;
+	}
 
-	T operator()();			///< Generate next sample
-	
-	void decay(T v);		///< Set number of units for curve to decay -60 dB
+	/// Set current value
+	Decay& value(T v){ mVal = v; return *this; }
 
-	void value(T v);		///< Set current value
+	/// Reset envelope and assign amplitude
+	Decay& reset(T amp=T(1)){ return value(amp); }
 
-	void reset(T amp=T(1));	///< Reset envelope and assign amplitude
-	void finish(T amp=T(0.001)); ///< Jump to end of envelope
+	/// Jump to end of envelope
+	Decay& finish(T amp=T(0.001)){ return value(amp); }
 
-	void onDomainChange(double r);
+
+	/// Generate next sample
+	T operator()(){
+		T o = mVal;
+		mVal *= mMul;
+		return o;
+	}
+
+	/// Returns -60 dB decay length
+	T decay() const { return mDcy; }
+
+	/// Returns whether value is below threshold
+	bool done(T thresh=T(0.001)) const { return mVal < thresh; }
+
+	/// Returns current value
+	T value() const { return mVal; }
+
+
+	void onDomainChange(double /*r*/){ decay(mDcy); }
 
 protected:
 	T mVal, mMul, mDcy;
@@ -569,14 +595,15 @@ public:
 	bool done() const { return mAcc.val >= Tp(1); }
 
 	/// Get current value
-	Tv val() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
+	Tv value() const { return mIpl(scl::min(mAcc.val, Tp(1))); }
 
 	
-	/// Set new end value.  Start value is set to current value.
-	void operator= (Tv v){
+	/// Set new end value (start value set to current value)
+	Seg& operator= (Tv v){
 		mIpl.val(mIpl(scl::min(mAcc.val, Tp(1))));
 		mIpl.push(v);
 		reset();
+		return *this;
 	}
 
 	/// Generate next value
@@ -603,19 +630,19 @@ public:
 	}
 	
 	/// Set frequency of envelope
-	void freq(Tp v){ mFreq = v; mAcc.add = v * Tp(Td::ups()); }
+	Seg& freq(Tp v){ mFreq = v; mAcc.add = v * Tp(Td::ups()); return *this; }
 	
 	/// Set length, in domain units
-	void length(Tp v){ freq(Tp(1)/v); }
+	Seg& length(Tp v){ return freq(Tp(1)/v); }
 
 	/// Set length, in domain units
-	void period(Tp v){ length(v); }
+	Seg& period(Tp v){ return length(v); }
 
 	/// Set phase along segment
-	void phase(Tp v){ mAcc = v; }
+	Seg& phase(Tp v){ mAcc = v; return *this; }
 
 	/// Reset envelope
-	void reset(){ phase(Tp(0)); }
+	Seg& reset(){ return phase(Tp(0)); }
 
 
 	Si<Tv>& ipol(){ return mIpl; }
@@ -657,24 +684,26 @@ public:
 	}
 	
 	/// Set new end value.  Start value is set to current value.
-	void operator= (T v){
+	SegExp& operator= (T v){
 		mVal1 = ipl::linear(scl::min(mCurve.value(), T(1)), mVal1, mVal0);
 		mVal0 = v;
 		mCurve.reset();
+		return *this;
 	}
 	
-	/// Set curvature.  Negative gives faster change, positive gives slower change.
-	void curve(T v){ set(mLen, v); }
+	/// Set curvature (negative for fast approach, positive for slow approach)
+	SegExp& curve(T v){ return set(mLen, v); }
 	
 	/// Set length in domain units.
-	void period(T v){ set(v, mCrv); }
+	SegExp& period(T v){ return set(v, mCrv); }
 
-	void reset(){ mCurve.reset(); }
+	SegExp& reset(){ mCurve.reset(); return *this; }
 
 	/// Set length and curvature
-	void set(T len, T crv){
+	SegExp& set(T len, T crv){
 		mLen = len; mCrv = crv;
 		mCurve.set(len * Td::spu(), crv);
+		return *this;
 	}
 	
 	void onDomainChange(double r){ set(mLen, mCrv); }
@@ -945,51 +974,6 @@ Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::maxLevel(Tv v){
 	for(int i=0; i<N+1; ++i) mLevels[i] *= v;
 	return *this;
 }
-
-
-
-template <class T, class Td>
-Decay<T,Td>::Decay(T decay_, T val)
-:	mVal(val)
-{
-	onDomainChange(1);
-	decay(decay_);
-}
-
-template <class T, class Td>
-inline T Decay<T,Td>::operator()(){
-	T o = mVal;
-	mVal *= mMul;
-	return o;
-}
-
-template <class T, class Td>
-void Decay<T,Td>::decay(T v){
-	mDcy = v;
-	mMul = scl::t60(v * Td::spu());
-}
-
-template <class T, class Td>
-void Decay<T,Td>::reset(T amp){ mVal = amp; }
-
-template <class T, class Td>
-void Decay<T,Td>::finish(T amp){ mVal = amp; }
-
-template <class T, class Td>
-void Decay<T,Td>::value(T v){ mVal = v; }
-
-template <class T, class Td>
-T Decay<T,Td>::decay() const { return mDcy; }
-
-template <class T, class Td>
-inline bool Decay<T,Td>::done(T thr) const { return mVal < thr; }
-
-template <class T, class Td>
-T Decay<T,Td>::value() const { return mVal; }
-
-template <class T, class Td>
-void Decay<T,Td>::onDomainChange(double /*r*/){ decay(mDcy); }
-
 
 } // gam::
 #endif
