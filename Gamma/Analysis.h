@@ -312,12 +312,6 @@ public:
 		return mErr;
 	}
 	
-	unsigned status() const { return mErr; }	///< Get error status
-	operator bool() const { return mErr; }
-	float peak() const { return mPeak; }		///< Get running peak value
-	float DC() const { return mDC; }			///< Get current DC value
-	float maxDC() const { return mMaxDC; }		///< Get running max DC value
-
 	/// Reset analysis and error states
 	Inspector& reset(){
 		mErr = 0;
@@ -329,6 +323,16 @@ public:
 
 	/// Set DC trigger threshold
 	Inspector& DCThresh(float v){ mDCThresh=v; return *this; }
+
+	/// Set name
+	Inspector& name(const char * v){ mName=v; return *this; }
+
+	unsigned status() const { return mErr; }	///< Get error status
+	operator bool() const { return mErr; }
+	float peak() const { return mPeak; }		///< Get running peak value
+	float DC() const { return mDC; }			///< Get current DC value
+	float maxDC() const { return mMaxDC; }		///< Get running max DC value
+	const char * name() const { return mName; }	///< Get name
 
 	void print() const {
 		printf("peak:%5.3f DC:% 7.4f ", mPeak, mDC);
@@ -350,6 +354,7 @@ private:
 	float mPeak = 0.;
 	float mDC = 0., mMaxDC = 0., mDCThresh=0.015, mRunSum = 0.;
 	PCounter mDCCount{4096};
+	const char * mName = "";
 	bool hasErr(unsigned e) const { return mErr&e; }
 };
 
