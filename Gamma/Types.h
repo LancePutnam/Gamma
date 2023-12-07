@@ -263,6 +263,17 @@ public:
 		return *(Vec<M,T>*)(elems()+Begin);
 	}
 
+	const Vec<2,T>& xy() const { return const_cast<Vec*>(this)->xy(); }
+	Vec<2,T>& xy(){ return sub<2,0>(); }
+	const Vec<2,T>& yz() const { return const_cast<Vec*>(this)->yz(); }
+	Vec<2,T>& yz(){ return sub<2,1>(); }
+	const Vec<2,T>& zw() const { return const_cast<Vec*>(this)->zw(); }
+	Vec<2,T>& zw(){ return sub<2,2>(); }
+	const Vec<2,T>& xyz() const { return const_cast<Vec*>(this)->xyz(); }
+	Vec<2,T>& xyz(){ return sub<3,0>(); }
+	const Vec<2,T>& yzw() const { return const_cast<Vec*>(this)->yzw(); }
+	Vec<2,T>& yzw(){ return sub<3,1>(); }
+
 	template <class U>
 	Vec& operator = (const Vec<N,U>& v){ IT(N) (*this)[i] = T(v[i]); return *this; }
 	Vec& operator = (const        T& v){ IT(N) (*this)[i] =       v; return *this; }
