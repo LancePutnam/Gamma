@@ -658,6 +658,7 @@ public:
 	const Tv& stored() const;			///< Returns stored value
 	Tv& stored();						///< Returns stored value
 
+	bool active() const { return mB1!=Tp(0); } ///< Returns whether the filter is actively filtering
 	bool zeroing(Tv eps=0.0001) const;	///< Returns whether the filter is outputting zeros
 	
 	void onDomainChange(double r);
