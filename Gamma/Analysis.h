@@ -218,11 +218,11 @@ public:
 		return mVal;
 	}
 
-	/// Current (non-smoothed) value
-	const Tv& value() const { return mMaxPrev; }
+	/// Current value (linearly smoothed)
+	const Tv& value() const { return mVal; }
 
-	/// Current linearly smoothed value
-	const Tv& valueL() const { return mVal; }
+	/// Current value (non-smoothed)
+	const Tv& valueN() const { return mMaxPrev; }
 
 private:
 	Tv mMaxCalc = Tv(0);
