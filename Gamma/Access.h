@@ -45,7 +45,7 @@ namespace acc{
 	struct Clip{
 		static index_t mapM1(index_t v, index_t /*mx*/, index_t mn){ return v>mn ? v : mn; }
 		static index_t mapP1(index_t v, index_t mx, index_t /*mn*/){ return v<mx ? v : mx; }
-		static index_t map  (index_t v, index_t mx, index_t mn){ return v>mn ? (v<mx ? v : mx) : mn; }
+		static index_t map  (index_t v, index_t mx, index_t mn){ return mapM1(mapP1(v, mx,mn), mx,mn); }
 	};
 
 //	struct Fold{
