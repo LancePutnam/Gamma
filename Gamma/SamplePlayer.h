@@ -176,6 +176,10 @@ protected:
 	T& sample(int idx, int chan){
 		return (*this)[chan*mStrideChan + idx*mStrideSamp];
 	}
+
+	static double clipd(double v, double mx, double mn){
+		return v>mx?mx:v<mn?mn:v;
+	}
 };
 
 
@@ -276,12 +280,6 @@ PRE void CLS::buffer(SamplePlayer& src){
 PRE inline void CLS::pos(double v){	mPos = v; }
 
 PRE inline void CLS::phase(double v){ pos(v * frames()); }
-
-namespace{
-	inline double clipd(double v, double mx, double mn){
-		return v>mx?mx:v<mn?mn:v;
-	}
-}
 
 PRE void CLS::min(double v){ mMin = clipd(v, mMax, 0.); }	
 
