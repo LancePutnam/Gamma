@@ -142,7 +142,7 @@ public:
 	double posInInterval(double frac) const;///< Get position from fraction within interval
 	double phase() const;					///< Get playback position, in [0, 1)
 	double rate() const { return mRate; }	///< Get playback rate
-
+	bool reversed() const { return mRate<0.; } ///< Whether playing in reverse
 
 	void onDomainChange(double r){ frameRate(mFrameRate); }
 
@@ -301,22 +301,18 @@ PRE void CLS::range(double posn, double period){
 }
 
 PRE void CLS::reset(){
-	pos(rate()<0 ? max() : min());
+	pos(reversed() ? max() : min());
 	mPhsInc.reset();
 }
 
 PRE void CLS::finish(){
-	pos(rate()<0 ? min() : max());
+	pos(reversed() ? min() : max());
 }
 
 PRE inline bool CLS::done() const{
 	// The trigger points are based on the logic of phsInc::OneShot
-	if(rate() >= 0.){
-		return pos() >= (max() - mInc);
-	}
-	else{
-		return pos() <= min();
-	}
+	if(reversed())	return pos() <= min();
+	else			return pos() >= (max() - mInc);
 }
 
 PRE bool CLS::loop(){
