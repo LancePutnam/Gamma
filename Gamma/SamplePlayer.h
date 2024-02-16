@@ -177,6 +177,11 @@ protected:
 		return (*this)[chan*mStrideChan + idx*mStrideSamp];
 	}
 
+	// safe version that clips to [min, max)
+	void posSafe(double v){
+		pos(phsInc::incClip(v, 0., max(), min()));
+	}
+
 	static double clipd(double v, double mx, double mn){
 		return v>mx?mx:v<mn?mn:v;
 	}
@@ -299,12 +304,12 @@ PRE void CLS::range(double posn, double period){
 }
 
 PRE void CLS::reset(){
-	pos(reversed() ? max() : min());
+	posSafe(reversed() ? max() : min());
 	mPhsInc.reset();
 }
 
 PRE void CLS::finish(){
-	pos(reversed() ? min() : max());
+	posSafe(reversed() ? min() : max());
 }
 
 PRE inline bool CLS::done() const{
