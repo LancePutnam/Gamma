@@ -68,9 +68,8 @@ public:
 /// Pink Noise
 
 /// Pink noise has a power spectrum of 1/f. This corresponds to an amplitude
-/// spectrum with a -3 dB/octave slope.
-/// In this implementation, it is produced by summing together 12 octaves of
-/// downsampled white noise.
+/// spectrum with a -3 dB/octave slope. This implementation is based on a
+/// sum of 12 octaves of downsampled white noise (the Voss-McCartney algorithm).
 /// \ingroup Noise
 template <class RNG = RNGLinCon>
 class NoisePink : public NoiseBase<RNG> {
@@ -196,13 +195,13 @@ inline float NoisePink<T>::operator()(){
 	return (mRunningSum + this->Us()) * 0.083333333f;
 }
 
-
 /*
-////////////////////////////////////////////////////////////////////////////////
-Pink Noise
-	Description:
-	Infinite sum of octaves of white noise.  Since we cannot compute an infinite
-	sum, we'll use 12 octaves. This gives a range of 10.77 - 44,100 Hz.
+Pink noise can be approximated through a finite sum of octaves of white noise.
+This was first proposed by Voss and later improved upon by McCartney:
+
+	https://www.firstpr.com.au/dsp/pink-noise/#Voss-McCartney
+
+Using 12 octaves at 44.1k gives a range of 10.77 - 44,100 Hz.
 
 	12345678901234567890123456789012	octave  length
 	********************************	0		0
@@ -245,7 +244,6 @@ Pink Noise
 	1		000		29		11101
 	 2		001		30		11110
 	1		000		31		11111
-	
 */
 
 } // gam::
