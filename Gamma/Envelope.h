@@ -160,7 +160,15 @@ public:
 	Tp * lengths(){ return mLengths; }
 	const Tp * lengths() const { return mLengths; }
 
-	/// Set break-point values
+	/// Set length of a segment (compile-time checked)
+	template <unsigned i>
+	Env& length(Tp v){
+		static_assert(i<N, "Invalid segment index");
+		lengths()[i] = v;
+		return *this;
+	}
+
+	/// Set lengths of segments
 	template <class V>
 	Env& lengths(const V* vals, int len){
 		int n = len <= size() ? len : size();
@@ -168,24 +176,18 @@ public:
 		return *this;
 	}
 
-	/// Set first two segment lengths
+	/// Set lengths of first two segments
 	Env& lengths(Tp a, Tp b){ Tp v[]={a,b}; return lengths(v,2); }
 
-	/// Set first three segment lengths
+	/// Set lengths of first three segments
 	Env& lengths(Tp a, Tp b, Tp c){ Tp v[]={a,b,c}; return lengths(v,3); }
 
-	/// Set first four segment lengths
+	/// Set lengths of first four segments
 	Env& lengths(Tp a, Tp b, Tp c, Tp d){ Tp v[]={a,b,c,d}; return lengths(v,4); }
 
-	/// Set first five segment lengths
+	/// Set lengths of first five segments
 	Env& lengths(Tp a, Tp b, Tp c, Tp d, Tp e){ Tp v[]={a,b,c,d,e}; return lengths(v,5); }
 
-	template <unsigned i>
-	Env& length(Tp v){
-		static_assert(i<N, "Invalid segment index");
-		lengths()[i] = v;
-		return *this;
-	}
 
 	/// Get total length of all envelope segments
 	Tp totalLength() const;
@@ -203,7 +205,15 @@ public:
 	/// Get segment curvature array
 	Tp * curves(){ return mCurves; }
 	const Tp * curves() const { return mCurves; }
-	
+
+	/// Set curvature of a segment (compile-time checked)
+	template <unsigned i>
+	Env& curve(Tp v){
+		static_assert(i<N, "Invalid curve index");
+		curves()[i] = v;
+		return *this;
+	}
+
 	/// Set curvature of all segments
 	Env& curve(Tp v){
 		for(int i=0; i<N; ++i) curves()[i]=v;
@@ -230,13 +240,6 @@ public:
 	Env& curves(Tp ca, Tp cb, Tp cc, Tp cd){
 		Tp c[]={ca,cb,cc,cd}; return curves(c,4); }
 
-	template <unsigned i>
-	Env& curve(Tp v){
-		static_assert(i<N, "Invalid curve index");
-		curves()[i] = v;
-		return *this;
-	}
-
 
 	/// Set length and curvature of a segment
 	Env& segment(int i, Tp len, Tp crv){
@@ -245,6 +248,7 @@ public:
 		return *this;
 	}
 
+	/// Set length and curvature of a segment (compile-time checked)
 	template <unsigned i>
 	Env& segment(Tp len, Tp crv){
 		static_assert(i<N, "Invalid segment index");
@@ -279,6 +283,14 @@ public:
 	Tv * levels(){ return mLevels; }
 	const Tv * levels() const { return mLevels; }
 
+	/// Set level at index (compile-time checked)
+	template <unsigned i>
+	Env& level(Tv v){
+		static_assert(i<(N+1), "Invalid level index");
+		levels()[i] = v;
+		return *this;
+	}
+
 	/// Set break-point values
 	template <class V>
 	Env& levels(const V* vals, int len){
@@ -298,13 +310,6 @@ public:
 
 	/// Set first five break-point levels
 	Env& levels(Tv a, Tv b, Tv c, Tv d, Tv e){ Tv v[]={a,b,c,d,e}; return levels(v,5); }
-
-	template <unsigned i>
-	Env& level(Tv v){
-		static_assert(i<(N+1), "Invalid level index");
-		levels()[i] = v;
-		return *this;
-	}
 
 	/// Set maximum level
 	Env& maxLevel(Tv v);
