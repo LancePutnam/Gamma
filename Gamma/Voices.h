@@ -460,6 +460,7 @@ public:
 
 
 	/// Get an array of the voices
+	const VoiceGen * voices() const { return mVoiceGens; }
 	VoiceGen * voices(){ return mVoiceGens; }
 
 	/// Get a reference to the voice at the specified index
