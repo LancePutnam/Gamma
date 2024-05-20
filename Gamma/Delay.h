@@ -92,6 +92,8 @@ public:
 	uint32_t indexBack() const;					///< Get index of backmost element
 	float maxDelay() const;						///< Get maximum delay length units
 
+	operator bool() const { return this->size(); }	///< Check if valid for processing
+
 	virtual void onResize();
 	void onDomainChange(double r);
 

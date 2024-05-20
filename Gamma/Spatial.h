@@ -312,6 +312,9 @@ public:
 	Combs& combs(){ return mCombs; }
 	Allpasses& allpasses(){ return mAllpasses; }
 
+	/// Check if valid for processing
+	operator bool() const { return mCombs.size(); }
+
 	void print() const;
 
 private:
