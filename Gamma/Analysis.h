@@ -334,7 +334,8 @@ public:
 	float maxDC() const { return mMaxDC; }		///< Get running max DC value
 	const char * name() const { return mName; }	///< Get name
 
-	void print() const {
+	void print(bool showName = true) const {
+		if(showName && mName[0]) printf("[%s] ", mName);
 		printf("peak:%5.3f DC:% 7.4f ", mPeak, mDC);
 
 		if(mErr){
