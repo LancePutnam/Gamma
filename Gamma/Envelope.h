@@ -628,9 +628,7 @@ public:
 	/// Generate next value
 	Tv operator()(){
 		if(done()) return mIpl.val();
-		Tp f = mAcc.val;
-		mAcc();
-		return mIpl(f);
+		return next();
 	}
 
 	/// Generates a new end point from a generator when the segment end is reached
@@ -643,9 +641,7 @@ public:
 			mIpl.push(g());
 			mAcc.val = mAcc.val - Tp(1); // wrap phase
 		}
-		Tp f = mAcc.val;
-		mAcc();
-		return mIpl(f);
+		return next();
 	}
 
 
@@ -663,6 +659,12 @@ protected:
 	Tp mFreq;
 	gen::RAdd<Tp> mAcc;
 	Si<Tv> mIpl;
+
+	Tv next(){
+		auto frac = mAcc.val;
+		mAcc();
+		return mIpl(frac);
+	}
 };
 
 
