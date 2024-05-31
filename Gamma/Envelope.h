@@ -590,19 +590,24 @@ public:
 	/// \param[in] start	Start value
 	/// \param[in] end		End value
 	/// \param[in] phase	Start phase along segment, in [0,1)
-	Seg(Tp len=0.5, Tv start=1, Tv end=0, Tp phase=0):
-		mFreq((Tp)1/len), mAcc(0, phase), mIpl(start)
-	{
-		mIpl.push(end);
-		onDomainChange(1);
+	Seg(Tp len=0.5, Tv start=1, Tv end=0, Tp phase=0){
+		length(len);
+		levels(start, end);
+		this->phase(phase);
 	}
 
 
 	/// Set frequency of envelope
-	Seg& freq(Tp v){ mFreq = v; mAcc.add = v * Tp(Td::ups()); return *this; }
+	Seg& freq(Tp v){
+		mFreq = scl::abs(v);
+		mAcc.add = v * Tp(Td::ups());
+		return *this;
+	}
 
 	/// Set length, in domain units
-	Seg& length(Tp v){ return freq(Tp(1)/v); }
+	Seg& length(Tp v){
+		return v > Tp(Td::ups()) ? freq(Tp(1)/v) : freq(Td::spu());
+	}
 
 	/// Set length, in domain units
 	Seg& period(Tp v){ return length(v); }
