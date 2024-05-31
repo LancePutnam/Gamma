@@ -523,11 +523,10 @@ public:
 	/// @param[in] f	Called with newly obtained voice, just before playing it
 	///
 	Voices& attackWithID(unsigned ID, const std::function<void(VoiceGen&)>& f){
-		auto& v = obtain();
-		f(v);
-		mIndexPool.idToIndex()[ID] = v.mIndex;
-		play(v);
-		return *this;
+		return attack([&](auto& v){
+			mIndexPool.idToIndex()[ID] = v.mIndex;
+			f(v);
+		});
 	}
 
 	/// Start new voice
