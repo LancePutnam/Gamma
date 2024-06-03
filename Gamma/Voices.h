@@ -464,6 +464,7 @@ public:
 	VoiceGen * voices(){ return mVoiceGens; }
 
 	/// Get a reference to the voice at the specified index
+	const VoiceGen& voice(unsigned i) const { return mVoiceGens[i]; }
 	VoiceGen& voice(unsigned i){ return mVoiceGens[i]; }
 
 	VoiceGen * begin(){ return mVoiceGens; }
