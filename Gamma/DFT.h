@@ -111,6 +111,17 @@ public:
 	/// Get read-only reference to bin value
 	const Complex<T>& bin(unsigned k) const { return mBins[k]; }
 
+	/// Iterate through frequency bins
+
+	///\tparam OnBin	Function called for each bin
+	///					with signature void(bin_type&, double freq)
+	template <class OnBin>
+	void forEach(const OnBin& onBin){
+		for(unsigned k=0; k<numBins(); ++k){
+			onBin(bin(k), k*binFreq());
+		}
+	}
+
 	/// Get pointer to inverse transform buffer
 	T * bufferInverse(){ return bufInvPos(); }
 	const T * bufferInverse() const { return bufInvPos(); }
