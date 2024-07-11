@@ -625,6 +625,20 @@ public:
 		return reset();
 	}
 
+	/// Set maximum level
+	Seg& maxLevel(Tv v){
+		auto maxAbs = mIpl.maxAbs();
+		if(maxAbs == Tv(0)) mIpl.set(v);
+		else{
+			auto mul = v/maxAbs;
+			for(auto& val : mIpl.vals) val *= mul;
+		}
+		return *this;
+	}
+
+	/// Get maximum level
+	Tv maxLevel() const { return mIpl.maxAbs(); }
+
 	/// Set new end value (start value set to current value)
 	Seg& operator= (Tv v){
 		return levels(mIpl(scl::min(mAcc.val, Tp(1))), v);
