@@ -5,6 +5,7 @@
 	Description:	
 */
 
+#include <iostream>
 #include "examples.h"
 
 class AddSyn : public Process<AudioIOData> {

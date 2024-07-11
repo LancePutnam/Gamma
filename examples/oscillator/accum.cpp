@@ -9,6 +9,7 @@ This demonstrates how to use a phase accumulator as a periodic timer to trigger
 events.
 */
 
+#include <iostream>
 #include "../AudioApp.h"
 #include "Gamma/Oscillator.h"
 using namespace gam;
