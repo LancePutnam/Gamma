@@ -16,12 +16,9 @@ namespace gam{
 
 /// \defgroup Strategy
 
-// \defgroup ipl Interpolation
-
 /// Gamma supports several interpolation strategies.  These can be used, for example,
 /// to make a delay line whose delay amount is a non-integer number of samples.
-/// Julius Smith's <A HREF="https://ccrma.stanford.edu/~jos/pasp/Delay_Line_Interpolation.html">
-/// Delay-Line Interpolation page</A>
+
 /// \defgroup ipl Random-access Interpolation Strategies
 
 namespace ipl{
@@ -311,7 +308,7 @@ struct Switchable{
 	void type(ipl::Type v){ mType=v; }
 
 	/// Return interpolated element from power-of-2 array
-	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{		
+	T operator()(const ArrayPow2<T>& a, uint32_t phase) const{
 		switch(mType){
 			case ROUND:		return round	(a, phase);
 			case LINEAR:	return linear	(a, phase);
@@ -368,24 +365,39 @@ namespace iplSeq{
 
 	/// Base class for sequence interpolation strategies
 
+	/// This basically holds a buffer of previous values in the input sequence.
 	/// \ingroup Strategy, iplSeq
 	template <unsigned N, class T>
 	struct Base{
-		Base(const T& v=0){ set(v); }
-	
+		Base(const T& v=T(0)){ set(v); }
+
 		/// Push a new value onto sequence
-		void push(T va){ for(unsigned i=N-1; i>0; --i) v[i]=v[i-1]; v[0]=va; }
-		
+		void push(const T& v){
+			// shift right
+			for(unsigned i=N-1; i>0; --i) vals[i]=vals[i-1];
+			vals[0]=v;
+		}
+
 		/// Set sequence history to value
-		void set(T va){ for(unsigned i=0; i<N; ++i) v[i]=va; }	
-		
+		void set(const T& v){ for(auto& val: vals) val=v; }	
+
 		/// Get current sequence value
-		T val() const { return v[0]; }
-		
+		const T& val() const { return vals[0]; }
+
 		/// Set current sequence value
-		void val(const T& va){ v[0]=va; }
-			
-		T v[N];	///< Value buffer, 0 is newest, N-1 is oldest
+		void val(const T& v){ vals[0]=v; }
+
+		/// Get maximum absolute value in sequence history
+		T maxAbs() const {
+			T m(0);
+			for(const auto& v : vals){
+				auto va = scl::abs(v);
+				if(va > m) m = va;
+			}
+			return m;
+		}
+
+		T vals[N];	///< Value buffer: 0 is newest, N-1 is oldest
 	};
 
 	/// Non-interpolating sequence interpolation strategy
@@ -393,19 +405,21 @@ namespace iplSeq{
 	/// \ingroup iplSeq
 	template <class T>
 	struct None : public Base<1,T>{
-		using Base<1,T>::v;
-		None(const T& v=0): Base<1,T>(v){}
-		T operator()(float f) const { return v[0]; }
+		using Super = Base<1,T>;
+		using Super::vals;
+		None(const T& v=T(0)): Super(v){}
+		T operator()(float f) const { return vals[0]; }
 	};
 
 	/// Truncating sequence interpolation strategy
 
 	/// \ingroup iplSeq
 	template <class T>
-	struct Trunc : public Base<2,T>{
-		using Base<2,T>::v;
-		Trunc(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return v[1]; }
+	struct Trunc : public Base<2,T> {
+		using Super = Base<2,T>;
+		using Super::vals;
+		Trunc(const T& v=T(0)): Super(v){}
+		T operator()(float f) const { return vals[1]; }
 	};
 
 	/// Round half up sequence interpolation strategy
@@ -413,9 +427,10 @@ namespace iplSeq{
 	/// \ingroup iplSeq
 	template <class T>
 	struct Round : public Base<2,T>{
-		using Base<2,T>::v;
-		Round(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return ipl::nearest(f, v[1], v[0]); }
+		using Super = Base<2,T>;
+		using Super::vals;
+		Round(const T& v=T(0)): Super(v){}
+		T operator()(float f) const { return ipl::nearest(f, vals[1], vals[0]); }
 	};
 
 	/// Linear sequence interpolation strategy
@@ -423,9 +438,10 @@ namespace iplSeq{
 	/// \ingroup Strategy, iplSeq
 	template <class T>
 	struct Linear : public Base<2,T>{
-		using Base<2,T>::v;
-		Linear(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return ipl::linear(f, v[1], v[0]); }
+		using Super = Base<2,T>;
+		using Super::vals;
+		Linear(const T& v=T(0)): Super(v){}
+		T operator()(float f) const { return ipl::linear(f, vals[1], vals[0]); }
 	};
 
 	/// Cubic sequence interpolation strategy
@@ -433,11 +449,12 @@ namespace iplSeq{
 	/// \ingroup Strategy, iplSeq
 	template <class T>
 	struct Cubic : public Base<4,T>{
-		using Base<4,T>::v;
-		Cubic(const T& v=0): Base<4,T>(v){}
-		T operator()(float f) const { return ipl::cubic(f, v[3], v[2], v[1], v[0]); }
-		T val() const { return v[1]; }
-		void val(const T& va){ v[1]=va; }
+		using Super = Base<4,T>;
+		using Super::vals;
+		Cubic(const T& v=T(0)): Super(v){}
+		T operator()(float f) const { return ipl::cubic(f, vals[3], vals[2], vals[1], vals[0]); }
+		T val() const { return vals[1]; }
+		void val(const T& v){ vals[1]=v; }
 	};
 
 	/// Cosine sequence interpolation strategy
@@ -445,9 +462,10 @@ namespace iplSeq{
 	/// \ingroup Strategy, iplSeq
 	template <class T>
 	struct Cosine : public Base<2,T>{
-		using Base<2,T>::v;
-		Cosine(const T& v=0): Base<2,T>(v){}
-		T operator()(float f) const { return ipl::linear(scl::mapSinUU(f), v[1], v[0]); }
+		using Super = Base<2,T>;
+		using Super::vals;
+		Cosine(const T& v=T(0)): Super(v){}
+		T operator()(float f) const { return ipl::linear(scl::mapSinUU(f), vals[1], vals[0]); }
 	};
 
 } // iplSeq::
