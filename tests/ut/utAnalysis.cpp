@@ -17,9 +17,9 @@
 		maxAbs(-1);
 		maxAbs(-2);
 		maxAbs(1);
-		assert(maxAbs.value() == 2);
+		assert(maxAbs.valueN() == 2);
 		maxAbs(4);
-		assert(maxAbs.value() == 2);
+		assert(maxAbs.valueN() == 2);
 	}
 	{
 		ZeroCross<> zeroCross(0);
