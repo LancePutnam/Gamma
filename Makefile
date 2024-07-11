@@ -52,6 +52,16 @@ include Makefile.rules
 # Force these targets to always execute
 .PHONY: clean test
 
+help:
+	@echo The possible rules are:
+	@echo "  gamma (or none) .. build library"
+	@echo "  clean ............ delete all build files and directories"
+	@echo "  rebuild .......... do a clean and then build library"
+	@echo "  install .......... install library into path specified by DESTDIR"
+	@echo "                     (default = ${DESTDIR})"
+	@echo "  test ............. run unit tests"
+	@echo "  buildtest ........ run unit tests and build all examples"
+#@echo "  docs ............ open API documentation"
 
 # Compile and run source files in RUN_DIRS
 EXEC_TARGETS = $(addsuffix *.cpp, $(RUN_DIRS)) $(addsuffix *.c, $(RUN_DIRS)) $(addsuffix *.mm, $(RUN_DIRS))
