@@ -449,6 +449,7 @@ float rampUp2U	(uint32_t phase);	///< Returns value of unipolar upward ramp2 fun
 float rampDownU	(uint32_t phase);	///< Returns value of unipolar upward ramp function.
 float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
 float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
+float paraU		(uint32_t phase);	///< Returns value of unipolar parabolic function.
 float triangleU	(uint32_t phase);	///< Returns value of unipolar triangle function.
 
 template<class T> T bartlett(T nphase);								///< Bartlett window. nphase => [-1, 1)
@@ -1223,6 +1224,10 @@ inline float stair(uint32_t p, uint32_t w){
 
 inline float stairU(uint32_t p, uint32_t w){
 	return ((p & MaskSign<float>()) ? 0.5f : 0.f) + (((p+w) & MaskSign<float>()) ? 0.5f : 0.f);
+}
+
+inline float paraU(uint32_t p){
+	return scl::pow2(rampDown(p));
 }
 
 // [1, 0, -1, 0]; abs on ramp down

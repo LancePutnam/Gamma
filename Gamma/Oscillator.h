@@ -102,6 +102,8 @@ private:
 	uint32_t mFreqI;	// Current fixed-point frequency
 	Sp mSp;
 
+	static uint32_t f2i(float v);
+	static double i2f(uint32_t v);
 	uint32_t mapFreq(float v) const;
 };
 
@@ -1044,25 +1046,6 @@ private:
 
 // Implementation_______________________________________________________________
 
-namespace{
-
-// Convert unit floating-point to fixed-point integer.
-// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
-inline uint32_t mapFI(float v){
-	//return scl::unitToUInt(v);
-	//return (uint32_t)(v * 4294967296.);
-	return castIntRound(v * 4294967296.);
-}
-
-// Convert fixed-point integer to unit floating-point.
-inline double mapIF(uint32_t v){
-	return v/4294967296.;
-	//return uintToUnit<float>(v); // not enough precision
-}
-
-};
-
-
 //---- Accum
 template<class Sp, class Td>
 Accum<Sp,Td>::Accum(float f, float p)
@@ -1072,9 +1055,25 @@ Accum<Sp,Td>::Accum(float f, float p)
 	phase(p);
 }
 
+// Convert unit floating-point to fixed-point integer
+// 32-bit float is good enough here since [0.f, 1.f) uses 29 bits.
+template<class Sp, class Td>
+inline uint32_t Accum<Sp,Td>::f2i(float v){
+	//return scl::unitToUInt(v);
+	//return (uint32_t)(v * 4294967296.);
+	return castIntRound(v * 4294967296.);
+}
+
+// Convert fixed-point integer to unit floating-point
+template<class Sp, class Td>
+inline double Accum<Sp,Td>::i2f(uint32_t v){
+	return v/4294967296.;
+	//return uintToUnit<float>(v); // not enough precision
+}
+
 template<class Sp, class Td>
 inline uint32_t Accum<Sp,Td>::mapFreq(float v) const {
-	//return mapFI(v * Td::ups());
+	//return f2i(v * Td::ups());
 	return castIntRound(v * mFreqToInt);
 }
 
@@ -1093,15 +1092,15 @@ inline void Accum<Sp,Td>::freq(float v){
 template<class Sp, class Td>
 inline void Accum<Sp,Td>::freqI(uint32_t v){
 	mFreqI= v;
-	mFreq = mapIF(v) * Td::spu();
+	mFreq = i2f(v) * Td::spu();
 }
 
 template<class Sp, class Td> inline void Accum<Sp,Td>::freqAdd(float v){ phaseAdd(v*Td::ups()); }
 template<class Sp, class Td> inline void Accum<Sp,Td>::freqMul(float v){ freqAdd((v-1.f)*freq()); }
 
 template<class Sp, class Td> inline void Accum<Sp,Td>::period(float v){ freq(1.f/v); }
-template<class Sp, class Td> inline void Accum<Sp,Td>::phase(float v){ mPhaseI = mapFI(v); }
-template<class Sp, class Td> inline void Accum<Sp,Td>::phaseAdd(float v){ mSp(mPhaseI, mapFI(v)); }
+template<class Sp, class Td> inline void Accum<Sp,Td>::phase(float v){ mPhaseI = f2i(v); }
+template<class Sp, class Td> inline void Accum<Sp,Td>::phaseAdd(float v){ mSp(mPhaseI, f2i(v)); }
 template<class Sp, class Td> void Accum<Sp,Td>::phaseMax(){ mPhaseI = 0xffffffff; }
 
 template<class Sp, class Td>
@@ -1117,9 +1116,9 @@ inline bool Accum<Sp,Td>::cycled() const {
 
 template<class Sp, class Td> inline float Accum<Sp,Td>::freq() const { return mFreq; }
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::freqI() const { return mFreqI; }
-template<class Sp, class Td> inline float Accum<Sp,Td>::freqUnit() const { return float(mapIF(mFreqI)); }
+template<class Sp, class Td> inline float Accum<Sp,Td>::freqUnit() const { return float(i2f(mFreqI)); }
 template<class Sp, class Td> inline float Accum<Sp,Td>::period() const { return 1.f/freq(); }
-template<class Sp, class Td> inline float Accum<Sp,Td>::phase() const { return float(mapIF(mPhaseI)); }
+template<class Sp, class Td> inline float Accum<Sp,Td>::phase() const { return float(i2f(mPhaseI)); }
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::phaseI() const { return mPhaseI; }
 
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(float frqOffset){
@@ -1425,41 +1424,35 @@ inline void DWO<Sp,Td>::freq(float v){
 
 /* Ideally we would use a differencing filter, however, it has a serious shortcoming. Any sudden changes in phase (or frequency) will lead a large amplitude impulse in the output which becomes worse the lower the frequency. A related problem is what to initialize the filter's previous input sample to. Instead of a filter, we use an analytic approach which subtracts two phase-shifted waveforms.
 */
-namespace{
-	inline float para01(uint32_t p){
-		float s = scl::rampUp(p);
-		return s*s;
-	}
-	inline float triangle02(uint32_t p){
-		p = Expo4<float>() | (p >> 9); // [4, 8)
-		return scl::abs(punUF(p) - 6.f);
-	}
-}
-
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::up(){
 	/*
-	float s = para01(this->nextPhase());
+	float s = scl::paraU(this->nextPhase());
 	return diff(s);//*/
 	//*
 	uint32_t p = this->nextPhase();
-	float s = para01(p);
-	float t = para01(p + this->freqI());
+	float s = scl::paraU(p);
+	float t = scl::paraU(p + this->freqI());
 	return (s - t)*mGain;//*/
 }
 
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::down(){
-	/*float s = para01(this->nextPhase());
+	/*float s = scl::paraU(this->nextPhase());
 	return diff(-s);*/
 	uint32_t p = this->nextPhase();
-	float s = para01(p);
-	float t = para01(p + this->freqI());
+	float s = scl::paraU(p);
+	float t = scl::paraU(p + this->freqI());
 	return (t - s)*mGain;
 }
 
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::sqr(){
+	// Unipolar triangle in [0,2]
+	auto triangle02 = [](uint32_t p){
+		p = Expo4<float>() | (p >> 9); // [4, 8)
+		return scl::abs(punUF(p) - 6.f);
+	};
 	/*
 	float s = triangle02(this->nextPhase());
 	return diff(s);//*/
@@ -1497,17 +1490,17 @@ template <class Sp, class Td>
 inline float DWO<Sp,Td>::pulse(){
 	/*
 	uint32_t p = this->nextPhase();
-	float s1 = para01(p);
-	float s2 = para01(p + mMod);
+	float s1 = scl::paraU(p);
+	float s2 = scl::paraU(p + mMod);
 	return diff((s1 - s2)*0.5f);//*/
 	//*
 	uint32_t p = this->nextPhase();
-	float s1 = para01(p);
-	float s2 = para01(p - mMod);
+	float s1 = scl::paraU(p);
+	float s2 = scl::paraU(p - mMod);
 	float s  = s1 - s2;
 	uint32_t q = p + this->freqI();
-	float t1 = para01(q);
-	float t2 = para01(q - mMod);
+	float t1 = scl::paraU(q);
+	float t2 = scl::paraU(q - mMod);
 	float t  = t1 - t2;
 	return (t - s)*0.5f*mGain;//*/
 }
