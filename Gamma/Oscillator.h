@@ -1064,7 +1064,7 @@ Accum<Sp,Td>::Accum(float f, float p)
 template<class Sp, class Td>
 inline uint32_t Accum<Sp,Td>::f2i(float v){
 	//return scl::unitToUInt(v);
-	//return (uint32_t)(v * maxUIntReal());
+	//return {v * maxUIntReal()};
 	return castIntRound(v * maxUIntReal());
 }
 
@@ -1112,8 +1112,8 @@ inline bool Accum<Sp,Td>::done() const { return mSp.done(phaseI()); }
 
 template<class Sp, class Td>
 inline bool Accum<Sp,Td>::cycled() const {
-	uint32_t prev = phaseI();
-	Sp temp = mSp;
+	auto prev = phaseI();
+	auto temp = mSp;
 	temp(prev, ~freqI());
 	return ((~phaseI() & prev) & maskSign()) != 0;
 }
@@ -1126,13 +1126,13 @@ template<class Sp, class Td> inline float Accum<Sp,Td>::phase() const { return f
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::phaseI() const { return mPhaseI; }
 
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(float frqOffset){
-	uint32_t p = mPhaseI;
+	auto p = mPhaseI;
 	mSp(mPhaseI, mFreqI + mapFreq(frqOffset)); // apply phase inc strategy
 	return p;
 }
 
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(){
-	uint32_t p = mPhaseI;
+	auto p = mPhaseI;
 	mSp(mPhaseI, mFreqI); // apply phase inc strategy
 	return p;
 }
@@ -1146,20 +1146,20 @@ template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return (cycles()
 //}
 
 template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::cycles(){
-	uint32_t prev = phaseI();
+	auto prev = phaseI();
 	nextPhase();
 	return ~phaseI() & prev;
 }
 
 template<class Sp, class Td> inline bool Accum<Sp,Td>::once(){
-	uint32_t prev = phaseI();
+	auto prev = phaseI();
 	bool c = cycle();
 	if(c) mPhaseI = prev;
 	return c;
 }
 
 template<class Sp, class Td> inline bool Accum<Sp,Td>::seq(uint32_t pat){
-	uint32_t prev = phaseI();
+	auto prev = phaseI();
 	nextPhase();
 
 	// Did any of the 5 MSBs change?
@@ -1322,18 +1322,18 @@ template<class Sp, class Td> inline TLFO& TLFO::modI(uint32_t v){
 }
 
 template<class Sp, class Td> inline float TLFO::line2(){
-	uint32_t m = scl::clip<uint32_t>(mMod, 0xffefffff, 512); // avoid div by zero
+	auto m = scl::clip<uint32_t>(mMod, 0xffefffff, 512); // avoid div by zero
 
 	/* Starts at 1
-	float r1 = scl::rampDown(phaseI());
-	float r2 = scl::rampDown(phaseI() + m); //*/
+	auto r1 = scl::rampDown(phaseI());
+	auto r2 = scl::rampDown(phaseI() + m); //*/
 
 	//* Starts at -1 (better for creating attack/decay like envelopes)
-	float r1 = scl::rampDown(phaseI() - m);
-	float r2 = scl::rampDown(phaseI()); //*/
+	auto r1 = scl::rampDown(phaseI() - m);
+	auto r2 = scl::rampDown(phaseI()); //*/
 
-	float p  = punUF(Expo2<float>() | (m >> 9)) - 2.f; // [0, 2);
-	float r = (r1*r1 - r2*r2)/(p*(2.f - p));
+	auto p  = punUF(Expo2<float>() | (m >> 9)) - 2.f; // [0, 2);
+	auto r = (r1*r1 - r2*r2)/(p*(2.f - p));
 	nextPhase();
 	return r;
 }
@@ -1420,7 +1420,7 @@ inline DWO<Sp,Td>& DWO<Sp,Td>::modI(uint32_t v){
 template <class Sp, class Td>
 inline void DWO<Sp,Td>::freq(float v){
 	Base::freq(v);
-	float freq1 = this->freqUnit();
+	auto freq1 = this->freqUnit();
 	// Very low freq will produce quantization noise
 	if(freq1 < 1e-5) freq1 = 1e-5;
 	mGain = -0.25/freq1;
@@ -1431,22 +1431,22 @@ inline void DWO<Sp,Td>::freq(float v){
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::up(){
 	/*
-	float s = scl::paraU(this->nextPhase());
+	auto s = scl::paraU(this->nextPhase());
 	return diff(s);//*/
 	//*
-	uint32_t p = this->nextPhase();
-	float s = scl::paraU(p);
-	float t = scl::paraU(p + this->freqI());
+	auto p = this->nextPhase();
+	auto s = scl::paraU(p);
+	auto t = scl::paraU(p + this->freqI());
 	return (s - t)*mGain;//*/
 }
 
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::down(){
-	/*float s = scl::paraU(this->nextPhase());
+	/*auto s = scl::paraU(this->nextPhase());
 	return diff(-s);*/
-	uint32_t p = this->nextPhase();
-	float s = scl::paraU(p);
-	float t = scl::paraU(p + this->freqI());
+	auto p = this->nextPhase();
+	auto s = scl::paraU(p);
+	auto t = scl::paraU(p + this->freqI());
 	return (t - s)*mGain;
 }
 
@@ -1461,19 +1461,19 @@ inline float DWO<Sp,Td>::sqr(){
 	float s = triangle02(this->nextPhase());
 	return diff(s);//*/
 	//*
-	uint32_t p = this->nextPhase();
-	float s = triangle02(p);
-	float t = triangle02(p + this->freqI());
+	auto p = this->nextPhase();
+	auto s = triangle02(p);
+	auto t = triangle02(p + this->freqI());
 	return (t - s)*mGain;//*/
 }
 
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::para(){
-	static const float c = (-M_PI*M_PI*M_PI/12.)*0.5;
-	uint32_t p = this->nextPhase();
-	float s = scl::rampUp(p);
+	static constexpr float c = (-M_PI*M_PI*M_PI/12.)*0.5;
+	auto p = this->nextPhase();
+	auto s = scl::rampUp(p);
 	s = s*s*s - s;
-	float t = scl::rampUp(p + this->freqI());
+	auto t = scl::rampUp(p + this->freqI());
 	t = t*t*t - t;
 	return (t - s)*c*mGain;
 }
@@ -1481,31 +1481,31 @@ inline float DWO<Sp,Td>::para(){
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::tri(){
 	/*
-	float s = scl::sinPara(this->nextPhase())*0.5f;
+	auto s = scl::sinPara(this->nextPhase())*0.5f;
 	return diff(s);//*/
 	//*
-	uint32_t p = this->nextPhase();
-	float s = scl::sinPara(p);
-	float t = scl::sinPara(p + this->freqI());
+	auto p = this->nextPhase();
+	auto s = scl::sinPara(p);
+	auto t = scl::sinPara(p + this->freqI());
 	return (t - s)*-0.5f*mGain;//*/
 }
 
 template <class Sp, class Td>
 inline float DWO<Sp,Td>::pulse(){
 	/*
-	uint32_t p = this->nextPhase();
-	float s1 = scl::paraU(p);
-	float s2 = scl::paraU(p + mMod);
+	auto p = this->nextPhase();
+	auto s1 = scl::paraU(p);
+	auto s2 = scl::paraU(p + mMod);
 	return diff((s1 - s2)*0.5f);//*/
 	//*
-	uint32_t p = this->nextPhase();
-	float s1 = scl::paraU(p);
-	float s2 = scl::paraU(p - mMod);
-	float s  = s1 - s2;
-	uint32_t q = p + this->freqI();
-	float t1 = scl::paraU(q);
-	float t2 = scl::paraU(q - mMod);
-	float t  = t1 - t2;
+	auto p = this->nextPhase();
+	auto s1 = scl::paraU(p);
+	auto s2 = scl::paraU(p - mMod);
+	auto s  = s1 - s2;
+	auto q = p + this->freqI();
+	auto t1 = scl::paraU(q);
+	auto t2 = scl::paraU(q - mMod);
+	auto t  = t1 - t2;
 	return (t - s)*0.5f*mGain;//*/
 }
 
@@ -1516,7 +1516,7 @@ inline float DWO<Sp,Td>::imp(){
 
 /*template <class Sp, class Td>
 inline float DWO<Sp,Td>::diff(float v){
-	float res = (v - mPrev)*mGain;
+	auto res = (v - mPrev)*mGain;
 	mPrev = v;
 	return res;
 }*/
