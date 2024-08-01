@@ -97,14 +97,18 @@ public:
 //protected:
 private:
 	float mFreq;		// Current frequency
-	double mFreqToInt;
+	double mFreqToUInt;	// Factor to convert real to fixed-point freq
 	uint32_t mPhaseI;	// Current fixed-point phase in [0, 2^32)
 	uint32_t mFreqI;	// Current fixed-point frequency
 	Sp mSp;
 
+	uint32_t mapFreq(float v) const;
+
 	static uint32_t f2i(float v);
 	static double i2f(uint32_t v);
-	uint32_t mapFreq(float v) const;
+	static constexpr uint32_t maxUInt(){ return ~uint32_t(0); }
+	static constexpr double maxUIntReal(){ return double(maxUInt())+1.; }
+	static constexpr uint32_t maskSign(){ return uint32_t(1)<<(sizeof(uint32_t)*8-1); }
 };
 
 #define ACCUM_INHERIT\
@@ -1049,7 +1053,7 @@ private:
 //---- Accum
 template<class Sp, class Td>
 Accum<Sp,Td>::Accum(float f, float p)
-:	mFreq(f), mFreqToInt(4294967296.), mFreqI(0)
+:	mFreq(f), mFreqToUInt(maxUIntReal()), mFreqI(0)
 {
 	onDomainChange(1);
 	phase(p);
@@ -1060,26 +1064,26 @@ Accum<Sp,Td>::Accum(float f, float p)
 template<class Sp, class Td>
 inline uint32_t Accum<Sp,Td>::f2i(float v){
 	//return scl::unitToUInt(v);
-	//return (uint32_t)(v * 4294967296.);
-	return castIntRound(v * 4294967296.);
+	//return (uint32_t)(v * maxUIntReal());
+	return castIntRound(v * maxUIntReal());
 }
 
 // Convert fixed-point integer to unit floating-point
 template<class Sp, class Td>
 inline double Accum<Sp,Td>::i2f(uint32_t v){
-	return v/4294967296.;
+	return v/maxUIntReal();
 	//return uintToUnit<float>(v); // not enough precision
 }
 
 template<class Sp, class Td>
 inline uint32_t Accum<Sp,Td>::mapFreq(float v) const {
 	//return f2i(v * Td::ups());
-	return castIntRound(v * mFreqToInt);
+	return castIntRound(v * mFreqToUInt);
 }
 
 template<class Sp, class Td>
 void Accum<Sp,Td>::onDomainChange(double /*r*/){ //printf("Accum: onDomainChange (%p)\n", this);
-	mFreqToInt = 4294967296. / Td::spu();
+	mFreqToUInt = maxUIntReal() / Td::spu();
 	freq(mFreq);
 }
 
@@ -1101,7 +1105,7 @@ template<class Sp, class Td> inline void Accum<Sp,Td>::freqMul(float v){ freqAdd
 template<class Sp, class Td> inline void Accum<Sp,Td>::period(float v){ freq(1.f/v); }
 template<class Sp, class Td> inline void Accum<Sp,Td>::phase(float v){ mPhaseI = f2i(v); }
 template<class Sp, class Td> inline void Accum<Sp,Td>::phaseAdd(float v){ mSp(mPhaseI, f2i(v)); }
-template<class Sp, class Td> void Accum<Sp,Td>::phaseMax(){ mPhaseI = 0xffffffff; }
+template<class Sp, class Td> void Accum<Sp,Td>::phaseMax(){ mPhaseI = maxUInt(); }
 
 template<class Sp, class Td>
 inline bool Accum<Sp,Td>::done() const { return mSp.done(phaseI()); }
@@ -1111,7 +1115,7 @@ inline bool Accum<Sp,Td>::cycled() const {
 	uint32_t prev = phaseI();
 	Sp temp = mSp;
 	temp(prev, ~freqI());
-	return ((~phaseI() & prev) & 0x80000000) != 0;
+	return ((~phaseI() & prev) & maskSign()) != 0;
 }
 
 template<class Sp, class Td> inline float Accum<Sp,Td>::freq() const { return mFreq; }
@@ -1135,7 +1139,7 @@ template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::nextPhase(){
 
 template<class Sp, class Td> inline bool Accum<Sp,Td>::operator()(){ return cycle(); }
 
-template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return (cycles() & 0x80000000) != 0; }
+template<class Sp, class Td> inline bool Accum<Sp,Td>::cycle(){ return (cycles() & maskSign()) != 0; }
 
 //template<class Sp, class Td> inline uint32_t Accum<Sp,Td>::cycle(uint32_t mask){
 //	return cycles() & mask;
