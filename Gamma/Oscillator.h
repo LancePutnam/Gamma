@@ -94,7 +94,13 @@ public:
 
 	void onDomainChange(double r);
 
-//protected:
+protected:
+	static uint32_t f2i(float v);
+	static double i2f(uint32_t v);
+	static constexpr uint32_t maxUInt(){ return ~uint32_t(0); }
+	static constexpr double maxUIntReal(){ return double(maxUInt())+1.; }
+	static constexpr uint32_t maskSign(){ return uint32_t(1)<<(sizeof(uint32_t)*8-1); }
+
 private:
 	float mFreq;		// Current frequency
 	double mFreqToUInt;	// Factor to convert real to fixed-point freq
@@ -103,12 +109,6 @@ private:
 	Sp mSp;
 
 	uint32_t mapFreq(float v) const;
-
-	static uint32_t f2i(float v);
-	static double i2f(uint32_t v);
-	static constexpr uint32_t maxUInt(){ return ~uint32_t(0); }
-	static constexpr double maxUIntReal(){ return double(maxUInt())+1.; }
-	static constexpr uint32_t maskSign(){ return uint32_t(1)<<(sizeof(uint32_t)*8-1); }
 };
 
 #define ACCUM_INHERIT\
@@ -773,7 +773,7 @@ public:
 
 	/// Get modifier value
 	uint32_t modI() const { return mMod; }
-	double mod() const { return mMod / 4294967296.; }
+	double mod() const { return this->i2f(mMod); }
 
 	/// Set frequency
 	void freq(float v);
@@ -1314,7 +1314,7 @@ template<class Sp, class Td> inline TLFO& TLFO::set(float f, float p, float m){
 	return mod(m);
 }
 template<class Sp, class Td> inline TLFO& TLFO::mod(double v){
-	return modI(castIntRound(v*4294967296.));
+	return modI(this->f2i(v));
 }
 template<class Sp, class Td> inline TLFO& TLFO::modI(uint32_t v){
 	mMod=v;
@@ -1332,7 +1332,7 @@ template<class Sp, class Td> inline float TLFO::line2(){
 	auto r1 = scl::rampDown(phaseI() - m);
 	auto r2 = scl::rampDown(phaseI()); //*/
 
-	auto p  = punUF(Expo2<float>() | (m >> 9)) - 2.f; // [0, 2);
+	auto p  = punUF(Expo2<float>() | (m >> 9)) - 2.f; // to [0, 2)
 	auto r = (r1*r1 - r2*r2)/(p*(2.f - p));
 	nextPhase();
 	return r;
@@ -1409,7 +1409,7 @@ DWO<Sp,Td>::DWO(float f, float p, float m)
 
 template<class Sp, class Td>
 inline DWO<Sp,Td>& DWO<Sp,Td>::mod(double v){
-	return modI(castIntRound(v*4294967296.));
+	return modI(this->f2i(v));
 }
 template<class Sp, class Td>
 inline DWO<Sp,Td>& DWO<Sp,Td>::modI(uint32_t v){
