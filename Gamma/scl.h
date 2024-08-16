@@ -421,8 +421,8 @@ bool zeroCrossP(float prev, float now);
 uint32_t quantizePow2(uint32_t value, uint32_t q);
 
 //---- Bipolar waveforms [-1, 1)
-float rampDown	(uint32_t phase);	///< Returns value of bipolar downward ramp function.
-float rampUp	(uint32_t phase);	///< Returns value of bipolar upward ramp function.
+float sawDown	(uint32_t phase);	///< Returns value of bipolar downward saw function.
+float sawUp		(uint32_t phase);	///< Returns value of bipolar upward saw function.
 float square	(uint32_t phase);	///< Returns value of bipolar square function.
 float triangle	(uint32_t phase);	///< Returns value of bipolar triangle function.
 
@@ -432,21 +432,21 @@ float sinFast	(uint32_t phase);
 /// Returns value of sine-like function constructed from parabolic sections
 float sinPara	(uint32_t phase);
 
-/// Returns value of bipolar pulse function (rampDown() + rampUp()).
+/// Returns value of bipolar pulse function (sawDown() + sawUp()).
 float pulse		(uint32_t phase, uint32_t width);
 
 /// Returns value of bipolar stair function (square() + square()).
 float stair		(uint32_t phase, uint32_t width);
 
-/// Returns value of bipolar dual upward ramp function (rampUp() + rampUp()).
-float rampUp2	(uint32_t phase, uint32_t width);	// rampUp + rampUp
+/// Returns value of bipolar dual upward saw function (sawUp() + sawUp()).
+float sawUp2	(uint32_t phase, uint32_t width);
 
 //---- Unipolar waveforms [0, 1)
+float sawUpU	(uint32_t phase);	///< Returns value of unipolar upward saw function.
+float sawUp2U	(uint32_t phase);	///< Returns value of unipolar upward saw2 function.
+float sawDownU	(uint32_t phase);	///< Returns value of unipolar downward saw function.
 float pulseU	(uint32_t phase, uint32_t width);	///< Returns value of unipolar pulse function.
 float pulseRange(uint32_t phase, uint32_t width, float highVal = 1.0, float lowVal = -1.0); ///< Returns value of ranged pulse function.
-float rampUpU	(uint32_t phase);	///< Returns value of unipolar downward ramp function.
-float rampUp2U	(uint32_t phase);	///< Returns value of unipolar upward ramp2 function.
-float rampDownU	(uint32_t phase);	///< Returns value of unipolar upward ramp function.
 float squareU	(uint32_t phase);	///< Returns value of unipolar square function.
 float stairU(uint32_t phase, uint32_t width); ///< Returns value of unipolar stair function.
 float paraU		(uint32_t phase);	///< Returns value of unipolar parabolic function.
@@ -1149,36 +1149,36 @@ inline float pulseRange(uint32_t p, uint32_t w, float highVal, float lowVal){
 }
 
 // [1, 0.5, 0, -0.5]
-inline float rampDown(uint32_t p){
+inline float sawDown(uint32_t p){
 	p = Expo2<float>() | (p >> 9);
 	return 3.f - punUF(p);
 }
 
 // [1, 0.75, 0.5, 0.25]
-inline float rampDownU(uint32_t p){
+inline float sawDownU(uint32_t p){
 	p = ExpoNeg1<float>() | (p >> 9);
 	return punUF(p) + 2.f;
 }
 
 // [-1, -0.5, 0, 0.5]
-inline float rampUp(uint32_t p){
+inline float sawUp(uint32_t p){
 	p = Expo2<float>() | (p >> 9);
 	return punUF(p) - 3.f;
 }
 
 // [0, 0.25, 0.5, 0.75]
-inline float rampUpU(uint32_t p){
+inline float sawUpU(uint32_t p){
 	p = Expo1<float>() | (p >> 9);
 	return punUF(p) - 1.f;
 }
 
-inline float rampUp2(uint32_t p, uint32_t w){
+inline float sawUp2(uint32_t p, uint32_t w){
 	uint32_t saw1 = (p    )>>10;
 	uint32_t saw2 = (p + w)>>10;
 	return punUF(Expo2<float>() | (saw1 + saw2)) - 3.f;
 }
 
-inline float rampUp2U(uint32_t p, uint32_t w){
+inline float sawUp2U(uint32_t p, uint32_t w){
 	uint32_t saw1 = (p    )>>10;
 	uint32_t saw2 = (p + w)>>10;
 	return punUF(Expo1<float>() | (saw1 + saw2)) - 1.f;
@@ -1227,7 +1227,7 @@ inline float stairU(uint32_t p, uint32_t w){
 }
 
 inline float paraU(uint32_t p){
-	return scl::pow2(rampDown(p));
+	return scl::pow2(sawDown(p));
 }
 
 // [1, 0, -1, 0]; abs on ramp down
@@ -1238,7 +1238,7 @@ inline float triangle(uint32_t p){
 
 // [1, 0.5, 0, 0.5]
 inline float triangleU(uint32_t p){
-	return scl::abs(rampDown(p));
+	return scl::abs(sawDown(p));
 }
 
 template<class T> inline T bartlett(T n){

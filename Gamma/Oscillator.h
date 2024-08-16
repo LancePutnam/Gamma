@@ -1325,15 +1325,15 @@ template<class Sp, class Td> inline float TLFO::line2(){
 	auto m = scl::clip<uint32_t>(mMod, 0xffefffff, 512); // avoid div by zero
 
 	/* Starts at 1
-	auto r1 = scl::rampDown(phaseI());
-	auto r2 = scl::rampDown(phaseI() + m); //*/
+	auto s1 = scl::sawDown(phaseI());
+	auto s2 = scl::sawDown(phaseI() + m); //*/
 
 	//* Starts at -1 (better for creating attack/decay like envelopes)
-	auto r1 = scl::rampDown(phaseI() - m);
-	auto r2 = scl::rampDown(phaseI()); //*/
+	auto s1 = scl::sawDown(phaseI() - m);
+	auto s2 = scl::sawDown(phaseI()); //*/
 
 	auto p  = punUF(Expo2<float>() | (m >> 9)) - 2.f; // to [0, 2)
-	auto r = (r1*r1 - r2*r2)/(p*(2.f - p));
+	auto r = (s1*s1 - s2*s2)/(p*(2.f - p));
 	nextPhase();
 	return r;
 }
@@ -1347,7 +1347,7 @@ DEF(sinPara(),	scl::sinPara(nextPhase()))
 DEF(cos(),		scl::sinFast(nextPhase() + uint32_t(1073741824)); )
 //DEF(cosCub(),		tri(); r *= 0.5f * r*r - 1.5f)
 DEF(cosCub(),	up(); r = -1.f - r*r*(4.f*scl::abs(r)-6.f) )
-DEF(down(),		scl::rampDown(nextPhase()))
+DEF(down(),		scl::sawDown(nextPhase()))
 DEF(even3(),	up(); float c=-2.598076211353315;/*-1.50*pow(3,0.50)*/ r *= (1.f-r*r)*c;)
 DEF(even5(),	up(); float c=-1.869185976526527;/*-1.25*pow(5,0.25)*/ r *= (1.f-scl::pow4(r))*c;)
 DEF(imp(),		scl::pulse(nextPhase(), this->freqI()) )
@@ -1356,15 +1356,15 @@ DEF(pulse(),	scl::pulse(nextPhase(), mMod))
 DEF(stair(),	scl::stair(nextPhase(), mMod))
 DEF(sqr(),		scl::square(nextPhase()))
 DEF(tri(),		scl::triangle(nextPhase()))
-DEF(up(),		scl::rampUp(nextPhase()))
-DEF(up2(),		scl::rampUp2(nextPhase(), mMod))
+DEF(up(),		scl::sawUp(nextPhase()))
+DEF(up2(),		scl::sawUp2(nextPhase(), mMod))
 DEF(S1(),		up(); float c=          -M_PI /  2; r = c*r)
 DEF(C2(),		up(); float c= scl::pow2(M_PI)/  4; r = c*(r*r - 1.f/3))
 DEF(S3(),		up(); float c= scl::pow3(M_PI)/ 12; r = c*(r*r*r - r))
 DEF(C4(),		up(); float c=-scl::pow4(M_PI)/ 48; float rr=r*r; r = c*(rr*(rr - 2.f) + 7.f/15))
 DEF(S5(),		up(); float c=-scl::pow5(M_PI)/240; float rr=r*r; r = c*r*(rr*(rr - 10.f/3) + 7.f/3))
 DEF(cosCubU(),	up(); r = r*r*(-2.f*scl::abs(r)+3.f))
-DEF(downU(),	scl::rampDownU(nextPhase()))
+DEF(downU(),	scl::sawDownU(nextPhase()))
 //DEF(hann(),	tri(); r = r * (0.25f * r*r - 0.75f) + 0.5f)
 DEF(hann(),		up(); r = 1.f + r*r*(2.f*scl::abs(r)-3.f))
 DEF(impU(),		scl::pulseU(nextPhase(), this->freqI()) )
@@ -1374,11 +1374,11 @@ DEF(pulseRange(), scl::pulseRange(nextPhase(), mMod))
 DEF(sqrU(),		scl::squareU(nextPhase()))
 DEF(stairU(),	scl::stairU(nextPhase(), mMod))
 DEF(triU(),		scl::triangleU(nextPhase()))
-DEF(upU(),		scl::rampUpU(nextPhase()))
-DEF(up2U(),		scl::rampUp2U(nextPhase(), mMod))
-DEF(patU(),		scl::rampUpU(nextPhase() & mMod))
+DEF(upU(),		scl::sawUpU(nextPhase()))
+DEF(up2U(),		scl::sawUp2U(nextPhase(), mMod))
+DEF(patU(),		scl::sawUpU(nextPhase() & mMod))
 
-DEF(patU(uint32_t mul), scl::rampUpU((nextPhase() & mMod) * mul))
+DEF(patU(uint32_t mul), scl::sawUpU((nextPhase() & mMod) * mul))
 
 /* The input domain for these is [-1,1] corresponding to [-pi,pi], but that will
 give us an upside-down sine. We therefore use a downward ramp to flip the wave
@@ -1471,9 +1471,9 @@ template <class Sp, class Td>
 inline float DWO<Sp,Td>::para(){
 	static constexpr float c = (-M_PI*M_PI*M_PI/12.)*0.5;
 	auto p = this->nextPhase();
-	auto s = scl::rampUp(p);
+	auto s = scl::sawUp(p);
 	s = s*s*s - s;
-	auto t = scl::rampUp(p + this->freqI());
+	auto t = scl::sawUp(p + this->freqI());
 	t = t*t*t - t;
 	return (t - s)*c*mGain;
 }
