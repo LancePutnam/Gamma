@@ -308,7 +308,11 @@ ifeq ($(BUILD_CONFIG), Release)
 	#CFLAGS += -flto=8 # link-time optimization
 	#CFLAGS += -fpeel-loops # not supported by clang
 else
-	CFLAGS += -O0 -fno-inline -ggdb3
+	CFLAGS += -O0 -fno-inline 
+
+	ifeq ($(BUILD_CONFIG), Debugger)
+		CFLAGS += -ggdb3
+	endif
 endif
 
 # Append warning flags
