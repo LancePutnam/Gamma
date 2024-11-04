@@ -8,7 +8,7 @@
 	Printing functions
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include "Gamma/Constants.h"
 #include "Gamma/scl.h"
@@ -44,6 +44,39 @@ void printHexArray(const float * table, unsigned len, unsigned valuesPerLine);
 /// \param[in]	sign	Whether plot is signed
 /// \param[in]	point	The print character for points
 void printPlot(float value, unsigned width=50, bool spaces=true, bool sign=true, const char * point="o");
+
+/// Print 1D signal on vertical plot
+class PrintSignal {
+public:
+
+	PrintSignal& width(unsigned v){ mWidth=v; return *this; }
+	PrintSignal& spaces(bool v){ mSpaces=v; return *this; }
+	PrintSignal& sign(bool v){ mSign=v; return *this; }
+	PrintSignal& point(const char * v){ mPoint=v; return *this; }
+
+	template <class OnSample>
+	PrintSignal& print(unsigned N, const OnSample& onSample){
+		for(unsigned i=0; i<N; ++i){
+			auto v = onSample(i);
+			printf("[%2d] % 6.4f ", i, v);
+			printPlot(v, mWidth, mSpaces, mSign, mPoint);
+			printf("\n");
+		}
+		return *this;
+	}
+
+	template <class T>
+	PrintSignal& print(const T * src, unsigned len){
+		return print(len, [&](auto i){ return src[i]; });
+	}
+
+private:
+	unsigned mWidth=50;
+	const char * mPoint="o";
+	bool mSpaces=true;
+	bool mSign=true;
+};
+
 
 /// Prints error messge to stderr and optionally calls exit()
 void err(const char * msg, const char * src="", bool exits=true);
