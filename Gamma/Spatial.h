@@ -8,7 +8,9 @@
 	Sound spatialization
 */
 
+#include <cmath> // min, max, sqrt
 #include <initializer_list>
+#include <vector>
 #include "Gamma/scl.h"
 #include "Gamma/Types.h"
 #include "Gamma/Delay.h"
