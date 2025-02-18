@@ -72,7 +72,7 @@ public:
 	Tv operator()() const;						///< Reads delayed element from buffer
 	Tv read() const;							///< Reads delayed element from buffer
 	Tv read(float ago) const;					///< Returns element 'ago' units ago
-	template <template <class> class InterpolationStrategy> Tv read(float ago) const;
+	template <template <class> class IpolStrat> Tv read(float ago) const;
 	void write(const Tv& v);					///< Writes new element into buffer
 
 	/// Copy delay elements to another array
@@ -113,6 +113,7 @@ protected:
 	void incPhase();				// increment phase
 	void refreshDelayFactor();
 	uint32_t delayFToI(float v) const; // convert f.p. delay to fixed-point
+	template <template <class> class IpolStrat> Tv read(const IpolStrat<Tv>&, uint32_t) const;
 };
 
 
@@ -415,18 +416,24 @@ TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
 	return read();*/
 }
 
+TM1
+template <template <class> class IpolStrat>
+inline Tv Delay<TM2>::read(const IpolStrat<Tv>& ipol, uint32_t d) const {
+	return ipol(*this, mPhase - d);
+}
+
 TM1 inline Tv Delay<TM2>::read() const {
-	return mIpol(*this, mPhase - mDelay);
+	return read(mIpol, mDelay);
 }
 
 TM1 inline Tv Delay<TM2>::read(float ago) const {
-	return mIpol(*this, mPhase - delayFToI(ago));
+	return read(mIpol, delayFToI(ago));
 }
 
 TM1
-template <template <class> class InterpolationStrategy>
+template <template <class> class IpolStrat>
 inline Tv Delay<TM2>::read(float ago) const {
-	return InterpolationStrategy<Tv>()(*this, mPhase - delayFToI(ago));
+	return read(IpolStrat<Tv>(), delayFToI(ago));
 }
 
 TM1
