@@ -31,11 +31,12 @@ class LoopGain{
 public:
 
 	/// Set filter gain
-	void gain(float v){
+	LoopGain& gain(float v){
 		mA0 = v;
+		return *this;
 	}
 
-	void damping(float v){}
+	LoopGain& damping(float v){ return *this; }
 
 	T operator()(T in){
 		return in*mA0;
@@ -55,8 +56,9 @@ class Loop1P{
 public:
 
 	/// Set filter gain
-	void gain(float v){
+	Loop1P& gain(float v){
 		mA0 = (1.f - scl::abs(mB1))*v;
+		return *this;
 	}
 
 	/// Set damping amount
@@ -65,12 +67,12 @@ public:
 	///					zero is a no-op,
 	///					positive values produce a low-pass and
 	///					negative values produce a high-pass.
-	void damping(float v){
+	Loop1P& damping(float v){
 		float g = gain();
 		const float vMax = 0.99999f;
 		v = std::min(std::max(v, -vMax), vMax); // limit to (-1,1)
 		mB1 = v;
-		gain(g);
+		return gain(g);
 	}
 
 	T operator()(T in){
@@ -94,17 +96,18 @@ class Loop1P1Z{
 public:
 
 	/// Set filter gain
-	void gain(float v){
+	Loop1P1Z& gain(float v){
 		mA0 = (mB1*0.5f + 0.5f)*v;
+		return *this;
 	}
 
 	/// Set damping amount in [0, 1)
-	void damping(float v){
+	Loop1P1Z& damping(float v){
 		float g = gain();
 		const float vMax = 0.99999f;
 		v = std::min(std::max(v, 0.f), vMax); // limit to [0, 1)
 		mB1 = 1.f-2.f*v; // [0, 1) -> [1, -1)
-		gain(g);
+		return gain(g);
 	}
 
 	T operator()(T in){
@@ -494,9 +497,9 @@ Echo<TARG>& Echo<TARG>::damping(float v){
 
 template<TDEC>
 inline Tv Echo<TARG>::operator()(Tv in){
-	Tv echo = Delay<Tv,Si,Td>::operator()();
+	Tv echo = Base::operator()();
 	echo = mFilter(echo);
-	return Delay<Tv,Si,Td>::operator()(in + echo);
+	return Base::operator()(in + echo);
 }
 
 
