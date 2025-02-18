@@ -59,9 +59,16 @@ public:
 		mA0 = (1.f - scl::abs(mB1))*v;
 	}
 
-	/// Set damping amount in [0, 1]
+	/// Set damping amount
+
+	/// \param[in] v	Damping amount in (-1,1) where
+	///					zero is a no-op,
+	///					positive values produce a low-pass and
+	///					negative values produce a high-pass.
 	void damping(float v){
 		float g = gain();
+		const float vMax = 0.99999f;
+		v = std::min(std::max(v, -vMax), vMax); // limit to (-1,1)
 		mB1 = v;
 		gain(g);
 	}
@@ -91,10 +98,12 @@ public:
 		mA0 = (mB1*0.5f + 0.5f)*v;
 	}
 
-	/// Set damping amount in [0, 1]
+	/// Set damping amount in [0, 1)
 	void damping(float v){
 		float g = gain();
-		if(v>0.f) mB1 = 1.f-2.f*v;
+		const float vMax = 0.99999f;
+		v = std::min(std::max(v, 0.f), vMax); // limit to [0, 1)
+		mB1 = 1.f-2.f*v; // [0, 1) -> [1, -1)
 		gain(g);
 	}
 
