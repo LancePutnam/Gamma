@@ -163,9 +163,14 @@ public:
 	/// Set damping factor of loop filter
 	Echo& damping(float v);
 
-	/// Filter next sample
+	/// Process next sample
 	Tv operator()(Tv in);
 
+	/// Process next sample; output tap is after loop filter
+	Tv nextPost(Tv in);
+
+	/// Process next sample; output tap is before loop filter
+	Tv nextPre(Tv in);
 
 	/// Get decay length
 	float decay() const { return mDecay; }
@@ -496,10 +501,23 @@ Echo<TARG>& Echo<TARG>::damping(float v){
 }
 
 template<TDEC>
-inline Tv Echo<TARG>::operator()(Tv in){
+inline Tv Echo<TARG>::nextPost(Tv in){
+	auto out = Base::read();
+	out = mFilter(out);
+	Base::write(in + out);
+	return out;
+}
+
+template<TDEC>
+inline Tv Echo<TARG>::nextPre(Tv in){
 	auto out = Base::read();
 	Base::write(in + mFilter(out));
 	return out;
+}
+
+template<TDEC>
+inline Tv Echo<TARG>::operator()(Tv in){
+	return nextPre(in);
 }
 
 
