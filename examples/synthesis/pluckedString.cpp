@@ -47,10 +47,10 @@ public:
 
 	Accum<> tmr{1./0.1};
 	PluckedString
-		pluck1{scl::freq("d6")},
-		pluck2{scl::freq("g5")},
-		pluck3{scl::freq("a4")},
-		pluck4{scl::freq("d3")};
+		pluck1{static_cast<float>(scl::freq("d6"))},
+		pluck2{static_cast<float>(scl::freq("g5"))},
+		pluck3{static_cast<float>(scl::freq("a4"))},
+		pluck4{static_cast<float>(scl::freq("d3"))};
 
 	void onAudio(AudioIOData& io){
 
