@@ -70,6 +70,7 @@ public:
 
 	Tv operator()(const Tv& v);					///< Returns next filtered value
 	Tv operator()() const;						///< Reads delayed element from buffer
+	Tv read() const;							///< Reads delayed element from buffer
 	Tv read(float ago) const;					///< Returns element 'ago' units ago
 	template <template <class> class InterpolationStrategy> Tv read(float ago) const;
 	void write(const Tv& v);					///< Writes new element into buffer
@@ -372,21 +373,6 @@ TM1 void Delay<TM2>::maxDelay(float length, bool setDelay){
 	if(setDelay) delay(length);
 }
 
-TM1 inline Tv Delay<TM2>::operator()() const {
-	return mIpol(*this, mPhase - mDelay);
-}
-
-TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
-	// Read, then write.
-	Tv res = (*this)();
-	write(i0);
-	return res;
-
-	// We must write before reading to support delay lengths of zero.
-	/*write(i0);
-	return (*this)();*/
-}
-
 TM1 inline uint32_t Delay<TM2>::delayFToI(float v) const {
 	return castIntRound((v * mDelayFactor) * 4294967296.);
 	//return scl::unitToUInt(v * mDelayFactor);
@@ -414,11 +400,32 @@ TM1 void Delay<TM2>::onDomainChange(double /*r*/){ //printf("Delay::onDomainChan
 	delay(currDelay);
 }
 
+TM1 inline Tv Delay<TM2>::operator()() const {
+	return read();
+}
+
+TM1 inline Tv Delay<TM2>::operator()(const Tv& i0){
+	// Read, then write.
+	Tv res = read();
+	write(i0);
+	return res;
+
+	// We must write before reading to support delay lengths of zero.
+	/*write(i0);
+	return read();*/
+}
+
+TM1 inline Tv Delay<TM2>::read() const {
+	return mIpol(*this, mPhase - mDelay);
+}
+
 TM1 inline Tv Delay<TM2>::read(float ago) const {
 	return mIpol(*this, mPhase - delayFToI(ago));
 }
 
-TM1 template <template <class> class InterpolationStrategy> inline Tv Delay<TM2>::read(float ago) const {
+TM1
+template <template <class> class InterpolationStrategy>
+inline Tv Delay<TM2>::read(float ago) const {
 	return InterpolationStrategy<Tv>()(*this, mPhase - delayFToI(ago));
 }
 
