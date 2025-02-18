@@ -497,9 +497,9 @@ Echo<TARG>& Echo<TARG>::damping(float v){
 
 template<TDEC>
 inline Tv Echo<TARG>::operator()(Tv in){
-	Tv echo = Base::operator()();
-	echo = mFilter(echo);
-	return Base::operator()(in + echo);
+	auto out = Base::read();
+	Base::write(in + mFilter(out));
+	return out;
 }
 
 
