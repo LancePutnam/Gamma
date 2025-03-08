@@ -101,6 +101,17 @@ public:
 	template <class U>
 	C& set(const Polar<U>& p){ return *this = p; }
 
+	/// Get reference to self as another type
+	template <class V>
+	V& as(){
+		static_assert(sizeof(V) <= sizeof(*this), "Attempt to pun Complex to object of larger size");
+		return *(V *)elems;
+	}
+
+	template <class V>
+	const V& as() const {
+		return const_cast<Complex*>(this)->as<V>();
+	}
 
 	T& operator[](unsigned i){ return elems[i];}
 	const T& operator[](unsigned i) const { return elems[i]; }
