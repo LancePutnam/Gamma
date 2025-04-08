@@ -9,7 +9,7 @@
 */
 
 
-#include "Gamma/pstdint.h"
+#include <cstdint>
 
 namespace gam{
 
