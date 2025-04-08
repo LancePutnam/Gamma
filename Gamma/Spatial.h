@@ -449,7 +449,7 @@ private:
 
 // Implementation_______________________________________________________________
 
-namespace{
+namespace detail{
 
 template <typename T>
 inline T decayToFbk(T decay, T delay){
@@ -482,14 +482,14 @@ Echo<TARG>::Echo(double delay)
 template<TDEC>
 Echo<TARG>& Echo<TARG>::decay(float v){
 	mDecay = v;
-	float fbk = decayToFbk(mDecay, this->delay());
+	float fbk = detail::decayToFbk(mDecay, this->delay());
 	mFilter.gain(fbk);
 	return *this;
 }
 
 template<TDEC>
 Echo<TARG>& Echo<TARG>::fbk(float v){
-	mDecay = fbkToDecay(v, this->delay());
+	mDecay = detail::fbkToDecay(v, this->delay());
 	mFilter.gain(v);
 	return *this;
 }
@@ -545,7 +545,7 @@ EchoCSine<TARG>& EchoCSine<TARG>::fbk(float amt, float ang){
 
 template<TDEC>
 EchoCSine<TARG>& EchoCSine<TARG>::decay(float units){
-	Tv fbk = decayToFbk(units, this->delay());
+	Tv fbk = detail::decayToFbk(units, this->delay());
 	mB.mag(fbk);
 	return *this;
 }

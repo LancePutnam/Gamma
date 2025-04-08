@@ -497,7 +497,7 @@ double ratioET(double pitch, double divs=12, double octave=2);
 // Implementation ______________________________________________________________
 
 // internal
-namespace{
+namespace detail{
 	inline uint32_t deBruijn(uint32_t v){
 		static const unsigned char deBruijnBitPosition[32] = {
 			 0,  1, 28,  2, 29, 14, 24,  3, 30, 22, 20, 15, 25, 17,  4,  8,
@@ -613,7 +613,7 @@ template<class T> inline T linLog2(T v, T recMin){
 	return scl::max(v * recMin, T(-1)) + T(1);
 }
 
-inline uint32_t log2(uint32_t v){ return deBruijn(ceilPow2(v)); }
+inline uint32_t log2(uint32_t v){ return detail::deBruijn(ceilPow2(v)); }
 
 template<> constexpr uint32_t log2<   1>(){ return  0; }
 template<> constexpr uint32_t log2<   2>(){ return  1; }
@@ -883,7 +883,7 @@ inline T invSqrt(T v){
 
 
 // sin/cos Taylor polynomial coefs
-namespace{ static const double
+namespace detail{ static const double
 	t73 = 42.,
 	t72 = 840.,
 	t71 = 1.9841269841e-04,
@@ -903,6 +903,7 @@ namespace{ static const double
 }
 
 template<class T> inline T cosT8(T r){
+	using namespace detail;
 	if(r < T(M_PI_4) && r > T(-M_PI_4)){
 		T rr = r*r;
 		return T(1) - rr * T(t81) * (T(t82) - rr * (T(t83) - rr * (T(t84) - rr)));
@@ -920,6 +921,7 @@ template<class T> inline T cosT8(T r){
 }
 
 template<class T> inline T sinT7(T r){
+	using namespace detail;
 	if(r < T(M_PI_4) && r > T(-M_PI_4)){
 		T rr = r*r;
 		return r * (T(1) - T(t71) * rr * (T(t72) - rr * (T(t73) - rr)));
@@ -937,6 +939,7 @@ template<class T> inline T sinT7(T r){
 }
 
 template<class T> inline T sinT9(T r){
+	using namespace detail;
 	if(r < T(M_PI_4) && r > T(-M_PI_4)){
 		T rr = r*r;
 		return r * (T(1) - T(t91) * rr * (T(t92) - rr * (T(t93) - rr * (T(t94) - rr))));
@@ -1113,7 +1116,7 @@ template<class T> inline bool odd(T v){ return v & T(1); }
 
 template<class T> inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
-inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -int32_t(v)); }
+inline uint32_t trailingZeroes(uint32_t v){ return detail::deBruijn(v & -int32_t(v)); }
 
 template<class T> inline bool within(T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 

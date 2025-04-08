@@ -694,23 +694,23 @@ template<> inline double normConstant<PARABOLIC	>(){ return 2/ M_PI; }
 template<> inline double normConstant<SQUARE	>(){ return 4/ M_PI; }
 template<> inline double normConstant<SAW		>(){ return 2/ M_PI; }
 
-namespace{
+namespace detail{
 	// This enables support for complex-valued tables
 	template<class T>
 	T getSin(double p);
 
 	template<class T>
-	T getSin(double p){
+	inline T getSin(double p){
 		return T(sin(p));
 	}
 
 	template<>
-	Complex<float> getSin<Complex<float> >(double p){
+	inline Complex<float> getSin<Complex<float> >(double p){
 		return Complex<float>(float(cos(p)), float(sin(p)));
 	}
 
 	template<>
-	Complex<double> getSin<Complex<double> >(double p){
+	inline Complex<double> getSin<Complex<double> >(double p){
 		return Complex<double>(cos(p), sin(p));
 	}
 };
@@ -720,7 +720,7 @@ void addSine(T * dst, unsigned len, double cycles, double amp, double phs){
 	double f = cycles/len;
 	for(unsigned i=0; i<len; ++i){
 		double p = (f*i + phs)*M_2PI;
-		dst[i] += getSin<T>(p) * amp;
+		dst[i] += detail::getSin<T>(p) * amp;
 	}
 }
 
@@ -749,7 +749,7 @@ void addSinesPow(
 		const double inch = inc1 * h;
 
 		for(unsigned i=0; i<len; ++i){
-			dst[i] += A*getSin<T>(inch*i + P);
+			dst[i] += A*detail::getSin<T>(inch*i + P);
 		}
 	}
 }

@@ -775,7 +775,7 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){
 }
 
 // hack to get proper max floating point value
-namespace{
+namespace detail{
 	template<class T> inline T	eps(){ return T(0.00001  ); }
 	template<> inline double	eps(){ return   0.00000001; }
 	template<class T> inline T	maxReal(){ return DBL_MAX; }
@@ -784,11 +784,11 @@ namespace{
 
 template <class Tv,class Tp>
 Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
-	static const Tp EPS = eps<Tp>();
+	static const Tp EPS = detail::eps<Tp>();
 
 	if(len == Tp(0)){ // if length is 0, return end value immediately
 		mEnd = end;
-		mMul = maxReal<Tp>();
+		mMul = detail::maxReal<Tp>();
 		mA = end;
 		mB = Tv(0);
 		return *this;

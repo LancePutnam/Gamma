@@ -51,7 +51,7 @@ inline T poleRadius(T bw, double ups){ return poleRadius(bw * ups); }
 template <class T>
 inline T freqToRad(T freq, double ups){ return scl::clip(freq * ups, 0.499) * M_PI; }
 
-namespace{
+namespace detail{
 	#ifndef GAM_FILTER_PRECISION
 	#define GAM_FILTER_PRECISION 1
 	#endif
@@ -297,7 +297,7 @@ public:
 		/*v = scl::clip<Tp>(v * Td::ups(), 0.5);
 		//mReal = scl::cosP3<Tp>(v);
 		mReal = scl::cosT8<Tp>(v * M_2PI);*/
-		mReal = getPoleRe(v * mFreqToAng);
+		mReal = detail::getPoleRe(v * mFreqToAng);
 		computeCoef1();
 	}
 
@@ -313,7 +313,7 @@ public:
 	void reset(){ d2=d1=Tv(0); }
 	
 	void onDomainChange(double r){
-		mFreqToAng = getFreqToAng(Td::ups());
+		mFreqToAng = detail::getFreqToAng(Td::ups());
 		onCacheVars();
 	}
 
@@ -443,7 +443,7 @@ public:
 
 	/// Set center frequency
 	void freq(Tp v){
-		getPole(mReal, mImag, v * mFreqToAng);
+		detail::getPole(mReal, mImag, v * mFreqToAng);
 		computeCoef1();
 		computeGain();
 	}
@@ -730,14 +730,14 @@ template <class Tv, class Tp, class Td>
 Biquad<Tv,Tp,Td>::Biquad(Tp frq, Tp res, FilterType type, Tp lvl)
 :	d1(0), d2(0), mType(type)
 {
-	mFreqToAng = getFreqToAng(Td::ups());
+	mFreqToAng = detail::getFreqToAng(Td::ups());
 	levelNoResUpdate(lvl);
 	set(frq, res);
 }
 
 template <class Tv, class Tp, class Td>
 void Biquad<Tv,Tp,Td>::onDomainChange(double /*r*/){
-	mFreqToAng = getFreqToAng(Td::ups());
+	mFreqToAng = detail::getFreqToAng(Td::ups());
 	freq(mFreq);
 }
 
@@ -774,7 +774,7 @@ void Biquad<Tv,Tp,Td>::coef(Tp a0, Tp a1, Tp a2, Tp b1, Tp b2){
 template <class Tv, class Tp, class Td>
 inline void Biquad<Tv,Tp,Td>::freq(Tp v){
 	mFreq = v;
-	getPole(mReal, mImag, mFreq * mFreqToAng);
+	detail::getPole(mReal, mImag, mFreq * mFreqToAng);
 	resRecip(mResRecip);
 }
 
@@ -947,7 +947,7 @@ OnePole<Tv,Tp,Td>::OnePole(Tp frq, const Tv& stored)
 
 template <class Tv, class Tp, class Td>
 void OnePole<Tv,Tp,Td>::onDomainChange(double /*r*/){
-	mFreqToAng = getFreqToAng(Td::ups());
+	mFreqToAng = detail::getFreqToAng(Td::ups());
 	freq(mFreq);
 }
 
@@ -968,7 +968,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at DC (inaccurate with large bandwidth)
 		//mB1 = poleRadius(Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tp re = getPoleRe(v * mFreqToAng);
+		Tp re = detail::getPoleRe(v * mFreqToAng);
 		Tp p1 = re - Tp(2);
 		mB1 = -(p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) - mB1;
@@ -978,7 +978,7 @@ inline void OnePole<Tv,Tp,Td>::freq(Tp v){
 		// cutoff based on pole at Nyquist (inaccurate with large bandwidth)
 		//mB1 = -poleRadius(Tp(1) - Tp(2) * v * Td::ups());
 		// b1 found by setting |H(w)| = 0.707
-		Tp re = getPoleRe(v * mFreqToAng);
+		Tp re = detail::getPoleRe(v * mFreqToAng);
 		Tp p1 = -Tp(2) - re; // -re flips cutoff
 		mB1 = (p1 + sqrt(p1*p1 - Tp(1)));
 		mA0 = Tp(1) + mB1;

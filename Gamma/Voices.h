@@ -212,7 +212,7 @@ private:
 
 
 // These functions are used for measuring amplitude of different sample types.
-namespace{
+namespace detail{
 	template<unsigned N, class T>
 	T ampSqr(const gam::Vec<N,T>& v){ return v.magSqr(); }
 
@@ -300,7 +300,7 @@ private:
 	// Returns true if the input has been below the threshold for the
 	// maximum number of samples.
 	bool detectSilence(){
-		if(ampSqr(mOutput) < mSilenceThresh){
+		if(detail::ampSqr(mOutput) < mSilenceThresh){
 			++mSilenceCount;
 			return mSilenceCount >= mSilenceCountMax;
 		}
