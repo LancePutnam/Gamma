@@ -4,9 +4,8 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <string>
-#include <vector>
 #include <cstdio>
+#include <string>
 #include "Gamma/mem.h" // deinterleave, deinterleave2
 
 namespace gam{
@@ -91,8 +90,8 @@ public:
 	int readAll(T * dst);
 
 	/// Copy all contents of file into array interleaved. Returns number of frames read.
-	template<class T>
-	int readAll(std::vector<T>& dst);
+	template<class Arr>
+	int readAll(Arr& dst);
 
 	/// Copy all contents of file into array deinterleaved. Returns number of frames read.
 
@@ -108,8 +107,8 @@ public:
 	template<class T>
 	int write(const T * src, int numFrames);
 
-	template<class T>
-	int write(const std::vector<T>& src);
+	template<class Arr>
+	int write(const Arr& src);
 
 	// Sound file properties
 	bool opened() const;						///< Returns whether the sound file is open
@@ -148,8 +147,8 @@ int SoundFile::readAll(T * dst){
 	return read(dst, frames());
 }
 
-template<class T>
-int SoundFile::readAll(std::vector<T>& dst){
+template<class Arr>
+int SoundFile::readAll(Arr& dst){
 	dst.resize(samples());
 	return readAll(&dst[0]);
 }
@@ -175,8 +174,8 @@ int SoundFile::readAllD(T * dst){
 	return framesRead;
 }
 
-template<class T>
-int SoundFile::write(const std::vector<T>& src){
+template<class Arr>
+int SoundFile::write(const Arr& src){
 	return write(&src[0], src.size()/channels());
 }
 
