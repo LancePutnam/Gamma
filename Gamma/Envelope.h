@@ -691,7 +691,11 @@ protected:
 /// Exponential envelope segment for smoothing out value changes.
 
 /// \ingroup Envelope Interpolation
-template <class T=gam::real, class Td=GAM_DEFAULT_DOMAIN>
+template <
+	class Tv=gam::real,
+	class Tp=gam::real,
+	class Td=GAM_DEFAULT_DOMAIN
+>
 class SegExp : public Td{
 public:
 
@@ -699,7 +703,7 @@ public:
 	/// \param[in] crv		Curvature of segment
 	/// \param[in] start	Start value
 	/// \param[in] end		End value
-	SegExp(T len, T crv=-3, T start=1, T end=0):
+	SegExp(Tp len, Tp crv=Tp(-3), Tv start=Tv(1), Tv end=Tv(0)):
 		mLen(len), mCrv(crv), mVal1(start), mVal0(end)
 	{
 		onDomainChange(1);
@@ -707,17 +711,17 @@ public:
 
 
 	/// Set curvature (negative for fast approach, positive for slow approach)
-	SegExp& curve(T v){ return set(mLen, v); }
+	SegExp& curve(Tp v){ return set(mLen, v); }
 
 	/// Set length in domain units.
-	SegExp& length(T v){ return set(v, mCrv); }
-	SegExp& period(T v){ return length(v); }
+	SegExp& length(Tp v){ return set(v, mCrv); }
+	SegExp& period(Tp v){ return length(v); }
 
 	/// Set length and curvature
 
 	/// It is more efficient to set both parameters simultaneously rather than
 	/// via their individual setters.
-	SegExp& set(T len, T crv){
+	SegExp& set(Tp len, Tp crv){
 		mLen = len; mCrv = crv;
 		mCurve.set(len * Td::spu(), crv);
 		return *this;
@@ -727,28 +731,29 @@ public:
 	SegExp& reset(){ mCurve.reset(); return *this; }
 
 	/// Set new end value (start value set to current value)
-	SegExp& operator= (T v){
-		mVal1 = ipl::linear(scl::min(mCurve.value(), T(1)), mVal1, mVal0);
+	SegExp& operator= (Tv v){
+		mVal1 = ipl::linear(scl::min(mCurve.value(), Tp(1)), mVal1, mVal0);
 		mVal0 = v;
 		mCurve.reset();
 		return *this;
 	}
 
 	/// Generate next value
-	T operator()(){
+	Tv operator()(){
 		if(done()) return mVal0;
-		return ipl::linear(scl::min(mCurve(), T(1)), mVal1, mVal0);
+		return ipl::linear(scl::min(mCurve(), Tp(1)), mVal1, mVal0);
 	}
 	
 
 	/// Returns whether envelope is done
-	bool done() const { return mCurve.value() >= T(1); }
+	bool done() const { return mCurve.value() >= Tp(1); }
 
 	void onDomainChange(double r){ set(mLen, mCrv); }
 	
 protected:
-	T mLen, mCrv, mVal1, mVal0;
-	Curve<T,T> mCurve;
+	Tv mVal1, mVal0;
+	Tp mLen, mCrv;
+	Curve<Tp,Tp> mCurve;
 };
 
 
