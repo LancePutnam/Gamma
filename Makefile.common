@@ -208,7 +208,7 @@ else ifeq ($(PLATFORM), macosx)
 
 	PLATFORM_DIR = osx/
 
-	# BUILD_ARCHS is a space-separated list in double quotes
+	# BUILD_ARCHS is a space-separated list in double quotes, e.g. "arm64 x86_64 i386"
 	ifdef BUILD_ARCHS
 		CFLAGS += $(addprefix -arch ,$(BUILD_ARCHS))
 	else
@@ -234,11 +234,7 @@ else ifeq ($(PLATFORM), macosx)
 
 	# Set system root directory for stdc++ etc.
 	OSX_SDK := $(lastword $(shell ls $(OSX_SDK_PATH)))
-	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK) 
-	
-	ifdef OSX_VERSION
-		CFLAGS += -mmacosx-version-min=10.$(OSX_VERSION)
-	endif
+	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK)
 
 	# Needed to link to libraries installed through MacPorts
 	ifdef HAS_OPT_LOCAL
