@@ -18,12 +18,9 @@ int main(){
 		Class g;\
 		setup;\
 		printf("\n" #Class "::" #func ": %s\n", description);\
-		for(int i=0; i<N; ++i){\
-			float v = g.func();\
-			printf("[%2u] % 6.3f  ", i, v);\
-			printPlot(v, 32, false);\
-			printf("\n");\
-		}\
+		PrintSignal().width(32).spaces(false).print(N, [&](int i){\
+			return g.func();\
+		});\
 	}
 
 	PLOT(Accum<>, g.period(N/2); g.phase(0), operator(), "period=N/2, phase=0")

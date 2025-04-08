@@ -18,12 +18,9 @@ int main(){
 		Class g;\
 		setup;\
 		printf("\n" #Class ": %s\n", description);\
-		for(int i=0; i<N; ++i){\
-			float v = g.func();\
-			printf("[%2u] % 6.3f  ", i, v);\
-			printPlot(v, 32, false, false);\
-			printf("\n");\
-		}\
+		PrintSignal().width(32).sign(false).spaces(false).print(N, [&](int i){\
+			return g.func();\
+		});\
 	}
 
 	PLOT(Decay<>, g.decay(N);, operator(), "decay=N")
