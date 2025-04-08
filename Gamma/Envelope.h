@@ -710,16 +710,21 @@ public:
 	SegExp& curve(T v){ return set(mLen, v); }
 
 	/// Set length in domain units.
-	SegExp& period(T v){ return set(v, mCrv); }
-
-	SegExp& reset(){ mCurve.reset(); return *this; }
+	SegExp& length(T v){ return set(v, mCrv); }
+	SegExp& period(T v){ return length(v); }
 
 	/// Set length and curvature
+
+	/// It is more efficient to set both parameters simultaneously rather than
+	/// via their individual setters.
 	SegExp& set(T len, T crv){
 		mLen = len; mCrv = crv;
 		mCurve.set(len * Td::spu(), crv);
 		return *this;
 	}
+
+	/// Reset envelope
+	SegExp& reset(){ mCurve.reset(); return *this; }
 
 	/// Set new end value (start value set to current value)
 	SegExp& operator= (T v){
