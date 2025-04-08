@@ -4,12 +4,7 @@
 
 # About #
 
-Gamma is a cross-platform, C++ library for doing generic synthesis and 
-filtering of signals. It contains helpful mathematical functions, 
-types, such as vectors and complex numbers, an assortment of sequence 
-generators, and many other objects for signal processing tasks. 
-It is oriented towards real-time sound and graphics synthesis, but is 
-equally useful for non-real-time tasks.
+Gamma is a cross-platform, C++ library for doing generic synthesis and filtering of signals. It contains helpful mathematical functions, types, such as vectors and complex numbers, an assortment of sequence generators, and many other objects for signal processing tasks. It is oriented towards real-time sound and graphics synthesis, but is equally useful for non-real-time tasks.
 
 
 # Compilation Instructions #
@@ -36,14 +31,7 @@ The script `run.sh` can be used to compile and run examples and other source fil
 
 	./run.sh examples/oscillator/sine.cpp
 
-To only compile the source file without running, include AUTORUN=0 after the source file. Binaries are located in the automatically generated `build/` directory. On OSX, the Gamma library will be linked to the pre-compiled dependent libraries in `external/lib_osx`. On Linux, use `apt-get` to install the necessary dependent libraries.
-
-
-### Xcode (OS X)
-You may also build the library using the supplied Xcode project.
-1. Open `project/xcode/gamma.xcodeproj`
-2. Build the target `libgamma{.a, .dylib}`. The library will be in project build folder.
-
+To only compile the source file without running, include AUTORUN=0 after the source file. Binaries are located in the automatically generated `build/` directory. Most examples stream audio out to the DAC and therefore require a real-time audio streaming library to be linked to (see Dependencies section below).
 
 ## Compiling Directly From Source
 Gamma can easily be compiled directly from source into an existing project.
