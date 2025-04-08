@@ -703,8 +703,8 @@ public:
 	/// \param[in] crv		Curvature of segment
 	/// \param[in] start	Start value
 	/// \param[in] end		End value
-	SegExp(Tp len, Tp crv=Tp(-3), Tv start=Tv(1), Tv end=Tv(0)):
-		mLen(len), mCrv(crv), mVal1(start), mVal0(end)
+	SegExp(Tp len, Tp crv=Tp(-3), Tv start=Tv(1), Tv end=Tv(0))
+	:	mLen(len), mCrv(crv), mStart(start), mEnd(end)
 	{
 		onDomainChange(1);
 	}
@@ -713,17 +713,32 @@ public:
 	/// Set curvature (negative for fast approach, positive for slow approach)
 	SegExp& curve(Tp v){ return set(mLen, v); }
 
-	/// Set length in domain units.
+	/// Get curvature
+	Tp curve() const { return mCrv; }
+	/// Get curvature with negative sign (decelerating approach)
+	Tp curveDecel() const { return -curveAccel(); }
+	/// Get curvature with positive sign (accelerating approach)
+	Tp curveAccel() const { return scl::abs(mCrv); }
+
+	/// Set length in domain units
 	SegExp& length(Tp v){ return set(v, mCrv); }
 	SegExp& period(Tp v){ return length(v); }
 
 	/// Set length and curvature
 
 	/// It is more efficient to set both parameters simultaneously rather than
-	/// via their individual setters.
+	/// via their individual setters. This call will reset the internal
+	/// interpolator.
 	SegExp& set(Tp len, Tp crv){
 		mLen = len; mCrv = crv;
 		mCurve.set(len * Td::spu(), crv);
+		return *this;
+	}
+
+	/// Set start and end values
+	SegExp& levels(Tv start, Tv end){
+		mStart = start;
+		mEnd = end;
 		return *this;
 	}
 
@@ -731,19 +746,25 @@ public:
 	SegExp& reset(){ mCurve.reset(); return *this; }
 
 	/// Set new end value (start value set to current value)
+
+	/// If the curve or length parameters are to be changed to accompany this
+	/// call, then they should be called \e after this call since they will 
+	/// reset the internal interpolator.
 	SegExp& operator= (Tv v){
-		mVal1 = ipl::linear(scl::min(mCurve.value(), Tp(1)), mVal1, mVal0);
-		mVal0 = v;
+		mStart = value();
+		mEnd = v;
 		mCurve.reset();
 		return *this;
 	}
 
 	/// Generate next value
 	Tv operator()(){
-		if(done()) return mVal0;
-		return ipl::linear(scl::min(mCurve(), Tp(1)), mVal1, mVal0);
+		if(done()) return mEnd;
+		return tween(mCurve());
 	}
-	
+
+	/// Get current value
+	Tv value() const { return tween(mCurve.value()); }
 
 	/// Returns whether envelope is done
 	bool done() const { return mCurve.value() >= Tp(1); }
@@ -751,9 +772,11 @@ public:
 	void onDomainChange(double r){ set(mLen, mCrv); }
 	
 protected:
-	Tv mVal1, mVal0;
+	Tv mStart, mEnd;
 	Tp mLen, mCrv;
 	Curve<Tp,Tp> mCurve;
+
+	Tv tween(Tp f) const { return ipl::linear(scl::min(f, Tp(1)), mStart, mEnd); }
 };
 
 
