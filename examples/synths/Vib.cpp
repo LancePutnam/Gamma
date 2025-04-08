@@ -82,15 +82,12 @@ protected:
 int main(){
 	
 	ArrayPow2<float>
-		tbSaw(2048), tbSqr(2048), tbImp(2048), tbSin(2048), tbPls(2048),
+		tbSaw(2048), tbSqr(2048), tbSin(2048), tbPls(2048),
 		tb__1(2048), tb__2(2048), tb__3(2048), tb__4(2048);
 
-	addSinesPow<1>(tbSaw, 9,1);
-	addSinesPow<1>(tbSqr, 9,2);
-	addSinesPow<0>(tbImp, 9,1);
+	addSinesPow<1>(tbSaw, 9,1,1, 0.5);
+	addSinesPow<1>(tbSqr, 9,2,1, 0.25);
 	addSine(tbSin);
-    addWave(&tbSin[0], 2048, SAW);
-    addWave(tbSin, SAW);
     
 	{	float A[] = {1,1,1,1,0.7,0.5,0.3,0.1};
 		addSines(tbPls, A,8);
