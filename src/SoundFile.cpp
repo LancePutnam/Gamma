@@ -3,7 +3,7 @@
 
 #include <cctype> // tolower
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include "Gamma/SoundFile.h"
 
 namespace gam{

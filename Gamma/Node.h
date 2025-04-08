@@ -4,7 +4,7 @@
 /*	Gamma - Generic processing library
 	See COPYRIGHT file for authors and license information */
 
-#include <stdio.h>
+#include <cstdio>
 
 namespace gam{
 

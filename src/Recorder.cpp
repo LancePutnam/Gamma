@@ -1,4 +1,4 @@
-//#include <stdio.h> // printf
+//#include <cstdio> // printf
 #include <cstring> // memcpy
 #include "Gamma/Recorder.h"
 
