@@ -321,7 +321,12 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
-		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas \
+		-Wignored-qualifiers \
+		-Wmisleading-indentation \
+		-Warray-bounds=1 -Wvla -Waddress \
+		-Wsizeof-pointer-div -Wsizeof-pointer-memaccess \
+		-Wunused-variable -Wsign-compare -Wtautological-compare -Wbool-operation -Wno-unknown-pragmas \
+		-Wenum-compare \
 		-Wuninitialized -Winit-self
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
