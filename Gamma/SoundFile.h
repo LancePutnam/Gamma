@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include <cstdio>
-#include "Gamma/mem.h"
+#include "Gamma/mem.h" // deinterleave, deinterleave2
 
 namespace gam{
 	
@@ -81,11 +81,8 @@ public:
 
 	/// Read next chunk of frames from file into array
 
-	/// From the libsndfile docs:\n
-	/// The file read frames functions fill the array pointed to by ptr with
-	/// the requested number of frames of data. The array must be large enough
-	/// to hold the product of frames and the number of channels.
-	//ULONG read(float * dst, ULONG numFrames);
+	/// The pointed to array must have enough elements to contain the product
+	/// of the number of frames and number of channels.
 	template<class T>
 	int read(T * dst, int numFrames);
 
@@ -106,10 +103,8 @@ public:
 
 	/// Write interleaved frames from array to file
 
-	/// From the libsndfile docs:\n
-	/// The file write frames functions write the data in the array pointed to
-	/// by ptr to the file. The array must be large enough to hold the product
-	/// of frames and the number of channels.
+	/// The pointed to array must have enough elements to contain the product
+	/// of the number of frames and number of channels.
 	template<class T>
 	int write(const T * src, int numFrames);
 
