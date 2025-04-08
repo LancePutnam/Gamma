@@ -211,12 +211,6 @@ else ifeq ($(PLATFORM), macosx)
 	# BUILD_ARCHS is a space-separated list in double quotes, e.g. "arm64 x86_64 i386"
 	ifdef BUILD_ARCHS
 		CFLAGS += $(addprefix -arch ,$(BUILD_ARCHS))
-	else
-		ifneq (,$(findstring $(UNAMEM),arm64 x86_64))
-			CFLAGS += -arch $(UNAMEM)
-		else ifeq ($((UNAMEM)), ia86)
-			CFLAGS += -arch i386
-		endif
 	endif
 
 	# Oh where, oh where have my SDKs gone?
@@ -244,14 +238,14 @@ else ifeq ($(PLATFORM), macosx)
 
 	# Needed to link to libraries installed through homebrew or by user
 	ifneq ($(wildcard /usr/local/lib),)
-		LDFLAGS  += -L/usr/local/lib/
+		LDFLAGS += -L/usr/local/lib/
 	endif
 	ifneq ($(wildcard /usr/local/include),)
 		CPPFLAGS += -I/usr/local/include/
 	endif
 
-	LDFLAGS	+= -lm
-	LDFLAGS	+= -lstdc++
+	LDFLAGS += -lm
+	LDFLAGS += -lstdc++
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
 
