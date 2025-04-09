@@ -48,15 +48,16 @@ public:
 	///						c = 0 approaches linearly
 	/// \param[in] start	start value
 	/// \param[in] end		end value
-	Curve(Tp length, Tp curve, Tv start=Tv(1), Tv end=Tv(0));
+	Curve(Tp length, Tp curve, Tv start=Tv(0), Tv end=Tv(1));
 
-	bool done() const;				///< Returns whether curve has gone past end value
-	Tv end() const { return mEnd; }	///< Get end value
-	Tv value() const;				///< Get current value
+	bool done() const;					///< Returns whether curve has gone past end value
+	Tv start() const { return mStart; }	///< Get start value
+	Tv end() const { return mEnd; }		///< Get end value
+	Tv value() const;					///< Get current value
 
-	Tv operator()();				///< Generates next value
-	Curve& reset(Tv start=Tv(0));	///< Reset envelope
-	Curve& value(const Tv& v);		///< Set value
+	Tv operator()();					///< Generates next value
+	Curve& reset();						///< Reset envelope
+	Curve& value(const Tv& v);			///< Set value
 
 	/// Set length and curvature
 	
@@ -66,8 +67,11 @@ public:
 	/// \param[in] end		end value
 	Curve& set(Tp length, Tp curve, Tv start=Tv(0), Tv end=Tv(1));
 
+	/// Set start and end levels
+	Curve& levels(Tv start, Tv end);
+
 protected:
-	Tv mEnd, mA, mB;
+	Tv mStart, mEnd, mA, mB;
 	Tp mMul;
 };
 
@@ -731,7 +735,7 @@ public:
 	/// interpolator.
 	SegExp& set(Tp len, Tp crv){
 		mLen = len; mCrv = crv;
-		mCurve.set(len * Td::spu(), crv);
+		mCurve.set(len * Td::spu(), crv, Tv(0), Tv(1));
 		return *this;
 	}
 
@@ -774,7 +778,7 @@ public:
 protected:
 	Tv mStart, mEnd;
 	Tp mLen, mCrv;
-	Curve<Tp,Tp> mCurve;
+	Curve<Tp,Tp> mCurve; // specialized version with levels (0,1)
 
 	Tv tween(Tp f) const { return ipl::linear(scl::min(f, Tp(1)), mStart, mEnd); }
 };
@@ -785,7 +789,7 @@ protected:
 
 template <class Tv,class Tp>
 Curve<Tv,Tp>::Curve()
-:	mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
+:	mStart(Tv(0)), mEnd(Tv(1)), mA(Tv(0)), mB(Tv(0)), mMul(Tp(1))
 {}
 
 template <class Tv,class Tp>
@@ -802,8 +806,8 @@ inline bool Curve<Tv,Tp>::done() const {
 
 // dividing by mMul goes back one step
 template <class Tv,class Tp>
-Curve<Tv,Tp>& Curve<Tv,Tp>::reset(Tv start){
-	mB = (mA-start) / mMul;
+Curve<Tv,Tp>& Curve<Tv,Tp>::reset(){
+	mB = (mA-mStart) / mMul;
 	return *this;
 }
 
@@ -819,10 +823,12 @@ template <class Tv,class Tp>
 Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	static const Tp EPS = detail::eps<Tp>();
 
+	mStart = start;
+	mEnd = end;
+
 	if(len == Tp(0)){ // if length is 0, return end value immediately
-		mEnd = end;
 		mMul = detail::maxReal<Tp>();
-		mA = end;
+		mA = mEnd;
 		mB = Tv(0);
 		return *this;
 	}
@@ -852,12 +858,18 @@ Curve<Tv,Tp>& Curve<Tv,Tp>::set(Tp len, Tp crv, Tv start, Tv end){
 	    1 - e^c           1 - e^c
 	*/
 
-	mEnd = end;
 	mMul = exp(crvOverLen);
-	mA = (end-start) / (Tp(1) - exp(crv));
-	mB = mA / mMul;
-	mA+= start;
-	return *this;
+	mA = (mEnd-mStart) / (Tp(1)-exp(crv)) + mStart;
+	return reset();
+}
+
+template <class Tv,class Tp>
+Curve<Tv,Tp>& Curve<Tv,Tp>::levels(Tv start, Tv end){
+	auto c = (mA-mStart) / (mEnd-mStart); // 1 / (1-e^c)
+	mStart = start;
+	mEnd = end;
+	mA = (mEnd-mStart)*c + mStart;
+	return reset();
 }
 
 template <class Tv,class Tp>
