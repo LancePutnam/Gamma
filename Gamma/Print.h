@@ -52,6 +52,7 @@ public:
 	PrintSignal& width(unsigned v){ mWidth=v; return *this; }
 	PrintSignal& spaces(bool v){ mSpaces=v; return *this; }
 	PrintSignal& sign(bool v){ mSign=v; return *this; }
+	PrintSignal& newLine(bool v){ mNewLine=v; return *this; }
 	PrintSignal& point(const char * v){ mPoint=v; return *this; }
 
 	template <class OnSample>
@@ -62,6 +63,7 @@ public:
 			printPlot(v, mWidth, mSpaces, mSign, mPoint);
 			printf("\n");
 		}
+		if(mNewLine) printf("\n");
 		return *this;
 	}
 
@@ -71,10 +73,11 @@ public:
 	}
 
 private:
-	unsigned mWidth=50;
 	const char * mPoint="o";
+	unsigned mWidth=50;
 	bool mSpaces=true;
 	bool mSign=true;
+	bool mNewLine=false;
 };
 
 
