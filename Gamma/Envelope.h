@@ -324,24 +324,6 @@ public:
 	/// Set maximum level
 	Env& maxLevel(Tv v);
 
-
-	/// Push new segment onto end and pop the first segment
-	Env& pushSegment(Tp len, Tv lvl, Tv crv){
-		if(mStage > 0){
-			for(int i=1; i<N; ++i){
-				mLengths[i-1] = mLengths[i];
-				mCurves[i-1] = mCurves[i];
-			}
-			for(int i=1; i<N+1; ++i) mLevels[i-1] = mLevels[i];
-			length<N-1>(len);
-			curve<N-1>(crv);
-			level<N>(lvl);
-			--mStage;
-		}
-		return *this;
-	}
-
-
 protected:
 	Curve<Tv,Tp> mCurve;
 	Tp mLengths[N];		// segment lengths, in samples
