@@ -147,8 +147,14 @@ public:
 	/// Sets the point at which the envelope holds its value until released
 	Env& sustainPoint(int v){ mSustain=v; return *this; }
 
+	template <int i>
+	Env& sustainPoint(){
+		static_assert(0<=i && i<=N, "Invalid sustain index");
+		return sustainPoint(i);
+	}
+
 	/// Disable sustain
-	Env& sustainDisable(){ return sustainPoint(N); }
+	Env& sustainDisable(){ return sustainPoint<N>(); }
 
 	/// Reset envelope to starting point
 	void reset();
@@ -164,13 +170,13 @@ public:
 	Tp * lengths(){ return mLengths; }
 	const Tp * lengths() const { return mLengths; }
 
+	/// Get length of a segment (compile-time checked)
+	template <unsigned i>
+	const Tp& length() const { return at<i>(mLengths); }
+
 	/// Set length of a segment (compile-time checked)
 	template <unsigned i>
-	Env& length(Tp v){
-		static_assert(i<N, "Invalid segment index");
-		lengths()[i] = v;
-		return *this;
-	}
+	Env& length(Tp v){ at<i>(mLengths) = v; return *this; }
 
 	/// Set lengths of segments
 	template <class V>
@@ -210,13 +216,13 @@ public:
 	Tp * curves(){ return mCurves; }
 	const Tp * curves() const { return mCurves; }
 
+	/// Get curvature of a segment (compile-time checked)
+	template <unsigned i>
+	const Tp& curve() const { return at<i>(mCurves); }
+
 	/// Set curvature of a segment (compile-time checked)
 	template <unsigned i>
-	Env& curve(Tp v){
-		static_assert(i<N, "Invalid curve index");
-		curves()[i] = v;
-		return *this;
-	}
+	Env& curve(Tp v){ at<i>(mCurves) = v; return *this; }
 
 	/// Set curvature of all segments
 	Env& curve(Tp v){
@@ -287,13 +293,13 @@ public:
 	Tv * levels(){ return mLevels; }
 	const Tv * levels() const { return mLevels; }
 
+	/// Get level at index (compile-time checked)
+	template <unsigned i>
+	const Tv& level() const { return at<i>(mLevels); }
+
 	/// Set level at index (compile-time checked)
 	template <unsigned i>
-	Env& level(Tv v){
-		static_assert(i<(N+1), "Invalid level index");
-		levels()[i] = v;
-		return *this;
-	}
+	Env& level(Tv v){ at<i>(mLevels) = v; return *this; }
 
 	/// Set break-point values
 	template <class V>
@@ -318,6 +324,24 @@ public:
 	/// Set maximum level
 	Env& maxLevel(Tv v);
 
+
+	/// Push new segment onto end and pop the first segment
+	Env& pushSegment(Tp len, Tv lvl, Tv crv){
+		if(mStage > 0){
+			for(int i=1; i<N; ++i){
+				mLengths[i-1] = mLengths[i];
+				mCurves[i-1] = mCurves[i];
+			}
+			for(int i=1; i<N+1; ++i) mLevels[i-1] = mLevels[i];
+			length<N-1>(len);
+			curve<N-1>(crv);
+			level<N>(lvl);
+			--mStage;
+		}
+		return *this;
+	}
+
+
 protected:
 	Curve<Tv,Tp> mCurve;
 	Tp mLengths[N];		// segment lengths, in samples
@@ -330,6 +354,16 @@ protected:
 	int mLoop=0;
 
 	void setLen(int i){ mLen=unsigned(mLengths[i]*Td::spu()); }
+
+	template <unsigned Idx, class T, int M>
+	static T& at(T (&arr)[M]){
+		static_assert(Idx < M, "Index out of bounds");
+		return arr[Idx];
+	}
+	template <unsigned Idx, class T, int M>
+	static const T& at(const T (&arr)[M]){
+		return at<Idx>(const_cast<T(&)[M]>(arr));
+	}
 };
 
 
@@ -357,28 +391,24 @@ public:
 	}
 
 	/// Set attack length
-	AD& attack(Tp len){ return setLen(0,len); }
+	AD& attack(Tp v){ this->template length<0>(v); return *this; }
 
 	/// Set decay length
-	AD& decay(Tp len){ return setLen(1,len); }
+	AD& decay(Tp v){ this->template length<1>(v); return *this; }
 
 	/// Set amplitude
-	AD& amp(Tv v){ this->levels()[1]=v; return *this; }
+	AD& amp(Tv v){ this->template level<1>(v); return *this; }
 
 
 	/// Get attack length
-	Tp attack() const { return this->lengths()[0]; }
+	Tp attack() const { return this->template length<0>(); }
 
 	/// Get decay length
-	Tp decay() const { return this->lengths()[1]; }
+	Tp decay() const { return this->template length<1>(); }
 
 	/// Get amplitude
-	Tv amp() const { return this->levels()[1]; }
+	Tv amp() const { return this->template level<1>(); }
 
-protected:
-	AD& setLen(int i, Tp v){
-		this->lengths()[i] = v; return *this;
-	}
 };
 
 
@@ -414,50 +444,42 @@ public:
 		Tp crv =Tp(-4)
 	)
 	{
-		this->sustainPoint(2);
+		this->template sustainPoint<2>();
 		this->levels(0,amp,sus*amp,0);
 		attack(att).decay(dec).release(rel);
 		this->curve(crv);
 	}
 
 	/// Set attack length
-	ADSR& attack(Tp len){ return setLen(0,len); }
+	ADSR& attack(Tp v){ this->template length<0>(v); return *this; }
 
 	/// Set decay length
-	ADSR& decay(Tp len){ return setLen(1,len); }
+	ADSR& decay(Tp v){ this->template length<1>(v); return *this; }
 
 	/// Set sustain level
-	ADSR& sustain(Tv val){
-		this->levels()[2] = val * this->levels()[1];
-		return *this;
-	}
+	ADSR& sustain(Tv v){ this->template level<2>(v * amp()); return *this; }
 
 	/// Set release length
-	ADSR& release(Tp len){ return setLen(2,len); }
+	ADSR& release(Tp v){ this->template length<2>(v); return *this; }
 	
 	/// Set amplitude
 	ADSR& amp(Tv v){ this->maxLevel(v); return *this; }
 
 
 	/// Get attack length
-	Tp attack() const { return this->lengths()[0]; }
+	Tp attack() const { return this->template length<0>(); }
 
 	/// Get decay length
-	Tp decay() const { return this->lengths()[1]; }
+	Tp decay() const { return this->template length<1>(); }
 
 	/// Get sustain level
-	Tv sustain() const { return this->levels()[2] / this->levels()[1]; }
+	Tv sustain() const { return this->template level<2>() / amp(); }
 
 	/// Get release length
-	Tp release() const { return this->lengths()[2]; }
+	Tp release() const { return this->template length<2>(); }
 
 	/// Get amplitude
-	Tv amp() const { return this->levels()[1]; }
-
-protected:
-	ADSR& setLen(int i, Tp v){
-		this->lengths()[i] = v; return *this;
-	}
+	Tv amp() const { return this->template level<1>(); }
 };
 
 
@@ -898,14 +920,14 @@ Env<N,Tv,Tp,Td>::Env(){
 		mCurves[i] = Tp(-4);
 		mLevels[i] = Tv();
 	}
-	mLevels[N] = Tv();
+	at<N>(mLevels) = Tv();
 	reset();
 }
 
 template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2){
 	levels(lvl1,lvl2);
-	lengths()[0] = len1;
+	at<0>(mLengths) = len1;
 	curve(-4);
 	reset();
 }
@@ -1039,7 +1061,7 @@ template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::totalLength(Tp length){
 	Tp mul = length / totalLength();
 	for(int i=0; i<size(); ++i){
-		lengths()[i] *= mul;
+		mLengths[i] *= mul;
 	}
 	return *this;
 }
