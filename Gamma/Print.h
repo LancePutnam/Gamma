@@ -19,7 +19,7 @@ namespace gam{
 char intensityToASCII(float v);
 
 std::string plotString(
-	float value, unsigned width=50, bool spaces=true, bool sign=true, const char * point="o"
+	float value, unsigned width=50, bool spaces=true, bool sign=true, char point='o'
 );
 
 
@@ -43,7 +43,7 @@ void printHexArray(const float * table, unsigned len, unsigned valuesPerLine);
 /// \param[in]	spaces	Print extra filling spaces to the right
 /// \param[in]	sign	Whether plot is signed
 /// \param[in]	point	The print character for points
-void printPlot(float value, unsigned width=50, bool spaces=true, bool sign=true, const char * point="o");
+void printPlot(float value, unsigned width=50, bool spaces=true, bool sign=true, char point='o');
 
 /// Print 1D signal on vertical plot
 class PrintSignal {
@@ -53,7 +53,7 @@ public:
 	PrintSignal& spaces(bool v){ mSpaces=v; return *this; }
 	PrintSignal& sign(bool v){ mSign=v; return *this; }
 	PrintSignal& newLine(bool v){ mNewLine=v; return *this; }
-	PrintSignal& point(const char * v){ mPoint=v; return *this; }
+	PrintSignal& point(char v){ mPoint=v; return *this; }
 
 	template <class OnSample>
 	PrintSignal& print(unsigned N, const OnSample& onSample){
@@ -73,8 +73,8 @@ public:
 	}
 
 private:
-	const char * mPoint="o";
 	unsigned mWidth=50;
+	char mPoint='o';
 	bool mSpaces=true;
 	bool mSign=true;
 	bool mNewLine=false;

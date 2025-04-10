@@ -7,7 +7,7 @@
 namespace gam{
 
 std::string plotString(
-	float value, unsigned width, bool spaces, bool sign, const char * point
+	float value, unsigned width, bool spaces, bool sign, char point
 ){
 	std::string res;
 
@@ -19,7 +19,7 @@ std::string plotString(
 	int clipFlag;
 	value = scl::clip(value, clipFlag, max, min);
 	
-	const char * pt = clipFlag != 0 ? "+" : point;
+	char pt = clipFlag != 0 ? '+' : point;
 
 	int imin = min/dia * width;	// normalize by diameter, then multiply by width
 	int imax = imin + width;
@@ -73,7 +73,7 @@ void printHexArray(const float * a, unsigned len,unsigned valuesPerLine){
 	}
 }
 
-void printPlot(float value, unsigned width, bool spaces, bool sign, const char * point){
+void printPlot(float value, unsigned width, bool spaces, bool sign, char point){
 	fprintf(stdout, "%s", plotString(value,width,spaces,sign,point).c_str());
 }
 
