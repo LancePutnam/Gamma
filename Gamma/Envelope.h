@@ -95,7 +95,8 @@ template <int N, class Tv=real, class Tp=real, class Td=GAM_DEFAULT_DOMAIN>
 class Env : public Td{
 public:
 
-	Env();
+	/// Set envelope as constant value with all lengths equal to zero
+	Env(Tv lvl = Tv());
 
 	Env(Tp lvl1, Tp len1, Tp lvl2);
 
@@ -336,6 +337,8 @@ protected:
 	int mLoop=0;
 
 	void setLen(int i){ mLen=unsigned(mLengths[i]*Td::spu()); }
+
+	static Tp curveDefault(){ return {-4}; }
 
 	template <unsigned Idx, class T, int M>
 	static T& at(T (&arr)[M]){
@@ -896,13 +899,13 @@ inline Tv Curve<Tv,Tp>::operator()(){
 
 
 template <int N,class Tv,class Tp,class Td>
-Env<N,Tv,Tp,Td>::Env(){
+Env<N,Tv,Tp,Td>::Env(Tv lvl){
 	for(int i=0; i<N; ++i){
 		mLengths[i]= Tp(1e-8);
-		mCurves[i] = Tp(-4);
-		mLevels[i] = Tv();
+		mCurves[i] = curveDefault();
+		mLevels[i] = lvl;
 	}
-	at<N>(mLevels) = Tv();
+	at<N>(mLevels) = lvl;
 	reset();
 }
 
@@ -910,7 +913,7 @@ template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2){
 	levels(lvl1,lvl2);
 	at<0>(mLengths) = len1;
-	curve(-4);
+	curve(curveDefault());
 	reset();
 }
 
@@ -918,7 +921,7 @@ template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3){
 	levels(lvl1,lvl2,lvl3);
 	lengths(len1,len2);
-	curve(-4);
+	curve(curveDefault());
 	reset();
 }
 
@@ -926,7 +929,7 @@ template <int N,class Tv,class Tp,class Td>
 Env<N,Tv,Tp,Td>::Env(Tp lvl1, Tp len1, Tp lvl2, Tp len2, Tp lvl3, Tp len3, Tp lvl4){
 	levels(lvl1,lvl2,lvl3,lvl4);
 	lengths(len1,len2,len3);
-	curve(-4);
+	curve(curveDefault());
 	reset();
 }
 
