@@ -325,6 +325,20 @@ public:
 	/// Set maximum level
 	Env& maxLevel(Tv v);
 
+
+	/// Push new segment onto end and pop the first segment
+
+	/// This allows for a kind of "streaming" envelope where new segments are
+	/// added to the end while segments at the start get ejected. Adding a new
+	/// segment will in most cases not interrupt the envelope. If currently in 
+	/// the first (popped) segment, then a soft reset is performed. The number 
+	/// of segments that can be pushed without popping the current segment is
+	/// equal to the envelope stage.
+	/// \param[in] len		Length of new segment
+	/// \param[in] lvl		End level of new segment
+	/// \param[in] crv		Curvature of new segment
+	Env& pushSegment(Tp len, Tv lvl, Tv crv);
+
 protected:
 	Curve<Tv,Tp> mCurve;
 	Tp mLengths[N];		// segment lengths, in samples
@@ -1057,6 +1071,23 @@ Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::maxLevel(Tv v){
 	for(int i=0; i<N+1; ++i) mx = scl::max(scl::abs(mLevels[i]), mx);
 	v = v/mx;
 	for(int i=0; i<N+1; ++i) mLevels[i] *= v;
+	return *this;
+}
+
+template <int N,class Tv,class Tp,class Td>
+Env<N,Tv,Tp,Td>& Env<N,Tv,Tp,Td>::pushSegment(Tp len, Tv lvl, Tv crv){
+	for(int i=1; i<N; ++i){
+		mLengths[i-1] = mLengths[i];
+		mCurves[i-1] = mCurves[i];
+	}
+	for(int i=1; i<N+1; ++i) mLevels[i-1] = mLevels[i];
+	length<N-1>(len);
+	curve<N-1>(crv);
+	level<N>(lvl);
+
+	if(!mStage) resetSoft();
+	else{ done() ? mStage-=2 : --mStage; }
+
 	return *this;
 }
 
