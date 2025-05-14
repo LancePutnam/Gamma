@@ -134,20 +134,6 @@ OBJ_DIR		= $(BUILD_DIR)obj/
 # Location of library installation
 DESTDIR		= $(PREFIX)
 
-# Check for some common shared library directories
-ifneq ($(wildcard /usr/local/),)
-	HAS_USR_LOCAL = 1
-endif
-ifneq ($(wildcard /opt/local/),)
-	HAS_OPT_LOCAL = 1
-endif
-ifneq ($(wildcard /usr/X11/),)
-	HAS_USR_X11 = 1
-endif
-
-# Platform-dependent directory
-PLATFORM_DIR ?=
-
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
@@ -185,8 +171,6 @@ ifeq ($(PLATFORM), em)
 # Linux:
 else ifeq ($(PLATFORM), linux)
 
-	PLATFORM_DIR = linux/
-
 	ifeq ($(ARCH), 32)
 		CFLAGS += -m32
 	else ifeq ($(ARCH), 64)
@@ -205,8 +189,6 @@ else ifeq ($(PLATFORM), linux)
 
 # Mac OSX:
 else ifeq ($(PLATFORM), macosx)
-
-	PLATFORM_DIR = osx/
 
 	# BUILD_ARCHS is a space-separated list in double quotes, e.g. "arm64 x86_64 i386"
 	ifdef BUILD_ARCHS
@@ -231,25 +213,21 @@ else ifeq ($(PLATFORM), macosx)
 	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK)
 
 	# Needed to link to libraries installed through MacPorts
-	ifdef HAS_OPT_LOCAL
-		LDFLAGS  += -L/opt/local/lib/
+	ifneq ($(wildcard /opt/local),)
 		CPPFLAGS += -I/opt/local/include/
+		LDFLAGS  += -L/opt/local/lib/
 	endif
 
-	# Needed to link to libraries installed through homebrew or by user
-	ifneq ($(wildcard /usr/local/lib),)
-		LDFLAGS += -L/usr/local/lib/
-	endif
-	ifneq ($(wildcard /usr/local/include),)
-		CPPFLAGS += -I/usr/local/include/
-	endif
-
-	# Needed to link to libraries installed through homebrew or by user
-	ifneq ($(wildcard /opt/homebrew/lib),)
+	# Needed to link to libraries installed through homebrew
+	ifneq ($(wildcard /opt/homebrew),)
+		CPPFLAGS += -I/opt/homebrew/include/
 		LDFLAGS += -L/opt/homebrew/lib/
 	endif
-	ifneq ($(wildcard /opt/homebrew/include),)
-		CPPFLAGS += -I/opt/homebrew/include/
+
+	# Needed to link to libraries installed by user
+	ifneq ($(wildcard /usr/local),)
+		CPPFLAGS += -I/usr/local/include/
+		LDFLAGS += -L/usr/local/lib/
 	endif
 
 	LDFLAGS += -lstdc++
@@ -262,17 +240,15 @@ else ifeq ($(PLATFORM), macosx)
 # Windows:
 else ifeq ($(PLATFORM), windows)
 
-	PLATFORM_DIR = windows/
-
 	ifeq ($(MSYS_VERSION), 2)
 		LDFLAGS  += -L/usr/lib/
 		CPPFLAGS += -I/usr/include/
 		CPPFLAGS += -D_WIN$(MINGW_VERSION)
-		PREFIX := /mingw$(MINGW_VERSION)/
+		PREFIX := /mingw$(MINGW_VERSION)
 	else ifeq ($(MSYS_VERSION), 1)
 		LDFLAGS  += -L/mingw/lib/
 		CPPFLAGS += -I/mingw/include/
-		PREFIX := /local/
+		PREFIX := /local
 		CC := gcc
 		# This fixes a bug in MINGW/MSYS math.h (!!!)
 		CPPFLAGS += -U _hypot -D _hypot=hypot
