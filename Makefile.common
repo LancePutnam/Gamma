@@ -244,6 +244,14 @@ else ifeq ($(PLATFORM), macosx)
 		CPPFLAGS += -I/usr/local/include/
 	endif
 
+	# Needed to link to libraries installed through homebrew or by user
+	ifneq ($(wildcard /opt/homebrew/lib),)
+		LDFLAGS += -L/opt/homebrew/lib/
+	endif
+	ifneq ($(wildcard /opt/homebrew/include),)
+		CPPFLAGS += -I/opt/homebrew/include/
+	endif
+
 	LDFLAGS += -lstdc++
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
