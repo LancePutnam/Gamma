@@ -213,21 +213,27 @@ else ifeq ($(PLATFORM), macosx)
 	CFLAGS += -isysroot $(OSX_SDK_PATH)$(OSX_SDK)
 
 	# Needed to link to libraries installed through MacPorts
-	ifneq ($(wildcard /opt/local),)
-		CPPFLAGS += -I/opt/local/include/
-		LDFLAGS  += -L/opt/local/lib/
+	ifneq ($(wildcard /opt/local/include),)
+		CPPFLAGS += -I/opt/local/include
+	endif
+	ifneq ($(wildcard /opt/local/lib),)
+		LDFLAGS  += -L/opt/local/lib
 	endif
 
 	# Needed to link to libraries installed through homebrew
-	ifneq ($(wildcard /opt/homebrew),)
-		CPPFLAGS += -I/opt/homebrew/include/
-		LDFLAGS += -L/opt/homebrew/lib/
+	ifneq ($(wildcard /opt/homebrew/include),)
+		CPPFLAGS += -I/opt/homebrew/include
+	endif
+	ifneq ($(wildcard /opt/homebrew/lib),)
+		LDFLAGS  += -L/opt/homebrew/lib
 	endif
 
 	# Needed to link to libraries installed by user
-	ifneq ($(wildcard /usr/local),)
-		CPPFLAGS += -I/usr/local/include/
-		LDFLAGS += -L/usr/local/lib/
+	ifneq ($(wildcard /usr/local/include),)
+		CPPFLAGS += -I/usr/local/include
+	endif
+	ifneq ($(wildcard /usr/local/lib),)
+		LDFLAGS  += -L/usr/local/lib
 	endif
 
 	LDFLAGS += -lstdc++
