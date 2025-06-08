@@ -166,10 +166,18 @@ public:
 	/// Process next sample
 	Tv operator()(Tv in);
 
-	/// Process next sample; output tap is after loop filter
+	/// Process next sample
+
+	/// The output tap is just after the loop filter after the delay, thus the
+	/// first echo is filtered.
+	/// \returns wet (delayed) sample.
 	Tv nextPost(Tv in);
 
 	/// Process next sample; output tap is before loop filter
+
+	/// The output tap is just after the delay before the loop filter, thus the
+	/// first echo is not filtered.
+	/// \returns wet (delayed) sample.
 	Tv nextPre(Tv in);
 
 	/// Get decay length
