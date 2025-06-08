@@ -325,6 +325,13 @@ public:
 	/// Set maximum level
 	Env& maxLevel(Tv v);
 
+	/// Configure as hold-attack-decay envelope
+	Env& setHAD(Tp h, Tp a, Tp d, Tv amp = Tv(1)){
+		static_assert(N==3, "Requires three segments");
+		levels(0,0,amp,0);
+		lengths(h,a,d);
+		return *this;
+	}
 
 	/// Push new segment onto end and pop the first segment
 
