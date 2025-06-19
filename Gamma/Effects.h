@@ -190,6 +190,44 @@ public:
 
 
 
+/// Celeste "heavenly" effect
+
+/// Emits a sum of two pitch-shifted versions of the input: one pitched up and 
+/// one pitched down. The effect operates under the observation that applying a
+/// triangle-shaped modulation to a delay line read produces a trill effect, 
+/// i.e., a regular alternation in pitch up and pitch down by equal amounts.
+/// Taking two such trills with opposite phase means one is pitched up while the 
+/// other is down, and vice versa. When the two are summed, they perceptually
+/// fuse into two steady pitch shifts. Unlike a chorus effect, celeste pitching
+/// is constant over time rather than variable thus more akin to an  oscillator
+/// detuning effect.
+template <class T=gam::real>
+class Celeste{
+public:
+
+	Celeste& amount(float v){ mAmount=v; return *this; }
+	Celeste& freq(float v){ mMod.freq(v); return *this; }
+	Celeste& delay(float v){ mDelay=v; return *this; }
+
+	T operator()(const T& in){
+		auto mod1 = mMod.triU(); // runs as 1, 1/2, 0, 1/2 ...
+		auto mod2 = 1.f - mod1;  // runs as 0, 1/2, 1, 1/2 ...
+		auto d1 = mDelayLine.read(mDelay + mod1*mAmount);
+		auto d2 = mDelayLine.read(mDelay + mod2*mAmount);
+		auto d = d1+d2;
+		mDelayLine.write(in);
+		return d;
+	}
+
+private:
+	Delay<T, ipl::Linear> mDelayLine{0.1, 0.05};
+	LFO<> mMod{0.6};
+	float mDelay = 0.04;
+	float mAmount = 0.004;
+};
+
+
+
 /// Dual delay-line chorus driven by quadrature sinusoid
 
 ///
