@@ -151,7 +151,9 @@ public:
 	Echo();
 
 	/// \param[in] delay	delay length
-	Echo(double delay);
+	/// \param[in] decay	decay length
+	/// \param[in] damp		damping factor of loop filter (if applicable)
+	Echo(float delay, float decay=1.f, float damp=0.f);
 
 
 	/// Set decay length
@@ -483,9 +485,12 @@ template<TDEC>
 Echo<TARG>::Echo(){}
 
 template<TDEC>
-Echo<TARG>::Echo(double delay)
+Echo<TARG>::Echo(float delay, float decay, float damp)
 :	Base(delay)
-{}
+{
+	this->decay(decay);
+	this->damping(damp);
+}
 
 template<TDEC>
 Echo<TARG>& Echo<TARG>::decay(float v){
