@@ -403,6 +403,12 @@ public:
 		if(msqr > T(0))	return (*this) /= std::sqrt(msqr);
 		else			return setIdentity();
 	}
+
+	/// Returns index of first occurrence of value or -1 if no match
+	int find(const T& v) const {
+		IT(N){ if(v == at(i)) return int(i); }
+		return -1;
+	}
 };
 
 
