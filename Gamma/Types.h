@@ -238,11 +238,14 @@ public:
 	/// Get element at index (no bounds checking)
 	const T& operator[](unsigned i) const { return elems()[i]; }
 
+	T& at(unsigned i){ return (*this)[i]; }
+	const T& at(unsigned i) const { return (*this)[i]; }
+
 	/// Set element at index with compile-time bounds checking
 	template <unsigned i>
 	T& at(){
 		static_assert(i<N, "Index out of bounds");
-		return (*this)[i];
+		return at(i);
 	}
 
 	/// Get element at index with compile-time bounds checking
@@ -253,15 +256,15 @@ public:
 
 	/// Get a vector comprised of indexed elements
 	Vec<2,T> get(int i0, int i1) const {
-		return Vec<2,T>((*this)[i0], (*this)[i1]); }
+		return {at(i0), at(i1)}; }
 
 	/// Get a vector comprised of indexed elements
 	Vec<3,T> get(int i0, int i1, int i2) const {
-		return Vec<3,T>((*this)[i0], (*this)[i1], (*this)[i2]); }
+		return {at(i0), at(i1), at(i2)}; }
 
 	/// Get a vector comprised of indexed elements
 	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
-		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
+		return {at(i0), at(i1), at(i2), at(i3)}; }
 
 	/// Get a subvector
 	template <int M, int Begin=0>
@@ -286,8 +289,8 @@ public:
 	Vec<2,T>& yzw(){ return sub<3,1>(); }
 
 	template <class U>
-	Vec& operator = (const Vec<N,U>& v){ IT(N) (*this)[i] = T(v[i]); return *this; }
-	Vec& operator = (const        T& v){ IT(N) (*this)[i] =       v; return *this; }
+	Vec& operator = (const Vec<N,U>& v){ IT(N) at(i) = T(v[i]); return *this; }
+	Vec& operator = (const        T& v){ IT(N) at(i) =       v; return *this; }
 
 	template <class U, class S>
 	Vec& set(const Vec<N-1,U>& v, S s){
@@ -314,56 +317,56 @@ public:
 	/// Set first 6 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
 		switch(N){
-		default:(*this)[5] = v6;
-		case 5: (*this)[4] = v5;
-		case 4: (*this)[3] = v4;
-		case 3: (*this)[2] = v3;
-		case 2: (*this)[1] = v2;
-		case 1: (*this)[0] = v1;
+		default:at(5) = v6;
+		case 5: at(4) = v5;
+		case 4: at(3) = v4;
+		case 3: at(2) = v3;
+		case 2: at(1) = v2;
+		case 1: at(0) = v1;
 		}
 		return *this;
 	}
 
 	/// Set elements to values from C array
 	template <class U>
-	Vec& set(const U * src){ IT(N){ (*this)[i]=src[i]; } return *this; }
+	Vec& set(const U * src){ IT(N){ at(i)=src[i]; } return *this; }
 
 	/// Set to identity, i.e., {1, 0, ..., 0}
 	Vec& setIdentity(){
 		at<0>() = T(1);
-		for(unsigned i=1; i<N; ++i) (*this)[i] = T(0);
+		for(unsigned i=1; i<N; ++i) at(i) = T(0);
 		return *this;
 	}
 
 
-	bool operator !=(const Vec& v){ IT(N){ if((*this)[i] == v[i]) return false; } return true; }
-	bool operator !=(const   T& v){ IT(N){ if((*this)[i] == v   ) return false; } return true; }
-	bool operator ==(const Vec& v){ IT(N){ if((*this)[i] != v[i]) return false; } return true; }
-	bool operator ==(const   T& v){ IT(N){ if((*this)[i] != v   ) return false; } return true; }
+	bool operator !=(const Vec& v){ IT(N){ if(at(i) == v[i]) return false; } return true; }
+	bool operator !=(const   T& v){ IT(N){ if(at(i) == v   ) return false; } return true; }
+	bool operator ==(const Vec& v){ IT(N){ if(at(i) != v[i]) return false; } return true; }
+	bool operator ==(const   T& v){ IT(N){ if(at(i) != v   ) return false; } return true; }
 
-	Vec  operator * (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] * v[i]; return r; }
-	Vec  operator * (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] * v;    return r; }
-	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
-	Vec& operator *=(const   T& v){ IT(N) (*this)[i] *= v;    return *this; }
-	Vec  operator / (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] / v[i]; return r; }
-	Vec  operator / (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] / v;    return r; }
-	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
-	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
-	Vec  operator - (          ) const { Vec r; IT(N) r[i] = -(*this)[i]; return r; }
-	Vec  operator - (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] - v[i]; return r; }
-	Vec  operator - (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] - v;    return r; }
-	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
-	Vec& operator -=(const   T& v){ IT(N) (*this)[i] -= v;    return *this; }
-	Vec  operator + (const Vec& v) const { Vec r; IT(N) r[i] = (*this)[i] + v[i]; return r; }
-	Vec  operator + (const   T& v) const { Vec r; IT(N) r[i] = (*this)[i] + v;    return r; }
-	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
-	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
+	Vec  operator * (const Vec& v) const { Vec r; IT(N) r[i] = at(i) * v[i]; return r; }
+	Vec  operator * (const   T& v) const { Vec r; IT(N) r[i] = at(i) * v;    return r; }
+	Vec& operator *=(const Vec& v){ IT(N) at(i) *= v[i]; return *this; }
+	Vec& operator *=(const   T& v){ IT(N) at(i) *= v;    return *this; }
+	Vec  operator / (const Vec& v) const { Vec r; IT(N) r[i] = at(i) / v[i]; return r; }
+	Vec  operator / (const   T& v) const { Vec r; IT(N) r[i] = at(i) / v;    return r; }
+	Vec& operator /=(const Vec& v){ IT(N) at(i) /= v[i]; return *this; }
+	Vec& operator /=(const   T& v){ IT(N) at(i) /= v;    return *this; }
+	Vec  operator - (          ) const { Vec r; IT(N) r[i] = -at(i); return r; }
+	Vec  operator - (const Vec& v) const { Vec r; IT(N) r[i] = at(i) - v[i]; return r; }
+	Vec  operator - (const   T& v) const { Vec r; IT(N) r[i] = at(i) - v;    return r; }
+	Vec& operator -=(const Vec& v){ IT(N) at(i) -= v[i]; return *this; }
+	Vec& operator -=(const   T& v){ IT(N) at(i) -= v;    return *this; }
+	Vec  operator + (const Vec& v) const { Vec r; IT(N) r[i] = at(i) + v[i]; return r; }
+	Vec  operator + (const   T& v) const { Vec r; IT(N) r[i] = at(i) + v;    return r; }
+	Vec& operator +=(const Vec& v){ IT(N) at(i) += v[i]; return *this; }
+	Vec& operator +=(const   T& v){ IT(N) at(i) += v;    return *this; }
 
 	template <class V, class Func, class... Args>
 	Vec<N,V> map(Func func, Args... args) const {
 		Vec<N,V> r;
 		for(int i=0; i<size(); ++i)
-			r[i] = func((*this)[i], args...);
+			r[i] = func(at(i), args...);
 		return r;
 	}
 
@@ -389,8 +392,8 @@ public:
 		return r;
 	}
 
-	T dot(const Vec& v) const { T r=T(0); IT(N) r+=(*this)[i]*v[i]; return r; }
-	T sum() const { T r=T(0); IT(N) r+=(*this)[i]; return r; }
+	T dot(const Vec& v) const { T r=T(0); IT(N) r+=at(i)*v[i]; return r; }
+	T sum() const { T r=T(0); IT(N) r+=at(i); return r; }
 	T mag() const { return std::sqrt(magSqr()); }
 	T magSqr() const { return dot(*this); }
 	Vec normalized() const { return Vec(*this).normalize(); }
