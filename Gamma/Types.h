@@ -339,10 +339,10 @@ public:
 	}
 
 
-	bool operator !=(const Vec& v){ IT(N){ if(at(i) == v[i]) return false; } return true; }
-	bool operator !=(const   T& v){ IT(N){ if(at(i) == v   ) return false; } return true; }
-	bool operator ==(const Vec& v){ IT(N){ if(at(i) != v[i]) return false; } return true; }
-	bool operator ==(const   T& v){ IT(N){ if(at(i) != v   ) return false; } return true; }
+	bool operator !=(const Vec& v) const { IT(N){ if(at(i) == v[i]) return false; } return true; }
+	bool operator !=(const   T& v) const { IT(N){ if(at(i) == v   ) return false; } return true; }
+	bool operator ==(const Vec& v) const { IT(N){ if(at(i) != v[i]) return false; } return true; }
+	bool operator ==(const   T& v) const { IT(N){ if(at(i) != v   ) return false; } return true; }
 
 	Vec  operator * (const Vec& v) const { Vec r; IT(N) r[i] = at(i) * v[i]; return r; }
 	Vec  operator * (const   T& v) const { Vec r; IT(N) r[i] = at(i) * v;    return r; }
