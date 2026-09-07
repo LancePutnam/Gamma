@@ -243,9 +243,7 @@ public:
 	}
 
 	template <class Func>
-	const Vec& forEach(const Func& f) const {
-		return const_cast<Vec*>(this)->forEach(f);
-	}
+	const Vec& forEach(const Func& f) const { return mut().forEach(f); }
 
 	/// Set element at index (no bounds checking)
 	T& operator[](unsigned i){ return elems()[i];}
@@ -265,9 +263,7 @@ public:
 
 	/// Get element at index with compile-time bounds checking
 	template <unsigned i>
-	const T& at() const {
-		return const_cast<Vec*>(this)->at<i>();
-	}
+	const T& at() const { return mut().template at<i>(); }
 
 	/// Get a vector comprised of indexed elements
 	Vec<2,T> get(int i0, int i1) const {
@@ -283,24 +279,23 @@ public:
 
 	/// Get a subvector
 	template <int M, int Begin=0>
-	const Vec<M,T>& sub() const {
-		return const_cast<Vec*>(this)->sub<M,Begin>();
-	}
+	const Vec<M,T>& sub() const { return mut().template sub<M,Begin>(); }
+
 	template <int M, int Begin=0>
 	Vec<M,T>& sub(){
 		static_assert((Begin+M)<=N, "Invalid subvector range");
 		return *(Vec<M,T>*)(elems()+Begin);
 	}
 
-	const Vec<2,T>& xy() const { return const_cast<Vec*>(this)->xy(); }
+	const Vec<2,T>& xy() const { return mut().xy(); }
 	Vec<2,T>& xy(){ return sub<2,0>(); }
-	const Vec<2,T>& yz() const { return const_cast<Vec*>(this)->yz(); }
+	const Vec<2,T>& yz() const { return mut().yz(); }
 	Vec<2,T>& yz(){ return sub<2,1>(); }
-	const Vec<2,T>& zw() const { return const_cast<Vec*>(this)->zw(); }
+	const Vec<2,T>& zw() const { return mut().zw(); }
 	Vec<2,T>& zw(){ return sub<2,2>(); }
-	const Vec<2,T>& xyz() const { return const_cast<Vec*>(this)->xyz(); }
+	const Vec<2,T>& xyz() const { return mut().xyz(); }
 	Vec<2,T>& xyz(){ return sub<3,0>(); }
-	const Vec<2,T>& yzw() const { return const_cast<Vec*>(this)->yzw(); }
+	const Vec<2,T>& yzw() const { return mut().yzw(); }
 	Vec<2,T>& yzw(){ return sub<3,1>(); }
 
 	template <class U>
@@ -424,6 +419,9 @@ public:
 		IT(N){ if(v == at(i)) return int(i); }
 		return -1;
 	}
+
+private:
+	Vec& mut() const { return const_cast<Vec&>(*this); }
 };
 
 
