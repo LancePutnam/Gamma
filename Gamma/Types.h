@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <initializer_list>
+#include <type_traits> // integral_constant
 
 namespace gam{
 
@@ -232,18 +233,21 @@ public:
 	T * end(){ return begin()+N; }
 	const T * end() const { return begin()+N; }
 
-	/// Iterate through all elements
+	/// Forward iterate through all elements
 
 	/// \param[in] f	Function called for each element with first arg the
-	///					value and second arg the index.
+	///					value and second arg the index. To ensure the second
+	///					(index) arg maintains constexpr, declare it \c auto.
 	template <class Func>
-	Vec& forEach(const Func& f){
-		IT(N) f(at(i), i);
+	constexpr Vec& forEach(const Func& f){
+		static_for<0,N>::apply([&](auto i){
+			f(at<i>(), i);
+		});
 		return *this;
 	}
 
 	template <class Func>
-	const Vec& forEach(const Func& f) const { return mut().forEach(f); }
+	constexpr const Vec& forEach(const Func& f) const { return mut().forEach(f); }
 
 	/// Set element at index (no bounds checking)
 	T& operator[](unsigned i){ return elems()[i];}
@@ -422,6 +426,25 @@ public:
 
 private:
 	Vec& mut() const { return const_cast<Vec&>(*this); }
+
+	/// \tparam Beg		Begin index (inclusive)
+	/// \tparam End		End index (exclusive)
+	template <int Beg, int End>
+	struct static_for{
+		template <class F>
+		static constexpr void apply(const F& f){
+			if(Beg < End){
+				f(std::integral_constant<int, Beg>{});
+				static_for<Beg + 1, End>::apply(f);
+			}
+		}
+	};
+	// terminal case
+	template <int I>
+	struct static_for<I,I>{
+		template <class F>
+		static constexpr void apply(const F& f){}
+	};
 };
 
 
