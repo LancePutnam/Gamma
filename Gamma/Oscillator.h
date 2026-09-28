@@ -239,7 +239,7 @@ public:
 	/// \param[in]	phs			Phase in [0, 1)
 	/// \param[in]	src			A table to use as a reference
 	Osc(float frq, float phs, ArrayPow2<Tv>& src)
-	:	Accum<Sp,Td>(frq, phs), ArrayPow2<Tv>(src.elems(), src.size())
+	:	Accum<Sp,Td>(frq, phs), ArrayPow2<Tv>(src)
 	{}
 
 
