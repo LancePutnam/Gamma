@@ -1124,10 +1124,6 @@ inline bool zeroCrossP(float prev, float now){
 	union{ float f; int32_t i; } u1, u0;
 	u1.f = prev; u0.f = now;
 	return (u1.i <= 0) && (u0.i > 0);
-	//(prevI <= 0) && (nowI > 0)
-//	prevI += 0x00800000;
-//	nowI += 0x00800000;
-//	(now & ~prev)>>31
 }
 
 
@@ -1192,10 +1188,7 @@ inline float sinFast(uint32_t p){
 }
 
 inline float sinPara(uint32_t p){
-	/*uint32_t saw = ((p)                   >> 9) | Expo4<float>(); // [4, 8]
-	uint32_t tri = ((p+MaskSign<float>()) >> 9) | Expo4<float>();
-	return (6.f - punUF(saw)) * abs(6.f - punUF(tri));//*/
-	auto x = punUF(Expo4<float>() | (p>>9)) - 6.f;
+	auto x = punUF(Expo4<float>() | (p>>9)) - 6.f; // saw up in [-2,2]
 	return x*(scl::abs(x) - 2.f);
 }
 
@@ -1210,8 +1203,8 @@ inline float square(uint32_t p){
 
 inline float squareU(uint32_t p){
 	// sign shift
-//	p = (~p & MaskSign<float>()) >> 1; // 2, 0, 2, 0 ...
-//	return punUF(p) * 0.5f;
+	/*p = (~p & MaskSign<float>()) >> 1; // 2, 0, 2, 0 ...
+	return punUF(p) * 0.5f;//*/
 	// half-amp square plus 1/2
 	p = (p & MaskSign<float>()) | Expo1_2<float>();
 	return punUF(p) + 0.5f;
