@@ -102,11 +102,11 @@ template<class T> T cosT8(T radians);
 
 /// Convert decibels to amplitude
 template <class T>
-inline T dBToAmp(const T& db){ return pow(10, db/20.); }
+inline T dBToAmp(const T& db){ return pow(10., db/20.); }
 
 /// Convert amplitude to decibels
 template <class T>
-inline T ampTodB(const T& amp){ return 20*log(amp); }
+inline T ampTodB(const T& amp){ return 20.*std::log10(amp); }
 
 /// Returns an equal-loudness amplitude for a given frequency, in Hz.
 
