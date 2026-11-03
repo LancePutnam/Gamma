@@ -301,7 +301,7 @@ template <class T> inline T & cond(T& v, const T& va, const T& vb, float pab, fl
 
 template <class RNG>
 float gaussian(RNG& rng = rnd::gen){
-	float x1, x2, w, y1, y2;
+	float x1, x2, w;
 
 	do{
 		x1 = uniS_float(rng);
@@ -310,8 +310,8 @@ float gaussian(RNG& rng = rnd::gen){
 	} while( w >= 1.f );
 
 	w = sqrt((-2.f * log(w)) / w);
-	y1 = x1 * w;
-	y2 = x2 * w;
+	auto y1 = x1 * w;
+	//auto y2 = x2 * w; // second independent value, unused
 	return y1;
 }
 
