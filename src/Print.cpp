@@ -7,7 +7,7 @@
 namespace gam{
 
 std::string plotString(
-	float value, unsigned width, bool spaces, bool sign, char point
+	float value, unsigned width, bool spaces, bool sign, char point, char bar
 ){
 	std::string res;
 
@@ -31,9 +31,9 @@ std::string plotString(
 	
 	for(int i=imin; i<imax; ++i){
 		if(i == pos)	res += pt;
-		else if(i==0)	res += "|";
-		else if((i>pos && i<0) || (i<pos && i>0))	res += "-";
-		else			res += " ";
+		else if(i==0)	res += '|';
+		else if((i>pos && i<0) || (i<pos && i>0))	res += bar;
+		else			res += ' ';
 	}
 	return res;
 }
@@ -73,8 +73,8 @@ void printHexArray(const float * a, unsigned len,unsigned valuesPerLine){
 	}
 }
 
-void printPlot(float value, unsigned width, bool spaces, bool sign, char point){
-	fprintf(stdout, "%s", plotString(value,width,spaces,sign,point).c_str());
+void printPlot(float value, unsigned width, bool spaces, bool sign, char point, char bar){
+	fprintf(stdout, "%s", plotString(value,width,spaces,sign,point,bar).c_str());
 }
 
 

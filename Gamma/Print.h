@@ -19,7 +19,7 @@ namespace gam{
 char intensityToASCII(float v);
 
 std::string plotString(
-	float value, unsigned width=50, bool spaces=true, bool sign=true, char point='o'
+	float value, unsigned width=50, bool spaces=true, bool sign=true, char point='o', char bar='-'
 );
 
 
@@ -43,7 +43,8 @@ void printHexArray(const float * table, unsigned len, unsigned valuesPerLine);
 /// \param[in]	spaces	Print extra filling spaces to the right
 /// \param[in]	sign	Whether plot is signed
 /// \param[in]	point	The print character for points
-void printPlot(float value, unsigned width=50, bool spaces=true, bool sign=true, char point='o');
+/// \param[in]	bar		The print character for bars
+void printPlot(float value, unsigned width=50, bool spaces=true, bool sign=true, char point='o', char bar='-');
 
 /// Print 1D signal on vertical plot
 class PrintSignal {
@@ -54,13 +55,14 @@ public:
 	PrintSignal& sign(bool v){ mSign=v; return *this; }
 	PrintSignal& newLine(bool v){ mNewLine=v; return *this; }
 	PrintSignal& point(char v){ mPoint=v; return *this; }
+	PrintSignal& bar(char v){ mBar=v; return *this; }
 
 	template <class OnSample>
 	PrintSignal& print(unsigned N, const OnSample& onSample){
 		for(unsigned i=0; i<N; ++i){
 			auto v = onSample(i);
 			printf("[%2d] % 6.4f ", i, float(v));
-			printPlot(v, mWidth, mSpaces, mSign, mPoint);
+			printPlot(v, mWidth, mSpaces, mSign, mPoint, mBar);
 			printf("\n");
 		}
 		if(mNewLine) printf("\n");
@@ -75,6 +77,7 @@ public:
 private:
 	unsigned mWidth=50;
 	char mPoint='o';
+	char mBar='-';
 	bool mSpaces=true;
 	bool mSign=true;
 	bool mNewLine=false;
